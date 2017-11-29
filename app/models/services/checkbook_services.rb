@@ -3,7 +3,8 @@ require 'nokogiri'
 module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
-    BASE_URL =  Settings.checkbook_services.base_url
+    # BASE_URL =  Settings.checkbook_services.base_url
+    BASE_URL= "https://staging.checkbookhealth.org"
     def initialize(census_employee)
       @census_employee= census_employee
       @url = BASE_URL+"/shop/dc/api/"
@@ -16,10 +17,9 @@ module CheckbookServices
       @result = HTTParty.post(@url,
               :body => construct_body.to_json,
               :headers => { 'Content-Type' => 'application/json' } )
-      @doc=Nokogiri::HTML(@result.parsed_response)
-      uri = @doc.xpath("//*[@id='inner_body']/div/article/div[2]/a/@href")
+      uri = @result.parsed_response["URL"]
       if uri.present?
-        return BASE_URL+uri.first.value
+        return uri
       else
         raise "Unable to generate url"
       end
@@ -31,19 +31,20 @@ module CheckbookServices
     private
     def construct_body
     {
-      "remote_access_key": Settings.checkbook_services.remote_access_key,
+      # "remote_access_key": Settings.checkbook_services.remote_access_key,
+      "remote_access_key": "cd535a89-49ea-4ea6-862f-e9558e8bef50",
       "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
       "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"),
       "employee_coverage_date": census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"), #census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
       "employer": {
         "state": 11,
-        "county": 111
+        "county": 001
       },
       "family": build_family,
       "contribution": employer_contributions,
       "reference_plan": census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
       "filterOption":"carrier",
-      "filterValue":"Carefirst"
+      "filterValue": carrier_name
       #"plans_available": census_employee.active_benefit_group.plan_year.benefit_groups.flat_map(&:elected_plans).map(&:hios_base_id)
     }
     end
@@ -57,6 +58,25 @@ module CheckbookServices
       end
       premium_benefit_contributions
     end
+
+   #  def carrier_name
+   #    carrier_profile_abbrevation = {}
+   #    census_employee.active_benefit_group.each do |benefit_group|
+   #      benefit_group.elected_plans.each do |elected_plan|
+   #        carrier_profile=elected_plan.carrier_profile_id.to_s
+   #          cp=CarrierProfile.find('carrier_profile')
+   #           carrier_profile_abbrevation=cp.abbrev
+   #     end 
+   #   end
+   #   carrier_profile_abbrevation
+   # end
+
+   def carrier_name
+    elected_plans= census_employee.active_benefit_group.plan_year.benefit_groups.flat_map(&:elected_plans) 
+    elected_plans.first.carrier_profile.legal_name.gsub(" ","") if elected_plans
+   end
+
+
 
     def build_family
       family = [{'dob': census_employee.dob.strftime("%Y-%d-%m") ,'relationship': 'self'}]

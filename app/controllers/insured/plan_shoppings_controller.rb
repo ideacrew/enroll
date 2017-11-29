@@ -7,6 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
+  include CheckbookServices
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -158,7 +159,7 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:max_aptc] = 0
       session[:elected_aptc] = 0
     end
-
+    @dc_checkbook_url = CheckbookServices::PlanComparision.new(@hbx_enrollment.employee_role.census_employee).generate_url
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
