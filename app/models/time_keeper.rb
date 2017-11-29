@@ -49,6 +49,7 @@ class TimeKeeper
         number_of_days.times do
           instance.set_date_of_record(instance.date_of_record + 1.day)
           instance.push_date_of_record
+          instance.push_date_change_event
         end
       end
     end
@@ -95,6 +96,10 @@ class TimeKeeper
     HbxEnrollment.advance_day(self.date_of_record)
     CensusEmployee.advance_day(self.date_of_record)
     ConsumerRole.advance_day(self.date_of_record)
+  end
+
+  def push_date_change_event
+    ModelEvents::PlanYear.date_change_event(self.date_of_record)
   end
 
   def self.with_cache
