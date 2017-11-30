@@ -46,6 +46,10 @@ module Observers
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
         end
 
+        if new_model_event.event_key == :plan_year_auto_published
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
+        end
+
         if new_model_event.event_key == :ineligible_renewal_application_submitted
           
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
