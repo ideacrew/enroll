@@ -17,14 +17,6 @@ module Subscribers
         xml = stringed_key_payload['body']
         eid = stringed_key_payload['employer_id']
 
-
-        Rails.logger.info "BEGIN **********===================**********"
-        Rails.logger.info "Enroll received nfp_statement_summary_success"
-        Rails.logger.info xml
-        Rails.logger.info stringed_key_payload
-        Rails.logger.info "Employer id: #{eid}"
-        Rails.logger.info "END **********===================**********"
-
         response = eval(xml)
 
         ep = Organization.where("hbx_id" => eid).first
@@ -38,7 +30,7 @@ module Subscribers
            :total_due => response[:total_due],
            :previous_balance => response[:previous_balance],
            :new_charges => response[:new_charges],
-           :current_statement_date => response[:current_statement_date]
+           :current_statement_date => response[:statement_date]
            )
 
            employer_profile_account.current_statement_activity.destroy_all
