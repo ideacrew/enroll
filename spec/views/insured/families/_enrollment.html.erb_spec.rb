@@ -24,18 +24,21 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('employer_sponsored')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
+      expect(rendered).to match /Carrier Contact Info/
     end
 
     it "when kind is employer_sponsored_cobra" do
       allow(hbx).to receive(:kind).and_return('employer_sponsored_cobra')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
+      expect(rendered).to match /Carrier Contact Info/
     end
 
     it "when kind is individual" do
       allow(hbx).to receive(:kind).and_return('individual')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
+      expect(rendered).to match /Carrier Contact Info/
     end
   end
 
