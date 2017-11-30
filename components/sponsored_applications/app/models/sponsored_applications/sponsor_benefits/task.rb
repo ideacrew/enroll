@@ -1,7 +1,7 @@
 module SponsoredApplications
   class SponsorBenefits::Task
 
-    attr_accesso :name, :parent
+    attr_accessor :name, :parent
 
     def initialize(name)
       @name = name

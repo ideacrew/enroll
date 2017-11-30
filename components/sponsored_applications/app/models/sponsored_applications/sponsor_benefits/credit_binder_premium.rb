@@ -2,7 +2,7 @@ module SponsoredApplications
   class SponsorBenefits::CreditBinderPremium < SponsorBenefits::Task
 
     def initialize
-      super('Sponsor paid initial premium payment-in-full')
+      super('Initial premium paid-in-full')
     end
 
     def call

@@ -2,8 +2,8 @@ module SponsoredApplications
   class SponsorBenefits::CompositeTask < SponsorBenefits::Task
 
     def initialize(name)
-      super(name)
       @subtasks = []
+      super(name)
     end
 
     def add_subtask(new_task)
