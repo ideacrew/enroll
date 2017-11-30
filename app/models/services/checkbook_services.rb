@@ -59,18 +59,6 @@ module CheckbookServices
       premium_benefit_contributions
     end
 
-   #  def carrier_name
-   #    carrier_profile_abbrevation = {}
-   #    census_employee.active_benefit_group.each do |benefit_group|
-   #      benefit_group.elected_plans.each do |elected_plan|
-   #        carrier_profile=elected_plan.carrier_profile_id.to_s
-   #          cp=CarrierProfile.find('carrier_profile')
-   #           carrier_profile_abbrevation=cp.abbrev
-   #     end 
-   #   end
-   #   carrier_profile_abbrevation
-   # end
-
    def carrier_name
     elected_plans= census_employee.active_benefit_group.plan_year.benefit_groups.flat_map(&:elected_plans) 
     elected_plans.first.carrier_profile.legal_name.gsub(" ","") if elected_plans
