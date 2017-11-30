@@ -10,7 +10,9 @@ class NotifyRenewalEmployeesDentalCarriersExitingShop < MongoidMigrationTask
         next if !enrollments.present?
         enrollments.each do |hbx_enrollment|
           if ["Delta Dental", "MetLife"].include?(hbx_enrollment.plan.carrier_profile.organization.legal_name)
-            ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_renewal_employees_dental_carriers_exiting_shop", { :hbx_enrollment => hbx_enrollment.hbx_id.to_s })
+            ce = hbx_enrollment.census_employee
+            ce.update_attributes!(employee_role_id: hbx_enrollment.employee_role.id.to_s ) if !ce.employee_role.present?
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_renewal_employees_dental_carriers_exiting_shop", { :hbx_enrollment => hbx_enrollment.hbx_id.to_s })
           end 
         end
       end

@@ -21,10 +21,11 @@ describe NotifyRenewalEmployeesDentalCarriersExitingShop do
     let!(:carrier_profile) {FactoryGirl.create(:carrier_profile, organization: organization)}
     let!(:plan) {FactoryGirl.create(:plan, :with_dental_coverage, carrier_profile: carrier_profile)}
     let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee_id: census_employee.id) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee) }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
+      census_employee.update_attributes(employee_role_id: employee_role.id)
     end
 
     it "should trigger notify_renewal_employees_dental_carriers_exiting_shop job in queue" do
