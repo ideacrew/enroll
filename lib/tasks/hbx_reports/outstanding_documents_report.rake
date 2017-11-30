@@ -50,16 +50,17 @@ namespace :reports do
     family_member.person.verification_types.each do |v_type|
       doc_due_date = family.document_due_date(family_member, v_type)
       due_date = doc_due_date.present? ? doc_due_date.to_date : nil
-      if v_type == 'DC Residency'
-        @residency_due_date = due_date
-      elsif v_type == 'Citizenship'
-        @citizenship_due_date = due_date
-      elsif v_type == 'Social Security Number'
-        @ssn_due_date = due_date
-      elsif v_type == 'American Indian Status'
-        @ami_due_date = due_date
-      elsif v_type == 'Immigration status'
-        @immigration_due_date = due_date
+      case v_type
+        when 'DC Residency'
+          @residency_due_date = due_date
+        when 'Citizenship'
+          @citizenship_due_date = due_date
+        when 'Social Security Number'
+          @ssn_due_date = due_date
+        when 'American Indian Status'
+          @ami_due_date = due_date
+        when 'Immigration status'
+          @immigration_due_date = due_date
       end
     end
   end
