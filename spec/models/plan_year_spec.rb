@@ -1024,7 +1024,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   end
 
                   context "greater than 100 employees " do
-                    let(:employee_count)    { 101 }
+                    let(:employee_count)    { Settings.aca.shop_market.small_market_active_employee_limit + 1 }
 
                     it "return 0" do
                       expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
