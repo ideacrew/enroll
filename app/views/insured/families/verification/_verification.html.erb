@@ -98,14 +98,6 @@
           </div>
         </div>
       </div>
-
-      <!-- ***** Verification History ***** -->
-        <div class="row">
-          <% if current_user.has_hbx_staff_role? %>
-              <%= render :partial => "insured/families/verification/verification_history", locals: { person: person, f_member: f_member} %>
-          <% end %>
-        </div>
-      <!-- === verification history ==== -->
     <% end %>
   </div>
 </div>
