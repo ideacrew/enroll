@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop, :dbclean => :after_each do
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,household: family.active_household, plan_id: plan.id, benefit_group_id: benefit_group.id)}
+  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,household: family.active_household, plan_id: plan.id, benefit_group_id: benefit_group.id, employee_role_id: employee_role.id)}
   let(:person) { FactoryGirl.create(:person)}
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employer_profile_id) { employer_profile.id }
