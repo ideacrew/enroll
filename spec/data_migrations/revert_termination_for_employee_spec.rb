@@ -39,10 +39,6 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
       expect(census_employee.aasm_state).to eq "employee_role_linked"
     end
 
-    it "should unset employment_terminated_on on census_employee" do
-      expect(census_employee.employment_terminated_on).to eq nil
-    end
-
     it "should unset coverage_terminated_on on census_employee" do
       expect(census_employee.employment_terminated_on).to eq nil
     end
@@ -87,10 +83,6 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
     end
 
     it "should unset employment_terminated_on on census_employee" do
-      expect(census_employee.employment_terminated_on).to eq nil
-    end
-
-    it "should unset coverage_terminated_on on census_employee" do
       expect(census_employee.employment_terminated_on).to eq nil
     end
 
