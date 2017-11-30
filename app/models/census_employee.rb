@@ -58,8 +58,8 @@ class CensusEmployee < CensusMember
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
   after_update :update_hbx_enrollment_effective_on_by_hired_on
+  after_save :assign_default_benefit_package
 
-  before_save :assign_default_benefit_package
   before_save :allow_nil_ssn_updates_dependents
 
   index({aasm_state: 1})
@@ -368,7 +368,7 @@ class CensusEmployee < CensusMember
     if employment_terminated_on < TimeKeeper.date_of_record
       if may_terminate_employee_role?
         terminate_employee_role!
-        perform_employer_plan_year_count
+        # perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
@@ -545,7 +545,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          puts "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
         end
       end
     end
@@ -556,7 +556,7 @@ class CensusEmployee < CensusMember
         begin
           census_employee.terminate_employment(census_employee.employment_terminated_on)
         rescue Exception => e
-          puts "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -567,7 +567,7 @@ class CensusEmployee < CensusMember
         begin
           employee.rebase_new_designee! if employee.may_rebase_new_designee?
         rescue Exception => e
-          puts "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -578,7 +578,7 @@ class CensusEmployee < CensusMember
         begin
           census_employee.terminate_employee_role!
         rescue Exception => e
-          puts "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -596,7 +596,7 @@ class CensusEmployee < CensusMember
             next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
             ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
           rescue Exception => e
-            puts "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" unless Rails.env.test?
+            (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
         end
       end
@@ -792,14 +792,29 @@ class CensusEmployee < CensusMember
     employee_role.present?
   end
 
-  # should disable cobra
-  # 1.waived
-  # 2.do not have an enrollment
-  # 3.census_employee is pending
-  def is_disabled_cobra_action?
-    employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
-      (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
-      employee_termination_pending?
+  ##
+  # This method is to verify whether roster employee is cobra eligible or not
+  # = Rules for employee cobra eligibility
+  #   * Employee must be in a terminated status
+  #   * Must be a covered employee on the date of their employment termination
+  def is_cobra_coverage_eligible?
+    return false unless self.employment_terminated?
+
+    Family.where(:"households.hbx_enrollments" => {
+      :$elemMatch => {
+        :benefit_group_assignment_id.in => benefit_group_assignments.pluck(:id),
+        :coverage_kind => 'health',
+        :kind => 'employer_sponsored',
+        :terminated_on => coverage_terminated_on || employment_terminated_on.end_of_month,
+        :aasm_state.in => ['coverage_terminated', 'coverage_termination_pending']}
+    }).present?
+  end
+
+  ##
+  # This is to validate 6 months rule for cobra eligiblity
+  def cobra_eligibility_expired?
+    last_date_of_coverage = (coverage_terminated_on || employment_terminated_on.end_of_month)
+    TimeKeeper.date_of_record > last_date_of_coverage + 6.months
   end
 
   def has_cobra_hbx_enrollment?
