@@ -6,7 +6,7 @@ module Exchanges
     end
 
     def can_cancel_application?(plan_year)
-      if (PlanYear::PUBLISHED + PlanYear::RENEWING + ["renewing_application_inelgible"]).include?(plan_year.aasm_state)
+      if (PlanYear::PUBLISHED + PlanYear::RENEWING + PlanYear::INITIAL_ENROLLING_STATE + ["renewing_application_ineligible", "application_ineligible", "draft"] - ["active"]).include?(plan_year.aasm_state)
         true
       else
         false

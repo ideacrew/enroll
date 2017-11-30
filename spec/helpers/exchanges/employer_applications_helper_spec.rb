@@ -20,7 +20,7 @@ RSpec.describe Exchanges::EmployerApplicationsHelper, :type => :helper do
   context "can_cancel_application" do
 
     let(:plan_year) {FactoryGirl.create(:plan_year)}
-    valid_states_for_canceling = PlanYear::PUBLISHED + PlanYear::RENEWING + ["renewing_application_inelgible"]
+    valid_states_for_canceling = PlanYear::PUBLISHED + PlanYear::RENEWING + PlanYear::INITIAL_ENROLLING_STATE + ["renewing_application_ineligible", "application_ineligible", "draft"] - ["active"]
 
     valid_states_for_canceling.each do |aasm_state|
 
