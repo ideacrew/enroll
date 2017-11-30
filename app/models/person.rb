@@ -8,6 +8,33 @@ class Person
   include UnsetableSparseFields
   include FullStrippedNames
 
+  # verification history tracking
+  include Mongoid::History::Trackable
+
+  track_history :on => [:first_name,
+                        :middle_name,
+                        :last_name,
+                        :full_name,
+                        :alternate_name,
+                        :encrypted_ssn,
+                        :dob,
+                        :gender,
+                        :is_incarcerated,
+                        :is_disabled,
+                        :ethnicity,
+                        :race,
+                        :tribal_id,
+                        :no_dc_address,
+                        :no_dc_address_reason,
+                        :is_active,
+                        :no_ssn],
+                :modifier_field => :modifier,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true     # track document destruction, default is false
+
+
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
 
@@ -820,17 +847,19 @@ class Person
   end
 
   def assign_citizen_status
+    new_status = nil
     if naturalized_citizen
-      self.citizen_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
+      new_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
     elsif us_citizen
-      self.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
+      new_status = ::ConsumerRole::US_CITIZEN_STATUS
     elsif eligible_immigration_status
-      self.citizen_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
+      new_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
     elsif (!eligible_immigration_status.nil?)
-      self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+      new_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
     end
+    self.consumer_role.lawful_presence_determination.assign_citizen_status(new_status) if new_status
   end
 
   def agent?

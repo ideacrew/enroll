@@ -66,7 +66,7 @@
                 </div>
               </div>
               <% if current_user.has_hbx_staff_role? %>
-                <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, v_type: v_type, f_member: f_member} %>
+                    <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, v_type: v_type, f_member: f_member} %>
               <% end %>
 
               <div class="row">
@@ -98,6 +98,14 @@
           </div>
         </div>
       </div>
+
+      <!-- ***** Verification History ***** -->
+        <div class="row">
+          <% if current_user.has_hbx_staff_role? %>
+              <%= render :partial => "insured/families/verification/verification_history", locals: { person: person, f_member: f_member} %>
+          <% end %>
+        </div>
+      <!-- === verification history ==== -->
     <% end %>
   </div>
 </div>

@@ -851,3 +851,14 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
 end
+
+describe "Verification Tracker" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  context "mongoid history" do
+    it "stores new record with changes" do
+      history_tracker_init =  HistoryTracker.count
+      person.update_attributes(:first_name => "updated")
+      expect(HistoryTracker.count).to be > history_tracker_init
+    end
+  end
+end
