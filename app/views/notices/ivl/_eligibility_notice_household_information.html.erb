@@ -19,7 +19,7 @@
             <% if ivl.is_medicaid_chip_eligible %>
               <p><%= ivl.first_name %> likely qualifies for Medicaid. Your monthly household income of <%= number_to_currency(ivl.tax_household.aptc_csr_monthly_household_income, precision: 2) %> is within the monthly income limit of <%= number_to_currency(ivl.magi_medicaid_monthly_income_limit, precision: 2) %> for this person.  Medicaid offers free, comprehensive health coverage.</p>
             <% end %>
-            <% if ivl.is_non_magi_medicaid_eligible %>
+            <% if ivl.is_non_magi_medicaid_eligible || ivl.no_medicaid_because_of_age %>
               <p><%= ivl.first_name %> may qualify for a special category of Medicaid because you told us on your application that at least one or more of the following apply to <%= ivl.first_name %>: over age 64; blind or has a disability; applying for long term care, community care, nursing care or other similar services; enrolled in Medicare; formerly in foster care in the District; or receives supplemental security income. Medicaid offers free, comprehensive health coverage.</p>
               <p>Medicaid offers some additional health services to people who qualify in this category. You may be required to submit additional documents.</p>
               <p>The DC Department of Human Services (DHS) will make a final decision on <%= ivl.first_name %>’s Medicaid eligibility. We have forwarded your application to them.</p>
