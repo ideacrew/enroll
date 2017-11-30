@@ -53,7 +53,7 @@ end
 
 #need to exlude this list from UQHP_FEL data set.
 @excluded_list = []
-CSV.foreach("11_29_fel_exclusion_list.csv",:headers =>true).each do |d|
+CSV.foreach("11_30_fel_exclusion_list.csv",:headers =>true).each do |d|
   @excluded_list << d["Subscriber"]
 end
 
