@@ -1,5 +1,9 @@
 module SponsoredApplications
-  class SponsorBenefits::HireBroker
-    include Mongoid::Document
+  class SponsorBenefits::HireBroker < SponsorBenefits::Task
+
+    def initialize
+      super('Enlist broker')
+    end
+
   end
 end
