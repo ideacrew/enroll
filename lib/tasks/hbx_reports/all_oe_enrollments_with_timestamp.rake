@@ -19,13 +19,14 @@ namespace :reports do
                         plan_type
                         plan_metal_level
                         submitted_at
+                        hbx_id
                         )
       processed_count = 0
       file_name = "#{Rails.root}/enrollments_with_timestamp.csv"
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         families.each do |family|
-          enrollments=family.active_household.hbx_enrollments.where({:"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES}).all
+          enrollments=family.active_household.hbx_enrollments.individual_market.where({:"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES}).all
           unless enrollments.nil?
             enrollments.each do |enrollment|
               csv << [
@@ -37,6 +38,7 @@ namespace :reports do
                   enrollment.plan.plan_type,
                   enrollment.plan.metal_level,
                   enrollment.submitted_at
+                  enrollment.hbx_id
                 ]
               processed_count += 1
               if processed_count % 500 ==0
