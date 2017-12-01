@@ -46,7 +46,6 @@ module ModelEvents
         end
 
         if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :force_publish)
-          binding.pry
           is_renewal_application_autosubmitted = true
         end
 
