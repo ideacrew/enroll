@@ -9,7 +9,7 @@ class FixHbxEnrollments < MongoidMigrationTask
 
   def get_enrollments(family)
     family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_selected"].include?(hbx_en.aasm_state)) &&
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive", "coverage_expired"].include?(hbx_en.aasm_state)) &&
           (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record)
     end
   end
