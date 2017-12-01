@@ -58,6 +58,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
 
   describe "append_data" do
     before do
+      allow(plan_year).to receive_message_chain("effective_date.yday").and_return(2)
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = ShopEmployerNotices::InitialEmployerIneligibilityNotice.new(employer_profile, valid_parmas)
     end
