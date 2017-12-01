@@ -26,6 +26,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :data => data,
+      enrollments: [hbx_enrollment],
       :person => person
   }}
 
@@ -69,26 +70,6 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
       expect(@final_eligibility_notice.notice.mpi_indicator).to eq application_event.mpi_indicator
     end
   end
-
-  describe "#pick_enrollments" do
-    before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
-    end
-
-    it "returns all auto_renewing enrollments" do
-      @final_eligibility_notice.build
-      expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
-    end
-
-    it "returns nil when there are no auto_renewing enrollments" do
-      hbx_enrollment.update_attributes!(:aasm_state => "coverage_expired")
-      @final_eligibility_notice.build
-      expect(@final_eligibility_notice.notice.enrollments.size).to eq 0
-    end
-  end
-
 
   describe "#append_open_enrollment_data" do
     before do
