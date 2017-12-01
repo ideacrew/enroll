@@ -726,8 +726,9 @@ class Family
 
   def application_applicable_year
     current_year = TimeKeeper.date_of_record.year
+    enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
     current_hbx = HbxProfile.current_hbx
-    if current_hbx && current_hbx.under_open_enrollment?
+    if current_hbx && current_hbx.under_open_enrollment? && current_year == enrollment_start_on_year.year
       current_year + 1
     else
       current_year

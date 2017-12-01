@@ -611,8 +611,7 @@ private
   end
 
   def set_assistance_year
-    current_year = TimeKeeper.date_of_record.year
-    assistance_year = HbxProfile.try(:current_hbx).try(:under_open_enrollment?) ? current_year + 1 : current_year
+    assistance_year = self.family.application_applicable_year
     update_attribute(:assistance_year, assistance_year)
   end
 
