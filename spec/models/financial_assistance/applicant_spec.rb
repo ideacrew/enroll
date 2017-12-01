@@ -236,6 +236,44 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
         end
       end
     end
+
+    context "validation of an Applicant in submission context" do
+      driver_qns = FinancialAssistance::Applicant::DRIVER_QUESTION_ATTRIBUTES
+
+      before(:each) do
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_claimed_as_tax_dependent).and_return(false)
+        driver_qns.each { |attribute|  applicant1.send("#{attribute}=", false) }
+      end
+
+      driver_qns.each do |attribute|
+        instance_check_method = attribute.to_s.gsub('has_', '') + "_exists?"
+
+        it "should NOT validate applicant when #{attribute} is nil" do
+          applicant1.send("#{attribute}=", nil)
+          expect(applicant1.applicant_validation_complete?).to eq false
+        end
+
+        it "should validate applicant when some Driver Question attribute is FALSE and there is No Instance of that type" do
+          applicant1.send("#{attribute}=", false)
+          allow(applicant1).to receive(instance_check_method).and_return false
+          expect(applicant1.applicant_validation_complete?).to eq true
+        end
+
+        it "should NOT validate applicant when some Driver Question attribute is TRUE but there is No Instance of that type" do
+          applicant1.send("#{attribute}=", true)
+          allow(applicant1).to receive(instance_check_method).and_return false
+          expect(applicant1.applicant_validation_complete?).to eq false
+        end
+
+        it "should NOT validate applicant when some Driver Question attribute is FALSE but there is an Instance of that type" do
+          applicant1.send("#{attribute}=", false)
+          allow(applicant1).to receive(instance_check_method).and_return true
+          expect(applicant1.applicant_validation_complete?).to eq false
+        end
+      end
+    end
+
   end
+
 end
 
