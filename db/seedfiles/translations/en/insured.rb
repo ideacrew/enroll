@@ -108,6 +108,7 @@ INSURED_TRANSLATIONS = {
   "en.edit" => "Edit",
   "en.insured.aptc_or_csr" => "APTC/CSR",
   "en.members" => "Members",
+  "en.plan_contact_info" => "Plan Contact Info",
   "en.insured.switch_to_all_families" => "Switch to All Families",
   "en.insured.families_selected" => "families selected",
   "en.total" => "total",
