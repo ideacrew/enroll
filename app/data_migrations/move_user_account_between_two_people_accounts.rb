@@ -19,8 +19,8 @@ class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
         end
         person2.user=person1.user
         person1.unset(:user_id)
-        person2.save
         person1.save
+        person2.save
         puts "move the user account from  #{hbx_id_1} to #{hbx_id_2}" unless Rails.env.test?
       end
     end
