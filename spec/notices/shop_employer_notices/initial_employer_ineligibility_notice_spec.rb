@@ -48,6 +48,11 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
       plan_year.advance_date!
       @employer_notice = ShopEmployerNotices::InitialEmployerIneligibilityNotice.new(employer_profile, valid_parmas)
     end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     it "should build notice with all necessary info" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
@@ -63,6 +68,10 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
       plan_year.advance_date!
       @employer_notice = ShopEmployerNotices::InitialEmployerIneligibilityNotice.new(employer_profile, valid_parmas)
       @employer_notice.append_data
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     it "should return plan year start on" do

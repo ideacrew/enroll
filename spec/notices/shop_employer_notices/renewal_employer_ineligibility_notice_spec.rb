@@ -65,6 +65,10 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerIneligibilityNotice do
       @employer_notice.append_data
     end
 
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     it "should return renewal plan year start on" do
       expect(@employer_notice.notice.plan_year.start_on).to eq renewal_plan_year.start_on
     end
