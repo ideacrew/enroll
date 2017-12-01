@@ -2,12 +2,13 @@ require 'rails_helper'
 
 describe 'ModelEvents::PlanYearAutoPublishedNotification' do
 
-  let(:model_event)  { "plan_year_auto_published" }
+  let(:model_event)  { "renewal_application_autosubmitted" }
   let(:notice_event) { "plan_year_auto_published" }
-  let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+  let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month } 
 
   let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
-  let(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft') }
+  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft', benefit_groups: [benefit_group]) }
+  let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
   describe "ModelEvent" do
     context "when renewal application created" do
@@ -15,10 +16,8 @@ describe 'ModelEvents::PlanYearAutoPublishedNotification' do
       it "should trigger model event" do
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
-            binding.pry
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            binding.pry
-            expect(model_event).to have_attributes(:event_key => :plan_year_auto_published, :klass_instance => model_instance, :options => {})
+            expect(model_event).to have_attributes(:event_key => :renewal_application_autosubmitted, :klass_instance => model_instance, :options => {})
           end
         end
 
@@ -32,7 +31,7 @@ describe 'ModelEvents::PlanYearAutoPublishedNotification' do
     context "when renewal application created" do
       subject { Observers::NoticeObserver.new }
 
-      let(:model_event) { ModelEvents::ModelEvent.new(:plan_year_auto_published, model_instance, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:renewal_application_autosubmitted, model_instance, {}) }
 
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
@@ -83,13 +82,12 @@ describe 'ModelEvents::PlanYearAutoPublishedNotification' do
       before do
         allow(subject).to receive(:resource).and_return(employer)
         allow(subject).to receive(:payload).and_return(payload)
-        model_instance.renew_plan_year
+        model_instance.publish
         model_instance.save
       end
 
       it "should build the data elements for the notice" do
         merge_model = subject.construct_notice_object
-
         expect(merge_model).to be_a(recipient.constantize)
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
         expect(merge_model.employer_name).to eq employer.legal_name
@@ -97,7 +95,6 @@ describe 'ModelEvents::PlanYearAutoPublishedNotification' do
         expect(merge_model.plan_year.renewal_py_submit_soft_due_date).to eq soft_dead_line.strftime('%m/%d/%Y')
         expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
         expect(merge_model.broker_present?).to be_falsey
-        expect(merge_model.plan_year.current_py_start_on).to eq model_instance.start_on.prev_year
         expect(merge_model.plan_year.renewal_py_start_on).to eq model_instance.start_on
       end 
     end

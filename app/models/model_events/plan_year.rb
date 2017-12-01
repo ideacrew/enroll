@@ -11,8 +11,7 @@ module ModelEvents
       :open_enrollment_began,
       :open_enrollment_ended,
       :application_denied,
-      :renewal_application_denied,
-      :plan_year_auto_published
+      :renewal_application_denied
     ]
 
     DATA_CHANGE_EVENTS = [
@@ -23,7 +22,6 @@ module ModelEvents
       return if self.is_conversion
 
       if aasm_state_changed?
-        binding.pry
 
         if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
           is_renewal_application_created = true
@@ -63,11 +61,7 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
-        end
-
-        if is_transition_matching?(to: [:renewing_enrolling, :renewing_published], from: :renewing_draft, event: :force_publish)
-          is_plan_year_auto_published = true
-        end  
+        end 
       
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
         EMPLOYER_APPLICATION_EVENTS.each do |event|
