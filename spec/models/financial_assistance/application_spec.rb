@@ -179,7 +179,7 @@ RSpec.describe FinancialAssistance::Application, type: :model do
     it "updates assistance year" do
       allow(application.family).to receive(:application_applicable_year).and_return(assistance_year.year)
       application.send(:set_assistance_year)
-      expect(application.assistance_year). to eq(assistance_year.year)
+      expect(application.assistance_year).to eq(assistance_year.year)
     end
   end
 
