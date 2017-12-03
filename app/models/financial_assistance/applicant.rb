@@ -46,6 +46,9 @@ class FinancialAssistance::Applicant
   INCOME_VALIDATION_STATES = %w(na valid outstanding pending)
   MEC_VALIDATION_STATES = %w(na valid outstanding pending)
 
+  DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
+                                :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
+
   field :assisted_income_validation, type: String, default: "pending"
   validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
   field :assisted_mec_validation, type: String, default: "pending"
@@ -158,6 +161,7 @@ class FinancialAssistance::Applicant
   validate :presence_of_attr_step_1, on: :step_1
 
   validate :presence_of_attr_other_qns, on: :other_qns
+  validate :driver_question_responses, on: :submission
   validates :validate_applicant_information, presence: true, on: :submission
 
   validate :strictly_boolean
@@ -569,10 +573,56 @@ class FinancialAssistance::Applicant
     return false
   end
 
+  def job_income_exists?
+    incomes.jobs.present?
+  end
+
+  def self_employment_income_exists?
+    incomes.self_employment.present?
+  end
+
+  def other_income_exists?
+    incomes.other.present?
+  end
+
+  def deductions_exists?
+    deductions.present?
+  end
+
+  def enrolled_health_coverage_exists?
+    benefits.eligible.present?
+  end
+
+  def eligible_health_coverage_exists?
+    benefits.enrolled.present?
+  end
+
   private
 
   def validate_applicant_information
     validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+  end
+
+  def driver_question_responses
+    DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+      instance_type = attribute.to_s.gsub('has_', '')
+      instance_check_method = instance_type + "_exists?"
+
+      # Add error to attribute that has a nil value.
+      errors.add(attribute, "#{attribute.to_s.titleize} can not be a nil") if send(attribute).nil?
+
+      # Add base error when driver question has a 'Yes' value and there is No existing instance for that type.
+      if send(attribute) && !public_send(instance_check_method)
+        errors.add(:base, "Based on your response, you should have at least one #{instance_type.titleize}.
+                           Please correct your response to '#{attribute}', or add #{instance_type.titleize}.")
+      end
+
+      # Add base error when driver question has a 'No' value and there is an existing instance for that type.
+      if !send(attribute) && public_send(instance_check_method)
+        errors.add(:base, "Based on your response, you should have no instance of #{instance_type.titleize}.
+                           Please correct your response to '#{attribute}', or delete the existing #{instance_type.titleize}.")
+      end
+    end
   end
 
   def presence_of_attr_step_1
