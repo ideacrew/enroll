@@ -861,4 +861,19 @@ describe "Verification Tracker" do
       expect(HistoryTracker.count).to be > history_tracker_init
     end
   end
+
+  context "mongoid history extension" do
+    it "stores action history element" do
+      history_action_tracker_init =  person.consumer_role.history_action_trackers.count
+      person.update_attributes(:first_name => "first_name updated", :last_name => "last_name updated")
+      person.reload
+      expect(person.consumer_role.history_action_trackers.count).to be > history_action_tracker_init
+    end
+
+    it "associates history element with mongoid history record" do
+      person.update_attributes(:first_name => "first_name updated", :last_name => "last_name updated")
+      person.reload
+      expect(person.consumer_role.history_action_trackers.last.tracking_record).to be_a(HistoryTracker)
+    end
+  end
 end

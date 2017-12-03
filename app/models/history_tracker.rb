@@ -71,8 +71,8 @@ class HistoryTracker
     if tracking_node("Family").exists?
       if last_chain_element == "hbx_enrollments"
         family = Family.where("households.hbx_enrollments._id" => association_chain.last["id"]).first
-        if family
-          enrollment = family.active_household.hbx_enrollments.find(association_chain.last["id"])
+        if family && family.active_household.hbx_enrollments.any?
+          enrollment = family.active_household.hbx_enrollments.find_by(id:association_chain.last["id"])
           enrollment.hbx_enrollment_members.each do |enrollment_member|
             person = enrollment_member.family_member.person
             person.consumer_role.history_action_trackers << create_history_element if person.consumer_role
