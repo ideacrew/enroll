@@ -172,6 +172,17 @@ RSpec.describe FinancialAssistance::Application, type: :model do
     end
   end
 
+  describe "#set_assistance_year" do
+    let(:assistance_year) { TimeKeeper.date_of_record + 1.year}
+    let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:application) { FactoryGirl.create(:application, family: family) }
+    it "updates assistance year" do
+      allow(application.family).to receive(:application_applicable_year).and_return(assistance_year.year)
+      application.send(:set_assistance_year)
+      expect(application.assistance_year).to eq(assistance_year.year)
+    end
+  end
+
   describe "trigger eligibility notice" do
     let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
     let!(:applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
