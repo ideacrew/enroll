@@ -21,6 +21,11 @@ module Subscribers
         return if person.nil? || person.consumer_role.nil?
         consumer_role = person.consumer_role
         consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.add_type_history_element(verification_type: "DC Residency",
+                                               action: "Local Hub response",
+                                               modifier: "external Hub",
+                                               update_reason: "Hub response",
+                                               details: payload.stringify_keys)
 
         if "503" == return_status.to_s
           consumer_role.deny_residency!
