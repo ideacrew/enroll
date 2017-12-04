@@ -703,11 +703,11 @@ class BenefitGroup
     self.plan_option_kind = "metal_level"
     self.default = true
 
-    # 2017 contribution schedule
+    # 2018 contribution schedule
     self.contribution_pct_as_int   = 75
-    self.employee_max_amt = 480.29 if employee_max_amt == 0
-    self.first_dependent_max_amt = 1030.88 if first_dependent_max_amt == 0
-    self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
+    self.employee_max_amt = 496.71 if employee_max_amt == 0
+    self.first_dependent_max_amt = 1063.83 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1130.09 if over_one_dependents_max_amt == 0
   end
 
   def update_dependent_composite_tiers
