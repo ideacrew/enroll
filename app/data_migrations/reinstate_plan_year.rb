@@ -56,7 +56,7 @@ class ReinstatePlanYear < MongoidMigrationTask
       if enrollment.coverage_terminated? && enrollment.terminated_on == @active_py_end_on
         py_enrollment_state = enrollment.aasm_state
         enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
-        puts "enrollment reinstated #{enrollment.hbx_id}." unless Rails.env.test?
+        puts "enrollment updated #{enrollment.hbx_id}." unless Rails.env.test?
         enrollment.workflow_state_transitions << WorkflowStateTransition.new(from_state: py_enrollment_state,to_state: 'coverage_enrolled')
         enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
         enrollment.expire_coverage! if enrollment.may_expire_coverage?
