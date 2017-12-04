@@ -356,7 +356,7 @@ class BenefitGroup
   end
 
   def monthly_employer_contribution_amount(plan = reference_plan)
-    return 0 if targeted_census_employees.count > 100
+    return 0 if targeted_census_employees.count > 199
 
     if self.sole_source? && self.composite_tier_contributions.empty?
       build_composite_tier_contributions
@@ -374,7 +374,7 @@ class BenefitGroup
 
   def monthly_employee_cost(coverage_kind=nil)
     rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
-    return 0 if targeted_census_employees.count > 100
+    return 0 if targeted_census_employees.count > 199
     targeted_census_employees.active.collect do |ce|
       pcd = if self.sole_source? && (!rp.dental?)
         CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
