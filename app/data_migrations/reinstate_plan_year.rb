@@ -83,7 +83,6 @@ class ReinstatePlanYear < MongoidMigrationTask
         if plan_year.expired?
           assignment.expire_coverage! if assignment.may_expire_coverage?
           assignment.update_attributes(end_on: plan_year.end_on,is_active: false)
-          puts "enrollment reinstated #{enrollment.hbx_id}." unless Rails.env.test?
           puts "benefit group assignment updated" unless Rails.env.test?
         else
           assignment.select_coverage! if assignment.may_select_coverage?
