@@ -2,8 +2,7 @@ require 'rails_helper'
 include Insured::FamiliesHelper
 
 RSpec.describe "insured/group_selection/_enrollment.html.erb" do
-
-  context 'Employer sponsored coverage' do 
+  context 'Employer sponsored coverage' do
     let(:employee_role) { FactoryGirl.build(:employee_role) }
     let(:person) { FactoryGirl.build(:person) }
     let(:plan) { FactoryGirl.build(:plan) }
@@ -15,6 +14,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:is_shop?).and_return true
+      allow(hbx_enrollment).to receive(:benefit_group).and_return benefit_group
       assign :change_plan, 'change_plan'
       assign :employee_role, employee_role
       assign :person, person
@@ -50,12 +50,12 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
       expect(rendered).to include dollar_amount
     end
 
-    it "should have terminate confirmation modal" do 
-      expect(rendered).to have_selector('h4', text: 'Select Terminate Reason') 
+    it "should have terminate confirmation modal" do
+      expect(rendered).to have_selector('h4', text: 'Select Terminate Reason')
     end
   end
 
-  context 'Enrollment termination' do 
+  context 'Enrollment termination' do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: kind)}
     let(:person) { FactoryGirl.build(:person) }
@@ -73,17 +73,17 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
     context 'with Individual coverage' do
       let(:kind) { 'individual' }
 
-      it "should not have terminate confirmation modal" do 
-        expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason') 
+      it "should not have terminate confirmation modal" do
+        expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
       end
     end
 
     context 'with Coverall coverage' do
       let(:kind) { 'coverall' }
 
-      it "should not have terminate confirmation modal" do 
-        expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason') 
-      end 
+      it "should not have terminate confirmation modal" do
+        expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
+      end
     end
   end
 end
