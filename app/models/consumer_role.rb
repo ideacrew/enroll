@@ -106,6 +106,7 @@ class ConsumerRole
   embeds_many :vlp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
+  embeds_many :verification_type_history_elements
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
@@ -619,6 +620,10 @@ class ConsumerRole
     person.no_dc_address &&
     no_dc_address == "false" &&
     family.person_has_an_active_enrollment?(person)
+  end
+
+  def add_type_history_element(params)
+    verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
   end
 
   def can_start_residency_verification? # initial trigger check for coverage purchase

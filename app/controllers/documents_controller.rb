@@ -1,7 +1,8 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date]
+  after_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :extend_due_date, :destroy]
   respond_to :html, :js
 
   def download
@@ -143,6 +144,20 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def add_type_history_element
+    actor = current_user ? current_user.email : "external source or script"
+    verification_type = params[:verification_type]
+    action = params[:admin_action] || params[:action]
+    action = "Delete #{params[:doc_title]}" if action == "destroy"
+    reason = params[:verification_reason]
+    if @person
+      @person.consumer_role.add_type_history_element(verification_type: verification_type,
+                                                     action: action,
+                                                     modifier: actor,
+                                                     update_reason: reason)
+    end
+  end
+
   private
   def updateable?
     authorize Family, :updateable?
@@ -167,7 +182,7 @@ class DocumentsController < ApplicationController
   end
 
   def set_person
-    @person = Person.find(params[:person_id])
+    @person = Person.find(params[:person_id]) if params[:person_id]
   end
 
   def verification_attr
