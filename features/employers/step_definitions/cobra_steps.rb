@@ -339,8 +339,9 @@ Then(/^.+ should not see individual on enrollment title/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
