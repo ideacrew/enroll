@@ -529,7 +529,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP10023',
+    hbx_id: 'SHOP_D041',
     title: 'Employee Terminating coverage',
     description: 'Employee Terminating coverage after QLE',
     resource_name: 'employer',
@@ -537,9 +537,9 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Notice to employer when employee terminates coverage',
-        notice_template: 'notices/employee_terminating_coverage',
-        notice_builder: 'EmployeeTerminatingCoverage',
-        mpi_indicator: 'MPI_SHOP10023',
+        notice_template: 'notices/shop_employer_notices/employee_terminating_coverage',
+        notice_builder: 'ShopEmployerNotices::EmployeeTerminatingCoverage',
+        mpi_indicator: 'SHOP_D041',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -717,8 +717,6 @@ shop_notice_triggers = [
       }
     ]
   },
-=======
->>>>>>> Refs #15212 Employee Terminating coverage- MEDIUM Priority(NOTICE ID 10023)
 ]
 
 ivl_notice_triggers = [
