@@ -637,7 +637,7 @@ context "Verification process and notices" do
         end
         it "updates residency status" do
           consumer.revert!
-          expect(consumer.is_state_resident?).to eq nil
+          expect(consumer.is_state_resident?).to eq true
         end
       end
     end

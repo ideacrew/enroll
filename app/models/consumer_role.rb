@@ -469,7 +469,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :verification_outstanding
     end
 
-    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :mark_residency_pending, :notify_of_eligibility_change, :record_transition] do
+    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
       transitions from: :dhs_pending, to: :unverified
@@ -631,7 +631,10 @@ class ConsumerRole
   end
 
   def invoke_residency_verification!
-    start_residency_verification_process if can_start_residency_verification?
+    if can_start_residency_verification?
+      mark_residency_pending
+      start_residency_verification_process
+    end
   end
 
   #class methods
@@ -648,18 +651,19 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false,
                       :local_residency_validation => "outstanding")
   end
 
   def mark_residency_pending(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = nil
+    update_attributes(:residency_determined_at => DateTime.now,
+                      :is_state_resident => nil,
+                      :local_residency_validation => nil)
   end
 
   def mark_residency_authorized(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true,
                       :local_residency_validation => "valid")
   end
@@ -854,6 +858,10 @@ class ConsumerRole
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
     (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  end
+
+  def processing_residency_24h?
+    residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
   end
 
   def no_changes_24_h?
