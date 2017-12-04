@@ -2,6 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ChangeBrokerNpn < MongoidMigrationTask
   def migrate
+    trigger_single_table_inheritance_auto_load_of_child = VlpDocument
     person_hbx_id = ENV['person_hbx_id']
     npn = ENV['new_npn']
     person = Person.where(hbx_id:person_hbx_id).first
