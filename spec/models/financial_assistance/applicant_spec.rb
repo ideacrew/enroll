@@ -242,6 +242,10 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
 
       before(:each) do
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_claimed_as_tax_dependent).and_return(false)
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_pregnant).and_return(false)
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_self_attested_blind).and_return(false)
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:has_daily_living_help).and_return(false)
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:need_help_paying_bills).and_return(false)
         driver_qns.each { |attribute|  applicant1.send("#{attribute}=", false) }
       end
 
