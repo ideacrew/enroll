@@ -231,6 +231,7 @@ class QhpBuilder
   end
 
   def parse_metal_level
+    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
     return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end
