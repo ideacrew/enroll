@@ -590,11 +590,11 @@ class FinancialAssistance::Applicant
   end
 
   def enrolled_health_coverage_exists?
-    benefits.eligible.present?
+    benefits.enrolled.present?
   end
 
   def eligible_health_coverage_exists?
-    benefits.enrolled.present?
+    benefits.eligible.present?
   end
 
   private
