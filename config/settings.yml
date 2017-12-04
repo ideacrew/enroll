@@ -39,13 +39,8 @@ aca:
       days: 0
 
     open_enrollment:
-      benefit_year_2016:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
-
-      benefit_year_2017:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
+      start_on: <%= Date.new(2017,11,1) %>
+      end_on: <%= Date.new(2018,01,31) %>
 
   shop_market:
     small_market_employee_count_maximum: 50
@@ -108,6 +103,9 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    transmit_employers_immediately: false
+    transmit_scheduled_employers: true
+    employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
 checkbook_services: 

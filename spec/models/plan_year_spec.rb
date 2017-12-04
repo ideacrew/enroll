@@ -472,9 +472,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
-  
+
   context 'should return correct benefit group assignments for an employee' do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }  
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
     let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
     let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
@@ -805,7 +805,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the employer doesn't request eligibility review" do
             context "and more than 90 days have elapsed since the ineligible application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
@@ -852,7 +852,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             end
 
             context "and more than 30 days have elapsed since application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 31.days)
               end
@@ -862,7 +862,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before do
                   TimeKeeper.set_date_of_record(submit_date + Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.days)
                 end
@@ -901,7 +901,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "employees should be able to browse, but not purchase plans"
 
           context "and open enrollment begins" do
-            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
             before do
               # $start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on
               TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
@@ -968,7 +968,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 context "and three of the six employees have enrolled" do
-                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                   before do
                     census_employees[0..2].each do |ee|
                       if ee.active_benefit_group_assignment.may_select_coverage?
@@ -1116,7 +1116,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and today is the day following close of open enrollment" do
-          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
           before do
             TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
@@ -2200,7 +2200,7 @@ describe PlanYear, "which has the concept of export eligibility" do
 
       let!(:owner) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
       let!(:non_owner) { FactoryGirl.create_list(:census_employee, 2, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-        
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(valid_open_enrollment_start_on)
         plan_year.publish!
@@ -2223,7 +2223,7 @@ describe PlanYear, "which has the concept of export eligibility" do
         end
 
         it "should transition application to ineligible state" do
-          expect(plan_year.application_ineligible?).to be_truthy 
+          expect(plan_year.application_ineligible?).to be_truthy
         end
 
         it "should transition employer to applicant state" do
@@ -2324,13 +2324,15 @@ describe PlanYear, "plan year schedule changes" do
     let(:open_enrollment_start_on)  { plan_year_start_on.prev_month }
     let(:open_enrollment_end_on)    { open_enrollment_start_on + 12.days }
 
+    let(:renewal_py_state) { 'renewing_draft' }
+
     let!(:renewing_plan_year)                     { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: open_enrollment_start_on,
                                                       open_enrollment_end_on: open_enrollment_end_on,
                                                       employer_profile: employer_profile,
-                                                      aasm_state: 'renewing_draft'
+                                                      aasm_state: renewal_py_state
                                                     )
 
                                                     py.benefit_groups = [FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)]
@@ -2383,9 +2385,78 @@ describe PlanYear, "plan year schedule changes" do
         expect(renewing_plan_year.valid?).to be_truthy
       end
     end
+
+    context 'when plan year reverted' do
+
+      context 'employee has enrollment under renewing plan year'  do
+
+        let(:renewal_py_state) { 'renewing_enrolling' }
+
+        let(:census_employee){
+          employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups.first
+          employee
+        }
+
+        let(:family) {
+          person = FactoryGirl.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
+          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)
+          census_employee.update_attributes({employee_role: employee_role})
+          Family.find_or_build_from_employee_role(employee_role)
+        }
+
+        let!(:plan) {
+          FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewing_plan_year.start_on.year, hios_id: "11111111122301-01", csr_variant_id: "01")
+        }
+
+        let(:person) { family.family_members.first.person }
+        let(:passive_renewal) { FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: renewing_plan_year.start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "employer_sponsored",
+                       benefit_group_id: renewing_plan_year.benefit_groups.first.id,
+                       employee_role_id: person.active_employee_roles.first.id,
+                       benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+                       plan_id: plan.id,
+                       aasm_state: 'auto_renewing'
+                       ) }
+
+        it 'should cancel enrollments under reverted plan year' do
+          expect(passive_renewal.auto_renewing?).to be_truthy
+          renewing_plan_year.revert_renewal!
+          passive_renewal.reload
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+        end
+      end
+    end
+  end
+
+  context '.carriers_offered' do
+
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
+    let(:plan_year) { employer_profile.published_plan_year }
+    let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
+    let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
+    let!(:silver_ref_plan)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+    let!(:gold_ref_plan)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+    let(:silver_bg) { FactoryGirl.build(:benefit_group, title: "silver offerings", plan_year: plan_year, reference_plan_id: silver_ref_plan.id, plan_option_kind: 'single_carrier')}
+    let(:gold_bg) { FactoryGirl.build(:benefit_group, title: "gold offerings", plan_year: plan_year, reference_plan_id: gold_ref_plan.id, plan_option_kind: 'single_carrier')}
+
+    before do
+      plan_year.benefit_groups = [silver_bg, gold_bg]
+      plan_year.save(:validate => false)
+    end
+
+    context '.carriers_offered' do
+
+      it "should return carriers offered on multiple benefit groups" do
+        expect(plan_year.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+      end
+    end
   end
 end
-
 
 describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :after_all do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
@@ -2396,7 +2467,7 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
     employee
   }
-  
+
   context 'when plan year begin date changed' do
     let(:modified_start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:modified_end_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }

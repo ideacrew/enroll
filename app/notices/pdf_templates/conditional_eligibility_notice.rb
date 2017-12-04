@@ -20,6 +20,7 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual]
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
+    attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
     attribute :indian_inconsistency, Array[PdfTemplates::Individual]
@@ -31,6 +32,7 @@ module PdfTemplates
     attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
+    attribute :current_year, String
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
@@ -92,12 +94,12 @@ module PdfTemplates
       enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
     end
 
-    def renewal_health_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+    def renewal_health_enrollments
+      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
-    def renewal_dental_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+    def renewal_dental_enrollments
+      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def magi_medicaid_eligible
@@ -156,15 +158,15 @@ module PdfTemplates
     end
 
     def eligibility_notice_display_medicaid(ivl)
-      (ivl.is_medicaid_chip_eligible) || (ivl.is_non_magi_medicaid_eligible) || ((ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && !(ivl.is_totally_ineligible))
+      ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || ivl.no_medicaid_because_of_immigration || (!(ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && (ivl.is_ia_eligible || ivl.is_without_assistance))
     end
 
     def eligibility_notice_display_aptc(ivl)
-      (ivl.tax_household.max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.has_access_to_affordable_coverage
+      (ivl.tax_household.max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.is_ia_eligible
     end
 
     def eligibiltiy_notice_display_csr(ivl)
-      (ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) || (ivl.indian_conflict == true && (ivl.magi_as_percentage_of_fpl <= 300 || ivl.magi_as_percentage_of_fpl > 300)) || ivl.no_csr_because_of_income || ivl.is_medicaid_chip_eligible || (ivl.tax_household.csr_percent_as_integer.nil? && ivl.has_access_to_affordable_coverage)
+      (!ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) || (ivl.indian_conflict && (ivl.magi_as_percentage_of_fpl <= 300 || ivl.magi_as_percentage_of_fpl > 300)) || ivl.no_csr_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_csr_because_of_tax || ivl.no_csr_because_of_mec
     end
   end
 end

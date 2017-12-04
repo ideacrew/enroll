@@ -127,7 +127,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP3B',
+    hbx_id: 'DRG007',
     title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
@@ -137,7 +137,7 @@ shop_notice_triggers = [
         name: 'PlanYear Renewal Auto-Published',
         notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_SHOPRB',
+        mpi_indicator: 'MPI_DRG007',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -298,7 +298,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP15',
+    hbx_id: 'SHOPD015',
     title: 'Notice of Low Enrollment - Action Needed',
     description: 'Notifies all the employers who doesnt meet minimum participation requirement',
     resource_name: 'employer',
@@ -308,7 +308,7 @@ shop_notice_triggers = [
         name: 'Low Enrollment Notice',
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_SHOP15',
+        mpi_indicator: 'MPI_D015',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -875,16 +875,60 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_PRE_2',
-    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
+    title: 'Update your information at DC Health Link by October 15',
+    description: 'Notice to be sent out to individuals with AQHP(Assisted)',
     resource_name: 'consumer_role',
     event_name: 'projected_eligibility_notice_2',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/projected_eligibility_notice',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'IVL_PRE',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVL_FEL_AQHP',
+    title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
+    description: 'Final Eligibility Notice will be sent to all AQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_aqhp',
+    notice_triggers: [
+      {
+        name: 'Final Eligibility Notice for AQHP individuals',
+        notice_template: 'notices/ivl/final_eligibility_notice_aqhp',
+        notice_builder: 'IvlNotices::FinalEligibilityNoticeAqhp',
+        mpi_indicator: 'IVL_FEL',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVL_FEL_UQHP',
+    title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
+    description: 'Final Eligibility Notice will be sent to all UQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_uqhp',
+    notice_triggers: [
+      {
+        name: 'Final Eligibility Notice for UQHP individuals',
+        notice_template: 'notices/ivl/final_eligibility_notice_uqhp',
+        notice_builder: 'IvlNotices::FinalEligibilityNoticeUqhp',
+        mpi_indicator: 'IVL_FEL',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
