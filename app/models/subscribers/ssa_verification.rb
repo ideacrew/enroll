@@ -23,6 +23,13 @@ module Subscribers
 
         consumer_role = person.consumer_role
         consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: xml})
+        (person.verification_types - ["DC Residency", "American Indian Status", "Immigration status"]).each do |type|
+          consumer_role.add_type_history_element(verification_type: type,
+                                                 action: "SSA Hub Response",
+                                                 modifier: "external Hub",
+                                                 update_reason: "Hub response",
+                                                 details: payload.stringify_keys)
+        end
 
         #TODO change response handler
         if "503" == return_status.to_s
