@@ -48,7 +48,7 @@ class Notice
   end
 
   def notice_filename
-    "#{subject.titleize.gsub(/\s*/, '')}"
+    "#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
   end
 
   def notice_path
