@@ -3,17 +3,17 @@ require 'nokogiri'
 module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
-    # BASE_URL =  Settings.checkbook_services.base_url
-    BASE_URL= "https://staging.checkbookhealth.org"
-    def initialize(census_employee)
+    BASE_URL =  Settings.checkbook_services.base_url
+    CONGRESS_URL = Settings.checkbook_services.congress_url
+    # BASE_URL= "https://staging.checkbookhealth.org"
+    def initialize(census_employee,is_congress=false)
       @census_employee= census_employee
-      @url = BASE_URL+"/shop/dc/api/"
+      is_congress ? @url = CONGRESS_URL : @url = BASE_URL+"/shop/dc/api/"
     end
 
     def generate_url
       begin
        puts construct_body.to_json
-       # binding.pry
       @result = HTTParty.post(@url,
               :body => construct_body.to_json,
               :headers => { 'Content-Type' => 'application/json' } )
