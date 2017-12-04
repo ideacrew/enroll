@@ -63,7 +63,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { redirect_to :action => "edit", :id => @employee_role.id }
         end
       end
-      trigger_employee_eligibility_notice(@employee_role.census_employee)
+      @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
     else
       respond_to do |format|
         format.html { redirect_to :back, alert: "You can not enroll as another employee"}
@@ -188,14 +188,6 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   private
-
-  def trigger_employee_eligibility_notice(census_employee)
-    begin
-      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_eligibility_notice")
-    rescue Exception => e
-      puts "Unable to deliver Employee Eligibility Notice to #{census_employee.full_name} due to #{e}" unless Rails.env.test?
-    end
-  end
 
   def check_employee_role_permissions_edit
     @employee_role = EmployeeRole.find(params.require(:id))

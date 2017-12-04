@@ -194,6 +194,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
         allow(census_employee).to receive(:is_linked?).and_return(true)
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
+        allow(census_employee).to receive(:trigger_notices).and_return(true)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)
         post :create, :employment_relationship => employment_relationship_properties

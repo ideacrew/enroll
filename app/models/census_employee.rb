@@ -440,6 +440,7 @@ class CensusEmployee < CensusMember
     return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
+    self.trigger_notices("employee_eligibility_notice")#sends EE eligibility notice to census employee
     return true
   end
 
@@ -766,6 +767,14 @@ class CensusEmployee < CensusMember
 
   def existing_cobra
     COBRA_STATES.include? aasm_state
+  end
+
+  def trigger_notices(event_name)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event_name)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event_name.humanize} to #{self.full_name} due to #{e}" }
+    end
   end
 
   def existing_cobra=(cobra)
