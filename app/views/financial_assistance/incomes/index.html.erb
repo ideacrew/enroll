@@ -44,7 +44,9 @@
         <% end %>
       </div>
 
-      <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b> Add Another</b> Job Income </a>
+      <% if @applicant.incomes.jobs.present? %>
+        <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b> Add Another</b> Job Income </a>
+      <% end %>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
@@ -53,7 +55,7 @@
 
     <div class="driver-question row row-form-wrapper radio-align no-buffer">
       <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Does this person expect to recieve <b>self employment income</b> in 2017? *</span>
+        <span class="fa-text-color">Does this person expect to receive <b>self employment income</b> in 2017? *</span>
       </div>
       <div class='col-md-6 mt11'>
         <div class='col-md-3 no-padding'>
@@ -79,7 +81,9 @@
         <% end %>
       </div>
 
-      <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add Another </b> Self-Employed Income </a>
+      <% if @applicant.incomes.self_employment.present? %>
+        <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add Another </b> Self-Employed Income </a>
+      <% end %>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build } %>

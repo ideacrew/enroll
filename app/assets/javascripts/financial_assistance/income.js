@@ -240,7 +240,40 @@ $(document).ready(function() {
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
+    $('#has_job_income_true').click(function(e) {
+      startEditingIncome($(this).parents('.income').attr('id'));
+      if ($('#job_income').children('.new-income-form').length) {
+        var  newIncomeForm = $('#job_income').children('.new-income-form')
+      }
 
+      if ($('#job_income').find('.incomes-list').length) {
+        var  incomeListEl =  $('#job_income').find('.incomes-list');
+      }
+      if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+      var clonedForm = newIncomeForm.clone(true, true)
+      .removeClass('hidden')
+      .appendTo(incomeListEl);
+      var length = incomeListEl.find(".income").length;
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+    });
+
+    $('#has_self_employment_income_true').click(function(e) {
+      startEditingIncome($(this).parents('.income').attr('id'));
+      if ($('#self_employed_incomes').children('.new-income-form').length) {
+        var  newIncomeForm = $('#self_employed_incomes').children('.new-income-form')
+      }
+      if ($('#self_employed_incomes').find('.incomes-list').length) {
+        var  incomeListEl =  $('#self_employed_incomes').find('.incomes-list');
+      }
+      if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+      var clonedForm = newIncomeForm.clone(true, true)
+      .removeClass('hidden')
+      .appendTo(incomeListEl);
+      var length = incomeListEl.find(".income").length;
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+    });
 
     /* Condtional Display Job Income Question */
     if (!$("#has_job_income_true").is(':checked')) $("#job_income").addClass('hidden');
@@ -470,7 +503,7 @@ function validateForm(form) {
 }
 
 
-$('#financial_assistance_income_employer_phone_full_phone_number').on('keyup keydown keypress', function (e) {
+$('body').on('keyup keydown keypress', '#financial_assistance_income_employer_phone_full_phone_number', function (e) {
   var key = e.which || e.keyCode || e.charCode;
   $(this).attr('maxlength', '10');
   return (key == 8 ||
@@ -489,7 +522,8 @@ $('#financial_assistance_income_employer_phone_full_phone_number').on('keyup key
 .on('keypress', function () {
   $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1)-$2-$3"));
 });
-$("#financial_assistance_income_employer_address_zip").on('keyup keydown keypress', function (e) {
+
+$('body').on('keyup keydown keypress', '#financial_assistance_income_employer_address_zip', function (e) {
   var key = e.which || e.keyCode || e.charCode;
   $(this).attr('maxlength', '5');
   return (key == 8 ||
