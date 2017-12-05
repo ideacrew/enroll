@@ -537,8 +537,8 @@ class FinancialAssistance::Application
       new_application.aasm_state = "draft"
       new_application.submitted_at = nil
       new_application.created_at = nil
-      determination_http_status_code = nil
-      determination_error_message = nil
+      new_application.determination_http_status_code = nil
+      new_application.determination_error_message = nil
       new_application.save!
       new_application.sync_family_members_with_applicants
       new_application
