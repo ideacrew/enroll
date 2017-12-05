@@ -14,6 +14,7 @@ module Subscribers
       application = FinancialAssistance::Application.where(:id => stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
+        log("payload_http_status_code for #{application.id} is: #{payload_http_status_code}")
         application.update_attributes(determination_http_status_code: payload_http_status_code, has_eligibility_response: true, haven_app_id: stringed_key_payload["haven_application_id"], haven_ic_id: stringed_key_payload["haven_ic_id"])
         if application.success_status_codes?(payload_http_status_code.to_i)
           if eligibility_payload_schema_valid?(xml)
