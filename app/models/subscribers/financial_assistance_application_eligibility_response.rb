@@ -9,14 +9,16 @@ module Subscribers
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
+      log("#{application.id} received a ED - call method invoked", :severity=>'crtical')
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
       application = FinancialAssistance::Application.where(:id => stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
-        log("payload_http_status_code for #{application.id} is: #{payload_http_status_code}")
+        log("payload_http_status_code for #{application.id} is: #{payload_http_status_code}", :severity=>'crtical')
         application.update_attributes(determination_http_status_code: payload_http_status_code, has_eligibility_response: true, haven_app_id: stringed_key_payload["haven_application_id"], haven_ic_id: stringed_key_payload["haven_ic_id"])
         if application.success_status_codes?(payload_http_status_code.to_i)
+          log("#{application.id} received a ED with success status code.", :severity=>'crtical')
           if eligibility_payload_schema_valid?(xml)
             sc = ShortCircuit.on(:processing_issue) do |err|
               log(xml, {:severity => "critical", :error_message => err})
