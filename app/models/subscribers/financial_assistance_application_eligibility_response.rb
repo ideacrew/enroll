@@ -52,13 +52,13 @@ module Subscribers
       primary_person = search_person(verified_primary_family_member)
       if primary_person.blank?
         application_in_context.set_determination_response_error!
-        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find primary person in xml")
+        application_in_context.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: "Failed to find primary person in xml")
         throw(:processing_issue, "ERROR: Failed to find primary person in xml")
       end
       family = primary_person.primary_family
       if family.blank?
         application_in_context.set_determination_response_error!
-        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find primary family for users person in xml")
+        application_in_context.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: "Failed to find primary family for users person in xml")
         throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml")
       end
       stupid_family_id = family.id
@@ -69,7 +69,7 @@ module Subscribers
       verified_dependents.each do |verified_family_member|
         if search_person(verified_family_member).blank?
           application_in_context.set_determination_response_error!
-          application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find dependent from xml")
+          application_in_context.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: "Failed to find dependent from xml")
           throw(:processing_issue, "ERROR: Failed to find dependent from xml")
         end
       end
