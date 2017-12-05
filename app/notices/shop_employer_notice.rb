@@ -27,6 +27,7 @@ class ShopEmployerNotice < Notice
   end
 
   def build
+    notice.aasm_state = self.state
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
