@@ -390,6 +390,7 @@ class FinancialAssistance::Application
   end
 
   def publish(payload)
+    return true #For DEMO purpose only #temporary
     if validity = self.is_schema_valid?(Nokogiri::XML.parse(payload))
       notify("acapi.info.events.assistance_application.submitted",
                 {:correlation_id => SecureRandom.uuid.gsub("-",""),
