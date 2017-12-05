@@ -30,13 +30,13 @@ module Subscribers
             sc.call(xml)
           else
             application.set_determination_response_error!
-            application.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to validate Eligibility Determination response XML")
+            application.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: "Failed to validate Eligibility Determination response XML")
             log(xml, {:severity => "critical", :error_message => "ERROR: Failed to validate Eligibility Determination response XML"})
           end
         else
           error_message = stringed_key_payload["body"]
           application.set_determination_response_error!
-          application.update_attributes(determination_http_status_code: payload_http_status_code, determination_error_message: error_message)
+          application.update_attributes(determination_http_status_code: payload_http_status_code, has_eligibility_response: true, determination_error_message: error_message)
         end
       else
         log(xml, {:severity => "critical", :error_message => "ERROR: Failed to find the Application in XML"})
