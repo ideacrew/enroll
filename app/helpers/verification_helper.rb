@@ -266,6 +266,10 @@ def ridp_type_status(type, person)
     options_for_select(build_ridp_admin_actions_list(ridp_type, person))
   end
 
+  def mod_attr(attr, val)
+      attr.to_s + " => " + val.to_s
+  end
+
   def build_admin_actions_list(v_type, f_member)
     if f_member.consumer_role.aasm_state == 'unverified'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }

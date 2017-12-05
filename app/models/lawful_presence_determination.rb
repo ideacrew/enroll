@@ -6,6 +6,7 @@ class LawfulPresenceDetermination
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Mongoid::History::Trackable
 
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
@@ -22,6 +23,16 @@ class LawfulPresenceDetermination
   field :citizen_status, type: String
   field :citizenship_result, type: String
   field :aasm_state, type: String
+
+  track_history   :on => [:vlp_verified_at,
+                          :vlp_authority,
+                          :citizen_status,
+                          :citizenship_result,
+                          :aasm_state],
+                  :scope => :consumer_role,
+                  :track_create  => false,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => false     # track document destruction, default is false
 
   aasm do
     state :verification_pending, initial: true
@@ -62,6 +73,10 @@ class LawfulPresenceDetermination
 
   def start_vlp_process(requested_start_date)
     notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
+  end
+
+  def assign_citizen_status(new_status)
+    update_attributes(citizen_status: new_status)
   end
 
   private
