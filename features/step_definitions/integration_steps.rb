@@ -262,7 +262,7 @@ Given(/^a Hbx admin with super admin access exists$/) do
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile, :no_open_enrollment_coverage_period
-  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  user = FactoryGirl.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
