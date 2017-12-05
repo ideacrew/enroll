@@ -9,8 +9,8 @@ module Subscribers
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
-      log("#{application.id} received a ED - call method invoked", :severity=>'crtical')
-      log("#{application.id} received a ED - call method invoked.", :severity=>'error')
+      log("received a ED - call method invoked", :severity=>'crtical')
+      log("received a ED - call method invoked.", :severity=>'error')
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
       application = FinancialAssistance::Application.where(:id => stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
