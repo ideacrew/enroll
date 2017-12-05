@@ -51,6 +51,9 @@ class FinancialAssistance::Application
   field :effective_date, type: DateTime # Date they want coverage
   field :timeout_response_last_submitted_at, type: DateTime
 
+  # The `assistance_year` of an application gets set during the submission of an application.
+  # Use `application_applicable_year` method in the Family model incase you need `assistance_year`
+  # when aplication is in a `draft state`.
   field :assistance_year, type: Integer
 
   field :is_renewal_authorized, type: Boolean, default: true
@@ -534,6 +537,8 @@ class FinancialAssistance::Application
       new_application.aasm_state = "draft"
       new_application.submitted_at = nil
       new_application.created_at = nil
+      determination_http_status_code = nil
+      determination_error_message = nil
       new_application.save!
       new_application.sync_family_members_with_applicants
       new_application
