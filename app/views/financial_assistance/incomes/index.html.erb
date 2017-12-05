@@ -44,9 +44,7 @@
         <% end %>
       </div>
 
-      <% if @applicant.incomes.jobs.present? %>
-        <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b> Add Another</b> Job Income </a>
-      <% end %>
+        <a class='new-income <%#= hidden unless @applicant.incomes.jobs.present? %>'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b> Add Another</b> Job Income </a>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
@@ -81,9 +79,7 @@
         <% end %>
       </div>
 
-      <% if @applicant.incomes.self_employment.present? %>
-        <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add Another </b> Self-Employed Income </a>
-      <% end %>
+      <a class="new-income <%= 'hidden' unless @applicant.incomes.self_employment.present? %>"> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add Another </b> Self-Employed Income </a>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build } %>
