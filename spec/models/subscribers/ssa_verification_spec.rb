@@ -33,18 +33,26 @@ describe Subscribers::SsaVerification do
         subject.call(nil, nil, nil, nil, payload)
         expect(consumer_role.verification_type_history_elements.count).to be > 1
       end
-      it "stores details as string in verification history element" do
+
+      it "stores verification history element for right verification type" do
         consumer_role.verification_type_history_elements.delete_all
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.first.details).to be_kind_of(String)
+        expect(consumer_role.verification_type_history_elements.map(&:verification_type)).to eq ["Social Security Number", "Citizenship"]
+      end
+
+      it "stores reference to EventResponse in verification history element" do
+        consumer_role.verification_type_history_elements.delete_all
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(BSON::ObjectId.from_string(consumer_role.verification_type_history_elements.first.event_response_record_id)).to eq consumer_role.lawful_presence_determination.ssa_responses.first.id
       end
       it "stores duplicate SSA records for both SSN and Citizenship types" do
         consumer_role.verification_type_history_elements.delete_all
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
         expect(consumer_role.verification_type_history_elements.count).to eq 2
-        expect(consumer_role.verification_type_history_elements[0].details).to eq consumer_role.verification_type_history_elements[1].details
+        expect(consumer_role.verification_type_history_elements[0].event_response_record_id).to eq consumer_role.verification_type_history_elements[1].event_response_record_id
       end
     end
 

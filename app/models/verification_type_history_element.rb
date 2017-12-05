@@ -9,6 +9,7 @@ class VerificationTypeHistoryElement
   field :modifier, type: String
   field :details, type: String
   field :update_reason, type: String
+  field :event_response_record_id, type: String
   field :details, type: String
 
 end

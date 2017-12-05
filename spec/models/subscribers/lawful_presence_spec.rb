@@ -43,11 +43,19 @@ describe Subscribers::LawfulPresence do
         subject.call(nil, nil, nil, nil, payload)
         expect(consumer_role.verification_type_history_elements.count).to be > 0
       end
-      it "stores details as string in verification history element" do
+
+      it "stores verification history element for right verification type" do
         consumer_role.verification_type_history_elements.delete_all
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.first.details).to be_kind_of(String)
+        expect(consumer_role.verification_type_history_elements.first.verification_type).to eq "Immigration status"
+      end
+
+      it "stores reference to EventResponse in verification history element" do
+        consumer_role.verification_type_history_elements.delete_all
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(BSON::ObjectId.from_string(consumer_role.verification_type_history_elements.first.event_response_record_id)).to eq consumer_role.lawful_presence_determination.vlp_responses.first.id
       end
     end
 
