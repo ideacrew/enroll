@@ -19,7 +19,6 @@ namespace :nfp do
         organization = Organization.by_invoice_filename(file_join_path)
         # It will trigger notice
         trigger_notice_for_employer(organization) if organization.present?
-
       end
     else
       puts "Folder #{absolute_folder_path} doesn't exist. Please check and rerun the rake"
