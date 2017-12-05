@@ -43,6 +43,7 @@ module Factories
           msp_count: @active_plan_year.msp_count
         })
 
+
         if @renewal_plan_year.may_renew_plan_year?
           @renewal_plan_year.renew_plan_year
         else
@@ -193,9 +194,13 @@ module Factories
         title: "#{active_group.title} (#{new_year})",
         effective_on_kind: "first_of_month",
         terminate_on_kind: active_group.terminate_on_kind,
+        plan_option_kind: active_group.plan_option_kind,
         default: active_group.default,
         effective_on_offset: active_group.effective_on_offset,
         employer_max_amt_in_cents: active_group.employer_max_amt_in_cents,
+        relationship_benefits: active_group.relationship_benefits,
+        reference_plan_id: reference_plan_id,
+        elected_plan_ids: elected_plan_ids,
         is_congress: active_group.is_congress
       }
 
@@ -209,6 +214,8 @@ module Factories
 
         benefit_group.build_estimated_composite_rates
       end
+
+      benefit_group = assign_dental_plan_offerings(benefit_group, active_group) if is_renewal_dental_offered?(active_group)
       benefit_group
     end
 
