@@ -220,8 +220,9 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       if !primary_family.active_household.latest_active_tax_households.map(&:application_id).include?(nil)
         if primary_family.active_approved_application.present?
-          family_member_ids.each do |key, member_id|
+          family_member_ids.each do |member_id|
             applicant = primary_family.active_approved_application.active_applicants.where(family_member_id: member_id).first
+
             if applicant.non_ia_eligible?
               return false
             end
@@ -231,7 +232,7 @@ class Insured::PlanShoppingsController < ApplicationController
           end
         end
       else
-        family_member_ids.each do |key, member_id|
+        family_member_ids.each do |member_id|
           primary_family.active_household.latest_active_tax_households.each do |thh|
             tax_household_member = thh.tax_household_members.where(applicant_id: member_id).first
             if tax_household_member.present?
@@ -277,7 +278,7 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
 
-    family_member_ids = @family_member_ids.collect { |k,v| v} if @family_member_ids.present?
+    family_member_ids = @family_member_ids
 
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
