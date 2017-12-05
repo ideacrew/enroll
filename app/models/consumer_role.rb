@@ -39,6 +39,7 @@ class ConsumerRole
       non_native_not_lawfully_present_in_us
       ssn_pass_citizenship_fails_with_SSA
       non_native_citizen
+      indian_tribe_member
   )
 
   ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
@@ -118,7 +119,7 @@ class ConsumerRole
 
   validates :citizen_status,
     allow_blank: true,
-    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+    inclusion: { in: CITIZEN_STATUS_KINDS + ACA_ELIGIBLE_CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
   validates :citizenship_result,
     allow_blank: true,
