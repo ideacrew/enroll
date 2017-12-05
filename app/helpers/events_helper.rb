@@ -35,7 +35,7 @@ module EventsHelper
                 when "employer_sponsored_coverage_termination"
                   "eligibility_change_employer_ineligible"
                 when "employer_sponsored_cobra"
-                  "employer_cobra_non_payment"
+                  "cobra"
                 else
                   eligibility_kind
                 end
