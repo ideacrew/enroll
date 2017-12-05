@@ -232,4 +232,27 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
       end
     end
   end
+
+  describe "set_dental_plans" do
+    let(:quote) { double("Quote", id: "id", start_on: Date.new(2018,1,1))}
+
+    before do
+      controller.instance_variable_set(:"@quote", quote)
+      @collection = Mongoid::Criteria.new(nil)
+      allow(@collection).to receive(:count).and_return 0
+    end
+
+    it "should find 2018 plans if quote start on is in 2018" do
+      @collection.selector =  {"active_year" => quote.start_on.year, "market"=>"shop", "coverage_kind"=>"dental"}
+      expect(Plan).to receive(:shop_dental_by_active_year).with(2018).and_return @collection
+      subject.send(:set_dental_plans)
+    end
+
+    it "should find 2017 plans if quote start on is in 2017" do
+      allow(quote).to receive(:start_on).and_return Date.new(2017,10,1)
+      @collection.selector =  {"active_year" => quote.start_on.year, "market"=>"shop", "coverage_kind"=>"dental"}
+      expect(Plan).to receive(:shop_dental_by_active_year).with(2017).and_return @collection
+      subject.send(:set_dental_plans)
+    end
+  end
 end

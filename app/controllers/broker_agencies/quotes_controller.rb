@@ -3,7 +3,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   include BrokerAgencies::QuoteHelper
 
   before_action :validate_roles, :set_broker_role
-  before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote]
+  before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote, :dental_plans_data]
   before_action :format_date_params  , :only => [:update,:create]
   before_action :employee_relationship_map
   before_action :set_qhp_variables, :only => [:plan_comparison, :download_pdf]
@@ -669,8 +669,8 @@ private
   end
 
   def set_dental_plans
-    @dental_plans = Plan.shop_dental_by_active_year(2017)
-    @dental_plans_count = Plan.shop_dental_by_active_year(2017).count
+    @dental_plans = Plan.shop_dental_by_active_year(@quote.start_on.year)
+    @dental_plans_count = @dental_plans.count
     carrier = params[:carrier_id].nil? ? [] : params[:carrier_id]
     dental_level = params[:dental_level].nil? ? [] : params[:dental_level]
     plan_type = params[:plan_type].nil? ? [] : params[:plan_type]
