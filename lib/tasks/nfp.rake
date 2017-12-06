@@ -8,7 +8,7 @@ namespace :nfp do
     if Dir.exists?(absolute_folder_path)
       Dir.entries(absolute_folder_path).each do |file|
         next if File.directory?(file) #skipping directories
-        puts "uploading file #{absolute_folder_path}/#{file}"
+        puts "uploading file #{absolute_folder_path}/#{file}" unless Rails.env.test?
         file_join_path = File.join(absolute_folder_path, file)
         # It will upload file to s3
         Organization.upload_invoice(file_join_path,file)
