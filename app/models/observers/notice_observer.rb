@@ -59,8 +59,6 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
-          errors = plan_year.enrollment_errors
-          unless errors.include?(:non_business_owner_enrollment_count) || errors.include?(:eligible_to_enroll_count)
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               enrollment = ce.active_benefit_group_assignment.hbx_enrollment
               if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state)
