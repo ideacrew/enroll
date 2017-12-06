@@ -18,7 +18,7 @@ class RemoveOneCeFromEr < MongoidMigrationTask
           puts "destroyed employee_role record for census employee" unless Rails.env.test?
         end
       census_employee.destroy!
-      puts "Deleted the census employee #{census_employee_id} from the employer roaster" unless Rails.env.test?
+      puts "Deleted the census employee #{census_employee.full_name} from the employer Roster" unless Rails.env.test?
     rescue Exception => e
       puts e.message
     end
