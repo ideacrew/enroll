@@ -1,6 +1,6 @@
 namespace :map do
 
-  desc "Seed the production database"
+  desc "Update tufts premier plan mappings"
   task :tufts_premier_plans => :environment do
 
     h = {
