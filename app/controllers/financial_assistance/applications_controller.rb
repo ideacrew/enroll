@@ -178,7 +178,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
     @model.tax_households.each do |txh|
-      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: coverage_year)
+      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 01, 01))
       txh.eligibility_determinations.build(max_aptc: 200.00,
                                               csr_percent_as_integer: 73,
                                               csr_eligibility_kind: "csr_73",
