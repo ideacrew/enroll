@@ -12,7 +12,7 @@ describe DeactivateTerminatedBenefitGroupAssignment, dbclean: :after_each do
     end
   end
 
-  describe "deactivate terminated benefit package" do
+  describe "deactivate terminated benefit group assignment" do
 
     let!(:benefit_group) { FactoryGirl.build(:benefit_group)}
     let(:plan_year) { FactoryGirl.create(:plan_year,benefit_groups:[benefit_group]) }
