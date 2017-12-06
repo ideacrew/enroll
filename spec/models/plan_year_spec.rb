@@ -852,7 +852,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             end
 
             context "and more than 30 days have elapsed since application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 31.days)
               end
@@ -901,7 +901,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "employees should be able to browse, but not purchase plans"
 
           context "and open enrollment begins" do
-            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
             before do
               # $start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on
               TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
@@ -968,7 +968,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 context "and three of the six employees have enrolled" do
-                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                   before do
                     census_employees[0..2].each do |ee|
                       if ee.active_benefit_group_assignment.may_select_coverage?
@@ -1116,7 +1116,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and today is the day following close of open enrollment" do
-          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
           before do
             TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
@@ -2388,7 +2388,7 @@ describe PlanYear, "plan year schedule changes" do
 
     context 'when plan year reverted' do
 
-      context 'employee has enrollment under renewing plan year'  do 
+      context 'employee has enrollment under renewing plan year'  do
 
         let(:renewal_py_state) { 'renewing_enrolling' }
 
@@ -2423,7 +2423,7 @@ describe PlanYear, "plan year schedule changes" do
                        aasm_state: 'auto_renewing'
                        ) }
 
-        it 'should cancel enrollments under reverted plan year' do 
+        it 'should cancel enrollments under reverted plan year' do
           expect(passive_renewal.auto_renewing?).to be_truthy
           renewing_plan_year.revert_renewal!
           passive_renewal.reload

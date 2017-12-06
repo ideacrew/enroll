@@ -3,7 +3,7 @@ module Forms
     def self.included(base)
       base.class_eval do
         attr_accessor :race, :ethnicity, :language_code, :citizen_status, :tribal_id
-        attr_accessor :is_incarcerated, :is_disabled, :citizen_status, :is_physically_disabled
+        attr_accessor :is_incarcerated, :is_disabled, :citizen_status
 
         def us_citizen=(val)
           @us_citizen = (val.to_s == "true")
