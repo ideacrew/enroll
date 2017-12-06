@@ -163,7 +163,7 @@ class BenefitGroupAssignment
     state :initialized, initial: true
     state :coverage_selected
     state :coverage_waived
-    state :coverage_terminated
+    state :coverage_terminated, :after_enter => :deactivate_coverage
     state :coverage_void
     state :coverage_renewing
     state :coverage_expired
@@ -184,7 +184,7 @@ class BenefitGroupAssignment
 
     event :terminate_coverage, :after => :record_transition do
       transitions from: :initialized, to: :coverage_void
-      transitions from: :coverage_selected, to: :coverage_terminated, :after => :deactivate_terminated_coverage
+      transitions from: :coverage_selected, to: :coverage_terminated
       transitions from: :coverage_renewing, to: :coverage_terminated
     end
 
@@ -217,11 +217,8 @@ class BenefitGroupAssignment
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
-  def deactivate_terminated_coverage
-    if self.is_active?
-      self.update_attributes(:is_active => false)
-      self.save
-    end
+  def deactivate_coverage
+    self.update_attributes(:is_active => false, end_on: plan_year.present? ? plan_year.end_on : nil)
   end
 
   private
