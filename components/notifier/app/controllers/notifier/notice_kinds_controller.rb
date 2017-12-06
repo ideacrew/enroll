@@ -54,7 +54,6 @@ module Notifier
     end
 
     def preview
-      binding.pry
       notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
 
