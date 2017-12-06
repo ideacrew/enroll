@@ -4,10 +4,15 @@ describe 'ModelEvents::PlanYearAutoPublishedNotification' do
 
   let(:model_event)  { "renewal_application_autosubmitted" }
   let(:notice_event) { "plan_year_auto_published" }
-  let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month } 
+  #let!(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month } 
+  let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 1.months).beginning_of_month.prev_year, plan_year_state: 'active') }
+  let!(:date) { (TimeKeeper.date_of_record).beginning_of_month }
+  let!(:open_enrollment_start_on) { date + 15.days + 1.months}
+  let!(:open_enrollment_end_on) { open_enrollment_start_on + 5.days }
+  let!(:start_on) { (open_enrollment_start_on + 2.months).beginning_of_month }
+  let!(:end_on) { start_on + 1.year - 1.day }
 
-  let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
-  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft', benefit_groups: [benefit_group]) }
+  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, end_on: end_on, aasm_state: 'renewing_draft', benefit_groups: [benefit_group]) }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
   describe "ModelEvent" do
@@ -21,8 +26,8 @@ describe 'ModelEvents::PlanYearAutoPublishedNotification' do
           end
         end
 
-        model_instance.force_publish
-        model_instance.save
+        model_instance.force_publish!
+        #model_instance.save
       end
     end
   end
