@@ -23,7 +23,7 @@ module Subscribers
 
         consumer_role = person.consumer_role
         event_response_record = EventResponse.new({received_at: Time.now, body: xml})
-            consumer_role.lawful_presence_determination.ssa_responses << event_response_record
+        consumer_role.lawful_presence_determination.ssa_responses << event_response_record
         (person.verification_types - ["DC Residency", "American Indian Status", "Immigration status"]).each do |type|
           consumer_role.add_type_history_element(verification_type: type,
                                                  action: "SSA Hub Response",
