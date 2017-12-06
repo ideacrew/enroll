@@ -65,7 +65,6 @@ module Observers
                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_enrollment_confirmation")
               end
             end
-          end
         end
 
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)

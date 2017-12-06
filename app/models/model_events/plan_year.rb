@@ -55,10 +55,6 @@ module ModelEvents
           is_open_enrollment_began = true
         end
 
-        # if enrolled? || renewing_enrolled?
-        #   is_open_enrollment_ended = true
-        # end
-
         if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
           is_application_denied = true
         end
