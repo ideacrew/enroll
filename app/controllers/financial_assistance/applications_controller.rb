@@ -174,10 +174,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def dummy_data_for_demo(params)
     #Dummy_ED
-    @model.update_attributes!(aasm_state: "determined", assistance_year: @person.primary_family.application_applicable_year, determination_http_status_code: 200)
+    coverage_year = @person.primary_family.application_applicable_year
+    @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
     @model.tax_households.each do |txh|
-      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true)
+      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: coverage_year)
       txh.eligibility_determinations.build(max_aptc: 200.00,
                                               csr_percent_as_integer: 73,
                                               csr_eligibility_kind: "csr_73",
