@@ -9,7 +9,6 @@ class FinancialAssistance::Application
   belongs_to :family, class_name: "::Family"
 
   before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id, :set_external_identifiers
-  after_create :end_date_latest_active_tax_households
   validates :application_submission_validity, presence: true, on: :submission
   validates :before_attestation_validity, presence: true, on: :before_attestation
   validate :attestation_terms_on_parent_living_out_of_home
@@ -707,11 +706,6 @@ private
     active_applicants.each do |applicant|
       applicant.assisted_verifications.each { |verification| verification.update_attributes(status: status) }
     end
-  end
-
-  def end_date_latest_active_tax_households
-    latest_tax_households = family.active_household.latest_active_tax_households
-    latest_tax_households.each { |th| th.update_attributes(effective_ending_on: TimeKeeper.date_of_record) } if latest_tax_households.present?
   end
 
   def set_submit
