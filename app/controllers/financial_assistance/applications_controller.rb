@@ -174,7 +174,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def dummy_data_for_demo(params)
     #Dummy_ED
-    @model.update_attributes!(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year, determination_http_status_code: 200)
+    @model.update_attributes!(aasm_state: "determined", assistance_year: @person.primary_family.application_applicable_year, determination_http_status_code: 200)
 
     @model.tax_households.each do |txh|
       txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true)
