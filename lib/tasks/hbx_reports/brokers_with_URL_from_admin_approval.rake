@@ -32,7 +32,7 @@ namespace :reports do
                 broker.email_address,
                 broker.npn,
                 invitation.created_at,
-                "http://enroll.dchealthlink.com/invitations/#{invitation.id}/claim"
+                "https://business.mahealthconnector.org/invitations/#{invitation.id}/claim"
               ]
               processed_count += 1
               end
