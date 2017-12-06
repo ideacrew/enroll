@@ -24,7 +24,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
                                           benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
                                           employee_role_id: census_employee.employee_role.id,
                                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-                                          aasm_state: "coverage_selected"
+                                          aasm_state: "renewing_coverage_enrolled"
   )
   }
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
@@ -36,6 +36,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
         allow_any_instance_of(PlanYear).to receive(:non_business_owner_enrolled).and_return(["rspec1", "rspec2"])
         allow_any_instance_of(PlanYear).to receive(:enrollment_ratio).and_return(2)
+        allow_any_instance_of(BenefitGroupAssignment).to receive(:hbx_enrollment).and_return(enrollment)
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
@@ -57,6 +58,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
         allow_any_instance_of(PlanYear).to receive(:non_business_owner_enrolled).and_return(["rspec1", "rspec2"])
         allow_any_instance_of(PlanYear).to receive(:enrollment_ratio).and_return(2)
+        allow_any_instance_of(BenefitGroupAssignment).to receive(:hbx_enrollment).and_return(enrollment)
         expect(subject).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.renewal_employee_enrollment_confirmation"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
@@ -102,6 +104,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
           allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
           allow_any_instance_of(PlanYear).to receive(:non_business_owner_enrolled).and_return(["rspec1", "rspec2"])
           allow_any_instance_of(PlanYear).to receive(:enrollment_ratio).and_return(2)
+          allow_any_instance_of(BenefitGroupAssignment).to receive(:hbx_enrollment).and_return(enrollment)
           model_instance.advance_date!
         end
 

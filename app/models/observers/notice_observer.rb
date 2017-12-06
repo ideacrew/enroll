@@ -62,7 +62,10 @@ module Observers
           errors = plan_year.enrollment_errors
           unless errors.include?(:non_business_owner_enrollment_count) || errors.include?(:eligible_to_enroll_count)
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_enrollment_confirmation")
+              enrollment = ce.active_benefit_group_assignment.hbx_enrollment
+              if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state)
+               trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_enrollment_confirmation")
+              end
             end
           end
         end

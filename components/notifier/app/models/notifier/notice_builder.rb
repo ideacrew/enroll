@@ -3,6 +3,7 @@ module Notifier
     include Config::SiteConcern
 
     def to_html(options = {})
+      binding.pry
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
       render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object}) 
     end
