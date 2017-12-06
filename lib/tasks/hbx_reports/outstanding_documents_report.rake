@@ -14,13 +14,13 @@ namespace :reports do
     if families.present?
       file_name = "#{Rails.root}/public/outstanding_documents_report_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
       CSV.open(file_name, 'w', force_quotes: true) do |csv|
-        csv << %w[HBX_ID First_Name Last_Name Number_of_Documents Due_Date Review_Color Citizenship Social_Security_Number American_Indian/Alaskan_Native Immigration_Status]
+        csv << %w[HBX_ID First_Name Last_Name Number_of_Documents Due_Date Review_Color DC_Residency Citizenship Social_Security_Number American_Indian/Alaskan_Native Immigration_Status]
         families.each do |family|
           family.family_members.each do |family_member|
             if family.enrolled_policy(family_member).present? # checking whether the family_member is present on enrollment or not
               person = family_member.person
               document_count = person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
-              min_verification_due_date = family.min_verification_due_date || TimeKeeper.date_of_record + 95.days
+              min_verification_due_date = family.min_verification_due_date
               status = review_button_class(family)
               color = color_scheme(status)
               calculate_due_date(family, family_member)
@@ -30,6 +30,7 @@ namespace :reports do
                       document_count,
                       min_verification_due_date,
                       color,
+                      @residency_due_date,
                       @citizenship_due_date,
                       @ssn_due_date,
                       @ami_due_date,
@@ -46,18 +47,21 @@ namespace :reports do
   end
 
   def calculate_due_date(family, family_member)
-    @citizenship_due_date = @ssn_due_date = @ami_due_date = @immigration_due_date = nil
+    @citizenship_due_date = @ssn_due_date = @ami_due_date = @immigration_due_date = @residency_due_date = nil
     family_member.person.verification_types.each do |v_type|
       doc_due_date = family.document_due_date(family_member, v_type)
       due_date = doc_due_date.present? ? doc_due_date.to_date : nil
-      if v_type == 'Citizenship'
-        @citizenship_due_date = due_date
-      elsif v_type == 'Social Security Number'
-        @ssn_due_date = due_date
-      elsif v_type == 'American Indian Status'
-        @ami_due_date = due_date
-      elsif v_type == 'Immigration status'
-        @immigration_due_date = due_date
+      case v_type
+        when 'DC Residency'
+          @residency_due_date = due_date
+        when 'Citizenship'
+          @citizenship_due_date = due_date
+        when 'Social Security Number'
+          @ssn_due_date = due_date
+        when 'American Indian Status'
+          @ami_due_date = due_date
+        when 'Immigration status'
+          @immigration_due_date = due_date
       end
     end
   end
