@@ -19,7 +19,7 @@ namespace :reports do
             if family.enrolled_policy(family_member).present? # checking whether the family_member is present on enrollment or not
               person = family_member.person
               document_count = person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
-              min_verification_due_date = family.min_verification_due_date || TimeKeeper.date_of_record + 95.days
+              min_verification_due_date = family.min_verification_due_date
               status = review_button_class(family)
               color = color_scheme(status)
               calculate_due_date(family, family_member)
