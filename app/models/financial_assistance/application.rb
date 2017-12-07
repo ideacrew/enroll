@@ -537,6 +537,7 @@ class FinancialAssistance::Application
       new_application.aasm_state = "draft"
       new_application.submitted_at = nil
       new_application.created_at = nil
+      new_application.hbx_id = HbxIdGenerator.generate_application_id
       new_application.determination_http_status_code = nil
       new_application.determination_error_message = nil
       new_application.save!
