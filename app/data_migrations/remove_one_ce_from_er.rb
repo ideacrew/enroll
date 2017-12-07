@@ -9,7 +9,7 @@ class RemoveOneCeFromEr < MongoidMigrationTask
           return
         end
       employee_role = census_employee.employee_role
-        if employee_role.present? && employee_role.person.primary_family.active_household.hbx_enrollments.where(employee_role_id: employee_role.id).present?
+        if employee_role.present? && employee_role.person.primary_family.active_household.hbx_enrollments.where(employee_role_id: employee_role.id, :"aasm_state".ne => "shopping").present?
             puts "EE enrolled in ER sponsored benefits. Handle them first"  unless Rails.env.test?
              return
         end
@@ -18,7 +18,7 @@ class RemoveOneCeFromEr < MongoidMigrationTask
           puts "destroyed employee_role record for census employee" unless Rails.env.test?
         end
       census_employee.destroy!
-      puts "Deleted the census employee #{census_employee_id} from the employer roaster" unless Rails.env.test?
+      puts "Deleted the census employee #{census_employee.full_name} from the employer Roster" unless Rails.env.test?
     rescue Exception => e
       puts e.message
     end
