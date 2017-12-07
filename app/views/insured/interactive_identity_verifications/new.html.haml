@@ -7,7 +7,7 @@
       = render  partial: 'shared/left_nav.html.erb'
     .col-lg-10.col-md-10.col-sm-10.col-xs-12.row
       .col-lg-9.col-md-9.col-sm-9.col-xs-12
-        %h1.darkblue Verify Identity
+        %h2.darkblue Verify Identity
         %h4 Please answer the following security questions. When you're finished click SUBMIT.
         = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path, :method => :post) do |f|
           = f.hidden_field :session_id
