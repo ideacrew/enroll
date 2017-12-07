@@ -13,7 +13,7 @@ module Subscribers
       log("received a ED - call method invoked.", {:severity=>'error'})
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
-      application = FinancialAssistance::Application.where(:id => stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
+      application = FinancialAssistance::Application.where(:hbx_id => stringed_key_payload["assistance_application_id"]).first if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
         log("payload_http_status_code for #{application.id} is: #{payload_http_status_code}", {:severity=>'crtical'})
@@ -48,7 +48,7 @@ module Subscribers
       verified_family.parse(xml)
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
-      application_in_context = FinancialAssistance::Application.where(:id => verified_family.fin_app_id).first
+      application_in_context = FinancialAssistance::Application.where(:hbx_id => verified_family.fin_app_id).first
       primary_person = search_person(verified_primary_family_member)
       if primary_person.blank?
         application_in_context.set_determination_response_error!
