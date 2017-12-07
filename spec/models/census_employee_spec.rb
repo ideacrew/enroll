@@ -1285,7 +1285,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context 'when none present with given benefit group' do
       let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: true) }
-
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 1
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
@@ -1460,63 +1459,49 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "is_disabled_cobra_action?" do
+  context "is_cobra_coverage_eligible?" do 
     let(:census_employee) { FactoryGirl.build(:census_employee) }
-    let(:employee_role) { FactoryGirl.build(:employee_role) }
-    let(:hbx_enrollment) { HbxEnrollment.new }
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
-
-    it "should return true without employee_role" do
-      allow(census_employee).to receive(:employee_role).and_return nil
-      expect(census_employee.is_disabled_cobra_action?).to be_truthy
+    let(:hbx_enrollment) { HbxEnrollment.new aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record , coverage_kind: 'health'}
+  
+    it "should return true when employement is terminated and " do
+      allow(Family).to receive(:where).and_return([hbx_enrollment])
+      allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
+      allow(census_employee).to receive(:employment_terminated?).and_return(true)
+      expect(census_employee.is_cobra_coverage_eligible?).to be_truthy
     end
 
-    it "should return true without active_benefit_group_assignment" do
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return nil
-      expect(census_employee.is_disabled_cobra_action?).to be_truthy
-    end
-
-    context "has employee_role and active_benefit_group_assignment" do
-      before :each do
-        allow(census_employee).to receive(:employee_role).and_return employee_role
-        allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-      end
-
-      it "should return true when coverage_waived" do
-        allow(benefit_group_assignment).to receive(:coverage_waived?).and_return true
-        expect(census_employee.is_disabled_cobra_action?).to be_truthy
-      end
-
-      it "should return true without hbx_enrollment" do
-        allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return nil
-        allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return []
-        expect(census_employee.is_disabled_cobra_action?).to be_truthy
-      end
-
-      it "should return false with hbx_enrollment" do
-        allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return hbx_enrollment
-        allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return []
-        expect(census_employee.is_disabled_cobra_action?).to be_falsey
-      end
-
-      it "should return false with hbx_enrollment" do
-        allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return nil
-        allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
-        expect(census_employee.is_disabled_cobra_action?).to be_falsey
-      end
-
-      it "should return false with pending hbx_enrollment" do
-        allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
-        allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return true
-        expect(census_employee.is_disabled_cobra_action?).to be_falsey
-      end
-
-      it "should return true when employee_termination_pending" do
-        allow(census_employee).to receive(:employee_termination_pending?).and_return true
-        expect(census_employee.is_disabled_cobra_action?).to be_truthy
-      end
+    it "should return false when employement is not terminated" do
+      allow(census_employee).to receive(:employment_terminated?).and_return(false)
+      expect(census_employee.is_cobra_coverage_eligible?).to be_falsey
     end
   end
+
+  context "cobra_eligibility_expired?" do 
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+  
+    it "should return true when coverage is terminated more that 6 months " do
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months) 
+      expect(census_employee.cobra_eligibility_expired?).to be_truthy
+    end
+
+    it "should return false when coverage is terminated not more that 6 months " do
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months) 
+      expect(census_employee.cobra_eligibility_expired?).to be_falsey
+    end
+
+    it "should return true when employment terminated more that 6 months " do
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(nil)
+      allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record - 7.months)
+      expect(census_employee.cobra_eligibility_expired?).to be_truthy
+    end
+
+    it "should return false when employment terminated not more that 6 months " do
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(nil)
+      allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record - 1.months)
+      expect(census_employee.cobra_eligibility_expired?).to be_falsey
+    end
+  end
+
 
   context "is_linked?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
