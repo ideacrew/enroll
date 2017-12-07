@@ -1,6 +1,6 @@
 class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person
+  attr_accessor :family, :data, :person, :enrollments
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -9,6 +9,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.person = args[:person]
+    self.enrollments = args[:enrollments]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -54,12 +55,11 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def append_data
     primary_member = data.detect{|m| m["subscriber"].upcase == "YES"}
     append_member_information_for_aqhp(primary_member)
-    pick_enrollments
+    append_enrollment_information
     if primary_member["aqhp_eligible"].upcase == "YES"
       notice.tax_households = append_tax_household_information(primary_member)
     end
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
-    notice.irs_consent_needed = check(primary_member["irs_consent"])
     notice.primary_firstname = primary_member["first_name"]
   end
 
@@ -78,6 +78,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :tax_status => filer_type(datum["filer_type"]),
         :mec => datum["mec"].try(:upcase) == "YES" ? "Yes" : "No",
         :is_ia_eligible => check(datum["aqhp_eligible"]),
+        :is_csr_eligible => datum["csr"].try(:upcase) == "YES" ? true : false,
         :indian_conflict => check(datum["indian"]),
         :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
         :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
@@ -86,55 +87,49 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
         :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
         :has_access_to_affordable_coverage => check(datum ["mec"]),
+        :no_medicaid_because_of_income => (datum["nonmedi_reason"].downcase == "over income") ? true : false,
+        :no_medicaid_because_of_immigration => (datum["nonmedi_reason"].downcase == "immigration") ? true : false,
+        :no_medicaid_because_of_age => (datum["nonmedi_reason"].downcase == "age") ? true : false,
+        :no_aptc_because_of_income => (datum["nonaptc_reason"].downcase == "over income") ? true : false,
+        :no_aptc_because_of_tax => datum["nonaptc_reason"].downcase == "tax" ? true : false,
+        :no_aptc_because_of_mec => datum["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
+        :no_csr_because_of_income => datum["noncsr_reason"].downcase == "over income" ? true : false,
+        :no_csr_because_of_tax => datum["noncsr_reason"].downcase == "tax" ? true : false,
+        :no_csr_because_of_mec => datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
         :tax_household => append_tax_household_information(primary_member)
       })
     end
   end
 
-  def pick_enrollments
-    hbx_enrollments = []
-    family = recipient.primary_family
-    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
-    return nil if enrollments.blank?
-    health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
-    dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
-
-    hbx_enrollments << health_enrollments
-    hbx_enrollments << dental_enrollments
-
-    return nil if hbx_enrollments.flatten.compact.empty?
-    hbx_enrollments.flatten.compact.each do |enrollment|
-      notice.enrollments << append_enrollment_information(enrollment)
-    end
-  end
-
-  def append_enrollment_information(enrollment)
-    plan = PdfTemplates::Plan.new({
-      plan_name: enrollment.plan.name,
-      is_csr: enrollment.plan.is_csr?,
-      coverage_kind: enrollment.plan.coverage_kind,
-      plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
-      family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
-      deductible: enrollment.plan.deductible
-      })
-    PdfTemplates::Enrollment.new({
-      premium: enrollment.total_premium.round(2),
-      aptc_amount: enrollment.applied_aptc_amount.round(2),
-      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-      phone: phone_number(enrollment.plan.carrier_profile.legal_name),
-      is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
-      coverage_kind: enrollment.coverage_kind,
-      kind: enrollment.kind,
-      effective_on: enrollment.effective_on,
-      plan: plan,
-      enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-        enrollee = PdfTemplates::Individual.new({
-          full_name: member.person.full_name.titleize,
-          age: member.person.age_on(TimeKeeper.date_of_record)
+  def append_enrollment_information
+    enrollments.each do |enrollment|
+      plan = PdfTemplates::Plan.new({
+        plan_name: enrollment.plan.name,
+        is_csr: enrollment.plan.is_csr?,
+        coverage_kind: enrollment.plan.coverage_kind,
+        plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
+        family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
+        deductible: enrollment.plan.deductible
         })
-        enrollees << enrollee
-      end
-    })
+      notice.enrollments << PdfTemplates::Enrollment.new({
+        premium: enrollment.total_premium.round(2),
+        aptc_amount: enrollment.applied_aptc_amount.round(2),
+        responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+        phone: phone_number(enrollment.plan.carrier_profile.legal_name),
+        is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
+        coverage_kind: enrollment.coverage_kind,
+        kind: enrollment.kind,
+        effective_on: enrollment.effective_on,
+        plan: plan,
+        enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+          enrollee = PdfTemplates::Individual.new({
+            full_name: member.person.full_name.titleize,
+            age: member.person.age_on(TimeKeeper.date_of_record)
+          })
+          enrollees << enrollee
+        end
+      })
+    end
   end
 
   def phone_number(legal_name)
@@ -155,12 +150,12 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def append_tax_household_information(primary_member)
     PdfTemplates::TaxHousehold.new({
       :csr_percent_as_integer => (primary_member["csr"].upcase == "YES") ? primary_member["csr_percent"] : "100",
-      :max_aptc => primary_member["aptc"],
-      :aptc_csr_annual_household_income => primary_member["actual_income"],
-      :aptc_csr_monthly_household_income => primary_member["monthly_hh_income"],
-      :aptc_annual_income_limit => primary_member["aptc_annual_limit"],
-      :csr_annual_income_limit => primary_member["csr_annual_income_limit"],
-      :applied_aptc => primary_member["applied_aptc"]
+      :max_aptc => primary_member["aptc"].present? ? primary_member["aptc"].to_f.round(2) : 0.0,
+      :aptc_csr_annual_household_income => primary_member["actual_income"].present? ? primary_member["actual_income"].to_f.round(2) : nil,
+      :aptc_csr_monthly_household_income => primary_member["monthly_hh_income"].present? ? primary_member["monthly_hh_income"].to_f.round(2) : nil,
+      :aptc_annual_income_limit => primary_member["aptc_annual_limit"].present? ? primary_member["aptc_annual_limit"].to_f.round(2) : nil,
+      :csr_annual_income_limit => primary_member["csr_annual_income_limit"].present? ? primary_member["csr_annual_income_limit"].to_f.round(2) : nil,
+      :applied_aptc => primary_member["applied_aptc"].present? ? primary_member["applied_aptc"] : 0.0
     })
   end
 
