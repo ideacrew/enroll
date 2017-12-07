@@ -46,6 +46,7 @@ module Notifier
     end
   
     def editor_tokens
+      binding.pry
       editor_attributes.inject([]) do |data, (virtus_model_name, virtus_attributes)|
         virtus_attributes.each do |attribute|
           method_name = "#{virtus_model_name}.#{attribute}"
