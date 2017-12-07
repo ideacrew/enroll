@@ -6,7 +6,7 @@ class UpdatePlanYearConversionFlag < MongoidMigrationTask
     begin
       feins = ENV['fein'].split(',').map(&:lstrip)
       feins.each do |fein|
-        organization = Organization.where(fein: fein)
+        organization = Organization.where(fein: fein).first
         employer_profile = organization.employer_profile if organization
         plan_years = employer_profile.plan_years if employer_profile
         if plan_years && employer_profile.is_conversion?
