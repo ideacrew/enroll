@@ -60,8 +60,8 @@ module Observers
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              enrollment = ce.active_benefit_group_assignment.hbx_enrollment
-              if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state)
+              enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+              if enrollments.present? && enrollments.any?{ |enr| HbxEnrollment::RENEWAL_STATUSES.include?(enr.aasm_state) }
                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_enrollment_confirmation")
               end
             end

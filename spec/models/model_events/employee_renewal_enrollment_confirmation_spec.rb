@@ -28,6 +28,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
   )
   }
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+  let!(:benefit_group_assign) { double("BenefitGroupAssign")}
 
   describe "ModelEvent" do
     context "when renewal_employee_enrollment_confirmation" do
@@ -36,7 +37,8 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
         allow_any_instance_of(PlanYear).to receive(:non_business_owner_enrolled).and_return(["rspec1", "rspec2"])
         allow_any_instance_of(PlanYear).to receive(:enrollment_ratio).and_return(2)
-        allow_any_instance_of(BenefitGroupAssignment).to receive(:hbx_enrollment).and_return(enrollment)
+        allow_any_instance_of(CensusEmployee).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assign)
+        allow(benefit_group_assign).to receive(:hbx_enrollments).and_return([enrollment])
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
@@ -55,10 +57,11 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
       let(:model_event) { ModelEvents::ModelEvent.new(:renewal_enrollment_confirmation, model_instance, {}) }
 
       it "should trigger notice event" do
+        allow_any_instance_of(CensusEmployee).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assign)
+        allow(benefit_group_assign).to receive(:hbx_enrollments).and_return([enrollment])
         allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
         allow_any_instance_of(PlanYear).to receive(:non_business_owner_enrolled).and_return(["rspec1", "rspec2"])
         allow_any_instance_of(PlanYear).to receive(:enrollment_ratio).and_return(2)
-        allow_any_instance_of(BenefitGroupAssignment).to receive(:hbx_enrollment).and_return(enrollment)
         expect(subject).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.renewal_employee_enrollment_confirmation"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
@@ -99,6 +102,8 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
 
         before do
+          allow_any_instance_of(CensusEmployee).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assign)
+          allow(benefit_group_assign).to receive(:hbx_enrollments).and_return([enrollment])
           allow(subject).to receive(:resource).and_return(census_employee.employee_role)
           allow(subject).to receive(:payload).and_return(payload)
           allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
