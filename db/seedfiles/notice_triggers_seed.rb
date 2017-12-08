@@ -903,7 +903,7 @@ ivl_notice_triggers = [
     notice_triggers: [
         {
             name: 'Final Eligibility Notice for UQHP/AQHP individuals',
-            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp.html.erb',
+            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
             notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalUqhp',
             mpi_indicator: 'IVL_FRE',
             notice_trigger_element_group: {
@@ -925,7 +925,7 @@ ivl_notice_triggers = [
     notice_triggers: [
         {
             name: 'Final Eligibility Notice for UQHP/AQHP individuals',
-            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp.html.erb',
+            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
             notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalAqhp',
             mpi_indicator: 'IVL_FRE',
             notice_trigger_element_group: {

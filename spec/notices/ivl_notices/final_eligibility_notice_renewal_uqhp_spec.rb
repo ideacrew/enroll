@@ -15,7 +15,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
   let!(:hbx_enrollment_1) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "enrolled_contingent", special_verification_period: TimeKeeper.date_of_record+95.days, effective_on: Date.new(2017,1,1))}
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Final Eligibility Notice for UQHP/AQHP individuals',
-      :notice_template => 'notices/ivl/final_eligibility_notice_uqhp_aqhp.html.erb',
+      :notice_template => 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
       :notice_builder => 'IvlNotices::FinalEligibilityNoticeRenewalUqhp',
       :event_name => 'final_eligibility_notice_renewal_uqhp',
       :mpi_indicator => 'IVL_FRE',
