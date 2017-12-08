@@ -101,8 +101,7 @@ class Insured::GroupSelectionController < ApplicationController
   def terminate
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-
-    if hbx_enrollment.may_terminate_coverage?
+    if hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_benefit(term_date)
       hbx_enrollment.propogate_terminate(term_date)
