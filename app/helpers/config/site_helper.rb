@@ -92,6 +92,10 @@ module Config::SiteHelper
     Settings.site.make_their_premium_payments_online
   end
 
+  def link_to_make_their_premium_payments_online
+    link_to "make your premium payments online", site_make_their_premium_payments_online
+  end
+
   def health_care_website
       Settings.site.health_care_website
   end
