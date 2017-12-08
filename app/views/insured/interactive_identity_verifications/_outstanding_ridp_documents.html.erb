@@ -1,3 +1,4 @@
+<% if @person.ridp_verification_types.present? %>
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
     <% @person%>
@@ -80,6 +81,7 @@
         </div>
   </div>
 </div>
+<% end %>
 
 <div class="row">
   <div class="col-xs-12">
