@@ -7,7 +7,7 @@ namespace :notice do
    @event_name = args[:event_name].to_s
    @options = args[:state].to_s
    @state_options = {:state => @options}
-   if @employer_id.present? && @event_name.present?
+   if @fein.present? && @event_name.present?
      employer = Organization.where(fein: @fein).first
      employer_id = employer.employer_profile.id.to_s
      if @state_options
