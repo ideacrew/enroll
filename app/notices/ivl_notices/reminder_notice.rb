@@ -16,7 +16,6 @@ class IvlNotices::ReminderNotice < IvlNotice
     generate_pdf_notice
     attach_blank_page(notice_path)
     attach_required_documents if (notice.documents_needed && !notice.cover_all?)
-    attach_appeals
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
