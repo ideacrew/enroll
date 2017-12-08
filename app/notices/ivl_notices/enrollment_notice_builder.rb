@@ -1,4 +1,5 @@
 class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
+  include ApplicationHelper
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -186,6 +187,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       deductible: enrollment.plan.deductible
       })
     PdfTemplates::Enrollment.new({
+      created_at: enrollment.created_at,
       premium: enrollment.total_premium.round(2),
       aptc_amount: enrollment.applied_aptc_amount.round(2),
       responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
