@@ -1,3 +1,4 @@
+<% if @person.ridp_verification_types.present? %>
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
     <% @person%>
@@ -92,6 +93,7 @@
 <div class="collapse" id="docs-verification-faq">
   <%= render partial: "insured/interactive_identity_verifications/ridp_document_list" %>
 </div>
+<% end %>
 
 <script>
     $(document).ready(function() {
