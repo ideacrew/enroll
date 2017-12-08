@@ -251,15 +251,31 @@
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong><br></br>_____________________________________________________________________________________________________________", top_margin: '-5px'} %>
 
-<%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
-"Eligibility standards:  45 CFR §155.305",
-"Social Security number requests/use:  45 CFR §155.305(f)(6)",
-"Eligibility process:  45 CFR §155.310",
-"Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
-"Document requests:  45 CFR §155.315(f)(2)(ii)",
-"Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
-"Annual open enrollment period:  45 CFR §155.410(e)",
-"Special enrollment periods: 45 CFR §155.420",
-"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
-"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<% if notice.notification_type && notice.notification_type == "enrollment_notice" %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards:  45 CFR §155.305",
+  "Social Security number requests/use:  45 CFR §155.305(f)(6)",
+  "Eligibility process:  45 CFR §155.310",
+  "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+  "Document requests:  45 CFR §155.315(f)(2)(ii)",
+  "Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+  "Annual open enrollment period:  45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)",
+  "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
+<% else %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards:  45 CFR §155.305",
+  "Social Security number requests/use:  45 CFR §155.305(f)(6)",
+  "Eligibility process:  45 CFR §155.310",
+  "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+  "Document requests:  45 CFR §155.315(f)(2)(ii)",
+  "Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+  "Annual open enrollment period:  45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<% end %>

@@ -1087,7 +1087,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_ENR',
-    title: 'Enrollment notice',
+    title: 'YOUR HEALTH OR DENTAL PLAN ENROLLMENT AND PAYMENT DEADLINE',
     description: 'Notice will be sent to families after their enrollment is done.',
     resource_name: 'consumer_role',
     event_name: 'enrollment_notice',

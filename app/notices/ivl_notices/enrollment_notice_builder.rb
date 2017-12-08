@@ -34,6 +34,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def build
+    notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_identifier = recipient.hbx_id
     append_open_enrollment_data
@@ -48,11 +49,25 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
   end
 
+
+
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
     notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+  end
+
+  def append_member_information(people)
+    people.each do |member|
+      notice.individuals << PdfTemplates::Individual.new({
+        :first_name => member.first_name.titleize,
+        :last_name => member.last_name.titleize,
+        :full_name => member.full_name.titleize,
+        :age => calculate_age_by_dob(member.dob),
+        :residency_verified => member.consumer_role.residency_verified?
+        })
+    end
   end
 
   def check_for_unverified_individuals
@@ -71,6 +86,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end.uniq
 
     people = family_members.map(&:person).uniq
+    append_member_information(people)
 
     outstanding_people = []
     people.each do |person|
