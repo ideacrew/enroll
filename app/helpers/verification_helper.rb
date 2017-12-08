@@ -280,6 +280,14 @@ def ridp_type_status(type, person)
     end
   end
 
+  def build_ridp_admin_actions_list(ridp_type, person)
+    if ridp_type_status(ridp_type, person) == 'outstanding'
+      ::RidpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == 'Reject'}
+    else
+      ::RidpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
   def build_reject_reason_list(v_type)
     case v_type
       when "Citizenship"
