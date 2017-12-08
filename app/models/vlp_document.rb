@@ -1,4 +1,5 @@
 class VlpDocument < Document
+  include Mongoid::History::Trackable
 
   attr_accessor :changing_status
 
@@ -116,8 +117,28 @@ class VlpDocument < Document
 
   field :comment, type: String
 
-  scope :uploaded, ->{ where(identifier: {:$exists => true}) }
+  track_history :on => [:title,
+                        :subject,
+                        :alien_number,
+                        :i94_number,
+                        :visa_number,
+                        :passport_number,
+                        :sevis_id,
+                        :naturalization_number,
+                        :receipt_number,
+                        :citizenship_number,
+                        :card_number,
+                        :country_of_citizenship,
+                        :expiration_date,
+                        :issuing_country,
+                        :status,
+                        :verification_type,
+                        :comment],
+                :scope => :consumer_role,
+                :track_create => true,
+                :track_destroy => true
 
+  scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
   validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true
