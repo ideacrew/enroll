@@ -1,5 +1,5 @@
 require 'rails_helper'
-
+include ActionView::Helpers::NumberHelper
 describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
 
   let(:model_event) { "renewal_employee_enrollment_confirmation" }
@@ -24,7 +24,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
                                           benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
                                           employee_role_id: census_employee.employee_role.id,
                                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-                                          aasm_state: "renewing_coverage_enrolled"
+                                          aasm_state: "auto_renewing"
   )
   }
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
@@ -65,8 +65,8 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         expect(subject).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.renewal_employee_enrollment_confirmation"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
-          expect(payload[:event_object_kind]).to eq 'PlanYear'
-          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq enrollment.id.to_s
         end
 
         subject.plan_year_update(model_event)
@@ -77,15 +77,20 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
 
       let(:data_elements) {
         [
+            "employee_profile.notice_date",
             "employee_profile.first_name",
             "employee_profile.last_name",
-            "employee_profile.employer_name",
             "employee_profile.enrollment.plan_name",
-            "employee_profile.plan_year.current_py_start_on",
+            "employee_profile.enrollment.coverage_start_on",
+            "employee_profile.enrollment.employee_responsible_amount",
+            "employee_profile.employer_name",
+            "employee_profile.enrollment.employer_responsible_amount",
             "employee_profile.broker.primary_fullname",
+            "employee_profile.broker.organization",
             "employee_profile.broker.phone",
             "employee_profile.broker.email",
             "employee_profile.broker_present?"
+
         ]
       }
 
@@ -93,8 +98,8 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
       let(:payload)   { {
-          "event_object_kind" => "PlanYear",
-          "event_object_id" => model_instance.id
+          "event_object_kind" => "HbxEnrollment",
+          "event_object_id" => enrollment.id
       } }
       
       context "when notice event received" do
@@ -117,7 +122,8 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
           merge_model = subject.construct_notice_object
           expect(merge_model).to be_a(recipient.constantize)
           expect(merge_model.employer_name).to eq employer.organization.legal_name
-          expect(merge_model.plan_year.current_py_start_on).to eq census_employee.employer_profile.plan_years.first.start_on
+          expect(merge_model.enrollment.coverage_start_on).to eq enrollment.effective_on.strftime('%m/%d/%Y')
+          expect(merge_model.enrollment.employer_responsible_amount).to eq number_to_currency(enrollment.total_employer_contribution, precision: 2)
           expect(merge_model.broker_present?).to be_falsey
         end
       end
