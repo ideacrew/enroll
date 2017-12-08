@@ -896,7 +896,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_FRE',
-    title: 'Your Final Plan Enrollment, And Remainder To Pay',
+    title: 'Review Your Insurance Plan Enrollment And Pay Your Bill Now',
     description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
     resource_name: 'consumer_role',
     event_name: 'final_eligibility_notice_renewal_uqhp',
@@ -918,7 +918,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_FRE',
-    title: 'Your Final Plan Enrollment, And Remainder To Pay',
+    title: 'Review Your Insurance Plan Enrollment And Pay Your Bill Now',
     description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
     resource_name: 'consumer_role',
     event_name: 'final_eligibility_notice_renewal_aqhp',
