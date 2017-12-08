@@ -86,6 +86,10 @@ module PdfTemplates
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
+    def renewal_csr_enrollments
+      renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
+    end
+
     def current_dental_enrollments
       enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
     end

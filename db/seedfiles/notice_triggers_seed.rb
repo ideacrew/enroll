@@ -895,6 +895,50 @@ ivl_notice_triggers = [
   },
 
   {
+    hbx_id: 'IVL_FRE',
+    title: 'Your Final Plan Enrollment, And Remainder To Pay',
+    description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_renewal_uqhp',
+    notice_triggers: [
+        {
+            name: 'Final Eligibility Notice for UQHP/AQHP individuals',
+            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp.html.erb',
+            notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalUqhp',
+            mpi_indicator: 'IVL_FRE',
+            notice_trigger_element_group: {
+                market_places: ['individual'],
+                primary_recipients: ["consumer"],
+                primary_recipient_delivery_method: ["secure_message", "paper"],
+                secondary_recipients: []
+            }
+        }
+    ]
+  },
+
+  {
+    hbx_id: 'IVL_FRE',
+    title: 'Your Final Plan Enrollment, And Remainder To Pay',
+    description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_renewal_aqhp',
+    notice_triggers: [
+        {
+            name: 'Final Eligibility Notice for UQHP/AQHP individuals',
+            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp.html.erb',
+            notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalAqhp',
+            mpi_indicator: 'IVL_FRE',
+            notice_trigger_element_group: {
+                market_places: ['individual'],
+                primary_recipients: ["consumer"],
+                primary_recipient_delivery_method: ["secure_message", "paper"],
+                secondary_recipients: []
+            }
+        }
+    ]
+    },
+
+  {
     hbx_id: 'IVLR2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals staying in APTC only',
