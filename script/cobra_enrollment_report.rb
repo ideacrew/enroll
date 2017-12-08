@@ -1,4 +1,10 @@
+## Pass the date range as given below to generate cobra report
+## rails r script/cobra_enrollment_report.rb "11/01/2017" "12/10/2017"
+
 require 'csv'
+
+@start_date = Date.strptime(ARGV[0], "%m/%d/%Y").beginning_of_day
+@end_date  = Date.strptime(ARGV[1], "%m/%d/%Y").end_of_day
 
 @carriers = CarrierProfile.all.inject({}){|data, c| data[c.id.to_s] = c.legal_name; data }
 
@@ -88,15 +94,11 @@ def header_rows
   data
 end
 
-
 def query_expression
-  start_date = Date.new(2017,11,29).beginning_of_day
-  end_date = TimeKeeper.date_of_record.end_of_day
-
   {
     :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["auto_renewing"]),
-    :created_at.gte => start_date,
-    :created_at.lte => end_date,
+    :created_at.gte => @start_date,
+    :created_at.lte => @end_date,
     :kind => 'employer_sponsored_cobra',
     :coverage_kind.in => %w(health dental)
   }
