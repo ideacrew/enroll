@@ -98,6 +98,21 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
       render template: "insured/families/inbox.html.erb"
       expect(rendered).not_to match(/Download Tax Documents/i)
     end
+
+    context "for Curam Navigation" do
+
+      before :each do
+        render template: "insured/families/inbox.html.erb"
+      end
+
+      it "should verify if the LEFT text exists on the page" do
+        expect(rendered).to have_content("If you applied for Medicaid and tax credit savings, view additional messages")
+      end
+
+      it "should verify if the Curam navigation link exists on the page" do
+        expect(rendered).to have_link('Medicaid & Tax Credits')
+      end
+    end
   end
 
   context "as employee" do

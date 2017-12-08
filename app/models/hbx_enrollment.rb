@@ -820,7 +820,7 @@ class HbxEnrollment
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
       special_enrollment_id = family.current_special_enrollment_periods.first.id
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
