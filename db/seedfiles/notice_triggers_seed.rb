@@ -298,7 +298,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP15',
+    hbx_id: 'SHOPD015',
     title: 'Notice of Low Enrollment - Action Needed',
     description: 'Notifies all the employers who doesnt meet minimum participation requirement',
     resource_name: 'employer',
@@ -308,7 +308,7 @@ shop_notice_triggers = [
         name: 'Low Enrollment Notice',
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_SHOP15',
+        mpi_indicator: 'MPI_D015',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -675,6 +675,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP_D092',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',
+    resource_name: 'employee_role',
+    event_name: 'notify_renewal_employees_dental_carriers_exiting_shop',
+    notice_triggers: [
+      {
+        name: 'Renewal EEs Dental Carriers are Exiting SHOP market notice',
+        notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
+        notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
+        mpi_indicator: 'SHOP_D092',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
@@ -819,6 +840,50 @@ ivl_notice_triggers = [
         notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'IVL_PRE',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVL_FEL_AQHP',
+    title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
+    description: 'Final Eligibility Notice will be sent to all AQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_aqhp',
+    notice_triggers: [
+      {
+        name: 'Final Eligibility Notice for AQHP individuals',
+        notice_template: 'notices/ivl/final_eligibility_notice_aqhp',
+        notice_builder: 'IvlNotices::FinalEligibilityNoticeAqhp',
+        mpi_indicator: 'IVL_FEL',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'IVL_FEL_UQHP',
+    title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
+    description: 'Final Eligibility Notice will be sent to all UQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_uqhp',
+    notice_triggers: [
+      {
+        name: 'Final Eligibility Notice for UQHP individuals',
+        notice_template: 'notices/ivl/final_eligibility_notice_uqhp',
+        notice_builder: 'IvlNotices::FinalEligibilityNoticeUqhp',
+        mpi_indicator: 'IVL_FEL',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
