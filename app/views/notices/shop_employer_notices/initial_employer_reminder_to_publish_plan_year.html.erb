@@ -124,7 +124,7 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "This notice is being provided in accordance with 45 C.F.R. 155.720."} %>

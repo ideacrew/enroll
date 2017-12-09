@@ -567,12 +567,12 @@ module ApplicationHelper
   end
 
   def env_bucket_name(bucket_name)
-    aws_env = ENV['AWS_ENV'] || "local"
+    aws_env = ENV['AWS_ENV'] || "qa"
     "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
-    return plan.metal_level.humanize if plan.coverage_kind == "health"
+    return plan.metal_level.titleize if plan.coverage_kind == "health"
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
@@ -658,8 +658,7 @@ module ApplicationHelper
   end
 
   def load_captcha_widget?
-    return false if Rails.env.test?
-    true
+    !Rails.env.test?
   end
 
   def exchange_icon_path(icon)

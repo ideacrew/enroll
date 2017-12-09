@@ -49,11 +49,11 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   benefit_group_carrier = benefit_group.reference_plan.carrier_profile
   renewing_carrier = benefit_group.reference_plan.carrier_profile
   [benefit_group_carrier, renewing_carrier].each do |carrier_profile|
-    sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+    sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
       factor_set.rating_factor_entries.new(factor_key: secondary_employer_profile.sic_code, factor_value: 1.0)
     end
     sic_factors.save!
-    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
       [0..5].each do |size|
         factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
       end

@@ -47,14 +47,19 @@
           </tr>
           </thead>
           <tbody>
-          <tr>
-            <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
-
-            <% plan_level = plan.metal_level.humanize %>
-            <td><span class="<%= plan_level.downcase %>-icon"><%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %></span></td>
-            <td><%= plan.nationwide ? l10n("nationwide") : l10n("DC-Metro") %></td>
-            <td><%= plan.family_deductible %></td>
-          </tr>
+            <tr>
+              <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
+              <td>
+                <% plan_level = plan.metal_level.titleize %>
+                <span class="<%= plan_level.downcase %>-icon">
+                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).titleize %>
+                </span>
+              </td>
+              <td>
+                <%= render partial: "shared/network_data", locals: {plan: plan} %>
+              </td>
+              <td> <%= deductible_display(@hbx_enrollment, plan) %> </td>
+            </tr>
           </tbody>
         </table>
       </div>

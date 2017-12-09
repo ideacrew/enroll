@@ -44,12 +44,46 @@ module Config::AcaHelper
     @offer_sole_source ||= Settings.aca.plan_options_available.include?("sole_source")
   end
 
+  def enabled_sole_source_years
+    @enabled_sole_source_years ||= Settings.aca.plan_option_years.sole_source_carriers_available
+  end
+
   def offers_metal_level?
     @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
   end
 
+  def metal_levels_explaned
+    response = ""
+    metal_level_contributions = {
+      'bronze': '60%',
+      'silver': '70%',
+      'gold': '80%',
+      'platinum': '90%'
+    }.with_indifferent_access
+    reference_plans_for_metal_level.each_with_index do |level, index|
+      if metal_level_contributions[level]
+        if index == 0
+          response << "#{level.capitalize} means the plan is expected to pay #{metal_level_contributions[level]} of expenses for an average population of consumers"
+        elsif (index == reference_plans_for_metal_level.length - 2) # subtracting 2 because of dental
+          response << ", and #{level.capitalize} #{metal_level_contributions[level]}."
+        else
+          response << ", #{level.capitalize} #{metal_level_contributions[level]}"
+        end
+      end
+    end
+    response
+  end
+
+  def enabled_metal_level_years
+    @enabled_metal_level_years ||= Settings.aca.plan_option_years.metal_level_carriers_available
+  end
+
   def offers_single_carrier?
     @offer_single_carrier ||= Settings.aca.plan_options_available.include?("single_carrier")
+  end
+
+  def enabled_single_carrier_years
+    @enabled_single_carrier_years ||= Settings.aca.plan_option_years.single_carriers_available
   end
 
   def offers_single_plan?
@@ -58,6 +92,26 @@ module Config::AcaHelper
 
   def offers_nationwide_plans?
     @offers_nationwide_plans ||= Settings.aca.nationwide_markets
+  end
+
+  def check_plan_options_title
+    Settings.site.plan_options_title_for_ma
+  end
+
+  def reference_plans_for_metal_level
+    Settings.aca.reference_carriers_for_metal_level
+  end
+
+  def fetch_plan_title_for_sole_source
+    Settings.plan_option_titles.sole_source
+  end
+
+  def fetch_plan_title_for_metal_level
+    Settings.plan_option_titles.metal_level
+  end
+
+  def fetch_plan_title_for_single_carrier
+    Settings.plan_option_titles.single_carrier
   end
 
   def carrier_special_plan_identifier_namespace

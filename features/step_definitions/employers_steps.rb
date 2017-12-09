@@ -319,28 +319,28 @@ end
 And(/^Employer can see the plan information on home tab$/) do
   sleep 1
   within('.benefit-group') do
-    expect(page).to have_content('All Plans From A Single Carrier')
+    expect(page).to have_content('One Carrier')
   end
 end
 
 And(/^Employer can see the sole source plan information on home tab$/) do
   sleep 1
   within('.benefit-group') do
-    expect(page).to have_content('A Sole Source Plan')
+    expect(page).to have_content('A Single Plan')
   end
 end
 
 And(/^Employer can see the plan information$/) do
   sleep 1
   within('.benefit-package') do
-    expect(page).to have_content('All Plans From A Single Carrier')
+    expect(page).to have_content('One Carrier')
   end
 end
 
 And(/^Employer can see the sole source plan information$/) do
   sleep 1
   within('.benefit-package') do
-    expect(page).to have_content('A Sole Source Plan')
+    expect(page).to have_content('A Single Plan')
   end
 end
 
@@ -352,7 +352,7 @@ end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.month).year}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
