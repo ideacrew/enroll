@@ -107,6 +107,14 @@ RSpec.describe Plan, dbclean: :after_each do
           expect(Plan.find(saved_plan.id).id.to_s).to eq saved_plan.id.to_s
         end
       end
+
+      context "check associations with plan model with renewal plan mapping" do
+        it "embeds_many assiciation check" do
+          association = Plan.reflect_on_association(:renewal_plan_mappings)
+          expect(association.macro).to eq (:embeds_many)
+          expect(association.name).to eq (:renewal_plan_mappings)
+        end
+      end
     end
 
     context "check plan offerings scope" do
@@ -132,6 +140,59 @@ RSpec.describe Plan, dbclean: :after_each do
         is_expected.to have_attributes(:frozen_plan_year => nil)
       end
 
+    end
+
+    context "renewal_plan_mapping filter by date" do
+      let(:calender_year) { TimeKeeper.date_of_record.year }
+      let!(:sole_source_plan) { create(:plan, is_sole_source: true, renewal_plan_id: renewal_health_plan.id, active_year: calender_year) }
+      let!(:renewal_health_plan) { create(:plan, coverage_kind: "health", active_year: calender_year + 1) }
+      let!(:neighbour_plan) { create(:plan, is_sole_source: true, active_year: calender_year + 1) }
+      let(:current_date) { Date.new(calender_year, 4, 10) }
+    
+      before do 
+        TimeKeeper.set_date_of_record_unprotected!(current_date)
+      end
+
+      context "when carrier mappings not present" do
+        it "should return same carrier renewal plan" do
+          expect(sole_source_plan.renewal_plan).to eq renewal_health_plan
+        end
+      end
+
+      context "when carrier mapping present" do
+        let(:renewal_plan_status) { true }
+
+        let!(:renewal_plan_mappings1) {
+          sole_source_plan.renewal_plan_mappings.create({ 
+            start_on: Date.new(calender_year, 1, 1),
+            end_on: Date.new(calender_year, 5, 1).end_of_month,
+            renewal_plan_id: neighbour_plan.id,
+            is_active: renewal_plan_status
+          })
+        }
+  
+        context "is not active" do 
+          let(:renewal_plan_status) { false }
+
+          it "should return just regular renewal plan" do
+            expect(sole_source_plan.renewal_plan(current_date)).to eq renewal_health_plan
+          end
+        end
+
+        context "is active" do
+          it "should return renewal plan from mapping" do
+            expect(sole_source_plan.renewal_plan(current_date)).to eq neighbour_plan
+          end
+        end
+
+        context "is expired" do
+          let(:current_date) { Date.new(calender_year, 6, 10) }
+
+          it "should return just regular renewal plan" do
+            expect(sole_source_plan.renewal_plan(current_date)).to eq renewal_health_plan
+          end
+        end
+      end
     end
 
     context "with no metal_level" do

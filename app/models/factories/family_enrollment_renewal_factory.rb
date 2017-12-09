@@ -70,7 +70,7 @@ module Factories
     end
 
     def renewal_plan_offered_by_er?(enrollment)
-      if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
+      if enrollment.plan.present? || enrollment.plan.renewal_plan(renewing_plan_year.start_on).present?
 
         if @census_employee.renewal_benefit_group_assignment.blank?
           benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
@@ -78,7 +78,7 @@ module Factories
           @census_employee.save!
         end
 
-        @census_employee.renewal_benefit_group_assignment.benefit_group.elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
+        @census_employee.renewal_benefit_group_assignment.benefit_group.elected_plan_ids.include?(enrollment.plan.renewal_plan(renewing_plan_year.start_on).id)
       else
         false
       end
@@ -155,7 +155,7 @@ module Factories
          renewal_enrollment.send("#{attr}=", active_enrollment.send(attr))
       end
 
-      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan_id if active_enrollment.plan.present?
+      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan(renewing_plan_year.start_on).id if active_enrollment.plan.present?
       renewal_enrollment
     end
 
