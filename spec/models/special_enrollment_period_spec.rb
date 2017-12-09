@@ -140,7 +140,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
     context "with invalid next_poss_effective_date" do
-      let(:param_with_invalid_next_poss_effective_date){
+      let(:param_with_valid_next_poss_effective_date){
         {
           family: family,
           qualifying_life_event_kind: ivl_qle,
@@ -150,12 +150,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         }
       }
       it "should be invalid" do
-        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_next_poss_effective_date).errors[:next_poss_effective_date].any?).to be_truthy
+        expect(SpecialEnrollmentPeriod.create(**param_with_valid_next_poss_effective_date).errors[:next_poss_effective_date].any?).to be_falsey
       end
     end
 
     context "with invalid optional_effective_on" do
-      let(:param_with_invalid_optional_effective_on){
+      let(:param_with_valid_optional_effective_on){
         {
           family: family,
           qualifying_life_event_kind: ivl_qle,
@@ -165,7 +165,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         }
       }
       it "should be invalid" do
-        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_optional_effective_on).errors[:optional_effective_on].any?).to be_truthy
+        expect(SpecialEnrollmentPeriod.create(**param_with_valid_optional_effective_on).errors[:optional_effective_on].any?).to be_falsey
       end
     end
 
