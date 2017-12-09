@@ -1,5 +1,7 @@
-Dir.glob('db/seedfiles/translations/*').each do |file|
-  require_relative 'translations/' + File.basename(file,File.extname(file))
+puts "Hi"
+Dir.glob('db/seedfiles/translations/en/*').each do |file|
+  puts file
+  require_relative 'translations/en/' + File.basename(file,File.extname(file))
 end
 
 puts "*"*80
@@ -15,6 +17,7 @@ translations = [
   MAIN_TRANSLATIONS,
   USERS_ORPHANS_TRANSLATIONS,
   WELCOME_INDEX_TRANSLATIONS,
+  BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
   INSURED_TRANSLATIONS,
   BROKER_AGENCIES_TRANSLATIONS,
   DEVISE_TRANSLATIONS
