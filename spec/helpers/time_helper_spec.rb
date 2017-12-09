@@ -142,17 +142,6 @@ RSpec.describe TimeHelper, :type => :helper do
       it "returns maximum range as nil when market kind is nil" do
         expect(helper.sep_optional_date(family, 'max', nil)).to eq nil
       end
-
-      it "returns minimum range as beginning_of_year when market kind is nil & no ER sponsored benefits present" do
-        allow(plan_year).to receive(:published_or_renewing_published).and_return []
-        expect(helper.sep_optional_date(family, 'min', nil)).to eq beginning_of_year
-      end
-
-      it "returns maximum range as end_of_year when market kind is nil & no ER sponsored benefits present" do
-        allow(plan_year).to receive(:published_or_renewing_published).and_return []
-        expect(helper.sep_optional_date(family, 'max', nil)).to eq end_of_year
-      end
-
     end
 
     context "for person with no consumer or active employee roles" do
