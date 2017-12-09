@@ -11,6 +11,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     super(args)
   end
 
+  def attach_required_documents
+    generate_custom_notice('notices/ivl/documents_section')
+    attach_blank_page(custom_notice_path)
+    join_pdfs [notice_path, custom_notice_path]
+    clear_tmp
+  end
+
   def deliver
     append_hbe
     build
