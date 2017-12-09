@@ -9,6 +9,7 @@ class HbxEnrollment
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include Mongoid::History::Trackable
 
   embedded_in :household
 
@@ -114,6 +115,22 @@ class HbxEnrollment
   # but did not originate with the exchange.  'External' enrollments
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
+
+  track_history   :on => [:kind,
+                          :enrollment_kind,
+                          :coverage_kind,
+                          :effective_on,
+                          :terminated_on,
+                          :terminate_reason,
+                          :aasm_state,
+                          :is_active,
+                          :waiver_reason,
+                          :review_status,
+                          :special_verification_period,
+                          :termination_submitted_on],
+                  :track_create  => true,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => true     # track document destruction, default is false
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -820,7 +837,7 @@ class HbxEnrollment
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
       special_enrollment_id = family.current_special_enrollment_periods.first.id
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end

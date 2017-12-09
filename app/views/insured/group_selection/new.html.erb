@@ -122,36 +122,44 @@
           </div>
 
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
-          <% if @change_plan.blank? && @enrollment_kind.blank?%>
-          <div class='row top-pd'>
-            <div class="col-sm-12">
-              <p><%= l10n(".coverage_begin_ivl_enrollment_effective_date", ivl_enrollment_effective_date: format_date(ivl_enrollment_effective_date)) %></p>
-              <p><%= l10n(".need_coverage_earlier_html") %></p>
+            <% if @change_plan.blank? && @enrollment_kind.blank?%>
+            <div class='row top-pd'>
+              <div class="col-sm-12">
+                <p><%= l10n(".coverage_begin_ivl_enrollment_effective_date", ivl_enrollment_effective_date: format_date(ivl_enrollment_effective_date)) %></p>
+                <p><%= l10n(".need_coverage_earlier_html") %></p>
+              </div>
             </div>
-          </div>
-          <% end %>
-          <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
-          <div class='row top-pd'>
-            <div class="col-sm-12">
-              <p><%= l10n(".show_residency_alert_msg", full_name: @person.full_name, aca_state_name: aca_state_name, site_short_name: site_short_name, contact_center_phone_number: contact_center_phone_number) %></p>
-            </div>
-          </div>
-          <% end %>
-          <% end %>
-
-          <% if @change_plan.present? %>
-            <%= hidden_field_tag 'change_plan', @change_plan %>
-            <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
-            <br/>
-            <h3><%= l10n("insured.group_selection.new.what_would_you_like_to_do") %></h3>
-            <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
-            <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
-              <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-
-              <%= link_to l10n('select_plan_to_terminate'), terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
-              class: ('btn btn-primary' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
-          <% else %>
+
+            <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
+              <div class='row top-pd'>
+                <div class="col-sm-12">
+                  <h4>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></h4>
+                </div>
+              </div>
+
+              <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
+                <div class='row top-pd'>
+                  <div class="col-sm-12">
+                    <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+
+            <% if @change_plan.present? %>
+              <%= hidden_field_tag 'change_plan', @change_plan %>
+              <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
+              <br/>
+              <h3><%= l10n("insured.group_selection.new.what_would_you_like_to_do") %></h3>
+              <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
+              <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
+                <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+
+                <%= link_to l10n('select_plan_to_terminate'), terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
+                class: ('btn btn-primary' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
+              <% end %>
+            <% else %>
             <!--<h3>Select a plan</h3>-->
             <!--<p class="text-justify"><%= t('welcome.employee.select_plan') %></p>-->
           <% end %>

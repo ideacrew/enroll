@@ -1,12 +1,7 @@
 source 'https://rubygems.org'
 
-gem "config", '~> 1.0.0'
-gem "mongoid-autoinc"
-gem "mongoid-enum"
-gem "pundit", '~> 1.0.1'
-gem "recaptcha", '1.1.0'
 gem 'aasm', '~> 4.8.0'
-gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
+gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: 'development'
 gem 'addressable', '2.3.8'
 gem 'animate-rails', '~> 1.0.7'
 gem 'aws-sdk', '2.2.4'
@@ -16,6 +11,7 @@ gem 'bson', '3.2.6'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'coffee-rails', '~> 4.1.0'
 gem 'combine_pdf'
+gem 'config', '~> 1.0.0'
 gem 'devise', '~> 3.4.1'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'font-awesome-rails', '4.5.0.1'
@@ -37,23 +33,26 @@ gem 'money-rails', '~> 1.3.0'
 gem 'mongo', '2.1.2'
 gem 'mongo_session_store-rails4', '~> 6.0.0'
 gem 'mongoid', '5.0.1'
-gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", branch: "master"
+gem 'mongoid-autoinc'
+gem 'mongoid-enum'
+gem 'mongoid-history'
 gem 'mongoid-versioning'
 gem 'mongoid_userstamp'
 gem 'nokogiri', '1.6.7.2'
 gem 'nokogiri-happymapper', :require => 'happymapper'
-gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
-gem 'prawn', :git => "https://github.com/prawnpdf/prawn.git", :ref => '8028ca0cd2'
-gem 'rails', '4.2.3' # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'openhbx_cv2', git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
+gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
+gem 'pundit', '~> 1.0.1'
+gem 'rails', '4.2.7.1'
 gem 'rails-i18n', '4.0.8'
+gem 'recaptcha', '1.1.0'
 gem 'redis-rails'
 gem 'resque'
 gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
-gem 'sdoc', '~> 0.4.0', group: :doc # bundle exec rake doc:rails generates the API under doc/api.
-gem 'slim'
-gem 'sprockets' , "~> 2.12.3"
+gem 'slim-rails'
+gem 'sprockets' , '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
 gem 'turbolinks','2.5.3'
@@ -66,7 +65,7 @@ gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 # Removed gems
 #######################################################
 #
-# gem 'acapi', path: "../acapi"
+# gem 'acapi', path: '../acapi'
 # gem 'bcrypt', '~> 3.1.7'
 # gem 'bh'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
@@ -78,8 +77,12 @@ gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 #
 #######################################################
 
+group :doc do
+  gem 'sdoc', '~> 0.4.0'
+end
+
 group :development do
-  gem "parallel_tests"
+  gem 'parallel_tests'
   gem 'web-console', '2.3.0'
 end
 
@@ -88,7 +91,7 @@ group :development, :test do
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
   gem 'email_spec', '2.0.0'
-  gem 'factory_girl_rails', "4.6.0"
+  gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
   gem 'pry'
   gem 'pry-byebug'

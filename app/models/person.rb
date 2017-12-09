@@ -8,6 +8,33 @@ class Person
   include UnsetableSparseFields
   include FullStrippedNames
 
+  # verification history tracking
+  include Mongoid::History::Trackable
+
+  track_history :on => [:first_name,
+                        :middle_name,
+                        :last_name,
+                        :full_name,
+                        :alternate_name,
+                        :encrypted_ssn,
+                        :dob,
+                        :gender,
+                        :is_incarcerated,
+                        :is_disabled,
+                        :ethnicity,
+                        :race,
+                        :tribal_id,
+                        :no_dc_address,
+                        :no_dc_address_reason,
+                        :is_active,
+                        :no_ssn],
+                :modifier_field => :modifier,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true     # track document destruction, default is false
+
+
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
 
@@ -37,7 +64,6 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
-  field :is_physically_disabled, type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -53,6 +79,7 @@ class Person
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
+  field :is_physically_disabled, type: Boolean
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
@@ -411,6 +438,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
+    verification_types << 'DC Residency' if (consumer_role && age_on(TimeKeeper.date_of_record) > 19)
     verification_types << 'Social Security Number' if ssn
     verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
@@ -819,17 +847,19 @@ class Person
   end
 
   def assign_citizen_status
+    new_status = nil
     if naturalized_citizen
-      self.citizen_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
+      new_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
     elsif us_citizen
-      self.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
+      new_status = ::ConsumerRole::US_CITIZEN_STATUS
     elsif eligible_immigration_status
-      self.citizen_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
+      new_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
     elsif (!eligible_immigration_status.nil?)
-      self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+      new_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
     end
+    self.consumer_role.lawful_presence_determination.assign_citizen_status(new_status) if new_status
   end
 
   def agent?
@@ -969,9 +999,5 @@ class Person
 
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
-  end
-
-  def family_member
-    primary_family.family_members.find_by(person_id: id)
   end
 end

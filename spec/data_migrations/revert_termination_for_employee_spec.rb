@@ -21,7 +21,7 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
     before do
       allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(enrollment.hbx_id)
       allow(ENV).to receive(:[]).with("census_employee_id").and_return(census_employee.id)
-      census_employee.class.skip_callback(:save, :before, :assign_default_benefit_package)
+      census_employee.class.skip_callback(:save, :after, :assign_default_benefit_package)
       census_employee.save! # We can only change the census record SSN & DOB when CE is in "eligible" status
       census_employee.aasm_state = "employment_terminated"
       census_employee.employee_role_id = employee_role.id
@@ -32,7 +32,7 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
     end
 
     after do
-      census_employee.class.set_callback(:save, :before, :assign_default_benefit_package)
+      census_employee.class.set_callback(:save, :after, :assign_default_benefit_package)
     end
 
     it "should show the state of census employee as linked" do

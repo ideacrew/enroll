@@ -7,6 +7,7 @@ site:
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
   website_name: "www.DCHealthLink.com"
+  website_url: "www.healthcare.gov"
 
   social_media:
     facebook_url: ""
@@ -37,13 +38,8 @@ aca:
       days: 0
 
     open_enrollment:
-      benefit_year_2016:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
-
-      benefit_year_2017:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
+      start_on: <%= Date.new(2017,11,1) %>
+      end_on: <%= Date.new(2018,01,31) %>
 
   shop_market:
     small_market_employee_count_maximum: 50
