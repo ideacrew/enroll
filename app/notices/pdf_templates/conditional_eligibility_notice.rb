@@ -101,6 +101,10 @@ module PdfTemplates
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
+    def latest_current_year_enrollment
+      enrollments.sort_by(&:effective_on).last
+    end
+
     def current_dental_enrollments
       enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == coverage_year}
     end

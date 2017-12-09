@@ -184,10 +184,10 @@
     content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '-5px'} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
+    content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
 
-   <%= render partial: 'notices/shared/paragraph', :locals => {
-     content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "If you expect your income for #{notice.coverage_year} to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
@@ -239,7 +239,8 @@
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian or Alaska Native status. Examples of such verifications include, but are not limited to the following:",
-    listings: ["A document issued by a federally recognized American Indian/Alaska Native Tribe, such as an enrollment or membership card, a Tribal passport, a Tribal census document, or a document issued by a Tribe indicating the person’s affiliation with the Tribe;", "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian; or","A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian."]} %>
+
+    listings: ["A document issued by a federally recognized American Indian/Alaska Native Tribe, such as an enrollment or membership card, a Tribal passport, a Tribal census document, or a document issued by a Tribe indicating the person’s affiliation with the Tribe;", "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian or Alaska Native; or","A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian or Alaska Native."]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "For American Indians or Alaska Native born outside of the United States, we will accept the following documents:",
@@ -250,15 +251,31 @@
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong><br></br>_____________________________________________________________________________________________________________", top_margin: '-5px'} %>
 
-<%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
-"Eligibility standards:  45 CFR §155.305",
-"Social Security number requests/use:  45 CFR §155.305(f)(6)",
-"Eligibility process:  45 CFR §155.310",
-"Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
-"Document requests:  45 CFR §155.315(f)(2)(ii)",
-"Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
-"Annual open enrollment period:  45 CFR §155.410(e)",
-"Special enrollment periods: 45 CFR §155.420",
-"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
-"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<% if notice.notification_type && notice.notification_type == "enrollment_notice" %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards:  45 CFR §155.305",
+  "Social Security number requests/use:  45 CFR §155.305(f)(6)",
+  "Eligibility process:  45 CFR §155.310",
+  "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+  "Document requests:  45 CFR §155.315(f)(2)(ii)",
+  "Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+  "Annual open enrollment period:  45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)",
+  "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
+<% else %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards:  45 CFR §155.305",
+  "Social Security number requests/use:  45 CFR §155.305(f)(6)",
+  "Eligibility process:  45 CFR §155.310",
+  "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+  "Document requests:  45 CFR §155.315(f)(2)(ii)",
+  "Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+  "Annual open enrollment period:  45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<% end %>
