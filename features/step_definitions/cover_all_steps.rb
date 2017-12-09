@@ -6,6 +6,11 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
   expect(page).not_to have_content('New DC Resident Application')
 end
 
+Then(/^Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link$/) do
+  expect(page).not_to have_content('New Consumer Phone Application')
+  expect(page).not_to have_content('New Consumer Paper Application')
+end
+
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do
   find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").trigger('click')
 end
