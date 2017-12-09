@@ -442,7 +442,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
 
       it "should render the agreement page" do
-        #consumer_role.update_attributes(identity_validation: "valid", application_validation: "valid")
         expect(response).to render_template("ridp_agreement")
       end
     end
