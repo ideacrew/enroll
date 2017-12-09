@@ -18,7 +18,6 @@ module Importers::Mhc
         "Subscriber SSN",
         "Subscriber DOB",
         "Subscriber Gender",
-        "Subscriber Premium",
         "Subscriber First Name",
         "Subscriber Middle Name",
         "Subscriber Last Name",
