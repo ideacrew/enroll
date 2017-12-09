@@ -383,27 +383,6 @@ shop_notice_triggers = [
       }
     ]
   },
-  {
-    hbx_id: 'SHOP18',
-    title: 'Group Open Enrollment Successfully Completed',
-    description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
-    resource_name: 'employer',
-    event_name: 'renewal_employer_open_enrollment_completed',
-    notice_triggers: [
-      {
-        name: 'Renewal Employee Open Employee Completed',
-        notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
-        notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_SHOP18',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
 
   {
     hbx_id: 'DAG058',
@@ -428,7 +407,29 @@ shop_notice_triggers = [
   },
   
   {
-    hbx_id: 'SHOP_D018',
+    hbx_id: 'DAE053',
+    title: 'Employee Eligibility Notice',
+    description: 'This notices goes to all the employees who have successfully matched their employer.',
+    resource_name: 'employee_role',
+    event_name: 'employee_eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Employee Eligibility Notice',
+        notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
+        notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
+        mpi_indicator: 'DAE053',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'SHOP18',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
     resource_name: 'employer',
@@ -438,7 +439,7 @@ shop_notice_triggers = [
         name: 'Renewal Employee Open Employee Completed',
         notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'SHOP_D018',
+        mpi_indicator: 'MPI_SHOP18',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

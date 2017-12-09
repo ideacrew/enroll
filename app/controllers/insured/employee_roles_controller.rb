@@ -63,6 +63,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { redirect_to :action => "edit", :id => @employee_role.id }
         end
       end
+      @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
     else
       respond_to do |format|
         log("Refs #19220 We have an SSN collision for the employee belonging to employer #{@employment_relationship.census_employee.employer_profile.parent.legal_name}", :severity=>'error')
