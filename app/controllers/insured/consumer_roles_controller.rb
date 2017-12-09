@@ -236,7 +236,8 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def ridp_agreement
     set_current_person
-    if @person.completed_identity_verification?
+    consumer = @person.consumer_role
+    if @person.completed_identity_verification? || (consumer.identity_verified? && consumer.application_verified?)
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
