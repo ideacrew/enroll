@@ -81,11 +81,6 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
     end
 
     context "Triggers a new waived enrollment" do
-
-      before do
-        census_employee.update_attributes(:ssn => census_employee.employee_role.person.ssn)
-      end
-
       it "should not generate passive waiver when employee not covered under current plan year", dbclean: :after_each do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
