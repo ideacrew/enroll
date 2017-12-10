@@ -411,9 +411,9 @@ describe Family do
     before do
       @qlek = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date1)
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date2)
     end
 
     it "should return latest active sep" do
@@ -807,6 +807,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
 
     it "should have one current shop eligible open enrollments" do
       expect(family.current_shop_eligible_open_enrollments.count).to eq 1
+    end
+
+    it "should have no current shop eligible open enrollments if the employee role is not active" do
+      census_employee.update_attributes(aasm_state: "employment_terminated")
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 0
     end
 
     it "should not be in ivl open enrollment" do

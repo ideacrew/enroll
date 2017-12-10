@@ -533,8 +533,9 @@ describe HbxEnrollment, dbclean: :after_all do
         end
 
         it "should return decoratored plans when not in the open enrollment" do
+          enrollment.update_attributes(effective_on: sep.effective_on - 1.month)
           allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
-          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).and_return(bcp)
+          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).with(enrollment.effective_on).and_return(bcp)
           allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
@@ -792,6 +793,10 @@ describe HbxProfile, "class methods", type: :model do
     let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
     let(:plan){ Plan.new(active_year: date.year) }
     let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
+
+    before do 
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+    end
 
     it "should return plan year start on year when shop" do
       expect(hbx_enrollment.coverage_year).to eq date.year
@@ -1730,12 +1735,16 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
                                                                                                                :hired_on => hired_on
                                                                       })
       })
-      subject.benefit_group = BenefitGroup.new({
-                                                 :plan_year => PlanYear.new({
-                                                                              :open_enrollment_start_on => open_enrollment_start,
-                                                                              :open_enrollment_end_on => open_enrollment_end
-                                                 })
+
+      benefit_group =  BenefitGroup.new({
+       :plan_year => PlanYear.new({
+        :open_enrollment_start_on => open_enrollment_start,
+        :open_enrollment_end_on => open_enrollment_end
+        })
       })
+
+      subject.benefit_group = benefit_group
+      allow(subject).to receive(:benefit_group).and_return(benefit_group)
     end
     it "should have an eligibility event date" do
       expect(subject.eligibility_event_has_date?).to eq true
@@ -1770,13 +1779,17 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
                                                                                                                :hired_on => hired_on
                                                                       })
       })
-      subject.benefit_group = BenefitGroup.new({
-                                                 :plan_year => PlanYear.new({
-                                                                              :open_enrollment_start_on => open_enrollment_start,
-                                                                              :open_enrollment_end_on => open_enrollment_end,
-                                                                              :start_on => coverage_start
-                                                 })
+
+      benefit_group = BenefitGroup.new({
+       :plan_year => PlanYear.new({
+        :open_enrollment_start_on => open_enrollment_start,
+        :open_enrollment_end_on => open_enrollment_end,
+        :start_on => coverage_start
+        })
       })
+
+      subject.benefit_group = benefit_group
+      allow(subject).to receive(:benefit_group).and_return(benefit_group)
     end
 
     describe "when coverage start is the same as the plan year" do

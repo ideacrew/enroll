@@ -43,9 +43,9 @@ module Subscribers
 
     def update_consumer_role(consumer_role, xml_hash)
       if xml_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
-        consumer_role.deny_residency!
+        consumer_role.fail_residency!
       else
-        consumer_role.authorize_residency!
+        consumer_role.pass_residency!
       end
 
       consumer_role.save
