@@ -9,13 +9,13 @@
             </div>
             <div class="verification-types col-md-12">
               <% @person.ridp_verification_types.each do |ridp_type| %>
-                  <div class="row">
+                  <div class="row" id="<%= ridp_type %>">
                     <div class="v-type col-md-12">
                       <div class="v-type-name col-md-2">
                         <%= ridp_type %>
                       </div>
                       <div class="v-type-status col-md-3">
-                      <span class="label lb-md label-<%=ridp_type_class(ridp_type, @person)%>">
+                      <span class="label lb-md label-<%=ridp_type_class(ridp_type, @person)%>" id="status">
                         <%= show_ridp_type(ridp_type, @person) %>
                       </span>&nbsp;
                         <%= pundit_span Family, :updateable? %>
