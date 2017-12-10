@@ -27,10 +27,9 @@ module Subscribers
           consumer_role.save
           return
         end
-
         xml_hash = xml_to_hash(xml)
-
         update_consumer_role(consumer_role, xml_hash)
+        save_residency_verification_responses(consumer_role)
       rescue => e
         notify("acapi.error.application.enroll.remote_listener.local_residency_responses", {
           :body => JSON.dump({
@@ -47,8 +46,15 @@ module Subscribers
       else
         consumer_role.pass_residency!
       end
-
       consumer_role.save
+    end
+
+    def save_residency_verification_responses(consumer_role)
+      data = Parsers::Xml::Cv::ResidencyVerificationResponse.parse(consumer_role.local_residency_responses.last.body).to_hash
+      consumer_role.residency_verification_responses <<
+      ResidencyVerificationResponse.new(
+        address_verification: data[:residency_verification_response]
+        )
     end
 
     def xml_to_hash(xml)

@@ -127,6 +127,7 @@ class ConsumerRole
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
   embeds_many :ridp_documents, as: :documentable
+  embeds_many :residency_verification_responses
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
 
