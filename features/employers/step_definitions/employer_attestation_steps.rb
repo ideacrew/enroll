@@ -133,6 +133,26 @@ When (/^Employer Staff clicks documents tab$/) do
   find('.interaction-click-control-documents').click
 end
 
+def enter_plan_year_info
+  wait_for_ajax(2,2)
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 5).click
+
+  screenshot("employer_add_plan_year")
+  find('.interaction-field-control-plan-year-fte-count').click
+
+  fill_in "plan_year[fte_count]", :with => "35"
+  fill_in "plan_year[pte_count]", :with => "15"
+  fill_in "plan_year[msp_count]", :with => "3"
+
+  find('.interaction-click-control-continue').click
+
+  # Benefit Group
+  fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "BMC HealthNet Plan Silver B"
+
+  find('.interaction-choice-control-plan-year-start-on', :visible => true).click
+  find('li.interaction-choice-control-plan-year-start-on-1').click
+end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for employer$/) do
   wait_for_ajax(2,2)
