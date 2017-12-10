@@ -32,7 +32,7 @@
             <%#= link_to(agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
               <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
               <%= l10n("broker_agencies.profiles.agency_mail")%>
-            <% end %>
+            <%# end %>
           </li>
           -->
         <% end %>
@@ -75,8 +75,8 @@
               First Time Applications for Medicaid
               <br/>
               and Premium Tax Credits
-          </li>
             <% end %>
+          </li>
         <% end %>
       </ul>
     </div>
