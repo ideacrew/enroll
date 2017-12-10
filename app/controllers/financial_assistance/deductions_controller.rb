@@ -4,6 +4,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   include UIHelpers::WorkflowController
   include NavigationHelper
+  include FinancialAssistanceHelper
 
   before_filter :find_application_and_applicant
   before_filter :load_support_texts, only: [:index]
@@ -114,7 +115,8 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def load_support_texts
-    @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+    raw_support_text = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+    @support_texts = set_support_text_placeholders raw_support_text
   end
 
   def find

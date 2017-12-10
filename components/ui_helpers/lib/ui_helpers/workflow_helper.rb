@@ -56,5 +56,16 @@ module UIHelpers
       end
     end
 
+    # set YAML text placeholders
+    def set_text_placeholders(text)
+      return "" if text.nil?
+      # set application applicable year placeholder
+      if text.include? '<application-applicable-year-placeholder>'
+        text.sub! '<application-applicable-year-placeholder>', (@model.class.to_s == "FinancialAssistance::Application" ? @model.family.application_applicable_year.to_s : @model.application.family.application_applicable_year.to_s)
+      else
+        text
+      end
+    end
+
   end
 end
