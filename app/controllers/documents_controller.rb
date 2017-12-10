@@ -2,7 +2,7 @@ class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date]
-  after_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :extend_due_date, :destroy]
+  before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :extend_due_date, :destroy]
   respond_to :html, :js
 
   def download
@@ -157,7 +157,7 @@ class DocumentsController < ApplicationController
     reason = params[:verification_reason]
     if @person
       @person.consumer_role.add_type_history_element(verification_type: verification_type,
-                                                     action: action,
+                                                     action: action.split('_').join(' '),
                                                      modifier: actor,
                                                      update_reason: reason)
     end

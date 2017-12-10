@@ -6,6 +6,7 @@ class LawfulPresenceDetermination
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Mongoid::Attributes::Dynamic
 
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"

@@ -23,7 +23,6 @@ describe Subscribers::SsaVerification do
 
     before :each do
       consumer_role.aasm_state="ssa_pending"
-      person.save!
     end
 
     context "stores SSA response in verification history" do
