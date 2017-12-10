@@ -31,16 +31,23 @@ Feature: Consumer requests enrollment in CoverAll
     When HBX Admin clicks go to my account button
     Then HBX Admin should see the home page with text coverage selected
 
-   Scenario: When we login as Hbx admin with only read permissions then on family tab we should not see link New DC Resident Application
+  Scenario: When we login as Hbx admin with only read permissions then on family tab we should not see link New DC Resident Application
     Given a Hbx admin with read only permissions exists
     When Hbx Admin logs on to the Hbx Portal
     Then Hbx Admin sees Families link
     When Hbx Admin clicks on Families link
     Then Hbx Admin should not see an DC Resident Application link
 
-   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should not see link New DC Resident Application
+  Scenario: When we login as Hbx admin with read and write permissions then on family tab we should not see link New DC Resident Application
      Given a Hbx admin with super admin access exists
      When Hbx Admin logs on to the Hbx Portal
      Then Hbx Admin sees Families link
      When Hbx Admin clicks on Families link
      Then Hbx Admin should not see an New DC Resident Application link
+
+  Scenario: When we login as Hbx admin then on family tab admin should not see link New Consumer Phone Application and New Consumer Paper Application
+    Given a Hbx admin with read and write permissions exists
+    When Hbx Admin logs on to the Hbx Portal
+    Then Hbx Admin sees Families link
+    When Hbx Admin clicks on Families link
+    Then Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link
