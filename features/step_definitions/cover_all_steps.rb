@@ -1,16 +1,25 @@
-Then(/^Hbx Admin should see an New DC Resident Application link$/) do
-  find_link('New DC Resident Application').visible?
+Then(/^Hbx Admin should see an DC Resident Application link$/) do
+  find_link('DC Resident Application').visible?
 end
 
 Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
   expect(page).not_to have_content('New DC Resident Application')
 end
 
-When(/^Hbx Admin clicks on New DC Resident Application link$/) do
-  click_link "New DC Resident Application"
+Then(/^Hbx Admin should not see an DC Resident Application link$/) do
+  expect(page).not_to have_content('DC Resident Application')
 end
 
-Then(/^Hbx Admin should see New DC Resident Personal Information page$/) do
+Then(/^Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link$/) do
+  expect(page).not_to have_content('New Consumer Phone Application')
+  expect(page).not_to have_content('New Consumer Paper Application')
+end
+
+When(/^Hbx Admin clicks on DC Resident Application link$/) do
+  find(:xpath, "/html/body/div[2]/div/ul/li[2]/ul/li[4]/a/span[1]").trigger('click')
+end
+
+Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
   expect(page).not_to have_content('Personal Information')
 end
 

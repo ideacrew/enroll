@@ -54,6 +54,7 @@ class Person
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
 
+
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
   # Login account
@@ -208,6 +209,8 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
+  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$eq" => "pending" })}
+  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$eq" => "pending" })}
 
 #  ViewFunctions::Person.install_queries
 
@@ -422,6 +425,14 @@ class Person
     verification_types
   end
 
+# collect all ridp_verification_types user in case of unsuccessful ridp
+  def ridp_verification_types
+    ridp_verification_types = []
+    ridp_verification_types << 'Identity' if consumer_role && consumer_role.is_applicant == true && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Application' if consumer_role && consumer_role.is_applicant == true && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types
+  end
+
   def relatives
     person_relationships.reject do |p_rel|
       p_rel.relative_id.to_s == self.id.to_s
@@ -572,6 +583,10 @@ class Person
   end
 
   class << self
+    def for_admin_approval
+      all_consumer_roles.outstanding_identity_validation || all_consumer_roles.outstanding_application_validation
+    end
+    
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]
     end

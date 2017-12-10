@@ -205,9 +205,23 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
+  context "GET upload_ridp_document" do
+    before(:each) do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+    end
+    it "should render new template" do
+      sign_in user
+      get :upload_ridp_document
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_ridp_document)
+    end
+  end
+
   context "PUT update" do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryGirl.build(:person) }
+    let(:person_params){{"family"=>{"application_type"=>"Phone"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person){ FactoryGirl.create(:person, :with_family) }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -268,6 +282,39 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
+  context "PUT update as HBX Admin" do
+    let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person){ FactoryGirl.create(:person, :with_family, :with_hbx_staff_role) }
+
+    before(:each) do
+      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(user).to receive(:person).and_return person
+      allow(person).to receive(:consumer_role).and_return consumer_role
+      sign_in user
+    end
+
+    it "should redirect to family members path when current user has application type as Curam" do
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+
+    it "should redirect to family members path when current user has application type as Mobile" do
+      person_params["family"]["application_type"] = "Mobile"
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+  end
+
   context "GET immigration_document_options" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
     let(:params) {{target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}}
@@ -325,6 +372,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         allow(person).to receive(:consumer_role?).and_return(true)
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person).to receive(:completed_identity_verification?).and_return(true)
+        allow(person.consumer_role).to receive(:identity_verified?).and_return(true)
+        allow(person.consumer_role).to receive(:application_verified?).and_return(true)
         get "ridp_agreement"
       end
 
@@ -341,6 +390,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       before :each do
         allow(user).to receive(:person).and_return(person)
         allow(person).to receive(:completed_identity_verification?).and_return(false)
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person.consumer_role).to receive(:identity_verified?).and_return(false)
+        allow(person.consumer_role).to receive(:application_verified?).and_return(false)
         get "ridp_agreement"
       end
 
