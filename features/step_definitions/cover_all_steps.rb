@@ -8,6 +8,7 @@ end
 
 Then(/^Hbx Admin should not see an DC Resident Application link$/) do
   expect(page).not_to have_content('DC Resident Application')
+end
 
 Then(/^Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link$/) do
   expect(page).not_to have_content('New Consumer Phone Application')
