@@ -151,7 +151,7 @@ class ConsumerRole
 
   validates :citizen_status,
     allow_blank: true,
-    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+    inclusion: { in: CITIZEN_STATUS_KINDS + ACA_ELIGIBLE_CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
   validates :citizenship_result,
     allow_blank: true,
