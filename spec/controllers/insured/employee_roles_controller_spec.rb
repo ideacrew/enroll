@@ -109,7 +109,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
   describe "GET edit" do
     let(:user) { double("User") }
-    let(:person) { double("Person", broker_role: BrokerRole.new) }
+    let(:person) { double("Person", :user => user, broker_role: BrokerRole.new) }
     let(:census_employee) { double("CensusEmployee") }
     let(:address) { double("Address") }
     let(:addresses) { [address] }
