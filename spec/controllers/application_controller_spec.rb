@@ -163,12 +163,12 @@ RSpec.describe ApplicationController do
     end
   end
 
-  describe 'hbx_staff_and_consumer_role' do
+  describe 'hbx_staff_and_consumer_role and with no user' do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:user) { FactoryGirl.create(:user, :person => person) }
     let(:role) {FactoryGirl.create(:consumer_role)}
 
-    context 'current user is hbx admin and role is consumer' do
+    context 'current user is hbx admin and role is consumer with no user record' do
       before do
         sign_in(user)
         allow(user).to receive(:has_hbx_staff_role?).and_return(true)
@@ -184,6 +184,11 @@ RSpec.describe ApplicationController do
         role = nil
         consumer = subject.send(:hbx_staff_and_consumer_role, role)
         expect(consumer).to eq(true)
+      end
+
+      it 'returns nil if person has consumer role with no user_id and current user is admin' do
+        consumer = subject.send(:hbx_staff_and_consumer_role, role)
+        expect(role.person.user).to eq(nil)
       end
     end
 

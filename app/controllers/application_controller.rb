@@ -282,7 +282,7 @@ class ApplicationController < ActionController::Base
     end
 
     def save_bookmark (role, bookmark_url)
-      return if hbx_staff_and_consumer_role(role)
+      return if hbx_staff_and_consumer_role(role) && !@person.user.nil?
       if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
         role.bookmark_url = bookmark_url
         role.try(:save!)
