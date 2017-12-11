@@ -100,7 +100,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
     context "American Indian Status verification type" do
       before do
-        person.consumer_role.update_attributes!(tribal_id: "444444444")
+        person.update_attributes(:tribal_id => "444444444")
       end
       it_behaves_like "update verification type", "American Indian Status", "Document in EnrollApp", "verify", "native_validation", "valid"
       it_behaves_like "update verification type", "American Indian Status", "Document in EnrollApp", "verify", "native_update_reason", "Document in EnrollApp"
@@ -112,6 +112,17 @@ RSpec.describe DocumentsController, :type => :controller do
 
     context "Immigration verification type" do
       it_behaves_like "update verification type", "Immigration", "SAVE system", "verify", "lawful_presence_update_reason", "SAVE system"
+    end
+
+    it 'updates verification type if verification reason is expired' do
+      initial_value = person.consumer_role.lawful_presence_update_reason
+      params = { person_id: person.id, verification_type: 'Citizenship', verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
+      put :update_verification_type, params
+      person.reload
+      updated_value = person.consumer_role.lawful_presence_update_reason
+
+      expect(person.consumer_role.lawful_presence_update_reason).to eq({"v_type"=>"Citizenship", "update_reason"=>"Expired"})
+      expect(initial_value).to_not eq(updated_value)
     end
 
     context "redirection" do
