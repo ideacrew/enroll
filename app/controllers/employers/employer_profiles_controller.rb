@@ -423,7 +423,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

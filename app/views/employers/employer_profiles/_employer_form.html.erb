@@ -124,6 +124,10 @@
               <% @row = true %>
             <% end %>
             <br/>
+            <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |f| %>
+              <%= render "employer_contact_preferences", f: f %><br>
+            <% end %>
+            <br>
             <div class="form-inputs">
               <%= pundit_span(EmployerProfile,:updateable?) %>
                  <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
