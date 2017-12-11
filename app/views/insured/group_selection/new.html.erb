@@ -81,7 +81,7 @@
             <% end %>
           <% end %>
 
-          <% if @employee_role.present? %>
+          <% if can_shop_shop?(@person) %>
             <%= render 'select_employer' %>
           <% end %>
 
@@ -122,21 +122,19 @@
           </div>
 
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
-          <% if @change_plan.blank? && @enrollment_kind.blank?%>
-          <div class='row top-pd'>
-            <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
-              <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></p>
+            <div class='row top-pd'>
+              <div class="col-sm-12">
+                <h4>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></h4>
+              </div>
             </div>
-          </div>
-          <% end %>
-          <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
-          <div class='row top-pd'>
-            <div class="col-sm-12">
-              <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
-            </div>
-          </div>
-          <% end %>
+
+            <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
+              <div class='row top-pd'>
+                <div class="col-sm-12">
+                  <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
+                </div>
+              </div>
+            <% end %>
           <% end %>
 
           <% if @change_plan.present? %>

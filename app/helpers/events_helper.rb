@@ -69,11 +69,7 @@ module EventsHelper
   end
 
   def employer_plan_years(employer)
-    if (is_renewal_or_conversion_employer?(employer) && TimeKeeper.date_of_record >= ((employer.renewing_published_plan_year.start_on - 1.month)+15.days))  || (is_initial_or_conversion_employer?(employer) && TimeKeeper.date_of_record >= ((employer.published_plan_year.start_on - 1.month)+15.days))
-      employer.plan_years.select(&:eligible_for_export?)
-    elsif is_renewal_employer?(employer) || is_renewing_conversion_employer?(employer)
-      employer.active_plan_year.to_a
-    end
+    employer.plan_years.select(&:eligible_for_export?)
   end
 
   def is_initial_or_conversion_employer?(employer)
