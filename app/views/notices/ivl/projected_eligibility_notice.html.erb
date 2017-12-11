@@ -28,7 +28,7 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "We’re sending you this letter because it’s almost time to renew your health or dental plan for next year.", bottom_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -65,7 +65,7 @@
    heading: 'Review Your Household Information', sub_heading: ''} %>
 
 <% if notice.notification_type == "projected_eligibility_notice_1"%>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
 
   <% notice.uqhp_individuals.each do |member| %>
@@ -113,7 +113,7 @@
       listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
     <% notice.tax_households.each do |thh|%>
       <% if thh.max_aptc.present? %>
-        <%= render partial: 'notices/shared/paragraph', :locals => {
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit before open enrollment begins.", bottom_margin: '5px'} %>
       <% end %>
     <% end %>
@@ -123,19 +123,19 @@
     <% notice.tax_hh_with_csr.each do |hh_csr|%>
       <% case hh_csr.csr_percent_as_integer %>
       <% when 73 %>
-        <%= render partial: 'notices/shared/paragraph', :locals => {
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
       <% when 87 %>
-        <%= render partial: 'notices/shared/paragraph', :locals => {
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
       <% when 94 %>
-        <%= render partial: 'notices/shared/paragraph', :locals => {
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
       <% when 100 %>
-        <%= render partial: 'notices/shared/paragraph', :locals => {
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
       <% else %>
-        <%= render partial: 'notices/shared/paragraph', :locals => {
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
       <% end %>
     <% end %>
@@ -169,7 +169,7 @@
               "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance",
               "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services"]} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "To see if you can get help, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at #{notice.hbe.phone}."} %>
 <% end %>
 
@@ -177,7 +177,7 @@
  contents: ["If your plan is terminated, or cancelled for any reason before the end of the year, it will not be automatically renewed. You must go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> during open enrollment to enroll for #{notice.coverage_year}.","Open enrollment for #{notice.coverage_year} begins on #{notice.ivl_open_enrollment_start_on.strftime("%B %d, %Y")}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
    heading: 'What if I Don’t Have a Plan Anymore?', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br><br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
