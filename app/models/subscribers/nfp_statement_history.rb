@@ -21,16 +21,17 @@ module Subscribers
 
         ep = Organization.where("hbx_id" => eid).first
 
-        if ep.employer_profile
+        if ep && ep.employer_profile
           employer_profile_account = ep.employer_profile.employer_profile_account || ep.employer_profile.build_employer_profile_account
-          employer_profile_account.update_attributes!(:next_premium_due_on => Date.today,
+          employer_profile_account.update_attributes!(
+           :next_premium_due_on => TimeKeeper.date_of_record, # just a random date, not currently being used.
            :past_due => response[:past_due],
            :adjustments => response[:adjustments],
            :payments => response[:payments],
            :total_due => response[:total_due],
            :previous_balance => response[:previous_balance],
            :new_charges => response[:new_charges],
-           :current_statement_date => response[:statement_date]
+           :current_statement_date => Date.strptime(response[:statement_date], "%m/%d/%Y")
            )
 
            employer_profile_account.current_statement_activity.destroy_all
@@ -41,7 +42,7 @@ module Subscribers
              csa.description = line[:description]
              csa.name = line[:name]
              csa.amount = line[:amount]
-             csa.posting_date = line[:posting_date]
+             csa.posting_date = Date.strptime(line[:posting_date], "%m/%d/%Y")
              csa.type = line[:type]
              csa.coverage_month = line[:coverage_month]
              csa.payment_method = line[:payment_method]
@@ -51,7 +52,7 @@ module Subscribers
 
            response[:payment_history].each do |payment|
              p = PremiumPayment.new
-             p.paid_on = payment[:paid_on]
+             p.paid_on = Date.strptime(payment[:paid_on], "%m/%d/%Y")
              p.reference_id = payment[:reference_id]
              p.method_kind = payment[:method_kind]
              p.amount = payment[:amount]
