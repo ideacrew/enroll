@@ -12,7 +12,7 @@ module Subscribers
           Rails.logger.error("PolicyTerminationsSubscriber") { "Began Processing" }
           Rails.logger.error("PolicyTerminationsSubscriber") { payload.inspect }
           stringed_payload = payload.stringify_keys
-          qr_uri = stringed_payload["qualifying_reason"]
+          qr_uri = stringed_payload["qualifying_reason"].present? ? stringed_payload["qualifying_reason"].split('#').last : nil
           policy_instance_uri = stringed_payload["resource_instance_uri"]
           end_effective_date_str = stringed_payload["event_effective_date"]
           hbx_enrollment_id_json_list = stringed_payload["hbx_enrollment_ids"]
