@@ -413,7 +413,7 @@ shop_notice_triggers = [
         name: 'Employee Termination Notice',
         notice_template: 'notices/shop_employee_notices/employee_termination_notice',
         notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
-        mpi_indicator: 'MPI_DAG058',
+        mpi_indicator: 'DAG058',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
