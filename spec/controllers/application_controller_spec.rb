@@ -163,12 +163,12 @@ RSpec.describe ApplicationController do
     end
   end
 
-  describe 'hbx_staff_and_consumer_role and with no user' do
+  describe 'hbx_staff_and_consumer_role' do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:user) { FactoryGirl.create(:user, :person => person) }
     let(:role) {FactoryGirl.create(:consumer_role)}
 
-    context 'current user is hbx admin and role is consumer with no user record' do
+    context 'current user is hbx admin and role is consumer' do
       before do
         sign_in(user)
         allow(user).to receive(:has_hbx_staff_role?).and_return(true)
@@ -184,11 +184,6 @@ RSpec.describe ApplicationController do
         role = nil
         consumer = subject.send(:hbx_staff_and_consumer_role, role)
         expect(consumer).to eq(true)
-      end
-
-      it 'returns nil if person has consumer role with no user_id and current user is admin' do
-        consumer = subject.send(:hbx_staff_and_consumer_role, role)
-        expect(role.person.user).to eq(nil)
       end
     end
 
@@ -212,4 +207,42 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe 'hbx_staff_and_consumer_role and person with no user' do
+    let(:current_person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:current_user) { FactoryGirl.create(:user, :person => current_person) }
+    let(:role) {FactoryGirl.create(:consumer_role)}
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+
+    let(:user2) { FactoryGirl.create(:user) }
+
+    context 'current user is hbx admin and role is consumer with no user record' do
+      before do
+        sign_in(current_user)
+        allow(current_user).to receive(:has_hbx_staff_role?).and_return(true)
+        subject.instance_variable_set(:@person, person)
+      end
+
+      it 'returns true if person has consumer role with no user_id and current user is admin' do
+        bookmark_url = "http://localhost:3000/insured/consumer_role/5a2ec91b16676709f7000034/edit"
+        value = subject.send(:save_bookmark, role, bookmark_url)
+        expect(value).to eq(true)
+      end
+
+    end
+
+    context 'current user is hbx admin and role is consumer with user record' do
+      before do
+        sign_in(current_user)
+        allow(current_user).to receive(:has_hbx_staff_role?).and_return(true)
+        subject.instance_variable_set(:@person, person)
+        person.user = user2
+      end
+
+      it 'returns nil if person has consumer role with user_id and current user is admin' do
+        bookmark_url = "http://localhost:3000/insured/consumer_role/5a2ec91b16676709f7000034/edit"
+        value = subject.send(:save_bookmark, role, bookmark_url)
+        expect(value).to eq(nil)
+      end
+    end
+  end
 end
