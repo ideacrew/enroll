@@ -436,6 +436,11 @@ class Family
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
+
+  def latest_active_sep
+    special_enrollment_periods.order_by(:submitted_at.desc).detect{ |sep| sep.is_active? }
+  end
+
   # Get list of HBX Admin assigned {SpecialEnrollmentPeriod} (SEP) eligibilities currently available to this family
   #
   # @example Get the list of HBX Admin assigned {SpecialEnrollmentPeriod SpecialEnrollmentPeriods}
@@ -976,6 +981,10 @@ class Family
     else
       "no enrollment"
     end
+  end
+
+  def person_has_an_active_enrollment?(person)
+    active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
 private
