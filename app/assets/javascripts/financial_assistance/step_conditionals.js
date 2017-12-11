@@ -367,6 +367,7 @@ $(document).ready(function(){
   $("body").on("change", "#is_pregnant_no", function(){
     if ($('#is_pregnant_no').is(':checked')) {
       $('#is_post_partum_period_yes').parents('.row-form-wrapper').removeClass('hide');
+      $('#is_post_partum_period_yes, #is_post_partum_period_no').attr('checked', false);
       $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
       $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
     };
