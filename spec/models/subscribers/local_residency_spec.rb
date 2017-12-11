@@ -18,7 +18,21 @@ describe Subscribers::LocalResidency do
     person
     }
 
+    let(:response_data) { Parsers::Xml::Cv::ResidencyVerificationResponse.parse(xml).to_hash }
     let(:payload) { {:individual_id => individual_id, :body => xml} }
+
+    context "store response fields" do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role); }
+      it "should create residency verification response record" do
+        person.consumer_role.aasm_state = "sci_verified"
+        allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(person.consumer_role.local_residency_responses.count).to eq(1)
+        expect(person.consumer_role.residency_verification_responses.first.address_verification).to eq(response_data[:residency_verification_response])
+
+      end
+    end
 
     context "ADDRESS_NOT_IN_AREA" do
       it "should deny local residency" do
@@ -65,5 +79,4 @@ describe Subscribers::LocalResidency do
       expect(found_person.consumer_role.local_residency_responses.length).to eq(2)
     end
   end
-
 end
