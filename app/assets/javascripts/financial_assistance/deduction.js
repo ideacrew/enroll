@@ -76,7 +76,7 @@ $(document).ready(function() {
           .appendTo(deductionListEl);
         startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
         $(clonedForm).find('select').selectric();
-        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
       } else {
         e.preventDefault();
         // prompt to delete all these dedcutions
@@ -115,7 +115,7 @@ $(document).ready(function() {
           .appendTo(deductionListEl);
       startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
       $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
 
     /* edit existing deductions */
@@ -126,7 +126,7 @@ $(document).ready(function() {
       deductionEl.find('.edit-deduction-form').removeClass('hidden');
       startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
 
-      $(deductionEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      $(deductionEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
 
     /* destroy existing deducitons */
