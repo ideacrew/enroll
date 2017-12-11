@@ -2,7 +2,7 @@ class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date]
-  before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :extend_due_date, :destroy]
+  before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
   respond_to :html, :js
 
   def download
@@ -103,6 +103,7 @@ class DocumentsController < ApplicationController
     v_type = params[:verification_type]
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
+      add_type_history_element
       sv = @family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
       if sv.present?
         new_date = sv.due_date.to_date + 30.days
