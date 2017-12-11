@@ -61,6 +61,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     IvlNoticesNotifierJob.perform_later(@person.id.to_s ,"enrollment_notice") unless @enrollment.is_shop?
 
+    @enrollment.mid_year_plan_change_notice
+    
     send_receipt_emails if @person.emails.first
   end
 

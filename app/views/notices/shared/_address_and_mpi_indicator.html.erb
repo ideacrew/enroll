@@ -1,0 +1,29 @@
+<table class="total_table">
+
+  <tr>
+    <td>
+      <div>
+        <%= Settings.site.short_name %><br>
+        1225 I Street, NW<br>
+        Suite 400<br>
+        Washington, DC 20005
+      </div>
+    </td>
+    <td align="right"><a href="https://dchealthlink.com/"
+                                  target=
+                                  "blank">
+                                  <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto;", 
+                                  width: "100"  %>
+                                </a>
+                                <br><br>
+    </td>
+  </tr>
+  <tr>
+    <td><br><br><br><br></td>
+  </tr>
+  <tr>
+    <td><%= render partial: 'notices/shared/address', :locals => {notice: notice} %></td>
+    <td align="right">Notice No: <%= notice.mpi_indicator %></td>
+  </tr>
+    
+</table>

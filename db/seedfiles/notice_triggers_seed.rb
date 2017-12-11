@@ -704,6 +704,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
       hbx_id: 'SHOP_D052',
       title: 'Confirmation of Broker Fired to Employer',
@@ -724,6 +725,28 @@ shop_notice_triggers = [
               }
           }
       ]
+  },
+
+  {
+    hbx_id: 'SHOP40',
+    title: 'Employee_Mid-Year Plan Change-Non-Congressional',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
+    resource_name: 'employer',
+    event_name: 'employee_mid_year_plan_change_non_congressional',
+    notice_triggers: [
+      {
+        name: 'Employee Made Mid-Year Plan',
+        notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change_non_congressional',
+        notice_builder: 'ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional',
+        mpi_indicator: 'MPI_SHOP40',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
   },
 
   {
@@ -871,6 +894,48 @@ shop_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP37',
+    title: 'Employee mid-year plan change',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
+    resource_name: 'employer',
+    event_name: 'ee_mid_year_plan_change_notice_congressional',
+    notice_triggers: [
+      {
+        name: 'Employee mid year plan change notice',
+        notice_template: 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
+        notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional',
+        mpi_indicator: 'MPI_SHOP37',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP40',
+    title: 'Employee Mid-Year Plan Change',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
+    resource_name: 'employer',
+    event_name: 'employee_mid_year_plan_change_non_congressional',
+    notice_triggers: [
+      {
+        name: 'Employee Mid-Year Plan change',
+        notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change_non_congressional',
+        notice_builder: 'ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional',
+        mpi_indicator: 'MPI_SHOP40',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
