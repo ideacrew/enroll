@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
   <tr>
-    <td><h3><strong>SUBJECT: EMPLOYEE ENROLLMENT CONFIRMATION</strong></h3></td>
+    <td><h3><strong>EMPLOYEE ENROLLMENT CONFIRMATION</strong></h3></td>
   </tr>
   </tbody>
 </table>
@@ -14,7 +14,7 @@
 <table class="total_table" border="0">
   <tbody>
   <tr>
-    <td>Dear <strong><%= notice.primary_fullname %></strong>:</td>
+    <td>Dear <strong><%= notice.primary_fullname.titleize %></strong>:</td>
   </tr>
   </tbody>
 </table>
@@ -37,7 +37,7 @@ content: "Thank you for enrolling into employer-sponsored coverage through <stro
  content: "You can also contact <strong>#{Settings.site.short_name}</strong> with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["By calling #{notice.hbe.phone}.",
+  ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
@@ -45,5 +45,5 @@ content: "Thank you for enrolling into employer-sponsored coverage through <stro
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the 'Find a Broker' link in your employer account or calling <strong>#{Settings.contact_center.phone_number}</strong>."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the 'Find a Broker' link in your employer account or calling <strong>#{notice.hbe.phone}</strong>."} %>
 <% end %>
