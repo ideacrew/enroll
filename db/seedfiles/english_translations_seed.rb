@@ -1,4 +1,3 @@
-puts "Hi"
 Dir.glob('db/seedfiles/translations/en/*').each do |file|
   puts file
   require_relative 'translations/en/' + File.basename(file,File.extname(file))
