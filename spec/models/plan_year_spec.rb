@@ -2489,7 +2489,7 @@ describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbcl
   let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
 
   it "should trigger renewal_employee_enrollment_confirmation job in queue" do
-    census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+    census_employee.renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
     hbx_enrollment.save!
     ActiveJob::Base.queue_adapter = :test
     ActiveJob::Base.queue_adapter.enqueued_jobs = []

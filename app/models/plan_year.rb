@@ -1049,15 +1049,15 @@ class PlanYear
   end
 
   def renewal_employee_enrollment_confirmation
-    begin
-      self.employer_profile.census_employees.non_terminated.each do |ce|
-        enrollment = ce.active_benefit_group_assignment.hbx_enrollment
-        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on == self.start_on
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        enrollment = ce.renewal_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && (enrollment.effective_on == self.start_on)
           ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
         end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
       end
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver notice due to '#{e}' " }
     end
   end
 

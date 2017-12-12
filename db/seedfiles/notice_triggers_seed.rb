@@ -984,7 +984,7 @@ shop_notice_triggers = [
         name: 'Notify Employees Enrollment confirmation',
         notice_template: 'notices/shop_employee_notices/renewal_employee_enrollment_confirmation',
         notice_builder: 'ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation',
-        mpi_indicator: 'MPI_SHOPDRE076',
+        mpi_indicator: 'DRE076',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

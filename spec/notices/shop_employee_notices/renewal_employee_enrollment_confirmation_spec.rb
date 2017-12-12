@@ -15,7 +15,6 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
   let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
   let!(:renewal_plan) { FactoryGirl.create(:plan) }
   let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
-  # let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id) }
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, benefit_group: renewal_benefit_group, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: plan) }
   let!(:application_event) { double("ApplicationEventKind", {
     :name => 'Notify Employees Enrollment confirmation',
@@ -70,11 +69,11 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
   describe "append data" do
     before do
       @employee_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
     end
     it "should append data" do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
-      enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
+      enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
       @employee_notice.build
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
@@ -86,7 +85,7 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
   describe "render template and generate pdf" do
     before do
       @employee_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
       @employee_notice.build
       @employee_notice.append_data
       @employee_notice.generate_pdf_notice
