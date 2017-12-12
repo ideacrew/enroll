@@ -103,10 +103,11 @@ class IvlNotices::ReminderNotice < IvlNotice
 
     hbx_enrollments = []
     en = enrollments.select{ |en| en.enrolled_contingent?}
-    health_enrollment = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at).last
-    dental_enrollment = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at).last
-    hbx_enrollments << health_enrollment
-    hbx_enrollments << dental_enrollment
+    health_enrollments = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at)
+    dental_enrollments = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at)
+    hbx_enrollments << health_enrollments
+    hbx_enrollments << dental_enrollments
+    hbx_enrollments.flatten!
     hbx_enrollments.compact!
 
     hbx_enrollments.each do |enrollment|
