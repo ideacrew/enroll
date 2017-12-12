@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
   let!(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{
@@ -168,6 +168,14 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       @eligibility_notice.append_hbe
       @eligibility_notice.build
       expect(@eligibility_notice).not_to receive :attach_required_documents
+      @eligibility_notice.attach_docs
+    end
+
+    it "should render documents section when the family has an invalid e_case_id and outstanding people are present" do
+      family.update_attributes!(:e_case_id => "curam_landing_for10000")
+      @eligibility_notice.append_hbe
+      @eligibility_notice.build
+      expect(@eligibility_notice).to receive :attach_required_documents
       @eligibility_notice.attach_docs
     end
 

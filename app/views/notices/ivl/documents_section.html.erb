@@ -231,12 +231,12 @@
 <!-- MEC Conflict -->
 
 <!-- Indian Inconsistency -->
-<% if notice.indian_inconsistency.any? %>
+<% if notice.american_indian_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "<strong>American Indian or Alaska Native Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.indian_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
+   rows: [notice.american_indian_unverified], top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian or Alaska Native status. Examples of such verifications include, but are not limited to the following:",

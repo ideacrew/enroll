@@ -1362,3 +1362,21 @@ describe "#document_due_date", dbclean: :after_each do
     end
   end
 end
+
+describe "has_valid_e_case_id" do
+  let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
+
+  it "returns false as e_case_id is nil" do
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
+
+  it "returns true as it has a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "curam_landing_for5a0208eesjdb2c000096")
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
+
+  it "returns false as it don't have a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
+    expect(family1000.has_valid_e_case_id?).to be_truthy
+  end
+end
