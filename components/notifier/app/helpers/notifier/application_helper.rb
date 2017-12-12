@@ -1,5 +1,8 @@
 module Notifier
   module ApplicationHelper
+    include Config::SiteConcern
+    include Config::AcaConcern
+    include Config::ContactCenterConcern
     def portal_display_name(controller)
     if current_user.nil?
       "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
@@ -32,14 +35,21 @@ module Notifier
       portal_display_name(controller_name)
   end
 
- def site_main_web_address_business
+  def site_main_web_address_business
     Settings.site.main_web_address_business
   end
 
-    def site_faqs_url
+  def site_faqs_url
     Settings.site.faqs_url
   end
 
+  def site_help_url
+    Settings.site.help_url
+  end
+
+  def contact_center_email_address
+    Settings.contact_center.email_address
+  end
 
   end
 end
