@@ -19,14 +19,14 @@ module SponsoredApplications
     INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
     INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
-    # Application type
+    # Sponsored Application type
     field :kind, type: Symbol
 
-    # Application coverage period
-    field :effective_term,        type: Range
+    # Sponsored Application coverage period
+    field :benefit_coverage_period, type: Range
 
     # Open enrollment period
-    field :open_enrollment_term,  type: Range
+    field :open_enrollment_period,    type: Range
 
     field :terminated_on, type: Date
 
@@ -39,32 +39,32 @@ module SponsoredApplications
     accepts_nested_attributes_for :benefit_groups
     # accepts_nested_attributes_for :workflow_state_transitions
 
-    validates_presence_of :effective_term, :open_enrollment_term
+    validates_presence_of :benefit_coverage_period, :open_enrollment_period
     validate :date_range_integrity
 
     after_update :update_employee_benefit_packages
 
 
     def effective_on
-      effective_term.begin.beginning_of_day
+      benefit_coverage_period.begin.beginning_of_day
     end
 
     alias_method :effective_begin_on, :effective_on
 
     def effective_end_on
-      terminated_on.end_of_day || effective_term.end.end_of_day
+      terminated_on.end_of_day || benefit_coverage_period.end.end_of_day
     end
 
     def open_enrollment_begin_on
-      open_enrollment_term.begin
+      open_enrollment_period.begin
     end
 
     def open_enrollment_end_on
-      open_enrollment_term.end
+      open_enrollment_period.end
     end
 
     def open_enrollment_completed?
-      open_enrollment_term.blank? ? false : (TimeKeeper.date_of_record > open_enrollment_term.end)
+      open_enrollment_period.blank? ? false : (TimeKeeper.date_of_record > open_enrollment_period.end)
     end
 
     def binder_paid?
@@ -92,12 +92,12 @@ module SponsoredApplications
   private
 
     def date_range_integrity
-      errors.add(:effective_on, "must precede application end date")  unless effective_term && effective_term.begin < effective_term.end
-      errors.add(:effective_on, "must be first day of the month")     unless effective_term && effective_term.begin == effective_term.begin.beginning_of_month
-      errors.add(:effective_on, "must be last day of the month")      unless effective_term && effective_term.end == effective_term.end.end_of_month
+      errors.add(:effective_on, "must precede application end date")  unless benefit_coverage_period && benefit_coverage_period.begin < benefit_coverage_period.end
+      errors.add(:effective_on, "must be first day of the month")     unless benefit_coverage_period && benefit_coverage_period.begin == benefit_coverage_period.begin.beginning_of_month
+      errors.add(:effective_on, "must be last day of the month")      unless benefit_coverage_period && benefit_coverage_period.end == benefit_coverage_period.end.end_of_month
 
-      errors.add(:open_enrollment_begin_on, "must precede open enrollment end date") unless open_enrollment_term && open_enrollment_term.begin < open_enrollment_term.end
-      errors.add(:open_enrollment_end_on,   "must precede effective start date") unless open_enrollment_term && effective_term && open_enrollment_term.end < effective_term.begin
+      errors.add(:open_enrollment_begin_on, "must precede open enrollment end date") unless open_enrollment_period && open_enrollment_period.begin < open_enrollment_period.end
+      errors.add(:open_enrollment_end_on,   "must precede effective start date") unless open_enrollment_period && benefit_coverage_period && open_enrollment_period.end < benefit_coverage_period.begin
     end
 
 
