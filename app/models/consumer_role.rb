@@ -8,8 +8,8 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
-  include DocumentsVerificationStatus
   include Mongoid::History::Trackable
+  include DocumentsVerificationStatus
 
   embedded_in :person
 
@@ -243,7 +243,7 @@ class ConsumerRole
 
   def has_outstanding_documents?
     self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
-  end  
+  end
 
   def has_ridp_docs_for_type?(type)
     self.ridp_documents.any?{ |doc| doc.ridp_verification_type == type && doc.identifier }
