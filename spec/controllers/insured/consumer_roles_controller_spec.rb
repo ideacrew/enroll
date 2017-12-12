@@ -419,6 +419,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person).to receive(:completed_identity_verification?).and_return(true)
         allow(person.consumer_role).to receive(:identity_verified?).and_return(true)
         allow(person.consumer_role).to receive(:application_verified?).and_return(true)
+        allow(person.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(true)
         get "ridp_agreement"
       end
 
@@ -438,6 +439,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person.consumer_role).to receive(:identity_verified?).and_return(false)
         allow(person.consumer_role).to receive(:application_verified?).and_return(false)
+        allow(person.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(false)
         get "ridp_agreement"
       end
 
