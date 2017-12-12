@@ -84,9 +84,9 @@ class IvlNotices::ReminderNotice < IvlNotice
     end.uniq
     people = family_members.map(&:person).uniq
     people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
-    people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
+    people.reject!{|person| !person.consumer_role.outstanding_verification_types.present? }
     if people.empty?
-      raise 'no family member found with outstanding verification'
+      raise 'no family member found with outstanding verification types or verification_outstanding status'
     end
 
     outstanding_people = []
@@ -157,6 +157,8 @@ class IvlNotices::ReminderNotice < IvlNotice
           notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         when "Citizenship"
           notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "American Indian Status"
+          notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         when "DC Residency"
           notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         end
