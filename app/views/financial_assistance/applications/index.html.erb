@@ -36,7 +36,7 @@
         <tbody>
           <% @applications.each do |application| %>
           <tr>
-            <td><%=application.id%></td>
+            <td><%=application.hbx_id%></td>
             <td><%=application.aasm_state%></td>
             <td><%=to_est application.created_at%></td>
             <td><%=to_est application.submitted_at%></td>
