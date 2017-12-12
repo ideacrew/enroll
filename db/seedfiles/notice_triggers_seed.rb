@@ -403,7 +403,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP19',
+    hbx_id: 'SHOP_D019',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
     resource_name: 'employer',
@@ -413,7 +413,7 @@ shop_notice_triggers = [
         name: 'Renewal Group Ineligible to Obtain Coverage',
         notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP19',
+        mpi_indicator: 'SHOP_D019',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
