@@ -655,7 +655,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP42',
+    hbx_id: 'SHOP_D073',
     title: 'Employee Plan Selection Confirmation',
     description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
     resource_name: 'employee_role',
@@ -665,7 +665,7 @@ shop_notice_triggers = [
         name: 'Notice to employee after they select a plan during Annual Open Enrollment',
         notice_template: 'notices/shop_employee_notices/employee_select_plan_during_open_enrollment',
         notice_builder: 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
-        mpi_indicator: 'MPI_SHOP42',
+        mpi_indicator: 'SHOP_D073',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

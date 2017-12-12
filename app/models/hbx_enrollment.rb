@@ -1422,8 +1422,12 @@ class HbxEnrollment
   end
 
   def ee_select_plan_during_oe
-    if is_shop? && self.census_employee.present? && self.enrollment_kind == "open_enrollment"
-      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe")
+    begin
+      if self.census_employee.present? && self.employee_role.is_under_open_enrollment? && self.enrollment_kind == "open_enrollment"
+        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment: self.hbx_id.to_s)
+      end
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver Employee notice to #{self.census_employee.id.to_s} due to #{e}" }
     end
   end
 

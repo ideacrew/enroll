@@ -1,5 +1,12 @@
 class ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment < ShopEmployeeNotice
 
+  attr_accessor :census_employee, :hbx_enrollment
+
+  def initialize(census_employee, args = {})
+    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment]).first
+    super(census_employee, args)
+  end
+
   def deliver
     build
     append_data
@@ -11,18 +18,18 @@ class ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment < ShopEmployee
   end
 
   def append_data
-    plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::OPEN_ENROLLMENT_STATE).first
+    hbx_enrollment = self.hbx_enrollment
+    plan_year = hbx_enrollment.benefit_group.plan_year
     notice.plan_year = PdfTemplates::PlanYear.new({
       :start_on => plan_year.start_on
       })
 
-    enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :employer_contribution => enrollment.total_employer_contribution,
-      :employee_cost => enrollment.total_employee_cost
+      :employer_contribution => hbx_enrollment.total_employer_contribution,
+      :employee_cost => hbx_enrollment.total_employee_cost
       })
 
-    plan = enrollment.plan
+    plan = hbx_enrollment.plan
     notice.plan = PdfTemplates::Plan.new({
       :plan_name => plan.name
       })
