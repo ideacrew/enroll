@@ -13,7 +13,7 @@ class ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation < ShopEmployeeN
   end
 
   def append_data
-    enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
+    enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
       :employer_contribution => enrollment.total_employer_contribution,
       :employee_cost => enrollment.total_employee_cost,
