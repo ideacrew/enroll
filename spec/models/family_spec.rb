@@ -411,9 +411,9 @@ describe Family do
     before do
       @qlek = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date1)
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date2)
     end
 
     it "should return latest active sep" do
@@ -452,7 +452,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep 
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
@@ -807,6 +807,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
 
     it "should have one current shop eligible open enrollments" do
       expect(family.current_shop_eligible_open_enrollments.count).to eq 1
+    end
+
+    it "should have no current shop eligible open enrollments if the employee role is not active" do
+      census_employee.update_attributes(aasm_state: "employment_terminated")
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 0
     end
 
     it "should not be in ivl open enrollment" do
@@ -1318,6 +1323,97 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
   end
 end
 
+describe "min_verification_due_date", dbclean: :after_each do
+  let!(:today) { Date.today }
+  let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }
+
+  context "::min_verification_due_date_range" do
+    it "returns a family in the range" do
+      expect(Family.min_verification_due_date_range(10.days.ago, today).to_a).to eq([family])
+    end
+  end
+end
+
+describe "#all_persons_vlp_documents_status" do
+
+  context "vlp documents status for single family member" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:family_person) {family.primary_applicant.person}
+    
+    it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
+      family_person.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
+      expect(family.all_persons_vlp_documents_status).to eq("None")
+    end
+
+    it "returns all_persons_vlp_documents_status is partially uploaded when single document is uploaded" do
+      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document)
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
+    end
+
+    it "returns all_persons_vlp_documents_status is fully uploaded when all documents are uploaded" do
+      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "Social Security Number")
+      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "DC Residency")
+      family_person.consumer_role.update_attributes(ssn_validation: "valid")
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
+    end
+
+    it "returns all_persons_vlp_documents_status is Fully Uploaded when documents status is verified" do
+      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "DC Residency" )
+      family_person.consumer_role.update_attributes(ssn_validation: "valid")
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
+    end
+
+    it "returns all_persons_vlp_documents_status is partially uploaded when document is rejected" do
+      family_person.consumer_role.update_attributes(:ssn_rejected => true)
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
+    end 
+
+    it "returns all_persons_vlp_documents_status is Partially Uploaded when documents status is verified and other is not uploaded" do
+      family_person.consumer_role.update_attributes(ssn_validation: "valid")
+      allow(family_person).to receive(:verification_types).and_return ["social Security", "Citizenship"]
+      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
+    end   
+  end
+
+  context "vlp documents status for multiple family members" do
+    let(:person1) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1)}
+    let(:family_member2) { FactoryGirl.create(:family_member, person: person2, family: family)}
+    let(:doc1) { FactoryGirl.build(:vlp_document, verification_type: "Social Security Number") }
+    let(:doc2) { FactoryGirl.build(:vlp_document) }
+    let(:doc3) { FactoryGirl.build(:vlp_document, verification_type: "DC Residency") }
+
+
+    it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
+      person1.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
+      person2.consumer_role.vlp_documents.delete_all 
+      expect(family.all_persons_vlp_documents_status).to eq("None")
+    end
+
+    it "returns all_persons_vlp_documents_status is partially uploaded when single document is uploaded on both" do
+      allow(person1.consumer_role).to receive(:vlp_documents).and_return doc1
+      allow(person2.consumer_role).to receive(:vlp_documents).and_return doc1
+      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
+    end
+
+    it "returns all_persons_vlp_documents_status is Fully uploaded when all document are uploaded on both" do
+      person1.consumer_role.vlp_documents << doc1
+      person1.consumer_role.vlp_documents << doc2
+      person1.consumer_role.vlp_documents << doc3
+      person2.consumer_role.vlp_documents << doc1
+      person2.consumer_role.vlp_documents << doc2
+      person2.consumer_role.vlp_documents << doc3
+      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
+    end 
+  end
+end
+
 describe "#document_due_date", dbclean: :after_each do
   context "when special verifications exists" do
     let(:special_verification) { FactoryGirl.create(:special_verification)}
@@ -1357,6 +1453,47 @@ describe "#document_due_date", dbclean: :after_each do
     context "when the family member had no policy" do
       it "should return nil" do
         expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
+      end
+    end
+  end  
+end
+
+describe Family, '#is_document_not_verified' do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  
+  it "return true when document is not verified" do
+    expect(family.is_document_not_verified("Citizenship", family.primary_family_member.person)).to eq true
+  end
+
+  it 'returns false when document is verified' do
+    person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "Social Security Number")
+    person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "DC Residency")
+    person.consumer_role.update_attributes(ssn_validation: "valid")
+    expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
+
+  end
+
+  context 'when the consumer vlp authority is curam' do
+    before do
+      person.consumer_role.update_attributes(vlp_authority: "curam", aasm_state: "fully_verified")
+    end
+
+    context "when user is admin" do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_hbx_staff_role)}
+      it 'returns true when consumer is fully verified and admin' do
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
+      end
+
+      it 'returns false when consumer is not verified and admin' do
+        person.consumer_role.update_attributes(aasm_state: "unverified")
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
+      end
+    end
+
+    context 'when user is not admin' do
+      it 'returns false when consumer is fully verified and not an admin' do
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
       end
     end
   end
