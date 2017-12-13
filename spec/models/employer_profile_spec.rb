@@ -135,7 +135,7 @@ describe EmployerProfile, dbclean: :after_each do
         census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
         hbx_enrollment.save!
         employer_profile1.plan_years.first.update_attributes!(:aasm_state => "enrolled")
-        employer_profile1.initial_employee_plan_selection_confirmation(organization.id)
+        EmployerProfile.update_status_to_binder_paid([organization.id])
         queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
           job_info[:job] == ShopNoticesNotifierJob
         end
