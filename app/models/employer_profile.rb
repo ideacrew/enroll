@@ -989,12 +989,12 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        initial_employee_plan_selection_confirmation(id)
+        self.initial_employee_plan_selection_confirmation(id)
       end
     end
   end
 
-  def initial_employee_plan_selection_confirmation(id)
+  def self.initial_employee_plan_selection_confirmation(id)
     begin
       employer = Organization.find(id).employer_profile
       plan_year = employer.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first
