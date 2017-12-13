@@ -101,8 +101,12 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def expire_enrollment(enrollments)
     enrollments.each do |enrollment|
-      enrollment.expire_coverage!
-      puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+      if enrollment.may_expire_coverage?
+        enrollment.expire_coverage!
+        puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+      else
+        puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
+      end
     end
   end
 end
