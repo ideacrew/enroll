@@ -184,19 +184,7 @@ namespace :migrations do
                 # family_id = family.id
                 # latest_submitted_application = Family.find(family_id).latest_submitted_application
                 # application_in_progress = Family.find(family_id).application_in_progress
-              core_29_app_ids = ['59971a17d7c2dc5b35000008',
-                                 '599e0841d7c2dc1ff500000b',
-                                 '599e0048d7c2dc7eac000008',
-                                 '599dec66d7c2dc343d00000e',
-                                 '599e22ccd7c2dc091600000c',
-                                 '599de971d7c2dc292a00000f',
-                                 '599e1f49d7c2dc7898000008',
-                                 '599e1b67d7c2dc6a56000008',
-                                 '599e16e4d7c2dc587d000008',
-                                 '599df7add7c2dc5ecf00000d',
-                                 '59652835d7c2dc67e6000007',
-                                 '599e1497d7c2dc501f000004',
-                                 '59652935d7c2dc6aa200001e']
+              core_29_app_ids = ['59971a17d7c2dc5b35000008']
               core_29_applications = FinancialAssistance::Application.where(id: { :$in => core_29_app_ids })
               core_29_applications.each do |application|
                 applicants = application.applicants
