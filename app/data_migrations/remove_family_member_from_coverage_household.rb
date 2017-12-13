@@ -4,14 +4,14 @@ class RemoveFamilyMemberFromCoverageHousehold < MongoidMigrationTask
   def migrate
     #person_hbx_id=19810927 family_member_hbx_id=123123123
     person = Person.where(hbx_id: ENV['person_hbx_id']).first
-    family_member_id = ENV['family_member_id']
+    family_member_id = ENV['family_member_id'].to_s
     if person.blank?
       raise "Invalid hbx_id of person"
     else
       family = person.primary_family
       if family.present?
           family.active_household.family_members.each do |i|
-            if i.id == family_member_id
+            if i.id.to_s == family_member_id
               i.delete
               family.save
               puts "Remove family member of hbx_id:#{family_member_id} " unless Rails.env == 'test'
