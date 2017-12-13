@@ -1077,6 +1077,11 @@ class Family
     ['Curam', 'Mobile'].include? application_type
   end
 
+  def has_valid_e_case_id?
+    return false if !e_case_id
+    e_case_id.split('#').last.scan(/\D/).empty?
+  end
+
 private
   def build_household
     if households.size == 0
