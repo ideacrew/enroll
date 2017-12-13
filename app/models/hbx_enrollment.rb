@@ -502,6 +502,12 @@ class HbxEnrollment
     return true
   end
 
+  def propagate_renewal
+    if is_shop? && coverage_kind == 'health'
+      benefit_group_assignment.renew_coverage! if benefit_group_assignment.may_renew_coverage?
+    end
+  end
+
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
     update_current(waiver_reason: waiver_reason)
     waive_coverage!
@@ -1239,8 +1245,8 @@ class HbxEnrollment
     # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
-      transitions from: :shopping, to: :auto_renewing
-      transitions from: :enrolled_contingent, to: :auto_renewing_contingent
+      transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
+      transitions from: :enrolled_contingent, to: :auto_renewing_contingent, after: :propagate_renewal
     end
 
     event :renew_waived, :after => :record_transition do
