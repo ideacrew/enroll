@@ -113,6 +113,8 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         let(:renewal_factory) {
           Factories::PlanYearRenewalFactory.new
         }
+        let(:start_on) {Date.new(2018,1,1)}
+        let(:end_on) {Date.new(2018,12,31)}
 
         before :each do
           renewal_factory.employer_profile = renewing_employer
@@ -121,6 +123,12 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
 
         it "should trigger notice to employer" do
           expect(renewal_factory).to receive(:trigger_notice)
+          renewal_factory.renew
+        end
+
+        it "should not trigger notice to employer if plan year doesn't start in 2018" do
+          renewing_employer.plan_years.first.update_attributes!(start_on: start_on, end_on: end_on)
+          expect(renewal_factory).not_to receive(:trigger_notice)
           renewal_factory.renew
         end
       end
