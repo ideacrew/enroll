@@ -11,7 +11,7 @@ namespace :recurring do
     date = TimeKeeper.date_of_record
     families.each do |family|
       begin
-        next if family.e_case_id.present? #skip assisted families
+        next if family.has_valid_e_case_id? #skip assisted families
         consumer_role = family.primary_applicant.person.consumer_role
         person = family.primary_applicant.person
         if consumer_role.present? && (family.best_verification_due_date > date)

@@ -229,7 +229,7 @@
 <% end %>
 <!-- MEC Conflict -->
 
-<!-- Indian Inconsistency -->
+<!-- Indian Inconsistency/American Indian or Alaskan Native-->
 <% if notice.american_indian_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "<strong>American Indian or Alaska Native Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:", top_margin: '5px'} %>
@@ -246,7 +246,7 @@
     previous: "For American Indians or Alaska Native born outside of the United States, we will accept the following documents:",
     listings: ["A Form I-94 with a notation of “S1-3”;", "I-551 permanent resident card stamped “S1-3”;", "Temporary I-551 stamp coded “S1-3” in a Canadian passport;", "A Tribal record or document certifying at least 50 percent American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as a birth certificate or baptismal certificate issued on a reservation; a letter from the Canadian Department of Indigenous and Northern Affairs; or school records."]} %>
 <% end %>
-<!-- Indian Inconsistency -->
+<!-- Indian Inconsistency/American Indian or Alaskan Native-->
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong><br></br>_____________________________________________________________________________________________________________", top_margin: '-5px'} %>
