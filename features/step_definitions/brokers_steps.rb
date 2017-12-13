@@ -66,7 +66,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency"
+  click_button "Create Broker Agency", wait: 10
 end
 
 Then(/^.+ should see broker registration successful message$/) do

@@ -8,6 +8,7 @@ module PdfTemplates
     attribute :primary_identifier, String
     attribute :employee_fullname, String
     attribute :mpi_indicator, String
+    attribute :aasm_state, String
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String

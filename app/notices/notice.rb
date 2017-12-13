@@ -4,7 +4,7 @@ class Notice
   include Config::SiteHelper
   include Config::ContactCenterHelper
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep
+  attr_accessor :from, :to, :options, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep, :aasm_state
 
   Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
 

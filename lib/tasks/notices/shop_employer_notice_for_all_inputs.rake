@@ -13,18 +13,18 @@ namespace :notice do
         when @employer_ids
           @employer_ids.each do | employer_id |
             employer_profile_id = EmployerProfile.find(employer_id).id.to_s
-            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name) if employer_profile_id
+            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name, options = {:state => "active"}) if employer_profile_id
           end
         when @hbx_ids
           @hbx_ids.each do |hbx_id|
             employer_profile_id = Organization.where(hbx_id: hbx_id).first.employer_profile.id.to_s
-            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name) if employer_profile_id
+            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name, options = {:state => "active"}) if employer_profile_id
             puts "Notice Triggered Successfully"
           end
         when @feins
           @feins.each do |fein_id|
             employer_profile_id = Organization.where(fein: fein_id).first.employer_profile.id.to_s
-            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name) if employer_profile_id
+            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name, options = {:state => "active"}) if employer_profile_id
             puts "Notice Triggered Successfully"
           end
         else
