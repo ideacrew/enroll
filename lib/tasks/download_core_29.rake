@@ -2,8 +2,8 @@ namespace :migrations do
   desc "download core 29"
   task :download_core_29 => :environment do
     desc "Load the people data"
-    seedfile_applications = File.open('db/applications_load.rb', 'a')
-    seedfile_applicants = File.open('db/applicants_load.rb', 'a')
+    # seedfile_applications = File.open('db/applications_load.rb', 'applicant')
+    # seedfile_applicants = File.open('db/applicants_load.rb', 'applicant')
     field_names=%w{id first_name last_name }
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/families_with_application.csv"
@@ -138,41 +138,43 @@ namespace :migrations do
                                         )
 
 
-    applicants_field_names_benefit = %w(title
-    esi_covered
-    kind
-    insurance_kind
-    is_employer_sponsored
-    is_esi_waiting_period
-    is_esi_mec_met
-    employee_cost
-    employee_cost_frequency
-    start_on
-    end_on
-    employer_name
-    employer_id
-    submitted_at
-)
+    applicants_field_names_benefit = %w(
+                                        title
+                                        esi_covered
+                                        kind
+                                        insurance_kind
+                                        is_employer_sponsored
+                                        is_esi_waiting_period
+                                        is_esi_mec_met
+                                        employee_cost
+                                        employee_cost_frequency
+                                        start_on
+                                        end_on
+                                        employer_name
+                                        employer_id
+                                        submitted_at
+                                        )
 
-    applicants_field_names_deduction = %w( title
- kind(deduction_type)
- amount
- start_on
- end_on
- frequency_kind
- submitted_at
-)
+    applicants_field_names_deduction = %w(
+                                          title
+                                          kind(deduction_type)
+                                          amount
+                                          start_on
+                                          end_on
+                                          frequency_kind
+                                          submitted_at
+                                          )
 
-    CSV.open(file_name, "wb") do |csv1|
-      csv1 << application_field_names
-      CSV.open(file_name_applicants, "wb") do |csv2|
-        csv2 << applicants_field_names
-        CSV.open(file_name_applicants_income, "wb") do |csv3|
-          csv3 << applicants_field_names_income
-          CSV.open(file_name_applicants_benefit, "wb") do |csv4|
-            csv4 << applicants_field_names_benefit
-            CSV.open(file_name_applicants_deduction, "wb") do |csv5|
-              csv5 << applicants_field_names_deduction
+    CSV.open(file_name, "wb") do |application_csv|
+      application_csv << application_field_names
+      CSV.open(file_name_applicants, "wb") do |applicant_csv|
+        applicant_csv << applicants_field_names
+        CSV.open(file_name_applicants_income, "wb") do |income_csv|
+          income_csv << applicants_field_names_income
+          CSV.open(file_name_applicants_benefit, "wb") do |benefit_csv|
+            benefit_csv << applicants_field_names_benefit
+            CSV.open(file_name_applicants_deduction, "wb") do |deduction_csv|
+              deduction_csv << applicants_field_names_deduction
 
               #data_hash['person'].each do |p|
                 # first_name = p["first_name"]
@@ -182,120 +184,132 @@ namespace :migrations do
                 # family_id = family.id
                 # latest_submitted_application = Family.find(family_id).latest_submitted_application
                 # application_in_progress = Family.find(family_id).application_in_progress
-              core_29_app_ids = ['','']
+              core_29_app_ids = ['59971a17d7c2dc5b35000008',
+                                 '599e0841d7c2dc1ff500000b',
+                                 '599e0048d7c2dc7eac000008',
+                                 '599dec66d7c2dc343d00000e',
+                                 '599e22ccd7c2dc091600000c',
+                                 '599de971d7c2dc292a00000f',
+                                 '599e1f49d7c2dc7898000008',
+                                 '599e1b67d7c2dc6a56000008',
+                                 '599e16e4d7c2dc587d000008',
+                                 '599df7add7c2dc5ecf00000d',
+                                 '59652835d7c2dc67e6000007',
+                                 '599e1497d7c2dc501f000004',
+                                 '59652935d7c2dc6aa200001e']
               core_29_applications = FinancialAssistance::Application.where(id: { :$in => core_29_app_ids })
               core_29_applications.each do |application|
                 applicants = application.applicants
 
-                csv1 << [
-                    family_id,
-                    latest_submitted_application.external_id.nil? ? "nil" : latest_submitted_application.external_id,
-                    latest_submitted_application.integrated_case_id.nil? ? "nil" : latest_submitted_application.integrated_case_id,
-                    latest_submitted_application.haven_app_id.nil? ? "nil" : latest_submitted_application.haven_app_id,
-                    latest_submitted_application.haven_ic_id.nil? ? "nil" : latest_submitted_application.haven_ic_id,
-                    latest_submitted_application.e_case_id.nil? ? "nil" : latest_submitted_application.e_case_id,
-                    latest_submitted_application.applicant_kind.nil? ? "nil" : latest_submitted_application.applicant_kind,
-                    latest_submitted_application.request_kind.nil? ? "nil" : latest_submitted_application.request_kind,
-                    latest_submitted_application.motivation_kind.nil? ? "nil" : latest_submitted_application.motivation_kind,
-                    latest_submitted_application.is_joint_tax_filing.nil? ? "nil" : latest_submitted_application.is_joint_tax_filing,
-                    latest_submitted_application.eligibility_determination_id.nil? ? "nil" : latest_submitted_application.eligibility_determination_id,
-                    latest_submitted_application.aasm_state.nil? ? "nil" : latest_submitted_application.aasm_state,
-                    latest_submitted_application.effective_date.nil? ? "nil" : latest_submitted_application.effective_date,
-                    latest_submitted_application.timeout_response_last_submitted_at.nil? ? "nil" : latest_submitted_application.timeout_response_last_submitted_at,
-                    latest_submitted_application.assistance_year.nil? ? "nil" : latest_submitted_application.assistance_year,
-                    latest_submitted_application.is_renewal_authorized.nil? ? "nil" : latest_submitted_application.is_renewal_authorized,
-                    latest_submitted_application.renewal_base_year.nil? ? "nil" : latest_submitted_application.renewal_base_year,
-                    latest_submitted_application.years_to_renew.nil? ? "nil" : latest_submitted_application.years_to_renew,
-                    latest_submitted_application.is_requesting_voter_registration_application_in_mail.nil? ? "nil" : latest_submitted_application.is_requesting_voter_registration_application_in_mail,
-                    latest_submitted_application.us_state.nil? ? "nil" : latest_submitted_application.us_state,
-                    latest_submitted_application.medicaid_terms.nil? ? "nil" : latest_submitted_application.medicaid_terms,
-                    latest_submitted_application.medicaid_insurance_collection_terms.nil? ? "nil" : latest_submitted_application.medicaid_insurance_collection_terms,
-                    latest_submitted_application.report_change_terms.nil? ? "nil" : latest_submitted_application.report_change_terms,
-                    latest_submitted_application.parent_living_out_of_home_terms.nil? ? "nil" : latest_submitted_application.parent_living_out_of_home_terms,
-                    latest_submitted_application.attestation_terms.nil? ? "nil" : latest_submitted_application.attestation_terms,
-                    latest_submitted_application.submission_terms.nil? ? "nil" : latest_submitted_application.submission_terms,
-                    latest_submitted_application.request_full_determination.nil? ? "nil" : latest_submitted_application.request_full_determination,
-                    latest_submitted_application.is_ridp_verified.nil? ? "nil" : latest_submitted_application.is_ridp_verified,
-                    latest_submitted_application.determination_error_message.nil? ? "nil" : latest_submitted_application.determination_error_message,
-                    latest_submitted_application.has_eligibility_response.nil? ? "nil" : latest_submitted_application.has_eligibility_response,
+                application_csv << [
+                    application.family_id,
+                    application.external_id.nil? ? "nil" : application.external_id,
+                    application.integrated_case_id.nil? ? "nil" : application.integrated_case_id,
+                    application.haven_app_id.nil? ? "nil" : application.haven_app_id,
+                    application.haven_ic_id.nil? ? "nil" : application.haven_ic_id,
+                    application.e_case_id.nil? ? "nil" : application.e_case_id,
+                    application.applicant_kind.nil? ? "nil" : application.applicant_kind,
+                    application.request_kind.nil? ? "nil" : application.request_kind,
+                    application.motivation_kind.nil? ? "nil" : application.motivation_kind,
+                    application.is_joint_tax_filing.nil? ? "nil" : application.is_joint_tax_filing,
+                    application.eligibility_determination_id.nil? ? "nil" : application.eligibility_determination_id,
+                    application.aasm_state.nil? ? "nil" : application.aasm_state,
+                    application.effective_date.nil? ? "nil" : application.effective_date,
+                    application.timeout_response_last_submitted_at.nil? ? "nil" : application.timeout_response_last_submitted_at,
+                    application.assistance_year.nil? ? "nil" : application.assistance_year,
+                    application.is_renewal_authorized.nil? ? "nil" : application.is_renewal_authorized,
+                    application.renewal_base_year.nil? ? "nil" : application.renewal_base_year,
+                    application.years_to_renew.nil? ? "nil" : application.years_to_renew,
+                    application.is_requesting_voter_registration_application_in_mail.nil? ? "nil" : application.is_requesting_voter_registration_application_in_mail,
+                    application.us_state.nil? ? "nil" : application.us_state,
+                    application.medicaid_terms.nil? ? "nil" : application.medicaid_terms,
+                    application.medicaid_insurance_collection_terms.nil? ? "nil" : application.medicaid_insurance_collection_terms,
+                    application.report_change_terms.nil? ? "nil" : application.report_change_terms,
+                    application.parent_living_out_of_home_terms.nil? ? "nil" : application.parent_living_out_of_home_terms,
+                    application.attestation_terms.nil? ? "nil" : application.attestation_terms,
+                    application.submission_terms.nil? ? "nil" : application.submission_terms,
+                    application.request_full_determination.nil? ? "nil" : application.request_full_determination,
+                    application.is_ridp_verified.nil? ? "nil" : application.is_ridp_verified,
+                    application.determination_error_message.nil? ? "nil" : application.determination_error_message,
+                    application.has_eligibility_response.nil? ? "nil" : application.has_eligibility_response
                 ]
 
 
-                applicants.each do |a|
-                  csv2 << [
-                      a.assisted_income_validation.nil? ? "nil" : a.assisted_income_validation,
-                      a.assisted_mec_validation.nil? ? "nil" : a.assisted_mec_validation,
-                      a.assisted_income_reason.nil? ? "nil" : a.assisted_income_reason,
-                      a.assisted_mec_reason.nil? ? "nil" : a.assisted_mec_reason,
-                      a.aasm_state.nil? ? "nil" : a.aasm_state,
-                      a.family_member_id.nil? ? "nil" : a.family_member_id,
-                      a.is_active.nil? ? "nil" : a.is_active,
-                      a.has_fixed_address.nil? ? "nil" : a.has_fixed_address,
-                      a.is_living_in_state.nil? ? "nil" : a.is_living_in_state,
-                      a.is_temp_out_of_state.nil? ? "nil" : a.is_temp_out_of_state,
-                      a.is_required_to_file_taxes.nil? ? "nil" : a.is_required_to_file_taxes,
-                      a.tax_filer_kind.nil? ? "nil" : a.tax_filer_kind,
-                      a.is_joint_tax_filing.nil? ? "nil" : a.is_joint_tax_filing,
-                      a.is_claimed_as_tax_dependent.nil? ? "nil" : a.is_claimed_as_tax_dependent,
-                      a.claimed_as_tax_dependent_by.nil? ? "nil" : a.claimed_as_tax_dependent_by,
-                      a.is_ia_eligible.nil? ? "nil" : a.is_ia_eligible,
-                      a.is_medicaid_chip_eligible.nil? ? "nil" : a.is_medicaid_chip_eligible,
-                      a.is_non_magi_medicaid_eligible.nil? ? "nil" : a.is_non_magi_medicaid_eligible,
-                      a.is_totally_ineligible.nil? ? "nil" : a.is_totally_ineligible,
-                      a.is_without_assistance.nil? ? "nil" : a.is_without_assistance,
-                      a.has_income_verification_response.nil? ? "nil" : a.has_income_verification_response,
-                      a.has_mec_verification_response.nil? ? "nil" : a.has_mec_verification_response,
-                      a.magi_medicaid_monthly_household_income.nil? ? "nil" : a.magi_medicaid_monthly_household_income,
-                      a.magi_medicaid_monthly_income_limit.nil? ? "nil" : a.magi_medicaid_monthly_income_limit,
-                      a.magi_as_percentage_of_fpl.nil? ? "nil" : a.magi_as_percentage_of_fpl,
-                      a.magi_medicaid_type.nil? ? "nil" : a.magi_medicaid_type,
-                      a.magi_medicaid_category.nil? ? "nil" : a.magi_medicaid_category,
-                      a.medicaid_household_size.nil? ? "nil" : a.medicaid_household_size,
-                      a.is_magi_medicaid.nil? ? "nil" : a.is_magi_medicaid,
-                      a.is_medicare_eligible.nil? ? "nil" : a.is_medicare_eligible,
-                      a.is_student.nil? ? "nil" : a.is_student,
-                      a.student_kind.nil? ? "nil" : a.student_kind,
-                      a.student_school_kind.nil? ? "nil" : a.student_school_kind,
-                      a.student_status_end_on.nil? ? "nil" : a.student_status_end_on,
-                      a.is_self_attested_blind.nil? ? "nil" : a.is_self_attested_blind,
-                      a.is_self_attested_disabled.nil? ? "nil" : a.is_self_attested_disabled,
-                      a.is_self_attested_long_term_care.nil? ? "nil" : a.is_self_attested_long_term_care,
-                      a.is_veteran.nil? ? "nil" : a.is_veteran,
-                      a.is_refugee.nil? ? "nil" : a.is_refugee,
-                      a.is_trafficking_victim.nil? ? "nil" : a.is_trafficking_victim,
-                      a.is_former_foster_care.nil? ? "nil" : a.is_former_foster_care,
-                      a.age_left_foster_care.nil? ? "nil" : a.age_left_foster_care,
-                      a.foster_care_us_state.nil? ? "nil" : a.foster_care_us_state,
-                      a.had_medicaid_during_foster_care.nil? ? "nil" : a.had_medicaid_during_foster_care,
-                      a.is_pregnant.nil? ? "nil" : a.is_pregnant,
-                      a.is_enrolled_on_medicaid.nil? ? "nil" : a.is_enrolled_on_medicaid,
-                      a.is_post_partum_period.nil? ? "nil" : a.is_post_partum_period,
-                      a.children_expected_count.nil? ? "nil" : a.children_expected_count,
-                      a.pregnancy_due_on.nil? ? "nil" : a.pregnancy_due_on,
-                      a.pregnancy_end_on.nil? ? "nil" : a.pregnancy_end_on,
-                      a.is_subject_to_five_year_bar.nil? ? "nil" : a.is_subject_to_five_year_bar,
-                      a.is_five_year_bar_met.nil? ? "nil" : a.is_five_year_bar_met,
-                      a.is_forty_quarters.nil? ? "nil" : a.is_forty_quarters,
-                      a.is_ssn_applied.nil? ? "nil" : a.is_ssn_applied,
-                      a.non_ssn_apply_reason.nil? ? "nil" : a.non_ssn_apply_reason,
-                      a.moved_on_or_after_welfare_reformed_law.nil? ? "nil" : a.moved_on_or_after_welfare_reformed_law,
-                      a.is_veteran_or_active_military.nil? ? "nil" : a.is_veteran_or_active_military,
-                      a.is_spouse_or_dep_child_of_veteran_or_active_military.nil? ? "nil" : a.is_spouse_or_dep_child_of_veteran_or_active_military,
-                      a.is_currently_enrolled_in_health_plan.nil? ? "nil" : a.is_currently_enrolled_in_health_plan,
-                      a.has_daily_living_help.nil? ? "nil" : a.has_daily_living_help,
-                      a.need_help_paying_bills.nil? ? "nil" : a.need_help_paying_bills,
-                      a.is_resident_post_092296.nil? ? "nil" : a.is_resident_post_092296,
-                      a.is_vets_spouse_or_child.nil? ? "nil" : a.is_vets_spouse_or_child,
-                      a.has_job_income.nil? ? "nil" : a.has_job_income,
-                      a.has_self_employment_income.nil? ? "nil" : a.has_self_employment_income,
-                      a.has_other_income.nil? ? "nil" : a.has_other_income,
-                      a.has_deductions.nil? ? "nil" : a.has_deductions,
-                      a.has_enrolled_health_coverage.nil? ? "nil" : a.has_enrolled_health_coverage,
-                      a.has_eligible_health_coverage.nil? ? "nil" : a.has_eligible_health_coverage
+                applicants.each do |applicant|
+                  applicant_csv << [
+                      applicant.assisted_income_validation.nil? ? "nil" : applicant.assisted_income_validation,
+                      applicant.assisted_mec_validation.nil? ? "nil" : applicant.assisted_mec_validation,
+                      applicant.assisted_income_reason.nil? ? "nil" : applicant.assisted_income_reason,
+                      applicant.assisted_mec_reason.nil? ? "nil" : applicant.assisted_mec_reason,
+                      applicant.aasm_state.nil? ? "nil" : applicant.aasm_state,
+                      applicant.family_member_id.nil? ? "nil" : applicant.family_member_id,
+                      applicant.is_active.nil? ? "nil" : applicant.is_active,
+                      applicant.has_fixed_address.nil? ? "nil" : applicant.has_fixed_address,
+                      applicant.is_living_in_state.nil? ? "nil" : applicant.is_living_in_state,
+                      applicant.is_temp_out_of_state.nil? ? "nil" : applicant.is_temp_out_of_state,
+                      applicant.is_required_to_file_taxes.nil? ? "nil" : applicant.is_required_to_file_taxes,
+                      applicant.tax_filer_kind.nil? ? "nil" : applicant.tax_filer_kind,
+                      applicant.is_joint_tax_filing.nil? ? "nil" : applicant.is_joint_tax_filing,
+                      applicant.is_claimed_as_tax_dependent.nil? ? "nil" : applicant.is_claimed_as_tax_dependent,
+                      applicant.claimed_as_tax_dependent_by.nil? ? "nil" : applicant.claimed_as_tax_dependent_by,
+                      applicant.is_ia_eligible.nil? ? "nil" : applicant.is_ia_eligible,
+                      applicant.is_medicaid_chip_eligible.nil? ? "nil" : applicant.is_medicaid_chip_eligible,
+                      applicant.is_non_magi_medicaid_eligible.nil? ? "nil" : applicant.is_non_magi_medicaid_eligible,
+                      applicant.is_totally_ineligible.nil? ? "nil" : applicant.is_totally_ineligible,
+                      applicant.is_without_assistance.nil? ? "nil" : applicant.is_without_assistance,
+                      applicant.has_income_verification_response.nil? ? "nil" : applicant.has_income_verification_response,
+                      applicant.has_mec_verification_response.nil? ? "nil" : applicant.has_mec_verification_response,
+                      applicant.magi_medicaid_monthly_household_income.nil? ? "nil" : applicant.magi_medicaid_monthly_household_income,
+                      applicant.magi_medicaid_monthly_income_limit.nil? ? "nil" : applicant.magi_medicaid_monthly_income_limit,
+                      applicant.magi_as_percentage_of_fpl.nil? ? "nil" : applicant.magi_as_percentage_of_fpl,
+                      applicant.magi_medicaid_type.nil? ? "nil" : applicant.magi_medicaid_type,
+                      applicant.magi_medicaid_category.nil? ? "nil" : applicant.magi_medicaid_category,
+                      applicant.medicaid_household_size.nil? ? "nil" : applicant.medicaid_household_size,
+                      applicant.is_magi_medicaid.nil? ? "nil" : applicant.is_magi_medicaid,
+                      applicant.is_medicare_eligible.nil? ? "nil" : applicant.is_medicare_eligible,
+                      applicant.is_student.nil? ? "nil" : applicant.is_student,
+                      applicant.student_kind.nil? ? "nil" : applicant.student_kind,
+                      applicant.student_school_kind.nil? ? "nil" : applicant.student_school_kind,
+                      applicant.student_status_end_on.nil? ? "nil" : applicant.student_status_end_on,
+                      applicant.is_self_attested_blind.nil? ? "nil" : applicant.is_self_attested_blind,
+                      applicant.is_self_attested_disabled.nil? ? "nil" : applicant.is_self_attested_disabled,
+                      applicant.is_self_attested_long_term_care.nil? ? "nil" : applicant.is_self_attested_long_term_care,
+                      applicant.is_veteran.nil? ? "nil" : applicant.is_veteran,
+                      applicant.is_refugee.nil? ? "nil" : applicant.is_refugee,
+                      applicant.is_trafficking_victim.nil? ? "nil" : applicant.is_trafficking_victim,
+                      applicant.is_former_foster_care.nil? ? "nil" : applicant.is_former_foster_care,
+                      applicant.age_left_foster_care.nil? ? "nil" : applicant.age_left_foster_care,
+                      applicant.foster_care_us_state.nil? ? "nil" : applicant.foster_care_us_state,
+                      applicant.had_medicaid_during_foster_care.nil? ? "nil" : applicant.had_medicaid_during_foster_care,
+                      applicant.is_pregnant.nil? ? "nil" : applicant.is_pregnant,
+                      applicant.is_enrolled_on_medicaid.nil? ? "nil" : applicant.is_enrolled_on_medicaid,
+                      applicant.is_post_partum_period.nil? ? "nil" : applicant.is_post_partum_period,
+                      applicant.children_expected_count.nil? ? "nil" : applicant.children_expected_count,
+                      applicant.pregnancy_due_on.nil? ? "nil" : applicant.pregnancy_due_on,
+                      applicant.pregnancy_end_on.nil? ? "nil" : applicant.pregnancy_end_on,
+                      applicant.is_subject_to_five_year_bar.nil? ? "nil" : applicant.is_subject_to_five_year_bar,
+                      applicant.is_five_year_bar_met.nil? ? "nil" : applicant.is_five_year_bar_met,
+                      applicant.is_forty_quarters.nil? ? "nil" : applicant.is_forty_quarters,
+                      applicant.is_ssn_applied.nil? ? "nil" : applicant.is_ssn_applied,
+                      applicant.non_ssn_apply_reason.nil? ? "nil" : applicant.non_ssn_apply_reason,
+                      applicant.moved_on_or_after_welfare_reformed_law.nil? ? "nil" : applicant.moved_on_or_after_welfare_reformed_law,
+                      applicant.is_veteran_or_active_military.nil? ? "nil" : applicant.is_veteran_or_active_military,
+                      applicant.is_spouse_or_dep_child_of_veteran_or_active_military.nil? ? "nil" : applicant.is_spouse_or_dep_child_of_veteran_or_active_military,
+                      applicant.is_currently_enrolled_in_health_plan.nil? ? "nil" : applicant.is_currently_enrolled_in_health_plan,
+                      applicant.has_daily_living_help.nil? ? "nil" : applicant.has_daily_living_help,
+                      applicant.need_help_paying_bills.nil? ? "nil" : applicant.need_help_paying_bills,
+                      applicant.is_resident_post_092296.nil? ? "nil" : applicant.is_resident_post_092296,
+                      applicant.is_vets_spouse_or_child.nil? ? "nil" : applicant.is_vets_spouse_or_child,
+                      applicant.has_job_income.nil? ? "nil" : applicant.has_job_income,
+                      applicant.has_self_employment_income.nil? ? "nil" : applicant.has_self_employment_income,
+                      applicant.has_other_income.nil? ? "nil" : applicant.has_other_income,
+                      applicant.has_deductions.nil? ? "nil" : applicant.has_deductions,
+                      applicant.has_enrolled_health_coverage.nil? ? "nil" : applicant.has_enrolled_health_coverage,
+                      applicant.has_eligible_health_coverage.nil? ? "nil" : applicant.has_eligible_health_coverage
                   ]
-                  binding.pry
-                  a.incomes.each do |i|
-                    csv3 <<[i.title,
+
+                  applicant.incomes.each do |i|
+                    income_csv <<[i.title,
                             i.kind(income_type),
                             i.wage_type,
                             i.hours_per_week,
@@ -313,8 +327,8 @@ namespace :migrations do
                     ]
                   end
 
-                  a.benefits.each do |i|
-                    csv4 <<[i.title,
+                  applicant.benefits.each do |i|
+                    benefit_csv <<[i.title,
                             i.esi_covered,
                             i.kind,
                             i.insurance_kind,
@@ -331,8 +345,8 @@ namespace :migrations do
                     ]
                   end
 
-                  a.benefits.each do |i|
-                    csv5 <<[i.title,
+                  applicant.benefits.each do |i|
+                    deduction_csv <<[i.title,
                             i.kind(deduction_type),
                             i.amount,
                             i.start_on,
@@ -344,7 +358,7 @@ namespace :migrations do
                 end
               end #Application.each iteration
               #end #data_hash end
-            end #close csv5
+            end #close deduction_csv
           end
         end
         puts "loaded to CSV"
