@@ -52,7 +52,7 @@ module Subscribers
 
            response[:payment_history].each do |payment|
              p = PremiumPayment.new
-             p.paid_on = Date.strptime(payment[:paid_on], "%m/%d/%Y")
+             p.paid_on = payment[:paid_on]
              p.reference_id = payment[:reference_id]
              p.method_kind = payment[:method_kind]
              p.amount = payment[:amount]
