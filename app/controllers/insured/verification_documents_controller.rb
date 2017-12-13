@@ -13,6 +13,7 @@ class Insured::VerificationDocumentsController < ApplicationController
         if doc_uri.present?
           if update_vlp_documents(file_name(file), doc_uri)
             @family.update_family_document_status!
+            add_type_history_element(file)
             flash[:notice] = "File Saved"
           else
             flash[:error] = "Could not save file. " + @doc_errors.join(". ")
@@ -94,6 +95,15 @@ class Insured::VerificationDocumentsController < ApplicationController
     options[:content_type] = document.format
     options[:filename] = document.title
     options
+  end
+
+  def add_type_history_element(file)
+    actor = current_user ? current_user.email : "external source or script"
+    verification_type = params[:verification_type]
+    action = "Upload #{file_name(file)}" if params[:action] == "upload"
+    @docs_owner.consumer_role.add_type_history_element(verification_type: verification_type,
+                                                   action: action,
+                                                   modifier: actor)
   end
 
   def vlp_docs_clean(person)

@@ -1018,3 +1018,17 @@ describe "Verification Tracker" do
     end
   end
 end
+
+describe "#add_type_history_element" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:attr) { {verification_type: "verification_type",
+                action: "action",
+                modifier: "actor",
+                update_reason: "reason"} }
+
+  it "creates verification history record" do
+    person.consumer_role.verification_type_history_elements.delete_all
+    person.consumer_role.add_type_history_element(attr)
+    expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
+end

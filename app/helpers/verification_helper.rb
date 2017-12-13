@@ -316,4 +316,38 @@ def ridp_type_status(type, person)
   def ridp_type_unverified?(ridp_type, person)
     ridp_type_status(ridp_type, person) != 'valid'
   end
+
+  def request_response_details(person, record, v_type)
+    if record.event_request_record_id
+      v_type == "DC Residency" ? show_residency_request(person, record) : show_ssa_dhs_request(person, record)
+    elsif record.event_response_record_id
+      v_type == "DC Residency" ? show_residency_response(person, record) : show_ssa_dhs_response(person, record)
+    end
+  end
+
+  def show_residency_request(person, record)
+    raw_request = person.consumer_role.local_residency_requests.select{
+        |request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)
+    }
+    raw_request ? Nokogiri::XML(raw_request.first.body) : "no request record"
+  end
+
+  def show_ssa_dhs_request(person, record)
+    requests = person.consumer_role.lawful_presence_determination.ssa_requests + person.consumer_role.lawful_presence_determination.vlp_requests
+    raw_request = requests.select{|request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)} if requests.any?
+    raw_request ? Nokogiri::XML(raw_request.first.body) : "no request record"
+  end
+
+  def show_residency_response(person, record)
+    raw_response = person.consumer_role.local_residency_responses.select{
+        |response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)
+    }
+    raw_response ? Nokogiri::XML(raw_response.first.body) : "no response record"
+  end
+
+  def show_ssa_dhs_response(person, record)
+    responses = person.consumer_role.lawful_presence_determination.ssa_responses + person.consumer_role.lawful_presence_determination.vlp_responses
+    raw_request = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
+    raw_request ? Nokogiri::XML(raw_request.first.body) : "no response record"
+  end
 end

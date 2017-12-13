@@ -139,6 +139,7 @@ class ConsumerRole
   end
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
+  embeds_many :verification_type_history_elements
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents, :ridp_documents
 
@@ -170,6 +171,7 @@ class ConsumerRole
   embeds_one :lawful_presence_determination, as: :ivl_role
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
+  embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
 
@@ -715,6 +717,10 @@ class ConsumerRole
     person.no_dc_address &&
     no_dc_address == "false" &&
     family.person_has_an_active_enrollment?(person)
+  end
+
+  def add_type_history_element(params)
+    verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
   end
 
   def can_start_residency_verification? # initial trigger check for coverage purchase

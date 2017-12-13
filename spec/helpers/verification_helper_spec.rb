@@ -606,4 +606,86 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "ridp admin actions dropdown list", "Identity", "verified", ["Verify", "Reject"]
     it_behaves_like "ridp admin actions dropdown list", "Identity", "in review", ["Verify", "Reject"]
   end
+
+  describe "#request response details" do
+    let(:residency_request_body) { "<?xml version='1.0' encoding='utf-8' ?>\n
+                                    <residency_verification_request xmlns='http://openhbx.org/api/terms/1.0'>\n
+                                    <individual>\n    <id>\n      <id>5a0b2901635d695b94000008</id>\n    </id>\n
+                                    <person>\n      <id>\n
+                                    ...
+                                    </person_demographics>\n  </individual>\n</residency_verification_request>\n" }
+    let(:ssa_request_body)       { "<?xml version='1.0' encoding='utf-8'?> <ssa_verification_request xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <id> <id>5a0b2901635d695b94000008</id> </id> <person> <id>
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#5c51371d9c04441899b29fb79086c4a0</id> </id>
+                                    ...
+                                    <created_at>2017-11-14T17:33:53Z</created_at> <modified_at>2017-12-09T18:20:48Z</modified_at>
+                                    </person_demographics> </ssa_verification_request> " }
+    let(:vlp_request_body)       { "<?xml version='1.0' encoding='utf-8'?> <lawful_presence_request xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <individual> <id> <id>5a12f461635d690fa20000dd</id> </id> <person> <id>
+                                    ...
+                                    </immigration_information> <check_five_year_bar>false</check_five_year_bar>
+                                    <requested_coverage_start_date>20171120</requested_coverage_start_date> </lawful_presence_request> " }
+    let(:residency_response_body) { "<?xml version='1.0' encoding='utf-8' ?>\n
+                                    <residency_verification_response xmlns='http://openhbx.org/api/terms/1.0'>\n
+                                    <individual>\n    <id>\n      <id>5a0b2901635d695b94000008</id>\n    </id>\n
+                                    <person>\n      <id>\n
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#5c51371d9c04441899b29fb79086c4a0</id>\n
+                                    </id>\n      <person_name>\n
+                                    <person_surname>vtuser5</person_surname>\n
+                                    <person_given_name>vtuser5</person_given_name>\n
+                                    </person_name>\n      <addresses>\n        <address>\n
+                                    ...
+                                    <modified_at>2017-12-09T16:13:31Z</modified_at>\n
+                                    </person_demographics>\n  </individual>\n</residency_verification_request>\n" }
+    let(:ssa_response_body)      { "<?xml version='1.0' encoding='utf-8'?> <ssa_verification_response xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <id> <id>5a0b2901635d695b94000008</id> </id> <person> <id>
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#5c51371d9c04441899b29fb79086c4a0</id> </id>
+                                    <person_name> <person_surname>vtuser5</person_surname> <person_given_name>vtuser5</person_given_name> </person_name>
+                                    ...
+                                    <birth_date>19851106</birth_date> <is_incarcerated>false</is_incarcerated>
+                                    <created_at>2017-11-14T17:33:53Z</created_at> <modified_at>2017-12-09T18:20:48Z</modified_at>
+                                    </person_demographics> </ssa_verification_request> " }
+    let(:vlp_response_body)     { "<?xml version='1.0' encoding='utf-8'?> <lawful_presence_response xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <individual> <id> <id>5a12f461635d690fa20000dd</id> </id> <person> <id>
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#2486ddcfe00c40fb95fc590195065fc4</id> </id>
+                                    ...
+                                    <has_document_I20>false</has_document_I20> <has_document_DS2019>false</has_document_DS2019> </documents>
+                                    </immigration_information> <check_five_year_bar>false</check_five_year_bar>
+                                    <requested_coverage_start_date>20171120</requested_coverage_start_date> </lawful_presence_request> " }
+
+    let(:ssa_request)              { EventRequest.new(requested_at: DateTime.now, body: ssa_request_body) }
+    let(:vlp_request)              { EventRequest.new(requested_at: DateTime.now, body: vlp_request_body) }
+    let(:local_residency_request)  { EventRequest.new(requested_at: DateTime.now, body: residency_request_body) }
+    let(:local_residency_response) { EventResponse.new(received_at: DateTime.now, body: residency_response_body) }
+    let(:ssa_response)             { EventResponse.new(received_at: DateTime.now, body: ssa_response_body) }
+    let(:vlp_response)             { EventResponse.new(received_at: DateTime.now, body: vlp_response_body) }
+    let(:records)                  { person.consumer_role.verification_type_history_elements }
+
+    shared_examples_for "request response details" do |type, event, result|
+      before do
+        if event == "local_residency_request" || event == "local_residency_response"
+          person.consumer_role.send(event.pluralize) << send(event)
+        else
+          person.consumer_role.lawful_presence_determination.send(event.pluralize) << send(event)
+        end
+        if event.split('_').last == "request"
+          records << [VerificationTypeHistoryElement.new(verification_type:type, event_request_record_id: send(event).id)]
+        elsif event.split('_').last == "response"
+          records << [VerificationTypeHistoryElement.new(verification_type:type, event_response_record_id: send(event).id)]
+        end
+      end
+      it "returns event body" do
+        expect(helper.request_response_details(person, records.first, type).children.first.name).to eq result
+      end
+    end
+
+    it_behaves_like "request response details", "DC Residency", "local_residency_request", "residency_verification_request"
+    it_behaves_like "request response details", "Social Security Number", "ssa_request", "ssa_verification_request"
+    it_behaves_like "request response details", "Citizenship", "ssa_request", "ssa_verification_request"
+    it_behaves_like "request response details", "Immigration status", "vlp_request", "lawful_presence_request"
+    it_behaves_like "request response details", "DC Residency", "local_residency_response", "residency_verification_response"
+    it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
+    it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
+    it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
+  end
 end
