@@ -20,6 +20,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       cancel_enr(enrollments)
     when "generate_hbx_signature"
       generate_hbx_signature(enrollments)
+    when "transfer_enrollment_from_glue_to_enroll"
+      transfer_enrollment_from_glue_to_enroll
     end
   end
 
@@ -95,5 +97,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       enrollment.save!
       puts "enrollment_signature generated #{enrollment.enrollment_signature}" unless Rails.env.test?
     end
+  end
+
+  def transfer_enrollment_from_glue_to_enroll
+    ts = TranscriptGenerator.new
+    ts.display_enrollment_transcripts
   end
 end
