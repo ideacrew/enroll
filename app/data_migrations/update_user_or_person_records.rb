@@ -10,13 +10,13 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
       find_user_by = ENV['find_user_by'] || ENV['hbx_id'].to_s
 
       record = case find_user_by
-      when "email"
-        find_user_from_email(email)
-      when "#{ENV['hbx_id']}"
-        find_person(find_user_by)
-      else
-        find_user_by_user_name(user_name)
-      end
+                 when "email"
+                   find_user_from_email(email)
+                 when "#{ENV['hbx_id']}"
+                   find_person(find_user_by)
+                 else
+                   find_user_by_user_name(user_name)
+               end
 
 
       if record.size != 1
@@ -30,7 +30,8 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
       end
 
       if action.casecmp("update_username") == 0
-        update_oim_id(record.first, user_name)
+        user = record.first.user
+        update_oim_id(user, user_name) if user
       end
 
       if action.casecmp("update_email") == 0
