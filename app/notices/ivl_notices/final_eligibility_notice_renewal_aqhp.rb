@@ -83,21 +83,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
                                                              :is_csr_eligible => datum["csr"].try(:upcase) == "YES" ? true : false,
                                                              :indian_conflict => check(datum["indian"]),
                                                              :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
-                                                             :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
                                                              :is_without_assistance => check(datum["uqhp_eligible"]),
-                                                             :is_totally_ineligible => check(datum["totally_inelig"]),
-                                                             :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
-                                                             :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
-                                                             :has_access_to_affordable_coverage => check(datum ["mec"]),
-                                                             :no_medicaid_because_of_income => (datum["nonmedi_reason"].downcase == "over income") ? true : false,
-                                                             :no_medicaid_because_of_immigration => (datum["nonmedi_reason"].downcase == "immigration") ? true : false,
-                                                             :no_medicaid_because_of_age => (datum["nonmedi_reason"].downcase == "age") ? true : false,
-                                                             :no_aptc_because_of_income => (datum["nonaptc_reason"].downcase == "over income") ? true : false,
-                                                             :no_aptc_because_of_tax => datum["nonaptc_reason"].downcase == "tax" ? true : false,
-                                                             :no_aptc_because_of_mec => datum["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
-                                                             :no_csr_because_of_income => datum["noncsr_reason"].downcase == "over income" ? true : false,
-                                                             :no_csr_because_of_tax => datum["noncsr_reason"].downcase == "tax" ? true : false,
-                                                             :no_csr_because_of_mec => datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
                                                              :tax_household => append_tax_household_information(primary_member)
                                                          })
     end
@@ -156,19 +142,41 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
         outstanding_people << person
       end
     end
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+
+    #enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
     # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
     # enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}.each do |enrollment|
     #   notice.enrollments << append_enrollment_information(enrollment)
     # end
-    notice.due_date = enrollments.first.special_verification_period.strftime("%B %d, %Y")
+    notice.due_date = document_due_date(family)
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
   end
 
+  def document_due_date(family)
+    enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
+    if enrolled_contingent_enrollment.present?
+      if enrolled_contingent_enrollment.special_verification_period.present?
+        enrolled_contingent_enrollment.special_verification_period
+      else
+        (TimeKeeper.date_of_record+95.days)
+      end
+    else
+      nil
+    end
+  end
+
   def ssn_outstanding?(person)
     person.consumer_role.outstanding_verification_types.include?("Social Security Number")
+  end
+
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship')
+  end
+
+  def immigration_status_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
   def append_unverified_individuals(people)
@@ -179,6 +187,10 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
 
       if lawful_presence_outstanding?(person)
         notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+      end
+
+      if immigration_status_outstanding?(person)
+        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
     end
   end
