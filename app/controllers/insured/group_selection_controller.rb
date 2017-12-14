@@ -29,7 +29,6 @@ class Insured::GroupSelectionController < ApplicationController
     @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
     @benefit_group = select_benefit_group(@qle, @employee_role)
     @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
-
     generate_coverage_family_members_for_cobra
   end
 
