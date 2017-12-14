@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = SponsoredBenefits::VERSION
   s.authors     = ["raghuram"]
   s.email       = ["raghuramg83@gmail.com"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of SponsoredBenefits."
-  s.description = "TODO: Description of SponsoredBenefits."
+  s.homepage    = "https://github.com/dchbx"
+  s.summary     = "Summary of SponsoredBenefits."
+  s.description = "Description of SponsoredBenefits."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
