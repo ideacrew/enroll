@@ -103,13 +103,12 @@ module PdfTemplates
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
-<<<<<<< HEAD
     def latest_current_year_enrollment
       enrollments.sort_by(&:effective_on).last
-=======
+    end
+
     def renewal_csr_enrollments
       renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
->>>>>>> origin/app_dev_feature_18967
     end
 
     def current_dental_enrollments
