@@ -69,12 +69,12 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
 
   def update_oim_id(user, user_name)
     user.update_attributes!(oim_id: user_name)
-    puts "Succesfully updated username" unless Rails.env.test?
+    puts "Successfully updated username for with #{user.oim_id}" unless Rails.env.test?
   end
 
   def update_email(user, email)
     user.update_attributes!(email: email)
-    puts "Succesfully updated email" unless Rails.env.test?
+    puts "Successfully updated email with #{user.email}" unless Rails.env.test?
   end
 
   def update_person_home_email(person, address)

@@ -66,7 +66,6 @@ describe UpdateUserOrPersonRecords, dbclean: :after_each do
       it "should update the home email on person record" do
         ENV['action'] = "update_person_home_email"
         ENV['person_email'] = "my_home1198@test.com"
-        ENV['headless_user'] = "no"
         ENV['hbx_id'] = person.hbx_id
         subject.migrate
         person.reload
@@ -76,7 +75,6 @@ describe UpdateUserOrPersonRecords, dbclean: :after_each do
 
       it "should update the work email on person record using oim_id" do
         ENV['hbx_id'] = person.hbx_id
-        ENV['headless_user'] = "no"
         ENV['user_name'] = user.oim_id
         ENV['action'] = "update_person_work_email"
         ENV['person_email'] = "my_work1198@test.com"
