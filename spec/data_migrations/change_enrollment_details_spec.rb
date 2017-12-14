@@ -151,5 +151,18 @@ describe ChangeEnrollmentDetails do
         expect(hbx_enrollment.enrollment_signature.present?).to be_truthy
       end
     end
+
+    context "expire the enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "expire_enrollment"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should expire the enrollment" do
+        expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
+      end
+    end
   end
 end
