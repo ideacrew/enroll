@@ -21,6 +21,7 @@ module PdfTemplates
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
+    attribute :immigration_unverified , Array[PdfTemplates::Individual]
     attribute :american_indian_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
@@ -102,8 +103,13 @@ module PdfTemplates
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
+<<<<<<< HEAD
     def latest_current_year_enrollment
       enrollments.sort_by(&:effective_on).last
+=======
+    def renewal_csr_enrollments
+      renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
+>>>>>>> origin/app_dev_feature_18967
     end
 
     def current_dental_enrollments

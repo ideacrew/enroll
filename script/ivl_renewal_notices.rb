@@ -1,6 +1,6 @@
 unless ARGV[0].present? && ARGV[1].present?
   puts "Please include mandatory arguments: File name and Event name. Example: rails runner script/ivl_renewal_notices.rb <file_name> <event_name>" unless Rails.env.test?
-  puts "Event Names: ivl_renewal_notice_2, ivl_renewal_notice_3, ivl_renewal_notice_4, final_eligibility_notice_uqhp, final_eligibility_notice_aqhp" unless Rails.env.test?
+  puts "Event Names: ivl_renewal_notice_2, ivl_renewal_notice_3, ivl_renewal_notice_4, final_eligibility_notice_uqhp, final_eligibility_notice_aqhp, final_eligibility_notice_renewal_uqhp, final_eligibility_notice_renewal_aqhp" unless Rails.env.test?
   exit
 end
 
@@ -52,18 +52,22 @@ unless event_kind.present?
 end
 
 #need to exlude this list from UQHP_FEL data set.
-@excluded_list = []
-CSV.foreach("11_30_fel_exclusion_list.csv",:headers =>true).each do |d|
-  @excluded_list << d["Subscriber"]
-end
+
+# @excluded_list = []
+# CSV.foreach("UQHP_FEL_EXLUDE_LIST_nov_14.csv",:headers =>true).each do |d|
+#   @excluded_list << d["Subscriber"]
+# end
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
+      #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
       next if primary_member.nil?
+      # next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] == "FALSE")
+      # next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
+      # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
       next if !person.present?
       enrollments = valid_enrollments(person)
