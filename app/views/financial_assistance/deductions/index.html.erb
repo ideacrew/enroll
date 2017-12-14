@@ -14,10 +14,11 @@
 
     <p>Tell Us about income adjustments for this person. When you're finished, select CONTINUE</p>
     <br>
+
     <!--income adjustment driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer">
       <div class="col-md-6 labelforcoverage">
-        <span class="fa-text-color">Does this person expect to have income adjustments in <%=@application.assistance_year%> *</span>
+        <span class="fa-text-color">Does this person expect to have income adjustments in <%= @application.family.application_applicable_year %> *</span>
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
