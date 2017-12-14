@@ -42,5 +42,9 @@ describe Events::ResidencyVerificationRequestsController do
       expect(person.consumer_role.local_residency_requests.first.id).to eq BSON::ObjectId.from_string(
           person.consumer_role.verification_type_history_elements.first.event_request_record_id)
     end
+
+    it "should store local residency request in consumer role" do
+      expect(person.consumer_role.local_residency_requests.count).to eq(1)
+    end
   end
 end

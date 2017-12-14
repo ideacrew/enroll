@@ -16,6 +16,7 @@ module Events
                                              modifier: "Enroll App",
                                              update_reason: "Hub request",
                                              event_request_record_id: event_request_record.id)
+
       notify("acapi.info.events.residency.verification_request", {:body => event_payload, :individual_id => individual.hbx_id, :retry_deadline => (Time.now + 24.hours).to_i})
     end
 

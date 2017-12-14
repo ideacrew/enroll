@@ -137,6 +137,7 @@ class ConsumerRole
       @target.select{|document| document.identifier }
     end
   end
+  embeds_many :residency_verification_responses
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
   embeds_many :verification_type_history_elements
