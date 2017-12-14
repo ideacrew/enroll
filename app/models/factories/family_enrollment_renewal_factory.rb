@@ -71,6 +71,17 @@ module Factories
       shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
     end
 
+    def renewal_plan_offered_by_er?(enrollment)
+      plan = enrollment.plan
+      if plan.present? || plan.renewal_plan_id.present?
+        benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
+        elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
+        elected_plan_ids.include?(plan.renewal_plan_id)
+      else
+       false
+     end
+   end
+
     def find_renewal_enrollments
       renewal_enrollments = family.active_household.hbx_enrollments.shop_market.by_coverage_kind(coverage_kind)
       renewal_enrollments.where({
@@ -90,6 +101,18 @@ module Factories
 
     def employer_offering_coverage_kind?
       coverage_kind == 'dental' ? renewal_assignment.benefit_group.is_offering_dental? : true
+    end
+
+    def assign_common_attributes(active_enrollment, renewal_enrollment)
+      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id
+          writing_agent_id original_application_type kind special_enrollment_period_id
+        )
+      common_attributes.each do |attr|
+         renewal_enrollment.send("#{attr}=", active_enrollment.send(attr))
+      end
+
+      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan(renewing_plan_year.start_on).id if active_enrollment.plan.present?
+      renewal_enrollment
     end
 
     def renew_enrollment(enrollment: nil, waiver: false)
@@ -115,16 +138,6 @@ module Factories
       end
     end
 
-    def renewal_plan_offered_by_er?(enrollment)
-      plan = enrollment.plan
-      if plan.present? || plan.renewal_plan_id.present?
-        benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
-        elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
-        elected_plan_ids.include?(plan.renewal_plan_id)
-      else
-       false
-     end
-   end
 
     # relationship offered in renewal plan year and member active in enrollment.
     def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
