@@ -26,15 +26,16 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Unsaved Tax Info Changes</h4>
+              <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+              <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
             </div>
             <div class="modal-body">
-            You have made changes to Tax Info that are not yet saved. Are you sure you want to continue?
+              If you leave without saving, you will lose all your changes.<br />
+              <strong>This cannot be undone.</strong>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-danger">Continue</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
+              <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
             </div>
           </div>
         </div>
