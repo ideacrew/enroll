@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This notice is to inform you that <strong>#{notice.primary_fullname}</strong> is no longer the broker of record for #{notice.employer_name}</strong> as of <strong>#{notice.termination_date}</strong>. You will no longer be authorized to access <strong>#{notice.employer_name}’s  Account or take action on behalf of <strong>#{notice.employer_name}</strong> or any employees of <strong>#{notice.employer_name}</strong>."} %>
+  { content: "This notice is to inform you that <strong>#{notice.primary_fullname}</strong> is no longer the broker of record for #{notice.employer_name}</strong> as of <strong>#{notice.termination_date}</strong>. You will no longer be authorized to access <strong>#{notice.employer_name}’s #{Settings.site.short_name} Account or take action on behalf of <strong>#{notice.employer_name}</strong> or any employees of <strong>#{notice.employer_name}</strong>."} %>
 <br>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
