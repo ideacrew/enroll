@@ -25,8 +25,6 @@ namespace :reports do
       person_count =  Person.all_consumer_roles.count
 
       while offset <= person_count
-        puts offset
-
         Person.all_consumer_roles.offset(offset).limit(batch_size).each do |person|
           begin
             family = person.primary_family rescue nil
@@ -35,14 +33,12 @@ namespace :reports do
               person = family_member.person rescue nil
               next if person.blank? || person.consumer_role.blank? || person.verification_types.select {|v_type| v_type == ver_type}.blank? || person.consumer_role.vlp_authority == "curam" || !type_unverified?(ver_type, person)
               due_date = family.document_due_date(family_member,ver_type).present?  ? family.document_due_date(family_member,ver_type) : family.min_verification_due_date
-                puts person.hbx_id
               csv << [
                 person.hbx_id,
                 person.first_name,
                 person.last_name,
                 due_date
               ]
-
             end
           rescue => e
             puts "Errors #{e} #{e.backtrace}"
