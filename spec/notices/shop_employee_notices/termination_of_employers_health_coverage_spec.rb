@@ -20,7 +20,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
                             :notice_template => 'notices/shop_employee_notices/termination_of_employers_health_coverage',
                             :notice_builder => 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
                             :event_name => 'notice_to_employee_for_missing_binder_payment',
-                            :mpi_indicator => 'MPI_SHOPDIE064',
+                            :mpi_indicator => 'SHOP_D064',
                             :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
                           }
 
@@ -83,8 +83,14 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
+    it "should match event_name" do
+      expect(@employee_notice.event_name).to eq "notice_to_employee_for_missing_binder_payment"
+    end
     it "should render termination_of_employers_health_coverage" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/termination_of_employers_health_coverage"
+    end
+    it "should match mpi_indicator" do
+      expect(@employee_notice.mpi_indicator).to eq "SHOP_D064"
     end
     it "should generate pdf" do
       @employee_notice.build

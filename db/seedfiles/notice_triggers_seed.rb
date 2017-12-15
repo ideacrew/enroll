@@ -1,3 +1,4 @@
+
 puts "*"*80
 puts "::: Cleaning ApplicationEventKinds :::"
 ApplicationEventKind.delete_all
@@ -1007,7 +1008,7 @@ shop_notice_triggers = [
       }
     ]
   },
-  
+
   {
     hbx_id: 'SHOP_D092',
     title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
@@ -1025,6 +1026,28 @@ shop_notice_triggers = [
           primary_recipients: ["employee"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {                
+    hbx_id: 'SHOP_D064',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
+    resource_name: 'employee_role',
+    event_name: 'notice_to_employee_for_missing_binder_payment', 
+    notice_triggers: [
+      {
+        name: "Notice to EEs that ER’s plan year will not be written",
+        notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
+        notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
+        mpi_indicator: 'SHOP_D064',
+        notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employee"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
         }
       }
     ]

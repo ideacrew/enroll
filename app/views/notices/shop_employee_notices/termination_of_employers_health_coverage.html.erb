@@ -23,13 +23,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px">Dear <%= notice.primary_fullname %>: </td>
+      <td style="padding-top: 10px">Dear <%= notice.primary_fullname.titleize %>, </td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This letter is notification that your employer, #{notice.employer_name}, is not offering health coverage to employees through the #{Settings.site.short_name}.", top_margin: '10px'} %>
+  { content: "This letter is notification that your employer, <strong>#{notice.employer_name}</strong>, is not offering health coverage to employees through the #{Settings.site.short_name}.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "<strong>If you selected a plan during your employer’s Open Enrollment period, the health coverage you selected for you and any of your enrolled family members will not go into effect on #{notice.plan_year.start_on} as planned.</strong>", top_margin: '10px'} %>
@@ -41,7 +41,7 @@
   { content: "You may be eligible to purchase coverage for yourself and your family members through the #{Settings.site.short_name}'s  individual marketplace. You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance. Please log into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "The next Open Enrollment period begins on #{notice.enrollment.ivl_open_enrollment_start_on} and ends on #{notice.enrollment.ivl_open_enrollment_end_on}.", top_margin: '10px'} %>
+  { content: "The next Open Enrollment period begins on <strong>#{notice.enrollment.ivl_open_enrollment_start_on}</strong> and ends on <strong>#{notice.enrollment.ivl_open_enrollment_end_on}</strong>.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs. To find the Health Insurance Marketplace in your state, go to <a href="">www.healthcare.gov</a>", top_margin: '10px'} %>
@@ -63,7 +63,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-    ["By calling #{notice.hbe.phone}.",
+    ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
