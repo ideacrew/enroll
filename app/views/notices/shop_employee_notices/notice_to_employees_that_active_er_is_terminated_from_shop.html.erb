@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
   <tr>
-    <td>Email notification sent to: <%= notice.primary_email %></td>
+    <td><strong>Email notification sent to</strong>: <%= notice.primary_email %></td>
   </tr>
   </tbody>
 </table>
@@ -23,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
   <tr>
-    <td>Dear <strong><%= notice.primary_fullname %></strong>:</td>
+    <td>Dear <strong><%= notice.primary_fullname %></strong>,</td>
   </tr>
   </tbody>
 </table>
@@ -33,9 +33,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
     { content: "<strong>Health coverage for you, and any of your enrolled family members, will end on #{notice.plan_year.terminated_on}. </strong>"} %>
-
 <br>
-
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
     { contents: [""], heading: 'You May be Eligible for Other Coverage', sub_heading: ''} %>
 
@@ -58,7 +56,7 @@
 
 <% if notice.broker.present? %>
 <%= render partial: 'notices/shared/paragraph', locals: {
-    content: "Please contact your broker for further assistance."} %>
+    content: "Contact your employer or your broker for further assistance."} %>
 
 <% else %>
     <%= render partial: 'notices/shared/paragraph', locals: {
@@ -69,7 +67,7 @@
     content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                      ["By calling #{notice.hbe.phone}.",
+                                                                      ["By calling #{notice.hbe.phone}",
                                                                        "TTY: #{Settings.contact_center.tty}",
                                                                        "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
