@@ -76,7 +76,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
-    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year)
+    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
     return true if tax_household.blank?
 
     cost_sharing = @benefit_package.cost_sharing

@@ -11,10 +11,15 @@ var Verification = (function(){
    function showHubCall(target){
        $('#'+target_id(target)+'-hub').fadeIn('slow');
    }
+
+   function showExtendAction(target) {
+       $('#'+target_id(target)+'-extend').fadeIn('slow');
+   }
    function hideAllActions(target){
        hideVerifyAction(target);
        hideReturnForDef(target);
        hideHubCall(target);
+       hideExtendAction(target);
    }
    function hideVerifyAction(target){
        $('#'+target_id(target)).hide();
@@ -24,6 +29,9 @@ var Verification = (function(){
    }
    function hideHubCall(target){
        $('#'+target_id(target)+'-hub').hide();
+   }
+   function hideExtendAction(target){
+       $('#'+target_id(target)+'-extend').hide();
    }
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
@@ -46,6 +54,10 @@ var Verification = (function(){
              hideAllActions($selected_id);
              showHubCall($selected_id);
              break;
+         case 'Extend':
+            hideAllActions($selected_id);
+            showExtendAction($selected_id);
+            break;
          default:
              hideAllActions($selected_id);
      }

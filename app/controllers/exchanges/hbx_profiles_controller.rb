@@ -37,14 +37,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   def transmit_group_xml
     HbxProfile.transmit_group_xml(params[:id].split)
     @employer_profile = EmployerProfile.find(params[:id])
-    @fein=@employer_profile.fein
-    start_on = @employer_profile.active_plan_year.start_on.strftime("%Y%m%d")
-    end_on = @employer_profile.active_plan_year.end_on.strftime("%Y%m%d")
+    @fein = @employer_profile.fein
+    start_on = @employer_profile.show_plan_year.start_on.strftime("%Y%m%d")
+    end_on = @employer_profile.show_plan_year.end_on.strftime("%Y%m%d")
     @xml_submit_time = @employer_profile.xml_transmitted_timestamp
     v2_xml_generator =  V2GroupXmlGenerator.new([@fein], start_on, end_on)
     send_data v2_xml_generator.generate_xmls
-    #flash["notice"] = "Successfully transmitted the employer group xml."
-    #redirect_to exchanges_hbx_profiles_root_path
   end
 
   def employer_index
@@ -204,6 +202,12 @@ def employer_poc
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
+  def outstanding_verification_dt
+    @selector = params[:scopes][:selector] if params[:scopes].present?
+    @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
+  end
+
+
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -331,14 +335,6 @@ def employer_poc
     end
   end
 
-  def verification_index
-    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
-    respond_to do |format|
-      format.html { render partial: "index_verification" }
-      format.js {}
-    end
-  end
-
   def binder_index
     @organizations = Organization.retrieve_employers_eligible_for_binder_paid
 
@@ -369,23 +365,6 @@ def employer_poc
     @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
     render
 
-  end
-
-  def verifications_index_datatable
-    dt_query = extract_datatable_parameters
-    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-
-    families = search_families(dt_query.search_string, all_families)
-
-    sorted_by, order = input_sort_request
-
-    families = sorted_families(sorted_by, order, families)
-
-    @draw = dt_query.draw
-    @total_records = all_families.count
-    @records_filtered = families.count
-    @families = families[dt_query.skip, dt_query.take]
-    render
   end
 
   def product_index
