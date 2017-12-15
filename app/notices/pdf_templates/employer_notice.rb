@@ -31,6 +31,8 @@ module PdfTemplates
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
+    attribute :enrollment, PdfTemplates::Enrollment
+    attribute :employee, PdfTemplates::EmployeeNotice
 
     def shop?
       return true
