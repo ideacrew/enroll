@@ -48,9 +48,6 @@ Rails.application.configure do
     :port => 3000
   }
 
-  #Queue adapter 
-  config.active_job.queue_adapter = :resque
-
   HbxIdGenerator.slug!
 
   Mongoid.logger.level = Logger::ERROR
