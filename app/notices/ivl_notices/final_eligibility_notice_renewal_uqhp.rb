@@ -158,6 +158,14 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
    person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
+  def american_indian_status_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
+  end
+
+  def residency_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('DC Residency')
+  end
+
   def append_unverified_individuals(people)
     people.each do |person|
       if ssn_outstanding?(person)
@@ -170,6 +178,14 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
 
       if immigration_status_outstanding?(person)
         notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+      end
+
+      if american_indian_status_outstanding?(person)
+        notice.american_indian_unverified  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+      end
+
+      if residency_outstanding?(person)
+        notice.residency_inconsistency  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
     end
   end
