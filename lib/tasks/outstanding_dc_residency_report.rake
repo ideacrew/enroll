@@ -7,10 +7,10 @@ namespace :reports do
   task :outstanding_dc_residency_report => :environment do
 
     field_names  = %w(
-          HBX ID
+          HBX_ID
           First_Name
           Last_Name
-          DUE DATE
+          DUE_DATE
     )
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
