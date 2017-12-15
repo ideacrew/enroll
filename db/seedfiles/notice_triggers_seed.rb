@@ -723,7 +723,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_DR1',
-    title: 'REMINDER - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+    title: 'Reminder - You Must Submit Documents by the Deadline to Keep Your Insurance',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
