@@ -361,6 +361,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   end
 
   context "GET ridp_agreement" do
+    let(:person100) { FactoryGirl.create(:person, :with_family, :with_consumer_role) }
 
     context "with a user who has already passed RIDP" do
       before :each do
@@ -368,13 +369,13 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
 
       before :each do
-        allow(user).to receive(:person).and_return(person)
-        allow(person).to receive(:consumer_role?).and_return(true)
-        allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(person).to receive(:completed_identity_verification?).and_return(true)
-        allow(person.consumer_role).to receive(:identity_verified?).and_return(true)
-        allow(person.consumer_role).to receive(:application_verified?).and_return(true)
-        allow(person.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(true)
+        allow(user).to receive(:person).and_return(person100)
+        allow(person100).to receive(:consumer_role?).and_return(true)
+        allow(person100).to receive(:consumer_role).and_return(consumer_role)
+        allow(person100).to receive(:completed_identity_verification?).and_return(true)
+        allow(person100.consumer_role).to receive(:identity_verified?).and_return(true)
+        allow(person100.consumer_role).to receive(:application_verified?).and_return(true)
+        allow(person100.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(true)
         get "ridp_agreement"
       end
 
@@ -389,12 +390,12 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
 
       before :each do
-        allow(user).to receive(:person).and_return(person)
-        allow(person).to receive(:completed_identity_verification?).and_return(false)
-        allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(person.consumer_role).to receive(:identity_verified?).and_return(false)
-        allow(person.consumer_role).to receive(:application_verified?).and_return(false)
-        allow(person.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(false)
+        allow(user).to receive(:person).and_return(person100)
+        allow(person100).to receive(:completed_identity_verification?).and_return(false)
+        allow(person100).to receive(:consumer_role).and_return(consumer_role)
+        allow(person100.consumer_role).to receive(:identity_verified?).and_return(false)
+        allow(person100.consumer_role).to receive(:application_verified?).and_return(false)
+        allow(person100.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(false)
         get "ridp_agreement"
       end
 
