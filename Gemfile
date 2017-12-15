@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.3'
+gem 'rails', '4.2.7.1'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
@@ -41,8 +41,7 @@ gem 'nokogiri', '1.6.7.2'
 
 gem 'mongo', '2.1.2'
 gem 'mongoid', '5.0.1'
-gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", branch: "master"
-# gem 'mongoid-history', '~> 5.1.0'
+gem 'mongoid-history'
 gem 'mongoid_userstamp'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "mongoid-autoinc"
