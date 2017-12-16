@@ -30,12 +30,11 @@ module SponsoredBenefits
 
     def age_on(date)
       age = date.year - dob.year
-      if date.month == dob.month
-        age -= 1 if date.day < dob.day
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
       else
-        age -= 1 if date.month < dob.month
+        age
       end
-      age
     end
   end
 end
