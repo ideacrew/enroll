@@ -1,6 +1,11 @@
 class ShopEmployeeNotices::WaiverConfirmationNotice < ShopEmployeeNotice
 
-  attr_accessor :census_employee
+  attr_accessor :census_employee, :hbx_enrollment
+
+  def initialize(census_employee, args = {})
+    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment]).first
+    super(census_employee, args)
+  end
 
   def deliver
     build
@@ -13,7 +18,7 @@ class ShopEmployeeNotices::WaiverConfirmationNotice < ShopEmployeeNotice
   end
 
   def append_data
-    hbx_enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.reject{|en| en.aasm_state == "inactive"}[-1]
+    hbx_enrollment = self.hbx_enrollment
     covered_dependents_count = hbx_enrollment.hbx_enrollment_members.reject{ |mem| mem.is_subscriber}.count
     notice.enrollment = PdfTemplates::Enrollment.new({
       :enrollees_count => covered_dependents_count,

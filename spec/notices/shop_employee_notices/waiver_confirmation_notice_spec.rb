@@ -26,7 +26,7 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
                             :notice_template => 'notices/shop_employee_notices/waiver_confirmation_notice',
                             :notice_builder => 'ShopEmployeeNotices::WaiverConfirmationNotice',
                             :event_name => 'waiver_confirmation_notice',
-                            :mpi_indicator => 'MPI_SHOPDAE031',
+                            :mpi_indicator => 'DAE031',
                             :title => "Confirmation of Election to Waive Coverage"})
                           }
 
@@ -34,7 +34,10 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
-      :template => application_event.notice_template
+      :template => application_event.notice_template,
+      :options => {
+        :hbx_enrollment => hbx_enrollment.hbx_id.to_s
+      }
   }}
 
   before do
@@ -71,20 +74,31 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
     before do 
       allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment])
       allow(person.primary_family).to receive(:household).and_return(household)
-    end
-
-    it "should append data" do
       enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.reject{|en| en.aasm_state == "inactive"}[-1]
       @employee_notice.append_data
+    end
+
+    it "should append enrollment terminated on" do
       expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+    end
+    it "should append enrollment effective on" do
       expect(@employee_notice.notice.enrollment.effective_on).to eq hbx_enrollment.effective_on
+    end
+    it "should append plan name" do
       expect(@employee_notice.notice.plan.plan_name).to eq hbx_enrollment.plan.name
     end
   end
 
-  describe "should render template" do
+  describe "render template with event kind" do
     it "render waiver_confirmation_notice" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/waiver_confirmation_notice"
+    end
+
+    it "should match event name" do
+      expect(@employee_notice.event_name).to eq "waiver_confirmation_notice"
+    end
+    it "should match mpi_indicator" do
+      expect(@employee_notice.mpi_indicator).to eq "DAE031"
     end
   end
 
