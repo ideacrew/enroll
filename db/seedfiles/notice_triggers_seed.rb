@@ -837,7 +837,7 @@ shop_notice_triggers = [
         name: 'Notice to employee after they select a plan Annual Open Enrollment',
         notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
         notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
-        mpi_indicator: 'DIE075',
+        mpi_indicator: 'SHOP_D075',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

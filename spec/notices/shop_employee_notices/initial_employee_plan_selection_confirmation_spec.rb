@@ -14,7 +14,7 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
                             name: 'Notice to employee after they select a plan Annual Open Enrollment',
                             notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
                             notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
-                            mpi_indicator: 'SHOP_M070',
+                            mpi_indicator: 'SHOP_D075',
                             event_name: 'initial_employee_plan_selection_confirmation',
                             title: "Employee Enrollment Confirmation"})
                           }
@@ -85,6 +85,12 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
       @employee_notice.generate_pdf_notice
     end
 
+    it "should match mpi_indicator" do
+      expect(@employee_notice.mpi_indicator).to eq "SHOP_D075"
+    end
+    it "should match event" do
+      expect(@employee_notice.event_name).to eq "initial_employee_plan_selection_confirmation"
+    end
     it "should render initial_employee_plan_selection_confirmation" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/initial_employee_plan_selection_confirmation"
     end
