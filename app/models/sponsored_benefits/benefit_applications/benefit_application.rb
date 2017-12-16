@@ -1,7 +1,6 @@
 module SponsoredBenefits
   class BenefitApplications
     module BenefitApplication
-
       include Mongoid::Document
       include Mongoid::Timestamps
 
@@ -76,7 +75,6 @@ module SponsoredBenefits
       def broker=(new_broker)
         self.broker_id = new_broker.id
       end
-
 
       def effective_period=(new_effective_period)
         write_attribute(:effective_period, dateify_range(new_effective_period))
