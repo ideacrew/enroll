@@ -1,5 +1,6 @@
 module SponsoredBenefits
-  class BenefitApplications::AcaShopDcBenefitApplication
-    include Mongoid::Document
+  class BenefitApplications::AcaShopDcBenefitApplication < BenefitApplication
+
+
   end
 end
