@@ -11,6 +11,7 @@ module SponsoredBenefits
         allow_blank: true,
         numericality: true
 
+      validate :is_ssn_composition_correct?
       after_validation :move_encrypted_ssn_errors
     end
 
@@ -47,6 +48,28 @@ module SponsoredBenefits
       end
     end
 
+    def is_ssn_composition_correct?
+      # Invalid compositions:
+      #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
+      #   00 in the group number (fourth and fifth digit); or
+      #   0000 in the serial number (last four digits)
+
+      if ssn.present?
+        invalid_area_numbers = %w(000 666)
+        invalid_area_range = 900..999
+        invalid_group_numbers = %w(00)
+        invalid_serial_numbers = %w(0000)
+
+        return false if ssn.to_s.blank?
+        return false if invalid_area_numbers.include?(ssn.to_s[0,3])
+        return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
+        return false if invalid_group_numbers.include?(ssn.to_s[3,2])
+        return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+      end
+
+      true
+    end
+
     module ClassMethods
       def encrypt_ssn(val)
         if val.blank?
@@ -58,6 +81,10 @@ module SponsoredBenefits
 
       def decrypt_ssn(val)
         SymmetricEncryption.decrypt(val)
+      end
+
+      def find_by_ssn(ssn)
+        self.where(encrypted_ssn: encrypt_ssn(ssn)).first
       end
     end
   end
