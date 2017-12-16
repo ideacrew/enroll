@@ -61,19 +61,19 @@
   <% notice.tax_hh_with_csr.each do |hh_csr|%>
     <% case hh_csr.csr_percent_as_integer %>
     <% when 73 %>
-      <%= render partial: 'notices/shared/paragraph', :locals => {
+      <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 87 %>
-      <%= render partial: 'notices/shared/paragraph', :locals => {
+      <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 94 %>
-      <%= render partial: 'notices/shared/paragraph', :locals => {
+      <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 100 %>
-      <%= render partial: 'notices/shared/paragraph', :locals => {
+      <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
     <% else %>
-      <%= render partial: 'notices/shared/paragraph', :locals => {
+      <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
     <% end %>
   <% end %>
@@ -123,7 +123,7 @@
       listings: ["Those who qualify must enroll before the deadline. ",
                  "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
 
-    <%= render partial: 'notices/shared/paragraph', :locals => {
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.coverage_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
   <% else %>
 
@@ -136,7 +136,7 @@
       listings: ["Those who qualify must enroll before the deadline. ",
                  "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
 
-    <%= render partial: 'notices/shared/paragraph', :locals => {
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "To find out if those who qualify can enroll now, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
 
   <% end %>
@@ -155,12 +155,12 @@
 <% end %>
 
 <% if (notice.magi_medicaid_eligible.nil? || notice.non_magi_medicaid_eligible.nil?) && (notice.request_full_determination == false) %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "You did not ask to have the DC Department of Human Services (DHS) do a full review for Medicaid eligibility.  If you want to change your mind, call #{Settings.site.short_name} at #{notice.hbe.phone}.", top_margin: '12px'} %>
 <% end %>
 
 <% if (notice.magi_medicaid_eligible.nil? || notice.non_magi_medicaid_eligible.nil?) && (notice.request_full_determination == true) %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "You asked us to send your application to the DC Department of Human Services (DHS) to review Medicaid eligibility for your household.  They may ask you for more information or documents. They will make a final decision.  If you have questions, call #{Settings.site.short_name} at #{notice.hbe.phone}", top_margin: '4px'} %>
 <% end %>
 
@@ -171,7 +171,7 @@
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
