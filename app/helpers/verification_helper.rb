@@ -1,5 +1,6 @@
 module VerificationHelper
-
+  include DocumentsVerificationStatus
+  
   def doc_status_label(doc)
     case doc.status
       when "not submitted"
@@ -10,46 +11,6 @@ module VerificationHelper
         "success"
       else
         "danger"
-    end
-  end
-
-  def verification_type_status(type, member, admin=false)
-    consumer = member.consumer_role
-    return "curam" if (consumer.vlp_authority == "curam" && consumer.fully_verified? && admin)
-    return 'attested' if (type == 'DC Residency' && member.age_on(TimeKeeper.date_of_record) <= 18)
-    case type
-      when 'Social Security Number'
-        if consumer.ssn_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      when 'American Indian Status'
-        if consumer.native_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      when 'DC Residency'
-        if consumer.residency_verified?
-          consumer.local_residency_validation
-        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      else
-        if consumer.lawful_presence_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
-          "in review"
-        else
-          "outstanding"
-        end
     end
   end
 
@@ -205,11 +166,28 @@ module VerificationHelper
     options_for_select(build_admin_actions_list(v_type, f_member))
   end
 
+  def mod_attr(attr, val)
+      attr.to_s + " => " + val.to_s
+  end
+
   def build_admin_actions_list(v_type, f_member)
     if verification_type_status(v_type, f_member) == "outstanding"
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
+  def build_reject_reason_list(v_type)
+    case v_type
+      when "Citizenship"
+        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      when "Immigration status"
+        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      when "Income" #will be implemented later
+        ::VlpDocument::INCOME_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      else
+        ::VlpDocument::ALL_TYPES_REJECT_REASONS
     end
   end
 
