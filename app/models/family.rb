@@ -199,6 +199,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :outstanding_verification,              ->{ by_enrollment_individual_market.by_enrollment_effective_date_range(TimeKeeper.date_of_record.beginning_of_year, TimeKeeper.date_of_record.end_of_year).where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")}
    
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
