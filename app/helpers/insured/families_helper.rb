@@ -211,6 +211,14 @@ module Insured::FamiliesHelper
     @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
   end
 
+  def person_has_any_roles?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? 
+  end
+
+  def is_strictly_open_enrollment_case?
+    is_under_open_enrollment? && @family.active_seps.blank?
+  end
+
   def tax_info_url
     if ENV['AWS_ENV'] == 'prod'
       "https://dchealthlink.com/individuals/tax-documents"

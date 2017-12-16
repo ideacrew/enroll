@@ -1,5 +1,6 @@
 module VerificationHelper
-
+  include DocumentsVerificationStatus
+  
   def doc_status_label(doc)
     case doc.status
       when "not submitted"
@@ -13,37 +14,6 @@ module VerificationHelper
     end
   end
 
-  def verification_type_status(type, member, admin=false)
-    consumer = member.consumer_role
-    return "curam" if (consumer.vlp_authority == "curam" && consumer.fully_verified? && admin)
-    case type
-      when 'Social Security Number'
-        if consumer.ssn_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      when 'American Indian Status'
-        if consumer.native_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      else
-        if consumer.lawful_presence_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-    end
-  end
-
   def verification_type_class(type, member, admin=false)
     case verification_type_status(type, member, admin)
       when "verified"
@@ -54,6 +24,10 @@ module VerificationHelper
         member.consumer_role.processing_hub_24h? ? "info" : "danger"
       when "curam"
         "default"
+      when "attested"
+        "default"
+      when "valid"
+        "success"
     end
   end
 
@@ -168,6 +142,10 @@ module VerificationHelper
         "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
       when "verified"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "valid"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "attested"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       when "curam"
         admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
@@ -183,9 +161,13 @@ module VerificationHelper
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
-  
+
   def admin_actions(v_type, f_member)
     options_for_select(build_admin_actions_list(v_type, f_member))
+  end
+
+  def mod_attr(attr, val)
+      attr.to_s + " => " + val.to_s
   end
 
   def build_admin_actions_list(v_type, f_member)
@@ -196,7 +178,20 @@ module VerificationHelper
     end
   end
 
+  def build_reject_reason_list(v_type)
+    case v_type
+      when "Citizenship"
+        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      when "Immigration status"
+        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      when "Income" #will be implemented later
+        ::VlpDocument::INCOME_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      else
+        ::VlpDocument::ALL_TYPES_REJECT_REASONS
+    end
+  end
+
   def type_unverified?(v_type, person)
-    verification_type_status(v_type, person) != "verified"
+    !["verified", "valid", "attested"].include?(verification_type_status(v_type, person))
   end
 end
