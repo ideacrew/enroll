@@ -1,22 +1,22 @@
 module SponsoredBenefits
-  class BenefitApplications::AcaShopCcaBenefitApplication < BenefitApplication
+  module BenefitApplications
+    class AcaShopCcaBenefitApplication < BenefitApplication
 
-    include SponsoredBenefits::BenefitApplications::AcaShopBenefitApplicationBehavior
+      include SponsoredBenefits::BenefitApplications::AcaShopBenefitApplicationBehavior
 
-    # Move CCA-specific PlanYear code here. e.g. Employer Attestation, SIC codes, etc
+      # Move CCA-specific PlanYear code here. e.g. Employer Attestation, SIC codes, etc
 
-    # SIC code, frozen when the plan year is published,
-    # otherwise comes from employer_profile
-    field :recorded_sic_code,     type: String
-    field :recorded_rating_area,  type: String
+      # SIC code, frozen when the plan year is published,
+      # otherwise comes from employer_profile
+      field :recorded_sic_code,     type: String
+      field :recorded_rating_area,  type: String
 
-    validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
+      validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
 
-    embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage", cascade_callbacks: true
-    accepts_nested_attributes_for :benefit_packages
+      embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage", cascade_callbacks: true
+      accepts_nested_attributes_for :benefit_packages
 
-
-
-
+      #  validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
+    end
   end
 end
