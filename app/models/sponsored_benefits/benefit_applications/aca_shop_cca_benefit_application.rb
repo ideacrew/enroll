@@ -1,8 +1,21 @@
 module SponsoredBenefits
-  class BenefitApplications::AcaShopCcaBenefitApplication < AcaShopBenefitApplication
+  class BenefitApplications::AcaShopCcaBenefitApplication < BenefitApplication
 
-    # Move CCA-specific PlanYear code here. e.g. Rating areas, Employer Attestation, Geographic Rating Areas,
-    # SIC codes, etc
+    include SponsoredBenefits::BenefitApplications::AcaShopBenefitApplicationBehavior
+
+    # Move CCA-specific PlanYear code here. e.g. Employer Attestation, SIC codes, etc
+
+    # SIC code, frozen when the plan year is published,
+    # otherwise comes from employer_profile
+    field :recorded_sic_code,     type: String
+    field :recorded_rating_area,  type: String
+
+    validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
+
+    embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage", cascade_callbacks: true
+    accepts_nested_attributes_for :benefit_packages
+
+
 
 
   end
