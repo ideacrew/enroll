@@ -9,7 +9,7 @@ module SponsoredBenefits
 
     has_many    :benefit_markets, class_name: "SponsoredBenefits::BenefitMarket" # (temporal: past, current and renewing)
     has_many    :offered_benefit_products, class_name: "SponsoredBenefits::BenefitProducts::BenefitProduct"
-    has_many    :benefit_applications, cascade_callbacks: true, validate: true
+    embeds_many :benefit_applications, cascade_callbacks: true, class_name: 'SponsoredBenefits::BenefitApplications::BenefitApplication', validate: true
     embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
 
 
