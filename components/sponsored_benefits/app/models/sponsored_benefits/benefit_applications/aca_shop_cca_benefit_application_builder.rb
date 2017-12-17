@@ -13,8 +13,8 @@ module SponsoredBenefits
         super(options)
 
         # @benefit_application = SponsoredBenefits::BenefitApplications::AcaShopCcaBenefitApplication.new
-        # @benefit_sponsor = 
-        # @benefit_market = 
+        # @benefit_sponsor =
+        # @benefit_market =
 
         # Settings.site.benefit_market
       end
@@ -37,7 +37,7 @@ module SponsoredBenefits
 
     private
       def one_year_period(begin_on)
-        begin_on..(effective_on + 1.year - 1.day)
+        begin_on..(begin_on + 1.year - 1.day)
       end
 
 
