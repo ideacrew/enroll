@@ -13,7 +13,7 @@ module SponsoredBenefits
 
       validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
 
-      embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage", cascade_callbacks: true
+      embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage"
       accepts_nested_attributes_for :benefit_packages
 
       #  validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true

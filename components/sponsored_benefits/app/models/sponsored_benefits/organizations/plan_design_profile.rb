@@ -1,9 +1,12 @@
+# Profile that supports Plan Design and Quoting functions
 module SponsoredBenefits
   module Organizations
     class PlanDesignProfile < Profile
 
-      embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
-      embeds_many :benefit_applications, class_name: "SponsoredBenefits::Organizations::BenefitApplications::BenefitApplication"
+      field :profile_source, type: String, default: "self_serve"
+      field :contact_method, type: String, default: "Only Electronic communications"
+      field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+      field :xml_transmitted_timestamp, type: DateTime
 
     end
   end
