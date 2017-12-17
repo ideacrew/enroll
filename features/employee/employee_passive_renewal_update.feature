@@ -23,7 +23,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee clicks back to my account button
       Then Soren While should see active enrollment with his daughter
-      And Soren White should see updated passive renewal with his daughter
+      And Soren White should see updated renewal with his daughter
 
   Scenario: Passively Renewed Employee terminates his coverage
     Given Renewing Employer for Soren White exists with active and renewing plan year
