@@ -3,7 +3,7 @@ module SponsoredBenefits
 
     include Mongoid::Document
     include Mongoid::Timestamps
-    include UnsetableSparseFields
+    include Concerns::UnsetableSparseFields
     include SponsoredBenefits::Concerns::Ssn
     include SponsoredBenefits::Concerns::Dob
 

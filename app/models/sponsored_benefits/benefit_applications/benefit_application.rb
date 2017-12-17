@@ -1,6 +1,6 @@
 module SponsoredBenefits
-  class BenefitApplications
-    module BenefitApplication
+  module BenefitApplications
+    class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
 
@@ -39,7 +39,7 @@ module SponsoredBenefits
       # The date range when members may enroll in benefit products
       field :open_enrollment_period,  type: Range
 
-      # Populate when 
+      # Populate when
       field :terminated_early_on, type: Date
 
       field :sponsorable_id, type: String
@@ -58,7 +58,7 @@ module SponsoredBenefits
       ## Override with specific benefit package subclasses
         embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
         accepts_nested_attributes_for :benefit_packages
-      ## 
+      ##
 
       validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
       validate :open_enrollment_date_checks
