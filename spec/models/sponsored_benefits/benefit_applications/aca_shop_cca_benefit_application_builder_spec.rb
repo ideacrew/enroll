@@ -14,6 +14,10 @@ module SponsoredBenefits
 
     let!(:subject) { BenefitApplications::AcaShopCcaBenefitApplicationBuilder.new(valid_params) }
 
+    before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today)
+    end
+
     context "given the minimal params" do
       it "builds a basic application" do
         expect(subject.benefit_application).to be_kind_of(BenefitApplications::AcaShopCcaBenefitApplication)
