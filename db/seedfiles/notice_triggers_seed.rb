@@ -973,10 +973,10 @@ shop_notice_triggers = [
     event_name: 'initial_employer_no_binder_payment_received',
     notice_triggers: [
       {
-        name: ' Initial Employer No Binding Payment Received',
+        name: 'Initial Employer No Binding Payment Received',
         notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
         notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
-        mpi_indicator: 'DIG063',
+        mpi_indicator: 'SHOP_D063',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
