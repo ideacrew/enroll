@@ -1,5 +1,7 @@
 module SponsoredBenefits
-  class BenefitProducts::HealthBenefitProduct
-    include Mongoid::Document
+  module BenefitProducts
+    class HealthBenefitProduct < Product
+
+    end
   end
 end
