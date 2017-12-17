@@ -1,6 +1,8 @@
+require 'active_support/concern'
+
 module SponsoredBenefits
   module Concerns::AcaShopBenefitApplicationConcern
-    extend ActiveSupport::Concerns
+    extend ActiveSupport::Concern
 
     # Move ACA-specific PlanYear code here. e.g. Rating areas, Geographic Rating Areas, etc
 
@@ -30,7 +32,7 @@ module SponsoredBenefits
 
       open_enrollment_period_earliest_begin = effective_period.begin - open_enrollment_period_maximum
       if open_enrollment_period.begin < open_enrollment_period_earliest_begin
-        errors.add(:open_enrollment_period, "may not begin more than #{open_enrollment_period_maximum} months sooner than effective date") 
+        errors.add(:open_enrollment_period, "may not begin more than #{open_enrollment_period_maximum} months sooner than effective date")
       end
 
       initial_application_earliest_begin_date = effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months

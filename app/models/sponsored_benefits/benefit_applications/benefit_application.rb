@@ -1,6 +1,6 @@
 module SponsoredBenefits
-  class BenefitApplications
-    module BenefitApplication
+  module BenefitApplications
+    class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
 
@@ -39,7 +39,7 @@ module SponsoredBenefits
       # The date range when members may enroll in benefit products
       field :open_enrollment_period,  type: Range
 
-      # Populate when 
+      # Populate when
       field :terminated_early_on, type: Date
 
       field :sponsorable_id, type: String
@@ -50,18 +50,17 @@ module SponsoredBenefits
       belongs_to :sponsorable, polymorphic: true
 
       has_one :rosterable, as: :rosterable
-      embeds_many :benefit_packages, as: :packageable
+      embeds_many :benefit_packages, as: :packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
 
       accepts_nested_attributes_for :benefit_packages
 
 
-      ## Override with specific benefit package subclasses
-        embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
-        accepts_nested_attributes_for :benefit_packages
-      ## 
+      # ## Override with specific benefit package subclasses
+      #   embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
+      #   accepts_nested_attributes_for :benefit_packages
+      # ##
 
       validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
-      validate :open_enrollment_date_checks
       after_update :validate_application_dates
 
       scope :by_date_range,    ->(begin_on, end_on) { where(:"effective_period.max".gte => begin_on, :"effective_period.max".lte => end_on) }
@@ -111,10 +110,9 @@ module SponsoredBenefits
 
       # Ensure class type and integrity of date period ranges
       def dateify_range(range_period)
-
         # Check that end isn't before start. Note: end == start is not trapped as an error
         raise "Range period end date may not preceed begin date" if range_period.begin > range_period.end
-        return if range_period.begin.is_a?(Date) && range_period.end.is_a?(Date)
+        return range_period if range_period.begin.is_a?(Date) && range_period.end.is_a?(Date)
 
         if range_period.begin.is_a?(Time) || range_period.end.is_a?(Time)
           begin_on  = range_period.begin.to_date

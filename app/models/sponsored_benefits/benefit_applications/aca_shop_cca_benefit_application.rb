@@ -1,8 +1,8 @@
 module SponsoredBenefits
   module BenefitApplications
     class AcaShopCcaBenefitApplication < BenefitApplication
-
-      include SponsoredBenefits::BenefitApplications::AcaShopBenefitApplicationBehavior
+      include Concerns::AcaRatingAreaConfigConcern
+      include Concerns::AcaShopBenefitApplicationConcern
 
       # Move CCA-specific PlanYear code here. e.g. Employer Attestation, SIC codes, etc
 
