@@ -1,3 +1,4 @@
+# Attributes, validations and constraints common to all Profile classes embedded in an Organization
 module SponsoredBenefits
   module Organizations
     class Profile
