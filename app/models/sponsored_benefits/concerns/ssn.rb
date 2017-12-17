@@ -5,7 +5,7 @@ module SponsoredBenefits
     extend ActiveSupport::Concern
 
     included do
-      field :encrypted_ssn, type: String
+      
       validates :ssn,
         length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
         allow_blank: true,
