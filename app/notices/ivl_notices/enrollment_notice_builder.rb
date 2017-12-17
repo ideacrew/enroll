@@ -23,8 +23,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_appeals
     attach_docs
+    attach_appeals
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
