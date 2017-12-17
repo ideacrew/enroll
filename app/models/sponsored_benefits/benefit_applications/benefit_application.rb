@@ -1,6 +1,6 @@
 module SponsoredBenefits
-  class BenefitApplications
-    module BenefitApplication
+  module BenefitApplications
+    class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
 
