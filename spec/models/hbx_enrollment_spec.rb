@@ -2317,19 +2317,22 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
 
-        context 'when employee passively renewed coverage' do 
+        context 'when employee already has passive renewal coverage' do 
 
-          it 'should cancel passive renewal and create new passive' do 
-            passive_renewal = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
-            expect(passive_renewal).not_to be_nil
-
+          it 'should cancel passive renewal and create new enrollment with coverage selected' do 
+            passive_renewals = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on)
+            expect(passive_renewals.size).to eq 1
+            passive_renewal = passive_renewals.first
+            expect(passive_renewal.auto_renewing?).to be_truthy
+            
             new_enrollment.select_coverage!
             family.reload
             passive_renewal.reload
 
             expect(passive_renewal.coverage_canceled?).to be_truthy 
-            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
-            expect(new_passive.plan).to eq new_renewal_plan
+            new_passives = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on, :id.ne => passive_renewal.id)
+            expect(new_passives.size).to eq 1
+            expect(new_passives.first.coverage_selected?).to be_truthy
           end
         end
 
