@@ -13,7 +13,7 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
                 family.save!
                 family }
   let!(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-  let!(:hbx_enrollment){FactoryGirl.create(:hbx_enrollment, household:family.active_household)}
+  let!(:hbx_enrollment){FactoryGirl.create(:hbx_enrollment, household:family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated")}
   let!(:hbx_enrollment_member2){ FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, is_subscriber: false, hbx_enrollment: hbx_enrollment) }
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
@@ -26,7 +26,7 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
                             :notice_template => 'notices/shop_employee_notices/waiver_confirmation_notice',
                             :notice_builder => 'ShopEmployeeNotices::WaiverConfirmationNotice',
                             :event_name => 'waiver_confirmation_notice',
-                            :mpi_indicator => 'DAE031',
+                            :mpi_indicator => 'SHOP_D031',
                             :title => "Confirmation of Election to Waive Coverage"})
                           }
 
@@ -98,7 +98,7 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
       expect(@employee_notice.event_name).to eq "waiver_confirmation_notice"
     end
     it "should match mpi_indicator" do
-      expect(@employee_notice.mpi_indicator).to eq "DAE031"
+      expect(@employee_notice.mpi_indicator).to eq "SHOP_D031"
     end
   end
 
