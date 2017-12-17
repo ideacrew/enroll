@@ -339,8 +339,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
       allow(hbx_enrollment).to receive(:shopping?).and_return(true)
-      # allow(hbx_enrollment).to receive(:census_employee).and_return(double)
-      # allow(subject).to receive(:employee_mid_year_plan_change_non_congressional).and_return(true)
       sign_in user
     end
 

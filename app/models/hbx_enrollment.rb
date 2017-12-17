@@ -644,7 +644,7 @@ class HbxEnrollment
           end
         end  
       rescue Exception => e
-        Rails.logger.error("#{e.message}; person_id: #{self.census_employee.employee_role.present? ? self.census_employee.employee_role.person.hbx_id : nil }")
+        Rails.logger.error {"Unable to send employee mid year plan change notice to census_employee - #{census_employee.id} due to #{e.backtrace}"}
       end
     end  
   end  
