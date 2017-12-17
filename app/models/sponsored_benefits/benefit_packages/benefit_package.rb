@@ -4,6 +4,10 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
+
+      # Length of time New Hire must wait before coverage effective date
+      field :probationary_period
+
     end
   end
 end

@@ -1,3 +1,4 @@
+# Parent model for any business, government agency, or other organized entity 
 module SponsoredBenefits
   module Organizations
     class Organization
@@ -28,6 +29,8 @@ module SponsoredBenefits
 
       # Federal Employer ID Number
       field :fein, type: String
+
+      field :entity_kind, type: String
 
       # Web URL
       field :home_page, type: String
