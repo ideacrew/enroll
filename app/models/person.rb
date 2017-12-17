@@ -7,7 +7,6 @@ class Person
   include Mongoid::Versioning
   include SponsoredBenefits::Concerns::Ssn
   include SponsoredBenefits::Concerns::Dob
-  include SponsoredBenefits::Concerns::Gender
 
   include Notify
   include UnsetableSparseFields
@@ -15,6 +14,8 @@ class Person
 
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
+
+  GENDER_KINDS = %W(male female)
 
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
@@ -31,6 +32,10 @@ class Person
   field :name_sfx, type: String
   field :full_name, type: String
   field :alternate_name, type: String
+
+  field :encrypted_ssn, type: String
+  field :gender, type: String
+  field :dob, type: Date
 
   # Sub-model in-common attributes
   field :date_of_death, type: Date
@@ -106,6 +111,10 @@ class Person
   validate :no_changing_my_user, :on => :update
 
   validates :encrypted_ssn, uniqueness: true, allow_blank: true
+
+  validates :gender,
+    allow_blank: true,
+    inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
   before_save :generate_hbx_id
   before_save :update_full_name
@@ -294,7 +303,13 @@ class Person
     end
   end
 
+  def date_of_birth=(val)
+    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
 
+  def gender=(new_gender)
+    write_attribute(:gender, new_gender.to_s.downcase)
+  end
 
   # Get the {Family} where this {Person} is the primary family member
   #
