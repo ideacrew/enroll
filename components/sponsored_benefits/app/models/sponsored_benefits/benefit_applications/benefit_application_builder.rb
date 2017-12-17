@@ -29,10 +29,9 @@ module SponsoredBenefits
         @benefit_application.geographic_rating_areas << new_geographic_rating_areas
       end
 
-
       # Date range beginning on coverage effective date and ending on coverage expiration date
-      def add_coverage_effective_range(new_coverage_effective_range)
-        @benefit_application.coverage_effective_range = new_coverage_effective_range
+      def add_application_period(new_application_period)
+        @benefit_application.application_period = new_application_period
       end
 
       def add_benefit_package(new_benefit_package)
@@ -44,12 +43,7 @@ module SponsoredBenefits
       end
 
       def reset
-        @benefit_application.benefit_sponsor = nil
-        @benefit_application.roster = nil
-        @benefit_application.broker = nil
-        @benefit_application.marketplace_kind = nil
-        @benefit_application.coverage_effective_range = nil
-        @benefit_application.benefit_packages = []
+        @benefit_application = @application_class.new(options)
       end
     end
   end
