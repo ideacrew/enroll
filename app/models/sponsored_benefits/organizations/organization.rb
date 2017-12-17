@@ -46,7 +46,8 @@ module SponsoredBenefits
       embeds_one :carrier_profile, cascade_callbacks: true, validate: true
       embeds_one :hbx_profile, cascade_callbacks: true, validate: true
 
-      accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
+      accepts_nested_attributes_for :office_locations, :broker_agency_profile, :carrier_profile, :hbx_profile
+      # accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
       validates_presence_of :legal_name, :fein, :office_locations
 
@@ -452,7 +453,7 @@ module SponsoredBenefits
           agency_ids = agencies.map{|org| org.broker_agency_profile.id}
           brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
         end
-
+      end
     end
   end
 end
