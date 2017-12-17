@@ -1,5 +1,6 @@
 # Manage enrollment-related behavior for a benefit-sponsoring organization (e.g. employers, HBX, etc.)
 module SponsoredBenefits
+<<<<<<< HEAD
   module BenefitSponsorships
     class BenefitSponsorship
       include Mongoid::Document
@@ -194,5 +195,11 @@ module SponsoredBenefits
      end
 
     end
+=======
+  class BenefitSponsorships::BenefitSponsorship
+    include Mongoid::Document
+
+    embeds_many :benefit_applications
+>>>>>>> 37258b4e7b25743aeba2b9a6fee2fb64c304f049
   end
 end
