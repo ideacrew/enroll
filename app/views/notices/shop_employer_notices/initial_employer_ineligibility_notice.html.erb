@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Email notification sent to: <%= notice.employer_email %></td>
+      <td><b>Email notification sent to:</b> <%= notice.employer_email %></td>
     </tr>
   </tbody>
 </table>
@@ -15,7 +15,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3><strong>Group Ineligible to Obtain Coverage</strong></h3></td>
+      <td style="padding-top: 10px"><b><b>Group Ineligible to Obtain Coverage</b></b></td>
     </tr>
   </tbody>
 </table>
@@ -23,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.employer_name %>:</td>
+      <td style="padding-top: 10px">Dear <%= notice.employer_name %>:</td>
     </tr>
   </tbody>
 </table>
@@ -32,7 +32,7 @@
   content: "Your employee open enrollment period closed on #{notice.plan_year.open_enrollment_end_on} and your group did not meet the eligibility requirement listed below. As a result, your group is not eligible to obtain employer-sponsored health insurance effective #{notice.plan_year.start_on} at this time."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "**<strong>#{notice.plan_year.warnings.join(' and ')}</strong>**"} %>
+  content: "**<strong>#{notice.plan_year.warnings.join(' and ')}</strong>**", top_margin: '10px', bottom_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>. Please note that you must meet the following requirements to be eligible to obtain employer-sponsored health insurance through #{Settings.site.short_name}:",
@@ -57,7 +57,7 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
