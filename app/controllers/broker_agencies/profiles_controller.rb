@@ -193,12 +193,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
-        @broker_agency_profile.default_general_agency_profile = nil
-        @broker_agency_profile.employer_clients.each do |employer_profile|
-          if employer_profile.general_agency_accounts.inactive.last.present?
-            ShopNoticesNotifierJob.perform_later(employer_profile.id.to_s, "general_agency_terminated")
+        if old_default_ga_id.present?
+          GeneralAgencyProfile.find(old_default_ga_id).employers_linked_with_general_agency.each do |emp|
+            emp.trigger_notices("general_agency_terminated")
           end
         end
+        @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end

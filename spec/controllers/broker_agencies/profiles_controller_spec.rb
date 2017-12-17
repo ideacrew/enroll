@@ -465,11 +465,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
    
     it "should send mail to General agency" do
+      general_agency_account.update_attributes!(:aasm_state => "active")
       broker_agency_profile.default_general_agency_profile = general_agency_profile
       broker_agency_profile.save
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
-      
+
       expect(enqueued_jobs.size).to eq(1)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob

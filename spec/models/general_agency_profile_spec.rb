@@ -215,4 +215,16 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       end
     end
   end
+
+  describe ".employers_linked_with_general_agency" do
+    let!(:employer_profile){ FactoryGirl.create :employer_profile}
+    let!(:general_agency_profile) { FactoryGirl.create :general_agency_profile }
+    let!(:general_agency_account) { FactoryGirl.create :general_agency_account ,aasm_state: 'active',employer_profile: employer_profile, general_agency_profile_id: general_agency_profile.id, end_on: TimeKeeper.date_of_record}
+    let!(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, general_agency_profile_id: general_agency_profile.id, :aasm_state => 'active')}
+
+    it "should return all the employers linked to the general agency" do
+      expect(general_agency_profile.employers_linked_with_general_agency).to eq [employer_profile]
+    end
+  end
+
 end

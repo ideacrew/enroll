@@ -1,12 +1,40 @@
 class GeneralAgencyNotice < Notice
   
-  Required= Notice::Required + []
+  Required = Notice::Required + []
 
-  attr_accessor :broker
-  attr_accessor :employer_profile
+  attr_accessor :employer_profile, :general_agency_profile, :general_agent
 
-  def initialize(args = {})
+  def initialize(employer_profile, args = {})
+    self.employer_profile = employer_profile
+    self.general_agency_profile = employer_profile.general_agency_accounts.inactive.last.general_agency_profile
+    self.general_agent = general_agency_profile.primary_staff.person
+    args[:recipient] = general_agency_profile
+    args[:market_kind]= 'shop'
+    args[:notice] = PdfTemplates::GeneralAgencyNotice.new
+    args[:to] = general_agent.work_email_or_best
+    args[:name] = general_agent.full_name
+    args[:recipient_document_store] = general_agency_profile
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
+  end
+
+  def deliver
+    build
+    generate_pdf_notice
+    non_discrimination_attachment
+    attach_envelope
+    upload_and_send_secure_message
+    send_generic_notice_alert
+  end
+
+  def build
+    notice.primary_fullname = general_agency_profile.legal_name.titleize
+    notice.ga_email = general_agent.work_email_or_best
+    notice.mpi_indicator = self.mpi_indicator
+    notice.employer_name = employer_profile.legal_name.titleize
+    notice.terminated_on = employer_profile.general_agency_accounts.inactive.last.end_on
+    append_hbe
+    append_address(general_agency_profile.organization.primary_office_location.address)
   end
 
   def attach_envelope
