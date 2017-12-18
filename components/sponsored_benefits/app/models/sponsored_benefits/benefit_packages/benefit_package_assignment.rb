@@ -1,5 +1,5 @@
 module SponsoredBenefits
-  class Issuer
+  class BenefitPackages::BenefitPackageAssignment
     include Mongoid::Document
   end
 end
