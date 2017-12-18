@@ -44,6 +44,14 @@ module Notifier
       %w{broker_present?}
     end
 
+    def shop?
+      true
+    end
+
+    def employee_notice?
+      false
+    end
+
     def broker_present?
       self.broker.present?
     end
