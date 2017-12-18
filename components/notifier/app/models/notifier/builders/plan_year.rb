@@ -49,13 +49,6 @@ module Notifier
       end
     end
 
-    def plan_year_renewal_py_submit_soft_due_date
-      if renewal_plan_year.present?
-        prev_month = renewal_plan_year.start_on.prev_month
-        merge_model.plan_year.renewal_py_submit_soft_due_date = format_date(Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.renewal_application.application_submission_soft_deadline))
-      end
-    end
-
     def plan_year_renewal_py_submit_due_date
       if renewal_plan_year.present?
         prev_month = renewal_plan_year.start_on.prev_month

@@ -71,7 +71,7 @@ module Notifier
     end
 
     def pdf_options
-      {
+      options = {
         margin:  {
           top: 15,
           bottom: 28,
@@ -91,6 +91,14 @@ module Notifier
             }),
           }
       }
+
+      options.merge!({footer: {
+        content: ApplicationController.new.render_to_string({
+          template: "notifier/notice_kinds/footer.html.erb",
+          layout: false,
+          locals: {notice: self}
+        })
+      }})
     end
 
     def notice_path
@@ -197,7 +205,7 @@ module Notifier
 
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
-      receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+      receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
     
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!

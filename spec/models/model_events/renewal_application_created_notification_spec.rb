@@ -52,7 +52,6 @@ describe 'ModelEvents::RenewalApplicationCreatedNotification' do
         "employer_profile.notice_date",
         "employer_profile.employer_name",
         "employer_profile.plan_year.renewal_py_start_date",
-        "employer_profile.plan_year.renewal_py_submit_soft_due_date",
         "employer_profile.plan_year.renewal_py_oe_end_date",
         "employer_profile.plan_year.current_py_start_on.year",
         "employer_profile.plan_year.renewal_py_start_on.year",
@@ -92,7 +91,6 @@ describe 'ModelEvents::RenewalApplicationCreatedNotification' do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
         expect(merge_model.employer_name).to eq employer.legal_name
         expect(merge_model.plan_year.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-        expect(merge_model.plan_year.renewal_py_submit_soft_due_date).to eq soft_dead_line.strftime('%m/%d/%Y')
         expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
         expect(merge_model.broker_present?).to be_falsey
         expect(merge_model.plan_year.current_py_start_on).to eq model_instance.start_on.prev_year
