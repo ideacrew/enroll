@@ -7,7 +7,7 @@ module SponsoredBenefits
 
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
-      field :owner_profile_kind,  type: String, default: "::BrokerAgency_profile"
+      field :owner_profile_kind,  type: String, default: "::BrokerAgencyProfile"
 
       # Plan design owner role type & ID
       # field :owner_role_id, type: BSON::ObjectId
@@ -20,9 +20,7 @@ module SponsoredBenefits
 
 
       embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
-
       embeds_one :plan_design_employer_profile, class_name: "SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile"
-      # embeddded_in :plan_designable, polymorphic: true
 
     end
   end

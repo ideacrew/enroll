@@ -6,52 +6,31 @@ module SponsoredBenefits
 
       embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorship"
 
-      ## Refactor States ##
-      # SUBMITTED         = %w()
-      # INITIAL_ENROLLING = %w(enrolling)
-      # RENEWAL_ENROLLING = %w(enrolling)
-      # APPROVED          = %w(published enrolled active suspended)
-
-      # deprecate PUBLISHED
-      PUBLISHED = %w(published enrolling enrolled active suspended)
-      RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
-      RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
-
-      INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
-
-      OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
-      INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
-      INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
-
-      TERMINATED = %w(expired terminated)
-
-      ### Deprecate -- use effective_period attribute
+     ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date
+
+      # The date range when this application is active
+      field :effective_period,        type: Range
 
       ### Deprecate -- use open_enrollment_period attribute
       # field :open_enrollment_start_on, type: Date
       # field :open_enrollment_end_on, type: Date
 
-      # The date range when this application is active
-      field :effective_period,        type: Range
-
       # The date range when members may enroll in benefit products
       field :open_enrollment_period,  type: Range
 
-      # Populate when
+      # Populate when enrollment is terminated prior to open_enrollment_period.end
       field :terminated_early_on, type: Date
 
-      field :sponsorable_id, type: String
-      field :rosterable_id, type: String
-      field :broker_id, type: String
-      field :kind, type: :symbol
+      # field :sponsorable_id, type: String
+      # field :rosterable_id, type: String
+      # field :broker_id, type: String
+      # field :kind, type: :symbol
 
-      belongs_to :sponsorable, polymorphic: true
-
-      has_one :rosterable, as: :rosterable
-      embeds_many :benefit_packages, as: :packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
-
+      # has_one :rosterable, as: :rosterable
+      embeds_many :benefit_packages, as: :benefit_packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
+      # embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage"
       accepts_nested_attributes_for :benefit_packages
 
 
@@ -76,11 +55,11 @@ module SponsoredBenefits
       end
 
       def effective_period=(new_effective_period)
-        write_attribute(:effective_period, dateify_range(new_effective_period))
+        write_attribute(:effective_period, tidy_date_range(new_effective_period))
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
-        write_attribute(:open_enrollment_period, dateify_range(new_open_enrollment_period))
+        write_attribute(:open_enrollment_period, tidy_date_range(new_open_enrollment_period))
       end
 
       def open_enrollment_begin_on
@@ -109,7 +88,7 @@ module SponsoredBenefits
     private
 
       # Ensure class type and integrity of date period ranges
-      def dateify_range(range_period)
+      def tidy_date_range(range_period)
         # Check that end isn't before start. Note: end == start is not trapped as an error
         raise "Range period end date may not preceed begin date" if range_period.begin > range_period.end
         return range_period if range_period.begin.is_a?(Date) && range_period.end.is_a?(Date)
