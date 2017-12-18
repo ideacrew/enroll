@@ -19,6 +19,7 @@ class Permission
   field :can_add_sep, default: false
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_view_application_types, type: Boolean, default: false
+  field :view_personal_info_page, type: Boolean, default: false
   
   class << self
     def hbx_staff
