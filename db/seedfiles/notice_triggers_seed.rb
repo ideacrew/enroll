@@ -383,7 +383,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'DAE053',
-    title: 'Employee Eligibility Notice',
+    title: 'Eligible to Apply for Employer-sponsored Health Insurance',
     description: 'This notices goes to all the employees who have successfully matched their employer.',
     resource_name: 'employee_role',
     event_name: 'employee_eligibility_notice',
