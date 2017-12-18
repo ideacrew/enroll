@@ -1,3 +1,6 @@
+include VerificationHelper
+
+InitialEvents = ["final_eligibility_notice_uqhp", "final_eligibility_notice_renewal_uqhp"]
 unless ARGV[0].present? && ARGV[1].present?
   puts "Please include mandatory arguments: File name and Event name. Example: rails runner script/ivl_renewal_notices.rb <file_name> <event_name>" unless Rails.env.test?
   puts "Event Names: ivl_renewal_notice_2, ivl_renewal_notice_3, ivl_renewal_notice_4, final_eligibility_notice_uqhp, final_eligibility_notice_aqhp, final_eligibility_notice_renewal_uqhp, final_eligibility_notice_renewal_aqhp" unless Rails.env.test?
@@ -47,6 +50,28 @@ def valid_enrollments(person)
   hbx_enrollments
 end
 
+def set_due_date_on_verification_types(family)
+  family.family_members.each do |family_member|
+    begin
+      person = family_member.person
+      person.verification_types.each do |v_type|
+        next if !type_unverified?(v_type, person)
+        person.consumer_role.special_verifications << SpecialVerification.new(due_date: future_date,
+                                                                              verification_type: v_type,
+                                                                              updated_by: nil,
+                                                                              type: "notice")
+        person.consumer_role.save!
+      end
+    rescue Exception => e
+      puts "Exception in family ID #{primary_person.primary_family.id}: #{e}"
+    end
+  end
+end
+
+def future_date
+  TimeKeeper.date_of_record + 95.days
+end
+
 unless event_kind.present?
   puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
 end
@@ -74,6 +99,11 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       next if enrollments.empty?
       consumer_role = person.consumer_role
       if consumer_role.present?
+        if InitialEvents.include? event
+          family = person.primary_family
+          set_due_date_on_verification_types(family)
+          family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+        end
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
