@@ -39,7 +39,6 @@ class BrokerAgencyProfile
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_many :documents, as: :documentable
-  embeds_one :plan_design_employer_profile, class_name: "SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile"
 
   accepts_nested_attributes_for :inbox
 
