@@ -267,7 +267,7 @@ class ConsumerRole
   def is_type_outstanding?(type)
     case type
       when "DC Residency"
-        residency_denied? && !has_docs_for_type?(type)
+        residency_denied? && !has_docs_for_type?(type) && local_residency_outstanding?
       when 'Social Security Number'
         !ssn_verified? && !has_docs_for_type?(type)
       when 'American Indian Status'
@@ -275,6 +275,10 @@ class ConsumerRole
       else
         !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
+  end
+
+  def local_residency_outstanding?
+    self.local_residency_validation == 'outstanding'
   end
 
   def ssn_verified?
