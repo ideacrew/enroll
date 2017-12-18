@@ -35,7 +35,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   def edit?
-    return @user.person.hbx_staff_role.permission.can_update_ssn if (@user.person && @user.person.hbx_staff_role)
+    return @user.person.hbx_staff_role.permission.can_update_ssn || @user.person.hbx_staff_role.permission.view_personal_info_page if (@user.person && @user.person.hbx_staff_role)
     return (@user.person.consumer_role.id == @record.id) if @user.has_consumer_role?
     return true  if @user.person && @user.person.has_broker_role?
     return false
