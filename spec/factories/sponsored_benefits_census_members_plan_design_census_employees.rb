@@ -10,9 +10,15 @@ FactoryGirl.define do
     hired_on "2015-04-01".to_date
     sequence(:ssn) { |n| 222222220 + n }
     is_business_owner  false
-    association :address, strategy: :build
-    association :email, strategy: :build
-    association :sponsored_benefits_benefit_sponsorships_plan_design_employer_profile, strategy: :build
+
+    address { build(:sponsored_benefits_locations_address) }
+    email { build(:sponsored_benefits_email) }
+    employer_profile { build(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile)}
+
+    # association :sponsored_benefits_locations_address, strategy: :build
+    # association :sponsored_benefits_email, strategy: :build
+    # association :sponsored_benefits_benefit_sponsorships_plan_design_employer_profile, strategy: :build
+    # plan_design_organization            { FactoryGirl.build(:sponsored_benefits_organizations_plan_design_organization) }
 
     transient do
       create_with_spouse false
