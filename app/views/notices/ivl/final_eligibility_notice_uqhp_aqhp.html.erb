@@ -136,7 +136,7 @@
 
 <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-        rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+        rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", number_to_currency(enrollment.responsible_amount, precision: 2), "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
         col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 <% notice.renewal_health_enrollments.each do |enrollment|%>
