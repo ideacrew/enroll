@@ -14,7 +14,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:  </td>
+      <td>Dear <%= notice.primary_fullname.titleize %>:  </td>
     </tr>
   </tbody>
 </table>
@@ -42,7 +42,7 @@
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                    ["By calling #{notice.hbe.phone}.",
                                                                     "TTY: #{Settings.contact_center.tty}",
-                                                                    "Online at <a href='#{Settings.site.website_name}''>#{Settings.site.website_name}</a>"] } %>
+                                                                    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 CFR 155.715(f)."} %>
