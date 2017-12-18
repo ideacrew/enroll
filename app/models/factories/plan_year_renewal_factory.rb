@@ -23,9 +23,9 @@ module Factories
           @employer_profile.force_enroll!
         end
 
-        validate_employer_profile
-
         @active_plan_year = @employer_profile.active_plan_year
+
+        validate_employer_profile
 
         @plan_year_start_on = @active_plan_year.end_on + 1.day
         @plan_year_end_on   = @active_plan_year.end_on + 1.year
@@ -81,11 +81,11 @@ module Factories
         raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} already renewed"
       end
 
-      unless PlanYear::PUBLISHED.include? @employer_profile.active_plan_year.aasm_state
+      unless PlanYear::PUBLISHED.include? @active_plan_year.aasm_state
         raise PlanYearRenewalFactoryError, "Renewals require an existing, published Plan Year"
       end
 
-      unless TimeKeeper.date_of_record <= @employer_profile.active_plan_year.end_on
+      unless TimeKeeper.date_of_record <= @active_plan_year.end_on
         raise PlanYearRenewalFactoryError, "Renewal time period has expired.  You must submit a new application"
       end
     end
