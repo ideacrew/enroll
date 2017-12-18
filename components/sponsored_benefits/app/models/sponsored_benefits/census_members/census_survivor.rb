@@ -1,7 +1,10 @@
 module SponsoredBenefits
-  class CensusMembers::CensusSurvivor  < CensusMembers::CensusMember
-    
-    embeds_many :census_dependents, as: :census_dependent, class_name: "SponsoredBenefits::CensusMembers::CensusDependent"
+  module CensusMembers
+    class CensusSurvivor < CensusMembers::CensusMember
 
+      embeds_many :census_dependents, as: :census_dependent, 
+        cascade_callbacks: true,
+        validate: true
+    end
   end
 end

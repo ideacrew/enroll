@@ -10,5 +10,15 @@ module SponsoredBenefits
     field :dba, type: String
 
     embeds_many :office_locations, class_name:"SponsoredBenefits::OfficeLocation"
+
+
+
+    def self.find(id)
+      organizations = PlanDesignOrganization.where("employer_profile._id" => BSON::ObjectId.from_string(id))
+      organizations.size > 0 ? organizations.first.employer_profile : nil
+    rescue
+      log("Can not find employer_profile with id #{id}", {:severity => "error"})
+      nil
+    end
   end
 end

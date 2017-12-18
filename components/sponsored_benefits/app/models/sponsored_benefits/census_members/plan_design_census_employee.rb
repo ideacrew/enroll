@@ -9,7 +9,7 @@ module SponsoredBenefits
 
     has_many :census_survivors, class_name: "SponsoredBenefits::CensusMembers::CensusSurvivor"
 
-    embeds_many :census_dependents, as: :census_dependent, 
+    embeds_many :census_dependents, as: :census_dependent, class_name: "SponsoredBenefits::CensusMembers::CensusDependent",
       cascade_callbacks: true,
       validate: true
 
@@ -20,10 +20,10 @@ module SponsoredBenefits
     validate :no_duplicate_census_dependent_ssns
     validate :check_hired_on_before_dob
 
-    validates :expected_selection,
-    inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
-
     before_save :allow_nil_ssn_updates_dependents
+
+    scope :by_employer_profile_id,    ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+    scope :by_ssn,    ->(ssn) { where(encrypted_ssn: SponsoredBenefits::CensusMembers::CensusMember.encrypt_ssn(ssn)) }
 
     def initialize(*args)
       super(*args)
@@ -39,7 +39,7 @@ module SponsoredBenefits
     end
 
     def active_census_employee_is_unique
-      potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
+      potential_dups = self.class.by_ssn(ssn).by_employer_profile_id(employer_profile_id)
       if potential_dups.detect { |dup| dup.id != self.id  }
         message = "Employee with this identifying information is already active. "\
         "Update or terminate the active record before adding another."
@@ -71,14 +71,14 @@ module SponsoredBenefits
     end
 
     def employer_profile=(new_employer_profile)
-      raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
+      raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile)
       self.employer_profile_id = new_employer_profile._id
       @employer_profile = new_employer_profile
     end
 
     def employer_profile
       return @employer_profile if defined? @employer_profile
-      @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+      @employer_profile = PlanDesignEmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
     end
 
     class << self
