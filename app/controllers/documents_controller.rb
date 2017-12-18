@@ -114,7 +114,7 @@ class DocumentsController < ApplicationController
 
       # special_verification_period is the day we send notices
       # enrollment.update_attributes!(:special_verification_period => new_date)
-      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id)
+      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id, type: "admin")
       @family_member.person.consumer_role.special_verifications << sv
       @family_member.person.consumer_role.save!
       set_min_due_date_on_family
