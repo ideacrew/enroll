@@ -22,6 +22,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
+      allow(existing_enrollment).to receive(:may_terminate_for_non_payment?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
     end
 
@@ -44,7 +45,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
-       allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(false)
+      allow(existing_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_terminate_for_non_payment?).and_return(true)
     end
 
@@ -64,6 +65,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
 
     before :each do
       allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
+      allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
     end
 
     it "cancels the enrollment" do
@@ -82,7 +84,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
     end
 
     before :each do
-      allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(false)
+      allow(existing_enrollment).to receive(:may_cancel_coverage?).and_return(true)
       allow(existing_enrollment).to receive(:may_cancel_for_non_payment?).and_return(true)
     end
 
