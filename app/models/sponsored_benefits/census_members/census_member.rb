@@ -27,7 +27,7 @@ module SponsoredBenefits
     field :employee_relationship, type: String
     field :employer_assigned_family_id, type: String
 
-    embeds_one :address
+    embeds_one :address, class_name: "SponsoredBenefits::Locations::Address"
     accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
 
     embeds_one :email
