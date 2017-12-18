@@ -9,7 +9,7 @@ module SponsoredBenefits
 
     store_in collection: 'census_members'
 
-    validates_with Validations::DateRangeValidator
+    # validates_with ::Validations::DateRangeValidator
 
     GENDER_KINDS = %W(male female)
 
@@ -22,7 +22,7 @@ module SponsoredBenefits
     field :gender, type: String
     field :dob, type: Date
 
-    include StrippedNames
+    # include StrippedNames
 
     field :employee_relationship, type: String
     field :employer_assigned_family_id, type: String
