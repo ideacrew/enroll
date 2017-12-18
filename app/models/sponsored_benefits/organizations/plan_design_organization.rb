@@ -29,6 +29,9 @@ module SponsoredBenefits
       # Federal Employer ID Number
       field :fein, type: String
 
+      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile"
+      embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
+
       embeds_one :plan_design_employer_profile, class_name: "SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile"
       # embeddded_in :plan_designable, polymorphic: true
 
