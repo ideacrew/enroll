@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency "aasm", "~> 4.8.0"
   s.add_dependency 'config'
   s.add_dependency 'symmetric-encryption', '~> 3.6.0'
+  s.add_dependency 'roo', '~> 2.1.0'
 
   s.test_files = Dir["spec/**/*"]
 

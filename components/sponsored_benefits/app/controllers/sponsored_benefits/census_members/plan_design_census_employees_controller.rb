@@ -3,26 +3,22 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
     before_action :set_census_members_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
+    before_action :load_plan_design_employer_profile, only: [:bulk_upload]
 
-    # GET /census_members/plan_design_census_employees
     def index
       @census_members_plan_design_census_employees = CensusMembers::PlanDesignCensusEmployee.all
     end
 
-    # GET /census_members/plan_design_census_employees/1
     def show
     end
 
-    # GET /census_members/plan_design_census_employees/new
     def new
       @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.new
     end
 
-    # GET /census_members/plan_design_census_employees/1/edit
     def edit
     end
 
-    # POST /census_members/plan_design_census_employees
     def create
       @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.new(census_members_plan_design_census_employee_params)
 
@@ -33,7 +29,6 @@ module SponsoredBenefits
       end
     end
 
-    # PATCH/PUT /census_members/plan_design_census_employees/1
     def update
       if @census_members_plan_design_census_employee.update(census_members_plan_design_census_employee_params)
         redirect_to @census_members_plan_design_census_employee, notice: 'Plan design census employee was successfully updated.'
@@ -42,21 +37,43 @@ module SponsoredBenefits
       end
     end
 
-    # DELETE /census_members/plan_design_census_employees/1
     def destroy
       @census_members_plan_design_census_employee.destroy
       redirect_to census_members_plan_design_census_employees_url, notice: 'Plan design census employee was successfully destroyed.'
     end
 
-    private
-      # Use callbacks to share common setup or constraints between actions.
-      def set_census_members_plan_design_census_employee
-        @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.find(params[:id])
+    def bulk_upload
+      file = params.require(:file)
+      @census_employee_import = SponsoredBenefits::Forms::CensusEmployeeImport.new({file:file, employer_profile: @employer_profile})
+      
+      begin
+        if @census_employee_import.save
+          redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
+        else
+          render "employers/employer_profiles/employee_csv_upload_errors"
+        end
+      rescue Exception => e
+        if e.message == "Unrecognized Employee Census spreadsheet format. Contact #{site_short_name} for current template."
+          render "employers/employer_profiles/_download_new_template"
+        else
+          @census_employee_import.errors.add(:base, e.message)
+          render "employers/employer_profiles/employee_csv_upload_errors"
+        end
       end
+    end
 
-      # Only allow a trusted parameter "white list" through.
-      def census_members_plan_design_census_employee_params
-        params[:census_members_plan_design_census_employee]
-      end
+    private
+
+    def load_plan_design_employer_profile
+      @employer_profile = SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile.find(params.require(:employer_profile_id))
+    end
+    
+    def set_census_members_plan_design_census_employee
+      @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.find(params[:id])
+    end
+
+    def census_members_plan_design_census_employee_params
+      params[:census_members_plan_design_census_employee]
+    end
   end
 end
