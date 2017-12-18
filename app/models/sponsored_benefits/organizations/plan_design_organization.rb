@@ -5,6 +5,7 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile"
 
       # Plan design owner profile type & ID
       # field :owner_profile_id,    type: BSON::ObjectId
@@ -28,9 +29,7 @@ module SponsoredBenefits
       # Federal Employer ID Number
       field :fein, type: String
 
-      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile"
-      embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
-      # embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::PlanDesignProfile"
+      embeds_one :plan_design_employer_profile, class_name: "SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile"
       # embeddded_in :plan_designable, polymorphic: true
 
     end
