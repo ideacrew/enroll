@@ -1,20 +1,21 @@
 require "rails_helper"
 
 RSpec.describe "insured/group_selection/new.html.erb" do
-  context "coverage selection" do
+  describe "Coverage selection" do
     let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
     let(:census_employee) { FactoryGirl.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
-    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment) }
-    let(:family_member1) { double("family member 1", id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,10), full_name: "member") }
-    let(:family_member2) { double("family member 2", id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
-    let(:family_member3) { double("family member 3", id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
+    let(:family_member1) { double("family member 1", id: "family_member", primary_relationship: "self", dob: Date.new(1990, 10, 10), full_name: "member") }
+    let(:family_member2) { double("family member 2", id: "family_member", primary_relationship: "parent", dob: Date.new(1990, 10, 10), full_name: "member") }
+    let(:family_member3) { double("family member 3", id: "family_member", primary_relationship: "spouse", dob: Date.new(1990, 10, 10), full_name: "member") }
+    let(:family_member4) { double("family member 4", id: "family_member", primary_relationship: "child", dob: Date.new(1989, 10, 10), full_name: "member") }
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
-    let(:coverage_household_members) {[double("coverage household member 1", family_member: family_member1), double("coverage household member 2", family_member: family_member2), double("coverage household member 3", family_member: family_member3)]}
-    # let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
-    let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false)}
-    let(:current_user) {FactoryGirl.create(:user)}
+    let(:coverage_household_members) { [double("coverage household member 1", family_member: family_member1), double("coverage household member 2", family_member: family_member2), double("coverage household member 3", family_member: family_member3), double("coverage household member 4", family_member: family_member4)] }
+    let(:hbx_enrollment) { double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false) }
+    let(:current_user) { FactoryGirl.create(:user) }
+    let(:effective_on) { benefit_group.effective_on_for(employee_role.hired_on) }
 
     before(:each) do
       assign(:person, person)
@@ -23,12 +24,14 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:coverage_household, coverage_household)
       assign(:market_kind, 'shop')
       assign(:hbx_enrollment, hbx_enrollment)
+      assign(:new_effective_on, effective_on)
       sign_in current_user
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(employee_role).to receive(:is_dental_offered?).and_return(true)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
+      allow(family_member4).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
@@ -37,40 +40,76 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
       allow(family_member3).to receive(:person).and_return(person)
-      #@eligibility = InsuredEligibleForBenefitRule.new(employee_role,'shop')
-      #allow(@eligibility).to receive(:satisfied?).and_return([true, true, false])
       controller.request.path_parameters[:person_id] = person.id
       controller.request.path_parameters[:employee_role_id] = employee_role.id
 
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      render :template => "insured/group_selection/new.html.erb"
     end
 
-    it "should show the title of family members" do
-      expect(rendered).to match /Choose Coverage for your Household/
+    context "when benefit group plan option kind is not solesource" do
+      before(:each) do
+        render :template => "insured/group_selection/new.html.erb"
+      end
+
+      it "should show the title of family members" do
+        expect(rendered).to match /Choose Coverage for your Household/
+      end
+
+      it "should have four checkbox option" do
+        expect(rendered).to have_selector("input[type='checkbox']", count: 4)
+      end
+
+      it "should have two checked checkbox option and a checked radio button" do
+        expect(rendered).to have_selector("input[checked='checked']", count: 3)
+      end
+
+      it "should have a disabled checkbox option" do
+        expect(rendered).to have_selector("input[disabled='disabled']", count: 2)
+      end
+
+      it "should have a readonly checkbox option" do
+        expect(rendered).to have_selector("input[readonly='readonly']", count: 1)
+      end
+
+      it "should have a 'not eligible'" do
+        expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.', count: 2)
+      end
+
     end
 
-    it "should have three checkbox option" do
-      expect(rendered).to have_selector("input[type='checkbox']", count: 3)
-    end
+    context "when benefit_group plan option kind is solesource" do
+      before(:each) do
+        allow(benefit_group).to receive(:sole_source?).and_return(true)
+        render :template => "insured/group_selection/new.html.erb"
+      end
 
-    it "should have two checked checkbox option and a checked radio button" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 3)
-    end
+      it "should show the title of family members" do
+        expect(rendered).to match /Choose Coverage for your Household/
+      end
 
-    it "should have a disabled checkbox option" do
-      expect(rendered).to have_selector("input[disabled='disabled']", count: 1)
-    end
+      it "should have four checkbox option" do
+        expect(rendered).to have_selector("input[type='checkbox']", count: 4)
+      end
 
-    it "should have a readonly checkbox option" do
-      expect(rendered).to have_selector("input[readonly='readonly']", count: 1)
-    end
+      it "should have two checked checkbox option and a checked radio button" do
+        expect(rendered).to have_selector("input[checked='checked']", count: 3)
+      end
 
-    it "should have a 'not eligible'" do
-      expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.')
-    end
+      it "should have a disabled checkbox option" do
+        expect(rendered).to have_selector("input[disabled='disabled']", count: 2)
+      end
 
+      it "should have a readonly checkbox option" do
+        expect(rendered).to have_selector("input[readonly='readonly']", count: 1)
+      end
+
+      it "should have two 'not eligible'" do
+        expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.', count: 2)
+      end
+
+    end
   end
+
   context "coverage selection with incarcerated" do
     let(:jail_person) { FactoryGirl.create(:person, is_incarcerated: true, us_citizen: true) }
     let(:person2) { FactoryGirl.create(:person, us_citizen: true, is_incarcerated: false) }
