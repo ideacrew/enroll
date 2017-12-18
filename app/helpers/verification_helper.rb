@@ -1,5 +1,6 @@
 module VerificationHelper
-
+  include DocumentsVerificationStatus
+  
   def doc_status_label(doc)
     case doc.status
       when "not submitted"
@@ -256,6 +257,10 @@ module VerificationHelper
 
   def ridp_admin_actions(ridp_type, person)
     options_for_select(build_ridp_admin_actions_list(ridp_type, person))
+  end
+
+  def mod_attr(attr, val)
+    attr.to_s + " => " + val.to_s
   end
 
   def build_admin_actions_list(v_type, f_member)
