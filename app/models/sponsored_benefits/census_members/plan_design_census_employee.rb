@@ -1,11 +1,20 @@
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployee < CensusMembers::CensusMember
+    include AASM
+    include Sortable
+    include Searchable
+    include Autocomplete
+
+    EMPLOYMENT_ACTIVE_STATES = %w(eligible cobra_eligible)
 
     field :is_business_owner, type: Boolean, default: false
     field :hired_on, type: Date
+    field :aasm_state, type: String
+    field :expected_selection, type: String, default: "enroll"
 
     # Employer for this employee
     field :employer_profile_id, type: BSON::ObjectId
+    field :benefit_application_id, type: BSON::ObjectId
 
     has_many :census_survivors, class_name: "SponsoredBenefits::CensusMembers::CensusSurvivor"
 
@@ -24,6 +33,8 @@ module SponsoredBenefits
 
     scope :by_employer_profile_id,    ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
     scope :by_ssn,    ->(ssn) { where(encrypted_ssn: SponsoredBenefits::CensusMembers::CensusMember.encrypt_ssn(ssn)) }
+    scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+
 
     def initialize(*args)
       super(*args)
@@ -81,12 +92,24 @@ module SponsoredBenefits
       @employer_profile = PlanDesignEmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
     end
 
+    def benefit_application
+      if employer_profile.present?
+        sponsorship = employer_profile.benefit_sponsorships.where(:"benefit_applications.id" => benefit_application_id).first
+        sponsorship.benefit_applications.detect{|application| application.id  == benefit_application_id}
+      end
+    end
+
     class << self
       def find_all_by_employer_profile(employer_profile)
         unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
       end
 
       alias_method :find_by_employer_profile, :find_all_by_employer_profile
+    end
+
+    aasm do
+      state :eligible, initial: true
+      state :cobra_eligible
     end
   end
 end
