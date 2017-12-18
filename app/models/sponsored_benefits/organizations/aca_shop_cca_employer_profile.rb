@@ -1,17 +1,15 @@
 module SponsoredBenefits
   module Organizations
     class AcaShopCcaEmployerProfile < Profile
-      include Mongoid::Document
-      include Mongoid::Timestamps
 
       embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
       field :sic_code, type: String
       
-      embeds_one  :benefit_sponsorship, as: :benefit_sponsorable, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      field :profile_source, type: String, default: "broker_quote"
+      field :contact_method, type: String, default: "Only Electronic communications"
+
       embeds_one  :employer_attestation
-
-
 
     end
   end

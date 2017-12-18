@@ -1,5 +1,8 @@
 module SponsoredBenefits
-  class BenefitPackages::AcaShopCcaBenefitPackage
-    include Mongoid::Document
+  module BenefitPackages
+    class AcaShopCcaBenefitPackage < BenefitPackage
+
+
+    end
   end
 end
