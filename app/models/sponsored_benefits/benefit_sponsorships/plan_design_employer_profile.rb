@@ -9,7 +9,7 @@ module SponsoredBenefits
     field :legal_name, type: String
     field :dba, type: String
 
-    embeds_many :office_locations, class_name:"SponsoredBenefits::OfficeLocation"
+    embeds_many :office_locations, class_name:"SponsoredBenefits::Organizations::OfficeLocation"
 
 
 
