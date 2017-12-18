@@ -2,7 +2,7 @@ module SponsoredBenefits
   class BenefitSponsorships::PlanDesignEmployerProfile
     include Mongoid::Document
 
-    embedded_in :broker_agency_profile, class_name: "::BrokerAgencyProfile"
+    embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
     field :entity_kind, type: String
     field :sic_code, type: String
