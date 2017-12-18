@@ -1,7 +1,7 @@
 module ModelEvents
   module PlanYear
 
-    EMPLOYER_APPLICATION_EVENTS = [
+    REGISTERED_EVENTS = [
       :renewal_application_created,
       :initial_application_submitted,
       :renewal_application_submitted,
@@ -64,7 +64,7 @@ module ModelEvents
         end
       
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
-        EMPLOYER_APPLICATION_EVENTS.each do |event|
+        REGISTERED_EVENTS.each do |event|
           if event_fired = instance_eval("is_" + event.to_s)
             # event_name = ("on_" + event.to_s).to_sym
             event_options = {} # instance_eval(event.to_s + "_options") || {}

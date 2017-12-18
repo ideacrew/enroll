@@ -1,29 +1,12 @@
 module Observers
   class NoticeObserver < Observer
 
-    PLANYEAR_NOTICE_EVENTS = [
-      :renewal_application_created,
-      :initial_application_submitted,
-      :renewal_application_submitted,
-      :renewal_application_autosubmitted,
-      :ineligible_initial_application_submitted,
-      :ineligible_renewal_application_submitted,
-      :open_enrollment_began,
-      :open_enrollment_ended,
-      :application_denied,
-      :renewal_application_denied
-    ]
-
-    HBXENROLLMENT_NOTICE_EVENTS = [
-      :application_coverage_selected
-    ]
-    
     def plan_year_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-      if PLANYEAR_NOTICE_EVENTS.include?(new_model_event.event_key)
+      if PlanYear::REGISTERED_EVENTS.include?(new_model_event.event_key)
         plan_year = new_model_event.klass_instance
-        
+
         if new_model_event.event_key == :renewal_application_denied
           errors = plan_year.enrollment_errors
 
@@ -37,7 +20,7 @@ module Observers
             end
           end
         end
-        
+
         if new_model_event.event_key == :renewal_application_submitted
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
         end
@@ -47,7 +30,7 @@ module Observers
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
-          
+
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
             trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
@@ -63,7 +46,7 @@ module Observers
     def employer_profile_update; end
 
     def hbx_enrollment_update(new_model_event)
-      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent) 
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
       if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
         hbx_enrollment = new_model_event.klass_instance
@@ -76,8 +59,6 @@ module Observers
         end
       end
     end
-
-    def census_employee_update; end
 
     def plan_year_date_change(model_event)
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
@@ -109,5 +90,13 @@ module Observers
     #   end
     # end
 
+    def census_employee_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+
+      if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        census_employee = new_model_event.klass_instance
+        trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
+      end
+    end
   end
 end
