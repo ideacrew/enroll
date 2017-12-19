@@ -3,7 +3,7 @@ module SponsoredBenefits
     class BenefitApplicationsController < ApplicationController
 
       def index
-        ## load quote for a given sponsorship
+        ## load quotes for a given sponsorship
       end
 
       def new
@@ -33,22 +33,27 @@ module SponsoredBenefits
       end
 
       def destroy
-        puts benefit_application.id
-        
-
         benefit_application.destroy!
         redirect_to benefit_sponsorship_benefit_applications_path(benefit_application.benefit_sponsorship)
       end
 
       private
-        helper_method :sponsor
+        helper_method :sponsor, :broker
+
+        def broker
+          @broker ||= BenefitSponsorships::BenefitSponsorship.find_broker_for_sponsorship(params[:benefit_sponsorship_id])
+        end
 
         def sponsor
-          @sponsor ||= EmployerProfile.find(benefit_sponsorship.benefit_sponsorable.customer_profile_id)
+          @sponsor ||= ::EmployerProfile.find(benefit_sponsorship.benefit_sponsorable.customer_profile_id)
         end
 
         def benefit_sponsorship
           @benefit_sponsorship ||= BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
+        end
+
+        def benefit_sponsorship_applications
+          @benefit_sponsorship_applicatios = benefit_sponsorship.benefit_applications
         end
 
         def benefit_application
