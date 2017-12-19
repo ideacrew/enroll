@@ -45,14 +45,18 @@ module SponsoredBenefits
       scope :by_date_range,    ->(begin_on, end_on) { where(:"effective_period.max".gte => begin_on, :"effective_period.max".lte => end_on) }
       scope :terminated_early, ->{ where(:aasm_state.in => TERMINATED, :"effective_period.max".gt => :"terminated_on") }
 
-
-      def benefit_sponsor=(new_sponsor)
-        self.sponsorable_id = new_sponsor.id
-      end
-
-      def broker=(new_broker)
-        self.broker_id = new_broker.id
-      end
+      #
+      # Are these correct? I don't think you can move an embedded object just by changing an id?
+      #
+      # def benefit_sponsor=(new_sponsor)
+      #   self.sponsorable_id = new_sponsor.id
+      # end
+      #
+      # BrokerAgencyProfile embeds this entire chain - this can't be the way we adjust it
+      #
+      # def broker=(new_broker)
+      #   self.broker_id = new_broker.id
+      # end
 
       def effective_period=(new_effective_period)
         write_attribute(:effective_period, tidy_date_range(new_effective_period))
@@ -84,11 +88,28 @@ module SponsoredBenefits
       def is_coverage_effective_eligible?
       end
 
+      class << self
+        def find(id)
+          application = nil
+          Organizations::PlanDesignOrganization.all.each do |pdo|
+            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
+            sponsorships.each do |sponsorship|
+              application = sponsorship.benefit_applications.select { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
+            end
+          end
+          application.first
+        end
+      end
 
     private
 
       # Ensure class type and integrity of date period ranges
       def tidy_date_range(range_period)
+        if range_period.class == String
+          beginning = range_period.split("..")[0]
+          ending = range_period.split("..")[1]
+          range_period = Date.strptime(beginning)..Date.strptime(ending)
+        end
         # Check that end isn't before start. Note: end == start is not trapped as an error
         raise "Range period end date may not preceed begin date" if range_period.begin > range_period.end
         return range_period if range_period.begin.is_a?(Date) && range_period.end.is_a?(Date)
@@ -96,10 +117,11 @@ module SponsoredBenefits
         if range_period.begin.is_a?(Time) || range_period.end.is_a?(Time)
           begin_on  = range_period.begin.to_date
           end_on    = range_period.end.to_date
-          begin_on..end_on
+          (begin_on..end_on)
         else
           raise "Range period values must be a Date or Time"
         end
+        range_period
       end
 
 

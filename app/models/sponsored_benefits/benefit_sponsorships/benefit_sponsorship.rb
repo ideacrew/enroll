@@ -55,13 +55,24 @@ module SponsoredBenefits
       end
 
       def earliest_plan_year_start_on_date
-       plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
-       plan_years.reject!{|py| py.can_be_migrated? }
-       plan_year = plan_years.sort_by {|test| test[:start_on]}.first
-       if !plan_year.blank?
-         plan_year.start_on
-       end
-     end
+        plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
+        plan_years.reject!{|py| py.can_be_migrated? }
+        plan_year = plan_years.sort_by {|test| test[:start_on]}.first
+        if !plan_year.blank?
+          plan_year.start_on
+        end
+      end
+
+      class << self
+        def find(id)
+          sponsorship = nil
+          Organizations::PlanDesignOrganization.all.each do |pdo|
+            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
+            sponsorship = sponsorships.select { |sponsorship| sponsorship._id == BSON::ObjectId.from_string(id)}
+          end
+          sponsorship.first
+        end
+      end
 
     end
 

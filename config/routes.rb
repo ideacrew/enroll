@@ -11,8 +11,10 @@ SponsoredBenefits::Engine.routes.draw do
   # end
   #
   resources :benefit_sponsorships, only: [] do
-    resources :benefit_applications
+    resources :benefit_applications, controller: 'benefit_applications/benefit_applications', only: [:index, :new, :create]
   end
+
+  resources :benefit_applications, controller: 'benefit_applications/benefit_applications', only: [:show, :edit, :update, :destroy]
 
   resources :broker_agency_profile, path: 'broker', as: 'broker', only: [] do
     resources :plan_design_organization, path: 'client', as: 'client'
