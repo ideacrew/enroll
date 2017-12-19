@@ -4,14 +4,17 @@ module SponsoredBenefits
 
       def index
         ## load quotes for a given sponsorship
+        # broker / sponsor
       end
 
       def new
         # initialize FormObject
+        # broker / sponsor
       end
 
       def show
         # load relevant quote (not nested)
+        # benefit_application
       end
 
       def edit
@@ -45,7 +48,7 @@ module SponsoredBenefits
         end
 
         def sponsor
-          @sponsor ||= ::EmployerProfile.find(benefit_sponsorship.benefit_sponsorable.customer_profile_id)
+          @sponsor ||= benefit_sponsorship.benefit_sponsorable
         end
 
         def benefit_sponsorship
@@ -53,7 +56,7 @@ module SponsoredBenefits
         end
 
         def benefit_sponsorship_applications
-          @benefit_sponsorship_applicatios = benefit_sponsorship.benefit_applications
+          @benefit_sponsorship_applicatios ||= benefit_sponsorship.benefit_applications
         end
 
         def benefit_application
