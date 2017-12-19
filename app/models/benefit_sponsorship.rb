@@ -2,11 +2,17 @@ class BenefitSponsorship
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
+
   embedded_in :hbx_profile
   # embedded_in :employer_profile
 
   # person/roles can determine which sponsor in a class has a relationship (offer products)
   # which benefit packages should be offered to person/roles
+
+  IRS_H36_GENERATION_EVENT = "acapi.info.events.report.federal.irs.h36"
+  CMS_PBP_GENERATION_EVENT = "acapi.info.events.report.federal.cms.pbp"
 
   SERVICE_MARKET_KINDS = %w(shop individual coverall)
 
@@ -96,10 +102,36 @@ class BenefitSponsorship
       end
 
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-      if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date && !Rails.env.test?
-        oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
-        oe_begin.process_renewals
+      if renewal_benefit_coverage_period.present? && !Rails.env.test?
+        if renewal_benefit_coverage_period.open_enrollment_start_on == new_date 
+          oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
+          oe_begin.process_renewals
+        end
+
+        # This is to generate additional CMS PBP reports for upcoming year during renewal OE
+        if new_date >= renewal_benefit_coverage_period.open_enrollment_start_on
+          if (new_date.day == Settings.aca.individual_market.cms_pbp_generation_initial_dom)
+            notify(CMS_PBP_GENERATION_EVENT, {coverage_year: new_date.next_year.year})
+          end
+
+          if (new_date.day == Settings.aca.individual_market.cms_pbp_generation_final_dom)
+            notify(CMS_PBP_GENERATION_EVENT, {coverage_year: new_date.next_year.year, pbp_final: true})
+          end
+        end
       end
+
+      if new_date.day == Settings.aca.individual_market.irs_h36_generation_dom
+        notify(IRS_H36_GENERATION_EVENT, {coverage_year: new_date.prev_month.year, coverage_month: new_date.prev_month.month}) 
+      end
+
+      if (new_date.day == Settings.aca.individual_market.cms_pbp_generation_initial_dom)
+        notify(CMS_PBP_GENERATION_EVENT, {coverage_year: new_date.year})
+      end
+
+      if (new_date.day == Settings.aca.individual_market.cms_pbp_generation_final_dom)
+        notify(CMS_PBP_GENERATION_EVENT, {coverage_year: new_date.year, pbp_final: true})
+      end
+
 
       # # Find families with events today and trigger their respective workflow states
       # orgs = Organization.or(

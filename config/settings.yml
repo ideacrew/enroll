@@ -41,6 +41,10 @@ aca:
       start_on: <%= Date.new(2017,11,1) %>
       end_on: <%= Date.new(2018,01,31) %>
 
+    irs_h36_generation_date: 15
+    cms_pbp_generation_initial: 1
+    cms_pbp_generation_final: 10
+
   shop_market:
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
