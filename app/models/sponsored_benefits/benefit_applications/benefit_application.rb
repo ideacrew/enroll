@@ -40,7 +40,7 @@ module SponsoredBenefits
       # ##
 
       validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
-      after_update :validate_application_dates
+      validate :validate_application_dates
 
       scope :by_date_range,    ->(begin_on, end_on) { where(:"effective_period.max".gte => begin_on, :"effective_period.max".lte => end_on) }
       scope :terminated_early, ->{ where(:aasm_state.in => TERMINATED, :"effective_period.max".gt => :"terminated_on") }
@@ -111,7 +111,7 @@ module SponsoredBenefits
           range_period = Date.strptime(beginning)..Date.strptime(ending)
         end
         # Check that end isn't before start. Note: end == start is not trapped as an error
-        raise "Range period end date may not preceed begin date" if range_period.begin > range_period.end
+        errors.add(:effective_period, "Range period end date may not preceed begin date") if range_period.begin > range_period.end
         return range_period if range_period.begin.is_a?(Date) && range_period.end.is_a?(Date)
 
         if range_period.begin.is_a?(Time) || range_period.end.is_a?(Time)
@@ -119,14 +119,11 @@ module SponsoredBenefits
           end_on    = range_period.end.to_date
           (begin_on..end_on)
         else
-          raise "Range period values must be a Date or Time"
+          errors.add(:effective_period, "Range period values must be a Date or Time")
         end
         range_period
       end
 
-
-      def validate_application_dates
-      end
     end
 
   end
