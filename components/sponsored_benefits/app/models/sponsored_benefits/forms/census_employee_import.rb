@@ -170,7 +170,7 @@ module SponsoredBenefits
       def add_or_update_census_member(record)
         # Process Employee
         if record[:employee_relationship].downcase == "self"
-          member = employee_klass.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first || employee_klass.new
+          member = find_employee(record) || employee_klass.new
           member = assign_census_employee_attributes(member, record)
           @last_ee_member = member
           @last_ee_member_record = record
