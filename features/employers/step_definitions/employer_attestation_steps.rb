@@ -124,8 +124,7 @@ When(/^Employer staff clicks employees tab$/) do
 end
 
 Then (/^Employer staff should employees coverage status as canceled$/) do
-  wait_for_ajax
-  pending "Add employees to the roster and enroll them under current plan year. When attestation denied, along with plan year employee coverages should be canceled."
+  expect(page).to have_content "Canceled"
 end
 
 When (/^Employer Staff clicks documents tab$/) do
