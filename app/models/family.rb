@@ -772,6 +772,11 @@ class Family
     applications.order_by(:submitted_at => 'desc').first
   end
 
+  def latest_drafted_application
+    #Returns last application submitted, aasm state is not in draft
+    applications.order_by(:created_at => 'desc').first
+  end
+
   class << self
     # Set the sort order to return families by primary applicant last_name, first_name
     def default_search_order
