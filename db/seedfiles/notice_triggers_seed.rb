@@ -944,20 +944,42 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP_D085',
-    title: 'Employer has hired you as a General agency',
-    description: ' GA is hired to a group, a notice is sent to the GAs agency mail inbox alerting them of the hire',
-    resource_name: 'general_agent_profile',
-    event_name: 'general_agency_hired_notice',
+    hbx_id: 'D048',
+    title: 'You have been Hired as a Broker',
+    description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+    resource_name: 'broker_role',
+    event_name: 'broker_hired',
     notice_triggers: [
       {
-        name: 'General Agency hired notification',
-        notice_template: 'notices/shop_general_agency_notices/general_agency_hired_notice',
-        notice_builder: 'ShopGeneralAgencyNotices::GeneralAgencyHiredNotice',
-        mpi_indicator: 'SHOP_D085',
+        name: 'Broker Hired',
+        notice_template: 'notices/shop_broker_notices/broker_hired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
+        mpi_indicator: 'SHOP_D048',
         notice_trigger_element_group: {
           market_places: ['shop'],
-          primary_recipients: ["general_agent_profile"],
+          primary_recipients: ["broker"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'D047',
+    title: 'You have been Hired as their Broker Agency',
+    description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
+    resource_name: 'broker_role',
+    event_name: 'broker_agency_hired',
+    notice_triggers: [
+      {
+        name: 'Broker Agency Hired',
+        notice_template: 'notices/shop_broker_notices/broker_agency_hired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerAgencyHiredNotice',
+        mpi_indicator: 'SHOP_D047',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["broker"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
@@ -973,13 +995,35 @@ shop_notice_triggers = [
     event_name: 'initial_employer_no_binder_payment_received',
     notice_triggers: [
       {
-        name: 'Initial Employer No Binding Payment Received',
+        name: ' Initial Employer No Binding Payment Received',
         notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
         notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
-        mpi_indicator: 'SHOP_D063',
+        mpi_indicator: 'MPI_DIG063',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'SHOP_D085',
+    title: 'Employer has hired you as a General agency',
+    description: ' GA is hired to a group, a notice is sent to the GAs agency mail inbox alerting them of the hire',
+    resource_name: 'general_agent_profile',
+    event_name: 'general_agency_hired_notice',
+    notice_triggers: [
+      {
+        name: 'General Agency hired notification',
+        notice_template: 'notices/shop_general_agency_notices/general_agency_hired_notice',
+        notice_builder: 'ShopGeneralAgencyNotices::GeneralAgencyHiredNotice',
+        mpi_indicator: 'SHOP_D085',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["general_agent_profile"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
