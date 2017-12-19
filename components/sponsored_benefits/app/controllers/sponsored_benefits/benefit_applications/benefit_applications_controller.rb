@@ -25,14 +25,21 @@ module SponsoredBenefits
         # create quote for sponsorship
         @benefit_application = AcaShopCcaBenefitApplicationBuilder.new(sponsor, benefit_application_params)
         benefit_sponsorship.benefit_applications << @benefit_application.benefit_application
-        benefit_sponsorship.save!
-        redirect_to benefit_application_path(@benefit_application.benefit_application._id)
+        if benefit_sponsorship.save
+          redirect_to benefit_application_path(@benefit_application.benefit_application._id)
+        else
+          @benefit_application = @benefit_application.benefit_application
+          render :new
+        end
       end
 
       def update
         # update relevant quote (not nested)
-        benefit_application.update_attributes(benefit_application_params)
-        redirect_to benefit_application_path(benefit_application._id)
+        if benefit_application.update_attributes(benefit_application_params)
+          redirect_to benefit_application_path(benefit_application._id)
+        else
+          render :edit
+        end
       end
 
       def destroy
