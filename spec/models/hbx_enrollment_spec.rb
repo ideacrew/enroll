@@ -2502,6 +2502,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
             expect(passive_renewals.size).to eq 1
             passive_renewal = passive_renewals.first
             expect(passive_renewal.auto_renewing?).to be_truthy
+
             new_enrollment.select_coverage!
             family.reload
             passive_renewal.reload
