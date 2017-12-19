@@ -453,7 +453,7 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "POST record_sep" do
+  describe "POST record_sep", dbclean: :after_each do
     let(:employee_role2) { FactoryGirl.create(:employee_role, census_employee: census_employee) }
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     
@@ -469,6 +469,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:primary_family).and_return(@family)
       allow(person).to receive(:employee_roles).and_return([employee_role2])
       allow(person).to receive(:hbx_staff_role).and_return(nil)
+      allow(person).to receive(:has_multiple_active_employers?).and_return(false)
     end
 
     context 'when its initial enrollment' do
@@ -483,11 +484,32 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context 'trigger_notice' do
+    context 'when employee has only one active employe role' do
       it "should receive notice" do
         special_enrollment_period = @family.special_enrollment_periods.last
-        expect(employee_role2.census_employee).to receive(:trigger_notice).with("ee_sep_request_accepted_notice")
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
         post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
+        expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_sep_request_accepted_notice']
+      end
+    end
+
+    context 'when employee has multiple active employee roles' do
+      before :each do
+        allow(person).to receive(:has_multiple_active_employers?).and_return(true)
+      end
+      it "should not receive notice" do
+        special_enrollment_period = @family.special_enrollment_periods.last
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
+        expect(queued_job).to eq nil
       end
     end
 

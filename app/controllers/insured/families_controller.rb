@@ -94,9 +94,14 @@ class Insured::FamiliesController < FamiliesController
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
-    emp_role_id = params.require(:employee_role_id)
-    @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-    @employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice") if (qle.present? && qle.shop? && @employee_role.present? && @employee_role.census_employee.present?)
+
+    emp_role_id = params[:employee_role_id]
+    employee_role = EmployeeRole.find(emp_role_id)
+
+    if !@person.has_multiple_active_employers? && qle.present? && qle.shop? && employee_role.present? && employee_role.census_employee.present?
+      employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice")
+    end
+
     redirect_to new_insured_group_selection_path(action_params)
   end
 
