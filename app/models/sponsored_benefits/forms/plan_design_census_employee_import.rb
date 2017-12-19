@@ -53,6 +53,35 @@ module SponsoredBenefits
         member
       end
 
+        # match by DOB
+      def find_employee(record)
+        employees = employee_klass.find_by_employer_profile_and_benefit_application(@employer_profile, @benefit_application)
+
+        ssn_query = record[:ssn]
+        dob_query = record[:dob]
+        last_name = record[:last_name]
+        first_name = record[:first_name]
+
+        raise ImportErrorValue, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
+
+        matches = Array.new
+        matches.concat employees.where(encrypted_ssn: encrypt_ssn(ssn_query), dob: dob_query).to_a unless ssn_query.blank?
+
+        if first_name.present? && last_name.present? && dob_query.present?
+          first_exp = /^#{first_name}$/i
+          last_exp = /^#{last_name}$/i
+          matches.concat matches.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a
+        end
+
+        matches.uniq
+
+        if matches.uniq.size > 1
+          raise ImportErrorValue, "found multiple employee records"
+        end
+
+        matches.first
+      end
+
     end
   end
 end
