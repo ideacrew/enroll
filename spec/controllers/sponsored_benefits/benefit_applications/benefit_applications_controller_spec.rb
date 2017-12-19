@@ -6,10 +6,10 @@ module SponsoredBenefits
       routes { SponsoredBenefits::Engine.routes }
 
       let(:broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
-      let(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }
+      let!(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }
       let(:sponsorship) { build(:benefit_sponsorship) }
       let(:cca_employer_profile) { build(:shop_cca_employer_profile, benefit_sponsorships: [sponsorship]) }
-      let!(:plan_design_organization) { create(:plan_design_organization, broker_agency_profile: broker_agency_profile, plan_design_profile: cca_employer_profile) }
+      let!(:plan_design_organization) { create(:plan_design_organization, customer_profile_id: broker_agency_profile._id, plan_design_profile: cca_employer_profile) }
       let(:beginning_of_next_month) { Date.today.next_month.beginning_of_month }
       let(:end_of_month) { Date.today.end_of_month }
 
