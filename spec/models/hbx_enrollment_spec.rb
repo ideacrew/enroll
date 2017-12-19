@@ -2677,7 +2677,7 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(queued_job[:args]).not_to be_empty
       expect(queued_job[:args].include?('ee_select_plan_during_oe')).to be_truthy
       expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.hbx_id.to_s
+      expect(queued_job[:args].third["hbx_enrollment_id"]).to eq hbx_enrollment.hbx_id.to_s
     end
   end
 end

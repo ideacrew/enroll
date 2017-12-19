@@ -29,9 +29,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
-      :options => {
-        :hbx_enrollment => hbx_enrollment.hbx_id.to_s
-      }
+      :options => { :hbx_enrollment_id => hbx_enrollment.hbx_id.to_s }
   }}
 
   describe "New" do
@@ -58,8 +56,8 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
     before do
       @employee_notice = ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment.new(census_employee, valid_params)
     end
-    it "should build notice with all necessory info" do
 
+    it "should build notice with all necessory info" do
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
@@ -74,17 +72,17 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
       enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
     end
-    it "should append plan_year start on date" do
-      expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
+    it "should append enrollment effective on date" do
+      expect(@employee_notice.notice.enrollment.effective_on).to eq hbx_enrollment.effective_on
     end
     it "shoud append plan name" do
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
     end
     it "should append employee_cost" do
-      expect(@employee_notice.notice.enrollment.employee_cost).to eq("0.0")
+      expect(@employee_notice.notice.enrollment.employee_cost).to eq(hbx_enrollment.total_employee_cost.to_s)
     end
     it "should append employer_contribution" do
-      expect(@employee_notice.notice.enrollment.employer_contribution).to eq("0.0")
+      expect(@employee_notice.notice.enrollment.employer_contribution).to eq(hbx_enrollment.total_employer_contribution.to_s)
     end
   end
 
