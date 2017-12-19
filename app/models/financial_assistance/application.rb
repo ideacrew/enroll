@@ -110,6 +110,7 @@ class FinancialAssistance::Application
 
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
   scope :determined, ->{ any_in(aasm_state: "determined") }
+  scope :by_hbx_id, ->(hbx_id) { where(hbx_id: hbx_id) }
 
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
   alias_method :is_renewal_authorized?, :is_renewal_authorized
