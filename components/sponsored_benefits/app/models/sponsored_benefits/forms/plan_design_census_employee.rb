@@ -4,11 +4,14 @@ module SponsoredBenefits
       include ActiveModel::Model
       include ActiveModel::Validations
 
-      attr_accessor :first_name, :middle_name, :last_name, :ssn, :gender, :dob, :employee_relationship
-
+      attr_accessor :first_name, :last_name, :ssn, :dob
 
       def save
         census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployeeBuilder.build do |builder|
+          builder.add_first_name(first_name)
+          builder.add_last_name(last_name)
+          builder.add_ssn(ssn)
+          builder.add_dob(dob)
           builder.add_dependent(dependent)
         end
 
