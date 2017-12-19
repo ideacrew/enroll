@@ -11,8 +11,8 @@ class BenefitSponsorship
   # person/roles can determine which sponsor in a class has a relationship (offer products)
   # which benefit packages should be offered to person/roles
 
-  IRS_H36_GENERATION_EVENT = "acapi.info.events.report.federal.irs.h36"
-  CMS_PBP_GENERATION_EVENT = "acapi.info.events.report.federal.cms.pbp"
+  IRS_H36_GENERATION_EVENT = "acapi.info.events.report.federal_irs_h36"
+  CMS_PBP_GENERATION_EVENT = "acapi.info.events.report.federal_cms_pbp"
 
   SERVICE_MARKET_KINDS = %w(shop individual coverall)
 
