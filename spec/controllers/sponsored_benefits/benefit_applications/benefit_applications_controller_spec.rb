@@ -2,7 +2,11 @@ require 'rails_helper'
 
 module SponsoredBenefits
   RSpec.describe BenefitApplications::BenefitApplicationsController, type: :controller do
-    let(:sponsorship) { create(:sponsored_benefits_benefit_sponsorship) }
+    let(:broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
+    let(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }
+    let(:sponsorship) { build(:benefit_sponsorship) }
+    let(:employer_profile) { build(:shop_cca_employer_profile, benefit_sponsorships: [sponsorship]) }
+    let!(:plan_design_organization) { create(:plan_design_organization, broker_agency_profile: broker_agency_profile, plan_design_profile: employer_profile) }
     let(:beginning_of_next_month) { Date.today.next_month.beginning_of_month }
     let(:end_of_month) { Date.today.end_of_month }
 
@@ -10,7 +14,6 @@ module SponsoredBenefits
       {
         effective_period: (beginning_of_next_month..(end_of_month + 1.year)),
         open_enrollment_period: (Date.today..end_of_month),
-        benefit_sponsorship_id: sponsorship.id
       }
     }
 
@@ -25,8 +28,8 @@ module SponsoredBenefits
 
     describe "GET #index" do
       it "returns a success response" do
-        benefit_application = BenefitApplications::BenefitApplication.create! valid_attributes
-        get :index, {}, valid_session
+        benefit_application = sponsorship.benefit_applications.create! valid_attributes
+        get :index, { benefit_sponsorship_id: sponsorship.id }, valid_session
         expect(response).to be_success
       end
     end
