@@ -1,5 +1,5 @@
 module SponsoredBenefits
-  module Organization
+  module Organizations
     class OfficeLocation
   	  include Mongoid::Document
 
