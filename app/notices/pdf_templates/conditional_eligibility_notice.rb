@@ -55,6 +55,10 @@ module PdfTemplates
       false
     end
 
+    def general_agency_notice?
+      return false
+    end
+
     def broker?
       return false
     end

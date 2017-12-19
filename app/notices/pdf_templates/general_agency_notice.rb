@@ -34,5 +34,9 @@ module PdfTemplates
       return false
     end
 
+    def broker?
+      return false
+    end
+
   end
 end
