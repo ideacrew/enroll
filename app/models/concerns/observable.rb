@@ -42,7 +42,6 @@ module Concerns::Observable
       if observers.none?{|k, v| k.is_a?(observer.class)}
         observers[observer] = func
       end
-
       observers
     end
 
@@ -66,7 +65,7 @@ module Concerns::Observable
 
     def notify_observers(*arg)
       if defined? @@observer_peers
-        @@observer_peers[self.to_s].each do |peer| 
+        @@observer_peers[self.to_s].each do |peer|
           peer.each do |k, v|
             k.send v, *arg
           end
