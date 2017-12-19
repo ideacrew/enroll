@@ -1550,7 +1550,7 @@ describe "#document_due_date", dbclean: :after_each do
       end
     end
   end
-end
+end  
 
 describe Family, '#is_document_not_verified' do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}

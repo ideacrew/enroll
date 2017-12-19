@@ -267,7 +267,7 @@ def ridp_type_status(type, person)
   end
 
   def mod_attr(attr, val)
-      attr.to_s + " => " + val.to_s
+    attr.to_s + " => " + val.to_s
   end
 
   def build_admin_actions_list(v_type, f_member)

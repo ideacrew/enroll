@@ -110,5 +110,3 @@ Then(/HBX Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
   screenshot("home_page")
 end
-
-
