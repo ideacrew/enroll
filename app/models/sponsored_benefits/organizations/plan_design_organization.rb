@@ -20,6 +20,7 @@ module SponsoredBenefits
 
 
       embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
+
     end
   end
 end

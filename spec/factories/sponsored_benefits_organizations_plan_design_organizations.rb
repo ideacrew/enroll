@@ -2,7 +2,8 @@ FactoryGirl.define do
   factory :plan_design_organization, class: 'SponsoredBenefits::Organizations::PlanDesignOrganization' do
     legal_name  "Turner Agency, Inc"
     dba         "Turner Brokers"
-
+    customer_profile_id "12345"
+    
     fein do
       Forgery('basic').text(:allow_lower   => false,
         :allow_upper   => false,

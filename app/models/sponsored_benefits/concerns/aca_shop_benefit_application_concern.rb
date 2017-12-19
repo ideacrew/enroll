@@ -40,12 +40,14 @@ module SponsoredBenefits
         errors.add(:effective_period, "may not start application before #{initial_application_earliest_begin_date.to_date} with #{effective_period.begin} effective date")
       end
 
-      if !['canceled', 'suspended', 'terminated','termination_pending'].include?(aasm_state)
-        benefit_period_minimum = Settings.aca.shop_market.benefit_period.length_minimum.year.years
-        if end_on != (effective_period.begin + benefit_period_minimum - 1.day)
-          errors.add(:effective_period, "application term period should be #{duration_in_days(benefit_period_minimum)} days")
-        end
-      end
+      # We do not have AASM state in this model at the moment
+      #
+      # if !['canceled', 'suspended', 'terminated','termination_pending'].include?(aasm_state)
+      #   benefit_period_minimum = Settings.aca.shop_market.benefit_period.length_minimum.year.years
+      #   if end_on != (effective_period.begin + benefit_period_minimum - 1.day)
+      #     errors.add(:effective_period, "application term period should be #{duration_in_days(benefit_period_minimum)} days")
+      #   end
+      # end
     end
 
 
