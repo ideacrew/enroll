@@ -33,12 +33,6 @@ module SponsoredBenefits
       # BenefitApplications::BenefitApplicationsController. Be sure to keep this updated too.
       let(:valid_session) { {} }
 
-      let(:employer_profile) { double() }
-
-      before do
-        allow(EmployerProfile).to receive(:find).with(plan_design_organization.customer_profile_id).and_return(employer_profile)
-      end
-
       describe "GET #index" do
         it "returns a success response" do
           get :index, { benefit_sponsorship_id: sponsorship.id }, valid_session
