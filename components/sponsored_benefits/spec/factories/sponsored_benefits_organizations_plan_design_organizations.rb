@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :sponsored_benefits_organizations_plan_design_organization, class: 'SponsoredBenefits::Organizations::PlanDesignOrganization' do
+  factory :plan_design_organization, class: 'SponsoredBenefits::Organizations::PlanDesignOrganization' do
     legal_name  "Turner Agency, Inc"
     dba         "Turner Brokers"
 
@@ -8,6 +8,10 @@ FactoryGirl.define do
         :allow_upper   => false,
         :allow_numeric => true,
         :allow_special => false, :exactly => 9)
+    end
+
+    office_locations do
+      [ build(:sponsored_benefits_office_location, :primary) ]
     end
   end
 end
