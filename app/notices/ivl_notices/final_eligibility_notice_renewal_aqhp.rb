@@ -63,6 +63,9 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
     end
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
     notice.primary_firstname = primary_member["first_name"]
+    notice.due_date = TimeKeeper.date_of_record + 95.days
+    notice.documents_needed = data.any?{|d| d["docs_needed"].try(:upcase)  == 'Y'}
+    append_document_information
   end
 
   def append_member_information_for_aqhp(primary_member)
@@ -87,6 +90,36 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
                                                              :tax_household => append_tax_household_information(primary_member)
                                                          })
     end
+  end
+
+  def append_document_information
+    data.collect do |datum|
+      ssn_doc_needed = datum["ssn_doc_needed"].try(:upcase) == "Y" ? true : false
+      citizenship_doc_needed = datum["citizenship_doc_needed"].try(:upcase) == "Y" ? true : false
+      immigration_doc_needed = datum["immigration_doc_needed"].try(:upcase) == "Y" ? true : false
+      income_doc_needed = datum["income_doc_needed"].try(:upcase) == "Y" ? true : false
+      other_coverage_doc_needed = datum["other_coverage_doc_needed"].try(:upcase) == "Y" ? true : false
+      if ssn_doc_needed
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: datum["full_name"].titleize, documents_due_date: notice.due_date, age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+
+      if citizenship_doc_needed
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: datum["full_name"].titleize, documents_due_date: notice.due_date, age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+
+      if immigration_doc_needed
+        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: datum["full_name"].titleize, documents_due_date: notice.due_date, age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+
+      if income_doc_needed
+        notice.income_unverified  << PdfTemplates::Individual.new({ full_name: datum["full_name"].titleize, documents_due_date: notice.due_date, age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+
+      if other_coverage_doc_needed
+        notice.mec_conflict  << PdfTemplates::Individual.new({ full_name: datum["full_name"].titleize, documents_due_date: notice.due_date, age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')), mec_type_1: datum["mec_type_1"], mec_type_2: datum["mec_type_2"] })
+      end
+    end
+
   end
 
   def append_enrollment_information
@@ -135,23 +168,6 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
     end.uniq
 
     people = family_members.map(&:person).uniq
-
-    outstanding_people = []
-    people.each do |person|
-      if person.consumer_role.outstanding_verification_types.present?
-        outstanding_people << person
-      end
-    end
-
-    #enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
-    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
-    # enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}.each do |enrollment|
-    #   notice.enrollments << append_enrollment_information(enrollment)
-    # end
-    notice.due_date = document_due_date(family)
-    outstanding_people.uniq!
-    notice.documents_needed = outstanding_people.present? ? true : false
-    append_unverified_individuals(outstanding_people)
   end
 
   def document_due_date(family)
@@ -164,50 +180,6 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
       end
     else
       nil
-    end
-  end
-
-  def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
-  end
-
-  def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship')
-  end
-
-  def immigration_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Immigration status')
-  end
-
-  def american_indian_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
-  end
-
-  def residency_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('DC Residency')
-  end
-
-  def append_unverified_individuals(people)
-    people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if immigration_status_outstanding?(person)
-        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if american_indian_status_outstanding?(person)
-        notice.american_indian_unverified  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if residency_outstanding?(person)
-        notice.residency_inconsistency  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
     end
   end
 

@@ -127,24 +127,24 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
     # enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}.each do |enrollment|
     #   notice.enrollments << append_enrollment_information(enrollment)
     # end
-    notice.due_date = document_due_date(family)
+    notice.due_date = family.min_verification_due_date
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
   end
 
-  def document_due_date(family)
-    enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
-    if enrolled_contingent_enrollment.present?
-      if enrolled_contingent_enrollment.special_verification_period.present?
-        enrolled_contingent_enrollment.special_verification_period
-      else
-        (TimeKeeper.date_of_record+95.days)
-      end
-    else
-      nil
-    end
-  end
+  # def document_due_date(family)
+  #   enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
+  #   if enrolled_contingent_enrollment.present?
+  #     if enrolled_contingent_enrollment.special_verification_period.present?
+  #       enrolled_contingent_enrollment.special_verification_period
+  #     else
+  #       (TimeKeeper.date_of_record+95.days)
+  #     end
+  #   else
+  #     nil
+  #   end
+  # end
 
   def ssn_outstanding?(person)
     person.consumer_role.outstanding_verification_types.include?("Social Security Number")
