@@ -16,11 +16,11 @@ Then(/^Hbx Admin should not see an New Consumer Phone Application link and New C
 end
 
 When(/^Hbx Admin clicks on DC Resident Application link$/) do
-  find(:xpath, "/html/body/div[2]/div/ul/li[2]/ul/li[4]/a/span[1]").trigger('click')
+  find(:xpath, '//*[@id="myTab"]/li[2]/ul/li[5]/a').trigger('click')
 end
 
 Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
-  expect(page).not_to have_content('Personal Information')
+  expect(page).to have_content('Personal Information')
 end
 
 When(/HBX Admin goes to register an user as individual$/) do
@@ -110,5 +110,3 @@ Then(/HBX Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
   screenshot("home_page")
 end
-
-
