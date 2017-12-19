@@ -206,6 +206,11 @@ def employer_poc
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
 
+  def outstanding_verification_dt
+    @selector = params[:scopes][:selector] if params[:scopes].present?
+    @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
+  end
+
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -333,14 +338,6 @@ def employer_poc
     end
   end
 
-  def verification_index
-    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
-    respond_to do |format|
-      format.html { render partial: "index_verification" }
-      format.js {}
-    end
-  end
-
   def binder_index
     @organizations = Organization.retrieve_employers_eligible_for_binder_paid
 
@@ -371,21 +368,6 @@ def employer_poc
     @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
     render
 
-  end
-
-  def verifications_index_datatable
-    dt_query = extract_datatable_parameters
-    query = ::Queries::VerificationsDatatableQuery.new(dt_query, params["filter"])
-
-    order = params[:order]["0"][:dir] if params[:order].present?
-
-    sorted_results = sorted_families(order, dt_query, query)
-
-    @draw = dt_query.draw
-    @total_records = query.all_families.count
-    @records_filtered = query.search_and_filter.count
-    @families = sorted_results
-    render
   end
 
   def product_index

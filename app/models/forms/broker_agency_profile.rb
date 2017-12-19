@@ -90,7 +90,7 @@ module Forms
       self.person.add_work_email(email)
       # since we can have multiple office_locations each will have separate phone numbers
       @office_locations.each do  |office_location|
-        self.person.phones.push(office_location.phone)
+        self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
       end
     end
 

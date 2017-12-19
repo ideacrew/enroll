@@ -54,6 +54,12 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes!(can_update_ssn: true)
   end
+  def hbx_admin_csr_view_personal_info_page
+    Permission.hbx_staff.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_csr_supervisor.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_csr_tier2.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_csr_tier1.update_attributes!(view_personal_info_page: true)
+  end
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
   end
@@ -66,5 +72,8 @@ class DefinePermissions < MigrationTask
     Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
+  end
+  def hbx_admin_can_view_application_types
+    Permission.hbx_staff.update_attributes!(can_view_application_types: true)
   end
 end

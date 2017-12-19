@@ -18,6 +18,13 @@
               remote: true
             } %>
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+              tab_name: 'outstanding-verifications',
+              link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
+              display_name: 'Outstanding Verifications',
+              active_tab: active_tab,
+              remote: true
+            } %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
               tab_name: 'new-consumer-application',
               link_path: begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'phone'),
               display_name: 'New Consumer Application',
@@ -31,6 +38,15 @@
               active_tab: active_tab,
               remote: true
             } %>
+            <% if policy(:family).hbx_super_admin_visible? %>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                tab_name: 'dc-resident-application',
+                link_path: begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'),
+                display_name: 'DC Resident Application',
+                active_tab: active_tab,
+                remote: false
+              } %>
+            <% end %>
           </ul>
         </li>
         <!-- <li role="presentation"<%= menu_tab_class(active_tab, "employers-tab") %>>
@@ -88,14 +104,6 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
          <% end %>
         </li>
-
-        <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
-          <%= link_to(verification_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "vlp-docs", "role" => "tab" ) do  %>
-              <span class="hidden-xs">Documents</span>
-              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="VLP Docs"></span>
-          <% end %>
-        </li>
-
         <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
          <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
             <span class="hidden-xs">Staff</span>
