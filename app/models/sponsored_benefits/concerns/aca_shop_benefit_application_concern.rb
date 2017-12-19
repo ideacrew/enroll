@@ -23,8 +23,6 @@ module SponsoredBenefits
 
 
     def validate_application_dates
-      super
-
       open_enrollment_period_maximum = Settings.aca.shop_market.open_enrollment.maximum_length.months.months
       if open_enrollment_period.end > (open_enrollment_period.begin + open_enrollment_period_maximum)
         errors.add(:open_enrollment_period, "may not exceed #{open_enrollment_period_maximum} months")

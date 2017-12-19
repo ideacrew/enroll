@@ -23,7 +23,7 @@ module SponsoredBenefits
       let(:benefit_application) { sponsorship.benefit_applications.create! valid_attributes }
       let(:invalid_attributes) {
         {
-          effective_period: (beginning_of_next_month..(end_of_month + 1.year)),
+          effective_period: ((end_of_month + 1.year)..beginning_of_next_month),
           open_enrollment_period: (beginning_of_next_month..beginning_of_next_month.end_of_month)
         }
       }
