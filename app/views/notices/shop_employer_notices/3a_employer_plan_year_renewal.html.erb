@@ -24,7 +24,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}. Your employees can begin to enroll in coverage on <strong>#{notice.plan_year.open_enrollment_start_on}</strong>, employees must complete their enrollments no later than <strong>#{notice.plan_year.open_enrollment_end_on}</strong>. You can monitor your employee enrollments during your open enrollment period through your employer account – see the
-  <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>Employers Managing Your Employee Roster guide</a>. for instructions.", bottom_margin: '5px'} %>
+  <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>Employers Managing Your Employee Roster guide</a> for instructions.", bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
@@ -75,4 +75,4 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>
+ content: "This notice is being provided in accordance with 45 C.F.R. 155.715(e)."} %>
