@@ -72,6 +72,15 @@ module SponsoredBenefits
           end
           sponsorship.first
         end
+
+        def find_broker_for_sponsorship(id)
+          organization = nil
+          Organizations::PlanDesignOrganization.all.each do |pdo|
+            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
+            organization = pdo if sponsorships.any? { |sponsorship| sponsorship._id == BSON::ObjectId.from_string(id)}
+          end
+          organization
+        end
       end
 
     end
