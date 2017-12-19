@@ -135,7 +135,7 @@ end
 def enter_plan_year_info
   wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  effective_on_year = TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+  effective_on_year = TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
   find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_on_year).year}')]", :wait => 5).click
 
   screenshot("employer_add_plan_year")
