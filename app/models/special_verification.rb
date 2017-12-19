@@ -6,7 +6,7 @@ class SpecialVerification
 
   TYPES = %w(admin notice)
 
-  field :due_date
+  field :due_date, type: Date
   field :verification_type
   field :updated_by
   field :type, type: String
@@ -20,8 +20,7 @@ class SpecialVerification
               message: "%{value} is not a valid type"
           }
 
-
   def admin_user
-    User.find(self.updated_by)
+    User.find(self.updated_by) if self.updated_by.present?
   end
 end
