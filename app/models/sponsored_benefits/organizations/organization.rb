@@ -1,4 +1,4 @@
-# Parent model for any business, government agency, or other organized entity 
+# Parent model for any business, government agency, or other organized entity
 module SponsoredBenefits
   module Organizations
     class Organization
@@ -45,7 +45,7 @@ module SponsoredBenefits
       field :updated_by, type: BSON::ObjectId
 
 
-      embeds_many :office_locations, class_name: "::OfficeLocations", cascade_callbacks: true, validate: true
+      embeds_many :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", cascade_callbacks: true, validate: true
 
       embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
       embeds_one :carrier_profile, cascade_callbacks: true, validate: true
@@ -112,7 +112,6 @@ module SponsoredBenefits
 
       before_save :generate_hbx_id
       after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
-      after_save :validate_and_send_denial_notice
 
       default_scope                               ->{ order("legal_name ASC") }
       scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -189,14 +188,8 @@ module SponsoredBenefits
         end
       end
 
-      def validate_and_send_denial_notice
-        if employer_profile.present? && primary_office_location.present? && primary_office_location.address.present?
-          employer_profile.validate_and_send_denial_notice
-        end
-      end
-
       def generate_hbx_id
-        write_attribute(:hbx_id, HbxIdGenerator.generate_profile_id) if hbx_id.blank?
+        write_attribute(:hbx_id, SponsoredBenefits::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
       end
 
       def invoices
