@@ -5,6 +5,7 @@ site:
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
+  notice_logo: "dchealthlink.jpg"
   home_url: "https://www.dchealthlink.com/"
   website_name: "www.DCHealthLink.com"
   website_url: "www.healthcare.gov"
@@ -22,6 +23,9 @@ contact_center:
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
+
+  mailing_address:
+    name: "DC Health Link"
 
 aca:
   state_name: "District of Columbia"
@@ -105,6 +109,12 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+
+notices:
+  shop:
+    attachments:
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "envelope_without_address.pdf"
 
 paper_notice: 'paper-notices'
 checkbook_services: 

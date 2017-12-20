@@ -36,6 +36,14 @@ module Notifier
       portal_display_name(controller_name)
     end
 
+    def site_main_web_address_business
+      Settings.site.main_web_address_business
+    end
+
+    def site_short_name
+      Settings.site.short_name
+    end
+
     def site_faqs_url
       Settings.site.faqs_url
     end
@@ -52,5 +60,16 @@ module Notifier
       number_to_phone(Settings.contact_center.phone_number.gsub(/^./, "").gsub('-',''), area_code: true)
     end
 
+    def dc_exchange?
+      Settings.aca.state_abbreviation.upcase == 'DC'
+    end
+
+    def shop_non_discrimination_attachment
+      Settings.notices.shop.attachments.non_discrimination_attachment
+    end
+
+    def shop_envelope_without_address
+      Settings.notices.shop.attachments.envelope_without_address
+    end
   end
 end

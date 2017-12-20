@@ -1,6 +1,7 @@
 module Notifier
   module NoticeBuilder
     include Config::SiteConcern
+    include ApplicationHelper
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
@@ -92,13 +93,15 @@ module Notifier
           }
       }
 
-      options.merge!({footer: {
-        content: ApplicationController.new.render_to_string({
-          template: "notifier/notice_kinds/footer.html.erb",
-          layout: false,
-          locals: {notice: self}
-        })
-      }})
+      if dc_exchange?
+        options.merge!({footer: {
+          content: ApplicationController.new.render_to_string({
+            template: "notifier/notice_kinds/footer.html.erb",
+            layout: false,
+            locals: {notice: self}
+          })
+        }})
+      end
     end
 
     def notice_path
@@ -114,11 +117,11 @@ module Notifier
     end
 
     def non_discrimination_attachment
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
+      join_pdfs [notice_path, Rails.root.join("lib/pdf_templates", shop_non_discrimination_attachment)]
     end
 
     def attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+      join_pdfs [notice_path, Rails.root.join("lib/pdf_templates", shop_envelope_without_address)]
     end
 
     def join_pdfs(pdfs)
