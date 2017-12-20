@@ -59,7 +59,7 @@ class FinancialAssistance::Benefit
   field :workflow, type: Hash, default: { }
 
   field :employer_name, type: String
-  field :employer_id, type: Integer
+  field :employer_id, type: String, default: ""
 
   embeds_one :employer_address, class_name: "::Address"
   embeds_one :employer_phone, class_name: "::Phone"
