@@ -244,8 +244,8 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
-  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:outstanding, :pending] })}
-  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:outstanding, :pending] })}
+  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
+  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
   scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
 
 
