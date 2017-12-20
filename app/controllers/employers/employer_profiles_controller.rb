@@ -114,7 +114,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
     # Conditional based columns has to display so we are passing arguments
     data_table_params = {id: params[:id], scopes: params[:scopes]}
-    if @employer_profile.renewing_plan_year.present?
+    if @employer_profile.renewing_published_plan_year.present? 
       data_table_params.merge!({renewal: true, renewal_status: true})
     end
     @datatable = Effective::Datatables::EmployeeDatatable.new(data_table_params)
