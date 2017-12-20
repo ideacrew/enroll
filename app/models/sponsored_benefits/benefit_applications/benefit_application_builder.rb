@@ -5,7 +5,7 @@ module SponsoredBenefits
       attr_reader :benefit_application
 
       def initialize(options)
-        @application_class ||= AcaShopBenefitApplication
+        @application_class ||= AcaShopDcBenefitApplication
         @benefit_application = @application_class.new(options)
       end
 
