@@ -31,7 +31,8 @@ site:
   main_web_address_text: "MAhealthconnector.org"
   curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
-
+  terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
+  registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   social_media:
     facebook_url: ""
 

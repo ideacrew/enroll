@@ -3,7 +3,7 @@ module Config::SiteHelper
   def site_redirect_on_timeout_route
     Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
   end
-  
+
   def site_byline
     Settings.site.byline
   end
@@ -31,7 +31,11 @@ module Config::SiteHelper
   def site_curam_enabled?
     Settings.site.curam_enabled
   end
-  
+
+  def site_brokers_agreement_path
+    link_to "#{Settings.aca.state_name} #{Settings.site.short_name} Broker Agreement", Settings.site.terms_and_conditions_url
+  end
+
   def site_home_link
     link_to site_home_url, site_home_url
   end
@@ -51,7 +55,7 @@ module Config::SiteHelper
   def site_nondiscrimination_notice_url
     Settings.site.nondiscrimination_notice_url
   end
-    
+
   def site_policies_url
     Settings.site.policies_url
   end
