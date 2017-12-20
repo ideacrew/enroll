@@ -551,6 +551,11 @@ class HbxEnrollment
         return
       end
 
+      # We are recoring an intermidiary state. please see #10489 
+      self.workflow_state_transitions << WorkflowStateTransition.new(
+              from_state: :coverage_reinstated,
+            to_state: :coverage_selected )
+    
       renewal_plan_year = self.benefit_group.employer_profile.renewing_published_plan_year
 
       if renewal_plan_year.present?
