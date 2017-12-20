@@ -14,11 +14,23 @@ module Queries
     def quiet_period_enrollment(hbx_id)
       enrollment = HbxEnrollment.by_hbx_id(hbx_id)[0]
       plan_year = enrollment.benefit_group.plan_year
-      quiet_period_end_on = plan_year.is_renewing? ? Settings.aca.shop_market.renewal_application.quiet_period_end_on : Settings.aca.shop_market.initial_application.quiet_period_end_on
-      quiet_period_start_date = plan_year.open_enrollment_end_on + 1.day
-      quiet_period_end_date = plan_year.start_on.prev_month + (quiet_period_end_on - 1).days
+      
+      if plan_year.is_renewing?
+        quiet_period_end_on = Settings.aca.shop_market.renewal_application.quiet_period_end_on
+        quiet_period_end_date = plan_year.start_on.prev_month + (quiet_period_end_on - 1).days
+        if enrollment.submitted_at >= TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end_date)
+          return true
+        else
+          return false
+        end
+      else
+        quiet_period_end_on = Settings.aca.shop_market.initial_application.quiet_period_end_on
+        quiet_period_end_date = plan_year.start_on.prev_month + (quiet_period_end_on - 1).days
+      end
 
-      (quiet_period_start_date.beginning_of_day..quiet_period_end_date.end_of_day).cover?(enrollment.submitted_at)
+      quiet_period_start_date = plan_year.open_enrollment_end_on + 1.day
+
+      (TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start_date)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end_date)).cover?(enrollment.submitted_at)
     end
 
     def self.shop_quiet_period_enrollments(effective_on, enrollment_statuses)
