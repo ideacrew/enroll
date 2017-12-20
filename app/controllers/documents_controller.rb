@@ -104,9 +104,6 @@ class DocumentsController < ApplicationController
       if sv.present?
         new_date = sv.due_date.to_date + 30.days
         flash[:success] = "Special verification period was extended for 30 days."
-      elsif enrollment.special_verification_period
-        new_date = enrollment.special_verification_period.to_date + 30.days
-        flash[:success] = "Special verification period was extended for 30 days."
       else
         new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days
         flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"

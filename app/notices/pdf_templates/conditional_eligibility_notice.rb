@@ -21,6 +21,7 @@ module PdfTemplates
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :immigration_unverified , Array[PdfTemplates::Individual]
+    attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
     attribute :american_indian_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
@@ -75,8 +76,12 @@ module PdfTemplates
       individuals.select{|individual| individual.incarcerated}
     end
 
+    def cover_all?
+      enrollments.select{|enrollment| enrollment.kind == "coverall"}.present?
+    end
+
     def current_health_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def assisted_enrollments
@@ -91,8 +96,12 @@ module PdfTemplates
       renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
+    def latest_current_year_enrollment
+      enrollments.sort_by(&:effective_on).last
+    end
+
     def current_dental_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def renewal_health_enrollments
@@ -147,7 +156,7 @@ module PdfTemplates
         else
           subject = "Your Health Plan and Cost Savings"
         end
-      elsif current_health_enrollments.present? && assisted_enrollments.nil?
+      elsif current_health_enrollments.present? && assisted_enrollments.empty?
         if current_dental_enrollments.present?
           subject = "Your Health and Dental Plan"
         else

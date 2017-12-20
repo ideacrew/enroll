@@ -1340,7 +1340,7 @@ describe "#all_persons_vlp_documents_status" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let(:family_person) {family.primary_applicant.person}
-    
+
     it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
       family_person.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
       expect(family.all_persons_vlp_documents_status).to eq("None")
@@ -1371,13 +1371,13 @@ describe "#all_persons_vlp_documents_status" do
       family_person.consumer_role.update_attributes(:ssn_rejected => true)
       family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end 
+    end
 
     it "returns all_persons_vlp_documents_status is Partially Uploaded when documents status is verified and other is not uploaded" do
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
       allow(family_person).to receive(:verification_types).and_return ["social Security", "Citizenship"]
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end   
+    end
   end
 
   context "vlp documents status for multiple family members" do
@@ -1392,7 +1392,7 @@ describe "#all_persons_vlp_documents_status" do
 
     it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
       person1.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
-      person2.consumer_role.vlp_documents.delete_all 
+      person2.consumer_role.vlp_documents.delete_all
       expect(family.all_persons_vlp_documents_status).to eq("None")
     end
 
@@ -1410,13 +1410,13 @@ describe "#all_persons_vlp_documents_status" do
       person2.consumer_role.vlp_documents << doc2
       person2.consumer_role.vlp_documents << doc3
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
-    end 
+    end
   end
 end
 
 describe "#document_due_date", dbclean: :after_each do
   context "when special verifications exists" do
-    let(:special_verification) { FactoryGirl.create(:special_verification)}
+    let(:special_verification) { FactoryGirl.create(:special_verification, type: "admin")}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
 
     it "should return the due date on the related latest special verification" do
@@ -1437,12 +1437,8 @@ describe "#document_due_date", dbclean: :after_each do
         fm = family.primary_family_member
         enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
       end
-      it "should return the special_verification_period on the enrollment if it exists" do
-        enrollment.special_verification_period = TimeKeeper.date_of_record + 45.days
-        enrollment.save!
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq enrollment.special_verification_period.to_date
-      end
 
+      #No longer updating special_verification_period on erollment. Due dates are moved to member level.
       it "should return nil if special_verification_period on the enrollment is nil" do
         enrollment.special_verification_period = nil
         enrollment.save
@@ -1455,13 +1451,13 @@ describe "#document_due_date", dbclean: :after_each do
         expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
       end
     end
-  end  
+  end
 end
 
 describe Family, '#is_document_not_verified' do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  
+
   it "return true when document is not verified" do
     expect(family.is_document_not_verified("Citizenship", family.primary_family_member.person)).to eq true
   end
@@ -1496,5 +1492,23 @@ describe Family, '#is_document_not_verified' do
         expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
       end
     end
+  end
+end
+
+describe "has_valid_e_case_id" do
+  let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
+
+  it "returns false as e_case_id is nil" do
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
+
+  it "returns true as it has a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "curam_landing_for5a0208eesjdb2c000096")
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
+
+  it "returns false as it don't have a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
+    expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end
