@@ -586,11 +586,11 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
       employer.save
-      
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+      queued_job = []
+      queued_job << ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer.id.to_s, 'general_agency_terminated']
+      expect(queued_job[0][3][:args]).to eq [employer.id.to_s, 'general_agency_terminated']
     end
 
     it 'works with multiple broker_agency_contacts'  do

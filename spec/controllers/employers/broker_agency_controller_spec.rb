@@ -109,12 +109,13 @@ RSpec.describe Employers::BrokerAgencyController do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in(@user)
         post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role.id, broker_agency_id: broker_agency_profile.id
-        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        queued_job = []
+        queued_job << ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
           job_info[:job] == ShopNoticesNotifierJob
         end
-        expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
-        expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
-        expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
+        expect(queued_job[0][1][:args].include?('general_agency_hired_notice')).to be_truthy
+        expect(queued_job[0][1][:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+        expect(queued_job[0][1][:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
       end
     end
   end
