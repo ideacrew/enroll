@@ -50,5 +50,13 @@ module Notifier
     def broker_present?
       self.broker.present?
     end
+
+    def employee_notice?
+      true
+    end
+
+    def shop?
+      true
+    end
   end
 end

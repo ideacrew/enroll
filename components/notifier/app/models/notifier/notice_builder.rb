@@ -66,8 +66,8 @@ module Notifier
         file << self.to_pdf
       end
 
-      attach_envelope
       non_discrimination_attachment
+      attach_envelope
       # clear_tmp
     end
 

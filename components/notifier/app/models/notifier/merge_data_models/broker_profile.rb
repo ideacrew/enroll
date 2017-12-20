@@ -38,5 +38,13 @@ module Notifier
     def conditions
       []
     end
+
+    def shop?
+      true
+    end
+
+    def employee_notice?
+      false
+    end
   end
 end
