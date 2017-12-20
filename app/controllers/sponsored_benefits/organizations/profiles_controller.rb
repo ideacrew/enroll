@@ -20,13 +20,26 @@ module SponsoredBenefits
     end
 
     def create
+      binding.pry
+      @organizatios_profile = BenefitSponsorships::PlanDesignEmployerProfile.new(organizatios_profiles_params)
 
+
+    end
+
+    def edit
+    end
+
+    def update
     end
 
   private  
     def find_broker_agency_profile
       @broker_agency_profile = ::BrokerAgencyProfile.find(params[:profile_id])
       #authorize @broker_agency_profile, :access_to_broker_agency_profile?
+    end
+    # Only allow a trusted parameter "white list" through.
+    def organizatios_profiles_params
+      params.require(:benefit_sponsorships_plan_design_employer_profile).permit(:entity_kind, :sic_code, :legal_name, :dba, :entity_kind)
     end
 
     def get_sic_codes
