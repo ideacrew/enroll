@@ -162,12 +162,12 @@
 <!-- Citizenship -->
 
 <!-- Immigration -->
-<% if notice.dhs_unverified.any? %>
+<% if notice.immigration_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.dhs_unverified], bottom_margin: '5px'} %>
+   rows: [notice.immigration_unverified], bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Documents you may be able to use to verify your immigration status include:",
@@ -184,14 +184,14 @@
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '-5px'} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
-
-   <%= render partial: 'notices/shared/paragraph', :locals => {
-     content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
-
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+    rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Recent pay stubs (showing at least 4 weeks in a row)"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, Social Security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in #{notice.coverage_year}"]} %>
@@ -217,26 +217,31 @@
 <!-- MEC Conflict -->
 <% if notice.mec_conflict.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>Access to Other Health Insurance:</strong> Our records indicate that the people listed below have access to <MEC Data Match Type 1>:", top_margin: '-5px'} %>
+    content: "<strong>Access to Other Health Insurance:</strong> Our records indicate that the people listed below have access to #{notice.mec_conflict.first["mec_type_1"]}:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.mec_conflict], top_margin: '5px', bottom_margin: '5px'} %>
 
+<% if notice.mec_conflict.first["mec_type_2"].present? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "Our records indicate that the following individual(s) have access to <MEC Data Match Type 2>:"} %>
+  content: "Our records indicate that the following individual(s) have access to #{notice.mec_conflict.first["mec_type_2"]}:"} %>
+
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+    rows: [notice.mec_conflict], top_margin: '5px', bottom_margin: '5px'} %>
+<%end%>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended."} %>
-<% end %>
+    content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended.", top_margin: '5px', bottom_margin: '7px'} %>
+<%end %>
 <!-- MEC Conflict -->
 
 <!-- Indian Inconsistency -->
-<% if notice.indian_inconsistency.any? %>
+<% if notice.american_indian_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "<strong>American Indian or Alaska Native Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.indian_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
+   rows: [notice.american_indian_unverified], top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian or Alaska Native status. Examples of such verifications include, but are not limited to the following:",
@@ -249,7 +254,10 @@
 <!-- Indian Inconsistency -->
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong><br></br>_____________________________________________________________________________________________________________", top_margin: '-5px'} %>
+  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "<br></br>_____________________________________________________________________________________________________________"} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",

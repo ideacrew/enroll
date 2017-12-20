@@ -20,7 +20,8 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual]
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
-    attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
+    attribute :immigration_unverified , Array[PdfTemplates::Individual]
+    attribute :american_indian_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
     attribute :indian_inconsistency, Array[PdfTemplates::Individual]
@@ -84,6 +85,10 @@ module PdfTemplates
 
     def csr_enrollments
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
+    end
+
+    def renewal_csr_enrollments
+      renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
     def current_dental_enrollments
