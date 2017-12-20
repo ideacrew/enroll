@@ -9,14 +9,20 @@ module PdfTemplates
     attribute :general_agency_name, String
     attribute :general_agency, String
     attribute :general_agent_email, String
-    attribute :employer, String
     attribute :employer_fullname, String
     attribute :broker_fullname, String
     attribute :effective_on, Date
-    attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :hbe, PdfTemplates::Hbe
     attribute :broker, PdfTemplates::Broker
     attribute :general_agency_account_start_on, Date
+    attribute :primary_identifier, String
+    attribute :employer_name, String
+    attribute :ga_email, String
+    attribute :primary_address, PdfTemplates::NoticeAddress
+    attribute :employer, PdfTemplates::EmployerStaff
+    attribute :general_agent, PdfTemplates::GeneralAgent
+    attribute :hbx_id, String
+    attribute :terminated_on, Date
 
     def shop?
       return true

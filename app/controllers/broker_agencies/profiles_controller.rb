@@ -190,10 +190,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def set_default_ga
     authorize HbxProfile, :modify_admin_tabs?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
-
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
+        if old_default_ga_id.present?
+          GeneralAgencyProfile.find(old_default_ga_id).employers_linked_with_general_agency.each do |emp|
+            emp.trigger_notices("general_agency_terminated")
+          end
+        end
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
@@ -202,7 +206,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
         end
       end
       @broker_agency_profile.save
-      #update_ga_for_employers(@broker_agency_profile, old_default_ga)
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
       @notice = "Changing default general agencies may take a few minutes to update all employers."
 
