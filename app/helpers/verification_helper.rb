@@ -28,6 +28,8 @@ module VerificationHelper
         "default"
       when "valid"
         "success"
+      when "processing"
+        "info"
     end
   end
 
