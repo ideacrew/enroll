@@ -96,7 +96,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     emp_role_id = params[:employee_role_id]
-    employee_role = EmployeeRole.find(emp_role_id)
+    employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
 
     if !@person.has_multiple_active_employers? && qle.present? && qle.shop? && employee_role.present? && employee_role.census_employee.present?
       employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice")
