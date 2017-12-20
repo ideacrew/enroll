@@ -488,7 +488,7 @@ shop_notice_triggers = [
   },
 
   {
-   hbx_id: 'DX0086',
+   hbx_id: 'D086',
    title: 'Genaral Agency Fired',
    description: "When a General Agency is terminated by an employer/broker, then General Agency receives termination notice",
    resource_name: 'general_agent_profile',
@@ -498,7 +498,7 @@ shop_notice_triggers = [
        name: 'GA Fired',
        notice_template: 'notices/general_agency_notices/general_agency_fired_notice',
        notice_builder: 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
-       mpi_indicator: 'SHOP_DX0086',
+       mpi_indicator: 'MPI_D086',
        notice_trigger_element_group: {
          market_places: ['shop'],
          primary_recipients: ["general_agency"],

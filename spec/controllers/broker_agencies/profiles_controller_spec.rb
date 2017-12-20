@@ -371,7 +371,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:employer_profile)).to eq employer_profile
     end
 
-    it "should send mail to General agency" do
+    it "should trigger notice to general agency" do
       expect(enqueued_jobs.size).to eq(1)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
@@ -464,7 +464,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
     end
    
-    it "should send mail to General agency" do
+    it "should trigger notice to general agency" do
       general_agency_account.update_attributes!(:aasm_state => "active")
       broker_agency_profile.default_general_agency_profile = general_agency_profile
       broker_agency_profile.save

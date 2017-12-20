@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><b>Email notification sent to:</b> <%= notice.ga_email %></h3></td>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.ga_email %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -15,7 +15,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><b><%= notice.employer_name.upcase %> HAS REMOVED YOU AS THEIR GENERAL AGENCY</b></td>
+      <td style="padding-top: 10px"><strong><%= notice.employer_name.upcase %> HAS REMOVED YOU AS THEIR GENERAL AGENCY</strong></td>
     </tr>
   </tbody>
 </table>
@@ -36,7 +36,7 @@
   heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', locals: {
-  content: "You can contact #{Settings.site.short_name} with any questions:"} %>
+  content: "Please contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
     ["By calling #{notice.hbe.phone}",

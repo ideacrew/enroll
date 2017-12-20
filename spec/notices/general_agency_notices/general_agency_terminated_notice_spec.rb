@@ -12,7 +12,7 @@ RSpec.describe GeneralAgencyNotices::GeneralAgencyTerminatedNotice, dbclean: :af
                              :notice_template => 'notices/general_agency_notices/general_agency_fired_notice',
                              :notice_builder => 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
                              :event_name => 'general_agency_terminated',
-                             :mpi_indicator => 'SHOP_DX0086)',
+                             :mpi_indicator => 'MPI_D086)',
                              :title => "Genaral Agency Fired"})
                           }
     let(:valid_parmas) {{
