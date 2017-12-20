@@ -45,6 +45,8 @@ class BrokerAgencyProfile
   has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
   accepts_nested_attributes_for :broker_agency_contacts, reject_if: :all_blank, allow_destroy: true
 
+  has_many :plan_design_organizations, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
+
   validates_presence_of :market_kind, :entity_kind #, :primary_broker_role_id
 
   validates :corporate_npn,
