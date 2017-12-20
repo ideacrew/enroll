@@ -7,7 +7,7 @@ module SponsoredBenefits
     include DataTablesAdapter
     include Config::BrokerAgencyHelper
 
-    before_action :find_broker_agency_profile, only: [:employers]
+    before_action :find_broker_agency_profile, only: [:employers, :new]
 
     def employers
       ::Effective::Datatables::BrokerAgencyEmployerDatatable.profile_id = @broker_agency_profile._id

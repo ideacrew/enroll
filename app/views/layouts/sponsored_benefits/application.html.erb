@@ -3,12 +3,23 @@
 <head>
   <title>SponsoredBenefits</title>
   <%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
+  <%= stylesheet_link_tag "application", :media => "all" %>
   <%= javascript_include_tag "sponsored_benefits/application" %>
+  <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
-<body>
+<body class="font">
+    <%= render '../../components/shared/header' %>
+    <%= render '../../components/shared/broker_menu', :active_tab => 'home-tab' %>
+    <div class="content <%= controller_name %> content-bottom">
+      <%#= render '../../components/shared/flash' %>
+      <div class="container">
+        <%= yield :horizontal_status %>
+      </div>
+        <%= yield %>
+    </div>
 
-<%= yield %>
+    <%= render '../../components/shared/footer' %>
 
 </body>
 </html>
