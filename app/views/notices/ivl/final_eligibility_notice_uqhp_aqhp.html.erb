@@ -71,7 +71,7 @@
     </table>
 <% end %>
 
-<% if notice.renewal_dental_enrollments.present?  %>
+<% if !notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
   <table class="total_table" border="0">
     <tbody>
       <tr>
