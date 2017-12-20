@@ -1054,6 +1054,27 @@ shop_notice_triggers = [
   },
 
   {
+    hbx_id: 'SHOP_DAG043',
+    title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
+    description: 'Group termination confirmation for advance request',
+    resource_name: 'employer',
+    event_name: 'group_advance_termination_confirmation',
+    notice_triggers: [
+      {
+        name: 'Confirmation notice to employer after group termination',
+        notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
+        notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
+        mpi_indicator: 'MPI_D043',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+           primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D092',
     title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
     description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',

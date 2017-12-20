@@ -98,7 +98,7 @@ class ShopEmployerNotice < Notice
     return if person.blank? || location.blank?
 
     notice.broker = PdfTemplates::Broker.new({
-      primary_fullname: person.full_name,
+      primary_fullname: person.full_name.titleize,
       organization: broker.legal_name,
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
