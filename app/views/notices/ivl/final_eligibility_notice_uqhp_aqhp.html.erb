@@ -69,22 +69,24 @@
       </tr>
       </tbody>
     </table>
-<% elsif notice.aqhp_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
-    <table class="total_table" border="0">
-      <tbody>
+<% end %>
+
+<% if !notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
+  <table class="total_table" border="0">
+    <tbody>
       <tr>
         <td><h3>YOUR DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
       </tr>
-      </tbody>
-    </table>
+    </tbody>
+  </table>
 
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
+  <table class="total_table" border="0">
+    <tbody>
+    <tr>
+      <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+    </tr>
+    </tbody>
+  </table>
 <% end %>
 
 <table class="total_table" border="0">

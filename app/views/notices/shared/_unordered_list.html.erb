@@ -1,11 +1,11 @@
-<table class="total_table" border="0" style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0" style="page-break-inside: avoid; display:block;">
   <tbody>
     <% if defined? previous %>
       <tr>
         <td style="padding-bottom: 6px">
           <%= previous.html_safe %>
         </td>
-      </tr>   
+      </tr>
     <% end %>
     <tr>
       <td>
@@ -22,7 +22,7 @@
                 <% end %>
               </ul>
             <% else %>
-              <%= listing.html_safe %>          
+              <%= listing.html_safe %>
             <% end %>
             </li>
           <% end %>
@@ -34,7 +34,7 @@
       <td style="padding-bottom: 0px;">
         <%= after.html_safe %>
       </td>
-    </tr>   
+    </tr>
     <% end %>
   </tbody>
 </table>

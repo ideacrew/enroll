@@ -20,8 +20,8 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
-    attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
     attribute :immigration_unverified , Array[PdfTemplates::Individual]
+    attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
     attribute :american_indian_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
@@ -54,7 +54,7 @@ module PdfTemplates
     def broker?
       return false
     end
-     
+
     def employee_notice?
       false
     end
@@ -111,12 +111,12 @@ module PdfTemplates
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
-    def latest_current_year_enrollment
-      enrollments.sort_by(&:effective_on).last
-    end
-
     def renewal_csr_enrollments
       renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
+    end
+
+    def latest_current_year_enrollment
+      enrollments.sort_by(&:effective_on).last
     end
 
     def current_dental_enrollments

@@ -36,7 +36,7 @@ class Family
   field :is_disabled, type: Boolean, default: false
   field :min_verification_due_date, type: Date, default: nil
   field :vlp_documents_status, type: String
-  
+
   belongs_to  :person
 
   # Collection of insured:  employees, consumers, residents
@@ -198,7 +198,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-   
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -1032,8 +1032,8 @@ class Family
 
   def self.min_verification_due_date_range(start_date,end_date)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
-    if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date    
-      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil) 
+    if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
+      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
     else
      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
     end
@@ -1045,19 +1045,19 @@ class Family
     self.active_family_members.each do |member|
       member.person.verification_types.each do |type|
       if member.person.consumer_role && is_document_not_verified(type, member.person)
-        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding") 
+        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
         document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
       end
       end
     end
     case
     when documents_list.include?(true) && documents_list.include?(false)
-      return "Partially Uploaded" 
-    when documents_list.include?(true) && !documents_list.include?(false)      
+      return "Partially Uploaded"
+    when documents_list.include?(true) && !documents_list.include?(false)
       if document_status_outstanding.include?("outstanding")
-        return "Partially Uploaded" 
+        return "Partially Uploaded"
       else
-        return "Fully Uploaded" 
+        return "Fully Uploaded"
       end
     when !documents_list.include?(true) && documents_list.include?(false)
       return "None"
