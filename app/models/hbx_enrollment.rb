@@ -1106,7 +1106,10 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!(edi)
+      # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+      # Move reinstated enrollment to "coverage enrolled" status if coverage begins
+      reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
     end
 
     reinstate_enrollment
@@ -1250,7 +1253,7 @@ class HbxEnrollment
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier,
                          :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier,
                          :auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
-                         :coverage_renewed, :enrolled_contingent, :unverified, :coverage_reinstated],
+                         :coverage_renewed, :enrolled_contingent, :unverified],
                     to: :coverage_enrolled, :guard => :is_shop?
 
       transitions from: [:auto_renewing, :coverage_reinstated], to: :coverage_selected
