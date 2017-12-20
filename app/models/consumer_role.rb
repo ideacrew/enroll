@@ -714,7 +714,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    local_residency_validation == "pending"
+    local_residency_validation == "pending" || is_state_resident.nil?
   end
 
   def residency_denied?

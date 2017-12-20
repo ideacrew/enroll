@@ -6,7 +6,7 @@ class AssignAttestedResidency < MongoidMigrationTask
   end
 
   def assign_attested(family_member, i)
-    puts "#{i} assigning status for #{family_member.id} ..."
+    puts "#{i} assigning status for #{family_member.id} ..." unless Rails.env.test?
     family_member.person.consumer_role.update_attributes(:local_residency_validation => "attested")
   end
 
