@@ -473,6 +473,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:primary_family).and_return(@family)
       allow(person).to receive(:employee_roles).and_return([employee_role2])
       allow(person).to receive(:hbx_staff_role).and_return(nil)
+      allow(person).to receive(:has_multiple_active_employers?).and_return(false)
     end
 
     context 'when its initial enrollment' do
