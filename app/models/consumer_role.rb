@@ -690,8 +690,9 @@ class ConsumerRole
   end
 
   def mark_residency_pending(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = nil
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => nil,
+                      :local_residency_validation => "pending")
   end
 
   def mark_residency_authorized(*args)
@@ -713,7 +714,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    is_state_resident.nil?
+    local_residency_validation == "pending"
   end
 
   def residency_denied?
@@ -892,13 +893,8 @@ class ConsumerRole
     end
   end
 
-  #check if consumer purchased a coverage and no response from hub in 24 hours
-  def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && no_changes_24_h?
-  end
-
-  def no_changes_24_h?
-    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
+  def citizenship_immigration_processing?
+    dhs_pending? || ssa_pending?
   end
 
   def sensitive_information_changed(field, person_params)
