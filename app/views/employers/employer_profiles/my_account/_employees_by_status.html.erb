@@ -4,11 +4,22 @@
   <% end %>
 <% end %>
 
+<div class="col-xs-10" style="text-align: right; top: 60px; margin-left: 15%;" >
+  <div class="row">
+    <%= pundit_span(EmployerProfile, :updateable?) %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
+  </div>
+</div>
 
-  <div class= "row effectivedatatable">
+  <div class= "effectivedatatable">
     <%= raw render_datatable(@datatable) %>
   </div>
 
+<script type="text/javascript" charset="utf-8">
+    initializeDataTables();
+    $('.buttons-csv').hide()
+    $('.buttons-excel').hide()
+</script>
 
 <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
 
@@ -19,9 +30,3 @@
     <% end %>
   </div>
 </div>
-
-<script type="text/javascript" charset="utf-8">
-    initializeDataTables();
-    $('.buttons-csv').hide()
-    $('.buttons-excel').hide()
-</script>
