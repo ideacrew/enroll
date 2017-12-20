@@ -547,19 +547,15 @@ class HbxEnrollment
   def update_renewal_coverage
     
     if is_applicable_for_renewal?
-      return if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
+      if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
+        return
+      end
+
       # We are recoring an intermidiary state. please see #10489 
-      #Expected transition: coverage_terminated => coverage_reinstated => coverage_selected => coverage_enrolled
-      self.workflow_state_transitions = [ WorkflowStateTransition.new(
+      self.workflow_state_transitions << WorkflowStateTransition.new(
               from_state: :coverage_reinstated,
-              to_state: :coverage_selected ),
-              WorkflowStateTransition.new(
-              from_state: :coverage_selected,
-              to_state: :coverage_enrolled ),
-              WorkflowStateTransition.new(
-              from_state: :coverage_enrolled,
-              to_state: :coverage_reinstated )
-            ]
+            to_state: :coverage_selected )
+    
       renewal_plan_year = self.benefit_group.employer_profile.renewing_published_plan_year
 
       if renewal_plan_year.present?
