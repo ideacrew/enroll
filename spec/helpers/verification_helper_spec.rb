@@ -397,7 +397,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe "#build_reject_reason_list" do
     shared_examples_for "reject reason dropdown list" do |type, reason_in, reason_out|
       before do
-        allow(helper).to receive(:verification_type_status).and_return "eview"
+        allow(helper).to receive(:verification_type_status).and_return "review"
       end
       it "includes #{reason_in} reject reason for #{type} verification type" do
         expect(helper.build_reject_reason_list(type)).to include reason_in
