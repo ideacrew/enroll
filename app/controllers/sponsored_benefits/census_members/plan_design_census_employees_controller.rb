@@ -3,24 +3,24 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
     before_action :set_census_members_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
-    before_action :load_plan_design_employer_profile, only: [:bulk_upload]
+    before_action :load_plan_design_benefit_application, only: [:index, :bulk_upload]
 
     def index
-      @census_members_plan_design_census_employees = CensusMembers::PlanDesignCensusEmployee.all
+      @plan_design_census_employees = @benefit_application.plan_design_census_employees
     end
 
     def show
     end
 
     def new
-      @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.new
+      @census_members_plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new
     end
 
     def edit
     end
 
     def create
-      @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.new(census_members_plan_design_census_employee_params)
+      @census_members_plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(census_members_plan_design_census_employee_params)
 
       if @census_members_plan_design_census_employee.save
         redirect_to @census_members_plan_design_census_employee, notice: 'Plan design census employee was successfully created.'
@@ -64,12 +64,13 @@ module SponsoredBenefits
 
     private
 
-    def load_plan_design_employer_profile
-      @employer_profile = SponsoredBenefits::BenefitSponsorships::PlanDesignEmployerProfile.find(params.require(:employer_profile_id))
+    def load_plan_design_benefit_application
+      @benefit_application = SponsoredBenefits::BenefitApplications::BenefitApplication.find(params.require(:benefit_application_id))
+      @employer_profile = @benefit_application.employer_profile if @benefit_application.present?
     end
     
     def set_census_members_plan_design_census_employee
-      @census_members_plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.find(params[:id])
+      @census_members_plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params[:id])
     end
 
     def census_members_plan_design_census_employee_params
