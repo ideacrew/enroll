@@ -19,7 +19,7 @@ module SponsoredBenefits
       field :entity_kind, type: String
 
 
-      embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
+      embeds_one :plan_design_profile #, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
 
     end
   end
