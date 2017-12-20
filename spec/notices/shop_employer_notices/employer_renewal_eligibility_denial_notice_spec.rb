@@ -26,7 +26,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice do
                             :notice_template => 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
                             :notice_builder => 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
                             :event_name => 'employer_renewal_eligibility_denial_notice',
-                            :mpi_indicator => 'MPI_SHOP33',
+                            :mpi_indicator => 'MPI_DRG005',
                             :title => "Employer Annual Renewal - Denial of Eligibility"})
                           }
   let(:valid_params) {{

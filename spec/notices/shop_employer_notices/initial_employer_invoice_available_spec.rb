@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
                             :notice_template => 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
                             :event_name => 'initial_employer_invoice_available',
-                            :mpi_indicator => 'MPI_SHOP20',
+                            :mpi_indicator => 'MPI_DIG022',
                             :title => "Your Invoice for Employer Sponsored Coverage is Now Available"})
                           }
     let(:valid_parmas) {{

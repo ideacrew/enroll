@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_approval_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
                             :event_name => 'initial_employer_approval',
-                            :mpi_indicator => 'MPI_SHOP2A',
+                            :mpi_indicator => 'MPI_DIG002',
                             :title => "Employer Approval Notice"})
                           }
     let(:valid_parmas) {{
