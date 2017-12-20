@@ -550,7 +550,7 @@ class HbxEnrollment
       if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
         return
       end
-
+      
       renewal_plan_year = self.benefit_group.employer_profile.renewing_published_plan_year
 
       if renewal_plan_year.present?
