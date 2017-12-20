@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :sponsored_benefits_census_members_plan_design_census_employee, class: 'SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee' do
+  factory :plan_design_census_employee, class: 'SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee' do
 
     first_name "Eddie"
     sequence(:last_name) {|n| "Vedder#{n}" }
@@ -13,7 +13,9 @@ FactoryGirl.define do
 
     address { build(:sponsored_benefits_locations_address) }
     email { build(:sponsored_benefits_email) }
-    employer_profile { build(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile)}
+
+    employer_profile  { build(:plan_design_profile) }
+    benefit_application  { build(:plan_design_benefit_application) }
 
     # association :sponsored_benefits_locations_address, strategy: :build
     # association :sponsored_benefits_email, strategy: :build

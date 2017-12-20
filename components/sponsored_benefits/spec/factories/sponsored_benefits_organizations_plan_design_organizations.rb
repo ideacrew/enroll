@@ -14,5 +14,13 @@ FactoryGirl.define do
     office_locations do
       [ build(:sponsored_benefits_office_location, :primary) ]
     end
+
+    trait :with_application do
+      after(:create) do |organization, evaluator|
+        create(:plan_design_profile, :with_application, plan_design_organization: organization)
+      end
+    end
   end
 end
+
+
