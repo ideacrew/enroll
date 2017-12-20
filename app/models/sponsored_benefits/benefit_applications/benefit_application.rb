@@ -4,7 +4,8 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorship"
+      embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      
 
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
@@ -40,7 +41,7 @@ module SponsoredBenefits
       # ##
 
       validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
-      validate :validate_application_dates
+      # validate :validate_application_dates
 
       scope :by_date_range,    ->(begin_on, end_on) { where(:"effective_period.max".gte => begin_on, :"effective_period.max".lte => end_on) }
       scope :terminated_early, ->{ where(:aasm_state.in => TERMINATED, :"effective_period.max".gt => :"terminated_on") }
@@ -88,16 +89,25 @@ module SponsoredBenefits
       def is_coverage_effective_eligible?
       end
 
+      def employer_profile
+        benefit_sponsorship.benefit_sponsorable
+      end
+
+      def plan_design_census_employees
+        CensusMembers::PlanDesignCensusEmployee.where(:benefit_application_id => self.id)
+      end
+
       class << self
         def find(id)
           application = nil
-          Organizations::PlanDesignOrganization.all.each do |pdo|
+          Organizations::PlanDesignOrganization.where(:"plan_design_profile.benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
             sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
             sponsorships.each do |sponsorship|
-              application = sponsorship.benefit_applications.select { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
+              application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
+              break if application.present?
             end
           end
-          application.first
+          application
         end
       end
 

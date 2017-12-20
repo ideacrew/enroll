@@ -22,7 +22,7 @@ module SponsoredBenefits
       field :annual_enrollment_period_begin_month_of_year, type: Integer
 
       embeds_one  :geographic_rating_area,  class_name: "SponsoredBenefits::Locations::GeographicRatingArea"
-      embeds_many :benefit_applications,    class_name: "SponsoredBenefits::BenefitApplications::AcaShopCcaBenefitApplication"
+      embeds_many :benefit_applications,    class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
       after_create :build_nested_models
 
@@ -38,7 +38,7 @@ module SponsoredBenefits
 
       def build_nested_models
         determine_geographic_rating_area if geographic_rating_area.blank?
-        build_inbox if inbox.nil?
+        # build_inbox if inbox.nil?
       end
 
       def save_inbox
