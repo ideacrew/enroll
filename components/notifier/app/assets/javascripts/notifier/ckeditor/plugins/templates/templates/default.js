@@ -20,10 +20,11 @@ CKEDITOR.addTemplates( 'default', {
 "<p>Dear #{employer_profile.employer_name}:</p>" +
 "<p>&lt;Paste Your Notice Body Here&gt;</p>" +
 "<h3>For Questions or Assistance:</h3>"+
-"<p>Please contact your broker for further assistance. You can also contact the Health Connector with any questions:</p>" +
+"<p>Please contact your broker for further assistance. You can also contact the #{site_short_name} with any questions:</p>" +
 "<ul>" +
-	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>" +
-	"<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
+	"<li>By calling #{contact_center_phone_number}</li>" +
+	"<li>TTY: #{Settings.contact_center.tty_number}</li>" +
+	"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
 "</ul>" +
 "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
 "<p>[[ if employer_profile.broker_present? ]]</p>" +
@@ -48,10 +49,9 @@ CKEDITOR.addTemplates( 'default', {
 	"</tbody>" +
 "</table>" +
 "<p>[[ else ]]</p>" +
-"<p>If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the &ldquo;Find a Broker&rdquo; link in your employer account or calling #{Settings.contact_center.phone_number}<br />" +
+"<p>If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the &ldquo;Find a Broker&rdquo; link in your employer account or calling #{contact_center_phone_number}<br />" +
 "[[ end ]]</p>" +
-"<p>___________________________________________________________________________________________________________________________________________________</p>" +
-"<p><small>This notice is being provided in accordance with 45 C.F.R. 155.720.</small></p>"
+"<p>This notice is being provided in accordance with 45 C.F.R. 155.720.</p>"
 	},
 	{
 		title: 'Employee Template',
@@ -68,10 +68,11 @@ CKEDITOR.addTemplates( 'default', {
 "<p>[[ else ]]</p>" +
 "<p>Contact your employer for further assistance.<br />" +
 "[[ end ]]</p>" +
-"<p>You can also contact the Health Connector with any questions:</p>" +
+"<p>You can also contact the #{site_short_name} with any questions:</p>" +
 "<ul>" +
-	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>" +
-	"<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
+	"<li>By calling #{contact_center_phone_number}</li>" +
+	"<li>TTY: #{Settings.contact_center.tty_number}</li>" +
+	"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
 "</ul>" +
 "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
 "[[ if employee_profile.broker_present? ]]" +
@@ -96,7 +97,6 @@ CKEDITOR.addTemplates( 'default', {
 	"</tbody>" +
 "</table>" +
 "[[ end ]]" +
-"<p>___________________________________________________________________________________________________________________________________________________</p>" +
-"<p><small>This notice is being provided in accordance with 45 C.F.R. 155.735(g).</small></p>"
+"<p>This notice is being provided in accordance with 45 C.F.R. 155.735(g).</p>"
 	}]
 } );

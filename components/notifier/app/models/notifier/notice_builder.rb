@@ -75,7 +75,7 @@ module Notifier
       options = {
         margin:  {
           top: 15,
-          bottom: 28,
+          bottom: 20,
           left: 22,
           right: 22 
         },
