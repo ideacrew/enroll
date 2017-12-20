@@ -29,8 +29,9 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
     :subject => application_event.title,
     :mpi_indicator => application_event.mpi_indicator,
     :event_name => application_event.event_name,
-    :template => application_event.notice_template
-  } }
+    :template => application_event.notice_template,
+    :options => { :hbx_enrollment => hbx_enrollment.hbx_id.to_s }
+  }}
 
   describe "New" do
     before do
@@ -67,26 +68,19 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
   end
 
   describe "append data" do
-    let(:effective_on) { Date.new(TimeKeeper.date_of_record.year, 07, 14) }
-    let(:special_enrollment_period) { [double("SpecialEnrollmentPeriod")] }
-    let(:sep) { family.special_enrollment_periods.new }
-    let(:order) { [sep] }
-    let(:enrollment) { [hbx_enrollment] }
+    let(:enrollment) { hbx_enrollment }
 
     before do
-      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
-      allow(census_employee.employee_role.person.primary_family).to receive_message_chain("households.first.hbx_enrollments.order_by").and_return(enrollment)
       @employer_notice = ShopEmployeeNotices::EePlanConfirmationSepNewHire.new(census_employee, valid_params)
-      sep.effective_on = effective_on
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       @employer_notice.deliver
     end
 
     it "should append data" do
-      expect(@employer_notice.notice.enrollment.effective_on.to_s).to eq("07/14/2017")
+      expect(@employer_notice.notice.enrollment.effective_on.to_s).to eq(enrollment.effective_on.to_s)
       expect(@employer_notice.notice.enrollment.plan.plan_name).to eq(plan.name)
-      expect(@employer_notice.notice.enrollment.employee_cost).to eq("0.00")
+      expect(@employer_notice.notice.enrollment.employee_cost).to eq("0.0")
+      expect(@employer_notice.notice.enrollment.employer_contribution).to eq("0.0")
     end
 
     it "should render ee_plan_selection_notice" do
