@@ -4,6 +4,22 @@ SponsoredBenefits::Engine.routes.draw do
     resources :plan_design_census_employees
   end
 
+  namespace :organizations do
+    resources :profiles do
+      get :employers
+      member do
+        get :new
+        post :employer_datatable
+      end
+    end
+
+    resource :office_locations do
+      member do
+        get :new
+      end
+    end
+  end
+
   # namespace :benefit_sponsorships do
   #   resources :plan_design_employer_profiles
   # end
