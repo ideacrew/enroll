@@ -2696,16 +2696,16 @@ describe HbxEnrollment, dbclean: :after_all do
   
   describe "#is_reinstated_enrollment?" do 
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored') }
-    let(:workflow_state_transition) {FactoryGirl.build(:workflow_state_transition,:from_state => "coverage_reinstated", :to_state => "coverage_selected")}
+    let(:workflow_state_transition) {FactoryGirl.create(:workflow_state_transition,:from_state => "coverage_reinstated", :to_state => "coverage_selected")}
     context 'when enrollment has been reinstated' do 
       it "should have reinstated enrollmentt" do
-        allow(hbx_enrollment).to receive(:workflow_state_transitions).and_return([workflow_state_transition])
+        allow(hbx_enrollment).to receive(workflow_state_transitions).and_return([workflow_state_transition])
         expect(hbx_enrollment.is_reinstated_enrollment?).to be_truthy
       end
     end
     context 'when enrollment has not been reinstated' do 
       it "should have reinstated enrollmentt" do
-        allow(hbx_enrollment).to receive(:workflow_state_transitions).and_return([])
+        allow(hbx_enrollment).to receive(workflow_state_transitions).and_return([])
         expect(hbx_enrollment.is_reinstated_enrollment?).to be_falsey
       end
     end
