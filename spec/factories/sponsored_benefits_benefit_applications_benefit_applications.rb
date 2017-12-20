@@ -1,5 +1,9 @@
 FactoryGirl.define do
-  factory :sponsored_benefits_benefit_applications_benefit_application, class: 'SponsoredBenefits::BenefitApplications::BenefitApplication' do
-    
+  factory :plan_design_benefit_application, class: 'SponsoredBenefits::BenefitApplications::BenefitApplication' do
+    benefit_sponsorship { FactoryGirl.build(:plan_design_benefit_sponsorship) }
+
+    effective_period { TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.next_month.beginning_of_month.next_year.prev_day }
+    open_enrollment_period { TimeKeeper.date_of_record.beginning_of_month..(TimeKeeper.date_of_record.beginning_of_month + 15.days) }
+   
   end
 end
