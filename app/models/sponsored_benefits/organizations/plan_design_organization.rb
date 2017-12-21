@@ -3,8 +3,6 @@ module SponsoredBenefits
   module Organizations
     class PlanDesignOrganization < Organization
 
-      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", foreign_key: 'customer_profile_id'
-
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
       field :owner_profile_kind,  type: String, default: "::BrokerAgencyProfile"
@@ -18,11 +16,16 @@ module SponsoredBenefits
       field :customer_profile_class_name, type: String, default: "::EmployerProfile"
       field :entity_kind, type: String
 
+      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", foreign_key: 'customer_profile_id'
+      embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::PlanDesignProfile"
 
-      embeds_one :profile
+      scope :find_by_profile,  -> (profile) { where(:"plan_design_profile._id" => BSON::ObjectId.from_string(profile)) }
+      scope :find_by_customer, -> (customer_id) { where(:"customer_profile_id" => BSON::ObjectId.from_string(customer_id)) }
+      scope :find_by_owner, -> (owner_id) { where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id)) }
 
-      scope :find_by_profile,  ->(profile){ where(:"profile._id" => BSON::ObjectId.from_string(id)).first }
-
+      def employer_profile
+        ::EmployerProfile.find(customer_profile_id)
+      end
     end
   end
 end
