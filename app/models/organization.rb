@@ -200,7 +200,7 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
-  def mailing_address
+  def primary_mailing_address
     office_locations.map(&:address).detect{|add| add.kind == "mailing"}
   end
 

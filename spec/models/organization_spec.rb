@@ -390,22 +390,22 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
-  context "mailing_address" do
+  context "primary_mailing_address" do
     let!(:organization) {FactoryGirl.build(:organization)}
     let!(:office_location) {FactoryGirl.build(:office_location, :with_mailing_address)}
 
     before :each do
       organization.office_locations = [office_location]
-      organization.mailing_address
+      organization.primary_mailing_address
     end
 
-    it 'should return a valid mailing_address for organization' do
-      expect(organization.mailing_address).to eq office_location.address
-      expect(organization.mailing_address.kind).to eq "mailing"
+    it 'should return a valid primary_mailing_address for organization' do
+      expect(organization.primary_mailing_address).to eq office_location.address
+      expect(organization.primary_mailing_address.kind).to eq "mailing"
     end
 
     it "should not return an invalid address" do
-      expect(organization.mailing_address.kind).not_to eq "branch"
+      expect(organization.primary_mailing_address.kind).not_to eq "branch"
     end
   end
 
