@@ -49,4 +49,10 @@ class ConsumerRolePolicy < ApplicationPolicy
     return @user.person.hbx_staff_role.permission.can_view_application_types if (@user.person && @user.person.hbx_staff_role)
     return false
   end
+
+  def access_new_consumer_application_sub_tab?
+    return @user.person.hbx_staff_role.permission.access_new_consumer_application_sub_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
 end
