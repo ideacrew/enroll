@@ -26,7 +26,7 @@
               active_tab: active_tab,
               remote: true,
               pundit_object: HbxProfile,
-              pundit_method: :access_outstanding_verification_sub_tab?
+              pundit_method: :can_access_outstanding_verification_sub_tab?
             } %>
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
               tab_name: 'new-consumer-application',
@@ -35,7 +35,7 @@
               active_tab: active_tab,
               remote: false,
               pundit_object: ConsumerRole,
-              pundit_method: :access_new_consumer_application_sub_tab?
+              pundit_method: :can_access_new_consumer_application_sub_tab?
             } %>
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
               tab_name: 'identity_verification',
@@ -44,7 +44,7 @@
               active_tab: active_tab,
               remote: true,
               pundit_object: HbxProfile,
-              pundit_method: :access_identity_verification_sub_tab?
+              pundit_method: :can_access_identity_verification_sub_tab?
             } %>
             <% if policy(:family).hbx_super_admin_visible? %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {

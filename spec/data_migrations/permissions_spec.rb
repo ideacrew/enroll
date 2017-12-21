@@ -161,9 +161,9 @@ describe DefinePermissions, dbclean: :after_each do
   end
 
   describe 'update permissions for hbx staff role' do
-    let(:given_task_name) { "hbx_admin_access_new_consumer_application_sub_tab" }
-    let(:given_task_name) { "hbx_admin_access_outstanding_verification_sub_tab" }
-    let(:given_task_name) { "hbx_admin_access_identity_verification_sub_tab" }
+    let(:given_task_name) { "hbx_admin_can_access_new_consumer_application_sub_tab" }
+    let(:given_task_name) { "hbx_admin_can_access_outstanding_verification_sub_tab" }
+    let(:given_task_name) { "hbx_admin_can_access_identity_verification_sub_tab" }
     let(:given_task_name) { "hbx_admin_can_complete_resident_application" }
 
     describe "given a task name" do
@@ -191,24 +191,24 @@ describe DefinePermissions, dbclean: :after_each do
       hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
       hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
     end
-    it "updates hbx_admin_access_new_consumer_application_sub_tab to true" do
-      subject.hbx_admin_access_new_consumer_application_sub_tab
+    it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
+      subject.hbx_admin_can_access_new_consumer_application_sub_tab
       expect(Person.all.count).to eq(5)
-      expect(@hbx_staff_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
     end
-    it "updates hbx_admin_access_outstanding_verification_sub_tab to true" do
-      subject.hbx_admin_access_outstanding_verification_sub_tab
+    it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
+      subject.hbx_admin_can_access_outstanding_verification_sub_tab
       expect(Person.all.count).to eq(5)
-      expect(@hbx_staff_person.hbx_staff_role.permission.access_outstanding_verification_sub_tab).to be true
-      expect(@hbx_read_only_person.hbx_staff_role.permission.access_outstanding_verification_sub_tab).to be true
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
+      expect(@hbx_read_only_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
     end
-    it "updates hbx_admin_access_identity_verification_sub_tab to true" do
-      subject.hbx_admin_access_identity_verification_sub_tab
+    it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
+      subject.hbx_admin_can_access_identity_verification_sub_tab
       expect(Person.all.count).to eq(5)
-      expect(@hbx_staff_person.hbx_staff_role.permission.access_identity_verification_sub_tab).to be true
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
     end
     it "updates hbx_admin_can_complete_resident_application to true" do
       subject.hbx_admin_can_complete_resident_application
