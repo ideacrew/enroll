@@ -674,7 +674,8 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
+  {
     hbx_id: 'SHOP36',
     title: 'Special Enrollment Period Approval',
     description: 'SEP request by Employee accepted when an eligiblity determination is reached',
@@ -715,10 +716,7 @@ shop_notice_triggers = [
         }
       }
     ]
-  },
-=======
   }
->>>>>>> refs #15206 EE SEP Requested (Accepted)
 ]
 
 
