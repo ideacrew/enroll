@@ -38,7 +38,7 @@
           existing_employers = Organization.by_broker_agency_profile(profile_id)
 
           # Prospective
-          prospective_employers = SponsoredBenefits::Organizations::PlanDesignOrganization.by_broker_agency_profile_id(profile_id)
+          prospective_employers = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(profile_id)
 
           return prospective_employers #for now
         end

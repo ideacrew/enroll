@@ -1,7 +1,8 @@
 # Broker-owned model to manage attributes of the prospective of existing employer
 module SponsoredBenefits
   module Organizations
-    class PlanDesignOrganization < Organization
+    class PlanDesignOrganization
+      include Concerns::OrganizationConcern
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: :plan_design_organization
 
@@ -20,17 +21,14 @@ module SponsoredBenefits
 
       embeds_one :profile
 
-      scope :find_by_profile,  ->(profile){ where(:"profile._id" => BSON::ObjectId.from_string(id)).first }
+      scope :find_by_profile,  -> (profile) { where(:"profile._id" => BSON::ObjectId.from_string(profile)) }
+      scope :find_by_customer, -> (customer_id) { where(:"customer_profile_id" => BSON::ObjectId.from_string(customer_id)) }
+      scope :find_by_owner, -> (owner_id) { where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id)) }
 
       def employer_profile
         ::EmployerProfile.find(customer_profile_id)
       end
 
-      class << self
-        def by_broker_agency_profile_id(id)
-          SponsoredBenefits::Organizations::Organization.where('_type' => 'SponsoredBenefits::Organizations::PlanDesignOrganization')
-        end
-      end
     end
   end
 end

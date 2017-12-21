@@ -12,14 +12,7 @@ module SponsoredBenefits
       class << self
 
         def find(id)
-          found_org = nil
-          SponsoredBenefits::Organizations::Organization.all.each do |org|
-            next unless org.broker_agency_profile.present?
-            org.broker_agency_profile.plan_design_organizations.each do |pdo|
-              found_org = org if pdo.owner_profile_id == BSON::ObjectId.from_string(id)
-            end
-          end
-          found_org.becomes(SponsoredBenefits::Organizations::PlanDesignOrganization)
+          SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(id).first
         end
 
         def assign_employer(broker_agency:, employer:, office_locations:)
