@@ -1,5 +1,8 @@
 SponsoredBenefits::Engine.routes.draw do
 
+  namespace :benefit_sponsorships do
+    resources :plan_design_proposals
+  end
   namespace :census_members do
     resources :plan_design_census_employees
   end
