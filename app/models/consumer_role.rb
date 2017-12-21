@@ -8,6 +8,8 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
+  include Mongoid::History::Trackable
+  include DocumentsVerificationStatus
 
   embedded_in :person
 
@@ -103,7 +105,11 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable
+  embeds_many :vlp_documents, as: :documentable do
+    def uploaded
+      @target.select{|document| document.identifier }
+    end
+  end
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
 
@@ -118,7 +124,7 @@ class ConsumerRole
 
   validates :citizen_status,
     allow_blank: true,
-    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+    inclusion: { in: CITIZEN_STATUS_KINDS + ACA_ELIGIBLE_CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
   validates :citizenship_result,
     allow_blank: true,
@@ -141,6 +147,37 @@ class ConsumerRole
   after_initialize :setup_lawful_determination_instance
 
   before_validation :ensure_validation_states, on: [:create, :update]
+
+  track_history   :on => [:five_year_bar,
+                          :aasm_state,
+                          :marital_status,
+                          :ssn_validation,
+                          :native_validation,
+                          :is_state_resident,
+                          :local_residency_validation,
+                          :ssn_update_reason,
+                          :lawful_presence_update_reason,
+                          :native_update_reason,
+                          :residency_update_reason,
+                          :is_applying_coverage,
+                          :ssn_rejected,
+                          :native_rejected,
+                          :lawful_presence_rejected,
+                          :residency_rejected],
+                  :scope => :person,
+                  :modifier_field => :modifier,
+                  :version_field => :tracking_version,
+                  :track_create  => true,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => true
+
+  # used to track history verification actions can be used on any top node model to build history of changes.
+  # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model
+  # might be encapsulated into new verification model further with verification code refactoring
+  embeds_many :history_action_trackers, as: :history_trackable
+
+  #list of the collections we want to track under consumer role model
+  COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
   def ivl_coverage_selected
     if unverified?
@@ -175,6 +212,10 @@ class ConsumerRole
   #check if consumer has uploaded documents for verification type
   def has_docs_for_type?(type)
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
+  end
+
+  def has_outstanding_documents?
+    self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
   end
 
   #use this method to check what verification types needs to be included to the notices
@@ -709,6 +750,8 @@ class ConsumerRole
         update_attributes(:lawful_presence_rejected => false)
       when "American Indian Status"
         update_attributes(:native_rejected => false)
+      when "DC Residency"
+        update_attributes(:residency_rejected => false)
     end
   end
 
@@ -796,8 +839,7 @@ class ConsumerRole
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
       when "DC Residency"
-        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record)
-        mark_residency_authorized
+        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record, :local_residency_validation => "valid")
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
       when "American Indian Status"
@@ -816,11 +858,11 @@ class ConsumerRole
 
   def is_type_verified?(type)
     case type
-      when "Residency"
+      when "DC Residency"
         residency_verified?
-      when 'Social Security Number'
+      when "Social Security Number"
         ssn_verified?
-      when 'American Indian Status'
+      when "American Indian Status"
         native_verified?
       else
         lawful_presence_verified?

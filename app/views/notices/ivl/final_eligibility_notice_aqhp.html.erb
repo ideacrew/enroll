@@ -53,7 +53,7 @@
 <% end %>
 
 <% notice.tax_households.each do |thh|%>
-  <% if thh.max_aptc.present? %>
+  <% if notice.individuals.any?{ |ind| ind.is_ia_eligible == true } && thh.max_aptc.present? %>
     <% if thh.max_aptc > 0 %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
         contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
@@ -66,7 +66,7 @@
   <% end %>
 <% end %>
 
-<% if notice.tax_hh_with_csr.present? %>
+<% if notice.tax_hh_with_csr.present? && notice.individuals.any?{ |ind| ind.is_csr_eligible == true } %>
   <% notice.tax_hh_with_csr.each do |hh_csr|%>
     <% case hh_csr.csr_percent_as_integer %>
     <% when 73 %>
@@ -88,6 +88,15 @@
   <% end %>
   <%= render partial: 'notices/shared/custom_listing', locals: {
   listing: "<strong>What you need to do next:</strong> Review your plan, and decide if you want to keep it. If you want to keep your plan, you don’t need to do anything. You’ll automatically be enrolled in the plan shown for coverage beginning January 1, #{notice.coverage_year}. If you want to change plans, shop for a new plan during open enrollment."} %>
+<% end %>
+
+<% if notice.uqhp_or_non_magi_medicaid_individuals.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
+    listings: notice.uqhp_or_non_magi_medicaid_individuals} %>
+
+  <%= render partial: 'notices/shared/custom_listing', locals: {
+  listing: "<strong>What you need to do next:</strong> Review your plan, and decide if you want to keep it. If you want to keep your plan, you don’t need to do anything. You’ll automatically be enrolled in the plan shown for coverage beginning January 1, #{notice.coverage_year}. If you want to change plans, shop for a new plan during open enrollment. "} %>
 <% end %>
 
 <% if notice.ineligible_applicants.present? %>

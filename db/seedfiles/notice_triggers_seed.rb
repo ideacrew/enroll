@@ -64,7 +64,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP2',
+    hbx_id: 'SHOP_D002',
     title: 'Employer Approval Notice',
     description: 'Application to Offer Group Health Coverage in DC Health Link',
     resource_name: 'employer',
@@ -74,7 +74,7 @@ shop_notice_triggers = [
         name: 'Initial Employer SHOP Approval Notice',
         notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_SHOP2A',
+        mpi_indicator: 'SHOP_D002',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -298,7 +298,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP15',
+    hbx_id: 'SHOPD015',
     title: 'Notice of Low Enrollment - Action Needed',
     description: 'Notifies all the employers who doesnt meet minimum participation requirement',
     resource_name: 'employer',
@@ -308,7 +308,7 @@ shop_notice_triggers = [
         name: 'Low Enrollment Notice',
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_SHOP15',
+        mpi_indicator: 'MPI_D015',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -592,7 +592,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP33',
+    hbx_id: 'SHOP_D005',
     title: 'Employer Annual Renewal - Denial of Eligibility',
     description: 'denial of eligibility for employer as failed resindency',
     resource_name: 'employer',
@@ -602,7 +602,7 @@ shop_notice_triggers = [
         name: 'Employer Annual Renewal - Denial of Eligibility',
         notice_template: 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
         notice_builder: 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
-        mpi_indicator: 'MPI_SHOP33',
+        mpi_indicator: 'SHOP_D005',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -666,6 +666,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
         notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
         mpi_indicator: 'MPI_SHOP10066',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP_D092',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',
+    resource_name: 'employee_role',
+    event_name: 'notify_renewal_employees_dental_carriers_exiting_shop',
+    notice_triggers: [
+      {
+        name: 'Renewal EEs Dental Carriers are Exiting SHOP market notice',
+        notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
+        notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
+        mpi_indicator: 'SHOP_D092',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

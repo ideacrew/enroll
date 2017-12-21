@@ -35,7 +35,7 @@ class Insured::PlanShoppingsController < ApplicationController
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
-    plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
+    plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id,params[:market_kind])
 
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
