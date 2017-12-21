@@ -68,12 +68,12 @@ module Notifier
 
     def enrollment_employee_responsible_amount
       return if enrollment.blank?
-      merge_model.enrollment.employee_responsible_amount = number_to_currency(current_premium(enrollment.total_employee_cost), precision: 2)
+      merge_model.enrollment.employee_responsible_amount = number_to_currency(enrollment.total_employee_cost, precision: 2)
     end
 
     def enrollment_employer_responsible_amount
       return if enrollment.blank?
-      merge_model.enrollment.employer_responsible_amount = number_to_currency(current_premium(enrollment.total_employer_contribution), precision: 2)
+      merge_model.enrollment.employer_responsible_amount = number_to_currency(enrollment.total_employer_contribution, precision: 2)
     end
 
     def census_employee
