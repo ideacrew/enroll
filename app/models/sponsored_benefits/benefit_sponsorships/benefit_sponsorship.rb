@@ -33,7 +33,7 @@ module SponsoredBenefits
       field :initial_enrollment_period, type: Range
       field :annual_enrollment_period_begin_month_of_year, type: Integer
 
-      # embeds_many :benefit_applications, class_name = "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
       # after_create :build_nested_models
 
