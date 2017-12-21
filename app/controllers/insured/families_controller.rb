@@ -106,7 +106,6 @@ class Insured::FamiliesController < FamiliesController
       action_params.merge!({change_plan: "change_plan"})
     end
 
-
     emp_role_id = params[:employee_role_id]
     employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
 

@@ -60,6 +60,17 @@ RSpec.describe Insured::FamilyMembersController do
         expect(employee_role.census_employee).to receive(:trigger_notice).with("ee_sep_request_accepted_notice")
         get :index, :employee_role_id => employee_role_id, qle_id: qle.id, effective_on_kind: "date_of_event", qle_date: date.yesterday, effective_on_date: date - 10.days
       end
+
+      it "should trigger notice when employee has only one active employee role" do
+        expect(employee_role.census_employee).to receive(:trigger_notice).with("ee_sep_request_accepted_notice")
+        get :index, :employee_role_id => employee_role_id, qle_id: qle.id, effective_on_kind: "date_of_event", qle_date: date.yesterday, effective_on_date: date - 10.days
+      end
+
+      it "should not trigger notice when employee has multiple active employee role" do
+        allow(person).to receive(:has_multiple_active_employers?).and_return(true)
+        expect(employee_role.census_employee).not_to receive(:trigger_notice)
+        get :index, :employee_role_id => employee_role_id, qle_id: qle.id, effective_on_kind: "date_of_event", qle_date: date.yesterday, effective_on_date: date - 10.days
+      end
     end
 
     context 'with no referer' do
