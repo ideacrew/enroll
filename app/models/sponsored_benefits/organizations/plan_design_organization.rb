@@ -21,6 +21,8 @@ module SponsoredBenefits
 
       embeds_one :profile
 
+      scope :find_by_profile,  ->(profile){ where(:"profile._id" => BSON::ObjectId.from_string(id)).first }
+
     end
   end
 end
