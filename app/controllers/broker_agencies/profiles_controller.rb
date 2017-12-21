@@ -198,6 +198,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
         broker_fires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s)
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
+        broker_fires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s)
       end
       @broker_agency_profile.save
       #update_ga_for_employers(@broker_agency_profile, old_default_ga)
@@ -497,7 +498,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def check_general_agency_profile_permissions_set_default
-    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    # @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_set_default_ga(self, @broker_agency_profile)
   end
