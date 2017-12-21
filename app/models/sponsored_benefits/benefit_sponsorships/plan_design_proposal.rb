@@ -4,7 +4,7 @@ module SponsoredBenefits
     include Mongoid::Timestamps
 
     field :title, type: String
-    field :cliam_date, type: Date
+    field :claim_date, type: Date
     field :submitted_date, type: Date
     field :benefit_sponsorship_id, type: BSON::ObjectId
 
