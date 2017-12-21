@@ -95,7 +95,7 @@ module ModelEvents
         # renewal_application with enrolling state, reached open-enrollment end date with minimum participation and non-owner-enrolle i.e 15th of month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month
           is_renewal_employer_open_enrollment_completed = true
-        end  
+        end
 
         # renewal_application with un-published plan year, send notice 2 days prior to the publish due date i.e 13th of the month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
