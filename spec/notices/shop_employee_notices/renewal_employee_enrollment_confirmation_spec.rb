@@ -21,7 +21,7 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
     :notice_template => 'notices/shop_employee_notices/renewal_employee_enrollment_confirmation',
     :notice_builder => 'ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation',
     :event_name => 'renewal_employee_enrollment_confirmation',
-    :mpi_indicator => 'MPI_SHOPDRE076',
+    :mpi_indicator => 'SHOP_D076',
     :title => "Employee Enrollment Confirmation"})
   }
 
