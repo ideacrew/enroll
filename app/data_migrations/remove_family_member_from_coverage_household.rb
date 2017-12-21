@@ -8,7 +8,6 @@ class RemoveFamilyMemberFromCoverageHousehold < MongoidMigrationTask
       raise "Invalid hbx_id of person"
     else
       family = person.primary_family
-      binding.pry
       if family.present?
           family.active_household.family_members.each do |i|
             if i.id.to_s == family_member_id
