@@ -943,26 +943,6 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
-    hbx_id: 'SHOP36',
-    title: 'Special Enrollment Period Approval',
-    description: 'SEP request by Employee accepted when an eligiblity determination is reached',
-    resource_name: 'employee_role',
-    event_name: 'ee_sep_request_accepted_notice',
-    notice_triggers: [
-      {
-        name: 'EE SEP Requested Accepted',
-        notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
-        notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
-        mpi_indicator: 'MPI_SHOP36',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
   },
 
   {
@@ -1096,6 +1076,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_D092',
     title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
@@ -1108,6 +1089,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
         notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
         mpi_indicator: 'SHOP_D092',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP_D076',
+    title: 'Employee Enrollment Confirmation',
+    description: 'We will notify renewal EEs that their ER successfully completed open enrollment and they are going to be enrolled in their selected plan for the upcoming PY',
+    resource_name: 'employee_role',
+    event_name: 'renewal_employee_enrollment_confirmation',
+    notice_triggers: [
+      {
+        name: 'Notify Employees Enrollment confirmation',
+        notice_template: 'notices/shop_employee_notices/renewal_employee_enrollment_confirmation',
+        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation',
+        mpi_indicator: 'SHOP_D076',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
