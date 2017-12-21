@@ -1,7 +1,7 @@
 And(/^admin has navigated into the NEW CONSUMER APPLICATION$/) do
 	visit exchanges_hbx_profiles_root_path
 	click_link "Families"
-	page.find('.interaction-click-control-new-consumer-application').click
+	page.find('.interaction-click-control-new-consumer-application').trigger('click')
 	visit begin_consumer_enrollment_exchanges_agents_path
 end
 

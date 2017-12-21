@@ -173,4 +173,20 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_view_application_types
     Permission.hbx_staff.update_attributes!(can_view_application_types: true)
   end
+
+  def hbx_admin_access_new_consumer_application_sub_tab
+    Permission.hbx_staff.update_attributes!(access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_supervisor.update_attributes!(access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_tier1.update_attributes!(access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_tier2.update_attributes!(access_new_consumer_application_sub_tab: true)
+  end
+
+  def hbx_admin_access_identity_verification_sub_tab
+    Permission.hbx_staff.update_attributes!(access_identity_verification_sub_tab: true)
+  end
+
+  def hbx_admin_access_outstanding_verification_sub_tab
+    Permission.hbx_staff.update_attributes!(access_outstanding_verification_sub_tab: true)
+    Permission.hbx_read_only.update_attributes!(access_outstanding_verification_sub_tab: true)
+  end
 end
