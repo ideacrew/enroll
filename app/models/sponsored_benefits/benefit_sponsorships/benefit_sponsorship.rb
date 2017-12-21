@@ -1,4 +1,15 @@
-# Manage enrollment-related behavior for a benefit-sponsoring organization (e.g. employers, HBX, etc.)
+# Manage enrollment-related behavior for a benefit-sponsoring organization (e.g. employers, congress, HBX, etc.)
+# The model design assumes a once annual enrollment period and effective date.  For scenarios where there's a once-yearly
+# open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
+# cycles.  Scenarios where enollments are conducted on a rolling monthly basis are also supported.
+
+# OrganzationProfiles will typically embed many BenefitSponsorships.  A new BenefitSponsorship is in order when 
+# a significant change occurs, such as the following supported scenarios:
+# - Benefit Sponsor (employer) terminates and later returns after some elapsed period
+# - Existing Benefit Sponsor changes effective date
+
+# Referencing a new BenefitSponsorship helps ensure integrity on subclassed and associated data models and
+# enables history tracking as part of the models structure 
 module SponsoredBenefits
   module BenefitSponsorships
     class BenefitSponsorship
@@ -10,34 +21,34 @@ module SponsoredBenefits
       # Obtain this value from site settings
       field :benefit_market, type: Symbol, default: :aca_shop_cca
 
-      ## Sponsor plan year and enrollment period examples
-      # DC IVL Initial & Renwal:  Jan - Dec
-      # DC/MA SHOP Initial & Renewal: Monthly rolling
+      ## Example sponsor enrollment periods
+      # DC Individual Market Initial & Renewal:  Jan 1 - Dec 31
+      # DC/MA SHOP Market Initial & Renewal: Monthly rolling
+      # Congress: Jan 1 - Dec 31
       # GIC Initial: Monthly rolling
-      # GIC Renewal: July - June
-
+      # GIC Renewal: July 1 - June 30
       # Enrollment periods are stored locally to enable sponsor-level exceptions
+
       # Store separate initial and on-going enrollment renewal values to handle mid-year start situations
       field :initial_enrollment_period, type: Range
       field :annual_enrollment_period_begin_month_of_year, type: Integer
 
-      embeds_one  :geographic_rating_area,  class_name: "SponsoredBenefits::Locations::GeographicRatingArea"
-      embeds_many :benefit_applications,    class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
-      after_create :build_nested_models
+      # after_create :build_nested_models
 
-      def determine_geographic_rating_area
-        build_geographic_rating_area if geographic_rating_area.blank?
-
-        ## Use Zip and County to look up primary office geographic rating area
-      end
+      # Prevent changes to immutable fields. Instantiate a new model instead
+      # before_validation { 
+      #     if persisted?
+      #       false if initial_enrollment_period.changed? || annual_enrollment_period_begin_month_of_year.changed
+      #     end
+      #   }
 
       def census_employees
         PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
       end
 
       def build_nested_models
-        determine_geographic_rating_area if geographic_rating_area.blank?
         # build_inbox if inbox.nil?
       end
 
