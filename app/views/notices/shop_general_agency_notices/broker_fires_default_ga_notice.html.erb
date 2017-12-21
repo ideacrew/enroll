@@ -30,7 +30,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', locals: {
- content: "This notice is to inform you that #{notice.primary_fullname} has been removed as the default general agency for #{notice.general_agency.broker_fullname} as of #{TimeKeeper.date_of_record}.  You will no longer be authorized to access #{notice.general_agency.broker_fullname}’s #{Settings.site.short_name} Account or take action on behalf of any clients of #{notice.general_agency.broker_fullname}. If you were assigned as the General Agency for any clients of #{notice.general_agency.broker_fullname}, you will receive a separate notification specific to those groups"} %>
+ content: "This notice is to inform you that #{notice.primary_fullname} has been removed as the default general agency for #{notice.general_agency.broker_fullname} as of #{TimeKeeper.date_of_record}. You will no longer be authorized to access #{notice.general_agency.broker_fullname}’s #{Settings.site.short_name} Account or take action on behalf of any clients of #{notice.general_agency.broker_fullname}.If you were assigned as the General Agency for any clients of #{notice.general_agency.broker_fullname},you will receive a separate notification specific to those groups"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
@@ -39,6 +39,6 @@
  content: "Please contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["By calling #{notice.hbe.phone}.",
+  ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
