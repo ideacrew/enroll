@@ -51,15 +51,16 @@ module SponsoredBenefits
         helper_method :sponsor, :broker
 
         def broker
-          @broker ||= BenefitSponsorships::BenefitSponsorship.find_broker_for_sponsorship(params[:benefit_sponsorship_id])
+          @broker ||= SponsoredBenefits::Organizations::BrokerAgencyProfile.find(params[:broker_id])
         end
 
         def sponsor
-          @sponsor ||= benefit_sponsorship.benefit_sponsorable
+          @sponsor ||= ::EmployerProfile.find(params[:client_id])
         end
 
         def benefit_sponsorship
-          @benefit_sponsorship ||= BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
+          broker.benefit_sponsorships.first || broker.benefit_sponsorships.new
+          #@benefit_sponsorship ||= BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
         end
 
         def benefit_sponsorship_applications

@@ -9,8 +9,7 @@
   <%= csrf_meta_tags %>
 </head>
 <body class="font">
-    <%= render '../../components/shared/header' %>
-    <%= render '../../components/shared/broker_menu', :active_tab => 'home-tab' %>
+
     <div class="content <%= controller_name %> content-bottom">
       <%#= render '../../components/shared/flash' %>
       <div class="container">
@@ -18,8 +17,6 @@
       </div>
         <%= yield %>
     </div>
-
-    <%= render '../../components/shared/footer' %>
 
 </body>
 </html>
