@@ -143,7 +143,7 @@ module InvoiceHelper
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Questions? Call the Health Connector Customer Service at 888-813-9220, go online to MAhealthconnector.org, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
+        @pdf.text_box "Questions? Call the Health Connector Customer Service at 888-813-9220, go online to #{site_website_name}, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
       }
     end
 
@@ -274,23 +274,23 @@ module InvoiceHelper
     end
 
     @pdf.move_down 72
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts #{site_short_name}. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
+    @pdf.text_box "#{site_invoice_bill_url}", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
+    @pdf.text_box "#{contact_center_mailing_address_name}", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
+    @pdf.text_box "#{contact_center_address_one}", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
+    @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call the Massachusetts #{site_short_name} Customer Service at 888-813-9220 (TTY #{contact_center_tty_number})", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -305,9 +305,9 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 112], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 122]
 
-    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  72]
-    @pdf.text_box "PO Box 780833", :at => [320,  60]
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  48]
+    @pdf.text_box "#{contact_center_mailing_address_name}", :at => [320,  72]
+    @pdf.text_box "#{contact_center_address_one}", :at => [320,  60]
+    @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [320,  48]
 
     address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 72]
