@@ -54,12 +54,13 @@ module SponsoredBenefits
       accepts_nested_attributes_for :office_locations, :broker_agency_profile, :carrier_profile, :hbx_profile
       # accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
-      validates_presence_of :legal_name, :fein, :office_locations
+      validates_presence_of :legal_name
 
       validates :fein,
+        presence: false,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
         numericality: true,
-        uniqueness: true
+        uniqueness: true 
 
       validate :office_location_kinds
 
