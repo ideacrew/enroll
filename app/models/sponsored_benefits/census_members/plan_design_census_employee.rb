@@ -23,6 +23,8 @@ module SponsoredBenefits
       cascade_callbacks: true,
       validate: true
 
+      accepts_nested_attributes_for :census_dependents
+
       validates_presence_of :dob
 
       validate :active_census_employee_is_unique

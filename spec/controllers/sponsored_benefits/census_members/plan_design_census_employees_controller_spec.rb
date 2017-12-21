@@ -50,7 +50,7 @@ module SponsoredBenefits
 
     describe "GET #index" do
       it "returns a success response" do
-        get :index, {benefit_application_id: census_employee.benefit_application_id}, valid_session
+        get :index, { benefit_application_id: census_employee.benefit_application_id }, valid_session
         expect(response).to be_success
       end
     end
@@ -80,6 +80,15 @@ module SponsoredBenefits
 
     describe "POST #create" do
       context "with valid params" do
+        # let(:valid_attributes) {
+        #   {
+        #     first_name: 'Angus',
+        #     last_name: 'Irvine',
+        #     dob: "06/06/1983",
+        #     employee_relationship: "employee"
+        #   }
+        # }
+
         it "creates a new CensusMembers::PlanDesignCensusEmployee" do
           expect {
             post :create, {:census_members_plan_design_census_employee => valid_attributes}, valid_session

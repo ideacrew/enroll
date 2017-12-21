@@ -2,7 +2,7 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
-    before_action :set_census_members_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
+    before_action :set_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
     before_action :load_plan_design_benefit_application, only: [:index, :bulk_upload]
 
     def index
@@ -13,32 +13,32 @@ module SponsoredBenefits
     end
 
     def new
-      @census_members_plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new
+      @plan_design_census_employee = SponsoredBenefits::Forms::PlanDesignCensusEmployee.new
     end
 
     def edit
     end
 
     def create
-      @census_members_plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(census_members_plan_design_census_employee_params)
+      @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(census_members_plan_design_census_employee_params)
 
-      if @census_members_plan_design_census_employee.save
-        redirect_to @census_members_plan_design_census_employee, notice: 'Plan design census employee was successfully created.'
+      if @plan_design_census_employee.save
+        redirect_to @plan_design_census_employee, notice: 'Plan design census employee was successfully created.'
       else
         render :new
       end
     end
 
     def update
-      if @census_members_plan_design_census_employee.update(census_members_plan_design_census_employee_params)
-        redirect_to @census_members_plan_design_census_employee, notice: 'Plan design census employee was successfully updated.'
+      if @plan_design_census_employee.update(census_members_plan_design_census_employee_params)
+        redirect_to @plan_design_census_employee, notice: 'Plan design census employee was successfully updated.'
       else
         render :edit
       end
     end
 
     def destroy
-      @census_members_plan_design_census_employee.destroy
+      @plan_design_census_employee.destroy
       redirect_to census_members_plan_design_census_employees_url, notice: 'Plan design census employee was successfully destroyed.'
     end
 
@@ -70,7 +70,7 @@ module SponsoredBenefits
     end
     
     def set_census_members_plan_design_census_employee
-      @census_members_plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params[:id])
+      @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params[:id])
     end
 
     def census_members_plan_design_census_employee_params
