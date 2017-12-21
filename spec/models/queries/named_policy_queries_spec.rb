@@ -83,7 +83,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
         )
     end
 
-    context ".shop_monthly_enrollments" do
+    context ".shop_monthly_enrollments", dbclean: :after_each do
 
       context 'When passed employer FEINs and plan year effective date', dbclean: :after_each do
 
@@ -100,25 +100,45 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
           expect(result & quiet_enrollment_hbx_ids).to eq []
         end
 
-        context 'When enrollments purchased with QLE' do
+        context 'When renewal enrollments purchased with QLE and not in quiet period' do
 
-          let!(:qle_coverages) {
+          let(:qle_coverages) {
             renewing_employees[0..4].inject([]) do |enrollments, ce|
               family = ce.employee_role.person.primary_family
-              enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, enrollment_kind: 'special_enrollment')
+              enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 1.month + 8.days, enrollment_kind: 'special_enrollment')
             end
           }
 
-          let!(:qle_coverages_in_quiet_period) {
-            renewing_employees[0..4].inject([]) do |enrollments, ce|
-              family = ce.employee_role.person.primary_family
-              enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: ce.renewal_benefit_group_assignment.plan_year.open_enrollment_end_on + 1.day, enrollment_kind: 'special_enrollment')
+          before do
+            renewing_employees[0..4].each do |ce|
+              ce.employee_role.person.primary_family.active_household.hbx_enrollments.each { |enr| enr.cancel_coverage! }
             end
-          }
+
+            qle_coverages
+          end
 
           it 'should return QLE enrollments' do
             result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
             expect((result & qle_coverages.map(&:hbx_id)).sort).to eq qle_coverages.map(&:hbx_id).sort
+          end
+        end
+
+        context 'When renewal enrollments purchased with QLE and in quiet period' do
+
+
+          let(:qle_coverages_in_quiet_period) {
+            renewing_employees[0..4].inject([]) do |enrollments, ce|
+              family = ce.employee_role.person.primary_family
+              enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: ce.renewal_benefit_group_assignment.plan_year.open_enrollment_end_on + 8.day, enrollment_kind: 'special_enrollment')
+            end
+          }
+
+          before do
+            renewing_employees[0..4].each do |ce|
+              ce.employee_role.person.primary_family.active_household.hbx_enrollments.each { |enr| enr.cancel_coverage! }
+            end
+
+            qle_coverages_in_quiet_period
           end
 
           it 'should not return QLE enrollments that are in quiet period' do
@@ -129,11 +149,17 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
 
         context 'When both active and passive renewal present' do
 
-          let!(:actively_renewed_coverages) {
+          let(:actively_renewed_coverages) {
             renewing_employees[0..4].inject([]) do |enrollments, ce|
-              enrollments << create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days)
+              enrollments << create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 1.month + 8.days)
             end
           }
+
+          before do
+            renewing_employees[0..4].each do |ce|
+              ce.employee_role.person.primary_family.active_household.hbx_enrollments.where(:"benefit_group_id".in => [ce.renewal_benefit_group_assignment.benefit_group_id]).each { |enr| enr.cancel_coverage! }
+            end
+          end
 
           it 'should return active renewal' do
             active_renewal_hbx_ids = actively_renewed_coverages.map(&:hbx_id).sort

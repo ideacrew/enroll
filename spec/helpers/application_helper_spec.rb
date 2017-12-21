@@ -309,7 +309,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should return true" do
       broker_agency_profile.default_general_agency_profile = general_agency_profile
-      expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq true
+      expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq tdb/seedfiles/notice_triggers_seed.rbrue
     end
 
     it "should return false when the default_general_agency_profile of broker_agency_profile is not general_agency_profile" do
