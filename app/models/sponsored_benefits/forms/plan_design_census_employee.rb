@@ -1,10 +1,15 @@
 module SponsoredBenefits
   module Forms
-    class PlanDesignCensusEmployee
-      include ActiveModel::Model
-      include ActiveModel::Validations
+    class PlanDesignCensusEmployee < CensusMember
 
-      attr_accessor :first_name, :last_name, :ssn, :dob
+      attr_accessor :hired_on, :is_business_owner
+
+      def initialize(attrs = {})
+        super
+      end
+   
+      def census_dependents=(attrs)
+      end
 
       def save
         census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployeeBuilder.build do |builder|
