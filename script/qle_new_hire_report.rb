@@ -119,10 +119,10 @@ end
 
 def sep_query_expression
   {
-    :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["auto_renewing"]),
+    :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
     :created_at.gte => @start_date,
     :created_at.lte => @end_date,
-    :kind => 'employer_sponsored_cobra',
+    :kind.in => %w(employer_sponsored employer_sponsored_cobra),
     :enrollment_kind => "special_enrollment",
     :coverage_kind.in => %w(health dental)
   }
@@ -134,7 +134,7 @@ def newhire_query_expression
     :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["auto_renewing"]),
     :created_at.gte => @start_date,
     :created_at.lte => @end_date,
-    :kind => 'employer_sponsored_cobra',
+    :kind.in => %w(employer_sponsored employer_sponsored_cobra),
     :enrollment_kind => "open_enrollment",
     :coverage_kind.in => %w(health dental)
   }
