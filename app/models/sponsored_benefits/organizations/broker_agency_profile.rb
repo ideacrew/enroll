@@ -28,15 +28,17 @@ module SponsoredBenefits
 
           broker_profile = org.broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.new()
 
-          profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({sic_code: employer.sic_code })
-          broker_profile.plan_design_organizations.create(
-            owner_profile_id: broker_agency._id,
-            customer_profile_id: employer._id,
-            office_locations: office_locations,
-            fein: employer.fein,
-            legal_name: employer.legal_name,
-            profile: profile
-          )
+          broker_profile.plan_design_organizations.new().tap do |org|
+            org.owner_profile_id = broker_agency._id
+            org.customer_profile_id = employer._id
+            org.office_locations = office_locations
+            org.fein = employer.fein
+            org.legal_name = employer.legal_name
+
+            org.build_plan_design_profile(sic_code: employer.sic_code)
+            org.save!
+          end
+
           org.save!
         end
       end
