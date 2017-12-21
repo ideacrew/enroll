@@ -39,12 +39,7 @@ module SponsoredBenefits
     end
 
   private
-    helper_method :active_tab
 
-    def active_tab
-      "employers-tab"
-    end
-    
     def find_broker_agency_profile
       @broker_agency_profile = ::BrokerAgencyProfile.find(params[:profile_id])
       #authorize @broker_agency_profile, :access_to_broker_agency_profile?
