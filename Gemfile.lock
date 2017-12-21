@@ -64,6 +64,7 @@ PATH
       config
       mongoid (~> 5.0.1)
       rails (~> 4.2.3)
+      roo (~> 2.1.0)
       slim (= 3.0.8)
       symmetric-encryption (~> 3.6.0)
 
