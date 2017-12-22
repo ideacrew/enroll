@@ -32,8 +32,8 @@ module SponsoredBenefits
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
 
-      validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id
-      validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id
+      validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
+      validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
 
       scope :find_by_proposal,  -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
       scope :find_by_customer,  -> (customer_id) { where(:"customer_profile_id" => BSON::ObjectId.from_string(customer_id)) }
