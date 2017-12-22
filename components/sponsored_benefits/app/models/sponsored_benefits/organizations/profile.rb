@@ -22,7 +22,8 @@ module SponsoredBenefits
 
 
       # Only one benefit_sponsorship may be active.  Enable many to support changes and history tracking
-      embeds_many  :benefit_sponsorships, as: :benefit_sponsorable, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      embeds_many :benefit_sponsorships, as: :benefit_sponsorable, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      embeds_many :office_locations, class_name:"SponsoredBenefits::Organizations::OfficeLocation"
 
 
       def self.find

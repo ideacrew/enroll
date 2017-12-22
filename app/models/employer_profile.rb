@@ -149,6 +149,7 @@ class EmployerProfile
 
   def fire_broker_agency(terminate_on = today)
     return unless active_broker_agency_account
+    SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: active_broker_agency_account.broker_agency_profile, employer: self)
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
