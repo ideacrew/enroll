@@ -6,7 +6,7 @@ Feature: Check permissions for admin roles to access links in admin familes tab
 	  When Hbx Admin navigate to main page
 	  And admin should see families dropdown link in main tabs
 	  And ciclks on families dropdown link in main tabs
-	  Then admin  should see all links in families dropdown
+	  Then all option are enabled in families dropdown
 
 	 Scenario: Hbx Admin with hbx_read_only role should only see enabled outstanding verifications link in families dropdown
     Given a Hbx admin with hbx_read_only role exists
@@ -14,7 +14,7 @@ Feature: Check permissions for admin roles to access links in admin familes tab
 	  When Hbx Admin navigate to main page
 	  And admin should see families dropdown link in main tabs
 	  And ciclks on families dropdown link in main tabs
-	  Then admin should see only outstanding verifications link in families dropdown
+	  Then the only enabled option should be Outstanding Verifications
 
 	Scenario: Hbx Admin with hbx_csr_supervisor role should only see enabled new consumer application link in families dropdown
     Given a Hbx admin with hbx_csr_supervisor role exists
@@ -22,7 +22,7 @@ Feature: Check permissions for admin roles to access links in admin familes tab
 	  When Hbx Admin navigate to main page
 	  And admin should see families dropdown link in main tabs
 	  And ciclks on families dropdown link in main tabs
-	  Then admin should see only new consumer application link in families dropdown
+	  Then the only enabled option should be New Consumer Application
 
 	Scenario: Hbx Admin with hbx_csr_tier2 role should only see enabled new consumer application link in families dropdown
     Given a Hbx admin with hbx_csr_tier2 role exists
@@ -30,7 +30,7 @@ Feature: Check permissions for admin roles to access links in admin familes tab
 	  When Hbx Admin navigate to main page
 	  And admin should see families dropdown link in main tabs
 	  And ciclks on families dropdown link in main tabs
-	  Then admin should see only new consumer application link in families dropdown
+	  Then the only enabled option should be New Consumer Application
 
 	Scenario: Hbx Admin with hbx_csr_tier1 role should only see enabled new consumer application link in families dropdown
     Given a Hbx admin with hbx_csr_tier1 role exists
@@ -38,6 +38,6 @@ Feature: Check permissions for admin roles to access links in admin familes tab
 	  When Hbx Admin navigate to main page
 	  And admin should see families dropdown link in main tabs
 	  And ciclks on families dropdown link in main tabs
-	  Then admin should see only new consumer application link in families dropdown
+	  Then the only enabled option should be New Consumer Application
 
 
