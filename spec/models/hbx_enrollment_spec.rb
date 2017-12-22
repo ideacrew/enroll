@@ -865,14 +865,13 @@ describe HbxProfile, "class methods", type: :model do
 
     let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
-    let(:current_date) { Date.new(TimeKeeper.date_of_record.year, 5, 1) }
 
     before do
-      TimeKeeper.set_date_of_record_unprotected!(current_date)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
