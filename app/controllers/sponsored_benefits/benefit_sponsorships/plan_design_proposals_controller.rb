@@ -2,61 +2,82 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class BenefitSponsorships::PlanDesignProposalsController < ApplicationController
-    before_action :set_benefit_sponsorships_plan_design_proposal, only: [:show, :edit, :update, :destroy]
+    include Config::BrokerAgencyHelper
 
-    # GET /benefit_sponsorships/plan_design_proposals
     def index
-      @benefit_sponsorships_plan_design_proposals = BenefitSponsorships::PlanDesignProposal.all
+      ## load quotes for a given sponsorship
+      # broker / sponsor
     end
 
-    # GET /benefit_sponsorships/plan_design_proposals/1
-    def show
-    end
-
-    # GET /benefit_sponsorships/plan_design_proposals/new
     def new
-      @benefit_sponsorships_plan_design_proposal = BenefitSponsorships::PlanDesignProposal.new
+      # initialize FormObject
+      # broker / sponsor
     end
 
-    # GET /benefit_sponsorships/plan_design_proposals/1/edit
+    def show
+      # load relevant quote (not nested)
+      # plan_design_proposal
+    end
+
     def edit
+      # edit relevant quote (not nested)
     end
 
-    # POST /benefit_sponsorships/plan_design_proposals
     def create
-      @benefit_sponsorships_plan_design_proposal = BenefitSponsorships::PlanDesignProposal.new(benefit_sponsorships_plan_design_proposal_params)
-
-      if @benefit_sponsorships_plan_design_proposal.save
-        redirect_to @benefit_sponsorships_plan_design_proposal, notice: 'Plan design proposal was successfully created.'
+      # create quote for sponsorship
+      @plan_design_proposal = AcaShopCcaBenefitApplicationBuilder.new(sponsor, plan_design_proposal_params)
+      benefit_sponsorship.plan_design_proposals << @plan_design_proposal.plan_design_proposal
+      if benefit_sponsorship.save
+        redirect_to plan_design_proposal_path(@plan_design_proposal.plan_design_proposal._id)
       else
+        @plan_design_proposal = @plan_design_proposal.plan_design_proposal
         render :new
       end
     end
 
-    # PATCH/PUT /benefit_sponsorships/plan_design_proposals/1
     def update
-      if @benefit_sponsorships_plan_design_proposal.update(benefit_sponsorships_plan_design_proposal_params)
-        redirect_to @benefit_sponsorships_plan_design_proposal, notice: 'Plan design proposal was successfully updated.'
+      # update relevant quote (not nested)
+      if plan_design_proposal.update_attributes(plan_design_proposal_params)
+        redirect_to plan_design_proposal_path(plan_design_proposal._id)
       else
         render :edit
       end
     end
 
-    # DELETE /benefit_sponsorships/plan_design_proposals/1
     def destroy
-      @benefit_sponsorships_plan_design_proposal.destroy
-      redirect_to benefit_sponsorships_plan_design_proposals_url, notice: 'Plan design proposal was successfully destroyed.'
+      plan_design_proposal.destroy!
+      redirect_to benefit_sponsorship_plan_design_proposals_path(plan_design_proposal.benefit_sponsorship)
     end
 
     private
-      # Use callbacks to share common setup or constraints between actions.
-      def set_benefit_sponsorships_plan_design_proposal
-        @benefit_sponsorships_plan_design_proposal = BenefitSponsorships::PlanDesignProposal.find(params[:id])
+      helper_method :customer, :broker, :plan_design_organization
+
+      def broker
+        @broker ||= SponsoredBenefits::Organizations::BrokerAgencyProfile.find(plan_design_organization.owner_profile_id)
       end
 
-      # Only allow a trusted parameter "white list" through.
-      def benefit_sponsorships_plan_design_proposal_params
-        params[:benefit_sponsorships_plan_design_proposal]
+      def customer
+        @customer ||= ::EmployerProfile.find(plan_design_organization.customer_profile_id)
+      end
+
+      def plan_design_organization
+        @plan_design_organization ||= SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:plan_design_organization_id])
+      end
+
+      def benefit_sponsorship
+        broker.benefit_sponsorships.first || broker.benefit_sponsorships.new
+      end
+
+      def benefit_sponsorship_applications
+        @benefit_sponsorship_applicatios ||= benefit_sponsorship.plan_design_proposals
+      end
+
+      def plan_design_proposal
+        @plan_design_proposal ||= BenefitSponsorships::PlanDesignProposal.find(params[:id])
+      end
+
+      def plan_design_proposal_params
+        params.require(:plan_design_proposal).permit(:effective_period, :open_enrollment_period)
       end
   end
 end

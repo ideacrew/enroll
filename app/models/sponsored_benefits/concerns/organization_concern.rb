@@ -37,11 +37,11 @@ module SponsoredBenefits
 
       validates_presence_of :legal_name
 
-      validates :fein,
-        presence: false,
-        length: { is: 9, message: "%{value} is not a valid FEIN" },
-        numericality: true,
-        uniqueness: true
+      # validates :fein,
+      #   presence: false,
+      #   length: { is: 9, message: "%{value} is not a valid FEIN" },
+      #   numericality: true,
+      #   uniqueness: true
 
       validate :office_location_kinds
 
