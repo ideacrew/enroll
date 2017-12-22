@@ -31,16 +31,16 @@ module SponsoredBenefits
 
       # Store separate initial and on-going enrollment renewal values to handle mid-year start situations
       field :initial_enrollment_period, type: Range
-      field :annual_enrollment_period_begin_month_of_year, type: Integer
+      field :annual_enrollment_period_begin_month, type: Integer
       field :contact_method, type: String
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
       validates_presence_of :initial_enrollment_period
-      validates :annual_enrollment_period_begin_month_of_year, 
-        numericality: {only_integer: true},
-        inclusion: { in: 1..12 },
-        allow_blank: false
+      # validates :annual_enrollment_period_begin_month_of_year, 
+      #   numericality: {only_integer: true},
+      #   inclusion: { in: 1..12 },
+      #   allow_blank: false
 
       # Prevent changes to immutable fields. Instantiate a new model instead
       before_validation { 
