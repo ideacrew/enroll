@@ -22,7 +22,11 @@ module Queries
       when "prospect_employers"
         @plan_design_organization.prospect_employers
       else
-        @plan_design_organization
+        if @search_string.present?
+          @plan_design_organization.datatable_search(@search_string)
+        else
+          @plan_design_organization
+        end
       end
     end
 
@@ -46,7 +50,7 @@ module Queries
     end
 
     def klass
-      Family
+      SponsoredBenefits::Organizations::PlanDesignOrganization
     end
 
     def size
