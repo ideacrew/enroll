@@ -13,7 +13,8 @@ SponsoredBenefits::Engine.routes.draw do
       get :employers
       member do
         get :new
-        post :employer_datatable
+        # post :employer_datatable
+        get :edit
       end
     end
 
