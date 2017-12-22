@@ -1,5 +1,8 @@
 class EmployerInvoice
   include InvoiceHelper
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
 
   attr_reader :errors
 
