@@ -45,7 +45,7 @@ module SponsoredBenefits
               org.fein = employer.fein
               org.legal_name = employer.legal_name
               org.has_active_broker_relationship = true
-              org.build_plan_design_profile(sic_code: employer.sic_code)
+              org.sic_code = employer.sic_code
               org.save!
             end
           end
@@ -53,6 +53,7 @@ module SponsoredBenefits
 
         def unassign_broker(broker_agency:, employer:)
           plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_customer(broker_agency.id, employer.id)
+          return unless plan_design_organization.present?
           plan_design_organization.has_active_broker_relationship = false
           plan_design_organization.save!
         end
