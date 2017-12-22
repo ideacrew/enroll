@@ -21,9 +21,9 @@
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
              #['Create Quote', new_broker_agencies_broker_role_quote_path(broker_role_id: BrokerAgencyEmployerDatatable.profile_id, id: row.id), 'static'],
-             ['Create Quote', sponsored_benefits.plan_design_organization_plan_design_proposals_path(plan_design_organization_id: row._id), 'static'],
+             ['Create Quote', sponsored_benefits.new_plan_design_organization_plan_design_proposal_path(plan_design_organization_id: row._id), 'static'],
              ['Remove Quote', 'some-quote-remove-path', 'static'],
-             ['Edit Employer', edit_organizations_profile_path(row), 'static']
+             ['Edit Employer', sponsored_benefits.edit_organizations_profile_path(row), 'static']
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
