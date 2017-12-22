@@ -410,6 +410,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   describe "POST set_default_ga" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let!(:fire_general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
@@ -420,7 +421,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should set default_general_agency_profile" do
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
     end
 
@@ -438,13 +439,21 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should call update_ga_for_employers" do
       sign_in user
       expect(controller).to receive(:notify)
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
     end
 
     it "should get notice" do
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
+    end
+
+    it "should fire exisitng default GA" do
+      sign_in user
+      broker_agency_profile.default_general_agency_profile = fire_general_agency_profile
+      broker_agency_profile.save
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
+      expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
     end
   end
 
