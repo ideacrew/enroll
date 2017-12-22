@@ -10,8 +10,7 @@ module SponsoredBenefits
     before_action :find_broker_agency_profile, only: [:employers, :new]
 
     def employers
-      ::Effective::Datatables::BrokerAgencyEmployerDatatable.profile_id = @broker_agency_profile._id
-      @datatable = ::Effective::Datatables::BrokerAgencyEmployerDatatable.new
+      @datatable = ::Effective::Datatables::BrokerAgencyEmployerDatatable.new(profile_id: @broker_agency_profile._id)
     end
 
     def new
@@ -20,10 +19,11 @@ module SponsoredBenefits
     end
 
     def create
-      broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
+      old_broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
+      broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(old_broker_agency_profile).broker_agency_profile
       sic_code = params[:organization][:profile][:sic_code]
       pdo = Organizations::PlanDesignOrganization.create(organization_params)
-      pdo.owner_profile_id = broker_agency_profile.id
+      pdo.owner_profile_id = old_broker_agency_profile.id
       pdo.profile = Organizations::AcaShopCcaEmployerProfile.new({sic_code: sic_code})
       broker_agency_profile.plan_design_organizations << pdo
       broker_agency_profile.save!

@@ -15,31 +15,46 @@ module SponsoredBenefits
           SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(id).first
         end
 
-        def assign_employer(broker_agency:, employer:, office_locations:)
+        def find_or_initialize_broker_profile(broker_agency)
           org = SponsoredBenefits::Organizations::Organization.find_or_initialize_by(fein: broker_agency.fein)
-
-          org.update_attributes({
-            hbx_id: broker_agency.hbx_id,
-            legal_name: broker_agency.legal_name,
-            dba: broker_agency.dba,
-            is_active: broker_agency.is_active,
-            office_locations: broker_agency.organization.office_locations
-          })
-
-          broker_profile = org.broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.new()
-
-          broker_profile.plan_design_organizations.new().tap do |org|
-            org.owner_profile_id = broker_agency._id
-            org.customer_profile_id = employer._id
-            org.office_locations = office_locations
-            org.fein = employer.fein
-            org.legal_name = employer.legal_name
-
-            org.build_plan_design_profile(sic_code: employer.sic_code)
-            org.save!
+          unless org.persisted?
+            org.hbx_id = broker_agency.hbx_id
+            org.legal_name = broker_agency.legal_name
+            org.dba = broker_agency.dba
+            org.is_active = broker_agency.is_active
+            org.office_locations = broker_agency.organization.office_locations
+            org.broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.new()
           end
+          org
+        end
 
-          org.save!
+        def assign_employer(broker_agency:, employer:, office_locations:)
+          org = find_or_initialize_broker_profile(broker_agency)
+
+          plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_customer(broker_agency.id, employer.id)
+
+          if plan_design_organization
+            plan_design_organization.has_active_broker_relationship = true
+            plan_design_organization.office_locations = office_locations
+            plan_design_organization.save!
+          else
+            org.broker_agency_profile.plan_design_organizations.new().tap do |org|
+              org.owner_profile_id = broker_agency._id
+              org.customer_profile_id = employer._id
+              org.office_locations = office_locations
+              org.fein = employer.fein
+              org.legal_name = employer.legal_name
+              org.has_active_broker_relationship = true
+              org.build_plan_design_profile(sic_code: employer.sic_code)
+              org.save!
+            end
+          end
+        end
+
+        def unassign_broker(broker_agency:, employer:)
+          plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_customer(broker_agency.id, employer.id)
+          plan_design_organization.has_active_broker_relationship = false
+          plan_design_organization.save!
         end
       end
 
