@@ -1,14 +1,21 @@
 module SponsoredBenefits
   module BenefitApplications
     class AcaShopCcaBenefitApplicationBuilder < BenefitApplicationBuilder
+      attr_reader :record
 
-      def initialize(benefit_sponsor, options={})
-        effective_on      = options[:effective_date] || Date.today.next_month.end_of_month + 1
-        effective_period  = one_year_period(effective_on)
-        @application_class    = AcaShopCcaBenefitApplication
-        @benefit_application  = @application_class.new({effective_period: effective_period})
+      def initialize(plan_design_organization, options={})
+        @application_class = BenefitApplications::AcaShopCcaBenefitApplication
+        profile_attr = options.fetch(:profile)
+        sponsorship_attr = profile_attr.fetch(:benefit_sponsorship)
+        application_attr = sponsorship_attr.delete(:benefit_application)
 
-        super(options)
+        @record = plan_design_organization.plan_design_proposals.new
+        @record.title = options.fetch(:title)
+        @record.profile = Organizations::AcaShopCcaEmployerProfile.new
+        sponsorship = @record.profile.benefit_sponsorships.build({
+          benefit_market: :aca_shop_cca
+        }.merge(sponsorship_attr))
+        sponsorship.benefit_applications << @application_class.new(application_attr)
       end
 
       def add_broker(new_broker)

@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="row">
+    <div id= 'message_form'></div>
+    <div class="top-pd" id="inbox_provider_form">
+      <span class="flash_message"></span>
+    </div>
+    <div class='hide' id='collection_scope'><%= plan_design_organization._id %> </div>
+    <div class="row">
+      <div class="col-md-2 col-md-offset-9">
+        <%= link_to "Create New Quote", "#", class:"btn btn-primary new-plan-design-proposal"  %>
+      </div>
+    </div>
+    <br>
+    <%= render_datatable(@datatable) %>
+  </div>
+</div>
+<script>
+  initializeDataTables();
+</script>
