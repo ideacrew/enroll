@@ -17,7 +17,7 @@ report_name = "#{Rails.root}/enrollment_notice_data_set.csv"
 def valid_enrollment_hbx_ids(family)
   enrollments = family.enrollments
   good_enrollments = enrollments.where(kind: "individual").enrolled.by_created_datetime_range(@start_date, @end_date)
-  bad_enrollments = enrollments.where(kind: "individual").by_created_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days).where(:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::ENROLLED_STATUSES )
+  bad_enrollments = enrollments.where(kind: "individual").by_created_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES )
   good_enrollments.uniq!
 
   if !bad_enrollments.present?
