@@ -3,9 +3,6 @@ module Queries
     attr_reader :search_string, :custom_attributes
 
     def datatable_search(string)
-      puts "****"
-      puts @plan_design_organization
-      puts string
       @search_string = string
       self
     end
@@ -16,7 +13,6 @@ module Queries
     end
 
     def build_scope()
-      puts "----"
       return [] if @plan_design_organization.nil?
       case @custom_attributes[:clients]
       when "active_clients"
@@ -26,7 +22,11 @@ module Queries
       when "prospect_employers"
         @plan_design_organization.prospect_employers
       else
-        @plan_design_organization
+        if @search_string.present?
+          @plan_design_organization.datatable_search(@search_string)
+        else
+          @plan_design_organization
+        end
       end
     end
 
@@ -50,7 +50,7 @@ module Queries
     end
 
     def klass
-      Family
+      SponsoredBenefits::Organizations::PlanDesignOrganization
     end
 
     def size
