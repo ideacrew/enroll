@@ -17,7 +17,7 @@ class Insured::GroupSelectionController < ApplicationController
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
-
+      @family.take_application_snapshot if (params[:add_snapshot].to_s == "true" && @family.present?)
       correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
     end

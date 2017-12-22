@@ -73,6 +73,7 @@ class Insured::FamiliesController < FamiliesController
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
+    @family.take_application_snapshot if (params[:add_snapshot].to_s == "true" && @family.present? && @market_kind == 'individual')
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end

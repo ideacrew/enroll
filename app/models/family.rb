@@ -51,6 +51,7 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  embeds_one :initial_application_snapshot
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -1062,6 +1063,18 @@ class Family
   def has_valid_e_case_id?
     return false if !e_case_id
     e_case_id.split('#').last.scan(/\D/).empty?
+  end
+
+  def take_application_snapshot
+    initialize_application_snapshot unless self.initial_application_snapshot.present?
+  end
+
+  def initialize_application_snapshot
+    self.initial_application_snapshot = InitialApplicationSnapshot.new
+    family_members.each do |family_member|
+      self.initial_application_snapshot.take_family_member_snapshot(family_member)
+      save!
+    end
   end
 
 private

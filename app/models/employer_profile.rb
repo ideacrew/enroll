@@ -270,8 +270,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present? 
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -281,10 +281,6 @@ class EmployerProfile
 
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
-  end
-
-  def is_conversion?
-    self.profile_source.to_s == "conversion"
   end
 
   def is_converting?

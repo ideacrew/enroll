@@ -175,6 +175,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123"
         expect(assigns(:new_effective_on)).to eq TimeKeeper.date_of_record
       end
+
+      it "creates application snapshot" do
+        sign_in user
+        get :new, person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", add_snapshot: true
+        expect(family.initial_application_snapshot).not_to be_nil
+      end
     end
   end
 
