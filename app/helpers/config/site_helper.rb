@@ -1,4 +1,9 @@
 module Config::SiteHelper
+
+  def site_redirect_on_timeout_route
+    Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
+  end
+
   def site_byline
     Settings.site.byline
   end
@@ -19,8 +24,20 @@ module Config::SiteHelper
     site_home_url + "/find-expert"
   end
 
+  def site_home_business_url
+    Settings.site.home_business_url
+  end
+
   def site_home_url
     Settings.site.home_url
+  end
+
+  def site_curam_enabled?
+    Settings.site.curam_enabled
+  end
+
+  def site_brokers_agreement_path
+    link_to "#{Settings.aca.state_name} #{Settings.site.short_name} Broker Agreement", Settings.site.terms_and_conditions_url
   end
 
   def site_home_link
@@ -43,10 +60,6 @@ module Config::SiteHelper
     Settings.site.nondiscrimination_notice_url
   end
 
-  def link_to_site_business_resource_center
-    link_to "Business Resource Center", site_business_resource_center_url
-  end
-    
   def site_policies_url
     Settings.site.policies_url
   end
@@ -75,10 +88,6 @@ module Config::SiteHelper
     Settings.site.main_web_address
   end
 
-  def site_main_web_address_url
-    Settings.site.main_web_address_url
-  end
-
   def site_main_web_link
     link_to site_website_name, site_main_web_address_url
   end
@@ -97,6 +106,10 @@ module Config::SiteHelper
 
   def ivl_login_url
     Settings.site.ivl_login_url
+  end
+
+  def site_main_web_address_url
+     Settings.site.main_web_address_url
   end
 
   def site_uses_default_devise_path?
@@ -133,5 +146,9 @@ module Config::SiteHelper
 
   def site_document_verification_checklist_url
     Settings.site.document_verification_checklist_url
+  end
+
+  def site_invoice_bill_url
+    Settings.site.invoice_bill_url
   end
 end

@@ -32,7 +32,6 @@ module Factories
       @plan_year_start_on  = renewing_plan_year.start_on
       prev_plan_year_start = @plan_year_start_on - 1.year
       prev_plan_year_end   = @plan_year_start_on - 1.day
-
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
       shop_enrollments.reject!{|enrollment| enrollment.coverage_termination_pending? }
       begin
@@ -47,30 +46,30 @@ module Factories
             active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
             if active_enrollment.present? && active_enrollment.inactive?
               renew_waived_enrollment(active_enrollment)
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
+              census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_plan_year}) unless disable_notifications
             elsif renewal_plan_offered_by_er?(active_enrollment)
               renewal_enrollment = renewal_builder(active_enrollment)
               renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
               renewal_enrollment.decorated_hbx_enrollment
               save_renewal_enrollment(renewal_enrollment, active_enrollment)
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal") unless renewal_enrollment.coverage_kind == "dental" || disable_notifications
+              census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: renewing_plan_year}) unless (renewal_enrollment.coverage_kind == "dental" || disable_notifications)
             else
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal") unless disable_notifications
+              census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewing_plan_year}) unless disable_notifications
             end
           end
         elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
           renew_waived_enrollment
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
+          census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_plan_year}) unless disable_notifications
         end
       rescue Exception => e
-        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
+        "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
 
       return family
     end
 
     def renewal_plan_offered_by_er?(enrollment)
-      if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
+      if enrollment.plan.present? || enrollment.plan.renewal_plan(renewing_plan_year.start_on).present?
 
         if @census_employee.renewal_benefit_group_assignment.blank?
           benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
@@ -78,7 +77,7 @@ module Factories
           @census_employee.save!
         end
 
-        @census_employee.renewal_benefit_group_assignment.benefit_group.elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
+        @census_employee.renewal_benefit_group_assignment.benefit_group.elected_plan_ids.include?(enrollment.plan.renewal_plan(renewing_plan_year.start_on).id)
       else
         false
       end
@@ -155,7 +154,7 @@ module Factories
          renewal_enrollment.send("#{attr}=", active_enrollment.send(attr))
       end
 
-      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan_id if active_enrollment.plan.present?
+      renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan(renewing_plan_year.start_on).id if active_enrollment.plan.present?
       renewal_enrollment
     end
 
@@ -252,6 +251,8 @@ module Factories
       renewal_enrollment.hbx_enrollment_members
     end
 
+
+
     def set_instance_variables
       @family = enrollment.family
       @census_employee = enrollment.employee_role.census_employee
@@ -260,7 +261,5 @@ module Factories
     end
   end
 
-  class FamilyEnrollmentRenewalFactoryError < StandardError; end
+class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
-
-

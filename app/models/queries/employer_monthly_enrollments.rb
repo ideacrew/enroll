@@ -14,7 +14,7 @@ module Queries
           decorator = PlanCostDecoratorCongress.new(plan, fe, benefit_group)
         else
           if benefit_group.sole_source? && (!plan.dental?)
-            decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, fe.composite_rating_tier)
+            decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, fe.composite_rating_tier, fe.is_cobra_status?)
           else
             reference_plan = (fe.coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
             decorator = PlanCostDecorator.new(plan_cache[fe.plan_id], fe, benefit_group, reference_plan)

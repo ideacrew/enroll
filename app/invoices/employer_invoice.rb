@@ -1,5 +1,8 @@
 class EmployerInvoice
   include InvoiceHelper
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
 
   attr_reader :errors
 
@@ -71,8 +74,12 @@ class EmployerInvoice
     File.delete(file)
   end
 
+  # It will trigger initial invoice notice
+  # Should trigger for regular employers but on conversion employers
+  # should not trigger with plan year is in renewal related states
+  # should trigger on conversion employers who has PlanYear::PUBLISHED
   def send_first_invoice_available_notice
-    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
+    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting_with_renewal_state? && (@organization.invoices.size < 1)
       @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
     end
   end

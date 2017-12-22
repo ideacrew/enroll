@@ -6,6 +6,8 @@ class PlanYear
   include Acapi::Notifiers
   include ScheduledEventService
   include Config::AcaModelConcern
+  include Concerns::Observable
+  include ModelEvents::PlanYear
 
   embedded_in :employer_profile
 
@@ -108,6 +110,8 @@ class PlanYear
   scope :non_canceled, -> { not_in(aasm_state: ['canceled, renewing_canceled']) }
 
   after_update :update_employee_benefit_packages
+
+  after_save :notify_on_save
 
   def update_employee_benefit_packages
     if self.start_on_changed?
@@ -568,7 +572,7 @@ class PlanYear
   end
 
   def calc_active_health_assignments_for(employee_pool)
-    benefit_group_ids = self.benefit_groups.map(&:id)
+    benefit_group_ids = self.benefit_groups.pluck(:_id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
       bg_assignment = nil
       bg_assignment = ce.active_benefit_group_assignment if benefit_group_ids.include?(ce.active_benefit_group_assignment.try(:benefit_group_id))
@@ -675,7 +679,7 @@ class PlanYear
       prior_month = effective_date - 1.month
       plan_year_start_on = effective_date
       plan_year_end_on = effective_date + 1.year - 1.day
-      employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
+      employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
       employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
       employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
       open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
@@ -721,7 +725,7 @@ class PlanYear
       # July 6 => Sept 1
       # July 1 => Aug 1
       start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
-      end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month
+      end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days).beginning_of_month
       dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
     end
 
@@ -809,8 +813,16 @@ class PlanYear
       date = date + 1 if date.sunday?
       date
     end
+
+    def open_enrollment_start_period_with_offset(date)
+      date - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days
+    end
+    ## end class method
   end
 
+  def open_enrollment_start_period_with_offset(date)
+    date - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days
+  end
 
   aasm do
     state :draft, initial: true
@@ -828,7 +840,7 @@ class PlanYear
     state :canceled,          :after_enter => :cancel_application             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
+    state :renewing_draft
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -879,8 +891,8 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -900,8 +912,8 @@ class PlanYear
       transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -1167,54 +1179,54 @@ class PlanYear
     end
   end
 
-  def trigger_renewal_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    if event_name == "publish"
-      self.employer_profile.trigger_notices("planyear_renewal_3a")
-    elsif event_name == "force_publish"
-      self.employer_profile.trigger_notices("planyear_renewal_3b")
-    end
-  end
-
   def zero_employees_on_roster
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
-      self.employer_profile.trigger_notices("zero_employees_on_roster")
+      begin
+        self.employer_profile.trigger_notices("zero_employees_on_roster")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
  def notify_employee_of_initial_employer_ineligibility
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.census_employees.non_terminated.each do |ce|
-    ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
   def initial_employer_approval_notice
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
-    self.employer_profile.trigger_notices("initial_employer_approval")
+    begin
+      self.employer_profile.trigger_notices("initial_employer_approval")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def initial_employer_open_enrollment_begins
     return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-  end
-
-  def renewal_group_notice
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
-    if self.employer_profile.is_converting?
-      self.employer_profile.trigger_notices("conversion_group_renewal")
-    else
-      self.employer_profile.trigger_notices("group_renewal_5")
+    begin
+      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial open enrollment notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
   def initial_employer_denial_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-      self.employer_profile.trigger_notices("initial_employer_denial")
+      begin
+        self.employer_profile.trigger_notices("initial_employer_denial")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
@@ -1224,7 +1236,11 @@ class PlanYear
       bg.finalize_composite_rates
     end
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+    begin
+      self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def renewal_successful
@@ -1238,7 +1254,11 @@ class PlanYear
 
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
-    self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+    begin
+      self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def record_transition

@@ -45,15 +45,15 @@ module Effective
             enrollment_state(row)
         }, :sortable => false, :filter => false
 
-        table_column :est_participation, :proc => Proc.new { |row|
-           row.expected_selection.titleize if row.expected_selection
-        }, :sortable => false, :filter => false
-
         if attributes["renewal_status"]
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
           }, :filter => false, :sortable => false
         end
+
+        table_column :est_participation, :proc => Proc.new { |row|
+           row.expected_selection.titleize if row.expected_selection
+        }, :sortable => false, :filter => false
 
         table_column :actions, label: "", :width => '50px', :proc => Proc.new { |row|
           @employer_profile = row.employer_profile

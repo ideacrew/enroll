@@ -129,38 +129,72 @@ RSpec.describe Organization, dbclean: :after_each do
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
     let(:office_location) { double(address: address)}
+    let(:carrier_plan) { instance_double(Plan, active_year: '2017', is_sole_source: true, is_vertical: false, is_horizontal: false) }
 
     before :each do
-      allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
       Rails.cache.clear
     end
 
     context "carrier_names" do
-
-      it "valid_carrier_names" do
-        carrier_names = {}
-        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-        carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
-        expect(Organization.valid_carrier_names).to match_array carrier_names
+      before :each do
+        allow(Plan).to receive(:valid_shop_health_plans).and_return([carrier_plan])
       end
 
-      it "valid_carrier_names_for_options" do
-        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options).to match_array carriers
+      context "base case" do
+        it "valid_carrier_names" do
+          carrier_names = {}
+          carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+          carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+          expect(Organization.valid_carrier_names).to match_array carrier_names
+        end
+
+        it "valid_carrier_names_for_options" do
+          carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
+          expect(Organization.valid_carrier_names_for_options).to match_array carriers
+        end
+
+        it "valid_carrier_names_for_options passes arguments and filters to sole source only" do
+          carriers = [[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
+          expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
+        end
+
+        it "can filter out by service area" do
+          carrier_names = {}
+          carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+
+          expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
+        end
       end
 
-      it "valid_carrier_names_for_options passes arguments and filters to sole source only" do
-        carriers = [[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
-      end
+      context "when limiting carriers to service area and coverage selection level and active year" do
+        before do
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).and_return([])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: carrier_profile_1, year: 2017).and_return([carrier_one_service_area])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: carrier_profile_1, year: 2018).and_return([carrier_one_service_area])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: sole_source_participater, year: 2018).and_return([carrier_one_service_area])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_2.id, 2017).and_return([])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", sole_source_participater.id, 2017).and_return([])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", sole_source_participater.id, 2018).and_return([carrier_plan])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2017).and_return([carrier_plan])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2018).and_return([carrier_plan])
+        end
 
-      it "can filter out by service area" do
-        carrier_names = {}
-        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+        it "returns carriers if they are available in the service area and offer plans for that coverage level" do
+          carrier_names = {}
+          multiple_carriers = {}
+          carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          multiple_carriers[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          multiple_carriers[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array carrier_names
+          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array multiple_carriers
+        end
 
-        expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
+        it "returns no carriers if there are no matches" do
+          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'metal_level')).to match_array []
+          expect(Organization.valid_carrier_names(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'single_plan')).to match_array []
+        end
       end
     end
 

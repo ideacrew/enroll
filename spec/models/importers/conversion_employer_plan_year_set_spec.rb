@@ -2,14 +2,14 @@ require "rails_helper"
 
 describe ::Importers::ConversionEmployerPlanYearSet, dbclean: :after_each do
   let(:out_stream) { StringIO.new }
-  let(:employer_record) { instance_double("::Importers::ConversionEmployerPlanYear", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
+  let(:employer_record) { instance_double("::Importers::ConversionEmployerPlanYearCreate", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
   let(:record_warnings) { { } }
   let(:default_plan_year_start) { Date.new(2015, 3, 1) }
 
   subject { ::Importers::ConversionEmployerPlanYearSet.new(file_name, out_stream, default_plan_year_start) }
   before :each do
-    allow(::Importers::ConversionEmployerPlanYear).to receive(:new).with(employer_data).and_return(employer_record)
+    allow(::Importers::ConversionEmployerPlanYearCreate).to receive(:new).with(employer_data).and_return(employer_record)
     subject.import!
     out_stream.rewind
   end

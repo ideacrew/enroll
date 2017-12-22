@@ -63,7 +63,7 @@ var EmployerProfile = ( function( window, undefined ) {
     editselectedplan = $('input.ref-plan');
     editbgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     editbgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
-    var validatedbgfamilypremiums = false;
+    var editvalidatedbgfamilypremiums = false;
 
     editbgtitles.each(function() {
         editplantitle = $(this).val();
@@ -93,6 +93,7 @@ var EmployerProfile = ( function( window, undefined ) {
     });
     if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       editvalidatedbgemployeepremiums = true;
+      editvalidatedbgfamilypremiums = true;
       editvalidated = true;
     } else {
       editbgemployeepremiums.each(function() {
@@ -317,6 +318,7 @@ var EmployerProfile = ( function( window, undefined ) {
     });
     if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       validatedbgemployeepremiums = true;
+      validatedbgfamilypremiums = true;
       validated = true;
     } else {
       bgemployeepremiums.each(function() {

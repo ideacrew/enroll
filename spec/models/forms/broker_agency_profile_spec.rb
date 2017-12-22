@@ -53,6 +53,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     market_kind: market_kind,
     working_hours: "0",
     accept_new_clients: "0",
+    ach_record: { routing_number: '123456789', routing_number_confirmation: '123456789', account_number: '99999999999999' },
     office_locations_attributes: office_locations
     }.merge(other_attributes) }
 
@@ -120,7 +121,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     end
 
     it 'should raise an error' do
-      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")    
+      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")
     end
   end
 

@@ -49,9 +49,6 @@ class ShopEmployeeNotice < Notice
   def attach_envelope
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
   end
-  def employee_appeal_rights_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employee_appeal_rights.pdf')]
-  end
 
   def employee_appeal_rights_attachment
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employee_appeal_rights.pdf')]

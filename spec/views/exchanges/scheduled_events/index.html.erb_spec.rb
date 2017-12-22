@@ -12,7 +12,7 @@ describe "exchanges/scheduled_events/index.html.erb" do
   end
 
   it "should display index page info" do
-  	render template: "exchanges/scheduled_events/index"
+  	render template: "exchanges/scheduled_events/_index"
   	expect(rendered).to have_text(/Calendar/)
     expect(rendered).to have_text(/Previous/)
     expect(rendered).to have_text(/Next/)

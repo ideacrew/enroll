@@ -208,10 +208,9 @@ module Employers::EmployerHelper
 
   def selected_benefit_plan(plan)
     case plan 
-      when 'single_carrier' then 'All Plans From A Single Carrier'
-      when 'metal_level' then 'All Plans From A Given Metal Level'
-      when 'single_plan' then 'A Single Plan'
-      when 'sole_source' then 'A Sole Source Plan'
+      when 'single_carrier' then fetch_plan_title_for_single_carrier
+      when 'metal_level' then fetch_plan_title_for_metal_level
+      when 'single_plan','sole_source' then 'A Single Plan'
     end
   end
 end

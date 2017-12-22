@@ -6,7 +6,7 @@ class CompositeRatingTierFactorSet < RatingFactorSet
     if record.present?
       record.lookup(val)
     else
-      logger.error "Composite Rating Set lookup for #{self} failed with no FactorSet found"
+      logger.error "Lookup for #{val} failed with no FactorSet found: Carrier: #{carrier_profile_id}, Year: #{year}"
       1.0
     end
   end

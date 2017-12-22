@@ -13,6 +13,12 @@
         <div class="row no-buffer row-form-wrapper" style="border-top: 0;">
           <%= render "shared/broker_agency_profile_fields", f: f%>
         </div><br>
+
+        <div class="action-group">
+          <%= render "broker_agencies/applicants/bank_information", f: f %>
+          <p class="bank-name-container"></p>
+        </div>
+
         <div class="row no-buffer row-form-wrapper no-border">
           <!-- recaptcha_tags -->
         </div>
@@ -20,6 +26,11 @@
           <%= render "shared/office_locations", f: f %>
           <div class="row no-buffer">
             <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency">Create Broker Agency</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <h5>By submitting this application to become a certified broker on the Health Connector for Business, I agree to the terms and conditions described in the <%= site_brokers_agreement_path %>.</h5>
           </div>
         </div>
       </div>
