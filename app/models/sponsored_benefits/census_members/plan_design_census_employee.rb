@@ -14,8 +14,8 @@ module SponsoredBenefits
       field :aasm_state, type: String
       field :expected_selection, type: String, default: "enroll"
 
-      field :employer_profile_id, type: BSON::ObjectId
-      field :benefit_application_id, type: BSON::ObjectId
+      # field :employer_profile_id, type: BSON::ObjectId
+      field :benefit_sponsorship_id, type: BSON::ObjectId
 
       has_many :census_survivors, class_name: "SponsoredBenefits::CensusMembers::CensusSurvivor"
 
