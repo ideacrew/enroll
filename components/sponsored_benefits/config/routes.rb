@@ -1,6 +1,6 @@
 SponsoredBenefits::Engine.routes.draw do
 
-  namespace :benefit_sponsorships do
+  namespace :organizations do
     resources :plan_design_proposals
   end
 
