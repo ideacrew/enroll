@@ -15,21 +15,26 @@ module Queries
 
     def build_scope()
       return [] if @plan_design_proposals.nil?
-      # case @custom_attributes[:clients]
-      # when "active_clients"
-      #   @plan_design_organization.active_clients
-      # when "inactive_clients"
-      #   @plan_design_organization.inactive_clients
-      # when "prospect_employers"
-      #   @plan_design_organization.prospect_employers
-      # else
-      #   if @search_string.present?
-      #     @plan_design_organization.datatable_search(@search_string)
-      #   else
-      #     @plan_design_organization
-      #   end
-      # end
-      @plan_design_proposals
+      case @custom_attributes[:quotes]
+      when "initial"
+        @plan_design_proposals
+      when "active"
+        @plan_design_proposals
+      when "renewing"
+        @plan_design_proposals
+      when "draft"
+        @plan_design_proposals
+      when "published"
+        @plan_design_proposals
+      when "expired"
+        @plan_design_proposals
+      else
+        if @search_string.present?
+          @plan_design_proposals.datatable_search(@search_string)
+        else
+          @plan_design_proposals
+        end
+      end
     end
 
     def skip(num)

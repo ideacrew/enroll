@@ -50,15 +50,17 @@
         end
 
         def nested_filter_definition
-          # {
-          #   clients:[
-          #         { scope: 'all', label: 'All'},
-          #         { scope: 'active_clients', label: 'Active'},
-          #         { scope: 'inactive_clients', label: 'Inactive'},
-          #         { scope: 'prospect_employers', label: "Prospects" }
-          #       ],
-          #   top_scope: :clients
-          # }
+          {
+            quotes:[
+                  { scope: 'all', label: 'All'},
+                  { scope: 'initial', label: 'Initial'},
+                  { scope: 'renewing', label: 'Renewing'},
+                  { scope: 'draft', label: "Draft" },
+                  { scope: 'published', label: "Published" },
+                  { scope: 'expired', label: "Expired" },
+                ],
+            top_scope: :quotes
+          }
         end
 
 
