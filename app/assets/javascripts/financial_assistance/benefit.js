@@ -23,6 +23,11 @@ function afterDestroyHide(selector_id, kind){
   $(".benefits #"+selector_id+" .add-more-link-"+kind).addClass('hidden');
 };
 
+// Input Masks
+$(document).find(".phone_number").mask("(999) 999-9999");
+$(document).find(".zip").mask("99999");
+$(document).find(".fien_field").mask("99-9999999");
+
 $(document).ready(function() {
   if ($('.benefit-kinds').length) {
     $(window).bind('beforeunload', function(e) {
@@ -278,10 +283,6 @@ $(document).ready(function() {
 
     });
 
-    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_phone_full_phone_number', function () {
-        $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1)-$2-$3"));
-    });
-
 
 
     $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_address_zip', function (e) {
@@ -306,10 +307,6 @@ $(document).ready(function() {
             (key >= 96 && key <= 105) );
 
     });
-
-    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_id', function () {
-        $(this).val($(this).val().replace(/^(\d{2})(\d{7})+$/, "$1-$2"));
-    });
-
+    
 });
 
