@@ -14,5 +14,7 @@ module SponsoredBenefits
 
     embeds_one :profile
 
+    scope :datatable_search, ->(query) { self.where({"$or" => ([{"title" => Regexp.compile(Regexp.escape(query), true)}])}) }
+
   end
 end
