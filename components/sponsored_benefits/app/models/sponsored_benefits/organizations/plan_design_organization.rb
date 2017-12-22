@@ -22,8 +22,8 @@ module SponsoredBenefits
 
       field :has_active_broker_relationship, type: Boolean, default: false
 
-      validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id
-      validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id
+      validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
+      validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| customer_profile_id.nil? }
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: :plan_design_organization
       embeds_one :plan_design_profile, class_name: "SponsoredBenefits::Organizations::PlanDesignProfile"
