@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :dbclean => :after_each do
-
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -21,19 +20,20 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :db
                             :notice_template => 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
                             :notice_builder => 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
                             :event_name => 'notify_employee_confirming_coverage_termination',
-                            :mpi_indicator => 'MPI_SHOPDAE042',
+                            :mpi_indicator => 'SHOP_D042',
                             :title => "Confirmation of Election To Terminate Coverage"})
                           }
-    let(:valid_params) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
+  let(:valid_params) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template,
+      :options => { :hbx_enrollment_hbx_id => hbx_enrollment.hbx_id.to_s }
+  }}
 
-let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_selected', coverage_kind: "dental")}
+  let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_selected', coverage_kind: "dental")}
 
-describe "New" do
+  describe "New" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
@@ -54,7 +54,7 @@ describe "New" do
     end
   end
 
-describe "Build" do
+  describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
@@ -67,7 +67,7 @@ describe "Build" do
     end
   end
 
-describe "append data" do
+  describe "append data" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
@@ -83,7 +83,7 @@ describe "append data" do
     end
   end
   
-describe "Rendering terminating_coverage_notice template and generate pdf" do
+  describe "Rendering terminating_coverage_notice template and generate pdf" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
@@ -92,11 +92,20 @@ describe "Rendering terminating_coverage_notice template and generate pdf" do
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment  
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
+
     it "should render terminating_coverage_notice" do
-      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_terminating_coverage_confirmation"
+      expect(@employee_notice.template).to eq application_event.notice_template
     end
+
+    it "should render terminating_coverage_notice" do
+      expect(@employee_notice.mpi_indicator).to eq application_event.mpi_indicator
+    end
+
+    it "should render terminating_coverage_notice" do
+      expect(@employee_notice.event_name).to eq application_event.event_name
+    end
+
     it "should generate pdf" do
-      census_employee.published_benefit_group_assignment.hbx_enrollments.select.sort_by(&:updated_at).last
       @employee_notice.build
       @employee_notice.append_data
       file = @employee_notice.generate_pdf_notice

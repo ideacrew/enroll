@@ -697,7 +697,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOPDAE042',
+    hbx_id: 'SHOP_D042',
     title: 'Confirmation of Election To Terminate Coverage',
     description: 'Employee Terminating coverage after QLE',
     resource_name: 'employer',
@@ -707,7 +707,7 @@ shop_notice_triggers = [
         name: 'Notice to employer when employee terminates coverage',
         notice_template: 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
         notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
-        mpi_indicator: 'MPI_SHOPDAE042',
+        mpi_indicator: 'SHOP_D042',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

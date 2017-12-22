@@ -1435,6 +1435,16 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def notify_employee_confirming_coverage_termination
+    if is_shop? && census_employee.present?
+      begin 
+        census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s) 
+      rescue Exception => e
+        (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) 
+      end
+    end 
+  end
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.

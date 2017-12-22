@@ -544,16 +544,6 @@ module ApplicationHelper
       concat " to see if you qualify for a Special Enrollment period"
     end
   end
-
-  def notify_employee_confirming_coverage_termination(hbx_enrollment)
-    if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
-      begin 
-        ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_coverage_termination") 
-      rescue Exception => e
-        (Rails.logger.error { "Unable to deliver Notices to #{hbx_enrollment.census_employee.full_name} due to #{e}" }) 
-      end
-    end 
-  end
   
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])

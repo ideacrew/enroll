@@ -1,5 +1,12 @@
 class ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation < ShopEmployeeNotice
-  attr_accessor :census_employee
+  
+  attr_accessor :census_employee, :hbx_enrollment
+  
+  def initialize(census_employee, args = {})
+    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment_hbx_id]).first
+    super(census_employee, args)
+  end
+
   def deliver
     build
     append_data
@@ -11,11 +18,11 @@ class ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation < ShopEmploye
   end
 
   def append_data
-    terminated_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.select{ |h| h.aasm_state == 'coverage_termination_pending'}.sort_by(&:updated_at).last
+    terminated_enrollment = self.hbx_enrollment
     plan = terminated_enrollment.plan
     notice.plan = PdfTemplates::Plan.new({
-                                             :plan_name => plan.name
-                                         })
+      :plan_name => plan.name
+      })
     notice.enrollment = PdfTemplates::Enrollment.new({
       :terminated_on => terminated_enrollment.terminated_on,
       :coverage_kind => terminated_enrollment.coverage_kind

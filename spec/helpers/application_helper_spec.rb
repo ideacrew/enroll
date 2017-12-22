@@ -393,27 +393,4 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
-
-  describe ".notify_employee_confirming_coverage_termination" do
-    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0, coverage_kind: "health") }
-    let(:census_employee) {FactoryGirl.create(:census_employee)}
-
-    before :each do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
-      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-    end
-
-    it "should enqueue a notify_employee_confirming_coverage_termination job" do
-      allow(enrollment).to receive(:coverage_kind).and_return("health")
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      helper.notify_employee_confirming_coverage_termination(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_coverage_termination']
-    end                                            
-  end
 end
