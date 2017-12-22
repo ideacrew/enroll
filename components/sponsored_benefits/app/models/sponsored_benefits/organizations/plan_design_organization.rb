@@ -10,7 +10,6 @@ module SponsoredBenefits
 
       # field :profile_kind, type: String, default: ":plan_design_profile"
 
-      field :hbx_id, type: String
       field :has_active_broker_relationship, type: Boolean, default: false
 
       # Registered legal name
@@ -22,6 +21,9 @@ module SponsoredBenefits
       # Federal Employer ID Number
       field :fein, type: String
 
+      # Standard Industrial Classification Code that indicates company's business type
+      field :sic_code, type: String
+
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
       field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
@@ -32,6 +34,7 @@ module SponsoredBenefits
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
 
+      validates_presence_of :legal_name, :sic_code
       validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
       validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
 
@@ -42,6 +45,7 @@ module SponsoredBenefits
       scope :active_clients, -> { where(:has_active_broker_relationship => true) }
       scope :inactive_clients, -> { where(:has_active_broker_relationship => false) }
       scope :prospect_employers, -> { where(:customer_profile_id => nil) }
+      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
       def employer_profile
         ::EmployerProfile.find(customer_profile_id)

@@ -8,7 +8,7 @@
     <% end %>
     <%# show_residency_alert = false %>
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
-        <% if @benefit_group.sole_source? %>
+        <% if @benefit_group.sole_source? && coverage_kind == 'health' %>
         <% is_coverage = offered_relationship_benefits.present? ? composite_relationship_check(offered_relationship_benefits, family_member, @new_effective_on) : true
            is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
            is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false

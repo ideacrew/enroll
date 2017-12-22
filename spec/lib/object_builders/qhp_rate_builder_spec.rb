@@ -9,8 +9,8 @@ describe QhpRateBuilder do
   it "should return qhp builder object" do
     @rates_hash = {
       items: [{
-        :effective_date => "#{TimeKeeper.date_of_record.year}-01-01",
-        :expiration_date => "#{TimeKeeper.date_of_record.year}-12-31",
+        :effective_date => "2017-01-01",
+        :expiration_date => "2017-12-31",
         :plan_id => plan.hios_id,
         :age_number => 20,
         :primary_enrollee => 256.41,
@@ -18,7 +18,7 @@ describe QhpRateBuilder do
       }]
     }
     qhp = QhpRateBuilder.new()
-    qhp.add(@rates_hash, "new")
+    qhp.add(@rates_hash, "new", 2017)
     qhp.run
     plan.reload
     expect(plan.premium_tables.size).to eq 1

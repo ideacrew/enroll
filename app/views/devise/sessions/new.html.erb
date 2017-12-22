@@ -14,19 +14,18 @@
 			    <%= f.password_field :password, autocomplete: "off", class: "form-control" %>
 			</div>
 
-			<% if devise_mapping.rememberable? -%>
+			<% if devise_mapping.rememberable? %>
 		        <div class="form-group">
 		          <%= f.check_box :remember_me %>
 		          <%= f.label :remember_me %>
 		        </div>
-			<% end -%>
-            <% unless resource.login.nil? %>
-              <% if User.login_captcha_required?(resource.login)  %>
-                <div class="recaptcha-error"></div>
-                <div class="recaptcha" id="captcha-widget"></div>
-              <% end %>
-            <% end %>
-
+			<% end %>
+      <% unless resource.login.nil? %>
+        <% if User.login_captcha_required?(resource.login)  %>
+          <div class="recaptcha-error alert-error"><p></p></div>
+          <div class="recaptcha" id="captcha-widget"></div>
+        <% end %>
+      <% end %>
 			<div class="actions">
 				<%= f.submit "Sign in", class: "btn btn-primary btn-lg sm_full_width " %>
 			</div><br>

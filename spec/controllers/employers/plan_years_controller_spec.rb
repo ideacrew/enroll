@@ -58,12 +58,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       expect(response).to render_template("new")
     end
 
-    it "should generate carriers" do
-      expect(assigns(:carrier_names)).to eq({'id' => "legal_name"})
-      expect(assigns(:carrier_names_with_sole_source)).to eq({'id' => "sole_source_legal_name"})
-      expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
-    end
-
+    ## Don't generate carriers on page load anymore
     it "should generate benefit_group with nil plan_option_kind" do
       benefit_group = assigns(:plan_year).benefit_groups.first
       expect(benefit_group.plan_option_kind).to eq nil
@@ -469,6 +464,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
+      allow(plan_year_proxy).to receive(:application_eligibility_warnings).and_return({})
     end
 
     context "plan year published sucessfully" do
@@ -500,7 +496,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
         allow(plan_year_proxy).to receive(:withdraw_pending!).and_return(true)
-        allow(plan_year_proxy).to receive(:application_eligibility_warnings)
+        allow(plan_year_proxy).to receive(:application_eligibility_warnings).and_return({primary_office_location: "address located outside the state"})
       end
 
       it "should be a render modal box with warnings" do

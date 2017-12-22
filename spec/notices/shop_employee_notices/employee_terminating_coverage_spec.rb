@@ -31,7 +31,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverage, :dbclean => :af
         :template => application_event.notice_template
     }}
 
-let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_selected')}
+let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_pending')}
 
 describe "New" do
     before do
@@ -78,7 +78,7 @@ describe "append data" do
 
     it "should append data" do
       @employee_notice.append_data
-      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.set_coverage_termination_date
+      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
       expect(@employee_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
     end
   end

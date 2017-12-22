@@ -27,7 +27,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       coverage_kind: "health",
       dental_level: "high",
       sbc_document: Document.new({title: 'sbc_file_name', subject: "SBC",
-                                    :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
+                                    :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
     )
   end
 

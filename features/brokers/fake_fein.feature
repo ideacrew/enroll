@@ -6,7 +6,7 @@ Feature: Fake FEINs
 
 Scenario: Primary Broker should not see FAKE Fein in his account
   When Primary Broker visits the HBX Broker Registration form
-
+  Given a valid ach record exists
   Given Primary Broker has not signed up as an HBX user
   Then Primary Broker should see the New Broker Agency form
   When Primary Broker enters personal information
@@ -17,7 +17,8 @@ Scenario: Primary Broker should not see FAKE Fein in his account
 
   Given Hbx Admin exists
   When Hbx Admin logs on to the Hbx Portal
-  And Hbx Admin clicks on the Brokers tab
+  And Hbx Admin clicks on the Brokers dropdown
+  And Hbx Admin clicks on the Broker Applications option
   Then Hbx Admin should see the list of broker applicants
   When Hbx Admin clicks on the current broker applicant show button
   Then Hbx Admin should see the broker application
@@ -37,13 +38,15 @@ Scenario: Hbx Admin should see broker's actual FEIN
   Given Hbx Admin exists
   And a broker exists
   When Hbx Admin logs on to the Hbx Portal
-  And Hbx Admin should click on the Broker Agencies tab
+  And Hbx Admin clicks on the Brokers dropdown
+  And Hbx Admin clicks on the Broker Agencies option
   And Hbx Admin clicks on the broker
   Then Hbx Admin should see fein
   And Hbx Admin logs out
 
 Scenario: Hbx Admin should see fake fein in broker's account
   When Primary Broker visits the HBX Broker Registration form
+  Given a valid ach record exists
   Given Primary Broker has not signed up as an HBX user
   Then Primary Broker should see the New Broker Agency form
   When Primary Broker enters personal information
@@ -54,7 +57,8 @@ Scenario: Hbx Admin should see fake fein in broker's account
 
   Given Hbx Admin exists
   When Hbx Admin logs on to the Hbx Portal
-  And Hbx Admin clicks on the Brokers tab
+  And Hbx Admin clicks on the Brokers dropdown
+  And Hbx Admin clicks on the Broker Applications option
   Then Hbx Admin should see the list of broker applicants
   When Hbx Admin clicks on the current broker applicant show button
   Then Hbx Admin should see the broker application
@@ -71,7 +75,8 @@ Scenario: Hbx Admin should see fake fein in broker's account
   And Primary Broker logs out
 
   When Hbx Admin logs on to the Hbx Portal
-  And Hbx Admin should click on the Broker Agencies tab
+  And Hbx Admin clicks on the Brokers dropdown
+  And Hbx Admin clicks on the Broker Agencies option
   And Hbx Admin clicks on the Fake broker
   Then Hbx Admin should see fein
   And Hbx Admin logs out

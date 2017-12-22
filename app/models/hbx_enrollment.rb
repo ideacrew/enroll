@@ -9,6 +9,8 @@ class HbxEnrollment
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::HbxEnrollment
 
   embedded_in :household
 
@@ -194,6 +196,7 @@ class HbxEnrollment
 
   before_save :generate_hbx_id, :set_submitted_at
   after_save :check_created_at
+  after_save :notify_on_save
 
   def generate_hbx_signature
     if self.subscriber
@@ -456,7 +459,7 @@ class HbxEnrollment
 
   def propogate_waiver
     return false unless is_shop? # there is no concept of waiver in ivl case
-    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
@@ -487,7 +490,7 @@ class HbxEnrollment
   end
 
   def update_existing_shop_coverage
-    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
 
     terminate_proc = lambda do |enrollment|
@@ -626,7 +629,7 @@ class HbxEnrollment
   end
 
   def applicant_ids
-    hbx_enrollment_members.map(&:applicant_id)
+    hbx_enrollment_members.pluck(:applicant_id)
   end
 
   def employer_profile
@@ -748,7 +751,7 @@ class HbxEnrollment
   end
 
   def rebuild_members_by_coverage_household(coverage_household:)
-    applicant_ids = hbx_enrollment_members.map(&:applicant_id)
+    applicant_ids = hbx_enrollment_members.pluck(:applicant_id)
     coverage_household.coverage_household_members.each do |coverage_member|
       next if applicant_ids.include? coverage_member.family_member_id
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
@@ -808,8 +811,8 @@ class HbxEnrollment
     if self.is_shop?
       if benefit_group.is_congress
         PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
-      elsif self.composite_rated?
-        CompositeRatedPlanCostDecorator.new(qhp_plan, benefit_group, self.composite_rating_tier)
+      elsif self.composite_rated? && (!qhp_plan.dental?)
+        CompositeRatedPlanCostDecorator.new(qhp_plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
       else
         reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
         PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
@@ -1165,7 +1168,7 @@ class HbxEnrollment
     state :renewing_contingent_transmitted_to_carrier
     state :renewing_contingent_enrolled
 
-    after_all_transitions :perform_employer_plan_year_count
+    # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing
@@ -1322,8 +1325,8 @@ class HbxEnrollment
     if plan.present? && benefit_group.present?
       if benefit_group.is_congress #is_a? BenefitGroupCongress
         @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
-      elsif self.composite_rated?
-        @cost_decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, self.composite_rating_tier)
+      elsif self.composite_rated? && (!plan.dental?)
+        @cost_decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
       else
         reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
         @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
@@ -1448,7 +1451,7 @@ class HbxEnrollment
   end
 
   def ee_select_plan_during_oe
-    if is_shop? && self.census_employee.present? 
+    if is_shop? && self.census_employee.present?
       ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "select_plan_year_during_oe")
     end
   end

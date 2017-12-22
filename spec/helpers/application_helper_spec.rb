@@ -215,10 +215,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "get_key_and_bucket" do
     it "should return array with key and bucket" do
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
       key, bucket = get_key_and_bucket(uri)
       expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
-      expect(bucket).to eq("dchbx-sbc")
+      expect(bucket).to eq("#{Settings.site.s3_prefix}-sbc")
     end
   end
   describe "current_cost" do
@@ -263,9 +263,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "env_bucket_name" do
+    let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     it "should return bucket name with system name prepended and environment name appended" do
       bucket_name = "sample-bucket"
-      expect(env_bucket_name(bucket_name)).to eq("mhc-enroll-" + bucket_name + "-local")
+      expect(env_bucket_name(bucket_name)).to eq("#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}")
     end
   end
 

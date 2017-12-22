@@ -3,7 +3,8 @@ Feature: Add, Edit and Delete security questions
   Scenario: Hbx Admin can add new security question
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
-    Then Hbx Admin click on Config
+    And Hbx Admin clicks on the Admin dropdown
+    And Hbx Admin clicks on the Config option
     And Hbx Admin should see Security Question link
     And Hbx Admin clicks on Security Question link
     And there is 0 questions available in the list
@@ -16,7 +17,8 @@ Feature: Add, Edit and Delete security questions
   Scenario: Hbx Admin can edit and update an existing security question
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
-    Then Hbx Admin click on Config
+    And Hbx Admin clicks on the Admin dropdown
+    And Hbx Admin clicks on the Config option
     And there is 1 preloaded security questions
     And Hbx Admin should see Security Question link
     And Hbx Admin clicks on Security Question link
@@ -31,7 +33,8 @@ Feature: Add, Edit and Delete security questions
   Scenario: Hbx Admin can delete an existing security question
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
-    Then Hbx Admin click on Config
+    And Hbx Admin clicks on the Admin dropdown
+    And Hbx Admin clicks on the Config option
     And there is 1 preloaded security questions
     And Hbx Admin should see Security Question link
     And Hbx Admin clicks on Security Question link

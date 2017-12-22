@@ -3,13 +3,13 @@
 # open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
 # cycles.  Scenarios where enollments are conducted on a rolling monthly basis are also supported.
 
-# OrganzationProfiles will typically embed many BenefitSponsorships.  A new BenefitSponsorship is in order when 
+# OrganzationProfiles will typically embed many BenefitSponsorships.  A new BenefitSponsorship is in order when
 # a significant change occurs, such as the following supported scenarios:
 # - Benefit Sponsor (employer) terminates and later returns after some elapsed period
 # - Existing Benefit Sponsor changes effective date
 
 # Referencing a new BenefitSponsorship helps ensure integrity on subclassed and associated data models and
-# enables history tracking as part of the models structure 
+# enables history tracking as part of the models structure
 module SponsoredBenefits
   module BenefitSponsorships
     class BenefitSponsorship
@@ -37,23 +37,19 @@ module SponsoredBenefits
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
       validates_presence_of :initial_enrollment_period
-      # validates :annual_enrollment_period_begin_month_of_year, 
-      #   numericality: {only_integer: true},
-      #   inclusion: { in: 1..12 },
-      #   allow_blank: false
+      validates :annual_enrollment_period_begin_month, 
+        numericality: {only_integer: true},
+        inclusion: { in: 1..12 },
+        allow_blank: false
 
       # Prevent changes to immutable fields. Instantiate a new model instead
-      before_validation { 
-          if persisted?
-            false if initial_enrollment_period.changed? || annual_enrollment_period_begin_month_of_year.changed
-          end
-        }
+      # before_validation {
+      #     if persisted?
+      #       false if initial_enrollment_period.changed? || annual_enrollment_period_begin_month.changed
+      #     end
+      #   }
 
       after_create :build_nested_models
-
-      def annual_enrollment_period_begin_month_of_year=(new_month)
-
-      end
 
       def census_employees
         PlanDesignCensusEmployee.find_by_benefit_sponsor(self)

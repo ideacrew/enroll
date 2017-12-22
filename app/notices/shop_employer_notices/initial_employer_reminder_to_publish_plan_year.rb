@@ -11,7 +11,8 @@ class ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear < ShopEmploy
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state => "draft").first
+    notice.aasm_state ||= "draft"
+    plan_year = employer_profile.plan_years.where(:aasm_state => notice.aasm_state).first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
         })

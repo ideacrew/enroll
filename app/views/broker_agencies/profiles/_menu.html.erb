@@ -9,17 +9,11 @@
           <% end %>
         </li>
         <li role="presentation" id="employers-tab" <%= menu_tab_class(active_tab, "employers-tab") %>>
-          <%= link_to(employers_broker_agencies_profiles_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
+          <%= link_to(sponsored_benefits.organizations_plan_design_organization_employers_path(@broker_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
             <span class="hidden-xs">Employers</span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
         </li>
-        </li>
-        <li role="presentation" id="prospect-employers-tab" <%= menu_tab_class(active_tab, "prospect-employers-tab") %>>
-          <%= link_to(sponsored_benefits.organizations_profile_employers_path(@broker_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
-            <span class="hidden-xs">Prospect Employers</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Prospect Employers"></span>
-          <% end %>
         </li>
         <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
           <%= link_to(family_index_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>

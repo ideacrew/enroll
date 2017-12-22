@@ -23,6 +23,11 @@
                 </div>
                 <div class="row no-buffer row-form-wrapper">
                   <%= render "shared/broker_agency_profile_fields", f: f, read_only_dropdown: 'read_only_dropdown' %>
+                </div>
+
+                <div class="action-group">
+                  <%= render "broker_agencies/applicants/bank_information", f: f %>
+                  <p class="bank-name-container"></p>
                 </div><br>
 
                 <div class="action-group">

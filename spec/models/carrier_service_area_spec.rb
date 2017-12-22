@@ -51,7 +51,7 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
       describe "::areas_valid_for_zip_code" do
         ## Note this requires a previously validated Mass. Zip Code
         it "returns the matching service areas" do
-          expect(subject.areas_valid_for_zip_code(zip_code: '01225')).to match_array([full_state_service_area, matching_service_area])
+          expect(subject.send(:areas_valid_for_zip_code, zip_code: '01225')).to match_array([full_state_service_area, matching_service_area])
         end
       end
 
