@@ -57,8 +57,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 2
-        expect(household.hbx_enrollments.where(aasm_state: "auto_renewing").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "auto_renewing").size).to eq 1
       end
 
       it "should trigger a renewing waived enrollment if the previous existing enrollment is inactive", dbclean: :after_each do
@@ -66,32 +66,26 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 2
-        expect(household.hbx_enrollments.where(aasm_state: "renewing_waived").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "renewing_waived").size).to eq 1
       end
 
       it "should not trigger an enrollment if we already have an enrollment with renewing plan year", dbclean: :after_each do
         hbx_enrollment.update_attributes(:benefit_group_id => organization.employer_profile.renewing_plan_year.benefit_groups.first.id, :benefit_group_assignment => census_employee.renewal_benefit_group_assignment)
-        hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on + 1.month)
+        hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on)
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 1
       end
     end
 
     context "Triggers a new waived enrollment" do
-
-      before do
-        census_employee.update_attributes(:ssn => census_employee.employee_role.person.ssn)
-      end
-
-      it "should trigger an waived enrollment if there was no enrollments present", dbclean: :after_each do
+      it "should not generate passive waiver when employee not covered under current plan year", dbclean: :after_each do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 1
-        expect(household.hbx_enrollments.first.aasm_state).to eq "renewing_waived"
+        expect(household.hbx_enrollments.by_coverage_kind('health').empty?).to be_truthy
       end
     end
   end

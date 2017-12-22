@@ -28,7 +28,7 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000004", abbrev: "GHMSI",
 org = Organization.new(office_locations: [hbx_office], fein: "080000000", legal_name: "Aetna")
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000007", abbrev: "AHI", hbx_carrier_id: "116163", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false)
 
-org = Organization.new(office_locations: [hbx_office], fein: "090000000", legal_name: "United Health Care")
+org = Organization.new(office_locations: [hbx_office], fein: "090000000", legal_name: "UnitedHealthcare")
 cp = org.create_carrier_profile(id: "53e67210eb899a460300000a", abbrev: "UHIC", hbx_carrier_id: "116034", ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false)
 
 org = Organization.new(office_locations: [hbx_office], fein: "001000000", legal_name: "Kaiser")

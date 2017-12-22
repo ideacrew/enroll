@@ -53,6 +53,14 @@ namespace :migrations do
         if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+
+          bg_ids = plan_year.benefit_groups.map(&:id)
+          census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+          census_employees.each do |census_employee|
+            census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+              assignment.update(end_on: plan_year.end_on) if assignment.end_on.present? && assignment.end_on > plan_year.end_on
+            end
+          end
         end
       end
 

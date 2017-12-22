@@ -16,7 +16,7 @@ describe ChangeInitialPlanYearAasmState, dbclean: :after_each do
   describe "updating aasm_state of the initial plan year", dbclean: :after_each do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:canceled_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month, aasm_state: "canceled",benefit_groups:[benefit_group]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [canceled_plan_year]) }
+    let(:employer_profile){ FactoryGirl.build(:employer_profile, aasm_state:'applicant',plan_years: [canceled_plan_year]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment]) }
@@ -39,6 +39,14 @@ describe ChangeInitialPlanYearAasmState, dbclean: :after_each do
       subject.migrate
       canceled_plan_year.reload
       expect(canceled_plan_year.aasm_state).to eq "active" # after migration
+    end
+
+    it "should update plan year aasm state of plan year after force publish date" do
+      canceled_plan_year.update_attributes(aasm_state:'application_ineligible') # before migration
+      subject.migrate
+      canceled_plan_year.reload
+      canceled_plan_year.employer_profile.reload
+      expect(canceled_plan_year.aasm_state).to eq "enrolling" # after migration
     end
 
   end

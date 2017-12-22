@@ -1,10 +1,10 @@
 class QhpBuilder
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
-  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
+  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005", "92479DC0020005", "92479DC0010003", "92479DC0010005"]
 
   def initialize(qhp_hash)
-    log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
-    @logger = Logger.new(log_path)
+    @log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.strftime("%Y_%m_%d_%H%M%S")}.log"
+    @logger = Logger.new(@log_path)
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?
@@ -39,7 +39,7 @@ class QhpBuilder
     elsif file_path.include?("metlife")
       "MetLife"
     elsif file_path.include?("united")
-      "United Health Care"
+      "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
@@ -119,7 +119,7 @@ class QhpBuilder
     puts "*"*80
     puts "Total Number of Plans imported from xml: #{@xml_plan_counter}."
     puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
-    puts "Check the log file #{LOG_PATH}"
+    puts "Check the log file #{@log_path}"
     puts "*"*80
     @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
     @logger.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
@@ -215,6 +215,7 @@ class QhpBuilder
   end
 
   def parse_metal_level
+    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
     return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end
