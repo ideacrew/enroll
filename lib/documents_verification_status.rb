@@ -25,7 +25,7 @@ module DocumentsVerificationStatus
           end
         when 'DC Residency'
           if consumer.residency_verified?
-            consumer.residency_attested? ? "attested" : consumer.local_residency_validation
+            consumer.residency_attested? ? "attested" : "verified"
           elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
             "review"
           elsif consumer.residency_pending?
