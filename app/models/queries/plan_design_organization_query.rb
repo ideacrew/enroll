@@ -3,6 +3,9 @@ module Queries
     attr_reader :search_string, :custom_attributes
 
     def datatable_search(string)
+      puts "****"
+      puts @plan_design_organization
+      puts string
       @search_string = string
       self
     end
@@ -13,6 +16,7 @@ module Queries
     end
 
     def build_scope()
+      puts "----"
       return [] if @plan_design_organization.nil?
       case @custom_attributes[:clients]
       when "active_clients"
