@@ -10,6 +10,7 @@ module PdfTemplates
     attribute :primary_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :employer_name, String
+    attribute :primary_email, String
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan

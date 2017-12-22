@@ -153,6 +153,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
+      hbx_enrollment.notify_employee_confirming_coverage_termination
       waive
     else
       redirect_to :back

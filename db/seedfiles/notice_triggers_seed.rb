@@ -1119,6 +1119,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_D076',
     title: 'Employee Enrollment Confirmation',
@@ -1208,17 +1209,17 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'DIG063',
-    title: "Notice To Initial Employer's No Binder Payment Received",
-    description: 'When an initial employer misses the binder payment deadline, this is sent the day after the binder payment deadline.',
+    hbx_id: 'SHOP_D042',
+    title: 'Confirmation of Election To Terminate Coverage',
+    description: 'Employee Terminating coverage after QLE',
     resource_name: 'employer',
-    event_name: 'initial_employer_no_binder_payment_received',
+    event_name: 'notify_employee_confirming_coverage_termination',
     notice_triggers: [
       {
-        name: ' Initial Employer No Binding Payment Received',
-        notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
-        notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
-        mpi_indicator: 'MPI_DIG063',
+        name: 'Notice to employer when employee terminates coverage',
+        notice_template: 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
+        notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
+        mpi_indicator: 'SHOP_D042',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
