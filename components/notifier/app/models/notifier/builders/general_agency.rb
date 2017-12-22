@@ -1,6 +1,8 @@
 module Notifier
   class Builders::GeneralAgency
+    include ActionView::Helpers::NumberHelper
     include Notifier::Builders::Broker
+    include Notifier::ApplicationHelper
 
     attr_accessor :general_agency, :merge_model, :payload
 
