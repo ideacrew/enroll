@@ -10,24 +10,21 @@ field_names = %w(
         primary_hbx_id
         primary_first_name
         primary_last_name
+        hbx_enrollment_hbx_ids
       )
 
 report_name = "#{Rails.root}/enrollment_notice_data_set.csv"
 
-#Check if any of the Enrolled Enrollment was an Auto Renewing Enrollment
-def any_enrollment_was_in_renewal_status?(enrollments)
-  enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? }
-end
-
 def valid_enrollment_hbx_ids(family)
   enrollments = family.enrollments
   good_enrollments = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(@start_date, @end_date)
-  auto_renewing_enrollments = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(@start_date, @end_date).where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES )
-  bad_enrollments_fre = enrollments.where(kind: "individual").by_submitted_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES )
+  auto_renewing_enrollments = enrollments.where(kind: "individual").renewing.by_submitted_datetime_range(@start_date, @end_date)
+  bad_enrollments_fre = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(Date.new(2016, 1, 1), @start_date - 1.days)
+  has_renewals = enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? } ? true : false
 
   good_enrollments.uniq!
 
-  if !bad_enrollments_fre.present? && !any_enrollment_was_in_renewal_status?(enrollments) && !auto_renewing_enrollments.present?
+  if !bad_enrollments_fre.present? && !has_renewals && !auto_renewing_enrollments.present?
     return good_enrollments.map(&:hbx_id)
   else
     return []
@@ -59,7 +56,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         csv << [
           person.hbx_id,
           person.first_name,
-          person.last_name
+          person.last_name,
+          hbx_enrollment_hbx_ids
         ]
       end
     rescue Exception => e
