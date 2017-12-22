@@ -253,6 +253,20 @@ context "Verification process and notices" do
       end
     end
 
+    context "DC Residency" do
+      it "returns true if residency status is outstanding and No documents for this type" do
+        person.consumer_role.local_residency_validation = "outstanding"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_truthy
+      end
+
+      it "returns false if residency status is attested and No documents for this type" do
+        person.consumer_role.local_residency_validation = "attested"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_falsey
+      end
+    end
+
     context "Immigration status" do
       it "returns true if lawful_presence fails and No documents for this type" do
         expect(person.consumer_role.is_type_outstanding?("Immigration status")).to be_truthy
@@ -823,6 +837,25 @@ describe "can_trigger_residency?" do
   end
 end
 
+
+
+describe "is_type_verified?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when entered type is DC Residency" do
+
+
+    it "should return true for dc residency verified type" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.is_type_verified?("DC Residency")).to eq true
+    end
+  end
+
+end
+
 RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
   let(:current_state) { c_state }
 
@@ -863,5 +896,31 @@ describe "#add_type_history_element" do
     person.consumer_role.verification_type_history_elements.delete_all
     person.consumer_role.add_type_history_element(attr)
     expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
+end
+
+describe "Verification Tracker" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  context "mongoid history" do
+    it "stores new record with changes" do
+      history_tracker_init =  HistoryTracker.count
+      person.update_attributes(:first_name => "updated")
+      expect(HistoryTracker.count).to be > history_tracker_init
+    end
+  end
+
+  context "mongoid history extension" do
+    it "stores action history element" do
+      history_action_tracker_init =  person.consumer_role.history_action_trackers.count
+      person.update_attributes(:first_name => "first_name updated", :last_name => "last_name updated")
+      person.reload
+      expect(person.consumer_role.history_action_trackers.count).to be > history_action_tracker_init
+    end
+
+    it "associates history element with mongoid history record" do
+      person.update_attributes(:first_name => "first_name updated", :last_name => "last_name updated")
+      person.reload
+      expect(person.consumer_role.history_action_trackers.last.tracking_record).to be_a(HistoryTracker)
+    end
   end
 end
