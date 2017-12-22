@@ -39,6 +39,10 @@ module Notifier
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
     end
 
+    def email
+      merge_model.email = employer_profile.staff_roles.first.work_email_or_best
+    end
+
     def employer_name
       merge_model.employer_name = employer_profile.legal_name
     end

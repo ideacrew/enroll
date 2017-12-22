@@ -19,8 +19,20 @@ module Notifier
       @employee_role = resource
     end
 
+    def ivl_oe_start_date
+      merge_model.ivl_oe_start_date = Settings.aca.individual_market.open_enrollment.start_on.strftime('%m/%d/%Y')
+    end
+
+    def ivl_oe_end_date
+      merge_model.ivl_oe_end_date = Settings.aca.individual_market.open_enrollment.end_on.strftime('%m/%d/%Y')
+    end
+
     def notice_date
       merge_model.notice_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    end
+
+    def email
+      merge_model.email = employee_role.person.work_email_or_best if employee_role.present?
     end
 
     def first_name

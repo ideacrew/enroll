@@ -11,6 +11,7 @@ module Notifier
     attribute :last_name, String
     # attribute :primary_identifier, String
     # attribute :mpi_indicator, String
+    attribute :email, String
     attribute :application_date, String
     attribute :employer_name, String
     attribute :mailing_address, MergeDataModels::Address
@@ -24,6 +25,7 @@ module Notifier
       notice = Notifier::MergeDataModels::EmployerProfile.new({
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         first_name: 'John',
+        email: 'johnwhitmore@gmail.com',
         last_name: 'Whitmore',
         application_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         employer_name: 'North America Football Federation'
