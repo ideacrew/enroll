@@ -1,4 +1,8 @@
 hello <%= broker.legal_name %>
+<% if customer %>
 create a quote for <%= customer.legal_name %>
+<% else %>
+create a prospect quote
+<% end %>
 
 <%= plan_design_organization.customer_profile_id %>

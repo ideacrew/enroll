@@ -11,8 +11,6 @@ module SponsoredBenefits
 
     embeds_many :office_locations, class_name:"SponsoredBenefits::Organizations::OfficeLocation"
 
-
-
     def self.find(id)
       organizations = PlanDesignOrganization.where("employer_profile._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.employer_profile : nil
