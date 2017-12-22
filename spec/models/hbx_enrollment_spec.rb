@@ -878,14 +878,12 @@ describe HbxProfile, "class methods", type: :model do
     let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
 
-    let(:current_date) { Date.new(TimeKeeper.date_of_record.year, 5, 1) }
-
     before do
-      TimeKeeper.set_date_of_record_unprotected!(current_date)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+       TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
@@ -2497,9 +2495,9 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
 
-        context 'when employee already has passive renewal coverage' do 
+        context 'when employee already has passive renewal coverage' do
 
-          it 'should cancel passive renewal and create new enrollment with coverage selected' do 
+          it 'should cancel passive renewal and create new enrollment with coverage selected' do
             passive_renewals = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on)
             expect(passive_renewals.size).to eq 1
             passive_renewal = passive_renewals.first
@@ -2508,7 +2506,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
             new_enrollment.select_coverage!
             family.reload
             passive_renewal.reload
-            expect(passive_renewal.coverage_canceled?).to be_truthy 
+            expect(passive_renewal.coverage_canceled?).to be_truthy
             new_passives = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on, :id.ne => passive_renewal.id)
             expect(new_passives.size).to eq 1
             expect(new_passives.first.coverage_selected?).to be_truthy
