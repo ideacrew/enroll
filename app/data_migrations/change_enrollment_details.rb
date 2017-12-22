@@ -20,6 +20,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       cancel_enr(enrollments)
     when "generate_hbx_signature"
       generate_hbx_signature(enrollments)
+    when "expire_enrollment"
+      expire_enrollment(enrollments)
     end
   end
 
@@ -94,6 +96,17 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       enrollment.generate_hbx_signature
       enrollment.save!
       puts "enrollment_signature generated #{enrollment.enrollment_signature}" unless Rails.env.test?
+    end
+  end
+
+  def expire_enrollment(enrollments)
+    enrollments.each do |enrollment|
+      if enrollment.may_expire_coverage?
+        enrollment.expire_coverage!
+        puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+      else
+        puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
+      end
     end
   end
 end
