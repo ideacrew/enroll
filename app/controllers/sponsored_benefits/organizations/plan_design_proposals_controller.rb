@@ -1,8 +1,11 @@
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
-  class BenefitSponsorships::PlanDesignProposalsController < ApplicationController
+  class Organizations::PlanDesignProposalsController < ApplicationController
     include Config::BrokerAgencyHelper
+
+    before_action :load_plan_design_organization
+
 
     def index
       ## load quotes for a given sponsorship
@@ -73,11 +76,15 @@ module SponsoredBenefits
       end
 
       def plan_design_proposal
-        @plan_design_proposal ||= BenefitSponsorships::PlanDesignProposal.find(params[:id])
+        @plan_design_proposal ||= Organizations::PlanDesignProposal.find(params[:id])
       end
 
       def plan_design_proposal_params
         params.require(:plan_design_proposal).permit(:effective_period, :open_enrollment_period)
+      end
+
+      def load_plan_design_organization
+        @plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params.require(:plan_design_organization_id))
       end
   end
 end
