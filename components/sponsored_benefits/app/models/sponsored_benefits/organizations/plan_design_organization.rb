@@ -42,6 +42,7 @@ module SponsoredBenefits
       scope :active_clients, -> { where(:has_active_broker_relationship => true) }
       scope :inactive_clients, -> { where(:has_active_broker_relationship => false) }
       scope :prospect_employers, -> { where(:customer_profile_id => nil) }
+      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
       def employer_profile
         ::EmployerProfile.find(customer_profile_id)
