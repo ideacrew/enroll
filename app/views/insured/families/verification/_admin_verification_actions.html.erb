@@ -107,7 +107,7 @@
         <% person.consumer_role.verification_type_history_elements.select{|el| el.verification_type == v_type }.each_with_index do |record, index| %>
             <tr>
               <th scope="row"><%= index + 1 %></th>
-              <td><%= record.created_at %></td>
+              <td><%= record.created_at.in_time_zone('Eastern Time (US & Canada)') %></td>
               <td><%= record.action.capitalize %></td>
               <td><%= record.modifier %></td>
               <td><%= record.update_reason %></td>
@@ -118,7 +118,7 @@
               </td>
             </tr>
             <div class="modal fade" id=<%="record_details_#{record.id}" %>  tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog" role="document">
+              <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h4 class="modal-title"><%= "#{record.action.capitalize} payload" %></h4>
