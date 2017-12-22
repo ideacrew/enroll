@@ -28,9 +28,9 @@ module Effective
       end
       
       def document_type(row)
-        if row.consumer_role.application_validation == "outstanding" && row.consumer_role.identity_validation == "pending"
+        if row.consumer_role.application_validation == "outstanding" && row.consumer_role.identity_validation == "pending" || row.consumer_role.application_validation == "valid" && row.consumer_role.identity_validation == "pending"
           return "Identity"
-        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "outstanding"
+        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "outstanding" || row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "valid"
           return "Application"
         elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "pending"
           return "Identity/Application"
