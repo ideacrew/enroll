@@ -1,11 +1,7 @@
 <div class="container content-bottom">
 	<div class="row">
 		<div class="col-md-9 col-sm-9 col-xs-12">
-            <h4>
-                <div class="col-md-4 col-sm-12 col-xs-12 col-4" >Employer Information
-                </div>
-              </h4>
-            <br/> <br/>
+            <br/>
             <%= render "entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
             <br>
             <%= render "office_locations", f: f %>
