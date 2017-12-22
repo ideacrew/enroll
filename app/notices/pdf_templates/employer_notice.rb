@@ -11,6 +11,7 @@ module PdfTemplates
     attribute :application_date, Date
     attribute :employer_name, String
     attribute :enrollment, PdfTemplates::Enrollment
+    attribute :employer_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
