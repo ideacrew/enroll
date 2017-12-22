@@ -44,6 +44,13 @@ class Insured::RidpDocumentsController < ApplicationController
 
   def destroy
     @document.delete
+
+    if @person.consumer_role.identity_validation == "pending"
+      @person.consumer_role.update_attributes(identity_validation: "outstanding")
+    elsif @person.consumer_role.application_validation == "pending"
+      @person.consumer_role.update_attributes(application_validation: "outstanding")
+    end
+
     respond_to do |format|
       format.js
     end
