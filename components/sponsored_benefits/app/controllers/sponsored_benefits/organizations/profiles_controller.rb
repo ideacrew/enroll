@@ -21,14 +21,15 @@ module SponsoredBenefits
     def create
       old_broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
       broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(old_broker_agency_profile).broker_agency_profile
-      sic_code = params[:organization][:profile][:sic_code]
-      pdo = Organizations::PlanDesignOrganization.create(organization_params)
+      pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.new(organization_params)
       pdo.owner_profile_id = old_broker_agency_profile.id
-      pdo.profile = Organizations::AcaShopCcaEmployerProfile.new({sic_code: sic_code})
       broker_agency_profile.plan_design_organizations << pdo
-      broker_agency_profile.save!
 
-      flash[:notice] = 'Prospect Employer Created'
+      if broker_agency_profile.save!
+        flash[:notice] = 'Prospect Employer added'
+      else
+        flash[:notice] = 'Failed to add Prospect Employer'
+      end
       redirect_to main_app.broker_agencies_profiles_path
     end
 
@@ -38,12 +39,13 @@ module SponsoredBenefits
     end
 
     def update
-      sic_code = params[:organization][:profile_attributes][:sic_code]
-      organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
-      organization.profile = Organizations::AcaShopCcaEmployerProfile.new({sic_code: sic_code})
-      organization.update_attributes(organization_params)
-
-      flash[:notice] = 'Employer Info Updated'
+      pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
+      pdo.assign_attributes(organization_params)
+      if pdo.save
+        flash[:notice] = 'Employer Information updated'
+      else
+        flash[:notice] = 'Failed to update Employer Information'
+      end
       redirect_to main_app.broker_agencies_profiles_path
     end
 
@@ -55,10 +57,8 @@ module SponsoredBenefits
     end
 
     def organization_params
-      params[:organization].delete :profile
       params.require(:organization).permit(
-        :entity_kind, :dba, :legal_name, :contact_method,
-        :profile_attributes => [:sic_code],
+        :legal_name, :dba, :entity_kind, :sic_code,
         :office_locations_attributes => [
           {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
           {:phone_attributes => [:kind, :area_code, :number, :extension]},

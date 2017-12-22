@@ -22,6 +22,9 @@ module SponsoredBenefits
       # Federal Employer ID Number
       field :fein, type: String
 
+      # Standard Industrial Classification Code that indicates company's business type
+      field :sic_code, type: String
+
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
       field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
@@ -32,6 +35,7 @@ module SponsoredBenefits
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
 
+      validates_presence_of :legal_name, :sic_code
       validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
       validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
 
