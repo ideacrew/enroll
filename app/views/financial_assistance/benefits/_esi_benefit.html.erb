@@ -33,18 +33,18 @@
       </div>
       <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel">ZIP</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:zip) %></span>
+        <span class="field_value zip floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:zip) %></span>
       </div>
     </div>
 
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel">EMPLOYER PHONE</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_phone.try(:full_phone_number) %></span>
+        <span class="field_value phone_number floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_phone.try(:full_phone_number) %></span>
       </div>
       <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel">EMPLOYER IDENTIFICATION NUMBER</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_id %></span>
+        <span class="field_value fien_field floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_id %></span>
       </div>
     </div>
 
@@ -54,11 +54,11 @@
       </div>
       <div class='col-md-6' style="line-height: 30px;">
         <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_waiting_period", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
+          <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
           <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
         </div>
         <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_waiting_period", false, !benefit.is_esi_waiting_period ,class: "radio-yml" )%>
+          <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml" )%>
           <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
         </div>
         <div class='col-md-4'>
@@ -73,11 +73,11 @@
       </div>
       <div class='col-md-6' style="line-height: 30px;">
         <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_mec_met", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
+          <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
           <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
         </div>
         <div class='col-md-4'>
-          <%= radio_button_tag("is_esi_mec_met", false, !benefit.is_esi_mec_met, class: "radio-yml" )%>
+          <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml" )%>
           <label class="radio-yml" for="is_esi_mec_met_no">No</label>
         </div>
         <div class='col-md-4'>

@@ -28,7 +28,7 @@
           <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), prompt: 'Choose', required: true %>
         </div>
         <div class="col-md-4">
-          <%= benefit_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: benefit.employer_address.try(:zip), class: "floatlabel" %>
+          <%= benefit_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: benefit.employer_address.try(:zip), class: "floatlabel zip" %>
         </div>
       </div>
     <% end %>
@@ -37,10 +37,10 @@
       <%= phone_fields.hidden_field :kind, value: "work" %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6">
-          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel" %>
+          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
         <div class="col-md-6">
-          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel ph-width" %>
+          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel ph-width fien_field" %>
         </div>
       </div>
     <% end %>
