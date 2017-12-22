@@ -3,13 +3,13 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include Config::BrokerAgencyHelper
+    include DataTablesAdapter
 
     before_action :load_plan_design_organization
 
 
     def index
-      ## load quotes for a given sponsorship
-      # broker / sponsor
+      @datatable = ::Effective::Datatables::BrokerEmployerQuotesDatatable.new(organization_id: plan_design_organization._id)
     end
 
     def new
