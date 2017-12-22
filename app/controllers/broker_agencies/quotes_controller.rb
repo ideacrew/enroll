@@ -498,7 +498,13 @@ class BrokerAgencies::QuotesController < ApplicationController
 private
 
   def set_broker_role
-    @broker = BrokerRole.find(params[:broker_role_id])
+    begin
+      @broker = BrokerRole.find(params[:broker_role_id])
+    rescue Exception => e
+      log(e, {:severity => "error", :error_message => "Error in #{controller_name} Controller #{action_name}
+       Action. Current URL: #{request.original_url}"})
+      raise e
+    end
   end
 
   def quote_download_link(quote)
