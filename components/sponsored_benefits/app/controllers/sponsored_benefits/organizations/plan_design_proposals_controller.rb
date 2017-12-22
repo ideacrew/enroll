@@ -7,14 +7,13 @@ module SponsoredBenefits
 
     before_action :load_plan_design_organization
 
-
     def index
       @datatable = ::Effective::Datatables::BrokerEmployerQuotesDatatable.new(organization_id: plan_design_organization._id)
     end
 
     def new
-      # initialize FormObject
-      # broker / sponsor
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
+      get_sic_codes
     end
 
     def show
@@ -28,12 +27,13 @@ module SponsoredBenefits
 
     def create
       # create quote for sponsorship
-      @plan_design_proposal = AcaShopCcaBenefitApplicationBuilder.new(sponsor, plan_design_proposal_params)
-      benefit_sponsorship.plan_design_proposals << @plan_design_proposal.plan_design_proposal
-      if benefit_sponsorship.save
-        redirect_to plan_design_proposal_path(@plan_design_proposal.plan_design_proposal._id)
+      proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({organization: @plan_design_organization}.merge(params.require(:forms_plan_design_proposal)))
+
+      if proposal.save
+        flash[:notice] = 'Quote created successfully'
+        redirect_to main_app.broker_agencies_profiles_path
       else
-        @plan_design_proposal = @plan_design_proposal.plan_design_proposal
+        @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
         render :new
       end
     end
@@ -86,5 +86,12 @@ module SponsoredBenefits
       def load_plan_design_organization
         @plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params.require(:plan_design_organization_id))
       end
+
+    def get_sic_codes
+      @grouped_options = {}
+      ::SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
+        @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} - #{sc.sic_code}", sc.sic_code]}
+      end
+    end
   end
 end
