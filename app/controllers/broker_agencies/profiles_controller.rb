@@ -203,6 +203,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
       @notice = "Changing default general agencies may take a few minutes to update all employers."
 
+      #triggers default GA hired notice to General Agency
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: @broker_agency_profile.default_general_agency_profile, event_object: @broker_agency_profile, notice_event: "ga_hire_notice") if @broker_agency_profile.default_general_agency_profile.present?
+
       @broker_role = current_user.person.broker_role || nil
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
     end
