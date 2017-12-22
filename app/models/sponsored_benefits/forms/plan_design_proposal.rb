@@ -8,7 +8,7 @@ module SponsoredBenefits
       attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :begin_date
       attr_reader :profile
       attr_reader :organization
-     
+
       validates_presence_of :title, :effective_date, :sic_code, :county, :zip_code
 
       def initialize(attrs = {})
@@ -39,7 +39,7 @@ module SponsoredBenefits
       end
 
       def ensure_sic_zip_county
-        # @sic_code = "0111" #@organization.sic_code
+        @sic_code = @organization.sic_code
         location = @organization.office_locations.first
         @zip_code = location.address.zip
         @county = location.address.county
@@ -59,7 +59,7 @@ module SponsoredBenefits
         sponsorship.benefit_applications.build
         @organization.save
       end
-   
+
       # def census_dependents=(attrs)
       # end
 

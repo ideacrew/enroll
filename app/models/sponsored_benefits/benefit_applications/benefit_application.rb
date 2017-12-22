@@ -5,7 +5,7 @@ module SponsoredBenefits
       include Mongoid::Timestamps
 
       embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
-      
+
 
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date

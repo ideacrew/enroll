@@ -10,7 +10,6 @@ module SponsoredBenefits
 
       # field :profile_kind, type: String, default: ":plan_design_profile"
 
-      field :hbx_id, type: String
       field :has_active_broker_relationship, type: Boolean, default: false
 
       # Registered legal name
