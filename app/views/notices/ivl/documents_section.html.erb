@@ -163,7 +163,7 @@
 <!-- Immigration -->
 <% if notice.immigration_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
+   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.immigration_unverified], bottom_margin: '5px'} %>
