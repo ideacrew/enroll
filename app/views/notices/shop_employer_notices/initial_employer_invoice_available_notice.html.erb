@@ -14,15 +14,15 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:</td>
+      <td>Dear <h3><%= notice.primary_fullname %></h3>:</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "The Open Enrollment period for #{notice.employer_name} is now closed and the first month’s invoice is available in the billing tab of your #{Settings.site.short_name} account. Please follow the steps listed below to make your first month’s premium payment. If your first month’s premium is not received by 5:00 p.m. on #{notice.plan_year.binder_payment_due_date}, your group’s coverage will be delayed and your employees may experience a gap in coverage."} %>
+  content: "The Open Enrollment period for #{notice.employer_name} is now closed and the first month’s invoice is available in the billing tab of your #{Settings.site.short_name} account. Please follow the steps listed below to make your first month’s premium payment. If your first month’s premium is not received by 5:00 p.m. on <strong>#{notice.plan_year.binder_payment_due_date}</strong>, your group’s coverage will be delayed and your employees may experience a gap in coverage."} %>
 
-
+<br>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
     heading: 'Next Steps', sub_heading: ''} %>
@@ -33,7 +33,7 @@
       <td>
         <ul style="list-style: circle solid;">
           <li>
-            <strong>Log in to your <a href= <%= Settings.site.home_url %> > <%= Settings.site.website_name %></a> Account</strong>
+            <strong>Log in to your <a href= <%= Settings.site.home_url %> >DCHealthLink.com</a> Account</strong>
           </li>
         </ul>
       </td>
@@ -119,7 +119,7 @@
  content: "Please contact your broker for further assistance. You can contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["By calling #{notice.hbe.phone}.",
+  ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
@@ -127,7 +127,7 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
