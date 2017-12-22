@@ -1,9 +1,5 @@
 SponsoredBenefits::Engine.routes.draw do
 
-  namespace :benefit_sponsorships do
-    resources :plan_design_proposals
-  end
-
   namespace :census_members do
     resources :plan_design_census_employees
   end
@@ -40,7 +36,7 @@ SponsoredBenefits::Engine.routes.draw do
   # end
 
   resources :plan_design_organizations, only: [] do
-    resources :plan_design_proposals, controller: 'benefit_sponsorships/plan_design_proposals'
+    resources :plan_design_proposals, controller: 'organizations/plan_design_proposals'
   end
 
 end
