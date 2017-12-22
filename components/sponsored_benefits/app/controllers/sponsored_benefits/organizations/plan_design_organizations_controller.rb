@@ -1,7 +1,7 @@
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
-  class Organizations::ProfilesController < ApplicationController
+  class Organizations::PlanDesignOrganizationsController < ApplicationController
     include Acapi::Notifiers
     include Config::AcaConcern
     include DataTablesAdapter
@@ -52,7 +52,7 @@ module SponsoredBenefits
   private
 
     def find_broker_agency_profile
-      @broker_agency_profile = ::BrokerAgencyProfile.find(params[:profile_id])
+      @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
       #authorize @broker_agency_profile, :access_to_broker_agency_profile?
     end
 

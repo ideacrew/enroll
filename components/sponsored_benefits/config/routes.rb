@@ -5,11 +5,10 @@ SponsoredBenefits::Engine.routes.draw do
   end
 
   namespace :organizations do
-    resources :profiles do
+    resources :plan_design_organizations do
       get :employers
       member do
         get :new
-        # post :employer_datatable
         get :edit
       end
     end
