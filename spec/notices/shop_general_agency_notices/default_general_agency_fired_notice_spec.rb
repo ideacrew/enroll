@@ -12,7 +12,7 @@ RSpec.describe ShopGeneralAgencyNotices::DefaultGeneralAgencyFiredNotice, :dbcle
                             :name =>'Default GA Hired - include date of appointment/termination',
                             :notice_template => 'notices/shop_general_agency_notices/broker_fires_default_ga_notice',
                             :notice_builder => 'ShopGeneralAgencyNotices::DefaultGeneralAgencyFiredNotice',
-                            :mpi_indicator => 'MPI_SHOPDX0088',
+                            :mpi_indicator => 'SHOP_D089',
                             :event_name => 'broker_fires_default_ga_notice',
                             :title => "Broker has removed you as their default general agency"})
                           }

@@ -677,7 +677,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOPDX0088',
+    hbx_id: 'SHOP_D089',
     title: 'Broker has removed you as their default general agency',
     description: 'When a broker selects a default GA in their account, a notice is sent to the GAs agency mail inbox alerting them of the appointment.',
     resource_name: 'general_agent_profile',
@@ -687,7 +687,7 @@ shop_notice_triggers = [
         name: 'Default GA Hired - include date of appointment/termination',
         notice_template: 'notices/shop_general_agency_notices/broker_fires_default_ga_notice',
         notice_builder: 'ShopGeneralAgencyNotices::DefaultGeneralAgencyFiredNotice',
-        mpi_indicator: 'MPI_SHOPDX0088',
+        mpi_indicator: 'SHOP_D089',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["general_agent_profile"],
