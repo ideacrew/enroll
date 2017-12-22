@@ -33,9 +33,18 @@ module SponsoredBenefits
     end
 
     def edit
+      @organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
+      get_sic_codes
     end
 
     def update
+      sic_code = params[:organization][:profile_attributes][:sic_code]
+      organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
+      organization.profile = Organizations::AcaShopCcaEmployerProfile.new({sic_code: sic_code})
+      organization.update_attributes(organization_params)
+
+      flash[:notice] = 'Employer Info Updated'
+      redirect_to main_app.broker_agencies_profiles_path
     end
 
   private
