@@ -14,7 +14,7 @@
              # ['View Quotes', sponsored_benefits.plan_design_organization_plan_design_proposals_path(plan_design_organization_id: row._id), 'static'],
              # ['Create Quote', sponsored_benefits.new_plan_design_organization_plan_design_proposal_path(plan_design_organization_id: row._id), 'static'],
              # ['Remove Quote', 'some-quote-remove-path', 'static'],
-             # ['Edit Employer', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'static']
+             ['Edit Quote', sponsored_benefits.edit_plan_design_proposal_path(row), 'static']
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quotes_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false

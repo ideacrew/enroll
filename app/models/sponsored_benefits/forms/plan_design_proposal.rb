@@ -42,6 +42,7 @@ module SponsoredBenefits
       end
 
       def proposal_id=(val)
+        return if val.blank?
         @proposal = @plan_design_organization.plan_design_proposals.detect{|proposal| proposal.id.to_s == val }
         if @proposal.present?
           @profile = @proposal.profile
@@ -76,10 +77,16 @@ module SponsoredBenefits
 
       def save
         initial_enrollment_period = @effective_date..(@effective_date.next_year.prev_day)
-        profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new
-        @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
-        sponsorship = @proposal.profile.benefit_sponsorships.build({benefit_market: :aca_shop_cca, initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
-        # sponsorship.benefit_applications.build
+
+        if @proposal.persisted?
+          @proposal.assign_attributes(title: @title)
+          @proposal.profile.benefit_sponsorships.first.assign_attributes(initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month)
+        else
+          profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({sic_code: @sic_code})
+          @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
+          sponsorship = @proposal.profile.benefit_sponsorships.build({benefit_market: :aca_shop_cca, initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
+        end
+
         @plan_design_organization.save
       end
 
