@@ -253,6 +253,20 @@ context "Verification process and notices" do
       end
     end
 
+    context "DC Residency" do
+      it "returns true if residency status is outstanding and No documents for this type" do
+        person.consumer_role.local_residency_validation = "outstanding"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_truthy
+      end
+
+      it "returns false if residency status is attested and No documents for this type" do
+        person.consumer_role.local_residency_validation = "attested"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_falsey
+      end
+    end
+
     context "Immigration status" do
       it "returns true if lawful_presence fails and No documents for this type" do
         expect(person.consumer_role.is_type_outstanding?("Immigration status")).to be_truthy
@@ -821,6 +835,25 @@ describe "can_trigger_residency?" do
       expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
   end
+end
+
+
+
+describe "is_type_verified?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when entered type is DC Residency" do
+
+
+    it "should return true for dc residency verified type" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.is_type_verified?("DC Residency")).to eq true
+    end
+  end
+
 end
 
 RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
