@@ -74,7 +74,6 @@ module SponsoredBenefits
         attributes.each { |name, value| send("#{name}=", value) }
 
         raise ArgumentError, "Must provide an import file" unless defined?(@file)
-        raise ArgumentError, "Must provide an EmployerProfile" unless defined?(@employer_profile)
       end
 
       def check_relationships
@@ -204,6 +203,7 @@ module SponsoredBenefits
         member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
         member.dob = record[:dob] if record[:dob]
         member.hired_on = record[:hire_date] if record[:hire_date]
+        member.benefit_sponsorship_id = benefit_sponsorship.id
         # is_business_owner blank or false based on it checkbox value will be set
         if ["0",""].include? record[:is_business_owner].to_s
           member.is_business_owner = false
@@ -213,7 +213,6 @@ module SponsoredBenefits
         member.gender = record[:gender].to_s if record[:gender]
         member.email = Email.new({address: record[:email].to_s, kind: "home"}) if record[:email]
         member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
-        member.employer_profile = @employer_profile
         assign_benefit_group(member, record[:benefit_group], record[:plan_year])
         address = SponsoredBenefits::Locations::Address.new({kind: 'home', address_1: record[:address_1], address_2: record[:address_2], city: record[:city],
                                state: record[:state], zip: record[:zip]})
@@ -403,10 +402,17 @@ module SponsoredBenefits
         end
       end
 
-
       def is_employee_terminable?(employee)
         #this logic may become more sophisticated in future
         employee.may_terminate_employee_role?
+      end
+
+      def encrypt_ssn(val)
+        if val.blank?
+          return nil
+        end
+        ssn_val = val.to_s.gsub(/\D/, '')
+        SymmetricEncryption.encrypt(ssn_val)
       end
 
       alias_method :count, :length

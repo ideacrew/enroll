@@ -10,7 +10,13 @@ module SponsoredBenefits
     end
 
     def new
-      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization)
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:proposal_id])
+
+      sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
+      data_table_params = {id: sponsorship.id, scopes: params[:scopes]}
+      @census_employees = sponsorship.census_employees
+
+      @datatable = Effective::Datatables::PlanDesignEmployeeDatatable.new(data_table_params)
     end
 
     def show
@@ -24,14 +30,15 @@ module SponsoredBenefits
 
     def create
       # create quote for sponsorship
-      proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({organization: plan_design_organization}.merge(params.require(:forms_plan_design_proposal)))
+      proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({organization: plan_design_organization}.merge(params.require(:forms_plan_design_proposal)))
 
-      if proposal.save
-        flash[:notice] = 'Quote created successfully'
-        redirect_to main_app.broker_agencies_profiles_path
-      else
-        @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization)
-        render :new
+      respond_to do |format|
+        if proposal_form.save
+          @plan_design_proposal = proposal_form
+          format.html { redirect_to new_plan_design_organization_plan_design_proposal_path(proposal_id: proposal_form.proposal.id), :flash => { :success => "Quote information save successfully."} } 
+        else
+          format.html { redirect_to :back, :flash => { :success => "Failed."} }
+        end
       end
     end
 
