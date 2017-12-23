@@ -2,6 +2,15 @@ module SponsoredBenefits
   module Forms
     class PlanDesignCensusEmployeeImport < CensusEmployeeImport
 
+      attr_accessor :proposal
+
+      def proposal=(val)
+        @proposal = val
+      end
+
+      def benefit_sponsorship
+        @proposal.profile.benefit_sponsorships.first
+      end
 
       def employee_klass
         SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
@@ -55,7 +64,8 @@ module SponsoredBenefits
 
         # match by DOB
       def find_employee(record)
-        employees = employee_klass.find_by_employer_profile_and_benefit_application(@employer_profile, @benefit_application)
+        # employees = employee_klass.find_by_benefit_sponsorship(benefit_sponsorship)
+        employees = employee_klass.where(benefit_sponsorship_id: benefit_sponsorship.id)
 
         ssn_query = record[:ssn]
         dob_query = record[:dob]
@@ -70,7 +80,7 @@ module SponsoredBenefits
         if first_name.present? && last_name.present? && dob_query.present?
           first_exp = /^#{first_name}$/i
           last_exp = /^#{last_name}$/i
-          matches.concat matches.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a
+          matches.concat employees.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a
         end
 
         matches.uniq
