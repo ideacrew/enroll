@@ -20,7 +20,7 @@ class ShopEmployerNotices::EmployeeTerminatingCoverage < ShopEmployerNotice
   def append_data
     employee_fullname =  hbx_enrollment.employee_role.person.full_name.titleize
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :terminated_on => hbx_enrollment.future_enrollment_termination_date,
+      :terminated_on => hbx_enrollment.terminated_on,
       :enrolled_count => hbx_enrollment.humanized_dependent_summary,
       :employee_fullname => employee_fullname
       })
