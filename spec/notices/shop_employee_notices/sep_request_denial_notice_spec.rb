@@ -7,7 +7,6 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
   let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, plan_year: TimeKeeper.date_of_record.beginning_of_year.next_year,  start_on: TimeKeeper.date_of_record.beginning_of_year.next_year, end_on: TimeKeeper.date_of_record.end_of_year.next_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31)) }
   let(:plan) { FactoryGirl.create(:plan) }
   let(:plan2) { FactoryGirl.create(:plan) }
-  let!(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind) }
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -33,7 +32,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
         :mpi_indicator => application_event.mpi_indicator,
         :event_name => application_event.event_name,
         :template => application_event.notice_template,
-        :options=>{:qle=>qualifying_life_event_kind}
+        :options=>{:qle_reported_date=> TimeKeeper.date_of_record + 10.days,:qle_title=>"Had a baby"}
     }}
 
   describe "New" do
@@ -69,8 +68,9 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
   end
 
   describe "append data" do
-    let(:start_on) {TimeKeeper.date_of_record - qualifying_life_event_kind.post_event_sep_in_days.days}
-    let(:end_on) {TimeKeeper.date_of_record + qualifying_life_event_kind.pre_event_sep_in_days.days}
+
+    let(:qle_reported_date) { valid_params[:options][:qle_reported_date]}
+    let(:title) { valid_params[:options][:qle_title]}
 
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
@@ -82,9 +82,9 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
 
     it "should append data" do
       @employee_notice.append_data
-      expect(@employee_notice.notice.sep.start_on).to eq start_on
-      expect(@employee_notice.notice.sep.end_on).to eq end_on
-      expect(@employee_notice.notice.sep.title).to eq qualifying_life_event_kind.title
+      expect(@employee_notice.notice.sep.start_on).to eq qle_reported_date
+      expect(@employee_notice.notice.sep.end_on).to eq qle_reported_date+30.days
+      expect(@employee_notice.notice.sep.title).to eq title
       
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on+1.year
 
