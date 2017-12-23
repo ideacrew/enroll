@@ -39,5 +39,9 @@ module PdfTemplates
       false
     end
 
+    def general_agency_notice?
+      false
+    end
+
   end
 end
