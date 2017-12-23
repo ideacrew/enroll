@@ -5,7 +5,7 @@ module SponsoredBenefits
       include ActiveModel::Model
       include ActiveModel::Validations
 
-      attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :begin_date
+      attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :quote_date
       attr_reader :profile
       attr_reader :plan_design_organization
       attr_reader :proposal
@@ -52,6 +52,7 @@ module SponsoredBenefits
       def prepopulate_attributes
         @title = @proposal.title
         @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.min.strftime("%m/%d/%Y")
+        @quote_date = @proposal.updated_at.strftime("%m/%d/%Y")
       end
 
       def ensure_proposal
