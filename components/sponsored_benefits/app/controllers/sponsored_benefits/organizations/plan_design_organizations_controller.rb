@@ -8,27 +8,27 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
 
     before_action :find_broker_agency_profile, only: [:employers, :new]
+    before_action :init_datatable, only: [:employers, :create, :update]
 
     def employers
-      @datatable = ::Effective::Datatables::BrokerAgencyEmployerDatatable.new(profile_id: @broker_agency_profile._id)
     end
 
     def new
-      @organization = ::Forms::EmployerProfile.new
-      get_sic_codes
+      init_organization
     end
 
     def create
+      init_organization
+
       old_broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
       broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(old_broker_agency_profile).broker_agency_profile
       broker_agency_profile.plan_design_organizations.new(organization_params.merge(owner_profile_id: old_broker_agency_profile.id))
 
       if broker_agency_profile.save
-        flash[:notice] = 'Prospect Employer added'
+        render :create
       else
-        flash[:notice] = 'Failed to add Prospect Employer'
+        render :new
       end
-      redirect_to main_app.broker_agencies_profiles_path
     end
 
     def edit
@@ -39,19 +39,27 @@ module SponsoredBenefits
     def update
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
       pdo.assign_attributes(organization_params)
+
       if pdo.save
-        flash[:notice] = 'Employer Information updated'
+        render :update
       else
-        flash[:notice] = 'Failed to update Employer Information'
+        render :edit
       end
-      redirect_to main_app.broker_agencies_profiles_path
     end
 
   private
 
+    def init_organization
+      @organization = ::Forms::EmployerProfile.new
+      get_sic_codes
+    end
+
+    def init_datatable
+      @datatable = ::Effective::Datatables::BrokerAgencyEmployerDatatable.new(profile_id: @broker_agency_profile._id)
+    end
+
     def find_broker_agency_profile
       @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
-      #authorize @broker_agency_profile, :access_to_broker_agency_profile?
     end
 
     def organization_params
