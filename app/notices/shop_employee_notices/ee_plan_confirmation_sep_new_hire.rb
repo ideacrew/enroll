@@ -1,7 +1,11 @@
-class
-ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
+class ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
 
-  attr_accessor :census_employee
+  attr_accessor :census_employee, :hbx_enrollment
+
+  def initialize(census_employee, args = {})
+    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment]).first
+    super(census_employee, args)
+  end
 
   def deliver
     build
@@ -14,17 +18,12 @@ ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
   end
 
   def append_data
-    sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-    new_hire = census_employee.employee_role.person.primary_family.households.first.hbx_enrollments.order_by(:"created_at".desc)[0]
-    effective_on = sep.present? ? sep.effective_on : new_hire.effective_on
-    build_plan = new_hire.build_plan_premium
+    hbx_enrollment = self.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
-                                                         :effective_on => effective_on,
-                                                         :plan => {:plan_name => new_hire.plan.name},
-                                                         :employee_cost => ('%.2f' % build_plan.total_employee_cost),
-                                                         :employer_cost => ('%.2f' % build_plan.total_employer_contribution)
-                                                     })
-    notice.employer_name = census_employee.employer_profile.legal_name
+       :effective_on => hbx_enrollment.effective_on,
+       :plan => {:plan_name => hbx_enrollment.plan.name},
+       :employee_cost => hbx_enrollment.total_employee_cost,
+       :employer_contribution => hbx_enrollment.total_employer_contribution
+       })
   end
-
 end

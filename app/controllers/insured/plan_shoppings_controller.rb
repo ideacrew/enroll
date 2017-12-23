@@ -57,7 +57,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    ee_plan_selection_confirmation_sep_new_hire(@enrollment)
+    @enrollment.ee_plan_selection_confirmation_sep_new_hire
 
     IvlNoticesNotifierJob.perform_later(@person.id.to_s ,"enrollment_notice") unless @enrollment.is_shop?
 
