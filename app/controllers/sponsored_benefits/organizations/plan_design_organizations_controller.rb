@@ -21,11 +21,9 @@ module SponsoredBenefits
     def create
       old_broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
       broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(old_broker_agency_profile).broker_agency_profile
-      pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.new(organization_params)
-      pdo.owner_profile_id = old_broker_agency_profile.id
-      broker_agency_profile.plan_design_organizations << pdo
+      broker_agency_profile.plan_design_organizations.new(organization_params.merge(owner_profile_id: old_broker_agency_profile.id))
 
-      if broker_agency_profile.save!
+      if broker_agency_profile.save
         flash[:notice] = 'Prospect Employer added'
       else
         flash[:notice] = 'Failed to add Prospect Employer'
