@@ -207,8 +207,12 @@ module Insured::FamiliesHelper
     QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
   end
 
-  def dual_role_without_shop_sep?
-    @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
+  def person_has_any_roles?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? 
+  end
+
+  def is_strictly_open_enrollment_case?
+    is_under_open_enrollment? && @family.active_seps.blank?
   end
 
   def tax_info_url
