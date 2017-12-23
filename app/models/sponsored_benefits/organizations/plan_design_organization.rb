@@ -32,7 +32,7 @@ module SponsoredBenefits
       field :customer_profile_id,         type: BSON::ObjectId
       field :customer_profile_class_name, type: String, default: "::EmployerProfile"
 
-      embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
+      embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
 
       validates_presence_of :legal_name, :sic_code
       validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }

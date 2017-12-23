@@ -1,7 +1,11 @@
 SponsoredBenefits::Engine.routes.draw do
 
   namespace :census_members do
-    resources :plan_design_census_employees
+    resources :plan_design_census_employees do 
+      collection do
+        post :bulk_employee_upload
+      end
+    end
   end
 
   namespace :organizations do

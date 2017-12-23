@@ -52,7 +52,7 @@ module SponsoredBenefits
       after_create :build_nested_models
 
       def census_employees
-        PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
+        SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
       end
 
       def build_nested_models
@@ -82,13 +82,11 @@ module SponsoredBenefits
       end
 
       class << self
+
         def find(id)
-          sponsorship = nil
-          Organizations::PlanDesignOrganization.all.each do |pdo|
-            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
-            sponsorship = sponsorships.select { |sponsorship| sponsorship._id == BSON::ObjectId.from_string(id)}
-          end
-          sponsorship.first
+          organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals.profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          proposal = organization.plan_design_proposals.where("profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          proposal.profile.benefit_sponsorships.detect{|sponsorship| sponsorship.id.to_s == id.to_s}
         end
 
         def find_broker_for_sponsorship(id)

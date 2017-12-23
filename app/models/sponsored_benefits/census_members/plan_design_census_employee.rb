@@ -35,6 +35,7 @@ module SponsoredBenefits
       before_save :allow_nil_ssn_updates_dependents
 
       scope :by_employer_profile_id,    ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+      scope :by_sponsorship_id,    ->(benefit_sponsorship_id) { where(benefit_sponsorship_id: benefit_sponsorship_id) }
       scope :by_ssn,    ->(ssn) { where(encrypted_ssn: SponsoredBenefits::CensusMembers::CensusMember.encrypt_ssn(ssn)) }
       scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
 
@@ -53,7 +54,7 @@ module SponsoredBenefits
       end
 
       def active_census_employee_is_unique
-        potential_dups = self.class.by_ssn(ssn).by_employer_profile_id(employer_profile_id)
+        potential_dups = self.class.by_ssn(ssn).by_sponsorship_id(benefit_sponsorship_id)
         if potential_dups.detect { |dup| dup.id != self.id  }
           message = "Employee with this identifying information is already active. "\
           "Update or terminate the active record before adding another."
@@ -112,6 +113,11 @@ module SponsoredBenefits
       end
 
       class << self
+
+        def find_by_benefit_sponsor(sponsor)
+          unscoped.where(benefit_sponsorship_id: sponsor._id).order_name_asc
+        end
+
         def find_all_by_employer_profile(employer_profile)
           unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
         end

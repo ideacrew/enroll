@@ -11,8 +11,8 @@
 <body class="font">
     <%= render 'shared/engines/header' %>
     <%= render 'shared/engines/broker_menu' %>
-
-    <div class="content <%= controller_name %> content-bottom">
+    <%= render_flash %>
+    <div class="content <%= controller_name %>">
 
       <%#= render '../../components/shared/flash' %>
       <div class="container">
