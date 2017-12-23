@@ -2,6 +2,11 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
 
   attr_accessor :census_employee
 
+  def initialize(census_employee, args = {})
+    @sep = args[:options][:qle]
+    super(census_employee, args)
+  end
+
   def deliver
     build
     append_data
@@ -13,13 +18,10 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   end
 
   def append_data
-    sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-    notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({
-      :qle_on => sep.qle_on,
-      :end_on => sep.end_on,
-      :title => sep.title
-      })
-
+    notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({:start_on => TimeKeeper.date_of_record - @sep.post_event_sep_in_days.try(:days),
+                                                            :end_on => TimeKeeper.date_of_record + @sep.pre_event_sep_in_days.try(:days),
+                                                            :title => @sep.title
+                                                           })
     active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED || PlanYear::RENEWING).first
     renewing_plan_year_start_on = active_plan_year.end_on+1
     notice.plan_year = PdfTemplates::PlanYear.new({

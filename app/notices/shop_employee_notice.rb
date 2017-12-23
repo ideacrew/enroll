@@ -28,6 +28,7 @@ class ShopEmployeeNotice < Notice
     notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employee_role.person.full_name
+    notice.primary_email = census_employee.employee_role.person.work_email_or_best
     notice.employer_name = census_employee.employer_profile.legal_name
     append_hbe
     append_address(census_employee.employee_role.person.mailing_address)
