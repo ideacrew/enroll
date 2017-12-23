@@ -533,8 +533,9 @@ describe HbxEnrollment, dbclean: :after_all do
         end
 
         it "should return decoratored plans when not in the open enrollment" do
+          enrollment.update_attributes(effective_on: sep.effective_on - 1.month)
           allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
-          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).and_return(bcp)
+          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).with(enrollment.effective_on).and_return(bcp)
           allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
@@ -793,7 +794,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan){ Plan.new(active_year: date.year) }
     let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
 
-    before do 
+    before do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
     end
 
@@ -870,11 +871,11 @@ describe HbxProfile, "class methods", type: :model do
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
 
     before do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1
+      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1
+       TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
@@ -1975,7 +1976,7 @@ context "for cobra", :dbclean => :after_each do
     end
 
     it "should return true" do
-      enrollment.kind = 'employer_sponsored_cobra' 
+      enrollment.kind = 'employer_sponsored_cobra'
       expect(enrollment.is_cobra_status?).to be_truthy
     end
   end
@@ -2017,7 +2018,7 @@ context "for cobra", :dbclean => :after_each do
   end
 
   it "can_select_coverage?" do
-    enrollment.kind = 'employer_sponsored_cobra' 
+    enrollment.kind = 'employer_sponsored_cobra'
     expect(enrollment.can_select_coverage?).to be_truthy
   end
 
@@ -2316,25 +2317,28 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
 
-        context 'when employee passively renewed coverage' do 
+        context 'when employee already has passive renewal coverage' do
 
-          it 'should cancel passive renewal and create new passive' do 
-            passive_renewal = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
-            expect(passive_renewal).not_to be_nil
+          it 'should cancel passive renewal and create new enrollment with coverage selected' do
+            passive_renewals = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on)
+            expect(passive_renewals.size).to eq 1
+            passive_renewal = passive_renewals.first
+            expect(passive_renewal.auto_renewing?).to be_truthy
 
             new_enrollment.select_coverage!
             family.reload
             passive_renewal.reload
 
-            expect(passive_renewal.coverage_canceled?).to be_truthy 
-            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
-            expect(new_passive.plan).to eq new_renewal_plan
+            expect(passive_renewal.coverage_canceled?).to be_truthy
+            new_passives = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on, :id.ne => passive_renewal.id)
+            expect(new_passives.size).to eq 1
+            expect(new_passives.first.coverage_selected?).to be_truthy
           end
         end
 
         context 'when employee actively renewed coverage' do
 
-          it 'should not cancel active renewal and should not generate passive' do 
+          it 'should not cancel active renewal and should not generate passive' do
             renewal_coverage = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
             renewal_coverage.update(aasm_state: 'coverage_selected')
 
@@ -2349,16 +2353,16 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
         end
       end
 
-      context 'when EE terminates current coverage' do 
+      context 'when EE terminates current coverage' do
 
-        it 'should cancel passive renewal and generate a waiver' do 
+        it 'should cancel passive renewal and generate a waiver' do
           passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(passive_renewal).not_to be_nil
 
           enrollment.terminate_coverage!
           enrollment.update_renewal_coverage
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy 
+          expect(passive_renewal.coverage_canceled?).to be_truthy
           passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
           expect(passive_waiver.present?).to be_truthy
         end
@@ -2485,7 +2489,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
     let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
     let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
-    
+
     before do
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
@@ -2511,7 +2515,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     context 'When employee not elgibile for cobra' do
       let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
 
-      it 'should raise error' do 
+      it 'should raise error' do
         expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
       end
     end
@@ -2557,23 +2561,23 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
        plan_id: plan.id
        )
     }
-    
+
     context 'for congression employer' do
       before do
         allow(enrollment).to receive_message_chain("benefit_group.is_congress") { true }
       end
-   
+
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: plan)
         expect(plan).to be_kind_of(PlanCostDecoratorCongress)
       end
     end
 
-    context 'for non congression employer' do 
+    context 'for non congression employer' do
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: plan)
         expect(plan).to be_kind_of(PlanCostDecorator)
-      end 
+      end
     end
   end
 
