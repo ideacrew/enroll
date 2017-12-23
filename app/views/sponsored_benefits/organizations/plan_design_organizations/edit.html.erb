@@ -1,12 +1,14 @@
 <div class="container content-bottom">
   <div class="row">
-    <h3>
-      <div class="col-md-4 col-sm-12 col-xs-12 col-4" >Edit Employer Information</div>
-    </h3>
-    <%= form_for @organization, as: :organization, url: {action: "update"} do |f| %>
-      <%= hidden_field_tag :broker_agency_id, @broker_agency_profile.id.to_s %>
-      <%= render 'shared/error_messages', :object => @organization %>
-      <%= render 'form', f: f %>
-    <% end %>
+    <div class="tab-content" id="myTabContent">
+      <h3>
+        <div class="col-md-4 col-sm-12 col-xs-12 col-4" >Edit Employer Information</div>
+      </h3>
+      <%= form_for @organization, as: :organization, url: {action: "update"}, remote:true do |f| %>
+        <%= hidden_field_tag :broker_agency_id, @broker_agency_profile.id.to_s %>
+        <%= render 'shared/error_messages', :object => @organization %>
+        <%= render 'form', f: f %>
+      <% end %>
+    </div>
   </div>
 </div>
