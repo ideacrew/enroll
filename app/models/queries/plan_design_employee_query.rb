@@ -14,7 +14,7 @@ module Queries
     end
 
     def build_scope()
-      # return [] if @employer_profile.nil?
+      return [] if @benefit_sponsorship.blank?
       # case @custom_attributes[:employers]
       #   when "active"
       #     @employer_profile.census_employees.active

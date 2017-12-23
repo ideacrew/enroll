@@ -1,19 +1,17 @@
-<div class="tab-content" id="myTabContent">
-  <div class="container">
+<div class="container">
+  <%= render 'shared/engines/horizontal_status', step:1 %>
+
     <div class="row">
-      <div class="col-sm-10">
-      <div class="top-pd">
-        <span class="flash_message"></span>
-      </div>
-       <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %></h3>
-        </div>
-        <div class="panel-body">
+      <div class="col-sm-12">
+        <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %></h3>
+          </div>
+          <div class="panel-body">
             <%= render 'shared/error_messages', :object => @plan_design_proposal %>
             <%= render 'form', f: f %>
-        </div>
+          </div>
         </div>
         <div class="pull-right">
           <%= f.submit "Save Quote", class: "btn btn-primary" %>
@@ -21,20 +19,27 @@
         <% end %>
       </div>
     </div>
-  </div>
 
-  <div class="container">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-sm-12">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Employee Roster</h3>
         </div>
         <div class="panel-body">
+          <p>Use the detailed roster below to specify the enrollees for this business.  The details below are from this Employer's current roster.  You can upload a new roster for this quote if required.</p>
           <%= render 'employees' %> 
         </div>
       </div>
     </div>
+    <div class="col-sm-12">
+      <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe, new_census_members_plan_design_census_employee_path(proposal_id: @plan_design_proposal.proposal.id, modal: 'upload'), remote: 'true', class: "btn btn-default" %>
+      <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe,{},class: "btn btn-default" %>
+      <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_census_members_plan_design_census_employee_path(proposal_id: @plan_design_proposal.proposal.id), :remote => true, class: "btn btn-default pull-right" %>
     </div>
   </div>
+  
+<!--   <div class="pull-right">
+    <%#= f.submit "Save Quote", class: "btn btn-primary" %> <%#= link_to "Select Health Benefits",{},class:"btn btn-primary" %>
+  </div> -->
 </div>

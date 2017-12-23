@@ -3,7 +3,7 @@ module SponsoredBenefits
     class BrokerAgencyProfile < Profile
 
       has_many :plan_design_organizations, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization", inverse_of: :broker_agency_profile
-
+      accepts_nested_attributes_for :plan_design_organizations, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
       # All PlanDesignOrganizations that belong to this BrokerRole/BrokerAgencyProfile
       def employer_leads
