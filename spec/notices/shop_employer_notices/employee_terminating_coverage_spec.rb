@@ -12,7 +12,7 @@ RSpec.describe ShopEmployerNotices::EmployeeTerminatingCoverage, :dbclean => :af
   let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id, coverage_terminated_on: TimeKeeper.date_of_record.end_of_month) }
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan, aasm_state: 'coverage_termination_pending', employee_role_id: employee_role.id)}
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan, aasm_state: 'coverage_termination_pending', employee_role_id: employee_role.id, terminated_on: TimeKeeper.date_of_record.end_of_month)}
   let(:renewal_plan) { FactoryGirl.create(:plan)}
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
@@ -66,6 +66,7 @@ RSpec.describe ShopEmployerNotices::EmployeeTerminatingCoverage, :dbclean => :af
       @employer_notice.append_data
       expect(@employer_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
       expect(@employer_notice.notice.enrollment.employee_fullname).to eq hbx_enrollment.employee_role.person.full_name.titleize
+      expect(@employer_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
     end
   end
 
