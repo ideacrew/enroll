@@ -349,6 +349,36 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
+  context "#non_eligible_for_non_owner_enrollee_rule" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:plan_year) { FactoryGirl.create(:future_plan_year) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: plan_year.employer_profile,
+      person: family.primary_applicant.person)}
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+
+    before do
+      census_employee.update_attributes(employer_profile_id: plan_year.employer_profile.id)
+      allow(plan_year).to receive(:benefit_groups).and_return [double("BG", id: "id")]
+    end
+
+    it "should return true if there are any employees who are not yet signed-up" do
+      expect(census_employee.employee_role_id).to eq nil
+      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq true
+    end
+
+    it "should return true if any employee without enrolled exist" do
+      census_employee.update_attributes(employee_role_id: employee_role.id)
+      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq true
+    end
+
+    it "it should return false when all employees are enrolled/waived" do
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id)
+      census_employee.update_attributes(employee_role_id: employee_role.id)
+      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq false
+    end
+  end
+
   context "has hired a broker" do
   end
 
