@@ -34,7 +34,7 @@ class CensusMember
   inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
 
-  validates_presence_of :first_name, :last_name, :employee_relationship
+  validates_presence_of :first_name, :last_name, :employee_relationship, :dob
 
   def full_name
     [first_name, middle_name, last_name, name_sfx].compact.join(" ")
