@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Employee of <%= notice.employer_name %> has made a change to their employer-sponsored coverage selection.</h3></td>
+      <td><h3>Employee of <%= notice.employer_name %> has made a change to their employer-sponsored coverage selection</h3></td>
     </tr>
   </tbody>
 </table>
@@ -20,10 +20,11 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This notice is to inform you that an employee of #{notice.employer_name} has elected to terminate their employer-sponsored coverage. "} %>
+  { content: "This notice is to inform you that an employee of #{notice.employer_name} has elected to terminate their employer-sponsored coverage."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
-  { contents: ["#{notice.employee_fullname.titleize} has elected to terminate their employer-sponsored health coverage with #{notice.employer_name}. Their policy covered themselves and #{notice.enrollment.enrolled_count} dependents. Their coverage will end on #{notice.enrollment.terminated_on}."], heading:'', sub_heading: ''} %>
+  { contents: ["#{notice.enrollment.employee_fullname} has elected to terminate their employer-sponsored health coverage with #{notice.employer_name}. Their policy covered themselves and #{notice.enrollment.enrolled_count} dependents. Their coverage will end on #{notice.enrollment.terminated_on}."], heading:'', sub_heading: ''} %>
+<br>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
@@ -42,4 +43,4 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This notice is being provided in accordance with 45 CFR 155.720(h)."} %>
+  { content: "This notice is being provided in accordance with 45 CFR 155.720(h)"} %>
