@@ -85,6 +85,7 @@ module SponsoredBenefits
 
         def find(id)
           organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals.profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          return if organization.blank?
           proposal = organization.plan_design_proposals.where("profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
           proposal.profile.benefit_sponsorships.detect{|sponsorship| sponsorship.id.to_s == id.to_s}
         end
