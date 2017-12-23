@@ -584,11 +584,9 @@ class HbxEnrollment
 
   def update_renewal_coverage
     if is_applicable_for_renewal?
-
       if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
         return
       end
-
       employer = benefit_group.plan_year.employer_profile
       if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
         begin
@@ -1140,7 +1138,10 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!(edi)
+      # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+      # Move reinstated enrollment to "coverage enrolled" status if coverage begins
+      reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
     end
 
     reinstate_enrollment
@@ -1581,6 +1582,10 @@ class HbxEnrollment
         (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) 
       end
     end 
+  end
+
+  def is_reinstated_enrollment?
+    self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}
   end
 
   private

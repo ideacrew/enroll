@@ -567,6 +567,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "POST reinstate_enrollment" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: '', format: :js
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+    end
+  end
+
   describe "GET get_user_info" do
     let(:user) { double("User", :has_hbx_staff_role? => true)}
     let(:person) { double("Person", id: double)}
