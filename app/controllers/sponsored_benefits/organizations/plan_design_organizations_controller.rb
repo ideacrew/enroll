@@ -22,7 +22,7 @@ module SponsoredBenefits
       broker_agency_profile = SponsoredBenefits::Organizations::BrokerAgencyProfile.find_or_initialize_broker_profile(old_broker_agency_profile).broker_agency_profile
       broker_agency_profile.plan_design_organizations.new(organization_params.merge(owner_profile_id: old_broker_agency_profile.id))
 
-      if !broker_agency_profile.save
+      if broker_agency_profile.save
         render :create
       else
         init_organization
