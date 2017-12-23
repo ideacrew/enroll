@@ -7,6 +7,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
   let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, plan_year: TimeKeeper.date_of_record.beginning_of_year.next_year,  start_on: TimeKeeper.date_of_record.beginning_of_year.next_year, end_on: TimeKeeper.date_of_record.end_of_year.next_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31)) }
   let(:plan) { FactoryGirl.create(:plan) }
   let(:plan2) { FactoryGirl.create(:plan) }
+  let!(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind) }
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -31,7 +32,8 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
         :event_name => application_event.event_name,
-        :template => application_event.notice_template
+        :template => application_event.notice_template,
+        :options=>{:qle=>qualifying_life_event_kind}
     }}
 
   describe "New" do
@@ -67,32 +69,22 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
   end
 
   describe "append data" do
-    let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
-    let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 18)}
-    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
-    let(:sep1) {family.special_enrollment_periods.new}
-    let(:sep2) {family.special_enrollment_periods.new}
-    let(:order) {[sep1,sep2]}
+    let(:start_on) {TimeKeeper.date_of_record - qualifying_life_event_kind.post_event_sep_in_days.days}
+    let(:end_on) {TimeKeeper.date_of_record + qualifying_life_event_kind.pre_event_sep_in_days.days}
 
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
       @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-      sep1.qle_on = qle_on
-      sep1.end_on = end_on
-      sep1.title = "had a baby"
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
 
     it "should append data" do
-      sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-      
       @employee_notice.append_data
-      expect(@employee_notice.notice.sep.qle_on).to eq qle_on
+      expect(@employee_notice.notice.sep.start_on).to eq start_on
       expect(@employee_notice.notice.sep.end_on).to eq end_on
-      expect(@employee_notice.notice.sep.title).to eq "had a baby"
+      expect(@employee_notice.notice.sep.title).to eq qualifying_life_event_kind.title
       
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on+1.year
 
