@@ -1,17 +1,19 @@
 <div class="container">
-  <div class="row">
-    <div id= 'message_form'></div>
-    <div class="top-pd" id="inbox_provider_form">
-      <span class="flash_message"></span>
-    </div>
-    <div class='hide' id='collection_scope'><%= @broker_agency_profile._id %> </div>
+  <div class="tab-content" id="myTabContent">
     <div class="row">
-      <div class="col-md-2 col-md-offset-9">
-        <%= link_to "Add Prospective Employer", new_organizations_plan_design_organization_path(plan_design_organization_id: params[:plan_design_organization_id]), class:"btn btn-primary prospective-employer"  %>
+      <div id= 'message_form'></div>
+      <div class="top-pd" id="inbox_provider_form">
+        <span class="flash_message"></span>
       </div>
+      <div class='hide' id='collection_scope'><%= @broker_agency_profile._id %> </div>
+      <div class="row">
+        <div class="col-md-2 col-md-offset-9">
+          <%= link_to "Add Prospective Employer", new_organizations_plan_design_organization_path(plan_design_organization_id: params[:plan_design_organization_id]), class:"btn btn-primary prospective-employer"  %>
+        </div>
+      </div>
+      <br>
+      <%= render_datatable(@datatable) %>
     </div>
-    <br>
-    <%= render_datatable(@datatable) %>
   </div>
 </div>
 <script>
