@@ -146,6 +146,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && @person.active_employee_roles.size < 2 )
     if ((@qle.present? && @qle.shop?) && !@qualified_date)
       sep_request_denial_notice
     end
