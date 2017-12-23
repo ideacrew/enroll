@@ -194,7 +194,7 @@ content: "The enrollment period for Medicaid never closes. A person can apply fo
 content: "<strong>Annual Open Enrollment Period</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not qualify for a new Special Enrollment Period, your next opportunity to enroll in employer-sponsored coverage through #{Settings.site.short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.start_on}."} %>
+content: "If you do not qualify for a new special enrollment period, your next opportunity to enroll in employer-sponsored coverage through #{Settings.site.short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Individual Market Enrollment</strong>"} %>
@@ -203,7 +203,7 @@ content: "<strong>Individual Market Enrollment</strong>"} %>
 content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period you can enroll in individual market coverage through #{Settings.site.short_name} if you live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. If you live outside the #{Settings.aca.state_name}, you can apply during open enrollment through the health insurance exchange operating in your state."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If you are a #{Settings.aca.state_name} resident and think you might be eligible for an individual market Special Enrollment Period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a Special Enrollment Period."} %>
+content: "There are separate eligibility rules for special enrollment periods into individual market coverage. If you are a #{Settings.aca.state_name} resident and think you might be eligible for an individual market special enrollment period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a special enrollment period."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
