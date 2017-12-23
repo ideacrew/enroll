@@ -16,10 +16,12 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      ENROLLMENT_FREQUENCY_KINDS = [ :annual, :rolling_month ]
+
       embedded_in :benefit_sponsorable, polymorphic: true
 
       # Obtain this value from site settings
-      field :benefit_market, type: Symbol, default: :aca_shop_cca
+      field :benefit_market, type: Symbol
 
       ## Example sponsor enrollment periods
       # DC Individual Market Initial & Renewal:  Jan 1 - Dec 31
@@ -32,22 +34,29 @@ module SponsoredBenefits
       # Store separate initial and on-going enrollment renewal values to handle mid-year start situations
       field :initial_enrollment_period, type: Range
       field :annual_enrollment_period_begin_month, type: Integer
+      field :enrollment_frequency, type: Symbol
       field :contact_method, type: String, default: "Paper and Electronic communications"
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :initial_enrollment_period, :contact_method
+      validates_presence_of :benefit_market, :contact_method
+
+      validates :enrollment_frequency,
+        inclusion: { in: ENROLLMENT_FREQUENCY_KINDS, message: "%{value} is not a valid enrollment frequency kind" },
+        allow_blank: false
+
       validates :annual_enrollment_period_begin_month, 
         numericality: {only_integer: true},
         inclusion: { in: 1..12 },
         allow_blank: false
 
       # Prevent changes to immutable fields. Instantiate a new model instead
-      # before_validation {
-      #     if persisted?
-      #       false if initial_enrollment_period.changed? || annual_enrollment_period_begin_month.changed
-      #     end
-      #   }
+      before_validation {
+          if persisted?
+            false if  (initial_enrollment_period.changed? && initial_enrollment_period_was.present?) ||
+                      (annual_enrollment_period_begin_month.changed? && annual_enrollment_period_begin_month.present?)
+          end
+        }
 
       after_create :build_nested_models
 
