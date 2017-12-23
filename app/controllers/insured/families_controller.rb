@@ -125,7 +125,6 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
-
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
@@ -147,7 +146,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && @person.active_employee_roles.size < 2 )
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && @person.has_multiple_active_employers? )
       sep_request_denial_notice
     end
   end
