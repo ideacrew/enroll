@@ -200,7 +200,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person)}
     let(:family1) {FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(10000), person:person)}
     let(:family2) {FactoryGirl.create(:family,:with_primary_family_member, e_case_id: rand(10000))}
-    let!(:organization) {FactoryGirl.create(:organization, fein: 333000535 + rand(1000))}
+    let!(:organization) {FactoryGirl.create(:organization, fein: 333000535 + rand(1000), employer_profile: employer)}
     let(:employer) { build(:employer_profile, entity_kind: "partnership", sic_code: '1111', broker_agency_profile: broker_agency_profile) }
 
     it "should find a consumer family" do
