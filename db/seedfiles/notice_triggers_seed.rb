@@ -343,8 +343,8 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP14',Open Enrollment
-    title: ' Completed',
+    hbx_id: 'SHOP14',
+    title: 'Open Enrollment Completed',
     description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
     resource_name: 'employer',
     event_name: 'initial_employer_open_enrollment_completed',
@@ -1045,6 +1045,28 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_general_agency_notices/general_agency_hired_notice',
         notice_builder: 'ShopGeneralAgencyNotices::GeneralAgencyHiredNotice',
         mpi_indicator: 'SHOP_D085',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["general_agent_profile"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {  
+    hbx_id: 'SHOP_D089',
+    title: 'Broker has removed you as their default general agency',
+    description: 'When a broker selects a default GA in their account, a notice is sent to the GAs agency mail inbox alerting them of the appointment.',
+    resource_name: 'general_agent_profile',
+    event_name: 'broker_fires_default_ga_notice',
+    notice_triggers: [
+      {
+        name: 'Default GA Hired - include date of appointment/termination',
+        notice_template: 'notices/shop_general_agency_notices/broker_fires_default_ga_notice',
+        notice_builder: 'ShopGeneralAgencyNotices::DefaultGeneralAgencyFiredNotice',
+        mpi_indicator: 'SHOP_D089',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["general_agent_profile"],

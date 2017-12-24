@@ -11,6 +11,9 @@ module PdfTemplates
     attribute :general_agent_email, String
     attribute :employer, String
     attribute :employer_fullname, String
+    attribute :primary_identifier, String
+    attribute :primary_fullname, String
+    attribute :email, String
     attribute :broker_fullname, String
     attribute :effective_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
@@ -43,6 +46,5 @@ module PdfTemplates
     def broker?
       return false
     end
-
   end
 end
