@@ -14,7 +14,7 @@ module SponsoredBenefits
 
       field :purchase_period          # => jan 1 - dec 31, 2018
 
-      embeds_many :benefit_product_rates, class: "SponsoredBenefits::BenefitProducts::BenefitProductRate"
+      embeds_many :benefit_product_rates, class_name: "SponsoredBenefits::BenefitProducts::BenefitProductRate"
 
       validates_presence_of :issuer_profile_id, :benefit_product_kind, :purchase_period
       validates :benefit_product_kind,
