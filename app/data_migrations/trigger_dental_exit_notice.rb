@@ -18,6 +18,6 @@ class TriggerDentalExitNotice < MongoidMigrationTask
         Rails.logger.error { "Unable to deliver #{notice_name} notice to employer #{@employer_profile.legal_name} due to #{e}" }
       end
     end
-    puts "************* Trigger Finished *************"
+    puts "************* Trigger Finished *************" unless Rails.env.test?
   end
 end
