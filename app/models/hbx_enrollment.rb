@@ -484,7 +484,7 @@ class HbxEnrollment
       if enrollment.effective_on > TimeKeeper.date_of_record
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future active
       else
-        enrollment.schedule_coverage_termination! if enrollment.may_waive_coverage? || enrollment.may_terminate_coverage? # terminate coverage if enrollment is already active
+        enrollment.schedule_coverage_termination! if enrollment.may_schedule_coverage_termination?
       end
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?
@@ -572,6 +572,16 @@ class HbxEnrollment
         rescue Exception => e
           Rails.logger.error { e }
         end
+      end
+    end
+  end
+
+  def trigger_waiver_confirmation_notice
+    if is_shop_sep?
+      begin
+        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "waiver_confirmation_notice")
+      rescue Exception => e
+        Rails.logger.error {"Unable to deliver waiver_confirmation_notice to employee #{enrollment.census_employee.full_name} due to #{e}"} unless Rails.env.test?
       end
     end
   end
@@ -1160,7 +1170,7 @@ class HbxEnrollment
     state :coverage_terminated    # coverage ended
 
     state :coverage_expired
-    state :inactive, :after_enter => :update_renewal_coverage   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
+    state :inactive, :after_enter => [:update_renewal_coverage, :trigger_waiver_confirmation_notice]   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
 
     # Verified Lawful Presence (VLP) flags
     state :unverified
