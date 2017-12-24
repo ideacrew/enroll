@@ -4,6 +4,7 @@ SponsoredBenefits::Engine.routes.draw do
     resources :plan_design_census_employees do 
       collection do
         post :bulk_employee_upload
+        post :expected_selection
       end
     end
   end

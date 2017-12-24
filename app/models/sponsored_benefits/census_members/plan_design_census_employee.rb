@@ -112,7 +112,25 @@ module SponsoredBenefits
         @benefit_application
       end
 
+      aasm do
+        state :eligible, initial: true
+        state :cobra_eligible
+        state :newly_designated_eligible
+        state :employee_role_linked
+        state :cobra_linked
+        state :newly_designated_linked
+        state :cobra_termination_pending
+        state :employee_termination_pending
+        state :employment_terminated
+        state :cobra_terminated
+        state :rehired
+      end
+
       class << self
+
+        def find(id)
+          unscoped.where(id: BSON::ObjectId.from_string(id)).first
+        end
 
         def find_by_benefit_sponsor(sponsor)
           unscoped.where(benefit_sponsorship_id: sponsor._id).order_name_asc
@@ -123,11 +141,6 @@ module SponsoredBenefits
         end
 
         alias_method :find_by_employer_profile, :find_all_by_employer_profile
-      end
-
-      aasm do
-        state :eligible, initial: true
-        state :cobra_eligible
       end
     end
   end
