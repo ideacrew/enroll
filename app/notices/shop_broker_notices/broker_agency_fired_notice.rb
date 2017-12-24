@@ -31,7 +31,8 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
   end
 
   def build
-    append_address(broker_agency_profile.organization.primary_office_location.address)
+    address = broker_agency_profile.organization.primary_mailing_address.present? ? broker_agency_profile.organization.primary_mailing_address : broker_agency_profile.organization.primary_office_location.address
+    append_address(address)
     append_broker(broker_agency_profile)
     append_hbe
   end
