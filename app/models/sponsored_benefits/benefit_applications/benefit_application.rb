@@ -60,11 +60,12 @@ module SponsoredBenefits
       # end
 
       def effective_period=(new_effective_period)
-        write_attribute(:effective_period, tidy_date_range(new_effective_period))
+        effective_range = SponsoredBenefits.tidy_date_range(new_effective_period, :effective_period)
+        write_attribute(:effective_period, effective_range) unless effective_range.blank?
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
-        write_attribute(:open_enrollment_period, tidy_date_range(new_open_enrollment_period))
+        write_attribute(:open_enrollment_period, SponsoredBenefits.tidy_date_range(new_open_enrollment_period))
       end
 
       def open_enrollment_begin_on
@@ -109,29 +110,6 @@ module SponsoredBenefits
           end
           application
         end
-      end
-
-    private
-
-      # Ensure class type and integrity of date period ranges
-      def tidy_date_range(range_period)
-        if range_period.class == String
-          beginning = range_period.split("..")[0]
-          ending = range_period.split("..")[1]
-          range_period = Date.strptime(beginning)..Date.strptime(ending)
-        end
-        # Check that end isn't before start. Note: end == start is not trapped as an error
-        errors.add(:effective_period, "Range period end date may not preceed begin date") if range_period.begin > range_period.end
-        return range_period if range_period.begin.is_a?(Date) && range_period.end.is_a?(Date)
-
-        if range_period.begin.is_a?(Time) || range_period.end.is_a?(Time)
-          begin_on  = range_period.begin.to_date
-          end_on    = range_period.end.to_date
-          (begin_on..end_on)
-        else
-          errors.add(:effective_period, "Range period values must be a Date or Time")
-        end
-        range_period
       end
 
     end

@@ -15,6 +15,7 @@ module SponsoredBenefits
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
+      # include Concerns::Observable
 
       ENROLLMENT_FREQUENCY_KINDS = [ :annual, :rolling_month ]
 
@@ -48,7 +49,7 @@ module SponsoredBenefits
       validates :annual_enrollment_period_begin_month, 
         numericality: {only_integer: true},
         inclusion: { in: 1..12 },
-        allow_blank: false
+        allow_blank: true
 
       # Prevent changes to immutable fields. Instantiate a new model instead
       before_validation {
@@ -59,6 +60,11 @@ module SponsoredBenefits
         }
 
       after_create :build_nested_models
+
+      def initial_enrollment_period=(new_initial_enrollment_period)
+        initial_enrollment_range = SponsoredBenefits.tidy_date_range(new_initial_enrollment_period, :initial_enrollment_period)
+        write_attribute(:initial_enrollment_period, initial_enrollment_range) if initial_enrollment_range.present?
+      end
 
       def census_employees
         PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
