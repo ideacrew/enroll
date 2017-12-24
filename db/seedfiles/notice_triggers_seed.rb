@@ -168,7 +168,7 @@ shop_notice_triggers = [
         }
       }
     ]
-  }, 
+  },
 
   {
     hbx_id: 'SHOP5',
@@ -309,27 +309,6 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
         mpi_indicator: 'MPI_D015',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP16',
-    title: 'Application to Offer Group Health Coverage in DC Health Link',
-    description: 'When Employer application meets minimum participation and non-owner requirements',
-    resource_name: 'employer',
-    event_name: 'initial_eligibile_employer_open_enrollment_begins',
-    notice_triggers: [
-      {
-        name: 'Initial Eligible Employer open enrollment begins',
-        notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
-        mpi_indicator: 'MPI_SHOP16',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -592,7 +571,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP33',
+    hbx_id: 'SHOP_D005',
     title: 'Employer Annual Renewal - Denial of Eligibility',
     description: 'denial of eligibility for employer as failed resindency',
     resource_name: 'employer',
@@ -602,7 +581,7 @@ shop_notice_triggers = [
         name: 'Employer Annual Renewal - Denial of Eligibility',
         notice_template: 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
         notice_builder: 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
-        mpi_indicator: 'MPI_SHOP33',
+        mpi_indicator: 'SHOP_D005',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -731,7 +710,7 @@ ivl_notice_triggers = [
       {
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/verifications_backlog_notice',
-        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_builder: 'IvlNotices::ReminderNotice',
         mpi_indicator: 'MPI_IVLV5B',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -743,17 +722,17 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'Notice20A',
-    title: 'Request for Additional Information - First Reminder',
+    hbx_id: 'IVL_DR1',
+    title: 'Reminder - You Must Submit Documents by the Deadline to Keep Your Insurance',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
     notice_triggers: [
       {
         name: 'First Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder1',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLV20A',
+        notice_template: 'notices/ivl/documents_verification_reminder',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR1',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -764,17 +743,17 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'Notice20B',
-    title: 'Request for Additional Information - Second Reminder',
+    hbx_id: 'IVL_DR2',
+    title: 'DON’T FORGET - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
     notice_triggers: [
       {
         name: 'Second Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder2',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLV20B',
+        notice_template: 'notices/ivl/documents_verification_reminder',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR2',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -785,17 +764,17 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'Notice21',
-    title: 'Request for Additional Information - Third Reminder',
+    hbx_id: 'IVL_DR3',
+    title: 'TIME SENSITIVE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
     notice_triggers: [
       {
         name: 'Third Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder3',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLV21',
+        notice_template: 'notices/ivl/documents_verification_reminder',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR3',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -806,17 +785,17 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'Notice22',
-    title: 'Request for Additional Information - Fourth Reminder',
+    hbx_id: 'IVL_DR4',
+    title: 'FINAL NOTICE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',
     notice_triggers: [
       {
         name: 'Fourth Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder4',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLV22',
+        notice_template: 'notices/ivl/documents_verification_reminder',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR4',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -914,6 +893,50 @@ ivl_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'IVL_FRE',
+    title: 'Review Your Insurance Plan Enrollment and Pay Your Bill Now',
+    description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_renewal_uqhp',
+    notice_triggers: [
+        {
+            name: 'Final Eligibility Notice for UQHP/AQHP individuals',
+            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
+            notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalUqhp',
+            mpi_indicator: 'IVL_FRE',
+            notice_trigger_element_group: {
+                market_places: ['individual'],
+                primary_recipients: ["consumer"],
+                primary_recipient_delivery_method: ["secure_message", "paper"],
+                secondary_recipients: []
+            }
+        }
+    ]
+  },
+
+  {
+    hbx_id: 'IVL_FRE',
+    title: 'Review Your Insurance Plan Enrollment and Pay Your Bill Now',
+    description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
+    resource_name: 'consumer_role',
+    event_name: 'final_eligibility_notice_renewal_aqhp',
+    notice_triggers: [
+        {
+            name: 'Final Eligibility Notice for UQHP/AQHP individuals',
+            notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
+            notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalAqhp',
+            mpi_indicator: 'IVL_FRE',
+            notice_trigger_element_group: {
+                market_places: ['individual'],
+                primary_recipients: ["consumer"],
+                primary_recipient_delivery_method: ["secure_message", "paper"],
+                secondary_recipients: []
+            }
+        }
+    ]
+    },
 
   {
     hbx_id: 'IVLR2',
@@ -1108,7 +1131,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_ENR',
-    title: 'Enrollment notice',
+    title: 'Your Health or Dental Plan Enrollment and Payment Deadline',
     description: 'Notice will be sent to families after their enrollment is done.',
     resource_name: 'consumer_role',
     event_name: 'enrollment_notice',
