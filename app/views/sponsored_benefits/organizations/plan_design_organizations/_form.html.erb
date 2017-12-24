@@ -1,14 +1,8 @@
-<div class="container content-bottom">
-	<div class="row">
-		<div class="col-md-9 col-sm-9 col-xs-12">
-            <br/>
-            <%= render "entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
-            <br>
-            <%= render "/sponsored_benefits/organizations/office_locations/office_locations", f: f %>
-            <div class="row no-buffer pull-right sm_full_width">
-            	<button type="submit" class="btn btn-primary pull-right sm_full_width">Confirm</button>
-            </div>
-		</div>
-	</div><br>
-</div>
+
+  <%= render "entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
+  <br>
+  <%= render "/sponsored_benefits/organizations/office_locations/office_locations", f: f %>
+  <div class="row no-buffer pull-right sm_full_width">
+    <button type="submit" class="btn btn-primary pull-right sm_full_width">Confirm</button>
+  </div>
 <input type="hidden" name="employer_id" id="employer_id" />

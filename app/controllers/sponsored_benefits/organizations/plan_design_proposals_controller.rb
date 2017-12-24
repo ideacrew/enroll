@@ -5,42 +5,58 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
+    before_action :find_broker_agency_profile, only: [:employers]
+    before_action :init_datatable, only: [:employers]
+
+
     def index
       @datatable = effective_datatable
     end
 
     def new
-      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization)
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:proposal_id])
+      init_employee_datatable
     end
 
+  
     def show
       # load relevant quote (not nested)
       # plan_design_proposal
     end
 
     def edit
-      # edit relevant quote (not nested)
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_proposal.plan_design_organization, proposal_id: params[:id])
+      init_employee_datatable
     end
 
     def create
       # create quote for sponsorship
-      proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({organization: plan_design_organization}.merge(params.require(:forms_plan_design_proposal)))
+      proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({
+        organization: plan_design_organization
+        }.merge(params.require(:forms_plan_design_proposal)))
 
-      if proposal.save
-        flash[:notice] = 'Quote created successfully'
-        redirect_to main_app.broker_agencies_profiles_path
-      else
-        @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization)
-        render :new
+      respond_to do |format|
+        if proposal_form.save
+          @plan_design_proposal = proposal_form
+          format.html { redirect_to new_plan_design_organization_plan_design_proposal_path(proposal_id: proposal_form.proposal.id), :flash => { :success => "Quote information save successfully."} } 
+        else
+          format.html { redirect_to :back, :flash => { :success => "Failed."} }
+        end
       end
     end
 
     def update
-      # update relevant quote (not nested)
-      if plan_design_proposal.update_attributes(plan_design_proposal_params)
-        redirect_to plan_design_proposal_path(plan_design_proposal._id)
-      else
-        render :edit
+      proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({
+        organization: plan_design_proposal.plan_design_organization, 
+        proposal_id: params[:id]}.merge(params.require(:forms_plan_design_proposal)))
+
+      respond_to do |format|
+        if proposal_form.save
+          @plan_design_proposal = proposal_form
+          format.html { redirect_to edit_plan_design_proposal_path(proposal_form.proposal), :flash => { :success => "Quote information updated successfully."} } 
+        else
+          format.html { redirect_to :back, :flash => { :success => "Update failed."} }
+        end
       end
     end
 
@@ -95,5 +111,13 @@ module SponsoredBenefits
           ]
         )
       end
+
+    def init_employee_datatable
+      sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
+      data_table_params = {id: sponsorship.id, scopes: params[:scopes]}
+      @census_employees = sponsorship.census_employees
+      @datatable = Effective::Datatables::PlanDesignEmployeeDatatable.new(data_table_params)
+    end
+
   end
 end

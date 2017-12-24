@@ -3,8 +3,8 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
     before_action :set_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
-    before_action :load_plan_design_benefit_application, only: [:index, :bulk_upload]
-    before_action :load_plan_design_organization, only: [:new]
+    before_action :load_plan_design_benefit_application, only: [:index]
+    before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload]
 
     def index
       @plan_design_census_employees = @benefit_application.plan_design_census_employees
@@ -15,6 +15,11 @@ module SponsoredBenefits
 
     def new
       @census_employee = build_census_employee #SponsoredBenefits::Forms::PlanDesignCensusEmployee.new
+      if params[:modal].present?
+        respond_to do |format|
+          format.js { render "upload_employees" }
+        end
+      end
     end
 
     def edit
@@ -43,30 +48,22 @@ module SponsoredBenefits
       redirect_to census_members_plan_design_census_employees_url, notice: 'Plan design census employee was successfully destroyed.'
     end
 
-    def bulk_upload
-      file = params.require(:file)
-      @census_employee_import = SponsoredBenefits::Forms::CensusEmployeeImport.new({file:file, employer_profile: @employer_profile})
+    def bulk_employee_upload
+      @census_employee_import = SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: params.require(:file), proposal: @plan_design_proposal})
       
-      begin
+      respond_to do |format|
         if @census_employee_import.save
-          redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
+          format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
         else
-          render "employers/employer_profiles/employee_csv_upload_errors"
-        end
-      rescue Exception => e
-        if e.message == "Unrecognized Employee Census spreadsheet format. Contact #{site_short_name} for current template."
-          render "employers/employer_profiles/_download_new_template"
-        else
-          @census_employee_import.errors.add(:base, e.message)
-          render "employers/employer_profiles/employee_csv_upload_errors"
+          format.html { redirect_to :back, :flash => { :success => "Roster upload failed."} }
         end
       end
     end
 
     private
 
-    def load_plan_design_organization
-      @plan_design_organization ||= SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:organization_id])
+    def load_plan_design_proposal
+      @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:proposal_id])
     end
 
     def load_plan_design_benefit_application
