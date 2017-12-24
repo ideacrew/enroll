@@ -70,7 +70,7 @@ module SponsoredBenefits
       def ensure_profile
         if @profile.blank?
           @profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new
-          sponsorship = @profile.benefit_sponsorships.build
+          sponsorship = @profile.benefit_sponsorships.first
           sponsorship.benefit_applications.build
         end
       end
@@ -84,10 +84,9 @@ module SponsoredBenefits
         else
           profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({sic_code: @sic_code})
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
-          @proposal.profile.benefit_sponsorships.build({benefit_market: :aca_shop_cca, initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
+          @proposal.profile.benefit_sponsorships.first.assign_attributes({initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
         end
-
-        @plan_design_organization.save
+        @proposal.save
       end
     end
   end

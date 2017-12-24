@@ -52,12 +52,12 @@ module SponsoredBenefits
         allow_blank: true
 
       # Prevent changes to immutable fields. Instantiate a new model instead
-      before_validation {
-          if persisted?
-            false if  (initial_enrollment_period.changed? && initial_enrollment_period_was.present?) ||
-                      (annual_enrollment_period_begin_month.changed? && annual_enrollment_period_begin_month.present?)
-          end
-        }
+      # before_validation {
+      #     if persisted?
+      #       false if  (self.initial_enrollment_period.changed? && self.initial_enrollment_period_was.present?) ||
+      #                 (annual_enrollment_period_begin_month.changed? && annual_enrollment_period_begin_month.present?)
+      #     end
+      #   }
 
       after_create :build_nested_models
 
