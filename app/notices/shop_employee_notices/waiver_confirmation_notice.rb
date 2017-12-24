@@ -13,15 +13,28 @@ class ShopEmployeeNotices::WaiverConfirmationNotice < ShopEmployeeNotice
   end
 
   def append_data
-    hbx_enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending"]).last
-    covered_dependents_count = hbx_enrollment.hbx_enrollment_members.reject{ |mem| mem.is_subscriber}.count
+    shop_enrollments = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.shop_market
+    
+    waived_enrollment = shop_enrollments.where(:aasm_state => "inactive").desc(:created_at).first
+
+    covered_dependents_count = waived_enrollment.hbx_enrollment_members.reject{ |mem| mem.is_subscriber}.count
     notice.enrollment = PdfTemplates::Enrollment.new({
       :enrollees_count => covered_dependents_count,
-      :terminated_on => hbx_enrollment.terminated_on,
-      :effective_on => hbx_enrollment.effective_on
+      :effective_on => waived_enrollment.effective_on
+    })
+
+    term_enrollment = shop_enrollments.where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending"]).desc(:created_at).first
+    
+    if term_enrollment.present?
+      covered_dependents_count = term_enrollment.hbx_enrollment_members.reject{ |mem| mem.is_subscriber}.count
+      notice.term_enrollment = PdfTemplates::Enrollment.new({
+        :enrollees_count => covered_dependents_count,
+        :terminated_on => term_enrollment.terminated_on,
+        :effective_on => term_enrollment.effective_on
       })
-    notice.plan = PdfTemplates::Plan.new({
-      :plan_name => hbx_enrollment.plan.name
+      notice.plan = PdfTemplates::Plan.new({
+        :plan_name => term_enrollment.plan.name
       })
+    end
   end
 end

@@ -2660,4 +2660,29 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
+
+  context "when EE waived coverage" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:person) { FactoryGirl.create(:person, :with_employee_role)}
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household,
+      aasm_state: "shopping", kind: "employer_sponsored")}
+
+    before do
+      HbxEnrollment.aasm.state_machine.events[:waive_coverage].transitions[0].instance_variable_set(:@after, nil)
+      allow(enrollment).to receive_message_chain(:census_employee, :id).and_return "id"
+    end
+
+    it "should trigger waiver notice if waived through SEP" do
+      enrollment.update_attributes(enrollment_kind: "special_enrollment")
+      allow(subject).to receive(:propogate_waiver).and_return true
+      expect(ShopNoticesNotifierJob).to receive(:perform_later).with(enrollment.census_employee.id.to_s, "waiver_confirmation_notice")
+      enrollment.waive_coverage!
+    end
+
+    it "should not trigger waiver notice if waived in OE" do
+      enrollment.update_attributes(enrollment_kind: "open_enrollment")
+      expect(ShopNoticesNotifierJob).not_to receive(:perform_later).with(enrollment.census_employee.id.to_s, "waiver_confirmation_notice")
+      enrollment.waive_coverage!
+    end
+  end
 end

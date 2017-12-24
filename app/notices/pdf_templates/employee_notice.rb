@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
     attribute :enrollment, PdfTemplates::Enrollment
+    attribute :term_enrollment, PdfTemplates::TermEnrollment
     attribute :email, String
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
