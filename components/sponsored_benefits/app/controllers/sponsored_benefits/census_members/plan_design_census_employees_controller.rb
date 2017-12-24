@@ -4,7 +4,7 @@ module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
     before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
     before_action :load_plan_design_benefit_application, only: [:index]
-    before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload]
+    before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload, :create]
 
     def index
       @plan_design_census_employees = @benefit_application.plan_design_census_employees
@@ -29,17 +29,19 @@ module SponsoredBenefits
     end
 
     def create
-      @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(census_members_plan_design_census_employee_params)
+      @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(plan_design_employee_params)
+      @plan_design_census_employee.benefit_sponsorship_id = @plan_design_proposal.profile.benefit_sponsorships.first.id
 
+      binding.pry
       if @plan_design_census_employee.save
-        redirect_to @plan_design_census_employee, notice: 'Plan design census employee was successfully created.'
+        redirect_to :back, :flash => {:success => "Employee record created successfully."}
       else
-        render :new
+        redirect_to :back, :flash => {:error => "Unable to create employee record."}
       end
     end
 
     def update
-      if @plan_design_census_employee.update(census_members_plan_design_census_employee_params)
+      if @plan_design_census_employee.update(plan_design_employee_params)
         redirect_to @plan_design_census_employee, notice: 'Plan design census employee was successfully updated.'
       else
         render :edit
@@ -48,8 +50,7 @@ module SponsoredBenefits
 
     def destroy
       @plan_design_census_employee.destroy
-      flash[:notice] = 'Roster entry deleted successfully'
-      
+
       respond_to do |format|
         format.js { render "delete" }
       end
@@ -101,10 +102,33 @@ module SponsoredBenefits
     end
 
     def build_census_employee
-      @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new
-      @census_employee.build_address
-      @census_employee.build_email
-      @census_employee
+      census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new
+      census_employee.build_address
+      census_employee.build_email
+      census_employee
+    end
+
+    def plan_design_employee_params
+      params.require(:census_members_plan_design_census_employee).permit(
+       :first_name,
+       :middle_name,
+       :last_name,
+       :name_sfx,
+       :dob,
+       :ssn,
+       :gender,
+       address_attributes: [
+        :kind,
+        :address_1,
+        :address_2,
+        :city,
+        :state,
+        :zip
+        ],
+        email_attributes: [
+          :kind,
+          :address
+        ])
     end
   end
 end
