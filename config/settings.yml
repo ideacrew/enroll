@@ -9,6 +9,7 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
+  website_url: "www.healthcare.gov"
 
   social_media:
     facebook_url: ""
@@ -37,6 +38,8 @@ aca:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
+    verification_due:
+      days: 95
 
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
