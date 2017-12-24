@@ -4,7 +4,7 @@ module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
     before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
     before_action :load_plan_design_benefit_application, only: [:index]
-    before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload, :create]
+    before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload, :create, :update]
 
     def index
       @plan_design_census_employees = @benefit_application.plan_design_census_employees
@@ -23,6 +23,8 @@ module SponsoredBenefits
     end
 
     def edit
+      @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
+      plan_design_proposal
       respond_to do |format|
         format.js { render "edit" }
       end
@@ -32,7 +34,6 @@ module SponsoredBenefits
       @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(plan_design_employee_params)
       @plan_design_census_employee.benefit_sponsorship_id = @plan_design_proposal.profile.benefit_sponsorships.first.id
 
-      binding.pry
       if @plan_design_census_employee.save
         redirect_to :back, :flash => {:success => "Employee record created successfully."}
       else
@@ -40,11 +41,11 @@ module SponsoredBenefits
       end
     end
 
-    def update
-      if @plan_design_census_employee.update(plan_design_employee_params)
-        redirect_to @plan_design_census_employee, notice: 'Plan design census employee was successfully updated.'
-      else
-        render :edit
+    def update      
+      @plan_design_census_employee.update(plan_design_employee_params)
+
+      respond_to do |format|
+        format.js { render "update" }
       end
     end
 
@@ -99,6 +100,10 @@ module SponsoredBenefits
     
     def census_members_plan_design_census_employee_params
       params[:census_members_plan_design_census_employee]
+    end
+
+    def plan_design_proposal
+      @plan_design_proposal = @census_employee.benefit_sponsorship.benefit_sponsorable.plan_design_proposal
     end
 
     def build_census_employee
