@@ -28,7 +28,7 @@ class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNoti
         names << Person.where(hbx_id: dep_id).first.full_name
         notice.enrollment = PdfTemplates::Enrollment.new({
           :dependents => names,
-          :dependent_dob => now.end_of_month,
+          :terminated_on => now.end_of_month,
           :is_congress => is_congress,
           :plan_year => bc_period.start_on.year,
           :effective_on => bc_period.start_on,

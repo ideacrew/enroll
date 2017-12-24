@@ -20,6 +20,7 @@ module PdfTemplates
     attribute :dependent_dob, Date
     attribute :plan_year, Date
     attribute :coverage_kind, String
+    attribute :terminated_on, Date
     attribute :is_congress, Boolean
   end
 end
