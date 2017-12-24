@@ -192,7 +192,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
-      debugger
       if params[:type] == 'clear'
         if old_default_ga_id.present?
           GeneralAgencyProfile.find(old_default_ga_id).employers_linked_with_general_agency.each do |emp|
