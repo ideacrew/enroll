@@ -143,6 +143,7 @@ class Insured::PlanShoppingsController < ApplicationController
     rescue Exception => e
       (Rails.logger.error {"Unable to deliver waiver_confirmation_notice to employee #{enrollment.census_employee.full_name} due to #{e}"}) unless Rails.env.test?
     end
+    notify_employer_when_employee_terminate_coverage(@hbx_enrollment)
   end
 
   def terminate
@@ -154,6 +155,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
       hbx_enrollment.notify_employee_confirming_coverage_termination
+      notify_employer_when_employee_terminate_coverage(hbx_enrollment)
       waive
     else
       redirect_to :back
