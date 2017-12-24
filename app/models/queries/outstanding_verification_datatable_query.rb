@@ -13,7 +13,7 @@ module Queries
     end
 
     def person_search search_string
-      return Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent") if search_string.blank?
+      Family.outstanding_verification if search_string.blank?
     end
 
     def build_scope()
