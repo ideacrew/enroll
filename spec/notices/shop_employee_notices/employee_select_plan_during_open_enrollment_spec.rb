@@ -29,7 +29,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
-      :options => { :hbx_enrollment_id => hbx_enrollment.hbx_id.to_s }
+      :options => { :hbx_enrollment_hbx_id => hbx_enrollment.hbx_id.to_s }
   }}
 
   describe "New" do

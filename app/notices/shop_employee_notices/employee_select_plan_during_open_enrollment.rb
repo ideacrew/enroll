@@ -3,7 +3,7 @@ class ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment < ShopEmployee
   attr_accessor :census_employee, :hbx_enrollment
 
   def initialize(census_employee, args = {})
-    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment_id]).first
+    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment_hbx_id]).first
     super(census_employee, args)
   end
 
@@ -19,7 +19,6 @@ class ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment < ShopEmployee
 
   def append_data
     hbx_enrollment = self.hbx_enrollment
-
     notice.enrollment = PdfTemplates::Enrollment.new({
       :employer_contribution => hbx_enrollment.total_employer_contribution,
       :employee_cost => hbx_enrollment.total_employee_cost,
