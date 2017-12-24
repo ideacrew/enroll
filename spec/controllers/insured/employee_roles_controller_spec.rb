@@ -27,6 +27,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       allow(role_form).to receive(:active_employee_roles).and_return [employee_role]
+      allow(census_employee).to receive(:trigger_notices).and_return(true)
       sign_in user
     end
 
@@ -194,7 +195,6 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
         allow(census_employee).to receive(:is_linked?).and_return(true)
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
-        allow(census_employee).to receive(:trigger_notices).and_return(true)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)
         allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
