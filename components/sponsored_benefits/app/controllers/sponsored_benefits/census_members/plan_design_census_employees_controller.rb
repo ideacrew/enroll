@@ -2,7 +2,7 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
-    before_action :set_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
+    before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
     before_action :load_plan_design_benefit_application, only: [:index]
     before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload]
 
@@ -23,6 +23,9 @@ module SponsoredBenefits
     end
 
     def edit
+      respond_to do |format|
+        format.js { render "edit" }
+      end
     end
 
     def create
@@ -45,7 +48,11 @@ module SponsoredBenefits
 
     def destroy
       @plan_design_census_employee.destroy
-      redirect_to census_members_plan_design_census_employees_url, notice: 'Plan design census employee was successfully destroyed.'
+      flash[:notice] = 'Roster entry deleted successfully'
+      
+      respond_to do |format|
+        format.js { render "delete" }
+      end
     end
 
     def bulk_employee_upload
@@ -60,6 +67,20 @@ module SponsoredBenefits
       end
     end
 
+    def expected_selection
+      if params[:ids].present?
+        begin
+          census_employees = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.where(:id.in => params[:ids])
+          census_employees.each do |census_employee|
+            census_employee.update_attributes(:expected_selection => params[:expected_selection].downcase)
+          end
+          render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
+        rescue => e
+          render json: { status: 500, message: 'An error occured while submitting employees participation status' }
+        end
+      end
+    end
+
     private
 
     def load_plan_design_proposal
@@ -70,15 +91,14 @@ module SponsoredBenefits
       @benefit_application = SponsoredBenefits::BenefitApplications::BenefitApplication.find(params.require(:benefit_application_id))
       @employer_profile = @benefit_application.employer_profile if @benefit_application.present?
     end
-    
-    def set_census_members_plan_design_census_employee
-      @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params[:id])
-    end
 
+    def load_plan_design_census_employee
+      @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
+    end
+    
     def census_members_plan_design_census_employee_params
       params[:census_members_plan_design_census_employee]
     end
-
 
     def build_census_employee
       @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new
