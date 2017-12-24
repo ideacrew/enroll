@@ -752,7 +752,7 @@ class EmployerProfile
             plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
             #exclude congressional employees
             next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+            if non_eligible_for_min_participation(plan_year) || non_eligible_for_non_owner_enrollee_rule(plan_year)
               organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
             end
           rescue Exception => e
@@ -887,6 +887,27 @@ class EmployerProfile
         plan_year
       end
     end
+  end
+
+  def non_eligible_for_min_participation(plan_year)
+    plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+  end
+
+  def non_eligible_for_non_owner_enrollee_rule(plan_year)
+    non_owner_employees = census_employees.active.non_business_owner
+    # Account not linked - which means not enrolled
+    return true if non_owner_employees.where(:"employee_role_id" => nil).present?
+    non_owner_employees.each do |census_employee|
+      begin
+        next if census_employee.employee_termination_pending? && census_employee.employment_terminated_on <= plan_year.start_on
+        return true if census_employee.employee_role.person.primary_family.blank?
+        enrolled = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.non_expired_and_non_terminated.map(&:benefit_group_id) & plan_year.benefit_groups.map(&:id)
+        return true if enrolled.blank?
+      rescue Exception => e
+        Rails.logger.error { "Issues with #{census_employee.id} on #{organization.legal_name} due to #{e}" }
+      end
+    end
+    return false
   end
 
   def self.transmit_scheduled_employers(new_date, feins=[])
