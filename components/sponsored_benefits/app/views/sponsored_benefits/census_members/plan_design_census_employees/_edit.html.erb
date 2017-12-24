@@ -1,1 +1,6 @@
-Hello world!
+<div class="col-xs-10 add-employee-tab">
+<%= form_for @census_employee, remote: true, method: :put do |f| %>
+  <%= hidden_field_tag :proposal_id, @plan_design_proposal.id %>
+  <%= render 'form', f: f %>
+<% end %>
+</div>

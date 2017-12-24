@@ -102,6 +102,10 @@ module SponsoredBenefits
         @employer_profile = Organizations::PlanDesignProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
       end
 
+      def benefit_sponsorship
+        SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.find(self.benefit_sponsorship_id)
+      end
+
       def benefit_application
         return @benefit_application if defined? @benefit_application
         if employer_profile.present?
