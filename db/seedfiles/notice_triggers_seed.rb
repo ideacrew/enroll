@@ -635,7 +635,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP_D050',
-    title: 'Broker Agency Fired',
+    title: 'Employer has removed you as their broker',
     description: 'PDF Generation for Broker after Termination',
     resource_name: 'broker_role',
     event_name: 'broker_agency_termination_notice',
@@ -644,7 +644,7 @@ shop_notice_triggers = [
         name: 'Employee termination notice by employer',
         notice_template: 'notices/shop_broker_notices/broker_agency_fired_notice.html.erb',
         notice_builder: 'ShopBrokerNotices::BrokerAgencyFiredNotice',
-        mpi_indicator: 'MPI_SHOP_D050',
+        mpi_indicator: 'SHOP_D050',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["broker_agencies"],
