@@ -41,7 +41,9 @@ class ShopBrokerNotices::BrokerHiredNotice < ShopBrokerNotice
     })
     notice.primary_fullname = broker.full_name
     notice.broker_agency = employer_profile.broker_agency_profile.legal_name.titleize
-    append_address(employer_profile.broker_agency_profile.organization.primary_office_location.address)
+    organization = employer_profile.broker_agency_profile.organization
+    address = organization.primary_mailing_address.present? ? organization.primary_mailing_address : organization.primary_office_location.address
+    append_address(address)
     append_hbe
   end
 
