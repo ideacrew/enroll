@@ -2,7 +2,6 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class Organizations::PlanDesignOrganizationsController < ApplicationController
-    include Acapi::Notifiers
     include Config::AcaConcern
     include DataTablesAdapter
     include Config::BrokerAgencyHelper
