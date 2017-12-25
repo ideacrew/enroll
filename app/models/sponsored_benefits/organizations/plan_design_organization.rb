@@ -51,6 +51,10 @@ module SponsoredBenefits
         ::EmployerProfile.find(customer_profile_id)
       end
 
+      def broker_agency_profile
+        ::BrokerAgencyProfile.find(owner_profile_id)
+      end
+
       def broker_relationship_inactive?
         !has_active_broker_relationship
       end

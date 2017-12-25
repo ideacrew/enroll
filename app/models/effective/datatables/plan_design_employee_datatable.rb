@@ -5,9 +5,9 @@ module Effective
       datatable do
 
         bulk_actions_column do
-          bulk_action 'Employee will enroll',  expected_selection_census_members_plan_design_census_employees_path(:expected_selection=>"enroll"), data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
-          bulk_action 'Employee will not enroll with valid waiver', expected_selection_census_members_plan_design_census_employees_path(:expected_selection=>"waive"), data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
-          bulk_action 'Employee will not enroll with invalid waiver', expected_selection_census_members_plan_design_census_employees_path(:expected_selection=>"will_not_participate"), data: {confirm: 'Remember, your participation rate can affect your group premium rates', no_turbolink: true}
+          bulk_action 'Employee will enroll',  expected_selection_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal.proposal, :expected_selection=>"enroll"), data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
+          bulk_action 'Employee will not enroll with valid waiver', expected_selection_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal.proposal, :expected_selection=>"waive"), data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
+          bulk_action 'Employee will not enroll with invalid waiver', expected_selection_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal.proposal, :expected_selection=>"will_not_participate"), data: {confirm: 'Remember, your participation rate can affect your group premium rates', no_turbolink: true}
         end
 
         table_column :employee_name, :width => '50px', :proc => Proc.new { |row|
@@ -34,10 +34,12 @@ module Effective
 
         table_column :actions, label: "", :width => '50px', :proc => Proc.new { |row|
           # @employer_profile = row.employer_profile
+
+          proposal = row.plan_design_proposal
           # Has to specify the valid route path for rehire and initiate cobra
           dropdown = [
-              ['Edit', sponsored_benefits.edit_census_members_plan_design_census_employee_path(row), 'ajax'],
-              ['Delete', sponsored_benefits.census_members_plan_design_census_employee_path(row), 'delete ajax with confirm and elementId', "Do you want to delete this employee?", "plan_design_employee_delete"],
+              ['Edit', sponsored_benefits.edit_plan_design_proposal_plan_design_census_employee_path(proposal, row), 'ajax'],
+              ['Delete', sponsored_benefits.plan_design_proposal_plan_design_census_employee_path(proposal, row), 'delete ajax with confirm and elementId', "Do you want to delete this employee?", "plan_design_employee_delete"],
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_employee_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false

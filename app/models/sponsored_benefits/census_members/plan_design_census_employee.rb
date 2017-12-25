@@ -106,6 +106,10 @@ module SponsoredBenefits
         SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.find(self.benefit_sponsorship_id)
       end
 
+      def plan_design_proposal
+        benefit_sponsorship.benefit_sponsorable.plan_design_proposal
+      end
+
       def benefit_application
         return @benefit_application if defined? @benefit_application
         if employer_profile.present?
