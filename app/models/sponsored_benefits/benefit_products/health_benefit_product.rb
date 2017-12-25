@@ -1,6 +1,6 @@
 module SponsoredBenefits
   module BenefitProducts
-    class HealthBenefitProduct < Product
+    class HealthBenefitProduct
 
     end
   end
