@@ -23,10 +23,21 @@
              ['View Quotes', sponsored_benefits.plan_design_organization_plan_design_proposals_path(plan_design_organization_id: row._id), 'ajax'],
              ['Create Quote', sponsored_benefits.new_plan_design_organization_plan_design_proposal_path(plan_design_organization_id: row._id), 'static'],
              ['Remove Quote', 'some-quote-remove-path', 'static'],
-             ['Edit Employer Detials', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax']
+             ['Edit Employer Detials', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
+             ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
+                                remove_employer_link_type(row),
+                                "Are you sure you want to remove this employer?"]
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
+        end
+
+        def remove_employer_link_type(employer)
+          if employer.is_prospect?
+            'delete ajax with confirm and elementId'
+          else
+            return 'disabled'
+          end
         end
 
         scopes do

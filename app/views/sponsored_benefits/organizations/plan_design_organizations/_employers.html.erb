@@ -1,3 +1,5 @@
+<%= render 'layouts/flash', type: 'notice', message: flash[:notice] if flash[:notice].present? %>
+
 <div class="container">
   <div class="tab-content" id="myTabContent">
     <div class="row">
