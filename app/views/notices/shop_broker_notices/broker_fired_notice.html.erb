@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><strong><%= notice.employer_name.upcase %> HAS REMOVED YOU AS THEIR BROKER</strong></td>
+      <td style="padding-top: 10px"><%= notice.employer_name %> has Removed you as their Broker</td>
     </tr>
   </tbody>
 </table>
@@ -14,13 +14,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px">Dear <strong><%= notice.primary_fullname %><strong>,</td>
+      <td style="padding-top: 10px">Dear <%= notice.primary_fullname %>,</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This notice is to inform you that <strong>#{notice.primary_fullname}</strong> is no longer the broker of record for #{notice.employer_name}</strong> as of <strong>#{notice.termination_date}</strong>. You will no longer be authorized to access <strong>#{notice.employer_name}’s #{Settings.site.short_name} Account or take action on behalf of <strong>#{notice.employer_name}</strong> or any employees of <strong>#{notice.employer_name}</strong>."} %>
+  { content: "This notice is to inform you that #{notice.primary_fullname} is no longer the broker of record for #{notice.employer_name} as of #{notice.termination_date}. You will no longer be authorized to access #{notice.employer_name}’s #{Settings.site.short_name} Account or take action on behalf of #{notice.employer_name} or any employees of #{notice.employer_name}."} %>
 <br>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
