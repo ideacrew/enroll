@@ -66,8 +66,6 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
   describe "append data" do
     before do
       @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
     it "should append data" do
       @employee_notice.append_data
@@ -79,9 +77,6 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
     it "should match event_name" do
       expect(@employee_notice.event_name).to eq "notice_to_employee_for_missing_binder_payment"
