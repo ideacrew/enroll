@@ -47,7 +47,7 @@ module SponsoredBenefits
 
     def destroy
       organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
-      if !organization.plan_design_proposals.blank?
+      if organization.plan_design_proposals.blank?
         organization.destroy
       else
         flash.now[:notice] = "Employer #{organization.legal_name}, has existing quotes.
