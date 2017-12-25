@@ -42,6 +42,19 @@ module SponsoredBenefits
       end
     end
 
+    def destroy
+      organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
+      if organization.plan_design_proposals.blank?
+        organization.destroy
+      else
+        flash.now[:notice] = "Employer #{organization.legal_name}, has existing quotes.
+                              Please remove any quotes for this employer before removing."
+      end
+
+      init_datatable
+      render :destroy
+    end
+
   private
 
     def load_broker_agency_profile
