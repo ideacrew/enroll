@@ -23,10 +23,9 @@
 content: "Congratulations!  You successfully enrolled in <strong>#{notice.enrollment.plan.plan_name}</strong>. Your coverage will go into effect on <strong>#{notice.enrollment.effective_on.strftime("%m/%d/%Y")}</strong>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Please note that your monthly premium contribution will be <strong>#{number_to_currency(notice.enrollment.employee_cost, precision: 2)}. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium."} %>
-
+content: "Please note that your monthly premium contribution will be <strong>#{number_to_currency(notice.enrollment.employee_cost, precision: 2)}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium."} %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Thank you for enrolling into employer-sponsored coverage through <strong>#{Settings.site.short_name}</strong>."} %>
+content: "Thank you for enrolling into employer-sponsored coverage through #{Settings.site.short_name}."} %>
 
 <br>
 
@@ -34,7 +33,7 @@ content: "Thank you for enrolling into employer-sponsored coverage through <stro
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', locals: {
- content: "You can also contact <strong>#{Settings.site.short_name}</strong> with any questions:"} %>
+ content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["By calling #{notice.hbe.phone}",
