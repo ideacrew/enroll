@@ -2,9 +2,10 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
+    include DataTablesAdapter
+    
+    before_action :load_plan_design_proposal
     before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
-    before_action :load_plan_design_benefit_application, only: [:index]
-    before_action :load_plan_design_proposal, only: [:new, :bulk_employee_upload, :create, :update]
 
     def index
       @plan_design_census_employees = @benefit_application.plan_design_census_employees
@@ -14,7 +15,7 @@ module SponsoredBenefits
     end
 
     def new
-      @census_employee = build_census_employee #SponsoredBenefits::Forms::PlanDesignCensusEmployee.new
+      @census_employee = build_census_employee
       if params[:modal].present?
         respond_to do |format|
           format.js { render "upload_employees" }
@@ -24,7 +25,6 @@ module SponsoredBenefits
 
     def edit
       @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
-      plan_design_proposal
       respond_to do |format|
         format.js { render "edit" }
       end
@@ -41,7 +41,7 @@ module SponsoredBenefits
       end
     end
 
-    def update      
+    def update
       @plan_design_census_employee.update(plan_design_employee_params)
 
       respond_to do |format|
@@ -86,24 +86,11 @@ module SponsoredBenefits
     private
 
     def load_plan_design_proposal
-      @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:proposal_id])
-    end
-
-    def load_plan_design_benefit_application
-      @benefit_application = SponsoredBenefits::BenefitApplications::BenefitApplication.find(params.require(:benefit_application_id))
-      @employer_profile = @benefit_application.employer_profile if @benefit_application.present?
+      @plan_design_proposal = SponsoredBenefits::Organizations::PlanDesignProposal.find(params.require(:plan_design_proposal_id))
     end
 
     def load_plan_design_census_employee
       @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
-    end
-    
-    def census_members_plan_design_census_employee_params
-      params[:census_members_plan_design_census_employee]
-    end
-
-    def plan_design_proposal
-      @plan_design_proposal = @census_employee.benefit_sponsorship.benefit_sponsorable.plan_design_proposal
     end
 
     def build_census_employee

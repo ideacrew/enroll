@@ -10,8 +10,7 @@
   <div class="upload-preview">
 
   </div>
-<%= form_for @plan_design_proposal, url: bulk_employee_upload_census_members_plan_design_census_employees_path, method: 'post', :html => { :multipart => true } do |f| %>
-<%= hidden_field_tag :proposal_id, @plan_design_proposal.id %>
+<%= form_for @plan_design_proposal, url: bulk_employee_upload_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal), method: 'post', :html => { :multipart => true } do |f| %>
 <%= file_field_tag :file %>
 <%#=pundit_span EmployerProfile, :updateable? %>
 <%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary ' %>
