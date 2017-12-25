@@ -21,6 +21,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is to inform you that an employee of #{notice.employer_name} has elected to terminate their employer-sponsored coverage."} %>
+<br>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: ["#{notice.enrollment.employee_fullname} has elected to terminate their employer-sponsored health coverage with #{notice.employer_name}. Their policy covered themselves and #{notice.enrollment.enrolled_count} dependents. Their coverage will end on #{notice.enrollment.terminated_on}."], heading:'', sub_heading: ''} %>
