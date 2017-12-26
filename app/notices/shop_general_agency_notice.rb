@@ -30,7 +30,6 @@ class ShopGeneralAgencyNotice < Notice
     notice.notification_type = self.event_name
     notice.general_agency_hbx_id = general_agency_profile.hbx_id
     notice.general_agent_email = general_agency_profile.general_agency_staff_roles.first.email_address
-    append_address(general_agency_profile.organization.primary_office_location.address)
     notice.email = general_agency_profile.general_agency_staff_roles.first.email_address
     notice.primary_identifier = general_agency_profile.hbx_id
     notice.primary_fullname = general_agency_profile.general_agency_staff_roles.first.person.full_name.titleize

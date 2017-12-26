@@ -23,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px">Dear <%= notice.primary_fullname %>,</td>
+      <td style="padding-top: 10px">Dear <strong><%= notice.primary_fullname %><strong>,</td>
     </tr>
   </tbody>
 </table>
@@ -33,7 +33,8 @@
 
  <%= render partial: 'notices/shared/paragraph', locals: {
  content: "If you need resources in assisting your new client, please look to <a href=https://dchealthlink.com/forms>DCHealthLink.com/forms</a>."} %>
-
+ <br>
+ 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
@@ -41,6 +42,6 @@
  content: "Please contact #{Settings.site.short_name} with any questions:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["By calling #{notice.hbe.phone}.",
+  ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
