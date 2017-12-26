@@ -36,7 +36,8 @@ families = Family.where({
     "$elemMatch" => {
       "kind" => "individual",
       "submitted_at" => {:"$gte" => @start_date, :"$lte" => @end_date},
-      "aasm_state" => { "$in" =>  HbxEnrollment::ENROLLED_STATUSES }
+      "aasm_state" => { "$in" =>  HbxEnrollment::ENROLLED_STATUSES },
+      "effective_on" => Date.new(2018, 1, 1)
     }
   }
 })
