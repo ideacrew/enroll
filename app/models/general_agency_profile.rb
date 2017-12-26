@@ -88,10 +88,6 @@ class GeneralAgencyProfile
     families.sort_by{|f| f.primary_applicant.person.last_name}
   end
 
-  def employers_linked_with_general_agency
-    EmployerProfile.find_by_general_agency_profile(self)
-  end
-
   def employer_clients_count
     employer_clients.present? ? employer_clients.count : 0
   end
