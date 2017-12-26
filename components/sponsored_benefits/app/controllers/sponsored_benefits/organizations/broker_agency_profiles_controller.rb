@@ -1,3 +1,5 @@
+require_dependency "sponsored_benefits/application_controller"
+
 module SponsoredBenefits
   class Organizations::BrokerAgencyProfilesController < ApplicationController
     include Config::AcaConcern

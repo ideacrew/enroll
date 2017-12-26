@@ -391,7 +391,7 @@ ready = function() {
 
       });
 
-    $(document).on('change', '.nav-tabs li input', function() {
+    $(document).on('change', '.health .nav-tabs li input', function() {
       if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
         EmployerProfile.validateEditPlanYear();
 
