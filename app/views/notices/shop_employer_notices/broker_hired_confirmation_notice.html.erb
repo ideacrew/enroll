@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! This notice is to confirm you successfully selected <strong>#{notice.broker.primary_fullname}</strong> from <strong>#{notice.broker.organization}</strong> as the broker for <strong>#{notice.employer_name}</strong> as of <strong>#{notice.broker.assignment_date}</strong>."} %>
+  { content: "Congratulations! This notice is to confirm you successfully selected #{notice.broker.primary_fullname} from #{notice.broker.organization} as the broker for #{notice.employer_name} as of #{notice.broker.assignment_date}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Your broker now has full access to your #{Settings.site.short_name} account. They can update your information, change your plan offerings, manage your employee roster, and enroll your employees into your medical and dental insurance offerings."} %>
