@@ -31,8 +31,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Metal Level title text' do
-      expect(rendered).to match /Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.
-    Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan./i
+      expect(rendered).to match /Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan./i
     end
 
     it 'should have Bronze title text' do
@@ -56,7 +55,10 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Plan Type title text ' do
-      expect(rendered).to match /The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay./i
+      # expect(rendered).to match /The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay./i
+
+      expect(rendered).to match /#{Regexp.escape("The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you’ll pay.")}/i
+
     end
 
     it 'should have Network title text' do
@@ -76,7 +78,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have HMO title text' do
-      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
+      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won’t cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
     end
 
     it 'should have PPO title text' do
@@ -88,7 +90,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Hsa_eligibilty title text' do
-      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them.")}/i)
+      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don’t spend them.")}/i)
     end
 
     it "should have Premium amount search" do
