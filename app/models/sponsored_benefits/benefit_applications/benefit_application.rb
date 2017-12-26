@@ -98,7 +98,137 @@ module SponsoredBenefits
         CensusMembers::PlanDesignCensusEmployee.where(:benefit_application_id => self.id)
       end
 
-      class << self
+
+
+
+
+      def default_benefit_group
+        benefit_groups.detect(&:default)
+      end
+
+
+      def minimum_employer_contribution
+        unless benefit_groups.size == 0
+          benefit_groups.map do |benefit_group|
+            if benefit_group.sole_source?
+              OpenStruct.new(:premium_pct => 100)
+            else
+              benefit_group.relationship_benefits.select do |relationship_benefit|
+                relationship_benefit.relationship == "employee"
+              end.min_by do |relationship_benefit|
+                relationship_benefit.premium_pct
+              end
+            end
+          end.map(&:premium_pct).first
+        end
+      end
+
+
+# def shop_enrollment_timetable(new_effective_date)
+#   effective_date = new_effective_date.to_date.beginning_of_month
+#   prior_month = effective_date - 1.month
+#   plan_year_start_on = effective_date
+#   plan_year_end_on = effective_date + 1.year - 1.day
+
+#   employer_initial_application_earliest_start_on = (effective_date + 
+#     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 
+#     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
+
+#   employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
+#   employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+
+
+#   open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+#   open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+#   open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_open_enrollment_monthly_end_on}").to_date
+#   binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_binder_payment_due_on}")
+#   advertised_due_date_of_month          = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentAdvBeginDueDayOfMonth}").to_date
+
+
+#   timetable = {
+#     effective_date: effective_date,
+#     plan_year_start_on: plan_year_start_on,
+#     plan_year_end_on: plan_year_end_on,
+#     employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
+#     employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
+#     employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
+#     open_enrollment_earliest_start_on: open_enrollment_earliest_start_on,
+#     open_enrollment_latest_start_on: open_enrollment_latest_start_on,
+#     open_enrollment_latest_end_on: open_enrollment_latest_end_on,
+#     binder_payment_due_date: binder_payment_due_date,
+#     advertised_due_date_of_month: advertised_due_date_of_month
+#   }
+
+#   timetable
+# end
+
+
+      class << self 
+
+        def open_enrollment_begin_deadline_day_of_month(use_grace_period = false)
+          if use_grace_period
+            minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
+          else
+            minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
+          end
+
+          open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
+          open_enrollment_end_on_day - minimum_length
+        end
+
+
+        def effective_period_begin_on_by_date(given_date = TimeKeeper.date_of_record, use_grace_period = false)
+          given_day_of_month    = given_date.day
+          next_month_start      = given_date.end_of_month + 1.day
+          following_month_start = next_month_start + 1.month
+
+          if use_grace_period
+            last_day = open_enrollment_begin_deadline_day_of_month(true)
+          else
+            last_day = open_enrollment_begin_deadline_day_of_month
+          end
+
+          given_day_of_month > last_day ? following_month_start : next_month_start
+        end
+
+
+        # TODOs
+        ## handle late rate scenarios where partial or no benefit product plan/rate data exists for effective date
+        ## handle midyear initial enrollments for annual fixed enrollment periods
+        def effective_period_by_effective_date(effective_date)
+          effective_date..(effective_date + 1.year - 1.day)
+        end
+
+        def open_enrollment_period_by_effective_date(effective_date)
+          open_enrollment_period_start_on = (effective_date + Settings.aca.shop_market.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
+        end
+
+
+        def self.enrollment_timetable_by_effective_date(effective_date)
+
+          effective_date          = effective_date.to_date.beginning_of_month
+          effective_period        = effective_period_by_effective_date(effective_date)
+          open_enrollment_period  = open_enrollment_period_by_effective_date(effective_date)
+
+
+          enrollment_process_month = effective_date.month - 1.month
+
+          open_enrollment_period          = open_enrollment_period_start_on..open_enrollment_period_end_on
+
+
+          {
+              effective_date: effective_date,
+              effective_period: effective_period,
+              open_enrollment_period: open_enrollment_period,
+              binder_payment_due_on: binder_payment_due_on,
+              initial_application_period: initial_application_period,
+              renewal_application_period: renewal_application_period,
+              initial_application_grace_period: initial_application_grace_period,
+              renewal_application_grace_period: renewal_application_grace_period,
+            }
+        end
+
+
         def find(id)
           application = nil
           Organizations::PlanDesignOrganization.where(:"plan_design_profile.benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
