@@ -36,7 +36,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
     end
 
     open_enrollment_py = open_enrollment_end_date_py.present? ? open_enrollment_end_date_py : active_plan_year
-    upcoming_plan_year_start_on = future_py_start_on.present? ? future_py_start_on : active_plan_year.end_on + 1
+    upcoming_plan_year_start_on = future_py_start_on.present? ? future_py_start_on : active_plan_year.end_on.next_day
 
     notice.plan_year = PdfTemplates::PlanYear.new({
       :open_enrollment_end_on => open_enrollment_py.open_enrollment_end_on,
@@ -44,8 +44,10 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
       :start_on => upcoming_plan_year_start_on
       })
 
-    hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    ben_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    current_open_enrollment_coverage = ben_sponsorship.benefit_coverage_periods.where(open_enrollment_end_on: Settings.aca.individual_market.open_enrollment.end_on ).first
+    bc_period = current_open_enrollment_coverage.open_enrollment_end_on >= TimeKeeper.date_of_record ? current_open_enrollment_coverage : ben_sponsorship.renewal_benefit_coverage_period
+
     notice.enrollment = PdfTemplates::Enrollment.new({
               :effective_on => bc_period.start_on,
               :plan_year => bc_period.start_on.year,
