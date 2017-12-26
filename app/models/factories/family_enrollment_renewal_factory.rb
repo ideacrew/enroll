@@ -46,10 +46,7 @@ module Factories
                 renew_enrollment(enrollment: active_enrollment)
                 trigger_notice { "employee_open_enrollment_auto_renewal" }
               else
-                if active_enrollment.benefit_group.plan_year.start_on < Date.new(2019,1,1)
-                  carrier_name = active_enrollment.plan.carrier_profile.legal_name.downcase
-                  trigger_notice_dental(enrollment_id: active_enrollment.hbx_id.to_s) { "dental_carriers_exiting_shop_notice_to_ee" } if carrier_name && ["metlife", "delta dental"].include?(carrier_name)
-                end
+                trigger_notice_dental(enrollment_id: active_enrollment.hbx_id.to_s) { "dental_carriers_exiting_shop_notice_to_ee" } if has_metlife_or_delta_plan?(active_enrollment)
                 trigger_notice { "employee_open_enrollment_no_auto_renewal" }
               end
             end
@@ -60,6 +57,11 @@ module Factories
       rescue Exception => e
         "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
+    end
+
+    def has_metlife_or_delta_plan?(active_enr)
+      carrier_name = active_enr.plan.carrier_profile.legal_name.downcase
+      coverage_kind == 'dental' && (active_enr.benefit_group.plan_year.start_on < Date.new(2019,1,1)) && carrier_name && (["metlife", "delta dental"].include?(carrier_name))
     end
 
     def find_active_coverage
@@ -117,7 +119,7 @@ module Factories
     end
 
     def trigger_notice_dental(enrollment_id: nil)
-      if !disable_notifications && coverage_kind == 'dental'
+      if !disable_notifications
         notice_name = yield
         begin
           hbx_enrollment = HbxEnrollment.by_hbx_id(enrollment_id).first
