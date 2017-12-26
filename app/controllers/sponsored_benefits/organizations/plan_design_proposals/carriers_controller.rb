@@ -5,16 +5,16 @@ module SponsoredBenefits
       def index
         @carrier_names = ::Organization.load_carriers(
                             primary_office_location: plan_design_organization.primary_office_location,
-                            selected_carrier_level: carrier_search_level,
+                            selected_carrier_level: selected_carrier_level,
                             active_year: active_year
                             )
       end
 
       private
-        helper_method :carrier_search_level
+        helper_method :selected_carrier_level, :plan_design_organization, :active_year
 
-        def carrier_search_level
-          @carrier_search_level ||= params[:selected_carrier_level]
+        def selected_carrier_level
+          @selected_carrier_level ||= params[:selected_carrier_level]
         end
 
         def plan_design_organization
@@ -22,7 +22,7 @@ module SponsoredBenefits
         end
 
         def active_year
-          DateTime.parse(params[:start_on]).year
+          params[:active_year]
         end
     end
   end

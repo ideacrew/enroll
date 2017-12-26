@@ -1,8 +1,10 @@
-<% case carrier_search_level %>
+<% case selected_carrier_level %>
 <% when 'single_plan' %>
-  $('#singlePlanCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: @carrier_search_level, benefit_group_id: @benefit_group, start_on: @start_on, location_id: @location_id }) %>");
+  $('#singlePlanCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year }) %>");
 <% when 'sole_source' %>
-  $('#soleSourceCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: @carrier_search_level, benefit_group_id: @benefit_group, start_on: @start_on, location_id: @location_id }) %>");
+  $('#soleSourceCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year }) %>");
 <% when 'single_carrier' %>
-  $('#singleCarrierCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: @carrier_search_level, benefit_group_id: @benefit_group, start_on: @start_on, location_id: @location_id }) %>");
+  $('#singleCarrierCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year }) %>");
+<% when 'metal_level' %>
+  $('#metalLevelCarrierList').html("<%= escape_javascript(render partial: 'carriers_list', locals: { carrier_names: @carrier_names, search_level: selected_carrier_level, active_year: active_year }) %>")
 <% end %>
