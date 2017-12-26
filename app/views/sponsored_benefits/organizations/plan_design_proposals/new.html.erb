@@ -1,47 +1,6 @@
 <div class="container">
   <%= render 'shared/engines/horizontal_status', step:1 %>
   <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
-    <%= hidden_field_tag :plan_design_organization_id, @plan_design_proposal.plan_design_organization._id %>
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %></h3>
-          </div>
-          <div class="panel-body">
-            <%= render 'shared/error_messages', :object => @plan_design_proposal %>
-            <%= render 'proposal_info', f: f %>
-          </div>
-        </div>
-        <div class="pull-right">
-          <%= f.submit "Save Quote", class: "btn btn-primary save-quote-btn" %>
-        </div>
-      </div>
-    </div>
-    <%= render 'employees' %>
-    <%= render 'carrier_options', f: f %>
+     <%= render 'form', f: f %>
   <% end %>
-
-
-<!--   <div class="pull-right">
-    <%#= f.submit "Save Quote", class: "btn btn-primary" %> <%#= link_to "Select Health Benefits",{},class:"btn btn-primary" %>
-  </div> -->
 </div>
-
-<script>
-$(document).on('click', '.nav-tabs li label', function() {
-  var start_on = $("#forms_plan_design_proposal_effective_date").val();
-  var selected_carrier_level = $(this).siblings('input').val();
-  var plan_design_organization_id = $('#plan_design_organization_id').val();
-
-  $.ajax({
-    type: "GET",
-    data:{
-      start_on: start_on,
-      selected_carrier_level: selected_carrier_level,
-    },
-    url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
-  });
-});
-
-</script>

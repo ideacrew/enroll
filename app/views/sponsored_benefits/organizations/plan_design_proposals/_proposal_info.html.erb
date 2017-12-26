@@ -24,3 +24,29 @@
     <%= f.text_field :county, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'County' %>
   </div>
 </div>
+
+<script>
+
+$(function() {
+  
+  function submitPlanDesignProposalInfo() {
+    if($("#forms_plan_design_proposal_title").val() != "" && $("#forms_plan_design_proposal_effective_date").val() != "") {
+      $.ajax({
+        type: "POST",
+        url: $("#new_forms_plan_design_proposal").attr('action'),
+        data: $("#new_forms_plan_design_proposal").serialize(),
+        dataType: "script",
+        success: function(data) {
+        }
+      });
+    }
+    else {
+      $('.save-quote-btn').click(); 
+    }
+  }
+
+  $("#new_forms_plan_design_proposal input[type=text]").each(function(){
+    $(this).on("change", submitPlanDesignProposalInfo);
+  })
+});
+</script>

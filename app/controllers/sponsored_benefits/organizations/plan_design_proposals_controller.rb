@@ -26,32 +26,34 @@ module SponsoredBenefits
     end
 
     def create
-      proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
         organization: @plan_design_organization
         }.merge(plan_design_proposal_params))
 
       respond_to do |format|
-        if proposal_form.save
-          @plan_design_proposal = proposal_form
-          format.html { redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, proposal_form.proposal), :flash => { :success => "Quote information save successfully."} } 
+        if @plan_design_proposal.save
+          flash[:success] = "Quote information saved successfully."
         else
-          format.html { redirect_to :back, :flash => { :error => "Failed! unable to save quote information."} }
+          flash[:error] = "Quote information save failed."
         end
+
+        format.js
       end
     end
 
     def update
-      proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({
+      @plan_design_proposal =  SponsoredBenefits::Forms::PlanDesignProposal.new({
         organization: @plan_design_organization, proposal_id: params[:id]
         }.merge(plan_design_proposal_params))
 
       respond_to do |format|
-        if proposal_form.save
-          @plan_design_proposal = proposal_form
-          format.html { redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, proposal_form.proposal), :flash => { :success => "Quote information updated successfully."} } 
+        if @plan_design_proposal.save
+          flash[:success] = "Quote information updated successfully."
         else
-          format.html { redirect_to :back, :flash => { :error => "Failed! unable to update quote information."} }
+          flash[:error] = "Quote information update failed."
         end
+
+        format.js
       end
     end
 
