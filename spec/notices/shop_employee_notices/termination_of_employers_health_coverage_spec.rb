@@ -73,21 +73,29 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
 
     it "should append data" do
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
-      end
-
-    it "should append current IVL OE date" do
-      expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2018.open_enrollment_start_on
-      expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2018.open_enrollment_end_on
     end
 
-    context "after current IVL OE closed " do
+    context "with current IVL Open Enrollment(2018)" do
+      before do
+        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2017,12,31))
+        @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
+        @employee_notice.append_data
+      end
+
+      it "should append current IVL OE date(2018)" do
+        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2018.open_enrollment_start_on
+        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2018.open_enrollment_end_on
+      end
+    end
+
+    context "after current IVL OE closed(2018)" do
       before do
         allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2018,02,1))
         @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
         @employee_notice.append_data
       end
 
-      it "should append next year IVL OE dates" do
+      it "should append next year IVL OE dates(2019)" do
         expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2019.open_enrollment_start_on
         expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2019.open_enrollment_end_on
       end
