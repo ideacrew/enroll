@@ -11,14 +11,14 @@ module SponsoredBenefits
 
       accepts_nested_attributes_for :broker_agency_profile, :carrier_profile, :hbx_profile
       # accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
-# 
+#
       validates_presence_of :legal_name, :office_locations
 
       # validates :fein,
       #   presence: false,
       #   length: { is: 9, message: "%{value} is not a valid FEIN" },
       #   numericality: true,
-      #   uniqueness: true 
+      #   uniqueness: true
 
       validate :office_location_kinds
 
@@ -151,10 +151,6 @@ module SponsoredBenefits
       # Strip non-numeric characters
       def fein=(new_fein)
         write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
-      end
-
-      def primary_office_location
-        office_locations.detect(&:is_primary?)
       end
 
       def self.search_by_general_agency(search_content)
