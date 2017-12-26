@@ -12,15 +12,12 @@
           <%= render 'proposal_info', f: f %>
         </div>
       </div>
-      <div class="pull-right">
-        <%= f.submit "Save Quote", class: "btn btn-primary" %>
+      <div class="pull-right hidden">
+        <%= f.submit "Save Quote", class: "btn btn-primary save-quote-btn" %>
       </div>
-    </div>
+  </div>
   </div>
   <% end %>
-  <%= render 'employees' %>
 
-<!--   <div class="pull-right">
-    <%#= f.submit "Save Quote", class: "btn btn-primary" %> <%#= link_to "Select Health Benefits",{},class:"btn btn-primary" %>
-  </div> -->
+  <%= render 'employees' %>
 </div>
