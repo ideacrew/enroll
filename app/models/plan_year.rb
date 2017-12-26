@@ -293,14 +293,14 @@ class PlanYear
   end
 
   def carriers_offered
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.carriers_offered
     end.uniq
   end
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.dental_carriers_offered
     end.uniq
   end
@@ -790,7 +790,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -1115,15 +1115,6 @@ class PlanYear
       self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
-  def initial_employer_open_enrollment_begins
-    return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    begin
-      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial open enrollment notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
