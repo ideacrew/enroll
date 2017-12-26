@@ -436,7 +436,7 @@ ready = function() {
 
     //toggle plan options checkbox through parent anchor
 
-    $(document).on('click', '.plan-options a', function() {
+    $(document).on('click', '.health .plan-options a', function() {
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
         if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
           EmployerProfile.validateEditPlanYear();

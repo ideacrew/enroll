@@ -42,17 +42,27 @@
       </div>
     </div>
   </div>
-  <% if @plan_design_proposal.proposal.persisted? %>
-  <div class="col-sm-12">
-    <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe,new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal, modal: 'upload'), remote: 'true', class: "btn btn-default" %>
-    <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe,{},class: "btn btn-default" %>
-    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal), :remote => true, class: "btn btn-default pull-right" %>
+
+  <div class="col-sm-12 employee-btns">
+    <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe,new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id, modal: 'upload'), remote: 'true', class: "btn btn-default", :onclick=>"validateQuote(); return false;" %>
+    <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe,{},class: "btn btn-default", :onclick=>"validateQuote(); return false;" %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id), :remote => true, class: "btn btn-default pull-right", :onclick=>"validateQuote(); return false;" %>
   </div>
-  <% else %>
-  <div class="col-sm-12">
-    <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe, '#', remote: 'true', class: "btn btn-default" %>
-    <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe,{},class: "btn btn-default" %>
-    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, '#', :remote => true, class: "btn btn-default pull-right" %>
-  </div>
- <% end %>
 </div>
+
+<script>
+$(function() {
+  $('.employee-btns a').each(function(){
+    $(this).click(function(e){
+      e.preventDefault();
+
+      if($("#forms_plan_design_proposal_title").val() == "" || $("#forms_plan_design_proposal_effective_date").val() == "") {
+        $('.save-quote-btn').click();
+        e.stopPropagation();
+      }
+
+    });
+  })
+});
+</script>
+
