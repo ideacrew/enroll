@@ -5,7 +5,7 @@ module SponsoredBenefits
       include ActiveModel::Model
       include ActiveModel::Validations
 
-      attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :quote_date
+      attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :quote_date, :plan_option_kind, :metal_level_for_elected_plan
       attr_reader :profile
       attr_reader :plan_design_organization
       attr_reader :proposal

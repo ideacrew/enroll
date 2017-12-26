@@ -1,0 +1,21 @@
+<% carrier_names.each_pair do |ck, cv| %>
+  <div class="col-xs-3 carriers">
+    <div class="col-xs-12 row">
+
+      <div class="col-xs-3">
+        <%= radio_button_tag :carrier_for_elected_plan, "#{ck}" %>
+        <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
+          <i class="fa fa-circle-o"></i>
+          <i class="fa fa-dot-circle-o"></i>
+        <% end %>
+      </div>
+        <div class="col-xs-9">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3><%= cv %></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<% end %>
