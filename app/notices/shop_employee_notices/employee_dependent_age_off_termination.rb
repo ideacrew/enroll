@@ -18,9 +18,10 @@ class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNoti
   end
 
   def append_data
-    now = TimeKeeper.date_of_record
-    hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(now.next_year) }
+    current_date = TimeKeeper.date_of_record
+    ben_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    current_open_enrollment_coverage = ben_sponsorship.benefit_coverage_periods.where(open_enrollment_end_on: Settings.aca.individual_market.open_enrollment.end_on ).first
+    bc_period = current_open_enrollment_coverage.open_enrollment_end_on >= current_date ? current_open_enrollment_coverage : ben_sponsorship.renewal_benefit_coverage_period
     is_congress = census_employee.employee_role.benefit_group.is_congress
     names = []
     if bc_period.present?
@@ -28,7 +29,7 @@ class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNoti
         names << Person.where(hbx_id: dep_id).first.full_name
         notice.enrollment = PdfTemplates::Enrollment.new({
           :dependents => names,
-          :terminated_on => now.end_of_month,
+          :terminated_on => current_date.end_of_month,
           :is_congress => is_congress,
           :plan_year => bc_period.start_on.year,
           :effective_on => bc_period.start_on,

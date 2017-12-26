@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::EmployeeDependentAgeOffTermination, :dbclean => :after_each do
-  let(:hbx_profile) {double}
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
   let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.next_year.year,11,1), open_enrollment_end_on: Date.new((TimeKeeper.date_of_record+2.years).year,1,31)) }
-  let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year.next_year, end_on: TimeKeeper.date_of_record.end_of_year.next_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31)) }
+  let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31)) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:primary_person){ FactoryGirl.create(:person)}
@@ -94,11 +94,10 @@ RSpec.describe ShopEmployeeNotices::EmployeeDependentAgeOffTermination, :dbclean
 
   describe "append data" do
     before do
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(census_employee).to receive(:employee_role).and_return(employee_role)
       allow(TimeKeeper).to receive(:date_of_record).and_return TimeKeeper.date_of_record.beginning_of_month
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
       census_employee.benefit_group_assignments.first.plan_year.update_attributes(aasm_state: "renewing_enrolled")
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.update_attributes!(open_enrollment_end_on: Settings.aca.individual_market.open_enrollment.end_on)
     end
 
     it "should append dependent's hbx_id" do
@@ -117,7 +116,6 @@ RSpec.describe ShopEmployeeNotices::EmployeeDependentAgeOffTermination, :dbclean
       @employee_notice.append_data
       expect(@employee_notice.notice.enrollment.plan_year).to eq renewal_bcp.start_on.year
       expect(@employee_notice.notice.enrollment.effective_on).to eq renewal_bcp.start_on
-      expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq renewal_bcp.open_enrollment_start_on
       expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq renewal_bcp.open_enrollment_end_on
     end
 
@@ -133,7 +131,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeDependentAgeOffTermination, :dbclean
 
   describe "should render template" do
     it "render employee_dependent_age_off_termination" do
-      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_dependent_age_off_termination"
+      expect(@employee_notice.template).to eq application_event.notice_template
     end
   end
 end
