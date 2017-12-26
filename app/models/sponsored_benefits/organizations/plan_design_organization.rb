@@ -5,6 +5,7 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
       include Concerns::OrganizationConcern
+      include Concerns::AcaRatingAreaConfigConcern
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'
 
@@ -53,6 +54,13 @@ module SponsoredBenefits
 
       def broker_agency_profile
         ::BrokerAgencyProfile.find(owner_profile_id)
+      end
+
+      def service_areas_available_on(date)
+        if use_simple_employer_calculation_model?
+          return []
+        end
+        ::CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
       end
 
       def broker_relationship_inactive?
