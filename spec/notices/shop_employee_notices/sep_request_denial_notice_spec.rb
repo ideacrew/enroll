@@ -22,7 +22,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
                             :name =>'Denial of SEP Requested by EE outside of allowable time frame',
                             :notice_template => 'notices/shop_employee_notices/sep_request_denial_notice',
                             :notice_builder => 'ShopEmployeeNotices::SepRequestDenialNotice',
-                            :mpi_indicator => 'MPI_DAE035',
+                            :mpi_indicator => 'SHOP_D035',
                             :event_name => 'sep_request_denial_notice',
                             :title => "Special Enrollment Period Denial"})
                           }

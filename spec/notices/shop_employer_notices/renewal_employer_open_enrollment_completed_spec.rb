@@ -13,7 +13,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted do
                             :notice_template => 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
                             :notice_builder => 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
                             :event_name => 'renewal_employer_open_enrollment_completed',
-                            :mpi_indicator => 'MPI_DRG018',
+                            :mpi_indicator => 'SHOP_D018',
                             :title => "Group Open Enrollment Successfully Completed"})
                           }
     let(:valid_parmas) {{

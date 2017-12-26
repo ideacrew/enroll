@@ -74,7 +74,7 @@ shop_notice_triggers = [
         name: 'Initial Employer SHOP Approval Notice',
         notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_DIG002',
+        mpi_indicator: 'SHOP_D002',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -95,7 +95,7 @@ shop_notice_triggers = [
         name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
         notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
-        mpi_indicator: 'MPI_DIG003',
+        mpi_indicator: 'SHOP_D003',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -116,7 +116,7 @@ shop_notice_triggers = [
         name: 'PlanYear Renewal',
         notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_DRG006',
+        mpi_indicator: 'SHOP_D006',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -137,7 +137,7 @@ shop_notice_triggers = [
         name: 'PlanYear Renewal Auto-Published',
         notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_DRG007',
+        mpi_indicator: 'SHOP_D007',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -159,7 +159,7 @@ shop_notice_triggers = [
         name: 'Out of pocket Notice',
         notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
         notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
-        mpi_indicator: 'MPI_DAG087',
+        mpi_indicator: 'SHOP_D087',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: [""],
@@ -181,7 +181,7 @@ shop_notice_triggers = [
         name: 'Group Renewal Notice',
         notice_template: 'notices/shop_employer_notices/5_employer_renewal_notice',
         notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-        mpi_indicator: 'MPI_DRG004',
+        mpi_indicator: 'SHOP_D004',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -203,7 +203,7 @@ shop_notice_triggers = [
         name: 'Conversion, Group Renewal Available',
         notice_template: 'notices/shop_employer_notices/6_conversion_group_renewal_notice',
         notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-        mpi_indicator: 'MPI_DCG077',
+        mpi_indicator: 'SHOP_D077',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -224,7 +224,7 @@ shop_notice_triggers = [
         name: 'Zero Employees on Rotser',
         notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
         notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
-        mpi_indicator: 'MPI_DAG008',
+        mpi_indicator: 'SHOP_D008',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -245,7 +245,7 @@ shop_notice_triggers = [
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8a_renewal_open_enrollment_notice_for_employee',
         notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal',
-        mpi_indicator: 'MPI_DRE010',
+        mpi_indicator: 'SHOP_D010',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -266,7 +266,7 @@ shop_notice_triggers = [
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
         notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal',
-        mpi_indicator: 'MPI_DRE011',
+        mpi_indicator: 'SHOP_D011',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -287,7 +287,7 @@ shop_notice_triggers = [
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',
         notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled',
-        mpi_indicator: 'MPI_DRG012',
+        mpi_indicator: 'SHOP_D012',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -308,7 +308,7 @@ shop_notice_triggers = [
         name: 'Low Enrollment Notice',
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_DAG015',
+        mpi_indicator: 'SHOP_D015',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -350,7 +350,7 @@ shop_notice_triggers = [
         name: 'Initial Employee Open Enrollment Successfully Completed',
         notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_DIG017',
+        mpi_indicator: 'SHOP_D017',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -371,7 +371,7 @@ shop_notice_triggers = [
         name: 'Employee Open Enrollment Reminder Notice',
         notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
         notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
-        mpi_indicator: 'MPI_DAE014',
+        mpi_indicator: 'SHOP_D014',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -392,7 +392,7 @@ shop_notice_triggers = [
         name: 'Renewal Employee Open Employee Completed',
         notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_DRG018',
+        mpi_indicator: 'SHOP_D018',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -413,7 +413,7 @@ shop_notice_triggers = [
         name: 'Renewal Group Ineligible to Obtain Coverage',
         notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_DRG019',
+        mpi_indicator: 'SHOP_D019',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -434,7 +434,7 @@ shop_notice_triggers = [
         name: 'Initial Employer first invoice available in the account',
         notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-        mpi_indicator: 'MPI_DIG022',
+        mpi_indicator: 'SHOP_D022',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -455,7 +455,7 @@ shop_notice_triggers = [
         name: 'Initial Employer Application - Reminder to publish',
         notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-        mpi_indicator: 'MPI_DIG026',
+        mpi_indicator: 'SHOP_D026',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -476,7 +476,7 @@ shop_notice_triggers = [
         name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
         notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-        mpi_indicator: 'MPI_DIG029',
+        mpi_indicator: 'SHOP_D029',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -497,7 +497,7 @@ shop_notice_triggers = [
         name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
         notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-        mpi_indicator: 'MPI_DIG028',
+        mpi_indicator: 'SHOP_D028',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -518,7 +518,7 @@ shop_notice_triggers = [
         name: 'Renewal Employer reminder to publish plan year.',
         notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
-        mpi_indicator: 'MPI_DRG025',
+        mpi_indicator: 'SHOP_D025',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -539,7 +539,7 @@ shop_notice_triggers = [
         name: 'Renewal Employer reminder to publish plan year.',
         notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
-        mpi_indicator: 'MPI_DRG024',
+        mpi_indicator: 'SHOP_D024',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -560,7 +560,7 @@ shop_notice_triggers = [
         name: 'Renewal Employer reminder to publish plan year.',
         notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
-        mpi_indicator: 'MPI_DRG023',
+        mpi_indicator: 'SHOP_D023',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -581,7 +581,7 @@ shop_notice_triggers = [
         name: 'Initial Employer ineligible to obtain coverage.',
         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_DIG020',
+        mpi_indicator: 'SHOP_D020',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -602,7 +602,7 @@ shop_notice_triggers = [
         name: 'Employer Annual Renewal - Denial of Eligibility',
         notice_template: 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
         notice_builder: 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
-        mpi_indicator: 'MPI_DRG005',
+        mpi_indicator: 'SHOP_D005',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -623,7 +623,7 @@ shop_notice_triggers = [
         name: 'Denial of SEP Requested by EE outside of allowable time frame',
         notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
         notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-        mpi_indicator: 'MPI_DAE035',
+        mpi_indicator: 'SHOP_D035',
                 notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -644,7 +644,7 @@ shop_notice_triggers = [
         name: 'Notification to employees regarding their Employer’s ineligibility.',
         notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
         notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
-        mpi_indicator: 'MPI_DIE040',
+        mpi_indicator: 'SHOP_D040',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -665,7 +665,7 @@ shop_notice_triggers = [
         name: 'Notify Employees of their employer termination due to ineligibility',
         notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
         notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
-        mpi_indicator: 'MPI_DRE038',
+        mpi_indicator: 'SHOP_D038',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

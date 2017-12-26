@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
                             :notice_template => 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
                             :event_name => 'initial_employer_ineligibility_notice',
-                            :mpi_indicator => 'MPI_DIG020',
+                            :mpi_indicator => 'SHOP_D020',
                             :title => "Group Ineligible to Obtain Coverage"})
                           }
     let(:valid_parmas) {{
