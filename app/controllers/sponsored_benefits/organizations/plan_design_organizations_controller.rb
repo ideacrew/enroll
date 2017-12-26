@@ -46,13 +46,12 @@ module SponsoredBenefits
       organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
       if organization.plan_design_proposals.blank?
         organization.destroy
+        message = "Prospect Employer Removed Successfully."
       else
-        flash.now[:notice] = "Employer #{organization.legal_name}, has existing quotes.
+        message = "Employer #{organization.legal_name}, has existing quotes.
                               Please remove any quotes for this employer before removing."
       end
-
-      init_datatable
-      render :destroy
+      redirect_to employers_organizations_broker_agency_profile_path(organization.broker_agency_profile), status: 303, notice: message
     end
 
   private
