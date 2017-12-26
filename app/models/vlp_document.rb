@@ -1,4 +1,5 @@
 class VlpDocument < Document
+  include Mongoid::History::Trackable
 
   attr_accessor :changing_status
 
@@ -49,31 +50,31 @@ class VlpDocument < Document
     VLP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'verified', 'rejected']
 
     COUNTRIES_LIST = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
-		"Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
-		"Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina",
-		"Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon",
-		"Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombi",
-		"Comoros", "Congo (Brazzaville)", "Congo", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba",
-		"Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor (Timor Timur)",
-		"Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland",
-		"France", "Gabon", "Gambia, The", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala",
-		"Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
-		"Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya",
-		"Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon",
-		"Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar",
-		"Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius",
-		"Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Morocco", "Mozambique", "Myanmar",
-		"Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway",
-		"Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
-		"Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis",
-		"Saint Lucia", "Saint Vincent", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
-		"Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
-		"Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan",
-		"Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
-		"Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey",
-		"Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom",
-		"United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
-		"Yemen", "Zambia","Zimbabwe"
+    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+    "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina",
+    "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon",
+    "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombi",
+    "Comoros", "Congo (Brazzaville)", "Congo", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba",
+    "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor (Timor Timur)",
+    "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland",
+    "France", "Gabon", "Gambia, The", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala",
+    "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
+    "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya",
+    "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon",
+    "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar",
+    "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius",
+    "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Morocco", "Mozambique", "Myanmar",
+    "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway",
+    "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+    "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis",
+    "Saint Lucia", "Saint Vincent", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+    "Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
+    "Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan",
+    "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
+    "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey",
+    "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom",
+    "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
+    "Yemen", "Zambia","Zimbabwe"
   ]
 
   # admin action list for verification process, dropdown for each verification type
@@ -82,8 +83,13 @@ class VlpDocument < Document
   # reasons admin can provide when verifying type
   VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
 
-  # reasons admin can provide when returning for deficiency verification type
-  RETURNING_FOR_DEF_REASONS = ["Illegible Document", "Member Data Change", "Document Expired", "Additional Document Required", "Other"]
+  # reasons admin can provide when rejecting verification type. these reasons applied for all verification types
+  ALL_TYPES_REJECT_REASONS = ["Illegible", "Incomplete Doc", "Wrong Type", "Wrong Person"]
+  #additionla reasons for citizenship and immigartion verification types
+  CITIZEN_IMMIGR_TYPE_ADD_REASONS = ["Expired"]
+  #additional reasons for Income verification types WILL BE IMPLEMENTED LATER
+  INCOME_TYPE_ADD_REASONS = ["4 weeks", "Too old", "All types"]
+
 
   field :alien_number, type: String
   field :i94_number, type: String
@@ -111,8 +117,28 @@ class VlpDocument < Document
 
   field :comment, type: String
 
-  scope :uploaded, ->{ where(identifier: {:$exists => true}) }
+  track_history :on => [:title,
+                        :subject,
+                        :alien_number,
+                        :i94_number,
+                        :visa_number,
+                        :passport_number,
+                        :sevis_id,
+                        :naturalization_number,
+                        :receipt_number,
+                        :citizenship_number,
+                        :card_number,
+                        :country_of_citizenship,
+                        :expiration_date,
+                        :issuing_country,
+                        :status,
+                        :verification_type,
+                        :comment],
+                :scope => :consumer_role,
+                :track_create => true,
+                :track_destroy => true
 
+  scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
   validates :citizenship_number, length: { in: 6..12 }, :allow_blank => true
@@ -123,8 +149,6 @@ class VlpDocument < Document
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
   validates :card_number, length: { is: 13 }, :allow_blank => true#first 3 alpha, remaining 10 numeric
-
-
 
   # hash of doc type and necessary fields
   def required_fields
@@ -153,6 +177,5 @@ class VlpDocument < Document
        errors.add(:base, "#{field} value is required") unless self.send(field).present?
      end
   end
-
-
+   
 end
