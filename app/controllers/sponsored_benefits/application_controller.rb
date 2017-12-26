@@ -10,7 +10,9 @@ module SponsoredBenefits
       end
 
       def set_broker_agency_profile_from_user
-        @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id)
+        if current_person.broker_role.present?
+          @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id)
+        end
       end
 
       def current_person

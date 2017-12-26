@@ -1,20 +1,23 @@
 SponsoredBenefits::Engine.routes.draw do
 
-  namespace :census_members do
-    resources :plan_design_census_employees do 
+  resources :plan_design_proposals, only: [] do
+    resources :plan_design_census_employees, controller: 'census_members/plan_design_census_employees' do
       collection do
         post :bulk_employee_upload
+        post :expected_selection
       end
     end
   end
 
   namespace :organizations do
+
+    resources :broker_agency_profiles, only: :employers do
+      get :employers, on: :member
+    end
+
     resources :plan_design_organizations do
-      get :employers
-      member do
-        get :new
-        get :edit
-      end
+      resources :plan_design_proposals
+      resources :carriers, controller: 'plan_design_proposals/carriers', only: [:index]
     end
 
     resource :office_locations do
@@ -23,10 +26,4 @@ SponsoredBenefits::Engine.routes.draw do
       end
     end
   end
-
-  resources :plan_design_organizations, only: [] do
-    resources :plan_design_proposals, controller: 'organizations/plan_design_proposals', only: [:index, :new, :create]
-  end
-
-  resources :plan_design_proposals, controller: 'organizations/plan_design_proposals', only: [:show, :edit, :destroy, :update]
 end
