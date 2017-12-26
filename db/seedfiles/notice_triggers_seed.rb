@@ -1860,6 +1860,27 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVL_ENR',
+    title: 'Your Health or Dental Plan Enrollment and Payment Deadline',
+    description: 'This is an Enrollment Notice and is sent for people who got enrolled in a Particular Date Range',
+    resource_name: 'consumer_role',
+    event_name: 'enrollment_notice_with_date_range',
+    notice_triggers: [
+      {
+        name: 'Enrollment Notice',
+        notice_template: 'notices/ivl/enrollment_notice',
+        notice_builder: 'IvlNotices::EnrollmentNoticeBuilderWithDateRange',
+        mpi_indicator: 'IVL_ENR',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
