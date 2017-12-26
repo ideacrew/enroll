@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container plan-design-proposal">
   <%= render 'shared/engines/horizontal_status', step:1 %>
   <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
     <%= hidden_field_tag :plan_design_organization_id, @plan_design_proposal.plan_design_organization._id %>
@@ -20,6 +20,7 @@
     </div>
     <%= render 'employees' %>
     <%= render 'carrier_options', f: f %>
+    <div class="reference-plans"></div>
   <% end %>
 
 
@@ -27,21 +28,3 @@
     <%#= f.submit "Save Quote", class: "btn btn-primary" %> <%#= link_to "Select Health Benefits",{},class:"btn btn-primary" %>
   </div> -->
 </div>
-
-<script>
-$(document).on('click', '.nav-tabs li label', function() {
-  var start_on = $("#forms_plan_design_proposal_effective_date").val();
-  var selected_carrier_level = $(this).siblings('input').val();
-  var plan_design_organization_id = $('#plan_design_organization_id').val();
-
-  $.ajax({
-    type: "GET",
-    data:{
-      start_on: start_on,
-      selected_carrier_level: selected_carrier_level,
-    },
-    url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
-  });
-});
-
-</script>

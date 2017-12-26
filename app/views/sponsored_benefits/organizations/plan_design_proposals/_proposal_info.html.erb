@@ -4,7 +4,8 @@
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.text_field :effective_date, :'data-date-min'=> "0d", class: "date-picker floatlabel form-control", required: true, placeholder: 'Quote Effective Date' %>
+    <%= f.select(:effective_date, options_for_select(::PlanYear.calculate_start_on_options, selected: f.object.effective_date.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, { :class => ''}) %>
+
     <%#= f.text_field :effective_date, class: "floatlabel form-control", required: true, placeholder: 'Quote Effective Date' %>
   </div>
 
