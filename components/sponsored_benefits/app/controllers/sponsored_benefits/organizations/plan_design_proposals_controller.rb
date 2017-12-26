@@ -1,19 +1,17 @@
-require_dependency "sponsored_benefits/application_controller"
-
 module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :find_broker_agency_profile, only: [:employers]
-    before_action :init_datatable, only: [:employers]
+    before_action :load_plan_design_organization
+    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy]
 
     def index
       @datatable = effective_datatable
     end
 
     def new
-      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:proposal_id])
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization, proposal_id: params[:proposal_id])
       init_employee_datatable
     end
 
@@ -23,19 +21,19 @@ module SponsoredBenefits
     end
 
     def edit
-      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_proposal.plan_design_organization, proposal_id: params[:id])
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization, proposal_id: params[:id])
       init_employee_datatable
     end
 
     def create
       proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({
-        organization: plan_design_organization
+        organization: @plan_design_organization
         }.merge(plan_design_proposal_params))
 
       respond_to do |format|
         if proposal_form.save
           @plan_design_proposal = proposal_form
-          format.html { redirect_to new_plan_design_organization_plan_design_proposal_path(proposal_id: proposal_form.proposal.id), :flash => { :success => "Quote information save successfully."} } 
+          format.html { redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, proposal_form.proposal), :flash => { :success => "Quote information save successfully."} } 
         else
           format.html { redirect_to :back, :flash => { :error => "Failed! unable to save quote information."} }
         end
@@ -44,13 +42,13 @@ module SponsoredBenefits
 
     def update
       proposal_form = SponsoredBenefits::Forms::PlanDesignProposal.new({
-        organization: plan_design_proposal.plan_design_organization, proposal_id: params[:id]
+        organization: @plan_design_organization, proposal_id: params[:id]
         }.merge(plan_design_proposal_params))
 
       respond_to do |format|
         if proposal_form.save
           @plan_design_proposal = proposal_form
-          format.html { redirect_to edit_plan_design_proposal_path(proposal_form.proposal), :flash => { :success => "Quote information updated successfully."} } 
+          format.html { redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, proposal_form.proposal), :flash => { :success => "Quote information updated successfully."} } 
         else
           format.html { redirect_to :back, :flash => { :error => "Failed! unable to update quote information."} }
         end
@@ -75,12 +73,18 @@ module SponsoredBenefits
     end
 
     def effective_datatable
-      ::Effective::Datatables::BrokerEmployerQuotesDatatable.new(organization_id: plan_design_organization._id)
+      ::Effective::Datatables::BrokerEmployerQuotesDatatable.new(organization_id: @plan_design_organization._id)
     end
 
-    def plan_design_organization
-      @plan_design_organization ||= SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:plan_design_organization_id])
+    def load_plan_design_organization
+      @plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:plan_design_organization_id])
+      broker_agency_profile
     end
+
+    def broker_agency_profile
+      @broker_agency_profile = @plan_design_organization.broker_agency_profile
+    end
+
 
     # def benefit_sponsorship
     #   broker.benefit_sponsorships.first || broker.benefit_sponsorships.new
@@ -90,7 +94,7 @@ module SponsoredBenefits
     #   @benefit_sponsorship_applicatios ||= benefit_sponsorship.plan_design_proposals
     # end
 
-    def plan_design_proposal
+    def load_plan_design_proposal
       @plan_design_proposal ||= Organizations::PlanDesignProposal.find(params[:id])
     end
 

@@ -1,9 +1,9 @@
 <div class="col-xs-12">
   <% if @census_employee.census_dependents.size == 0 %>
-    <h3>Dependents</h3>
-  <% else %>
-    <h3>Dependents (<%= @census_employee.census_dependents.size %>)</h3>
-  <% end %> 
+<!--     <h3>Dependents</h3>
+ -->  <% else %>
+<!--     <h3>Dependents (<%#= @census_employee.census_dependents.size %>)</h3>
+ -->  <% end %> 
 
   <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
     <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>

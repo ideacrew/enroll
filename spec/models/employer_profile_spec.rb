@@ -483,21 +483,23 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   before { organization0; organization1; organization2 }
 
   describe '.find_by_broker_agency_profile' do
-    let!(:organization6)  { FactoryGirl.build(:organization, fein: "024897585", broker_agency_profile: broker_agency_profile) }
-    let(:broker_agency_profile)  { build(:broker_agency_profile, market_kind: "shop", primary_broker_role_id: "8754985") }
-    let!(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", broker_agency_profile: broker_agency_profile7) }
-    let(:broker_agency_profile7)  { build(:broker_agency_profile, market_kind: "shop", primary_broker_role_id: "7754985") }
-    let!(:organization3)  {FactoryGirl.create(:organization, fein: "034267123", employer_profile: employer_profile_3) }
-    let(:employer_profile_3) { build(:employer_profile, entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111') }
-    let!(:organization4)  {FactoryGirl.create(:organization, fein: "027636010", employer_profile: employer_profile_4) }
-    let(:employer_profile_4) { build(:employer_profile, entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111') }
-    let!(:organization5)  {FactoryGirl.create(:organization, fein: "076747654", employer_profile: employer_profile_5) }
-    let(:employer_profile_5) { build(:employer_profile, entity_kind: "partnership", sic_code: '1111') }
+    let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
+    let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
+    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
+    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
+    let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
+    let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
+
+    def er3; organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
+    def er4; organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
+    def er5; organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111'); end
+    before { broker_agency_profile; er3; er4; er5 }
 
     it 'returns employers represented by the specified broker agency' do
-      expect(employer_profile_3.broker_agency_profile.id).to eq broker_agency_profile.id
-      expect(employer_profile_4.broker_agency_profile.id).to eq broker_agency_profile.id
-      expect(employer_profile_5.broker_agency_profile).to be_nil
+      expect(er3.broker_agency_profile.id).to eq broker_agency_profile.id
+      expect(er4.broker_agency_profile.id).to eq broker_agency_profile.id
+      expect(er5.broker_agency_profile).to be_nil
       employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
       expect(employers_with_broker.first).to be_a EmployerProfile
     end
@@ -510,9 +512,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
 
     it 'shows one employer moving to another broker agency' do
-      employer =  organization5.employer_profile
+      employer =  organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111');
       employer.hire_broker_agency(broker_agency_profile7)
-
+      employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
@@ -525,7 +527,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
 
     it 'shows an employer selected a broker for the first time' do
-      employer = employer_profile_5
+      employer = er5
       employer.hire_broker_agency(broker_agency_profile7)
       employer.save
       employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
@@ -535,7 +537,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
 
     it 'works with multiple broker_agency_contacts'  do
-      employer = employer_profile_5
+      employer = er5
       org_id = employer.organization.id
       employer.hire_broker_agency(broker_agency_profile7)
       employer.save

@@ -2,16 +2,10 @@ require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
   class Organizations::PlanDesignOrganizationsController < ApplicationController
-    include Acapi::Notifiers
     include Config::AcaConcern
-    include DataTablesAdapter
     include Config::BrokerAgencyHelper
 
-    before_action :find_broker_agency_profile, only: [:employers, :new]
-    before_action :init_datatable, only: [:employers, :create, :update]
-
-    def employers
-    end
+    before_action :load_broker_agency_profile, only: [:new, :create]
 
     def new
       init_organization
@@ -23,7 +17,8 @@ module SponsoredBenefits
       broker_agency_profile.plan_design_organizations.new(organization_params.merge(owner_profile_id: old_broker_agency_profile.id))
 
       if broker_agency_profile.save
-        render :create
+        flash[:success] = "Prospect Employer Added Successfully."
+        redirect_to employers_organizations_broker_agency_profile_path(@broker_agency_profile)
       else
         init_organization
         render :new
@@ -40,21 +35,35 @@ module SponsoredBenefits
       pdo.assign_attributes(organization_params)
 
       if pdo.save
-        render :update
+        flash[:success] = "Prospect Employer Updated Successfully."
+        redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
       else
         render :edit
       end
     end
 
+    def destroy
+      organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
+      if organization.plan_design_proposals.blank?
+        organization.destroy
+      else
+        flash.now[:notice] = "Employer #{organization.legal_name}, has existing quotes.
+                              Please remove any quotes for this employer before removing."
+      end
+
+      init_datatable
+      render :destroy
+    end
+
   private
+
+    def load_broker_agency_profile
+      @broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id])
+    end
 
     def init_organization
       @organization = ::Forms::EmployerProfile.new
       get_sic_codes
-    end
-
-    def init_datatable
-      @datatable = ::Effective::Datatables::BrokerAgencyEmployerDatatable.new(profile_id: @broker_agency_profile._id)
     end
 
     def find_broker_agency_profile
