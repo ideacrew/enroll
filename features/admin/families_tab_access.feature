@@ -39,5 +39,3 @@ Feature: Check permissions for admin roles to access links in admin familes tab
 	  And admin should see families dropdown link in main tabs
 	  And ciclks on families dropdown link in main tabs
 	  Then the only enabled option should be New Consumer Application
-
-
