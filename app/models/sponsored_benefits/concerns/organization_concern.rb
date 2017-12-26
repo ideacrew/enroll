@@ -93,6 +93,10 @@ module SponsoredBenefits
           end
         end
       end
+
+      def primary_office_location
+        office_locations.detect(&:is_primary?)
+      end
     end
 
     class_methods do

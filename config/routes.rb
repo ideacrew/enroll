@@ -1,7 +1,7 @@
 SponsoredBenefits::Engine.routes.draw do
 
   resources :plan_design_proposals, only: [] do
-    resources :plan_design_census_employees, controller: 'census_members/plan_design_census_employees' do 
+    resources :plan_design_census_employees, controller: 'census_members/plan_design_census_employees' do
       collection do
         post :bulk_employee_upload
         post :expected_selection
@@ -17,6 +17,7 @@ SponsoredBenefits::Engine.routes.draw do
 
     resources :plan_design_organizations do
       resources :plan_design_proposals
+      resources :carriers, controller: 'plan_design_proposals/carriers', only: [:index]
     end
 
     resource :office_locations do
