@@ -19,8 +19,8 @@ def valid_enrollment_hbx_ids(family)
   enrollments = family.enrollments
   good_enrollments = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(@start_date, @end_date)
   auto_renewing_enrollments = enrollments.where(kind: "individual").renewing.by_submitted_datetime_range(@start_date, @end_date)
-  bad_enrollments_fre = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(Date.new(2016, 1, 1), @start_date - 1.days)
-  has_renewals = enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? } ? true : false
+  bad_enrollments_fre = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days)
+  has_renewals = good_enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? } ? true : false
 
   good_enrollments.uniq!
 
