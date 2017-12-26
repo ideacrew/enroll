@@ -14,11 +14,12 @@ module SponsoredBenefits
     let(:employer) { double(:employer, id: "11111", name: 'ABC Company', sic_code: '0197') }
     let(:broker) { double(:broker, id: 2) }
     let(:broker_role) { double(:broker_role, id: 3) }
-    let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: "3123", persisted: true, fein: "5555", hbx_id: "123312",
-                                    legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization()) }
+    let(:broker_agency_profile_id) { "216735" }
+    let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
+                                    legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization) }
     let(:old_broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
     let!(:plan_design_organization) { create(:plan_design_organization, customer_profile_id: employer.id,
-                                                                        owner_profile_id: '22222',
+                                                                        owner_profile_id: broker_agency_profile_id,
                                                                         legal_name: employer.name,
                                                                         sic_code: employer.sic_code ) }
     let(:user) { double(:user) }
@@ -29,14 +30,6 @@ module SponsoredBenefits
       allow(subject).to receive(:current_person).and_return(current_person)
       allow(current_person).to receive(:broker_role).and_return(broker_role)
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
-      allow(subject).to receive(:init_datatable).and_return(datatable)
-    end
-
-    context "GET #employers" do
-      it "returns a success response" do
-        xhr :get, :employers, { plan_design_organization_id: plan_design_organization.id }, valid_session
-        expect(response).to be_success
-      end
     end
 
     describe "GET #new" do
@@ -109,9 +102,9 @@ module SponsoredBenefits
           }.to change { Organizations::PlanDesignOrganization.all.count }.by(1)
         end
 
-        it "renders the create view" do
+        it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
           post :create, { organization: valid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}, valid_session
-          expect(response).to render_template(:create)
+          expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
         end
       end
 
@@ -158,9 +151,9 @@ module SponsoredBenefits
           }.to change { plan_design_organization.reload.legal_name }.to('Some New Name')
         end
 
-        it "renders the update view" do
+        it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
           patch :update, { organization: valid_attributes, id: plan_design_organization.id, format: 'js' }, valid_session
-          expect(response).to render_template(:update)
+          expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
         end
 
         it "does not create a new Organizations::PlanDesignOrganization" do
