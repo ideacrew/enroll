@@ -22,7 +22,7 @@ module SponsoredBenefits
       field :open_enrollment_period,  type: Range
 
       # Populate when enrollment is terminated prior to open_enrollment_period.end
-      field :terminated_early_on, type: Date
+      # field :terminated_early_on, type: Date
 
       # field :sponsorable_id, type: String
       # field :rosterable_id, type: String
@@ -30,10 +30,11 @@ module SponsoredBenefits
       # field :kind, type: :symbol
 
       # has_one :rosterable, as: :rosterable
-      embeds_many :benefit_packages, as: :benefit_packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
-      # embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::AcaShopCcaBenefitPackage"
-      accepts_nested_attributes_for :benefit_packages
 
+      embeds_many :benefit_groups, class_name: "::BenefitGroup", cascade_callbacks: true
+
+      # embeds_many :benefit_packages, as: :benefit_packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
+      # accepts_nested_attributes_for :benefit_packages
 
       # ## Override with specific benefit package subclasses
       #   embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
@@ -43,8 +44,7 @@ module SponsoredBenefits
       validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
       # validate :validate_application_dates
 
-      scope :by_date_range,    ->(begin_on, end_on) { where(:"effective_period.max".gte => begin_on, :"effective_period.max".lte => end_on) }
-      scope :terminated_early, ->{ where(:aasm_state.in => TERMINATED, :"effective_period.max".gt => :"terminated_on") }
+      validate :open_enrollment_date_checks
 
       #
       # Are these correct? I don't think you can move an embedded object just by changing an id?
@@ -65,7 +65,8 @@ module SponsoredBenefits
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
-        write_attribute(:open_enrollment_period, SponsoredBenefits.tidy_date_range(new_open_enrollment_period))
+        open_enrollment_range = SponsoredBenefits.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
+        write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
       end
 
       def open_enrollment_begin_on
@@ -83,7 +84,6 @@ module SponsoredBenefits
 
       # Application meets criteria necessary for sponsored group to shop for benefits
       def is_open_enrollment_eligible?
-
       end
 
       # Application meets criteria necessary for sponsored group to effectuate selected benefits
@@ -112,7 +112,46 @@ module SponsoredBenefits
         end
       end
 
-    end
 
+
+      def open_enrollment_date_checks
+        return if effective_period.blank? || effective_period.blank? || open_enrollment_period.blank? || open_enrollment_period.blank?
+
+        if effective_period.begin != effective_period.begin.beginning_of_month
+          errors.add(:effective_period, "start date must be first day of the month")
+        end
+
+        if effective_period.end != effective_period.end.end_of_month
+          errors.add(:effective_period, "must be last day of the month")
+        end
+
+        if effective_period.end > effective_period.begin.years_since(Settings.aca.shop_market.benefit_period.length_maximum.year)
+          errors.add(:effective_period, "benefit period may not exceed #{Settings.aca.shop_market.benefit_period.length_maximum.year} year")
+        end
+
+        if open_enrollment_period.end > effective_period.begin
+          errors.add(:effective_period, "start date can't occur before open enrollment end date")
+        end
+
+        if open_enrollment_period.end < open_enrollment_period.begin
+          errors.add(:open_enrollment_period, "can't occur before open enrollment start date")
+        end
+
+        if open_enrollment_period.begin < (effective_period.begin - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
+          errors.add(:open_enrollment_period.begin, "can't occur earlier than 60 days before start date")
+        end
+
+        if open_enrollment_period.end > (open_enrollment_period.begin + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
+          errors.add(:open_enrollment_period, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
+        end
+
+        if (effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
+          errors.add(:effective_period, "may not start application before " \
+                     "#{(effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{effective_period.begin} effective date")
+        end
+      end
+
+
+    end
   end
 end
