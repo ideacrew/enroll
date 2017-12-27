@@ -1062,7 +1062,6 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    Rails.logger.error { "@@@@@@@@@@@@@@@___________IN trigger notice _______@@@@@@"}
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
     rescue Exception => e
