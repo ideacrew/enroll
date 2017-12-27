@@ -421,23 +421,25 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.local_residency_validation = 'pending'
         person.consumer_role.is_state_resident = false
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "DC Residency")
-        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Review")
       end
       it 'returns verified if residency is valid' do
         allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return true
         person.consumer_role.local_residency_validation = 'valid'
-        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Verified")
       end
       it 'returns outstanding for residency outstanding' do
+        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return false
         person.consumer_role.local_residency_validation = 'outstanding'
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person)).to eq('Outstanding')
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
       it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
-        person.consumer_role.local_residency_validation = 'outstanding'
+        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return false
+        allow_any_instance_of(ConsumerRole).to receive(:residency_pending?).and_return true
         allow_any_instance_of(ConsumerRole).to receive(:processing_residency_24h?).and_return true
         person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
   end
@@ -546,7 +548,6 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-<<<<<<< HEAD
     it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
@@ -555,11 +556,6 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
     it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
     it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
-=======
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "review", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
->>>>>>> origin/bug-19554
   end
 
   describe "#build_ridp_admin_actions_list" do
