@@ -133,7 +133,7 @@
                     Washington, DC 20001<br>
                     Phone: (202) 727-2525 <br>"
 - step:
-    heading: Submit Application
+    heading: Submit Your Application
     heading_text: "This is the last step. Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION."
     sections:
       - section:
@@ -142,7 +142,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b> I understand that eligibility for Medicaid or private health insurance with or without financial assistance will be reviewed every year. </b> <br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including with my consent information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources and I will be able to correct information that is wrong.I may also be asked to provide additional information if found eligible Medicaid or private health insurance coverage with or without financial assistance will be extended for another year for myself and/or members of my application group child support veterans payments or supplemental security income(SSI).
+                    text: <b> I understand that eligibility for Medicaid or private health insurance with or without financial assistance will be reviewed every year. </b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including with my consent information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources and I will be able to correct information that is wrong.I may also be asked to provide additional information if found eligible Medicaid or private health insurance coverage with or without financial assistance will be extended for another year for myself and/or members of my application group child support veterans payments or supplemental security income(SSI).
             - cells:
                   - gutter: 12
                     type: checkbox
@@ -262,13 +262,19 @@
                   type: raw_html
                   text: "<h5><b>Electronic Signature * (enter your name)</b></h5>"
             - cells:
-                - gutter: 6
+                - gutter: 4
                   type: signature_inputs
                   id: 'first_name_thank_you'
                   name: first_name_thank_you
                   placeholder: First Name *
                   required: true
-                - gutter: 6
+                - gutter: 4
+                  type: signature_inputs
+                  id: 'middle_name_thank_you'
+                  name: middle_name_thank_you
+                  placeholder: Middle Name *
+                  required: false
+                - gutter: 4
                   type: signature_inputs
                   id: 'last_name_thank_you'
                   name: last_name_thank_you
