@@ -13,10 +13,18 @@ module SponsoredBenefits
         if current_person.broker_role.present?
           @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id)
         end
+
+        if active_user.has_hbx_staff_role? && params[:plan_design_organization_id].present?
+          @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
+        end
       end
 
       def current_person
         current_user.person
+      end
+
+      def active_user
+        current_user
       end
   end
 end

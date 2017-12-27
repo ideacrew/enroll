@@ -99,9 +99,6 @@ module SponsoredBenefits
       end
 
 
-
-
-
       def default_benefit_group
         benefit_groups.detect(&:default)
       end
@@ -124,48 +121,69 @@ module SponsoredBenefits
       end
 
 
-# def shop_enrollment_timetable(new_effective_date)
-#   effective_date = new_effective_date.to_date.beginning_of_month
-#   prior_month = effective_date - 1.month
-#   plan_year_start_on = effective_date
-#   plan_year_end_on = effective_date + 1.year - 1.day
+      ## This Plan Year code is refactored in section below.  Remove this section once the values are properly mapped in new context ##
 
-#   employer_initial_application_earliest_start_on = (effective_date + 
-#     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 
-#     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
+      # def shop_enrollment_timetable(new_effective_date)
+      #   effective_date = new_effective_date.to_date.beginning_of_month
+      #   prior_month = effective_date - 1.month
+      #   plan_year_start_on = effective_date
+      #   plan_year_end_on = effective_date + 1.year - 1.day
 
-#   employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
-#   employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+      #   employer_initial_application_earliest_start_on = (effective_date + 
+      #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 
+      #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
 
-
-#   open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-#   open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-#   open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_open_enrollment_monthly_end_on}").to_date
-#   binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_binder_payment_due_on}")
-#   advertised_due_date_of_month          = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentAdvBeginDueDayOfMonth}").to_date
+      #   employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
+      #   employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
 
 
-#   timetable = {
-#     effective_date: effective_date,
-#     plan_year_start_on: plan_year_start_on,
-#     plan_year_end_on: plan_year_end_on,
-#     employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
-#     employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
-#     employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
-#     open_enrollment_earliest_start_on: open_enrollment_earliest_start_on,
-#     open_enrollment_latest_start_on: open_enrollment_latest_start_on,
-#     open_enrollment_latest_end_on: open_enrollment_latest_end_on,
-#     binder_payment_due_date: binder_payment_due_date,
-#     advertised_due_date_of_month: advertised_due_date_of_month
-#   }
+      #   open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+      #   open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+      #   open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_open_enrollment_monthly_end_on}").to_date
+      #   binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_binder_payment_due_on}")
+      #   advertised_due_date_of_month          = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentAdvBeginDueDayOfMonth}").to_date
 
-#   timetable
-# end
+
+      #   timetable = {
+      #     effective_date: effective_date,
+      #     plan_year_start_on: plan_year_start_on,
+      #     plan_year_end_on: plan_year_end_on,
+      #     employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
+      #     employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
+      #     employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
+      #     open_enrollment_earliest_start_on: open_enrollment_earliest_start_on,
+      #     open_enrollment_latest_start_on: open_enrollment_latest_start_on,
+      #     open_enrollment_latest_end_on: open_enrollment_latest_end_on,
+      #     binder_payment_due_date: binder_payment_due_date,
+      #     advertised_due_date_of_month: advertised_due_date_of_month
+      #   }
+
+      #   timetable
+      # end
 
 
       class << self 
 
-        def open_enrollment_begin_deadline_day_of_month(use_grace_period = false)
+        def enrollment_timetable_by_effective_date(effective_date)
+          effective_date            = effective_date.to_date.beginning_of_month
+          effective_period          = effective_date..(effective_date + 1.year - 1.day)
+          open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+          prior_month               = effective_date - 1.month
+          binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
+
+          open_enrollment_minimum_day     = open_enrollment_minimum_begin_day_of_month
+          open_enrollment_period_minimum  = Date.new(prior_month.year, prior_month.month, open_enrollment_minimum_day)..open_enrollment_period.end
+
+          {
+              effective_date: effective_date,
+              effective_period: effective_period,
+              open_enrollment_period: open_enrollment_period,
+              open_enrollment_period_minimum: open_enrollment_period_minimum,
+              binder_payment_due_on: binder_payment_due_on,
+            }
+        end
+
+        def open_enrollment_minimum_begin_day_of_month(use_grace_period = false)
           if use_grace_period
             minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
           else
@@ -177,55 +195,35 @@ module SponsoredBenefits
         end
 
 
-        def effective_period_begin_on_by_date(given_date = TimeKeeper.date_of_record, use_grace_period = false)
+        # TODOs
+        ## handle late rate scenarios where partial or no benefit product plan/rate data exists for effective date
+        ## handle midyear initial enrollments for annual fixed enrollment periods
+        def effective_period_by_date(given_date = TimeKeeper.date_of_record, use_grace_period = false)
           given_day_of_month    = given_date.day
           next_month_start      = given_date.end_of_month + 1.day
           following_month_start = next_month_start + 1.month
 
           if use_grace_period
-            last_day = open_enrollment_begin_deadline_day_of_month(true)
+            last_day = open_enrollment_minimum_begin_day_of_month(true)
           else
-            last_day = open_enrollment_begin_deadline_day_of_month
+            last_day = open_enrollment_minimum_begin_day_of_month
           end
 
-          given_day_of_month > last_day ? following_month_start : next_month_start
+          if given_day_of_month > last_day
+            following_month_start..(following_month_start + 1.year - 1.day)
+          else
+            next_month_start..(next_month_start + 1.year - 1.day)
+          end
         end
 
-
-        # TODOs
-        ## handle late rate scenarios where partial or no benefit product plan/rate data exists for effective date
-        ## handle midyear initial enrollments for annual fixed enrollment periods
-        def effective_period_by_effective_date(effective_date)
-          effective_date..(effective_date + 1.year - 1.day)
-        end
 
         def open_enrollment_period_by_effective_date(effective_date)
-          open_enrollment_period_start_on = (effective_date + Settings.aca.shop_market.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
-        end
+          earliest_begin_date = effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+          prior_month = effective_date - 1.month
 
-
-        def self.enrollment_timetable_by_effective_date(effective_date)
-
-          effective_date          = effective_date.to_date.beginning_of_month
-          effective_period        = effective_period_by_effective_date(effective_date)
-          open_enrollment_period  = open_enrollment_period_by_effective_date(effective_date)
-
-
-          enrollment_process_month = effective_date.month - 1.month
-
-          open_enrollment_period          = open_enrollment_period_start_on..open_enrollment_period_end_on
-
-
-          {
-              effective_date: effective_date,
-              effective_period: effective_period,
-              open_enrollment_period: open_enrollment_period,
-              binder_payment_due_on: binder_payment_due_on,
-              initial_application_period: initial_application_period,
-              renewal_application_period: renewal_application_period,
-              initial_application_grace_period: initial_application_grace_period,
-              renewal_application_grace_period: renewal_application_grace_period,
-            }
+          begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
+          end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
+          begin_on..end_on
         end
 
 
@@ -275,10 +273,11 @@ module SponsoredBenefits
           errors.add(:open_enrollment_period, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")
         end
 
-        if (effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
-          errors.add(:effective_period, "may not start application before " \
-                     "#{(effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{effective_period.begin} effective date")
-        end
+        ## Leave this validation disabled in the BQT??
+        # if (effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
+        #   errors.add(:effective_period, "may not start application before " \
+        #              "#{(effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{effective_period.begin} effective date")
+        # end
       end
 
 
