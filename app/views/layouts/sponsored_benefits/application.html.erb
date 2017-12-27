@@ -9,16 +9,11 @@
   <%= csrf_meta_tags %>
 </head>
 <body class="font">
-    <%= render 'shared/engines/header' %>
+    <%= render 'layouts/header' %>
     <%= render 'shared/engines/broker_menu' %>
     <%= render_flash %>
     <div class="content <%= controller_name %>">
-
-      <%#= render '../../components/shared/flash' %>
-      <div class="container">
-        <%= yield :horizontal_status %>
-      </div>
-        <%= yield %>
+      <%= yield %>
     </div>
 
 </body>
