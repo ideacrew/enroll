@@ -46,11 +46,12 @@ module SponsoredBenefits
         inclusion: { in: ENROLLMENT_FREQUENCY_KINDS, message: "%{value} is not a valid enrollment frequency kind" },
         allow_blank: false
 
-      validates :annual_enrollment_period_begin_month, 
+      validates :annual_enrollment_period_begin_month,
         numericality: {only_integer: true},
         inclusion: { in: 1..12 },
         allow_blank: true
 
+      delegate :sic_code, to: :benefit_sponsorable
       # Prevent changes to immutable fields. Instantiate a new model instead
       # before_validation {
       #     if persisted?
