@@ -17,8 +17,7 @@ module SponsoredBenefits
         flash[:notice] = "Quote Published"
       else
         flash[:error] = "Quote failed to publish.".html_safe
-        # FIXME: where to route if error occurs?
-        redirect_to benefit_sponsorship_plan_design_proposals_path(plan_design_proposal.benefit_sponsorship)
+        redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
       end
     end
 
