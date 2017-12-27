@@ -1,6 +1,6 @@
 module VerificationHelper
   include DocumentsVerificationStatus
-  
+
   def doc_status_label(doc)
     case doc.status
       when "not submitted"
@@ -36,63 +36,22 @@ def ridp_type_status(type, person)
     end
   end
 
-  def verification_type_status(type, member, admin=false)
-    consumer = member.consumer_role
-    return "curam" if (consumer.vlp_authority == "curam" && consumer.fully_verified? && admin)
-    case type
-      when 'Social Security Number'
-        if consumer.ssn_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      when 'American Indian Status'
-        if consumer.native_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      when 'DC Residency'
-        if consumer.residency_verified?
-          consumer.residency_attested? ? "attested" : consumer.local_residency_validation
-        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-      else
-        if consumer.lawful_presence_verified?
-          "verified"
-        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
-          "in review"
-        else
-          "outstanding"
-        end
-    end
-  end
-
   def verification_type_class(type, member, admin=false)
     case verification_type_status(type, member, admin)
       when "verified"
         "success"
-      when "in review"
+      when "review"
         "warning"
       when "outstanding"
-        if type == 'DC Residency'
-          member.consumer_role.processing_residency_24h? ? "info" : "danger"
-        else
-          member.consumer_role.processing_hub_24h? ? "info" : "danger"
-        end
+        "danger"
       when "curam"
         "default"
       when "attested"
         "default"
       when "valid"
         "success"
+      when "processing"
+        "info"
     end
   end
 
@@ -161,7 +120,7 @@ def ridp_type_status(type, person)
       v_types_list = get_person_v_type_status(people)
       if !v_types_list.include?('outstanding')
         'success'
-      elsif v_types_list.include?('in review') && v_types_list.include?('outstanding')
+      elsif v_types_list.include?('review') && v_types_list.include?('outstanding')
         'info'
       else
         'default'
@@ -213,24 +172,7 @@ def ridp_type_status(type, person)
   end
 
   def show_v_type(v_type, person, admin = false)
-    case verification_type_status(v_type, person, admin)
-      when "in review"
-        "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
-      when "verified"
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      when "valid"
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      when "attested"
-        "&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      when "curam"
-        admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
-      else
-        if v_type == 'DC Residency'
-          person.consumer_role.processing_residency_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
-        else
-          person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
-        end
-    end
+    verification_type_status(v_type, person, admin).capitalize.center(12).gsub(' ', '&nbsp;').html_safe
   end
 
   def show_ridp_type(ridp_type, person)
