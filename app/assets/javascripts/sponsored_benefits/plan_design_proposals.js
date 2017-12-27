@@ -14,51 +14,40 @@ $(document).on('click', '.nav-tabs li label', function() {
 });
 
 $(document).on('click', '.nav-tabs li label', function() {
-  nav = '.health-plan-design'
 
-  $(this).closest('.plan-design-proposal').find(nav+' .nav-tabs li').removeClass('active');
-  $(this).closest('.plan-design-proposal').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', false);
+  $(this).closest('.health-plan-design').find('.nav-tabs li').removeClass('active');
   $(this).closest('li').addClass('active');
-  $(this).closest('.plan-design-proposal').find(nav+' .nav-tabs li.active label').attr('style', '');
-  $(this).closest('.plan-design-proposal').find(nav+' .nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
+
+  $(this).closest('.health-plan-design').find('.plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', false);
+  $(this).closest('.health-plan-design').find('.nav-tabs li.active label').attr('style', '');
+  $(this).closest('.health-plan-design').find('.nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
 
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
     $(this).find('input[type=radio]').prop('checked', true );
-    $(this).closest('.plan-design-proposal').find(nav+' .plan-options > *').hide();
-    $(this).closest('.plan-design-proposal').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', 0);
-    $(this).closest('.plan-design-proposal').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
+    $(this).closest('.health-plan-design').find('.plan-options > *').hide();
+    $(this).closest('.health-plan-design').find('.plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', 0);
+    $(this).closest('.health-plan-design').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
   }
 
 });
 
 $(document).on('change', '.health-plan-design .nav-tabs li input', function() {
-  nav = '.health-plan-design';
-
+  $('.tab-container').hide();
   if ($(this).attr('value') == "single_carrier") {
-    $(this).closest('.plan-design-proposal').find(nav+' .carriers-tab').show();
-    $(this).closest('.plan-design-proposal').find(nav+' .plan-options').slideDown();
-
+    $(this).closest('.health-plan-design').find('.carriers-tab').show();
+    $(this).closest('.health-plan-design').find('.plan-options').slideDown();
   }
   else if ($(this).attr('value') == "metal_level") {
-    $(this).closest('.plan-design-proposal').find(nav+' .metals-tab').show();
-    $(this).closest('.plan-design-proposal').find(nav+' .plan-options').slideDown();
+    $(this).closest('.health-plan-design').find('.metals-tab').show();
+    $(this).closest('.health-plan-design').find('.plan-options').slideDown();
   }
   else if ($(this).attr('value') == "single_plan") {
-    if ( nav == '.health-plan-design' ) {
-      $(this).closest('.plan-design-proposal').find(nav+' .single-plan-tab').show();
-      $(this).closest('.plan-design-proposal').find(nav+' .plan-options').slideDown();
-    } else {
-      $(this).closest('.plan-design-proposal').find(nav+' .single-plan-tab').show();
-    }
+    $(this).closest('.health-plan-design').find('.single-plan-tab').show();
+    $(this).closest('.health-plan-design').find('.plan-options').slideDown();
   }
   else if ($(this).attr('value') == 'sole_source') {
-    if ( nav == '.health-plan-design' ) {
-      $(this).closest('.plan-design-proposal').find(nav+' .sole-source-plan-tab').show();
-      $(this).closest('.plan-design-proposal').find(nav+' .plan-options').slideDown();
-    } else {
-      $(this).closest('.benefit-group-fields').find(nav+' .sole-source-plan-tab').show();
-
-    }
+    $(this).closest('.health-plan-design').find('.sole-source-plan-tab').show();
+    $(this).closest('.health-plan-design').find('.plan-options').slideDown();
   }
 });
