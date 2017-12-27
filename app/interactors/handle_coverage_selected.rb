@@ -8,7 +8,7 @@ class HandleCoverageSelected
       enrollment.hbx_enrollment_members.each do |hem|
         hem.ivl_coverage_selected
       end
-      notify(HbxEnrollment::ENROLLMENT_CREATED_EVENT_NAME, {policy_id: enrollment.hbx_id})
+      notify(HbxEnrollment::ENROLLMENT_CREATED_EVENT_NAME, {policy_id: enrollment.hbx_id, enrollment_kind: enrollment.kind})
       enrollment.update_attributes!(:published_to_bus_at => Time.now)
     elsif enrollment.is_shop_sep?
       notify(HbxEnrollment::ENROLLMENT_CREATED_EVENT_NAME, {policy_id: enrollment.hbx_id})
