@@ -78,16 +78,6 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   def check_for_unverified_individuals
     family = recipient.primary_family
     date = TimeKeeper.date_of_record
-    # start_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
-    # end_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
-
-    # enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-    #   (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
-    #   (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record) &&
-    #   (hbx_en.created_at >= start_time && hbx_en.created_at <= end_time)
-    # end
-
-    # enrollments.reject!{|e| e.coverage_terminated? }
 
     hbx_enrollments = @hbx_enrollment_hbx_ids.inject([]) do | hbx_enrollments, hbx_id|
       hbx_enrollments << HbxEnrollment.all.by_hbx_id(hbx_id)
@@ -112,17 +102,6 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     end
 
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family) unless family.min_verification_due_date.present?
-
-
-
-    # hbx_enrollments = []
-    # en = enrollments.select{ |en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
-    # health_enrollments = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:effective_on)
-    # dental_enrollments = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:effective_on)
-    # hbx_enrollments << health_enrollments
-    # hbx_enrollments << dental_enrollments
-    # hbx_enrollments.flatten!
-    # hbx_enrollments.compact!
 
     hbx_enrollments.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)

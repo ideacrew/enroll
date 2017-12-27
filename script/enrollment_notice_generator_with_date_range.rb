@@ -50,10 +50,22 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
 
       hbx_enrollment_hbx_ids = valid_enrollment_hbx_ids(family)
       hbx_enrollment_hbx_ids.compact!
+      role = person.consumer_role
 
-      if person.consumer_role.present? && hbx_enrollment_hbx_ids.present?
-        IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name, {:hbx_enrollment_hbx_ids => hbx_enrollment_hbx_ids })
+      if role.present? && hbx_enrollment_hbx_ids.present?
+
+        event_kind = ApplicationEventKind.where(:event_name => event_name).first
+        notice_trigger = event_kind.notice_triggers.first
+        builder = notice_trigger.notice_builder.camelize.constantize.new(role, {
+                  template: notice_trigger.notice_template,
+                  subject: event_kind.title,
+                  event_name: event_name,
+                  options: {:hbx_enrollment_hbx_ids => hbx_enrollment_hbx_ids },
+                  mpi_indicator: notice_trigger.mpi_indicator,
+                  }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
+
         @logger.info "#{event_name} generated to family with primary_person: #{person.hbx_id}" unless Rails.env.test?
+
         csv << [
           person.hbx_id,
           person.first_name,
