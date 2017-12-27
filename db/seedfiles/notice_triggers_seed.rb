@@ -1299,7 +1299,7 @@ shop_notice_triggers = [
 
   {
     hbx_id: 'SHOP_D049',
-    title: 'Broker Hired Confirmation Notice',
+    title: 'Confirmation - Broker Hired',
     description: 'Confirmation of Broker Hired Sent to Employer',
     resource_name: 'employer',
     event_name: 'broker_hired_confirmation_notice',
