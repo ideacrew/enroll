@@ -588,6 +588,7 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_multiple_active_employers?).and_return(false)
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
         @qle = FactoryGirl.create(:qualifying_life_event_kind)
         @family = FactoryGirl.build(:family, :with_primary_family_member)
