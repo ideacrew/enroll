@@ -19,7 +19,7 @@ class ResidentRole
   field :is_state_resident, type: Boolean, default:true
   field :residency_determined_at, type: DateTime
 
-  field :contact_method, type: String, default: "Only Paper communication"
+  field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
 
   delegate :hbx_id,           to: :person, allow_nil: true
@@ -89,8 +89,8 @@ class ResidentRole
     self.lawful_presence_determination
   end
 
-  def latest_active_tax_household_with_year(year)
-    person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+  def latest_active_tax_household_with_year(year, family)
+    family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
