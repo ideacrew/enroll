@@ -31,11 +31,19 @@ namespace :reports do
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
 
-      families = Family.where(:"households.hbx_enrollments.plan_id".in => invalid_plan_ids)
+      families = Family.where(:"households.hbx_enrollments" =>
+        {:"$elemMatch" =>
+          {
+            :plan_id => {:"$in" => invalid_plan_ids},
+            :aasm_state => {:"$in" => HbxEnrollment::ENROLLED_STATUSES},
+            :kind => {:"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
+          }
+        }
+      )
 
       families.each do |family|
         person = family.primary_applicant.person
-        family.active_household.hbx_enrollments.where(:"plan_id".in => invalid_plan_ids).each do |enrollment|
+        family.active_household.hbx_enrollments.shop_market.enrolled.where(:"plan_id".in => invalid_plan_ids).each do |enrollment|
 
           plan_year = enrollment.benefit_group.plan_year
 
@@ -54,7 +62,18 @@ namespace :reports do
             ]
         end
       end
-      puts "Finished generating report!!"
+      puts "*********** Finished generating Report ***********************"
     end
+
+    puts "*********** Canceling the Incorrect Enrollments **************"
+
+    families.each do |family|
+      family.active_household.hbx_enrollments.shop_market.enrolled.where(:"plan_id".in => invalid_plan_ids).each do |enrollment|
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+        puts "Enrollment with hbx_id #{enrollment.hbx_id} canceled"
+      end
+    end
+
+    puts "*********** Cancellation Finished **************"
   end
 end
