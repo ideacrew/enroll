@@ -25,6 +25,10 @@ module SponsoredBenefits
 
       accepts_nested_attributes_for :census_dependents
 
+      embeds_many :benefit_group_assignments, as: :benefit_assignable,
+      cascade_callbacks: true,
+      validate: true
+
       validates_presence_of :dob
 
       validate :active_census_employee_is_unique
