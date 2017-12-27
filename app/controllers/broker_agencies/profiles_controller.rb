@@ -193,10 +193,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
-        @broker_agency_profile.employer_clients.each do |employer_profile|
-          Rails.logger.error { "@@@@@@@@@@@@@@@___________ProfilesController _______@@@@@@"}
-          employer_profile.trigger_notices("general_agency_terminated") if employer_profile.general_agency_profile == @broker_agency_profile.default_general_agency_profile
-        end
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
