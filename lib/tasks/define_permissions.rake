@@ -37,8 +37,23 @@ namespace :permissions do
 end
 
 namespace :permissions do
-  desc 'hbx admin can view application types of consumer'
+  desc 'hbx admin and csr view personal information page of consumer'
   DefinePermissions.define_task :hbx_admin_csr_view_personal_info_page => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can view new consumer application link tab'
+  DefinePermissions.define_task :hbx_admin_can_access_new_consumer_application_sub_tab => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can view identity verification link tab'
+  DefinePermissions.define_task :hbx_admin_can_access_identity_verification_sub_tab => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can view outstanding verification link tab'
+  DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
 end
 
 #rake permissions:initial_hbx
@@ -47,3 +62,6 @@ end
 #rake permissions:hbx_admin_can_complete_resident_application
 
 #rake permissions:hbx_admin_can_view_application_types
+#rake permissions:hbx_admin_can_access_new_consumer_application_sub_tab
+#rake permissions:hbx_admin_can_access_identity_verification_sub_tab
+#rake permissions:hbx_admin_can_access_outstanding_verification_sub_tab
