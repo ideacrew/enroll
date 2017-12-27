@@ -64,83 +64,120 @@ module SponsoredBenefits
 
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplication }
-      let(:standard_begin_day)  { 10 }
-      let(:grace_begin_day)     { 15 }
+      let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on - 
+                                  Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
+      let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on - 
+                                  Settings.aca.shop_market.open_enrollment.minimum_length.days }
 
       it "should return the day of month deadline for an open enrollment standard period to begin" do
-        expect(subject.open_enrollment_begin_deadline_day_of_month).to eq standard_begin_day
+        expect(subject.open_enrollment_minimum_begin_day_of_month).to eq standard_begin_day
       end
 
       it "should return the day of month deadline for an open enrollment grace period to begin" do
-        expect(subject.open_enrollment_begin_deadline_day_of_month(true)).to eq grace_begin_day
+        expect(subject.open_enrollment_minimum_begin_day_of_month(true)).to eq grace_begin_day
       end
 
-      context "and passed a calendar date" do
+      context "and a calendar date is passed to effective period by date method" do
         let(:seed_date)                         { Date.new(2018,4,4) }
-        let(:next_month)                        { seed_date.beginning_of_month + 1.month }
-        let(:following_month)                   { seed_date.beginning_of_month + 2.months }
+        let(:next_month_begin_on)               { seed_date.beginning_of_month + 1.month }
+        let(:next_month_effective_period)       { next_month_begin_on..(next_month_begin_on + 1.year - 1.day) }
+        let(:following_month_begin_on)          { seed_date.beginning_of_month + 2.months }
+        let(:following_month_effective_period)  { following_month_begin_on..(following_month_begin_on + 1.year - 1.day) }
 
-        let(:standard_period_last_day)          { subject.open_enrollment_begin_deadline_day_of_month }
+        let(:standard_period_last_day)          { subject.open_enrollment_minimum_begin_day_of_month }
         let(:standard_period_deadline_date)     { Date.new(seed_date.year, seed_date.month, standard_period_last_day) }
         let(:standard_period_pre_deadline_date) { standard_period_deadline_date - 1.day }
 
-        let(:grace_period_last_day)             { subject.open_enrollment_begin_deadline_day_of_month(true) }
+        let(:grace_period_last_day)             { subject.open_enrollment_minimum_begin_day_of_month(true) }
         let(:grace_period_deadline_date)        { Date.new(seed_date.year, seed_date.month, grace_period_last_day) }
         let(:grace_period_post_deadline_date)   { grace_period_deadline_date + 1.day }
 
 
         context "that is before standard period deadline" do
-          it "should provide an effective (standard) period begin date for the first of next month" do
-            expect(subject.effective_period_begin_on_by_date(standard_period_pre_deadline_date)).to eq next_month
+          it "should provide an effective (standard) period beginning the first of next month" do
+            expect(subject.effective_period_by_date(standard_period_pre_deadline_date)).to eq next_month_effective_period
           end
 
-          it "should provide an effective (grace) period begin date for the first of next month" do
-            expect(subject.effective_period_begin_on_by_date(standard_period_pre_deadline_date, true)).to eq next_month
+          it "should provide an effective (grace) period beginning the first of next month" do
+            expect(subject.effective_period_by_date(standard_period_pre_deadline_date, true)).to eq next_month_effective_period
           end
         end
 
         context "that is the same day as the standard period deadline" do
-          it "should provide an effective (standard) period begin date for the first of next month" do
-            expect(subject.effective_period_begin_on_by_date(standard_period_deadline_date)).to eq next_month
+          it "should provide an effective (standard) period beginning the first of next month" do
+            expect(subject.effective_period_by_date(standard_period_deadline_date)).to eq next_month_effective_period
           end
 
-          it "should provide an effective (grace) period begin date for the first of next month" do
-            expect(subject.effective_period_begin_on_by_date(standard_period_deadline_date, true)).to eq next_month
+          it "should provide an effective (grace) period beginning the first of next month" do
+            expect(subject.effective_period_by_date(standard_period_deadline_date, true)).to eq next_month_effective_period
           end
         end
 
         context "that is after the standard period, but before the grace period deadline" do
-          it "should provide an effective (standard) period begin date for the first of month following next month" do
-            expect(subject.effective_period_begin_on_by_date(grace_period_deadline_date)).to eq following_month
+          it "should provide an effective (standard) period beginning the first of month following next month" do
+            expect(subject.effective_period_by_date(grace_period_deadline_date)).to eq following_month_effective_period
           end
 
-          it "should provide an effective (grace) period begin date for the of first next month" do
-            expect(subject.effective_period_begin_on_by_date(grace_period_deadline_date, true)).to eq next_month
+          it "should provide an effective (grace) period beginning the of first next month" do
+            expect(subject.effective_period_by_date(grace_period_deadline_date, true)).to eq next_month_effective_period
           end
         end
 
         context "that is after both the standard and grace period deadlines" do
-          it "should provide an effective (standard) period begin date for the first of month following next month" do
-            expect(subject.effective_period_begin_on_by_date(grace_period_post_deadline_date)).to eq following_month
+          it "should provide an effective (standard) period beginning the first of month following next month" do
+            expect(subject.effective_period_by_date(grace_period_post_deadline_date)).to eq following_month_effective_period
           end
 
-          it "should provide an effective (grace) period begin date for the first of month following next month" do
-            expect(subject.effective_period_begin_on_by_date(grace_period_post_deadline_date, true)).to eq following_month
+          it "should provide an effective (grace) period beginning the first of month following next month" do
+            expect(subject.effective_period_by_date(grace_period_post_deadline_date, true)).to eq following_month_effective_period
           end
+        end
+      end
 
+      context "and an effective date is passed to open enrollment period by effective date method" do
+        let(:effective_date)                  { (TimeKeeper.date_of_record + 3.months).beginning_of_month }
+        let(:prior_month)                     { effective_date - 1.month }
+        let(:valid_open_enrollment_begin_on)  { (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
+        let(:valid_open_enrollment_end_on)    { Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
+        let(:valid_open_enrollment_period)    { valid_open_enrollment_begin_on..valid_open_enrollment_end_on }
+
+        it "should provide a valid open enrollment period for that effective date" do
+          expect(subject.open_enrollment_period_by_effective_date(effective_date)).to eq valid_open_enrollment_period
+        end
+      end
+
+      context "and an effective date is passed to enrollment timetable by effective date method" do
+        let(:effective_date)                  { Date.new(2018,3,1) }
+
+        let(:prior_month)                     { effective_date - 1.month }
+        let(:late_open_enrollment_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on - 
+                                                Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
+        let(:open_enrollment_end_day)         { Settings.aca.shop_market.open_enrollment.monthly_end_on }
+        let(:open_enrollment_end_on)          { Date.new(prior_month.year, prior_month.month, open_enrollment_end_day) }
+
+        let(:late_open_enrollment_begin_on)   { Date.new(prior_month.year, prior_month.month, late_open_enrollment_begin_day) }
+        let(:late_open_enrollment_period)     { late_open_enrollment_begin_on..open_enrollment_end_on }
+
+        let(:valid_timetable)                 { 
+                                                { 
+                                                    effective_date:                 Date.new(2018,3,1), 
+                                                    effective_period:               Date.new(2018,3,1)..Date.new(2019,2,28),
+                                                    open_enrollment_period:         Date.new(2018,1,1)..open_enrollment_end_on, 
+                                                    open_enrollment_period_minimum: late_open_enrollment_period,
+                                                    binder_payment_due_on:          Date.new(2018,2,23)
+                                                  }
+                                               }
+
+        it "should provide a valid an enrollment timetabe hash for that effective date" do
+          expect(subject.enrollment_timetable_by_effective_date(effective_date)).to eq valid_timetable
         end
 
+        it "timetable date values should be valid" do
+          timetable = subject.enrollment_timetable_by_effective_date(effective_date)
+          expect(subject.new(effective_period: timetable[:effective_period], open_enrollment_period: timetable[:open_enrollment_period])).to be_valid
+        end
       end
+
     end
-
-
-    # it "assigns date ranges correctly" do
-    #   expect(subject.send(:tidy_date_range, date_range)).to be_kind_of(Range)
-    # end
-
-    # it "assigns effective_period correctly" do
-    #   subject.effective_period = date_range
-    #   expect(subject.effective_period).to eq(date_range)
-    # end
   end
 end
