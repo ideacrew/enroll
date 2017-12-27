@@ -1,7 +1,6 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposal
-
       include Mongoid::Document
       include Mongoid::Timestamps
 
@@ -14,7 +13,6 @@ module SponsoredBenefits
       embeds_one :profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"title" => Regexp.compile(Regexp.escape(query), true)}])}) }
-
 
       def self.find(id)
         organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals._id" => BSON::ObjectId.from_string(id)).first
