@@ -25,7 +25,7 @@ module SponsoredBenefits
 
     def edit
       @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
-      
+
       respond_to do |format|
         format.js { render "edit" }
       end
@@ -44,6 +44,15 @@ module SponsoredBenefits
 
     def update
       @plan_design_census_employee.update(plan_design_employee_params)
+
+      if plan_design_employee_params[:census_dependents_attributes]
+        destroyed_dependent_ids = plan_design_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]}
+        destroyed_dependent_ids.each do |g|
+          if census_dependent = @plan_design_census_employee.census_dependents.find(g)
+            census_dependent.delete
+          end
+        end
+      end
 
       respond_to do |format|
         format.js { render "update" }
@@ -112,7 +121,7 @@ module SponsoredBenefits
        :gender,
        address_attributes: [:kind, :address_1, :address_2, :city, :state, :zip],
        email_attributes: [:kind, :address],
-       census_dependents_attributes: [:first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender])
+       census_dependents_attributes: [:id, :first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender, :_destroy])
     end
   end
 end
