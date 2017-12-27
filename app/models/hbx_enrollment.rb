@@ -387,7 +387,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).first
+    HbxEnrollment.find(predecessor_enrollment_id)
   end
 
   def census_employee
@@ -552,12 +552,6 @@ class HbxEnrollment
     end
 
     # TODO: gereate or update passive renewal
-  end
-
-  def propagate_reinstate(edi_required = false)
-    if edi_required
-      # Transmit edi
-    end
   end
 
   def propagate_selection
@@ -1112,6 +1106,19 @@ class HbxEnrollment
       :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
   end
 
+  def notify_of_coverage_start(publish_to_carrier)
+    config = Rails.application.config.acapi
+    notify(
+      "acapi.info.events.hbx_enrollment.coverage_selected",
+      {
+        :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+        "hbx_enrollment_id" => self.hbx_id,
+        "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#initial",
+        "is_trading_partner_publishable" => publish_to_carrier
+      }
+    )
+  end
+
   def reinstate(edi: false)
     return if reinstated_enrollment_exists?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
@@ -1127,6 +1134,7 @@ class HbxEnrollment
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
       # Move reinstated enrollment to "coverage enrolled" status if coverage begins
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
+      reinstate_enrollment.notify_of_coverage_start(edi)
     end
 
     reinstate_enrollment
@@ -1346,7 +1354,7 @@ class HbxEnrollment
     end
 
     event :reinstate_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_reinstated, after: :propagate_reinstate
+      transitions from: :shopping, to: :coverage_reinstated
     end
   end
 
