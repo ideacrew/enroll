@@ -11,7 +11,7 @@
               (link_to row.legal_name, main_app.employers_employer_profile_path(id: row.customer_profile_id, :tab=>'home'))
             end
             }, :sortable => false, :filter => false
-          table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
+          table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
           table_column :ee_count, :label => 'EE Count', :proc => Proc.new { |row| ee_count(row) }, :sortable => false, :filter => false
           table_column :er_state, :label => 'ER State', :proc => Proc.new { |row| er_state(row) }, :sortable => false, :filter => false
           table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row| row.try(:employer_profile).try(:registered_on) }, :sortable => false, :filter => false
@@ -52,6 +52,11 @@
         def er_state(row)
           return 'N/A' if row.is_prospect?
           row.employer_profile.aasm_state.capitalize
+        end
+
+        def er_fein(row)
+          return 'N/A' if row.is_prospect?
+          row.fein
         end
 
         class << self
