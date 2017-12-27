@@ -25,6 +25,7 @@ module SponsoredBenefits
 
     def edit
       @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
+      
       respond_to do |format|
         format.js { render "edit" }
       end
@@ -33,7 +34,7 @@ module SponsoredBenefits
     def create
       @plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(plan_design_employee_params)
       @plan_design_census_employee.benefit_sponsorship_id = @plan_design_proposal.profile.benefit_sponsorships.first.id
-
+       
       if @plan_design_census_employee.save
         redirect_to :back, :flash => {:success => "Employee record created successfully."}
       else
@@ -109,18 +110,9 @@ module SponsoredBenefits
        :dob,
        :ssn,
        :gender,
-       address_attributes: [
-        :kind,
-        :address_1,
-        :address_2,
-        :city,
-        :state,
-        :zip
-        ],
-        email_attributes: [
-          :kind,
-          :address
-        ])
+       address_attributes: [:kind, :address_1, :address_2, :city, :state, :zip],
+       email_attributes: [:kind, :address],
+       census_dependents_attributes: [:first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender])
     end
   end
 end
