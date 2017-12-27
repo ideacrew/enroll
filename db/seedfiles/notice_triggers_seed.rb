@@ -593,8 +593,8 @@ shop_notice_triggers = [
   },
   {
       hbx_id: 'SHOP_D052',
-      title: 'Confirmation of Broker Fired to Employer',
-      description: ' Broker gets terminated after employer selects change broker',
+      title: 'Confirmation - Broker Fired',
+      description: 'Broker gets terminated after employer selects change broker',
       resource_name: 'employer',
       event_name: 'employer_broker_fired',
       notice_triggers: [
