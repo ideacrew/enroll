@@ -75,5 +75,11 @@ namespace :reports do
     end
 
     puts "*********** Cancellation Finished **************"
+
+    invalid_plan_ids.each do |plan_id|
+      plan = Plan.find(plan_id)
+      plan.update_attributes!(nationwide: false)
+      puts "Changing Network Field Value from Nationwide to DC Metro for #{plan.hios_id}"
+    end
   end
 end
