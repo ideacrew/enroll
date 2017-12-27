@@ -6,7 +6,7 @@ module SponsoredBenefits
 
       embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
 
-
+      delegate :sic_code, to: :benefit_sponsorship
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date
@@ -31,7 +31,7 @@ module SponsoredBenefits
 
       # has_one :rosterable, as: :rosterable
 
-      embeds_many :benefit_groups, class_name: "::BenefitGroup", cascade_callbacks: true
+      embeds_many :benefit_groups, cascade_callbacks: true
 
       # embeds_many :benefit_packages, as: :benefit_packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
       # accepts_nested_attributes_for :benefit_packages
@@ -180,8 +180,8 @@ module SponsoredBenefits
       #   plan_year_start_on = effective_date
       #   plan_year_end_on = effective_date + 1.year - 1.day
 
-      #   employer_initial_application_earliest_start_on = (effective_date + 
-      #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 
+      #   employer_initial_application_earliest_start_on = (effective_date +
+      #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months +
       #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
 
       #   employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
@@ -213,7 +213,7 @@ module SponsoredBenefits
       # end
 
 
-      class << self 
+      class << self
 
         def enrollment_timetable_by_effective_date(effective_date)
           effective_date            = effective_date.to_date.beginning_of_month
