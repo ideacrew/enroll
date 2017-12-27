@@ -36,17 +36,23 @@ module SponsoredBenefits
       # The name of the country where this address is located
       field :country_name, type: String, default: ""
 
-      validates_presence_of :zip
-      
+      validates :zip, presence: true, unless: :plan_design_model?
+      validates :kind, presence: true, unless: :plan_design_model?
+
       validates :kind,
         inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
-        allow_blank: false
+        allow_blank:true
 
       validates :zip,
+        allow_blank: true,
         format: {
             :with => /\A\d{5}(-\d{4})?\z/,
             :message => "should be in the form: 12345 or 12345-1234"
           }
+    end
+
+    def plan_design_model?
+      _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
     end
 
     # @note Add support for GIS location
