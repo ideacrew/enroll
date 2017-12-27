@@ -220,7 +220,6 @@ class EmployerProfile
   end
 
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
-    Rails.logger.error { "@@@@@@@@@@@@@@@___________Employer Profile _______@@@@@@"}
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated

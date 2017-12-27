@@ -31,7 +31,6 @@ module Subscribers
             if general_agency && general_agency.id.to_s == pre_default_ga_id.to_s
               send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, 'Terminate')
               employer_profile.fire_general_agency!
-              Rails.logger.error { "@@@@@@@@@@@@@@@___________fire general agency in DefaultGaChanged"}
             end
           end
         end
