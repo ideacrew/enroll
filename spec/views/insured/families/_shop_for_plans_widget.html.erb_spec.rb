@@ -113,5 +113,21 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
   end
 
+  context "dual role person with IVL sep" do
+    let(:qle) { double("QualifyingLifeEventKind", title: "", market_kind: "Individual")}
+    let(:sep) { double("SpecialEnrollmentPeriod", qualifying_life_event_kind: qle)}
+    before :each do
+      assign :person, person
+      assign :family, family
+      sign_in(current_user)
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(family).to receive(:latest_active_sep).and_return sep
+      render "insured/families/shop_for_plans_widget"
+    end
 
+    it "should have SEP eligible text in pop up window" do
+      expect(rendered).to have_content "You qualify for a Special Enrollment Period (SEP) because you"
+    end
+  end
 end

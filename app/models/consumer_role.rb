@@ -260,7 +260,7 @@ class ConsumerRole
   def is_type_outstanding?(type)
     case type
       when "DC Residency"
-        residency_denied? && !has_docs_for_type?(type)
+        residency_denied? && !has_docs_for_type?(type) && local_residency_outstanding?
       when 'Social Security Number'
         !ssn_verified? && !has_docs_for_type?(type)
       when 'American Indian Status'
@@ -268,6 +268,10 @@ class ConsumerRole
       else
         !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
+  end
+
+  def local_residency_outstanding?
+    self.local_residency_validation == 'outstanding'
   end
 
   def ssn_verified?
@@ -926,8 +930,7 @@ class ConsumerRole
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
       when "DC Residency"
-        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record)
-        mark_residency_authorized
+        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record, :local_residency_validation => "valid")
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
       when "American Indian Status"

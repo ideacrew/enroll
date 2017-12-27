@@ -83,6 +83,12 @@ class IvlNotice < Notice
     Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")
   end
 
+  def generate_custom_notice(custom_template)
+    File.open(custom_notice_path, 'wb') do |file|
+      file << self.pdf_custom(custom_template)
+    end
+  end
+
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
       url: Settings.site.home_url,
