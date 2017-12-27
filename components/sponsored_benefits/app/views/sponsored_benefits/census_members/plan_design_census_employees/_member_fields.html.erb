@@ -81,11 +81,11 @@
 </div>
 <br/>
 <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
-  <%= render 'address_fields', f: address, required: false %>
+  <%= render 'sponsored_benefits/census_members/shared/address_fields', f: address, required: false %>
 <% end %>
 <br/>
 <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
-  <%= render 'email_fields', f: email, required: false %>
+  <%= render 'sponsored_benefits/census_members/shared/email_fields', f: email, required: false %>
 <% end %>
 <br/>
 
