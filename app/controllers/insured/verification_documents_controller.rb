@@ -12,8 +12,8 @@ class Insured::VerificationDocumentsController < ApplicationController
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
           if update_vlp_documents(file_name(file), doc_uri)
-            @family.update_family_document_status!
             add_type_history_element(file)
+            @family.update_family_document_status!
             flash[:notice] = "File Saved"
           else
             flash[:error] = "Could not save file. " + @doc_errors.join(". ")
