@@ -12,6 +12,7 @@ module SponsoredBenefits
 
       field :claim_code, type: String
       field :claim_date, type: Date
+      field :published_on, type: Date
       field :aasm_state, type: String
 
       embeds_one :profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
@@ -42,6 +43,7 @@ module SponsoredBenefits
 
       def set_employer_claim_code
         self.claim_code = employer_claim_code
+        self.published_on = TimeKeeper.date_of_record
         self.save!
       end
 
