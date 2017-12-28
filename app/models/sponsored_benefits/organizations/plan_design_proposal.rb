@@ -27,7 +27,6 @@ module SponsoredBenefits
       end
 
       def can_quote_be_published?
-        # FIXME, do we have any validations, if yes what are they
         self.valid?
       end
 
