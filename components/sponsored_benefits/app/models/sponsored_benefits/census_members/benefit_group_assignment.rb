@@ -23,6 +23,16 @@ module SponsoredBenefits
       embeds_many :workflow_state_transitions, as: :transitional
       validates_presence_of :benefit_group_id, :start_on, :is_active
 
+
+      def self.by_benefit_group_id(bg_id)
+        census_employees = PlanDesignCensusEmployee.where({
+          "benefit_group_assignments.benefit_group_id" => bg_id
+          })
+        census_employees.flat_map(&:benefit_group_assignments).select do |bga|
+          bga.benefit_group_id == bg_id
+        end
+      end
+
       def benefit_group=(new_benefit_group)
         raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
         self.benefit_group_id = new_benefit_group._id
