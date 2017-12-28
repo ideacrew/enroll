@@ -14,12 +14,6 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
   end
 
   def append_data
-    hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.enrollment = PdfTemplates::Enrollment.new({
-                      :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
-                      :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
-      })
     enrollments = []
     en = census_employee.active_benefit_group_assignment.hbx_enrollments.select{ |h| ['coverage_terminated', 'coverage_termination_pending'].include?(h.aasm_state)}
     health_enrollment = en.select{ |h| h.coverage_kind == 'health'}.sort_by(&:effective_on).last
