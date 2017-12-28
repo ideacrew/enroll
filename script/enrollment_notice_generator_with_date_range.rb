@@ -21,10 +21,11 @@ def valid_enrollment_hbx_ids(family)
   auto_renewing_enrollments = enrollments.where(kind: "individual").renewing.by_submitted_datetime_range(@start_date, @end_date)
   bad_enrollments_fre = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days)
   has_renewals = good_enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? } ? true : false
+  future_enrollments = enrollments.enrolled.where(kind: "individual").any? { |enr| enr.submitted_at.present? && (enr.submitted_at.to_date > @end_date) }
 
   good_enrollments.uniq!
 
-  if !bad_enrollments_fre.present? && !has_renewals && !auto_renewing_enrollments.present?
+  if !bad_enrollments_fre.present? && !has_renewals && !auto_renewing_enrollments.present? && !future_enrollments.present?
     return good_enrollments.map(&:hbx_id)
   else
     return []
@@ -50,10 +51,22 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
 
       hbx_enrollment_hbx_ids = valid_enrollment_hbx_ids(family)
       hbx_enrollment_hbx_ids.compact!
+      role = person.consumer_role
 
-      if hbx_enrollment_hbx_ids.present?
-        IvlNoticesNotifierJob.perform_later(person.id.to_s, event_name, {:hbx_enrollment_hbx_ids => hbx_enrollment_hbx_ids }) if person.consumer_role.present?
+      if role.present? && hbx_enrollment_hbx_ids.present?
+
+        event_kind = ApplicationEventKind.where(:event_name => event_name).first
+        notice_trigger = event_kind.notice_triggers.first
+        builder = notice_trigger.notice_builder.camelize.constantize.new(role, {
+                  template: notice_trigger.notice_template,
+                  subject: event_kind.title,
+                  event_name: event_name,
+                  options: {:hbx_enrollment_hbx_ids => hbx_enrollment_hbx_ids },
+                  mpi_indicator: notice_trigger.mpi_indicator,
+                  }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
+
         @logger.info "#{event_name} generated to family with primary_person: #{person.hbx_id}" unless Rails.env.test?
+
         csv << [
           person.hbx_id,
           person.first_name,
