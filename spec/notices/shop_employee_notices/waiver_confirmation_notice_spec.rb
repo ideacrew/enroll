@@ -14,6 +14,7 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
                 family }
   let!(:household) { FactoryGirl.build_stubbed(:household, family: family) }
   let!(:hbx_enrollment){FactoryGirl.create(:hbx_enrollment, household:family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated")}
+  let!(:waived_enrollment){FactoryGirl.create(:hbx_enrollment, household:family.active_household, kind: "employer_sponsored", aasm_state: "inactive")}
   let!(:hbx_enrollment_member2){ FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, is_subscriber: false, hbx_enrollment: hbx_enrollment) }
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
@@ -72,17 +73,17 @@ RSpec.describe ShopEmployeeNotices::WaiverConfirmationNotice, :dbclean => :after
   describe "append data" do
 
     before do 
-      allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment])
+      allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment, waived_enrollment])
       allow(person.primary_family).to receive(:household).and_return(household)
       enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.reject{|en| en.aasm_state == "inactive"}[-1]
       @employee_notice.append_data
     end
 
     it "should append enrollment terminated on" do
-      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+      expect(@employee_notice.notice.term_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
     end
     it "should append enrollment effective on" do
-      expect(@employee_notice.notice.enrollment.effective_on).to eq hbx_enrollment.effective_on
+      expect(@employee_notice.notice.term_enrollment.effective_on).to eq hbx_enrollment.effective_on
     end
     it "should append plan name" do
       expect(@employee_notice.notice.plan.plan_name).to eq hbx_enrollment.plan.name

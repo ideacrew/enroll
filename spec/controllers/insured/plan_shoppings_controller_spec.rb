@@ -326,7 +326,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       sign_in(user)
       allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
-      expect(controller).to receive(:waiver_confirmation_notice).with(enrollment)
       allow(hbx_enrollment).to receive(:census_employee).and_return(double)
       allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
       get :print_waiver, id: "id"

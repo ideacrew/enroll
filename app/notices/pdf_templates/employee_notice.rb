@@ -16,6 +16,7 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :census_employee, PdfTemplates::CensusEmployee
     attribute :enrollment, PdfTemplates::Enrollment
+    attribute :term_enrollment, PdfTemplates::TermEnrollment
     attribute :email, String
     attribute :primary_email, String
     attribute :plan_year, PdfTemplates::PlanYear

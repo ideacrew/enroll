@@ -492,7 +492,11 @@ class HbxEnrollment
     id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
-      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      if enrollment.effective_on > TimeKeeper.date_of_record
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future active
+      else
+        enrollment.schedule_coverage_termination!(self.effective_on.prev_day) if enrollment.may_schedule_coverage_termination?
+      end
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?
       benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
@@ -586,6 +590,16 @@ class HbxEnrollment
         rescue Exception => e
           Rails.logger.error { e }
         end
+      end
+    end
+  end
+
+  def trigger_waiver_confirmation_notice
+    if is_shop_sep?
+      begin
+        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "waiver_confirmation_notice")
+      rescue Exception => e
+        Rails.logger.error {"Unable to deliver waiver_confirmation_notice to employee #{self.census_employee.full_name} due to #{e}"} unless Rails.env.test?
       end
     end
   end
@@ -1229,7 +1243,7 @@ class HbxEnrollment
     state :coverage_reinstated    # coverage reinstated
 
     state :coverage_expired
-    state :inactive, :after_enter => :update_renewal_coverage   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
+    state :inactive, :after_enter => [:update_renewal_coverage, :trigger_waiver_confirmation_notice]   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
 
     # Verified Lawful Presence (VLP) flags
     state :unverified
