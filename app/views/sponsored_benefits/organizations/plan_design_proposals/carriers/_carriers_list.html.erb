@@ -1,32 +1,26 @@
 <% if selected_carrier_level != 'metal_level' %>
   <% carrier_names.each_pair do |ck, cv| %>
-    <div class="col-xs-3 carriers">
-      <div class="col-xs-12 row">
-        <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
-          carrier_id: "#{ck}",
-          selected_carrier_level: selected_carrier_level,
-          active_year: active_year), remote: true do %>
-            <div class="col-xs-3">
-              <%= radio_button_tag :carrier_for_elected_plan, "#{ck}" %>
-              <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
-                <i class="fa fa-circle-o"></i>
-                <i class="fa fa-dot-circle-o"></i>
-              <% end %>
-            </div>
-          <% end %>
-          <div class="col-xs-9">
-            <div class="panel">
-              <div class="panel-heading">
-                <h3><%= cv %></h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="col-xs-4 carriers">
+    <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
+    carrier_id: "#{ck}",
+    selected_carrier_level: selected_carrier_level,
+    active_year: active_year), remote: true do %>
+    <div class="col-xs-3">
+      <%= radio_button_tag :carrier_for_elected_plan, "#{ck}" %>
+      <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      <% end %>
+    </div>
+    <% end %>
+    <div class="col-xs-9">
+          <h3><%= cv %></h3>
+    </div>
+  </div>
   <% end %>
 <% else %>
   <br><br>
-  <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explaned %></p>
+  <p class="twenty plan_heading_text">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explaned %></p>
   <br/>
   <% reference_plans = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>
