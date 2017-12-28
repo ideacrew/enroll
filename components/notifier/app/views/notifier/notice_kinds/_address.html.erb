@@ -1,0 +1,45 @@
+<table class="total_table address" border="0">
+  <tbody>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td><%= recipient.first_name %> <%= recipient.last_name %></td>
+    </tr>
+    <% if (recipient.shop? && !recipient.employee_notice?) %>
+    <tr class="fssize1">
+      <td><%= recipient.employer_name %></td>
+    </tr>
+    <% end %>
+    <tr class="fssize1">
+       <td><%= recipient.mailing_address.street_1 %></td>
+    </tr>
+    <% if recipient.mailing_address.street_2.present? %>
+    <tr class="fssize1">
+      <td><%= recipient.mailing_address.street_2 %></td>
+    </tr>
+    <% end %>
+    <tr>
+    <td><%= recipient.mailing_address.city %>, <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
+    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+    <% if display_mpi_indicator.nil? %>
+      <td style="text-align: right;"><%= notice_number %></td>
+    <% end %>
+    </tr>
+    <% if (recipient.mailing_address.street_2.blank? || (recipient.shop? && !recipient.employee_notice?) == false) %>
+    <tr>
+      <td><br></td>
+    </tr>
+    <% end %>
+    <% if (recipient.shop? && !recipient.employee_notice?) == false %>
+    <tr>
+      <td><br></td>
+    </tr>
+    <% end %>
+    <tr>
+      <td>
+        <br></br>
+      </td>
+    </tr>
+  </tbody>
+</table>

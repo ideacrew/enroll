@@ -6,7 +6,7 @@
     <% if employer.binder_paid? %>
       <%= "" %>
     <% else %>
-      <%= check_box_tag("employer_profile_ids[]", employer.id, nil, id: "employer_profile_id_#{employer.id.to_s}", disabled: make_binder_checkbox_disabled(employer), class: "binderCheckBox") %>
+      <%= check_box_tag("employer_profile_ids[]", employer.id, nil, id: "employer_profile_id_#{employer.id.to_s}", disabled: make_binder_checkbox_disabled(org), class: "binderCheckBox") %>
     <% end %>
   <% end %>
   <%= raw checkboxes.to_json %>,
@@ -14,12 +14,12 @@
   "<%= json_escape employer.aasm_state.titleize %>",
   "<%= json_escape employer.renewing_plan_year.present? ? "Renewing" : "New" %>",
   <% rule = capture do %>
-    <%= eligibility_criteria(employer) %>
+    <%= eligibility_criteria(org) %>
   <% end %>
   <%= raw rule.to_json %>,
   "<%= json_escape format_time_display(employer.xml_transmitted_timestamp) %>",
   <% transmit_xml_button = capture do %>
-    <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: group_xml_transmitted_message(employer)  }, disabled: make_binder_checkbox_disabled(employer) || employer.is_transmit_xml_button_disabled? ) %>
+    <%= link_to('Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(employer), method: :post, class: "btn btn-primary transmit-group-xml" , data: { confirm: group_xml_transmitted_message(employer)  }, disabled: make_binder_checkbox_disabled(org) || employer.is_transmit_xml_button_disabled? ) %>
   <% end %>
   <%= raw transmit_xml_button.to_json %>
   ]
