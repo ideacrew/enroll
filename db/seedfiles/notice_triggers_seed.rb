@@ -654,7 +654,7 @@ shop_notice_triggers = [
       }
     ]
   },
-  
+
   {
     hbx_id: 'SHOP_D031',
     title: 'Confirmation of Election to Waive Coverage',
@@ -678,7 +678,6 @@ shop_notice_triggers = [
   },
 
   {
-    {
     hbx_id: 'SHOP_D074',
     title: 'Employee Enrollment Confirmation',
     description: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
