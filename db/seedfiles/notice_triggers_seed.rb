@@ -106,7 +106,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP3A',
+    hbx_id: 'DRG006',
     title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
     resource_name: 'employer',
@@ -116,7 +116,7 @@ shop_notice_triggers = [
         name: 'PlanYear Renewal',
         notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_SHOPRA',
+        mpi_indicator: 'MPI_DRG006',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -361,7 +361,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP18',
+    hbx_id: 'SHOP_D018',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
     resource_name: 'employer',
@@ -371,7 +371,7 @@ shop_notice_triggers = [
         name: 'Renewal Employee Open Employee Completed',
         notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_SHOP18',
+        mpi_indicator: 'SHOP_D018',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -654,6 +654,7 @@ shop_notice_triggers = [
       }
     ]
   },
+  
   {
     hbx_id: 'SHOP_D031',
     title: 'Confirmation of Election to Waive Coverage',
@@ -675,6 +676,30 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    {
+    hbx_id: 'SHOP_D074',
+    title: 'Employee Enrollment Confirmation',
+    description: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
+    resource_name: 'employee_role',
+    event_name: 'ee_plan_selection_confirmation_sep_new_hire',
+    notice_triggers: [
+      {
+        name: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
+        notice_template: 'notices/shop_employee_notices/ee_plan_selection_confirmation_sep_new_hire',
+        notice_builder: 'ShopEmployeeNotices::EePlanConfirmationSepNewHire',
+        mpi_indicator: 'SHOP_D074',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
     hbx_id: 'SHOP_D092',
     title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
