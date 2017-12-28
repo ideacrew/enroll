@@ -11,7 +11,6 @@ module SponsoredBenefits
     end
 
     def publish_quote
-      #FIXME, any specific conditions to be verified before publishing?
       if @plan_design_proposal.may_publish?
         @plan_design_proposal.publish!
         flash[:notice] = "Quote Published"
