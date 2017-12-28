@@ -49,6 +49,7 @@ $brand-primary: $mhc-dark-blue;
 
 
 .plan_design_proposals {
+  /* Style Benefit Model Selection of BQT */
   ul.nav.nav-tabs, .plan-options .col-xs-3 a {
     border-bottom: none;
     li {
@@ -147,4 +148,184 @@ $brand-primary: $mhc-dark-blue;
     font-weight:bold;
     margin-top:-1px;
   }
+  /* Styles Benefit Package Selection of BQT */
+  .reference-plans, .dental-reference-plans, .elected-plans-tab  {
+    background-color: #ffffff;
+    border: solid 1px #d7d7d7;
+    padding-bottom: 25px;
+    overflow-y: scroll;
+    display: none;
+
+    .loading {
+      position: relative;
+      padding-top: 30px;
+      top: 50%;
+      text-align: center;
+    }
+    .reference-plan-info {
+      margin-top:-12px;
+    } 
+    .reference-plan, .dental-reference-plan {
+      height: 175px;
+      padding: 0;
+      cursor: pointer;
+      padding-top: 20px;
+      border-bottom: solid 1px #d7d7d7;
+
+      &:hover {
+        border-bottom: solid 1px $primary-blue;
+        .col-xs-10 .panel .panel-body .view-summary {
+          display: inline-block;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+      .col-xs-2:first-of-type {
+        padding-left: 0;
+      }
+      .panel {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        border: none;
+        background-color: transparent;
+        .panel-heading {
+          padding: 0 0 5px 0;
+          color: #333333;
+          background-color: transparent;
+          h3 {
+            font-size: 12px;
+            weight: 700;
+            margin-bottom: 0;
+          }
+        }
+        .panel-body {
+          padding: 0;
+          line-height: 110%;
+          span {
+            font-size: 12px;
+            color: #333333;
+            text-transform: uppercase;
+          }
+          .plan-label {
+            color: #b7b7b7;
+            font-size: 10px;
+
+          }
+          a.view-summary {
+            display: none;
+            margin-top: 3.5%;
+          }
+        }
+      }
+
+      input[type=radio] {
+        display: none;
+      }
+      input[type=radio] + label {
+        position: relative;
+        top: 50%;
+
+        &>i {
+          font-size: 28px;
+          color: #b7b7b7;
+
+
+
+          &:first-of-type {
+            display: inline-block;
+
+          }
+          &:last-of-type {
+            display: none;
+          }
+        }
+      }
+      input[type=radio]:checked + label {
+
+        &>i {
+          color: #69A30D;
+          &:first-of-type {
+            display: none;
+          }
+          &:last-of-type {
+            display: inline-block;
+          }
+        }
+      }
+
+    }
+
+
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+
+  }
+  input[type=radio] {
+    display: inline-block;
+  }
+
+ input[type=checkbox] {
+    display: none;
+    + label > i.fa {
+      color: #69A30D;
+    }
+  }
+  .checkbox {
+    display: block;
+    margin: auto;
+    padding-left: 15%;
+  }
+  .checkbox {
+    &>div {
+      display: inline-block;
+      margin: auto;
+    }
+  }
+  .checkbox label {
+    padding-left: 0;
+  }
+  .checkbox label label {
+    display: inline;
+    padding-left: 0;
+  }
+  .checkbox label label + span {
+    display: inline-block;
+    position: relative;
+    text-transform: capitalize;
+    font-size: 16px;
+    top: -5px;
+    left: 10px;
+  }
+  input[type=checkbox]:disabled + label i {
+    color: #b7b7b7;
+    cursor: not-allowed;
+  }
+  input[type=checkbox] + label i {
+    &:first-of-type {
+      display: none;
+
+    }
+    &:last-of-type {
+      display: inline-block;
+      width: 30px;
+    }
+  }
+  input[type=checkbox]:checked + label i {
+    &:first-of-type {
+      display: inline-block;
+      width: 30px;
+    }
+    &:last-of-type {
+      display: none;
+    }
+  }
+
 }
