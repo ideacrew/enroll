@@ -72,7 +72,7 @@ module Effective
 
       def nested_filter_definition
           {
-            employers:
+            employees:
                 [
                     {scope: 'active_alone', label: 'Active only'},
                     {scope: 'active', label: 'Active & COBRA'},
@@ -80,7 +80,7 @@ module Effective
                     {scope: 'terminated', label: 'Terminated'},
                     {scope: 'all', label: 'All'}
                 ],
-            top_scope: :employers
+            top_scope: :employees
         }
       end
     end
