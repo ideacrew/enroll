@@ -21,7 +21,7 @@ SponsoredBenefits::Engine.routes.draw do
       resources :plans, controller: 'plan_design_proposals/plans', only: [:index]
     end
 
-    resources :plan_design_proposals, only: [:destroy] do
+    resources :plan_design_proposals, only: [:destroy, :create] do
       resources :contributions, controller: 'plan_design_proposals/contributions', only: [:index]
       resources :plan_selections, controller: 'plan_design_proposals/plan_selections', only: [:new]
     end
