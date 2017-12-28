@@ -1,18 +1,18 @@
-<%= hidden_field_tag :plan_design_organization_id, @plan_design_proposal.plan_design_organization._id %>
+<%= hidden_field_tag :plan_design_organization_id, plan_design_organization._id %>
 <%= hidden_field_tag :elected_plan_kind, '' %>
 <%= hidden_field_tag :reference_plan_id, '' %>
-<%= hidden_field_tag :plan_design_proposal_id, @plan_design_proposal.proposal.id %>
-<%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(@plan_design_proposal.proposal.id) %>
+<%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
+<%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
 
 <div class="row">
   <div class="col-md-12">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %></h3>
+        <h3 class="panel-title">Quote for <%= plan_design_organization.legal_name %></h3>
       </div>
       <div class="panel-body">
-        <%= render 'shared/error_messages', :object => @plan_design_proposal %>
-        <%= render 'proposal_info', f: f, read_only: false %>
+        <%= render 'shared/error_messages', :object => plan_design_form %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/proposal_info', f: f, read_only: true %>
       </div>
     </div>
     <!--  Need below hidden button element to force form validations -->
@@ -22,10 +22,6 @@
   </div>
 </div>
 
-<%= render 'employees' %>
-
-<%= link_to "Select and Compare Plans", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id) %>
-
 <div class="row">
   <div class="col-md-6">
     <div class="panel panel-default">
@@ -34,6 +30,7 @@
       </div>
       <div class="panel-body">
         <p>Select the type of options you want to offer enrollees.</p>
+        <%= render 'carrier_options', f: f %>
       </div>
     </div>
   </div>
