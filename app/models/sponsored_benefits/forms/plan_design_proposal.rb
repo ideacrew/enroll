@@ -17,6 +17,7 @@ module SponsoredBenefits
         ensure_proposal
         ensure_profile
         ensure_sic_zip_county
+        ensure_benefit_group
       end
 
       def assign_wrapper_attributes(attrs = {})
@@ -73,6 +74,18 @@ module SponsoredBenefits
           sponsorship = @profile.benefit_sponsorships.first
           sponsorship.benefit_applications.build
         end
+        sponsorship = @profile.benefit_sponsorships.first
+        if sponsorship.benefit_applications.empty?
+          sponsorship.benefit_applications.build
+        end
+      end
+
+      def ensure_benefit_group
+        sponsorship = @profile.benefit_sponsorships.first
+        application = sponsorship.benefit_applications.first
+        application.benefit_groups.build
+        application.benefit_groups.first.build_relationship_benefits
+        application.benefit_groups.first.build_composite_tier_contributions
       end
 
       def save

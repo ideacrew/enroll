@@ -1,0 +1,92 @@
+<div class="row">
+  <br/><br/>
+
+<div class="col-xs-6">
+  <h1>Your Reference Plan</h1>
+</div>
+
+<div id="employer_cost_info_btn" class="col-xs-6" style="padding-top: 10px;">
+  <div class="btn btn-default btn-right pull-right" style="margin-right: 0;">
+    Employee Detail Costs
+  </div>
+  <!--  employee_costs_employers_employer_profile_plan_years_path(@employer_profile) -->
+  <%= link_to "Employee Costs", '#', id: "employee_costs_link", class: "hidden" %>
+</div>
+</div>
+<%= render "employers/plan_years/employee_costs_modal" %>
+
+<div class="panel benefitgroup col-xs-12 health referenceplan">
+  <section class="col-xs-6">
+    <header class="row">
+      <h5 style="color: #69A30D; font-size: 18px;"><strong><%= @plan.name %></strong></h5>
+    </header>
+  </section>
+  <section class="col-xs-6">
+    <h4 class="change-dental-reference-plan pull-right" style="display: none;">Change Reference Plan?</h4>
+      <% render partial: "employers/plan_years/dental_reference_plans_options_modal" %>
+  </section>
+  <h2></h2>
+  <table>
+    <tr>
+      <th>
+        <header>Type</header>
+      </th>
+      <th>
+        <header>Carrier</header>
+      </th>
+      <th>
+        <header>Metal Level</header>
+      </th>
+      <th>
+        <header>Network</header>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <p><%= @plan.plan_type.try(:upcase) %></p>
+      </td>
+      <td>
+        <p><%= @plan.carrier_profile.legal_name %></p>
+      </td>
+      <td>
+        <p>
+          <%= display_dental_metal_level @plan %>
+        </p>
+      </td>
+      <td style="padding-left: 0;">
+        <p style="text-transform: capitalize;">
+          <%= render partial: "shared/network_data", locals: {plan: @plan} %>
+        </p>
+      </td>
+
+    </tr>
+  </table>
+  <div class="col-xs-12 row plan-details">
+    <hr>
+    <div class="col-xs-4 row">
+      <span>Your Estimated Monthly Cost</span>
+      <h2 class="employer-monthly-cost"></h2>
+    </div>
+    <div class="col-xs-8">
+      <table>
+        <tr>
+          <th></th>
+          <th>Min</th>
+          <th>Max</th>
+        </tr>
+        <tr>
+          <td>Estimated monthly cost including all roster employees</td>
+          <td class="employee-monthly-cost-min"></td>
+          <td class="employee-monthly-cost-max" style="padding-left: 0;"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<% if check_plan_options_title %>
+    <div class="col-xs-12">
+      <div class="row">
+        <p class="text-info"><span class="glyphicon glyphicon-info-sign"></span>Note: Your final monthly cost is based on final employee enrollment.</p>
+      </div>
+    </div>
+<% end %>

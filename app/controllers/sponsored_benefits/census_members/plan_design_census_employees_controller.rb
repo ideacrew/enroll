@@ -3,7 +3,7 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class CensusMembers::PlanDesignCensusEmployeesController < ApplicationController
     include DataTablesAdapter
-    
+
     before_action :load_plan_design_proposal
     before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
 
@@ -38,6 +38,7 @@ module SponsoredBenefits
       if @plan_design_census_employee.save
         redirect_to :back, :flash => {:success => "Employee record created successfully."}
       else
+        puts @plan_design_census_employee.errors.full_messages
         redirect_to :back, :flash => {:error => "Unable to create employee record."}
       end
     end
@@ -69,7 +70,7 @@ module SponsoredBenefits
 
     def bulk_employee_upload
       @census_employee_import = SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: params.require(:file), proposal: @plan_design_proposal})
-      
+
       respond_to do |format|
         if @census_employee_import.save
           format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
