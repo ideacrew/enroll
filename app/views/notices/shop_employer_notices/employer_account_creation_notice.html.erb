@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Welcome to the #{Settings.site.short_name}! Now that you created your employer account, you can start the process of offering medical and dental coverage to your employees. Please follow the steps below:"} %>
+  { content: "Welcome to the #{Settings.site.short_name}! Now that you created your employer account, you can start the process of offering medical and dental coverage to your employees. Please follow the steps below:", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => { content: "<strong>Next Steps</strong>", top_margin: '10px', bottom_margin: '5px'} %>
 
@@ -45,7 +45,7 @@
               </div>
               <div style="page-break-inside: avoid;">
               <strong>Make a Secure Online Payment</strong><br>
-                <%= Settings.site.short_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Paying-Your-Premiums-Online.pdf"> Employers Paying Your Premiums Online guide</a> to make your premium payment online here: <a href="https://www.e-BillExpress.com/ebpp/DCHealthPay"> https://www.e-BillExpress.com/ebpp/DCHealthPay.</a>.
+                <%= Settings.site.short_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Paying-Your-Premiums-Online.pdf"> Employers Paying Your Premiums Online guide</a> to make your premium payment online here: <a href="https://www.e-BillExpress.com/ebpp/DCHealthPay"> https://www.e-BillExpress.com/ebpp/DCHealthPay</a>.
                 <br><br>
               </div>
               <strong>To make a secure electronic check payment by phone</strong>
