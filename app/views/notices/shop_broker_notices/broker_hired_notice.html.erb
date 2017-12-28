@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><strong>You Have Been Hired as a Broker</strong></td>
+      <td style="padding-top: 10px">You Have Been Hired as a Broker</td>
     </tr>
   </tbody>
 </table>  
@@ -14,13 +14,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td class="notice-font"><br>Dear <strong><%= notice.broker.full_name.titleize %></strong>,</td>
+      <td class="notice-font"><br>Dear <%= notice.broker.full_name.titleize %>,</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! You have been selected as the broker for <strong>#{notice.employer_name }</strong> as of <strong>#{notice.broker.assignment_date}</strong>, with <strong>#{notice.broker_agency}</strong> as the assigned agency. The primary contact at <strong>#{notice.employer_name}</strong> is <strong>#{notice.employer.employer_first_name.titleize} #{notice.employer.employer_last_name.titleize}</strong>.", top_margin: '10px'} %>
+  { content: "Congratulations! You have been selected as the broker for #{notice.employer_name } as of #{notice.broker.assignment_date}, with #{notice.broker_agency} as the assigned agency. The primary contact at #{notice.employer_name} is #{notice.employer.employer_first_name.titleize} #{notice.employer.employer_last_name.titleize}.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Please remember that as a registered broker with #{Settings.site.short_name}, you are agreeing to the #{Settings.site.short_name} Statement of Producer Attestations when logging into <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>.",  top_margin: '10px'} %>
