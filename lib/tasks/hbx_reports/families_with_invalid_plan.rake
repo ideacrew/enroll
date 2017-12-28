@@ -78,7 +78,7 @@ namespace :reports do
 
     invalid_plan_ids.each do |plan_id|
       plan = Plan.find(plan_id)
-      plan.update_attributes!(nationwide: false)
+      plan.update_attributes!(nationwide: false, dc_in_network: true)
       puts "Changing Network Field Value from Nationwide to DC Metro for #{plan.hios_id}"
     end
   end
