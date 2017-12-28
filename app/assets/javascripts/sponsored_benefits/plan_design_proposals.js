@@ -33,7 +33,8 @@ function fetchCarriers() {
   });
 
   displayActiveCarriers();
-  hidePlanContainerAndContributionSliders();
+  hidePlanContainer();
+  toggleSliders(selected_carrier_level);
 }
 
 function displayActiveCarriers() {
@@ -51,10 +52,8 @@ function displayActiveCarriers() {
   }
 }
 
-function hidePlanContainerAndContributionSliders() {
+function hidePlanContainer() {
   $('.reference-plans').hide();
-  $('.composite-offerings').addClass('hidden');
-  $('.offerings').addClass('hidden');
   $('.selected-plan').html("");
 }
 
