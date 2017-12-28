@@ -15,22 +15,20 @@ module Queries
 
     def build_scope()
       return [] if @benefit_sponsorship.blank?
-      # case @custom_attributes[:employers]
-      #   when "active"
-      #     @employer_profile.census_employees.active
-      #   when "active_alone"
-      #     @employer_profile.census_employees.active_alone
-      #   when "by_cobra"
-      #     @employer_profile.census_employees.by_cobra
-      #   when "terminated"
-      #     @employer_profile.census_employees.terminated
-      #   when "all"
-      #     @employer_profile.census_employees
-      #   else
-      #     @employer_profile.census_employees.active_alone
-      # end
-
-      @benefit_sponsorship.census_employees
+      case @custom_attributes[:employees]
+      when "active"
+        @benefit_sponsorship.census_employees.active
+      when "active_alone"
+        @benefit_sponsorship.census_employees.active_alone
+      when "by_cobra"
+        @benefit_sponsorship.census_employees.by_cobra
+      when "terminated"
+        @benefit_sponsorship.census_employees.terminated
+      when "all"
+        @benefit_sponsorship.census_employees
+      else
+        @benefit_sponsorship.census_employees.active
+      end
     end
 
     def skip(num)

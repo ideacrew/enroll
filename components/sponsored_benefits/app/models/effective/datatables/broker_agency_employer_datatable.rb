@@ -11,7 +11,7 @@
               (link_to row.legal_name, main_app.employers_employer_profile_path(id: row.customer_profile_id, :tab=>'home'))
             end
             }, :sortable => false, :filter => false
-          table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
+          table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
           table_column :ee_count, :label => 'EE Count', :proc => Proc.new { |row| ee_count(row) }, :sortable => false, :filter => false
           table_column :er_state, :label => 'ER State', :proc => Proc.new { |row| er_state(row) }, :sortable => false, :filter => false
           table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row| row.try(:employer_profile).try(:registered_on) }, :sortable => false, :filter => false
@@ -20,10 +20,10 @@
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['View Quotes', organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
+             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
              ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
              ['Remove Quote', 'some-quote-remove-path', 'static'],
-             ['Edit Employer Detials', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
+             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
              ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
                                 remove_employer_link_type(row),
                                 "Are you sure you want to remove this employer?"]
@@ -34,7 +34,7 @@
 
         def remove_employer_link_type(employer)
           if employer.is_prospect?
-            'delete ajax with confirm and elementId'
+            'delete with confirm'
           else
             return 'disabled'
           end
@@ -52,6 +52,11 @@
         def er_state(row)
           return 'N/A' if row.is_prospect?
           row.employer_profile.aasm_state.capitalize
+        end
+
+        def er_fein(row)
+          return 'N/A' if row.is_prospect?
+          row.fein
         end
 
         class << self

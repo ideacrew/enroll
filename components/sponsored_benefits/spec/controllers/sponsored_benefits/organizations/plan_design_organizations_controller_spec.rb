@@ -152,6 +152,7 @@ module SponsoredBenefits
           before do
             allow(BrokerAgencyProfile).to receive(:find).with(broker_agency_profile.id).and_return(broker_agency_profile)
             allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:find_or_initialize_by).with(:fein).and_return("223232323")
+            allow(subject).to receive(:get_sic_codes).and_return(sic_codes)
             allow(active_user).to receive(:has_hbx_staff_role?).and_return( role == :with_hbx_staff_role ? true : false)
           end
 
