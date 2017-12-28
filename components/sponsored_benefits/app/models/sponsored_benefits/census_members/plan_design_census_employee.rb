@@ -117,9 +117,32 @@ module SponsoredBenefits
         if employer_profile.present?
           employer_profile.benefit_sponsorships.each do |sponsorship|
             @benefit_application = sponsorship.benefit_applications.detect{|application| application.id  == benefit_application_id}
-          end          
+          end
         end
         @benefit_application
+      end
+
+      def is_cobra_status?
+        false
+      end
+
+      def expected_to_enroll?
+        ## placeholder, todo: implement
+        true
+      end
+
+      def expected_to_enroll_or_valid_waive?
+        true
+      end
+      
+      def composite_rating_tier
+        return ::CompositeRatingTier::EMPLOYEE_ONLY if self.census_dependents.empty?
+        relationships = self.census_dependents.map(&:employee_relationship)
+        if (relationships.include?("spouse") || relationships.include?("domestic_partner"))
+          relationships.many? ? ::CompositeRatingTier::FAMILY : ::CompositeRatingTier::EMPLOYEE_AND_SPOUSE
+        else
+          ::CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
+        end
       end
 
       aasm do

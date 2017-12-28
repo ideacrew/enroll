@@ -1,7 +1,9 @@
-<div class="health-plan-design benefits-setup-tab">
+<% offering_id = f.object.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.id %>
+
+<div class="health-plan-design benefits-setup-tab quote-setup-tab">
   <ul class="nav nav-tabs row">
     <% if offers_single_carrier? %>
-      <li role="presentation" class="col-xs-4 single-carrier-tab">
+      <li role="presentation" class="col-xs-4 single-carrier-tab" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "single_carrier" %>
         <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
           <i class="fa fa-circle-o"></i>
@@ -15,7 +17,7 @@
       </li>
     <% end %>
     <% if offers_metal_level? %>
-      <li role="presentation" class="col-xs-4 metal-level-tab">
+      <li role="presentation" class="col-xs-4 metal-level-tab" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "metal_level" %>
         <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
           <i class="fa fa-circle-o"></i>
@@ -29,7 +31,7 @@
       </li>
     <% end %>
     <% if offer_sole_source? && check_plan_options_title %>
-      <li role="presentation" class="col-xs-4 sole-source-tab" data-offering-kind="sole_source">
+      <li role="presentation" class="col-xs-4 sole-source-tab" data-offering-id="<%= offering_id %>" data-offering-kind="sole_source">
         <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
         <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
           <i class="fa fa-circle-o"></i>
@@ -39,7 +41,7 @@
       </li>
     <% end %>
     <% if offers_single_plan? %>
-      <li role="presentation" class="col-xs-4 single-plan-tab">
+      <li role="presentation" class="col-xs-4 single-plan-tab" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
         <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
           <i class="fa fa-circle-o"></i>

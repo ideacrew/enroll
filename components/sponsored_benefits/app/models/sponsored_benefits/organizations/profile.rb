@@ -26,7 +26,6 @@ module SponsoredBenefits
       embeds_many :benefit_sponsorships, as: :benefit_sponsorable, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
       embeds_many :office_locations, class_name:"SponsoredBenefits::Organizations::OfficeLocation"
 
-
       def self.find
         org = Organizations::PlanDesignOrganization.find_by_profile(self)
         org.profile if org.present

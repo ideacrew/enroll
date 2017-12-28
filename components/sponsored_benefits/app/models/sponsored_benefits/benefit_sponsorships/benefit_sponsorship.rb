@@ -52,6 +52,7 @@ module SponsoredBenefits
         allow_blank: true
 
       delegate :sic_code, to: :benefit_sponsorable
+      delegate :rating_area, to: :benefit_sponsorable
       # Prevent changes to immutable fields. Instantiate a new model instead
       # before_validation {
       #     if persisted?
