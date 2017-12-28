@@ -18,6 +18,7 @@ module Enrollments
         reinstated_enrollment.enrollment_kind = base_enrollment.enrollment_kind
         reinstated_enrollment.kind = base_enrollment.kind
         reinstated_enrollment.plan_id = base_enrollment.plan_id
+        reinstated_enrollment.predecessor_enrollment_id = base_enrollment.id
 
         if base_enrollment.is_shop?
           reinstated_enrollment.employee_role_id = base_enrollment.employee_role_id

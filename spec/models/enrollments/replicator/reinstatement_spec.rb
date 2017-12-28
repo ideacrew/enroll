@@ -62,6 +62,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model do
       expect(reinstated_enrollment.kind).to eq enrollment.kind
       expect(reinstated_enrollment.coverage_kind).to eq enrollment.coverage_kind
       expect(reinstated_enrollment.plan_id).to eq enrollment.plan_id
+      expect(reinstated_enrollment.predecessor_enrollment_id).to eq enrollment.id
     end
 
     it 'should build a continuous coverage' do
