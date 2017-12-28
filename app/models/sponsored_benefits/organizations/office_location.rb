@@ -51,7 +51,6 @@ module SponsoredBenefits
   	  #     parent.office_locations.each { |loc| loc.is_primary == false unless loc == self }
   	  #   end
   	  # end
-
     end
   end
 
