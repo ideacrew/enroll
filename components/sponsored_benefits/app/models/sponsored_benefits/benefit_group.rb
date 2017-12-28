@@ -51,8 +51,7 @@ module SponsoredBenefits
     field :is_congress, type: Boolean, default: false
     field :_type, type: String, default: self.name
 
-
-    delegate :employer_profile, to: :plan_year, allow_nil: true
+    delegate :plan_year, to: :benefit_application, allow_nil: true
 
     embeds_many :composite_tier_contributions, cascade_callbacks: true
     accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
@@ -102,13 +101,18 @@ module SponsoredBenefits
     alias_method :is_default?, :default
     alias_method :is_congress?, :is_congress
 
-                    def benefit_group_assignments
-                      BenefitGroupAssignment.by_benefit_group_id(id)
-                    end
 
-                    def census_employees
-                      CensusEmployee.find_all_by_benefit_group(self)
-                    end
+    def benefit_group_assignments
+      BenefitGroupAssignment.by_benefit_group_id(id)
+    end
+
+    def census_employees
+      CensusEmployee.find_all_by_benefit_group(self)
+    end
+
+    def employer_profile
+      benefit_application.employer_profile
+    end
 
     def sorted_composite_tier_contributions
       self.composite_tier_contributions.sort{|a,b| a.sort_val <=> b.sort_val}
@@ -263,15 +267,14 @@ module SponsoredBenefits
       ]
     end
 
-              def self.find(id)
-                ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
-                  organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
-                  organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
-                    bg.id == id
-                  end.first
-                end
-              end
-
+    def self.find(id)
+      ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
+        organizations = PlanDesignOrganization.unscoped.where({"plan_design_proposals.profile.benefit_sponsorships.benefit_applications.benefit_groups._id" => id })
+        organizations.flat_map(&:plan_design_proposals).lazy.map(&:profile).flat_map(&:benefit_sponsorships).flat_map(&:benefit_applications).flat_map(&:benefit_groups).select do |bg|
+          bg.id == id
+        end.first
+      end
+    end
 
     def monthly_employer_contribution_amount(plan = reference_plan)
       return 0 if targeted_census_employees.count > 100
@@ -332,27 +335,26 @@ module SponsoredBenefits
     end
 
 
-                def elected_plans_by_option_kind
-                  start_on = benefit_application.effective_period.begin
-                  @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on.year)
+    def elected_plans_by_option_kind
+      start_on = benefit_application.effective_period.begin
+      @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on.year)
 
-                  case plan_option_kind
-                  when "sole_source"
-                    Plan.where(id: reference_plan_id).first
-                  when "single_plan"
-                    Plan.where(id: reference_plan_id).first
-                  when "single_carrier"
-                    if carrier_for_elected_plan.blank?
-                      @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
-                    end
-                    carrier_profile_id = reference_plan.carrier_profile_id
-                    plans = Plan.check_plan_offerings_for_single_carrier # filter by vertical choice(as there should be no bronze plans for one carrier.)
-                    plans.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile_id }).to_a
-                  when "metal_level"
-                    Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).and(:metal_level => reference_plan.metal_level).to_a
-                  end
-                end
-
+      case plan_option_kind
+      when "sole_source"
+        Plan.where(id: reference_plan_id).first
+      when "single_plan"
+        Plan.where(id: reference_plan_id).first
+      when "single_carrier"
+        if carrier_for_elected_plan.blank?
+          @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
+        end
+        carrier_profile_id = reference_plan.carrier_profile_id
+        plans = Plan.check_plan_offerings_for_single_carrier # filter by vertical choice(as there should be no bronze plans for one carrier.)
+        plans.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile_id }).to_a
+      when "metal_level"
+        Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).and(:metal_level => reference_plan.metal_level).to_a
+      end
+    end
 
     def effective_title_by_offset
       case effective_on_offset
@@ -367,21 +369,21 @@ module SponsoredBenefits
       end
     end
 
-                      def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
-                        self.employer_profile.census_employees.each do |ce|
-                          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+    def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
+      census_employees.each do |ce|
+        benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
 
-                          if benefit_group_assignments.present?
-                            benefit_group_assignments.each do |bga|
-                              bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-                              bga.destroy
-                            end
+        if benefit_group_assignments.present?
+          benefit_group_assignments.each do |bga|
+            bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
+            bga.destroy
+          end
 
-                            benefit_groups = self.benefit_application.benefit_groups.select { |bg| bg.id != self.id}
-                            ce.find_or_create_benefit_group_assignment(benefit_groups.first)
-                          end
-                        end
-                      end
+          benefit_groups = self.benefit_application.benefit_groups.select { |bg| bg.id != self.id}
+          ce.find_or_create_benefit_group_assignment(benefit_groups.first)
+        end
+      end
+    end
 
     # Interface for composite and list bill.
     # Defines the methods needed for calculation of both composite and list

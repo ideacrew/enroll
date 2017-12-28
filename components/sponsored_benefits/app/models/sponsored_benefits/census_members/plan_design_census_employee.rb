@@ -150,6 +150,10 @@ module SponsoredBenefits
           unscoped.where(benefit_sponsorship_id: sponsor._id).order_name_asc
         end
 
+        def find_all_by_benefit_group(benefit_group)
+          unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
+        end
+
         def find_all_by_employer_profile(employer_profile)
           unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
         end
