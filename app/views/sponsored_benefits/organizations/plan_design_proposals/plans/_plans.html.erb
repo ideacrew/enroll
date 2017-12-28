@@ -11,11 +11,7 @@
     </div>
 
     <div class="col-xs-10">
-      <div class="panel row">
-        <div class="panel-heading">
           <h3><%= plan.name %></h3>
-        </div>
-        <div class="panel-body">
           <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
           <span class="plan-label">Carrier: </span><span><%= carriers_cache[plan.carrier_profile_id] %></span><br>
           <span class="plan-label">Level: </span><span><%= plan.metal_level.titleize %></span><br>
@@ -24,7 +20,6 @@
             <%= render partial: "shared/network_data", locals: {plan: plan} %>
           </span>
           <br/>
-        </div>
       </div>
 
     </div>

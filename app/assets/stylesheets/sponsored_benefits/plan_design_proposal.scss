@@ -129,4 +129,22 @@ $brand-primary: $mhc-dark-blue;
       }
     }
   }
+  .benefits-setup-tab ul.nav.nav-tabs li label {
+    font-size:12px;
+    padding-bottom:15px;
+  }
+  .pdp_carrier_title {
+    width:auto;
+    margin-top:-20px;
+    margin-left:35px;
+  }
+  .plan_heading_text {
+    font-size:14px;
+  }
+  .benefits-setup-tab .plan-options .col-xs-9 h3 {
+    font-size:12px;
+    min-height:90px;
+    font-weight:bold;
+    margin-top:-1px;
+  }
 }
