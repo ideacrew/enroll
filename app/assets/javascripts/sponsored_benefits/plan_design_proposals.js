@@ -32,7 +32,8 @@ function fetchCarriers() {
     url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
   });
 
-  displayActiveCarriers()
+  displayActiveCarriers();
+  hidePlanContainerAndContributionSliders();
 }
 
 function displayActiveCarriers() {
@@ -48,6 +49,13 @@ function displayActiveCarriers() {
     $(this).closest('.health-plan-design').find('.plan-options > *').hide();
     $(this).closest('.health-plan-design').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
   }
+}
+
+function hidePlanContainerAndContributionSliders() {
+  $('.reference-plans').hide();
+  $('.composite-offerings').addClass('hidden');
+  $('.offerings').addClass('hidden');
+  $('.selected-plan').html("");
 }
 
 function carrierSelected() {
@@ -111,7 +119,6 @@ function setSliderDisplayVal(slideEvt) {
 }
 
 function toggleSliders(plan_kind) {
-  console.log(plan_kind);
   if (plan_kind == 'sole_source') {
     $('.composite-offerings').removeClass('hidden');
     $('.offerings').addClass('hidden');
