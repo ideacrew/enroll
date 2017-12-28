@@ -1,7 +1,8 @@
 module SponsoredBenefits
   module Organizations
     class AcaShopCcaEmployerProfile < Profile
-
+      include Concerns::AcaRatingAreaConfigConcern
+      
       field  :sic_code, type: String
       embeds_one  :employer_attestation
       after_initialize :initialize_benefit_sponsorship
