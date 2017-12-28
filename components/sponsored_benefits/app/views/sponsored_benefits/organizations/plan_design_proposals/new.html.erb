@@ -1,6 +1,6 @@
-<div class="profile-content top-pd">
+<div class="profile-content top-pd" id="myTabContent">
   <div class="tab-row">
-    <div class="tab-content" id="myTabContent">
+    <div class="tab-content">
      <div class="container plan-design-proposal">
       <%= render 'shared/engines/horizontal_status', step:1 %>
       <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
@@ -10,7 +10,3 @@
     </div>
 </div>
 </div>
-
-
-
-
