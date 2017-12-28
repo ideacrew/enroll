@@ -1,12 +1,10 @@
 <div class="row no-buffer row-form-wrapper">
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.text_field :title, class: "floatlabel form-control", required: true, placeholder: 'Quote Name' %>
+    <%= f.text_field :title, class: "floatlabel form-control", disabled: read_only, required: true, placeholder: 'Quote Name' %>
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.select :effective_date, options_for_select(::PlanYear.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"} %>
-
-    <%#= f.text_field :effective_date, class: "floatlabel form-control", required: true, placeholder: 'Quote Effective Date' %>
+    <%= f.select :effective_date, options_for_select(::PlanYear.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"}, disabled: read_only %>
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
@@ -29,7 +27,7 @@
 <script>
 
 $(function() {
-  
+
   function submitPlanDesignProposalInfo() {
     if($("#forms_plan_design_proposal_title").val() != "" && $("#forms_plan_design_proposal_effective_date").val() != "") {
       $.ajax({
@@ -42,7 +40,7 @@ $(function() {
       });
     }
     else {
-      // $('.save-quote-btn').click(); 
+      // $('.save-quote-btn').click();
     }
   }
 
