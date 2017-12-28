@@ -23,7 +23,7 @@
              ['View Quotes', organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
              ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
              ['Remove Quote', 'some-quote-remove-path', 'static'],
-             ['Edit Employer Detials', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
+             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
              ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
                                 remove_employer_link_type(row),
                                 "Are you sure you want to remove this employer?"]
@@ -34,7 +34,7 @@
 
         def remove_employer_link_type(employer)
           if employer.is_prospect?
-            'delete ajax with confirm and elementId'
+            'delete with confirm'
           else
             return 'disabled'
           end

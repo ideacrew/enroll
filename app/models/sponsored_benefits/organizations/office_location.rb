@@ -14,7 +14,7 @@ module SponsoredBenefits
 
       # Remove validations
 
-  	  #validates_presence_of :address
+      validates_presence_of :address
   	  #validates_presence_of :phone, if: :primary_or_branch?
 
   	  # validate :address_includes_county_for_employers_primary_location
