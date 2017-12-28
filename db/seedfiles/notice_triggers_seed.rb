@@ -677,7 +677,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'D048',
-    title: 'You have been Hired as a Broker',
+    title: 'You have been hired/removed as a broker',
     description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
     resource_name: 'broker_role',
     event_name: 'broker_hired',
