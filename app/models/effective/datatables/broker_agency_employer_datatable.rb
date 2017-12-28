@@ -20,7 +20,7 @@
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['View Quotes', organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
+             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
              ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
              ['Remove Quote', 'some-quote-remove-path', 'static'],
              ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
