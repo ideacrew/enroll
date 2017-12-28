@@ -4,8 +4,13 @@
       class BrokerEmployerQuotesDatatable < ::Effective::MongoidDatatable
         datatable do
 
-          table_column :title, :label => 'Legal Name', :proc => Proc.new { |row| row.title }, :sortable => false, :filter => false
-          table_column :claim_date, :label => 'Claim Date', :proc => Proc.new { |row| row.claim_date }, :sortable => false, :filter => false
+          table_column :title, :label => 'Quote Name', :proc => Proc.new { |row| row.title }, :sortable => false, :filter => false
+          table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row| row.profile.benefit_sponsorships.first.initial_enrollment_period.begin.strftime("%Y - %m - %d") }, :sortable => true, :filter => false
+          table_column :claim_code, :label => 'Claim Code', :proc => Proc.new { |row| 'claim code'}, :sortable => false, :filter => false
+          table_column :family_count, :label => 'Family Count', :proc => Proc.new { |row| 'family count placeholder'}, :sortable => false, :filter => false
+          table_column :family_count, :label => 'State', :proc => Proc.new { |row| 'state placeholder'}, :sortable => false, :filter => false
+
+          #table_column :claim_date, :label => 'Claim Date', :proc => Proc.new { |row| row.claim_date }, :sortable => false, :filter => false
           #table_column :broker, :label => 'Broker', :proc => Proc.new { |row| row.employer_profile.active_broker.full_name }, :sortable => false, :filter => false
 
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
