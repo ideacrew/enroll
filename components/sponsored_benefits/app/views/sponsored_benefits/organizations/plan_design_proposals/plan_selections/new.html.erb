@@ -1,11 +1,16 @@
 <div class="profile-content top-pd">
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
-     <div class="container plan-design-proposal">
+     <div class="container plan_design_proposals">
       <%= render 'shared/engines/horizontal_status', step:2 %>
       <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
       <%= render 'plan_selection_form', f: f %>
       <% end %>
+      <div class="row">
+        <div class="col-md-3">
+          <%= link_to 'Return to Quote Management', url_for(:back), class:'btn btn-primary' %>
+        </div>
+      </div>
     </div>
     </div>
   </div>
