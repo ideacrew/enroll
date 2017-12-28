@@ -569,7 +569,7 @@ shop_notice_triggers = [
        name: 'GA Fired',
        notice_template: 'notices/general_agency_notices/general_agency_fired_notice',
        notice_builder: 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
-       mpi_indicator: 'MPI_D086',
+       mpi_indicator: 'SHOP_D086',
        notice_trigger_element_group: {
          market_places: ['shop'],
          primary_recipients: ["general_agency"],

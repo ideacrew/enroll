@@ -349,15 +349,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET clear_assign_for_employer" do
-    include ActiveJob::TestHelper
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    after do
-      clear_enqueued_jobs
-    end
     before :each do
       sign_in user
       xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
@@ -369,14 +365,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should get employer_profile" do
       expect(assigns(:employer_profile)).to eq employer_profile
-    end
-
-    it "should trigger notice to general agency" do
-      expect(enqueued_jobs.size).to eq(1)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'general_agency_terminated']
     end
   end
 
@@ -421,7 +409,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "POST set_default_ga" do
-    include ActiveJob::TestHelper
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let!(:fire_general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
@@ -435,9 +422,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
     before :each do
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
-    after do
-      clear_enqueued_jobs
-    end 
 
     it "should set default_general_agency_profile" do
       sign_in user
@@ -480,20 +464,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
-    end
-   
-    it "should trigger notice to general agency" do
-      general_agency_account.update_attributes!(:aasm_state => "active")
-      broker_agency_profile.default_general_agency_profile = general_agency_profile
-      broker_agency_profile.save
-      sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
-
-      expect(enqueued_jobs.size).to eq(2)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'general_agency_terminated']
     end
 
     it "should fire exisitng default GA" do

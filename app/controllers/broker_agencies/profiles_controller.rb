@@ -193,11 +193,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
-        if old_default_ga_id.present?
-          GeneralAgencyProfile.find(old_default_ga_id).employers_linked_with_general_agency.each do |emp|
-            emp.trigger_notices("general_agency_terminated")
-          end
-        end
         @broker_agency_profile.default_general_agency_profile = nil
         broker_fires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s)
       elsif params[:type] == 'fire'
