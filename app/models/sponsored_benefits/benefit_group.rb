@@ -52,8 +52,6 @@ module SponsoredBenefits
     field :_type, type: String, default: self.name
 
 
-    delegate :employer_profile, to: :plan_year, allow_nil: true
-
     embeds_many :composite_tier_contributions, cascade_callbacks: true
     accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
@@ -334,7 +332,7 @@ module SponsoredBenefits
 
                 def elected_plans_by_option_kind
                   start_on = benefit_application.effective_period.begin
-                  @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on.year)
+                  @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, benefit_application.effective_period.begin.year)
 
                   case plan_option_kind
                   when "sole_source"
