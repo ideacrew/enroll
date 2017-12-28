@@ -1,0 +1,75 @@
+<%= hidden_field_tag :plan_design_organization_id, plan_design_organization._id %>
+<%= hidden_field_tag :elected_plan_kind, '' %>
+<%= hidden_field_tag :reference_plan_id, '' %>
+<%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
+<%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Quote for <%= plan_design_organization.legal_name %></h3>
+      </div>
+      <div class="panel-body">
+        <%= render 'shared/error_messages', :object => plan_design_form %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/proposal_info', f: f, read_only: true %>
+      </div>
+    </div>
+    <!--  Need below hidden button element to force form validations -->
+    <div class="pull-right hidden">
+      <%= f.submit "Save Quote", class: "btn btn-primary save-quote-btn" %>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Benefit Model Selection</h3>
+      </div>
+      <div class="panel-body">
+        <p>Select the type of options you want to offer enrollees.</p>
+        <%= render 'carrier_options', f: f %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Employer Contributions</h3>
+      </div>
+      <div class="panel-body">
+        <p>Specify contribution levels for each enrollee type.</p>
+        <%= f.fields_for :profile, f.object.profile do |pr| %>
+          <%= pr.fields_for :benefit_sponsorship, pr.object.benefit_sponsorships.first do |s| %>
+            <%= s.fields_for :benefit_application, s.object.benefit_applications.first do |ba| %>
+              <%= ba.fields_for :benefit_group, ba.object.benefit_groups.first do |bg| %>
+                <%= render 'sponsored_benefits/organizations/plan_design_proposals/contributions/contribution_sliders', f: bg %>
+              <% end %>
+            <% end%>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Benefit Package Selection</h3>
+      </div>
+      <div class="panel-body">
+        <p>Select the plan you wish to offer to all enrollees.  Your maximum monthly cost will be based on the benefit cost, contribution amount and expected participation as specified on the employee roster.</p><br />
+        <div class="col-md-10">
+          <div class="reference-plans"></div>
+        </div>
+        <div class="col-md-2">
+          Plans Types here
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

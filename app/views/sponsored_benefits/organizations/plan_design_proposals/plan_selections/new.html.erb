@@ -1,0 +1,12 @@
+<div class="profile-content top-pd">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+     <div class="container plan-design-proposal">
+      <%= render 'shared/engines/horizontal_status', step:2 %>
+      <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
+      <%= render 'plan_selection_form', f: f %>
+      <% end %>
+    </div>
+    </div>
+  </div>
+</div>
