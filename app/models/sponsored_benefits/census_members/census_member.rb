@@ -34,13 +34,12 @@ module SponsoredBenefits
     accepts_nested_attributes_for :email, allow_destroy: true
 
     validates_presence_of :first_name, :last_name, :dob, :employee_relationship
-
-    validates :gender,
-      allow_blank: false,
-      inclusion: { in: GENDER_KINDS, message: "must be selected" }, unless: :plan_design_model?
+  
+    validates :gender, presence: true, unless: :plan_design_model?
+    validates :gender, allow_blank: true, inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
     def plan_design_model?
-      self.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
+      self.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) || _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
     end
 
     def full_name

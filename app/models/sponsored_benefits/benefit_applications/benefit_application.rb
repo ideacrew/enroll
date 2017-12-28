@@ -77,6 +77,14 @@ module SponsoredBenefits
         write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
       end
 
+      def start_on
+        effective_period.begin
+      end
+
+      def end_on
+        effective_period.end
+      end
+
       def open_enrollment_begin_on
         open_enrollment_period.begin
       end
@@ -88,7 +96,6 @@ module SponsoredBenefits
       def open_enrollment_completed?
         open_enrollment_period.blank? ? false : (::TimeKeeper.date_of_record > open_enrollment_period.end)
       end
-
 
       # Application meets criteria necessary for sponsored group to shop for benefits
       def is_open_enrollment_eligible?
