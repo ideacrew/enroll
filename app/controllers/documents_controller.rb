@@ -34,11 +34,13 @@ class DocumentsController < ApplicationController
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
+    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
+      update_documents_status(family_member) if family_member
     else
       flash_message = { :error => "Please provide a verification reason."}
     end
@@ -72,10 +74,15 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.redetermine!(verification_attr)
+    if params[:verification_type] == 'DC Residency'
+      @person.consumer_role.invoke_residency_verification!
+    else
+      @person.consumer_role.redetermine_verification!(verification_attr)
+    end
     respond_to do |format|
       format.html {
-        flash[:success] = "Request was sent to FedHub."
+        hub =  params[:verification_type] == 'DC Residency' ? 'Local Residency' : 'FedHub'
+        flash[:success] = "Request was sent to #{hub}."
         redirect_to :back
       }
       format.js
@@ -102,9 +109,6 @@ class DocumentsController < ApplicationController
       if sv.present?
         new_date = sv.due_date.to_date + 30.days
         flash[:success] = "Special verification period was extended for 30 days."
-      elsif enrollment.special_verification_period
-        new_date = enrollment.special_verification_period.to_date + 30.days
-        flash[:success] = "Special verification period was extended for 30 days."
       else
         new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days
         flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"
@@ -112,7 +116,7 @@ class DocumentsController < ApplicationController
 
       # special_verification_period is the day we send notices
       # enrollment.update_attributes!(:special_verification_period => new_date)
-      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id)
+      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id, type: "admin")
       @family_member.person.consumer_role.special_verifications << sv
       @family_member.person.consumer_role.save!
       set_min_due_date_on_family
@@ -160,6 +164,11 @@ class DocumentsController < ApplicationController
   def authorized_to_download?(owner, documents, document_id)
     return true
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
+  end
+
+  def update_documents_status(family_member)
+    family = family_member.family
+    family.update_family_document_status!
   end
 
   def set_document

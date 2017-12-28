@@ -35,7 +35,11 @@ end
 def document_due_date(family)
   enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
   if enrolled_contingent_enrollment.present?
-    enrolled_contingent_enrollment.special_verification_period.strftime("%m/%d/%Y")
+    if enrolled_contingent_enrollment.special_verification_period.present?
+      enrolled_contingent_enrollment.special_verification_period.strftime("%m/%d/%Y")
+    else
+      (TimeKeeper.date_of_record+95.days).strftime("%m/%d/%Y")
+    end
   else
     nil
   end

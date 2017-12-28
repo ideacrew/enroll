@@ -253,6 +253,20 @@ context "Verification process and notices" do
       end
     end
 
+    context "DC Residency" do
+      it "returns true if residency status is outstanding and No documents for this type" do
+        person.consumer_role.local_residency_validation = "outstanding"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_truthy
+      end
+
+      it "returns false if residency status is attested and No documents for this type" do
+        person.consumer_role.local_residency_validation = "attested"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_falsey
+      end
+    end
+
     context "Immigration status" do
       it "returns true if lawful_presence fails and No documents for this type" do
         expect(person.consumer_role.is_type_outstanding?("Immigration status")).to be_truthy
@@ -637,7 +651,7 @@ context "Verification process and notices" do
         end
         it "updates residency status" do
           consumer.revert!
-          expect(consumer.is_state_resident?).to eq nil
+          expect(consumer.is_state_resident?).to eq true
         end
       end
     end
@@ -692,6 +706,27 @@ describe "#find_document" do
       expect(found_document).to eq(document)
       expect(found_document.subject).to eq("Certificate of Citizenship")
     end
+  end
+end
+
+describe "#processing_residency_24h?" do
+  let(:consumer_role) {ConsumerRole.new}
+
+  it "returns false if residency determined at attribute is nil" do
+    subject = consumer_role.send(:processing_residency_24h?)
+    expect(subject).to eq false
+  end
+
+  it "returns true if called residency hub today and state resident is nil" do
+    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now)
+    subject = consumer_role.send(:processing_residency_24h?)
+    expect(subject).to eq true
+  end
+
+  it "returns false if residency is already determined in past and state resident is nil" do
+    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now - 2.day)
+    subject = consumer_role.send(:processing_residency_24h?)
+    expect(subject).to eq false
   end
 end
 
@@ -821,6 +856,25 @@ describe "can_trigger_residency?" do
       expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
   end
+end
+
+
+
+describe "is_type_verified?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when entered type is DC Residency" do
+
+
+    it "should return true for dc residency verified type" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.is_type_verified?("DC Residency")).to eq true
+    end
+  end
+
 end
 
 RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
