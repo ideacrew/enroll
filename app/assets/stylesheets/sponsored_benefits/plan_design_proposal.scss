@@ -149,6 +149,11 @@ $brand-primary: $mhc-dark-blue;
     margin-top:-1px;
   }
   /* Styles Benefit Package Selection of BQT */
+  .offerings-slider {
+    .row-form-wrapper, input.premium-storage-input {
+      border:none;
+    }
+  }
   .reference-plans, .dental-reference-plans, .elected-plans-tab  {
     background-color: #ffffff;
     border: solid 1px #d7d7d7;
