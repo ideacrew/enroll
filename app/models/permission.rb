@@ -30,9 +30,11 @@ class Permission
   field :can_submit_time_travel_request, type: Boolean, default: false
   field :can_view_application_types, type: Boolean, default: false
   field :view_personal_info_page, type: Boolean, default: false
-  field :access_new_consumer_application_sub_tab, type: Boolean, default: false
-  field :access_identity_verification_sub_tab, type: Boolean, default: false
-  field :access_outstanding_verification_sub_tab, type: Boolean, default: false
+  field :can_access_new_consumer_application_sub_tab, type: Boolean, default: false
+  field :can_access_identity_verification_sub_tab, type: Boolean, default: false
+  field :can_access_outstanding_verification_sub_tab, type: Boolean, default: false
+  field :can_access_resident_application_sub_tab, type: Boolean, default: false
+
   
   class << self
     def hbx_staff

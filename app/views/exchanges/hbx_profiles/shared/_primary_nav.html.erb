@@ -46,7 +46,6 @@
               pundit_object: HbxProfile,
               pundit_method: :access_identity_verification_sub_tab?
             } %>
-            <% if policy(:family).hbx_super_admin_visible? %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                 tab_name: 'dc-resident-application',
                 link_path: begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'),
@@ -54,9 +53,8 @@
                 active_tab: active_tab,
                 remote: false,
                 pundit_object: ResidentRole,
-                pundit_method: :begin_resident_enrollment?
+                pundit_method: :can_access_resident_application_sub_tab?
               } %>
-            <% end %>
           </ul>
         </li>
         <!-- <li role="presentation"<%= menu_tab_class(active_tab, "employers-tab") %>>
