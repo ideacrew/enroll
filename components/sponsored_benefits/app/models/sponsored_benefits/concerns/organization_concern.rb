@@ -33,9 +33,9 @@ module SponsoredBenefits
 
       embeds_many :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", cascade_callbacks: true, validate: true
 
-      accepts_nested_attributes_for :office_locations
+      accepts_nested_attributes_for :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation"
 
-      validates_presence_of :legal_name
+      validates_presence_of :legal_name, :office_locations
 
       # validates :fein,
       #   presence: false,

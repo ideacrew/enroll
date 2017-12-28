@@ -5,7 +5,7 @@
         <div>Edit Employer Information</div>
       </h3>
       <br />
-      <%= form_for @organization, as: :organization, url: {action: "update"} do |f| %>
+      <%= form_for @organization, as: :organization, url: {action: "update"}, method: :patch do |f| %>
         <%= render 'shared/error_messages', :object => @organization %>
         <%= render 'form', f: f %>
       <% end %>
