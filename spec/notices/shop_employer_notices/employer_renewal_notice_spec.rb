@@ -13,7 +13,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalNotice do
                             :notice_template => 'notices/shop_employer_notices/6_conversion_group_renewal_notice',
                             :notice_builder => 'ShopEmployerNotices::EmployerRenewalNotice',
                             :event_name => 'group_renewal_5',
-                            :mpi_indicator => 'MPI_SHOP6',
+                            :mpi_indicator => 'SHOP_D077',
                             :title => "Welcome to DC Health Link, Group Renewal Available"})
                           }
     let(:valid_parmas) {{
