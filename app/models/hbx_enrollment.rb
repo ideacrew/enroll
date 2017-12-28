@@ -1436,6 +1436,19 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def ee_plan_selection_confirmation_sep_new_hire
+    if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
+      if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
+        begin
+          census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
+        rescue Exception => e
+          (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
+        end
+      end
+    end
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
