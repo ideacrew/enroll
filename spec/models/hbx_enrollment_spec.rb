@@ -2655,4 +2655,32 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
+
+  describe "#trigger ee_plan_selection_confirmation_sep_new_hire" do
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: @household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+
+    before :each do
+      @household = mikes_family.households.first
+    end
+
+    it "should trigger ee_plan_selection_confirmation_sep_new_hire job in queue" do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+
+      hbx_enrollment.ee_plan_selection_confirmation_sep_new_hire
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('ee_plan_selection_confirmation_sep_new_hire')).to be_truthy
+      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.hbx_id.to_s
+    end
+  end
 end
