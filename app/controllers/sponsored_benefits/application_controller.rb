@@ -1,7 +1,8 @@
 module SponsoredBenefits
   class ApplicationController < ActionController::Base
     before_action :set_broker_agency_profile_from_user
-
+    layout 'sponsored_benefits/application'
+    
     private
       helper_method :active_tab
 
