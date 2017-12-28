@@ -18,7 +18,7 @@ module Queries
 
     def build_scope()
 
-      family = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+      family = Family.outstanding_verification
       person = Person
       family= family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
@@ -48,7 +48,7 @@ module Queries
     end
 
     def klass
-      Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+      Family.outstanding_verification
     end
 
     def size
