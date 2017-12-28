@@ -7,7 +7,10 @@ module SponsoredBenefits
       include Searchable
       include Autocomplete
 
-      EMPLOYMENT_ACTIVE_STATES = %w(eligible cobra_eligible)
+      EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
+      EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
+      EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
+      COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
 
       field :is_business_owner, type: Boolean, default: false
       field :hired_on, type: Date
@@ -41,8 +44,11 @@ module SponsoredBenefits
       scope :by_employer_profile_id,    ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
       scope :by_sponsorship_id,    ->(benefit_sponsorship_id) { where(benefit_sponsorship_id: benefit_sponsorship_id) }
       scope :by_ssn,    ->(ssn) { where(encrypted_ssn: SponsoredBenefits::CensusMembers::CensusMember.encrypt_ssn(ssn)) }
-      scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
 
+      scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+      scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
+      scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
+      scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
 
       def initialize(*args)
         super(*args)
@@ -125,7 +131,7 @@ module SponsoredBenefits
         end
         @benefit_application
       end
-
+      
       aasm do
         state :eligible, initial: true
         state :cobra_eligible
