@@ -454,9 +454,7 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "POST record_sep", dbclean: :after_each do
-    let(:employee_role2) { FactoryGirl.create(:employee_role, census_employee: census_employee) }
-    let(:census_employee) { FactoryGirl.create(:census_employee) }
-    
+
     before :each do
       date = TimeKeeper.date_of_record - 10.days
       @qle = FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date)
@@ -467,49 +465,18 @@ RSpec.describe Insured::FamiliesController do
       special_enrollment_period.qle_on = date.strftime('%m/%d/%Y')
       special_enrollment_period.save
       allow(person).to receive(:primary_family).and_return(@family)
-      allow(person).to receive(:employee_roles).and_return([employee_role2])
       allow(person).to receive(:hbx_staff_role).and_return(nil)
-      allow(person).to receive(:has_multiple_active_employers?).and_return(false)
     end
 
     context 'when its initial enrollment' do
       before :each do
-        post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
       it "should redirect" do
         special_enrollment_period = @family.special_enrollment_periods.last
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: @qle.id, employee_role_id:employee_role2.id}))
-      end
-    end
-
-    context 'when employee has only one active employe role' do
-      it "should receive notice" do
-        special_enrollment_period = @family.special_enrollment_periods.last
-        ActiveJob::Base.queue_adapter = :test
-        ActiveJob::Base.queue_adapter.enqueued_jobs = []
-        post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
-        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-          job_info[:job] == ShopNoticesNotifierJob
-        end
-        expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_sep_request_accepted_notice']
-      end
-    end
-
-    context 'when employee has multiple active employee roles' do
-      before :each do
-        allow(person).to receive(:has_multiple_active_employers?).and_return(true)
-      end
-      it "should not receive notice" do
-        special_enrollment_period = @family.special_enrollment_periods.last
-        ActiveJob::Base.queue_adapter = :test
-        ActiveJob::Base.queue_adapter.enqueued_jobs = []
-        post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
-        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-          job_info[:job] == ShopNoticesNotifierJob
-        end
-        expect(queued_job).to eq nil
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: @qle.id}))
       end
     end
 
@@ -517,12 +484,12 @@ RSpec.describe Insured::FamiliesController do
 
       before :each do
         allow(@family).to receive(:enrolled_hbx_enrollments).and_return([double])
-        post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id, employee_role_id:employee_role2.id}))
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
       end
     end
   end
@@ -592,6 +559,7 @@ RSpec.describe Insured::FamiliesController do
     before(:each) do
       sign_in(user)
       allow(person).to receive(:resident_role?).and_return(false)
+      allow(controller).to receive(:is_ee_sep_request_accepted?).and_return false
     end
 
     it "renders the 'check_qle_date' template" do
