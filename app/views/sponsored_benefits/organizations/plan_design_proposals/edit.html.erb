@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" id="myTabContent">
   <%= render 'shared/engines/horizontal_status', step:1 %>
   <%= form_for @plan_design_proposal, url: {action: "update"}, method: :put do |f| %>
      <%= render 'form', f: f %>

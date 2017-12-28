@@ -3,7 +3,7 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :load_plan_design_organization
+    before_action :load_plan_design_organization, except: [:destroy]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy]
 
     def index
@@ -58,8 +58,8 @@ module SponsoredBenefits
     end
 
     def destroy
-      plan_design_proposal.destroy!
-      redirect_to benefit_sponsorship_plan_design_proposals_path(plan_design_proposal.benefit_sponsorship)
+      @plan_design_proposal.destroy!
+      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id)
     end
 
     private
