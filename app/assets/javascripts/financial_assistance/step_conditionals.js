@@ -7,6 +7,9 @@ $(document).ready(function() {
       $('.btn.btn-danger').click(function() {
         window.location.href = $(self).attr('href');
       });
+      $('.btn.btn-primary').click(function() {
+        window.location.href = e.target.href;
+      });
       return false;
     } else
     return true;
@@ -19,6 +22,9 @@ $(document).ready(function() {
       $('#unsavedTaxInfoQuestionsWarning').modal('show');
       $('.btn.btn-danger').click(function() {
         window.location.href = $(self).attr('href');
+      });
+      $('.btn.btn-primary').click(function() {
+        window.location.href = e.target.href;
       });
       return false;
     } else
