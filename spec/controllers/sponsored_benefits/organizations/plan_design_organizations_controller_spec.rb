@@ -53,8 +53,7 @@ module SponsoredBenefits
                         "extension" =>  ""
                       }
                   }
-        },
-        "broker_agency_id" => broker_agency_profile.id
+        }
       }
     }
 
@@ -70,10 +69,10 @@ module SponsoredBenefits
                         "county"    =>  "Hampden"
                       }
                   }
-        },
-        "broker_agency_id" => broker_agency_profile.id
+        }
       }
     }
+
     before do
       allow(subject).to receive(:current_person).and_return(current_person)
       allow(current_person).to receive(:broker_role).and_return(broker_role)
@@ -224,5 +223,52 @@ module SponsoredBenefits
         end
       end
     end
+
+    describe "DELETE #destroy" do
+      USER_ROLES.each do |role|
+        context "for user #{role}" do
+          let(:broker_agency_profile) { double(id: "12345") }
+
+          before do
+            allow(BrokerAgencyProfile).to receive(:find).with(broker_agency_profile.id).and_return(broker_agency_profile)
+          end
+
+          context "when attempting to delete plan design organizations without existing quotes" do
+            let!(:plan_design_organization) { create(:plan_design_organization, customer_profile_id: '1', owner_profile_id: broker_agency_profile.id,
+                                                                                legal_name: 'ABC Company', sic_code: '0197' ) }
+
+            it "destroys the requested plan_design_organization" do
+              expect {
+                delete :destroy, {:id => plan_design_organization.to_param}, valid_session
+              }.to change(SponsoredBenefits::Organizations::PlanDesignOrganization, :count).by(-1)
+            end
+
+            it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
+              delete :destroy, {:id => plan_design_organization.to_param}, valid_session
+              expect(response).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
+            end
+          end
+
+          context "when attempting to delete plan design organizations with existing quotes" do
+            let!(:plan_design_organization) { create(:plan_design_organization, customer_profile_id: '1', owner_profile_id: '12345',
+                                                      plan_design_proposals: [ plan_design_proposal ], sic_code: '0197' ) }
+            let(:plan_design_proposal) { build(:plan_design_proposal) }
+
+            it "does not destroy the requested plan_design_organization" do
+              expect {
+                delete :destroy, {:id => plan_design_organization.to_param}, valid_session
+              }.to change(SponsoredBenefits::Organizations::PlanDesignOrganization, :count).by(0)
+            end
+
+            it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
+              delete :destroy, {:id => plan_design_organization.to_param}, valid_session
+              expect(response).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
+            end
+          end
+
+        end
+      end
+    end
+
   end
 end
