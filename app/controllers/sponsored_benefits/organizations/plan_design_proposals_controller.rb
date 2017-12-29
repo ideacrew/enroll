@@ -18,7 +18,7 @@ module SponsoredBenefits
         flash[:error] = "Quote failed to publish.".html_safe
       end
       redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
-      
+
     end
 
     def new
@@ -86,7 +86,7 @@ module SponsoredBenefits
     end
 
     def effective_datatable
-      ::Effective::Datatables::BrokerEmployerQuotesDatatable.new(organization_id: @plan_design_organization._id)
+      ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
     end
 
     def load_plan_design_organization

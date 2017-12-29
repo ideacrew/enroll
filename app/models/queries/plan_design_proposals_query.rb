@@ -1,5 +1,5 @@
 module Queries
-  class PlanDesignOrganizationQuotesQuery
+  class PlanDesignProposalsQuery
     attr_reader :search_string, :custom_attributes
 
     def datatable_search(string)
@@ -17,20 +17,18 @@ module Queries
       return [] if @plan_design_proposals.nil?
       case @custom_attributes[:quotes]
       when "initial"
-        @plan_design_proposals
-      when "active"
-        @plan_design_proposals
+        @plan_design_organization.plan_design_proposals.initial
       when "renewing"
-        @plan_design_proposals
+        @plan_design_organization.plan_design_proposals.renewing
       when "draft"
-        @plan_design_proposals
+        @plan_design_organization.plan_design_proposals.draft
       when "published"
-        @plan_design_proposals
+        @plan_design_organization.plan_design_proposals.published
       when "expired"
-        @plan_design_proposals
+        @plan_design_organization.plan_design_proposals.expired
       else
         if @search_string.present?
-          @plan_design_proposals.datatable_search(@search_string)
+          @plan_design_organization.plan_design_proposals.datatable_search(@search_string)
         else
           @plan_design_proposals
         end

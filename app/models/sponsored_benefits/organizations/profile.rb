@@ -27,6 +27,10 @@ module SponsoredBenefits
       def plan_design_organization
         plan_design_proposal.plan_design_organization if plan_design_proposal.present?
       end
+
+      def effective_date
+        benefit_sponsorships.first.initial_enrollment_period.begin
+      end
     end
   end
 end

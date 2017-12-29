@@ -1,7 +1,7 @@
 # module SponsoredBenefits
   module Effective
     module Datatables
-      class BrokerEmployerQuotesDatatable < ::Effective::MongoidDatatable
+      class PlanDesignProposalsDatatable < ::Effective::MongoidDatatable
         datatable do
 
           table_column :title, :label => 'Quote Name', :proc => Proc.new { |row| row.title }, :sortable => false, :filter => false
@@ -34,7 +34,7 @@
 
         def collection
           unless (defined? @quotes) && @quotes.present?
-            @quotes = Queries::PlanDesignOrganizationQuotesQuery.new(attributes)
+            @quotes = Queries::PlanDesignProposalsQuery.new(attributes)
           end
           @quotes
         end
