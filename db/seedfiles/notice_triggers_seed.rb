@@ -838,6 +838,28 @@ shop_notice_triggers = [
   },
 
   {
+    hbx_id: 'SHOP_D001',
+    title: 'Welcome to DC Health Link',
+    description: 'ER creates an account in DC Health',
+    resource_name: 'employer',
+    event_name: 'employer_account_creation_notice',
+    notice_triggers: [
+      {
+        name: 'Welcome Notice sent to Employer',
+        notice_template: 'notices/shop_employer_notices/employer_account_creation_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerAccountCreationNotice',
+        mpi_indicator: 'SHOP_D001',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
     hbx_id: 'SHOP_D073',
     title: 'Employee Plan Selection Confirmation',
     description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
