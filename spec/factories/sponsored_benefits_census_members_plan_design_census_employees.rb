@@ -14,9 +14,6 @@ FactoryGirl.define do
     address { build(:sponsored_benefits_locations_address) }
     email { build(:sponsored_benefits_email) }
 
-    employer_profile  { build(:plan_design_profile) }
-    benefit_application  { build(:plan_design_benefit_application) }
-
     # association :sponsored_benefits_locations_address, strategy: :build
     # association :sponsored_benefits_email, strategy: :build
     # association :sponsored_benefits_benefit_sponsorships_plan_design_employer_profile, strategy: :build
