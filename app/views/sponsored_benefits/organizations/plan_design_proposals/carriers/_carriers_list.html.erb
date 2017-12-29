@@ -6,7 +6,7 @@
     selected_carrier_level: selected_carrier_level,
     active_year: active_year), remote: true do %>
     <div class="col-xs-3">
-      <%= radio_button_tag :carrier_for_elected_plan, "#{ck}" %>
+      <%= radio_button_tag :carrier_for_elected_plan, "#{ck}", false, class: "rfi_radio" %>
       <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
       <i class="fa fa-circle-o"></i>
       <i class="fa fa-dot-circle-o"></i>
