@@ -13,7 +13,6 @@ require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
-
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
 
@@ -41,11 +40,12 @@ ActionController::Base.allow_rescue = false
 
 # Remove/comment out the lines below if your app doesn't have a database.
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
-#begin
-#  DatabaseCleaner.strategy = :truncation
-#rescue NameError
-#  raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
-#end
+begin
+  load Rails.root + "db/seedfiles/english_translations_seed.rb"
+  DatabaseCleaner.strategy = :truncation, {:except => %w[translations]}
+rescue NameError
+  raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
+end
 
 # You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
 # See the DatabaseCleaner documentation for details. Example:
@@ -65,18 +65,20 @@ ActionController::Base.allow_rescue = false
 # Possible values are :truncation and :transaction
 # The :transaction strategy is faster, but might give you threading problems.
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
-Cucumber::Rails::Database.javascript_strategy = :truncation
-Capybara.default_driver = :poltergeist
-Capybara.javascript_driver = :poltergeist
-Capybara.register_driver :poltergeist do |app|
-  options = {
-      :js_errors => true,
-      :timeout => 120,
-      :debug => false,
-      :phantomjs_options => ['--load-images=no', '--disk-cache=false'],
-      :inspector => true,
-      :window_size => [1280,720],
-      :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),
-  }
-  Capybara::Poltergeist::Driver.new(app, options)
+Before do |scenario|
+  Cucumber::Rails::Database.javascript_strategy = :truncation
+  Capybara.default_driver = :poltergeist
+  Capybara.javascript_driver = :poltergeist
+  Capybara.register_driver :poltergeist do |app|
+    options = {
+        :js_errors => true,
+        :timeout => 120,
+        :debug => false,
+        :phantomjs_options => ['--load-images=no', '--disk-cache=false'],
+        :inspector => true,
+        :window_size => [1280,720],
+        :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),
+    }
+    Capybara::Poltergeist::Driver.new(app, options)
+  end
 end
