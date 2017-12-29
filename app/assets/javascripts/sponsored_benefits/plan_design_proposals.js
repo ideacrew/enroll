@@ -220,5 +220,10 @@ function formatRadioButtons() {
       input.attr('checked', true)
     });
   })
-
 }
+
+$(document).ready(function() {
+    // Sets One Plan to active on page load
+    button = $('li.sole-source-tab').find('label');
+    button.trigger('click');
+})
