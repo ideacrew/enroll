@@ -22,12 +22,19 @@ function fetchCarriers() {
   var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
   var selected_carrier_level = $(this).siblings('input').val();
   var plan_design_organization_id = $('#plan_design_organization_id').val();
+  $(this).closest('.health-plan-design').find('.nav-tabs li').removeClass('active');
+  $(this).closest('li').addClass('active');
 
   $.ajax({
     type: "GET",
     data:{
       active_year: active_year,
       selected_carrier_level: selected_carrier_level,
+    },
+    success: function() {
+      setTimeout(function() {
+        formatRadioButtons()
+      },400);
     },
     url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
   });
@@ -82,6 +89,7 @@ function carrierSelected() {
 }
 
 function planSelected() {
+  
   toggleSliders($("#elected_plan_kind").val());
 
   var reference_plan_id = $(this).closest('.health-plan-design .reference-plan').find('input').attr('value');
@@ -204,4 +212,15 @@ function initSlider() {
       return 'Contribution Percentage: ' + value + '%';
     }
   });
+}
+
+function formatRadioButtons() {
+  /*
+  $('.fa-circle-o').each(function() {
+    $(this).click(function() {
+      $(this).toggleClass('fa-dot-circle-o fa-circle-o');
+      console.log($(this).parent())
+    });
+  })
+  */  
 }
