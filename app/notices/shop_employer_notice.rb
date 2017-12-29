@@ -31,9 +31,10 @@ class ShopEmployerNotice < Notice
     notice.notification_type = self.event_name
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
-    notice.employer_email = employer_profile.staff_roles.first.work_email_or_best
+    notice.employer_email = recipient.staff_roles.first.work_email_or_best
     notice.primary_identifier = employer_profile.hbx_id
-    append_address(employer_profile.organization.primary_office_location.address)
+    address = employer_profile.organization.primary_mailing_address.present? ? employer_profile.organization.primary_mailing_address : employer_profile.organization.primary_office_location.address
+    append_address(address)
     append_hbe
     append_broker(employer_profile.broker_agency_profile)
   end
@@ -66,13 +67,13 @@ class ShopEmployerNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
   end
 
-  def append_address(primary_address)
+  def append_address(address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: primary_address.address_1.titleize,
-      street_2: primary_address.address_2.titleize,
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
+      street_1: address.address_1.titleize,
+      street_2: address.address_2.titleize,
+      city: address.city.titleize,
+      state: address.state,
+      zip: address.zip
       })
   end
 
@@ -95,13 +96,16 @@ class ShopEmployerNotice < Notice
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
-    
+
     notice.broker = PdfTemplates::Broker.new({
       primary_fullname: person.full_name,
       organization: broker.legal_name,
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      assignment_date: employer_profile.active_broker_agency_account.present? ? employer_profile.active_broker_agency_account.start_on : "",
       address: PdfTemplates::NoticeAddress.new({
         street_1: location.address.address_1,
         street_2: location.address.address_2,
