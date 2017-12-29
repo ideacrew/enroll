@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
-  
+
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -106,13 +106,6 @@ class Insured::FamiliesController < FamiliesController
       action_params.merge!({change_plan: "change_plan"})
     end
 
-    emp_role_id = params[:employee_role_id]
-    employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-
-    if !@person.has_multiple_active_employers? && qle.present? && qle.shop? && employee_role.present? && employee_role.census_employee.present?
-      employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice")
-    end
-
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -168,6 +161,8 @@ class Insured::FamiliesController < FamiliesController
 
     if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
       sep_request_denial_notice
+    elsif is_ee_sep_request_accepted?
+      ee_sep_request_accepted_notice
     end
   end
 
@@ -278,6 +273,17 @@ class Insured::FamiliesController < FamiliesController
       ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: @qle_date, qle_title: @qle.title)
     rescue Exception => e
       log("#{e.message}; person_id: #{@person.id}")
+    end
+  end
+
+  def is_ee_sep_request_accepted?
+    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
+  end
+
+  def ee_sep_request_accepted_notice
+    employee_role = @person.active_employee_roles.first
+    if employee_role.present? && employee_role.census_employee.present?
+      employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice")
     end
   end
 

@@ -859,7 +859,7 @@ shop_notice_triggers = [
     ]
   },
 
-  {
+ {
     hbx_id: 'SHOP_D073',
     title: 'Employee Plan Selection Confirmation',
     description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
