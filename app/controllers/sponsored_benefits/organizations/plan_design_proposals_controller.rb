@@ -53,7 +53,7 @@ module SponsoredBenefits
     end
 
     def update
-      @plan_design_proposal =  SponsoredBenefits::Forms::PlanDesignProposal.new({
+      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
         organization: @plan_design_organization, proposal_id: params[:id]
         }.merge(plan_design_proposal_params))
 
