@@ -108,7 +108,7 @@ module SponsoredBenefits
           benefit_application.open_enrollment_period= enrollment_dates[:open_enrollment_period]
         end
 
-        @proposal.save
+        @proposal.save!
       end
 
       def to_h
@@ -124,7 +124,7 @@ module SponsoredBenefits
           profile: [
             benefit_sponsorship: [
               initial_enrollment_period: effective_date..(effective_date.next_year.prev_day),
-              annual_enrollment_period_begin_month_of_year: effective_date.month,
+              annual_enrollment_period_begin_month: effective_date.month,
               benefit_market: sponsorship.benefit_market,
               contact_method: sponsorship.contact_method,
               benefit_application: [
