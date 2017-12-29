@@ -1,6 +1,5 @@
 <fieldset>
-  <% primary_office_location = (!@row && !params[:child_index]) %>
-  <p class="twenty"> <% if primary_office_location %> Primary <% end %> Office Location </p>
+  <p class="twenty"> Office Location </p>
 
   <div id="address_info" class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
@@ -55,7 +54,7 @@
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                  <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP',oninvalid:"checkZip(this);", oninput:"checkZip(this);", data: { 'child-index': "#{f.index.to_s}" } %>
               </div>
-	            <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd <%= 'primary-office-location' if primary_office_location %>">
+	            <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
 	               <% @counties = RatingArea.find_counties_for(zip_code: address.object.try(:zip)) %>
 	               <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
 	               <% @counties = [@empty_message] if @counties.empty? %>
