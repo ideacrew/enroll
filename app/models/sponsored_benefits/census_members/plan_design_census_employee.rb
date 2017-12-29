@@ -28,7 +28,7 @@ module SponsoredBenefits
 
       accepts_nested_attributes_for :census_dependents
 
-      embeds_many :benefit_group_assignments, as: :benefit_assignable,
+      embeds_many :benefit_group_assignments, as: :benefit_assignable, class_name: "SponsoredBenefits::CensusMembers::BenefitGroupAssignment",
       cascade_callbacks: true,
       validate: true
 
