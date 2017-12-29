@@ -167,7 +167,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
       end
 
       if lawful_presence_outstanding?(person)
-        notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
 
       if immigration_status_outstanding?(person)
