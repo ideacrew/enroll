@@ -16,10 +16,16 @@ module SponsoredBenefits
       field :aasm_state, type: String
 
       embeds_one :profile, class_name: "SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile"
-
+      delegate :effective_date, to: :profile
       validates_uniqueness_of :claim_code, :case_sensitive => false, :allow_nil => true
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"title" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      ## TODO: how are we defining 'initial' vs 'renewing'?
+      scope :initial, -> { all }
+      scope :renewing, -> { none }
+      scope :draft, -> { where(aasm_state: 'draft') }
+      scope :published, -> { where(aasm_state: 'published') }
+      scope :expired, -> { where(:'effective_date'.lt => TimeKeeper.date_of_record) }
 
       def self.find(id)
         organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals._id" => BSON::ObjectId.from_string(id)).first
