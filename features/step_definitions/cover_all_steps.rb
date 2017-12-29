@@ -7,7 +7,7 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
 end
 
 Then(/^Hbx Admin should not see an DC Resident Application link$/) do
-  expect(page).not_to have_content('DC Resident Application')
+  find(:xpath, "/html/body/div[2]/div/ul/li[2]/ul/li[5]/a/span[1]", text: 'DC Resident Application')[:class].include?("blocking") == false
 end
 
 Then(/^Hbx Admin should not see an New Consumer Phone Application link and New Consumer Paper Application link$/) do
