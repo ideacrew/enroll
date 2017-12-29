@@ -16,9 +16,9 @@
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['Edit Quote', edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, row), 'static'],
-             ['Publish Quote', organizations_plan_design_proposal_publish_path(row.id), 'post_ajax'],
-             ['Remove Quote', organizations_plan_design_proposal_path(row.id), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
+             ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization.id, row.id), 'static'],
+             ['Publish Quote', sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), 'post_ajax'],
+             ['Remove Quote', sponsored_benefits.organizations_plan_design_proposal_path(row.id), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quotes_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
