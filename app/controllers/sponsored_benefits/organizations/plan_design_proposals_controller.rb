@@ -3,21 +3,22 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :load_plan_design_organization, except: [:destroy]
-    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish_quote]
+    before_action :load_plan_design_organization, except: [:destroy, :publish]
+    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish]
 
     def index
       @datatable = effective_datatable
     end
 
-    def publish_quote
+    def publish
       if @plan_design_proposal.may_publish?
         @plan_design_proposal.publish!
         flash[:notice] = "Quote Published"
       else
         flash[:error] = "Quote failed to publish.".html_safe
-        redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
       end
+      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
+      
     end
 
     def new
@@ -107,7 +108,8 @@ module SponsoredBenefits
     # end
 
     def load_plan_design_proposal
-      @plan_design_proposal ||= Organizations::PlanDesignProposal.find(params[:id])
+      proposal_id = params[:id] || params[:plan_design_proposal_id]
+      @plan_design_proposal ||= Organizations::PlanDesignProposal.find(proposal_id)
     end
 
     def plan_design_proposal_params
