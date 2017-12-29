@@ -23,6 +23,11 @@ function afterDestroyHide(selector_id, kind){
   $(".benefits #"+selector_id+" .add-more-link-"+kind).addClass('hidden');
 };
 
+// Input Masks
+$(document).find(".phone_number").mask("(999) 999-9999");
+$(document).find(".zip").mask("99999");
+$(document).find(".fien_field").mask("99-9999999");
+
 $(document).ready(function() {
   if ($('.benefit-kinds').length) {
     $(window).bind('beforeunload', function(e) {
@@ -108,10 +113,9 @@ $(document).ready(function() {
       var benefitEl = $(this).parents('.benefit');
       benefitEl.find('.benefit-show').addClass('hidden');
       benefitEl.find('.edit-benefit-form').removeClass('hidden');
-      startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
-
-      //$(clonedForm).find('select').selectric();
+      benefitEl.find('select').selectric();
       $(benefitEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
     });
 
 
@@ -267,5 +271,42 @@ $(document).ready(function() {
       })
     });
   }
+    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_phone_full_phone_number', function (e) {
+        var key = e.which || e.keyCode || e.charCode;
+        $(this).attr('maxlength', '10');
+        return (key == 8 ||
+            key == 9 ||
+            key == 46 ||
+            (key >= 37 && key <= 40) ||
+            (key >= 48 && key <= 57) ||
+            (key >= 96 && key <= 105) );
+
+    });
+
+
+
+    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_address_zip', function (e) {
+        var key = e.which || e.keyCode || e.charCode;
+        $(this).attr('maxlength', '5');
+        return (key == 8 ||
+            key == 9 ||
+            key == 46 ||
+            (key >= 37 && key <= 40) ||
+            (key >= 48 && key <= 57) ||
+            (key >= 96 && key <= 105) );
+    });
+
+    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_id', function (e) {
+        var key = e.which || e.keyCode || e.charCode;
+        $(this).attr('maxlength', '9');
+        return (key == 8 ||
+            key == 9 ||
+            key == 46 ||
+            (key >= 37 && key <= 40) ||
+            (key >= 48 && key <= 57) ||
+            (key >= 96 && key <= 105) );
+
+    });
+    
 });
 
