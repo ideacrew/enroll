@@ -31,11 +31,9 @@ module SponsoredBenefits
     end
 
     def update
-      #init_organization(organization_params)
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
       pdo.assign_attributes(organization_params)
       ola = organization_params[:office_locations_attributes]
-      #pdo.office_locations = [] if ola.blank?
 
       if ola.blank?
         flash[:error] = "Prospect Employer must have one Primary Office Location."
@@ -47,7 +45,6 @@ module SponsoredBenefits
         init_organization(organization_params)
         render :edit
       end
-      #binding.pry
     end
 
     def destroy
