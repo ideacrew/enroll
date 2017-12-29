@@ -4,10 +4,20 @@ module SponsoredBenefits
     include DataTablesAdapter
 
     before_action :load_plan_design_organization, except: [:destroy]
-    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy]
+    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish_quote]
 
     def index
       @datatable = effective_datatable
+    end
+
+    def publish_quote
+      if @plan_design_proposal.may_publish?
+        @plan_design_proposal.publish!
+        flash[:notice] = "Quote Published"
+      else
+        flash[:error] = "Quote failed to publish.".html_safe
+        redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
+      end
     end
 
     def new
