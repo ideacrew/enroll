@@ -12,9 +12,12 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
   end
 
   def deliver
+    append_hbe
     build
     generate_pdf_notice
-    prepend_envelope
+    attach_blank_page(notice_path)
+    attach_non_discrimination
+    attach_taglines
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
