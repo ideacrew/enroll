@@ -120,7 +120,7 @@ When(/^Admin enters the information needed$/) do
 end
 
 When(/^Employer staff clicks employees tab$/) do
-  find('.interaction-click-control-employees').trigger('click')
+  find('.interaction-click-control-employees').click
 end
 
 Then (/^Employer staff should employees coverage status as canceled$/) do

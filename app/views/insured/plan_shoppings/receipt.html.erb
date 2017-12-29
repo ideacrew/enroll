@@ -7,7 +7,7 @@
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
-          <h1>Enrollment Submitted</h1>
+          <h1 class="darkblue">Enrollment Submitted</h1>
           <p>Your enrollment has been submitted as of <%= format_datetime(@enrollment.updated_at) %>.</p>
           <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
           <% if @enrollment.employee_role.present? %>

@@ -10,7 +10,7 @@
   <% end %>
   <%= render 'sep_message' if @active_admin_sep.present? %>
   <div class="my-account-page">
-    <h1>My <%= site_short_name %></h1>
+    <h1><%= l10n("my_site_short_name", site_short_name: site_short_name) %></h1>
   </div>
   <div class="row">
     <div class="col-md-8">
