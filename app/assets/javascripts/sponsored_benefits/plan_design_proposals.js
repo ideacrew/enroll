@@ -89,6 +89,7 @@ function carrierSelected() {
 }
 
 function planSelected() {
+  formatRadioButtons();
   toggleSliders($("#elected_plan_kind").val());
 
   var reference_plan_id = $(this).siblings('input').val();
@@ -121,7 +122,6 @@ function setSliderDisplayVal(slideEvt) {
   $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
   $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   calcEmployerContributions();
-
 }
 
 function toggleSliders(plan_kind) {
@@ -214,12 +214,11 @@ function initSlider() {
 }
 
 function formatRadioButtons() {
-  /*
   $('.fa-circle-o').each(function() {
     $(this).click(function() {
-      $(this).toggleClass('fa-dot-circle-o fa-circle-o');
-      console.log($(this).parent())
+      input = $(this).closest('div').find('input');
+      input.attr('checked', true)
     });
   })
-  */
+
 }
