@@ -43,40 +43,49 @@ families = Family.where({
   }
 })
 
+total_families = families.count
+offset_count = 0
+limit_count = 500
+processed_count = 0
+
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
-  families.each do |family|
-    begin
-      person = family.primary_applicant.person
+  while (offset_count <= total_families) do
+    families.offset(offset_count).limit(limit_count).each do |family|
+      begin
+        person = family.primary_applicant.person
 
-      hbx_enrollment_hbx_ids = valid_enrollment_hbx_ids(family)
-      hbx_enrollment_hbx_ids.compact!
-      role = person.consumer_role
+        hbx_enrollment_hbx_ids = valid_enrollment_hbx_ids(family)
+        hbx_enrollment_hbx_ids.compact!
+        role = person.consumer_role
 
-      if role.present? && hbx_enrollment_hbx_ids.present?
+        if role.present? && hbx_enrollment_hbx_ids.present?
 
-        event_kind = ApplicationEventKind.where(:event_name => event_name).first
-        notice_trigger = event_kind.notice_triggers.first
-        builder = notice_trigger.notice_builder.camelize.constantize.new(role, {
-                  template: notice_trigger.notice_template,
-                  subject: event_kind.title,
-                  event_name: event_name,
-                  options: {:hbx_enrollment_hbx_ids => hbx_enrollment_hbx_ids },
-                  mpi_indicator: notice_trigger.mpi_indicator,
-                  }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
+          event_kind = ApplicationEventKind.where(:event_name => event_name).first
+          notice_trigger = event_kind.notice_triggers.first
+          builder = notice_trigger.notice_builder.camelize.constantize.new(role, {
+                    template: notice_trigger.notice_template,
+                    subject: event_kind.title,
+                    event_name: event_name,
+                    options: {:hbx_enrollment_hbx_ids => hbx_enrollment_hbx_ids },
+                    mpi_indicator: notice_trigger.mpi_indicator,
+                    }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
+          processed_count = processed_count + 1
+          @logger.info "#{event_name} generated to family with primary_person: #{person.hbx_id}" unless Rails.env.test?
 
-        @logger.info "#{event_name} generated to family with primary_person: #{person.hbx_id}" unless Rails.env.test?
-
-        csv << [
-          person.hbx_id,
-          person.first_name,
-          person.last_name,
-          hbx_enrollment_hbx_ids
-        ]
+          csv << [
+            person.hbx_id,
+            person.first_name,
+            person.last_name,
+            hbx_enrollment_hbx_ids
+          ]
+        end
+      rescue Exception => e
+        @logger.error "Unable to deliver #{event_name} to family with PrimaryPerson: #{person.hbx_id} due to the following error #{e.backtrace}" unless Rails.env.test?
       end
-    rescue Exception => e
-      @logger.error "Unable to deliver #{event_name} to family with PrimaryPerson: #{person.hbx_id} due to the following error #{e.backtrace}" unless Rails.env.test?
     end
+    @logger.info " #{offset_count} number of families processed at this point." unless Rails.env.test?
+    offset_count = offset_count + limit_count
   end
-  @logger.info "End of the scirpt" unless Rails.env.test?
+  @logger.info "End of the script. #{processed_count} number of families processed." unless Rails.env.test?
 end
