@@ -31,16 +31,23 @@ module SponsoredBenefits
     end
 
     def update
+      #init_organization(organization_params)
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
       pdo.assign_attributes(organization_params)
+      ola = organization_params[:office_locations_attributes]
+      #pdo.office_locations = [] if ola.blank?
 
-      if pdo.save
+      if ola.blank?
+        flash[:error] = "Prospect Employer must have one Primary Office Location."
+        redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+      elsif pdo.save
         flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
         redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
       else
         init_organization(organization_params)
         render :edit
       end
+      #binding.pry
     end
 
     def destroy
@@ -76,7 +83,7 @@ module SponsoredBenefits
     end
 
     def organization_params
-      params.require(:organization).permit(
+      org_params = params.require(:organization).permit(
         :legal_name, :dba, :entity_kind, :sic_code,
         :office_locations_attributes => [
           {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
@@ -85,6 +92,12 @@ module SponsoredBenefits
           :is_primary
         ]
       )
+
+      if org_params[:office_locations_attributes].present?
+        org_params[:office_locations_attributes].delete_if {|key, value| value.blank?}
+      end
+
+      org_params
     end
 
     def get_sic_codes
