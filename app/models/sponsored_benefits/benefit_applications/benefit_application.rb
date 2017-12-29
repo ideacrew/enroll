@@ -67,13 +67,12 @@ module SponsoredBenefits
       end
 
       def effective_period=(new_effective_period)
-        ## this method does not exist so I am not sure what the intention is
-        # effective_range = SponsoredBenefits.tidy_date_range(new_effective_period, :effective_period)
+        effective_range = SponsoredBenefits.tidy_date_range(new_effective_period, :effective_period)
         write_attribute(:effective_period, new_effective_period) unless new_effective_period.blank?
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
-        #open_enrollment_range = SponsoredBenefits.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
+        open_enrollment_range = SponsoredBenefits.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
         write_attribute(:open_enrollment_period, new_open_enrollment_period) unless new_open_enrollment_period.blank?
       end
 
@@ -303,7 +302,7 @@ module SponsoredBenefits
 
 
       def open_enrollment_date_checks
-        return if effective_period.blank? || effective_period.blank? || open_enrollment_period.blank? || open_enrollment_period.blank?
+        return if effective_period.blank? || open_enrollment_period.blank?
 
         if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
           errors.add(:effective_period, "start date must be first day of the month")
