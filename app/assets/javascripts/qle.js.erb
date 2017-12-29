@@ -202,11 +202,21 @@ $(function () {
     }
   });
 
-  $(document).on('change', '#effective_on_option', function() {
-    if($(this).val() != ''){
-      $('#qle-submit-date :input[type="submit"]').attr('disabled', false);
+  $(document).on('submit', '.qle-detail-for-existing', function(e) {
+    if($('#effective_on_option').val() == ''){
+      $('#qle_effective_on_kind_alert').removeClass('hidden');
+      e.preventDefault()
     }else{
-      $('#qle-submit-date :input[type="submit"]').attr("disabled", true);
+      $('#qle_effective_on_kind_alert').addClass('hidden');
+    }
+  });
+
+  $(document).on('submit', '.qle-detail-for-existing-kind', function(e) {
+    if($('#qle_date').val() == ''){
+      $('#qle_effective_on_kind_alert-4').removeClass('hidden');
+      e.preventDefault()
+    }else{
+      $('#qle_effective_on_kind_alert-4').addClass('hidden');
     }
   });
 
