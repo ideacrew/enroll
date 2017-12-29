@@ -24,6 +24,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP1B',
     title: 'Request for Clarifying Documentation',
@@ -44,6 +45,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP1C',
     title: 'Approval of Employer SHOP Application after Request for Clarifying Documentation',
@@ -64,6 +66,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DIG002',
     title: 'Employer Approval Notice',
@@ -85,6 +88,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DIG003',
     title: 'Employer Denial Notice',
@@ -106,6 +110,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRG006',
     title: 'Plan Offerings Finalized',
@@ -127,6 +132,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRG007',
     title: 'Plan Offerings Finalized',
@@ -148,6 +154,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DAG087',
     title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
@@ -213,6 +220,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DAG008',
     title: 'Action Needed – Add all Eligible Employees to your Roster',
@@ -234,6 +242,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRE010',
     title: 'Your Health Plan Open Enrollment Period has Begun',
@@ -255,6 +264,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRE011',
     title: 'Your Health Plan Open Enrollment Period has Begun',
@@ -276,6 +286,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRG012',
     title: 'Your Health Plan Open Enrollment Period has Begun',
@@ -473,6 +484,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DIG022',
     title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
@@ -494,6 +506,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP21',
     title: 'Monthly Invoice Available Notice',
@@ -501,20 +514,21 @@ shop_notice_triggers = [
     resource_name: 'employer',
     event_name: 'employer_invoice_available',
     notice_triggers: [
-        {
-          name: 'Employer monthly invoice available in the account',
-          notice_template: 'notices/shop_employer_notices/employer_invoice_available_notice',
-          notice_builder: 'ShopEmployerNotices::EmployerInvoiceAvailable',
-          mpi_indicator: 'SHOP_D021',
-          notice_trigger_element_group: {
-              market_places: ['shop'],
-              primary_recipients: ["employer"],
-              primary_recipient_delivery_method: ["secure_message"],
-              secondary_recipients: []
-          }
+      {
+        name: 'Employer monthly invoice available in the account',
+        notice_template: 'notices/shop_employer_notices/employer_invoice_available_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerInvoiceAvailable',
+        mpi_indicator: 'SHOP_D021',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
         }
+      }
     ]
   },
+
   {
     hbx_id: 'DIG026',
     title: 'First Reminder to publish Application',
@@ -536,6 +550,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DIG029',
     title: 'Final Reminder to publish Application',
@@ -578,7 +593,7 @@ shop_notice_triggers = [
        }
      }
    ]
- },
+  },
 
   {
     hbx_id: 'DIG028',
@@ -601,6 +616,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRG025',
     title: 'Group Renewal – Final Reminder to Publish',
@@ -622,6 +638,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_D041',
     title: 'Employee Terminating coverage',
@@ -643,6 +660,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRG024',
     title: 'Group Renewal – Second Reminder to Publish',
@@ -664,6 +682,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRG023',
     title: 'Group Renewal – First Reminder to Publish',
@@ -685,6 +704,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DIG020',
     title: 'Group Ineligible to Obtain Coverage',
@@ -730,25 +750,25 @@ shop_notice_triggers = [
   },
 
   {
-      hbx_id: 'SHOP_D052',
-      title: 'Confirmation - Broker Fired',
-      description: 'Broker gets terminated after employer selects change broker',
-      resource_name: 'employer',
-      event_name: 'employer_broker_fired',
-      notice_triggers: [
-          {
-              name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
-              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
-              notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
-              mpi_indicator: 'SHOP_D052',
-              notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employer"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-              }
-          }
-      ]
+    hbx_id: 'SHOP_D052',
+    title: 'Confirmation - Broker Fired',
+    description: 'Broker gets terminated after employer selects change broker',
+    resource_name: 'employer',
+    event_name: 'employer_broker_fired',
+    notice_triggers: [
+      {
+        name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
+        notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
+        mpi_indicator: 'SHOP_D052',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]    
   },
 
   {
@@ -774,26 +794,26 @@ shop_notice_triggers = [
   },
 
   {
-        hbx_id: 'SHOP51',
-        title: 'You have been hired/removed as a broker',
-        description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
-        resource_name: 'broker_role',
-        event_name: 'broker_fired_confirmation_to_broker',
-        notice_triggers: [
-           {
-              name: 'Broker Fired',
-              notice_template: 'notices/shop_broker_notices/broker_fired_notice',
-              notice_builder: 'ShopBrokerNotices::BrokerFiredNotice',
-              mpi_indicator: 'SHOP_D051',
-              notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["broker"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-        ]
-    },
+    hbx_id: 'SHOP51',
+    title: 'You have been hired/removed as a broker',
+    description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
+    resource_name: 'broker_role',
+    event_name: 'broker_fired_confirmation_to_broker',
+    notice_triggers: [
+      {
+        name: 'Broker Fired',
+        notice_template: 'notices/shop_broker_notices/broker_fired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerFiredNotice',
+        mpi_indicator: 'SHOP_D051',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["broker"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 
   {
     hbx_id: 'SHOP10023',
@@ -882,6 +902,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_D037',
     title: 'Employee has made a change to their employer-sponsored coverage selection',
@@ -903,6 +924,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_D040',
     title: 'Employee has made a change to their employer-sponsored coverage selection',
@@ -924,6 +946,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'DRE038',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
@@ -1129,6 +1152,7 @@ shop_notice_triggers = [
     resource_name: 'employee_role',
     event_name: 'ee_sep_request_accepted_notice',
     notice_triggers: [
+      {
         name: 'EE SEP Requested Accepted',
         notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
         notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
