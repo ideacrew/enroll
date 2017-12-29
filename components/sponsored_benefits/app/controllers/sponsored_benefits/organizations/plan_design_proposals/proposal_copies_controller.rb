@@ -4,10 +4,10 @@ module SponsoredBenefits
 
       def create
         new_plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({ organization: plan_design_organization }.merge(plan_design_form.to_h))
-        existing_roster = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(plan_design_form.profile.benefit_sponsorships.first)
+        existing_roster = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(plan_design_form.proposal.profile.benefit_sponsorships.first)
 
         if new_plan_design_proposal.save
-          #assign_roster_employees(sponsorship: new_plan_design_proposal.profile.benefit_sponsorships.first, roster: existing_roster)
+          assign_roster_employees(sponsorship: new_plan_design_proposal.proposal.profile.benefit_sponsorships.first, roster: existing_roster)
           flash[:success] = "Proposal successfully copied"
         else
           flash[:error] = "Something went wrong"
@@ -33,7 +33,7 @@ module SponsoredBenefits
             ce.email = employee.email
             ce.benefit_sponsorship_id = sponsorship.id
           end
-          census_employee
+          census_employee.save!
         end
       end
 
