@@ -364,18 +364,18 @@ describe EmployerProfile, dbclean: :after_each do
 
     it "should return true if there are any employees who are not yet signed-up" do
       expect(census_employee.employee_role_id).to eq nil
-      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq true
+      expect(EmployerProfile.non_eligible_for_non_owner_enrollee_rule(plan_year, plan_year.employer_profile)).to eq true
     end
 
     it "should return true if any employee without enrolled exist" do
       census_employee.update_attributes(employee_role_id: employee_role.id)
-      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq true
+      expect(EmployerProfile.non_eligible_for_non_owner_enrollee_rule(plan_year, plan_year.employer_profile)).to eq true
     end
 
     it "it should return false when all employees are enrolled/waived" do
       enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id)
       census_employee.update_attributes(employee_role_id: employee_role.id)
-      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq false
+      expect(EmployerProfile.non_eligible_for_non_owner_enrollee_rule(plan_year, plan_year.employer_profile)).to eq false
     end
   end
 
