@@ -123,7 +123,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    notify_employer_when_employee_terminate_coverage(@hbx_enrollment)
   end
 
   def terminate
