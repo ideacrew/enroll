@@ -2,7 +2,14 @@ FactoryGirl.define do
   factory :plan_design_organization, class: 'SponsoredBenefits::Organizations::PlanDesignOrganization' do
     legal_name  "Turner Agency, Inc"
     dba         "Turner Brokers"
-    customer_profile_id "12345"
+
+    sequence :customer_profile_id do |n|
+      "12345#{n}"
+    end
+
+    sequence :owner_profile_id do |n|
+      "52345#{n}"
+    end
     
     fein do
       Forgery('basic').text(:allow_lower   => false,
@@ -15,9 +22,9 @@ FactoryGirl.define do
       [ build(:sponsored_benefits_office_location, :primary) ]
     end
 
-    trait :with_application do
+    trait :with_profile do
       after(:create) do |organization, evaluator|
-        create(:plan_design_profile, :with_application, plan_design_organization: organization)
+        create(:plan_design_proposal, :with_profile, plan_design_organization: organization)
       end
     end
   end

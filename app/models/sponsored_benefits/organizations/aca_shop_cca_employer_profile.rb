@@ -5,6 +5,8 @@ module SponsoredBenefits
       
       field  :sic_code, type: String
       embeds_one  :employer_attestation
+      embedded_in :plan_design_proposal, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
+
       after_initialize :initialize_benefit_sponsorship
 
       def primary_office_location
