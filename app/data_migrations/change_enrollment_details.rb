@@ -23,9 +23,11 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     when "expire_coverage"
       expire_coverage
     when "expire_enrollment"
-      expire_enrollment
-    when "transfer_enrollment_from_glue_to_enroll"
-      transfer_enrollment_from_glue_to_enroll
+      expire_enrollment(enrollments)
+    when "change_plan"
+      change_plan(enrollments)
+    when "change_benefit_group"
+      change_benefit_group(enrollments)
     end
   end
 
@@ -50,8 +52,35 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     end
   end
 
+<<<<<<< HEAD
   def revert_termination
     @enrollments.each do |enrollment|
+=======
+  def change_plan(enrollments)
+    if ENV['new_plan_id'].blank?
+      raise "Input required: plan id" unless Rails.env.test?
+    end
+    new_plan_id = ENV['new_plan_id']
+    enrollments.each do |enrollment|
+      enrollment.update_attributes!(:plan_id => new_plan_id)
+      puts "Changed Enrollment's plan to #{new_plan_id}" unless Rails.env.test?
+    end
+  end
+
+  def change_benefit_group(enrollments)
+    if ENV['new_benefit_group_id'].blank?
+      raise "Input required: benefit group id" unless Rails.env.test?
+    end
+    new_benefit_group_id = ENV['new_benefit_group_id']
+    enrollments.each do |enrollment|
+      enrollment.update_attributes!(:benefit_group_id => new_benefit_group_id)
+      puts "Changed Enrollment's benefit group to #{new_benefit_group_id}" unless Rails.env.test?
+    end
+  end
+
+  def revert_termination(enrollments)
+    enrollments.each do |enrollment|
+>>>>>>> origin/data-17952
       state = enrollment.aasm_state
       if enrollment.is_shop?
         enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")

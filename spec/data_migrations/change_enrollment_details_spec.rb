@@ -31,6 +31,8 @@ describe ChangeEnrollmentDetails do
     let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
     let(:term_enrollment2) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
     let(:term_enrollment3) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household, kind: "individual")}
+    let(:new_plan) { FactoryGirl.create(:plan) }
+    let(:new_benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return("#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}")
@@ -162,6 +164,34 @@ describe ChangeEnrollmentDetails do
 
       it "should expire the enrollment" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
+      end
+    end
+
+    context "change the plan of enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("new_plan_id").and_return(new_plan.id)
+        allow(ENV).to receive(:[]).with("action").and_return "change_plan"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should change the plan of enrollment" do
+        expect(hbx_enrollment.plan_id).to eq new_plan.id
+      end
+    end
+
+    context "change the benefit group of enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("new_benefit_group_id").and_return(new_benefit_group.id)
+        allow(ENV).to receive(:[]).with("action").and_return "change_benefit_group"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should change the benefit group of enrollment" do
+        expect(hbx_enrollment.benefit_group_id).to eq new_benefit_group.id
       end
     end
   end
