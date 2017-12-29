@@ -7,6 +7,7 @@ site:
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
   website_name: "www.DCHealthLink.com"
+  forms: "https://dchealthlink.com/forms"
   website_url: "www.healthcare.gov"
 
   social_media:
@@ -36,6 +37,8 @@ aca:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
+    verification_due:
+      days: 95
 
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>

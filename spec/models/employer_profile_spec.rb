@@ -352,6 +352,20 @@ describe EmployerProfile, dbclean: :after_each do
   context "has hired a broker" do
   end
 
+  context "trigger employer_invoice_available" do
+    let(:params)  { {} }
+    let(:employer_profile) {EmployerProfile.new(**params)}
+    it "should trigger renewal_notice job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.trigger_notices("employer_invoice_available")
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'employer_invoice_available']
+    end
+  end
+
   context "has employees that have enrolled in coverage" do
     let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
     let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
@@ -505,6 +519,8 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
+      expect(employer).to receive(:employer_broker_fired)
+      employer.employer_broker_fired
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
@@ -882,6 +898,18 @@ describe EmployerProfile, "Renewal Queries" do
     it 'should return organizations for renewal' do
       months_prior = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
       expect(EmployerProfile.organizations_eligible_for_renewal(Date.new(calender_year+1, 2, 1)).to_a).to eq [organization2]
+    end
+  end
+
+  context '.organizations_for_low_enrollment_notice', dbclean: :after_each do
+    let(:date) { TimeKeeper.date_of_record }
+    let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
+    let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
+    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
+    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
+
+    it 'should return organizations elgible low enrollment notice' do
+      expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
     end
   end
 end
