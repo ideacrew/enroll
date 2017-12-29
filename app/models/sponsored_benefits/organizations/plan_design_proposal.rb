@@ -5,6 +5,8 @@ module SponsoredBenefits
       include Mongoid::Timestamps
       include AASM
 
+      RENEWAL_STATES = %w(renewing_draft renewing_published renewing_claimed renewing_expired)
+
       embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
       field :title, type: String
@@ -21,10 +23,10 @@ module SponsoredBenefits
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"title" => Regexp.compile(Regexp.escape(query), true)}])}) }
       ## TODO: how are we defining 'initial' vs 'renewing'?
-      scope :initial, -> { all }
-      scope :renewing, -> { none }
-      scope :draft, -> { where(aasm_state: 'draft') }
-      scope :published, -> { where(aasm_state: 'published') }
+      scope :initial, -> { not_in(aasm_state: RENEWAL_STATES) }
+      scope :renewing, ->{ any_in(aasm_state: RENEWAL_STATES) }
+      scope :draft, -> { any_in(aasm_state: %w(draft renewing_draft)) }
+      scope :published, -> { any_in(aasm_state: %w(published renewing_published)) }
       scope :expired, -> { where(:'effective_date'.lt => TimeKeeper.date_of_record) }
 
       def self.find(id)
@@ -57,6 +59,10 @@ module SponsoredBenefits
         state :published
         state :claimed
         state :expired
+        state :renewing_draft
+        state :renewing_published
+        state :renewing_claimed
+        state :renewing_expired
 
         event :publish do
           transitions from: :draft, to: :published, :guard => "can_quote_be_published?", after: :set_employer_claim_code
