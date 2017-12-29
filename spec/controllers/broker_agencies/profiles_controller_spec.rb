@@ -414,7 +414,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    let!(:params) { {recipient: general_agency_profile, event_object: broker_agency_profile, notice_event: "ga_hire_notice"} }
     before :each do
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
@@ -423,12 +422,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
-    end
-
-    it "should trigger notice when default_general_agency_profile is set" do
-      sign_in user
-      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(params).and_return(true)
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
     end
 
     it "should clear default general_agency_profile" do
