@@ -7,8 +7,6 @@ module SponsoredBenefits
       attr_accessor :office_locations
       attr_accessor :contact_method
 
-      include ::Forms::FnameLname
-
       validates_presence_of :legal_name, :sic_code
       validate :office_location_validations
       validate :office_location_kinds
