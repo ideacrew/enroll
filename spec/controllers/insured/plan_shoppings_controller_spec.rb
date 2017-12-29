@@ -161,6 +161,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(enrollment).to receive(:employee_role).and_return(double)
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(enrollment).to receive(:ee_plan_selection_confirmation_sep_new_hire).and_return(true)
     end
 
     it "returns http success" do
@@ -299,6 +300,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       sign_in(user)
       allow(hbx_enrollment).to receive(:census_employee).and_return(double)
       allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
+      allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end
