@@ -3,7 +3,7 @@
     <% if defined?(@applicant) %>
       <li class="activer list-box step-tabs no-hover global-nav">
         <a href="<%= edit_financial_assistance_application_path(@application) %>">
-          <i class="fa fa-arrow-circle-left white-font" aria-hidden="true"></i>
+          <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
           My Household</a>
       </li>
       <li class="activer list-box step-tabs income-style no-hover">
@@ -15,62 +15,76 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav bd-top">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
             <% if @applicant.tax_info_complete? %>
-              <span class="fa fa-check applicant-check"></span> &nbsp
+              <div class="col-md-2 row fa fa-check applicant-check"></div>
+              <div class="col-md-offset-2 col-md-8 p0"> Tax Info </div>
+            <% else %>
+              <div class="pdl20"> Job Income </div>
             <% end %>
-            Tax Info
           <% end %>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:income)%>
-              <span class="fa fa-check applicant-check"></span> &nbsp
+              <div class="col-md-2 row fa fa-check applicant-check"></div>
+              <div class="col-md-offset-2 col-md-8 p0"> Job Income </div>
+            <% else %>
+              <div class="pdl20"> Job Income </div>
             <% end %>
-            Job Income
           <% end %>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %> applicant-nav">
           <%= link_to other_financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
-              <span class="fa fa-check applicant-check"></span> &nbsp
+              <div class="col-md-2 row fa fa-check applicant-check"></div>
+              <div class="col-md-offset-2 col-md-8 p0"> Other Income </div>
+            <% else %>
+              <div class="pdl20"> Other Income </div>
             <% end %>
-            Other Income
           <% end %>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
-              <span class="fa fa-check applicant-check"></span> &nbsp
+              <div class="col-md-2 row fa fa-check applicant-check ln-ht-nav"></div>
+              <div class="col-md-offset-2 col-md-8 p0"> Income Adjustments </div>
+            <% else %>
+              <div class="pdl20"> Income Adjustments </div>
             <% end %>
-            Income Adjustments
           <%end%>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
-              <span class="fa fa-check applicant-check"></span> &nbsp
+              <div class="col-md-2 row fa fa-check applicant-check ln-ht-nav"></div>
+              <div class="col-md-offset-2 col-md-8 p0"> Health Coverage </div>
+            <% else %>
+              <div class="pdl20"> Health Coverage </div>
             <% end %>
-            Health Coverage
           <% end %>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %> applicant-nav">
           <%= link_to other_questions_financial_assistance_application_applicant_path(@application, @applicant) do %>
             <% if @applicant.other_questions_complete? %>
-              <span class="fa fa-check applicant-check"></span> &nbsp
+              <div class="col-md-2 row fa fa-check applicant-check ln-ht-nav"></div>
+              <div class="col-md-offset-2 col-md-8 p0"> Other Questions </div>
+            <% else %>
+              <div class="pdl20"> Other Questions </div>
             <% end %>
-            Other Questions
           <% end %>
         </li>
       </ul>
     <% else %>
       <li class="activer list-box step-tabs no-hover global-nav">
+
+
         <a href="<%= financial_assistance_applications_path %>">
-          <i class="fa fa-arrow-circle-left white-font" aria-hidden="true"></i>
-          View My Applications
+          <i class="fa fa-arrow-circle-left white-font previous-icon" aria-hidden="true"></i>
+          <div class="view-nav-app float-left"> View My Applications </div>
         </a>
       </li>
 
