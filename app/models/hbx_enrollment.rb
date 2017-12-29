@@ -9,6 +9,7 @@ class HbxEnrollment
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include Mongoid::History::Trackable
 
   embedded_in :household
   embeds_many :comments, as: :commentable, cascade_callbacks: true
@@ -114,6 +115,22 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
+  track_history   :on => [:kind,
+                          :enrollment_kind,
+                          :coverage_kind,
+                          :effective_on,
+                          :terminated_on,
+                          :terminate_reason,
+                          :aasm_state,
+                          :is_active,
+                          :waiver_reason,
+                          :review_status,
+                          :special_verification_period,
+                          :termination_submitted_on],
+                  :track_create  => true,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => true     # track document destruction, default is false
+
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
@@ -128,6 +145,8 @@ class HbxEnrollment
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
+  scope :by_created_datetime_range,  ->(start_at, end_at){ where(:created_at => { "$gte" => start_at, "$lte" => end_at} )}
+  scope :by_submitted_datetime_range,  ->(start_at, end_at){ where(:submitted_at => { "$gte" => start_at, "$lte" => end_at} )}
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :by_hbx_id,            ->(hbx_id) { where(hbx_id: hbx_id) }
@@ -369,7 +388,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).first
+    HbxEnrollment.find(predecessor_enrollment_id)
   end
 
   def census_employee
@@ -476,13 +495,19 @@ class HbxEnrollment
       if enrollment.effective_on > TimeKeeper.date_of_record
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future active
       else
-        enrollment.schedule_coverage_termination! if enrollment.may_waive_coverage? || enrollment.may_terminate_coverage? # terminate coverage if enrollment is already active
+        enrollment.schedule_coverage_termination!(self.effective_on.prev_day) if enrollment.may_schedule_coverage_termination?
       end
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?
       benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
     end
     return true
+  end
+
+  def propagate_renewal
+    if is_shop? && coverage_kind == 'health'
+      benefit_group_assignment.renew_coverage! if benefit_group_assignment.may_renew_coverage?
+    end
   end
 
   def waive_coverage_by_benefit_group_assignment(waiver_reason)
@@ -532,12 +557,6 @@ class HbxEnrollment
     # TODO: gereate or update passive renewal
   end
 
-  def propagate_reinstate(edi_required = false)
-    if edi_required
-      # Transmit edi
-    end
-  end
-
   def propagate_selection
     if is_shop?
       update_existing_shop_coverage
@@ -561,11 +580,9 @@ class HbxEnrollment
 
   def update_renewal_coverage
     if is_applicable_for_renewal?
-
       if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
         return
       end
-
       employer = benefit_group.plan_year.employer_profile
       if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
         begin
@@ -573,6 +590,16 @@ class HbxEnrollment
         rescue Exception => e
           Rails.logger.error { e }
         end
+      end
+    end
+  end
+
+  def trigger_waiver_confirmation_notice
+    if is_shop_sep?
+      begin
+        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "waiver_confirmation_notice")
+      rescue Exception => e
+        Rails.logger.error {"Unable to deliver waiver_confirmation_notice to employee #{self.census_employee.full_name} due to #{e}"} unless Rails.env.test?
       end
     end
   end
@@ -652,6 +679,22 @@ class HbxEnrollment
       self.benefit_group.employer_profile
     else
       nil
+    end
+  end
+
+  def mid_year_plan_change_notice
+    if self.census_employee.present?
+      begin
+        if (self.enrollment_kind != "open_enrollment" || self.census_employee.new_hire_enrollment_period.present?)
+          if self.benefit_group.is_congress
+            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
+          else
+            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_non_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
+          end
+        end
+      rescue Exception => e
+        Rails.logger.error {"Unable to send employee mid year plan change notice to census_employee - #{census_employee.id} due to #{e.backtrace}"}
+      end
     end
   end
 
@@ -842,7 +885,7 @@ class HbxEnrollment
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
       special_enrollment_id = family.current_special_enrollment_periods.first.id
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
@@ -1090,6 +1133,19 @@ class HbxEnrollment
       :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
   end
 
+  def notify_of_coverage_start(publish_to_carrier)
+    config = Rails.application.config.acapi
+    notify(
+      "acapi.info.events.hbx_enrollment.coverage_selected",
+      {
+        :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+        "hbx_enrollment_id" => self.hbx_id,
+        "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#initial",
+        "is_trading_partner_publishable" => publish_to_carrier
+      }
+    )
+  end
+
   def reinstate(edi: false)
     return if reinstated_enrollment_exists?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
@@ -1101,7 +1157,11 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!(edi)
+      # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+      # Move reinstated enrollment to "coverage enrolled" status if coverage begins
+      reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
+      reinstate_enrollment.notify_of_coverage_start(edi)
     end
 
     reinstate_enrollment
@@ -1132,7 +1192,6 @@ class HbxEnrollment
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
-
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).enrolled_and_renewing.to_a
@@ -1184,7 +1243,7 @@ class HbxEnrollment
     state :coverage_reinstated    # coverage reinstated
 
     state :coverage_expired
-    state :inactive, :after_enter => :update_renewal_coverage   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
+    state :inactive, :after_enter => [:update_renewal_coverage, :trigger_waiver_confirmation_notice]   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
 
     # Verified Lawful Presence (VLP) flags
     state :unverified
@@ -1206,8 +1265,8 @@ class HbxEnrollment
     # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
-      transitions from: :shopping, to: :auto_renewing
-      transitions from: :enrolled_contingent, to: :auto_renewing_contingent
+      transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
+      transitions from: :enrolled_contingent, to: :auto_renewing_contingent, after: :propagate_renewal
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1273,7 +1332,23 @@ class HbxEnrollment
                   to: :coverage_canceled
     end
 
+    event :cancel_for_non_payment, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
+                         :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
+                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
+                         :coverage_enrolled, :renewing_waived, :inactive],
+                  to: :coverage_canceled
+    end
+
     event :terminate_coverage, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
+                         :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
+                         :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
+                         :enrolled_contingent, :unverified],
+                  to: :coverage_terminated, after: :propogate_terminate
+    end
+
+    event :terminate_for_non_payment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
@@ -1321,7 +1396,7 @@ class HbxEnrollment
     end
 
     event :reinstate_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_reinstated, after: :propagate_reinstate
+      transitions from: :shopping, to: :coverage_reinstated
     end
   end
 
@@ -1385,7 +1460,16 @@ class HbxEnrollment
       return special_enrollment_period.qualifying_life_event_kind.reason
     end
     return "open_enrollment" if !is_shop?
+    if is_shop? && is_cobra_status?
+      if cobra_eligibility_date == effective_on
+        return "employer_sponsored_cobra"
+      end
+    end
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
+  end
+
+  def cobra_eligibility_date
+    employee_role.census_employee.cobra_begin_date
   end
 
   def check_for_renewal_event_kind
@@ -1407,6 +1491,7 @@ class HbxEnrollment
       return special_enrollment_period.qle_on
     end
     return nil if !is_shop?
+    return self.employee_role.census_employee.cobra_begin_date if is_shop? && is_cobra_status?
     new_hire_enrollment_for_shop? ? benefit_group_assignment.census_employee.hired_on : nil
   end
 
@@ -1416,6 +1501,7 @@ class HbxEnrollment
       return true
     end
     return false unless is_shop?
+    return true if is_shop? && is_cobra_status?
     new_hire_enrollment_for_shop?
   end
 
@@ -1436,7 +1522,7 @@ class HbxEnrollment
 
   def set_submitted_at
     if submitted_at.blank?
-      write_attribute(:submitted_at, TimeKeeper.date_of_record)
+      write_attribute(:submitted_at, Time.now)
     end
   end
 
@@ -1495,9 +1581,44 @@ class HbxEnrollment
   end
 
   def ee_select_plan_during_oe
-    if is_shop? && self.census_employee.present? && self.enrollment_kind == "open_enrollment"
-      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe")
+    if self.census_employee.present?
+      begin
+        self.census_employee.update_attributes!(employee_role_id: self.employee_role.id.to_s ) if !census_employee.employee_role.present?
+        if self.employee_role.is_under_open_enrollment? && self.enrollment_kind == "open_enrollment"
+          ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s)
+        end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employee plan selection during OE notice to #{self.census_employee.id.to_s} due to #{e.backtrace}" }
+      end
     end
+  end
+
+  def ee_plan_selection_confirmation_sep_new_hire
+    if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
+      if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
+        begin
+          census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
+        rescue Exception => e
+          (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
+        end
+      end
+    end
+  end
+
+  def notify_employee_confirming_coverage_termination
+    if is_shop? && census_employee.present?
+      begin 
+        census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s) 
+      rescue Exception => e
+        (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) 
+      end
+    end 
+  end
+
+  def is_reinstated_enrollment?
+    self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}
   end
 
   private

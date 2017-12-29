@@ -6,11 +6,11 @@ describe UploadNoticeToEmployerAccount, dbclean: :after_each do
   let(:given_task_name) { "upload_notice_to_employer_account" }
   subject { UploadNoticeToEmployerAccount.new(given_task_name, double(:current_scope => nil)) }
   let!(:organization)      { FactoryGirl.create(:organization)}
-  let!(:plan_year)         { FactoryGirl.create(:plan_year)}
   let(:bucket_name) { 'notices' }
   let(:file_path) { File.dirname(__FILE__) }
   let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key" }
-  let!(:employer_profile)  { FactoryGirl.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
+  let!(:employer_profile)  { FactoryGirl.create(:employer_profile, organization: organization)}
+  let!(:plan_year)         { FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
 
   before(:each) do
     allow(ENV).to receive(:[]).with('fein').and_return(organization.fein)

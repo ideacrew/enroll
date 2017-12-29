@@ -144,6 +144,7 @@ class EmployerProfile
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_broker_agency(terminate_on)
+      fire_general_agency!(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
@@ -253,6 +254,7 @@ class EmployerProfile
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
+    self.trigger_notices("general_agency_terminated")
   end
   
   def remove_general_agency_when_broker_decertified!(terminate_on = TimeKeeper.datetime_of_record)
@@ -271,7 +273,15 @@ class EmployerProfile
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
-# TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
+  def has_premium_payments?
+    try(:employer_profile_account).try(:premium_payments) ? true : false
+  end
+
+  def premium_payments
+    try(:employer_profile_account).try(:premium_payments) || nil
+  end
+
+  # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size
     @roster_size = census_employees.active.size
@@ -307,8 +317,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present?
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present?
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -742,7 +752,7 @@ class EmployerProfile
             plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
             #exclude congressional employees
             next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+            if non_eligible_for_min_participation(plan_year) || non_eligible_for_non_owner_enrollee_rule(plan_year)
               organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
             end
           rescue Exception => e
@@ -877,6 +887,27 @@ class EmployerProfile
         plan_year
       end
     end
+  end
+
+  def non_eligible_for_min_participation(plan_year)
+    plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+  end
+
+  def non_eligible_for_non_owner_enrollee_rule(plan_year)
+    non_owner_employees = census_employees.active.non_business_owner
+    # Account not linked - which means not enrolled
+    return true if non_owner_employees.where(:"employee_role_id" => nil).present?
+    non_owner_employees.each do |census_employee|
+      begin
+        next if census_employee.employee_termination_pending? && census_employee.employment_terminated_on <= plan_year.start_on
+        return true if census_employee.employee_role.person.primary_family.blank?
+        enrolled = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.non_expired_and_non_terminated.map(&:benefit_group_id) & plan_year.benefit_groups.map(&:id)
+        return true if enrolled.blank?
+      rescue Exception => e
+        Rails.logger.error { "Issues with #{census_employee.id} on #{organization.legal_name} due to #{e}" }
+      end
+    end
+    return false
   end
 
   def self.transmit_scheduled_employers(new_date, feins=[])
@@ -1053,22 +1084,25 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        initial_employee_plan_selection_confirmation(id)
+        self.initial_employee_plan_selection_confirmation(id)
       end
     end
   end
 
-  def initial_employee_plan_selection_confirmation(id)
+  def self.initial_employee_plan_selection_confirmation(id)
     begin
       employer = Organization.find(id).employer_profile
-      census_employees = employer.census_employees.active if employer.is_new_employer?
-      census_employees.each do |ce|
-        if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer.active_plan_year.start_on
-          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+      plan_year = employer.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first
+      if employer.is_new_employer? && plan_year.present?
+        census_employees = employer.census_employees.active
+        census_employees.each do |ce|
+          if ce.active_benefit_group_assignment.hbx_enrollment.present? && (ce.active_benefit_group_assignment.hbx_enrollment.effective_on == plan_year.start_on)
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+          end
         end
       end
     rescue Exception => e
-      (Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation from organization #{id} due to #{e}"}) unless Rails.env.test?
+      Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{employer.legal_name} due to #{e.backtrace}"}
     end
   end
 

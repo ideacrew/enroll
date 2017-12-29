@@ -317,7 +317,7 @@ QuotePageLoad = (function() {
         $('#dental-nationwide').find('.active1').each(function(){
          nationwide.push(this.id)
         })
-        quote = $('#quote').val()
+
         $.ajax({
           type: 'GET',
           url: '/broker_agencies/broker_roles/'+$('#broker_role_id').val()+'/quotes/dental_plans_data/',
@@ -327,7 +327,7 @@ QuotePageLoad = (function() {
             plan_type: plan_type,
             dc_network: dc_network,
             nationwide: nationwide,
-            quote: quote
+            id: window.location.href.split("/").pop()
           },
           success: function(response) {
             $('#dental_plan_container').html(response)

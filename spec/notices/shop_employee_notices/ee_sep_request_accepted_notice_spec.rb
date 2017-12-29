@@ -17,7 +17,7 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'EE SEP Requested Accepted',
-                            :notice_template => 'notices/ee_sep_request_accepted_notice',
+                            :notice_template => 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
                             :notice_builder => 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
                             :event_name => 'ee_sep_request_accepted_notice',
                             :mpi_indicator => 'MPI_SHOP36',
@@ -79,8 +79,11 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
       @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
       sep1.qle_on = qle_on
       sep1.end_on = end_on
-      sep1.title = "rspec"
+      sep1.title = "had a baby"
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      @employee_notice.append_data
+      @employee_notice.build
+      @employee_notice.generate_pdf_notice
     end
 
     it "should append data" do
@@ -88,7 +91,17 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
       @employee_notice.append_data
       expect(@employee_notice.notice.sep.qle_on).to eq qle_on
       expect(@employee_notice.notice.sep.end_on).to eq end_on
-      expect(@employee_notice.notice.sep.title).to eq "rspec"
+      expect(@employee_notice.notice.sep.title).to eq "had a baby"
+    end
+
+    it "should render ee_sep_request_accepted_notice" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/ee_sep_request_accepted_notice"
+    end
+
+    it "should generate pdf" do
+      @employee_notice.build
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 end

@@ -12,8 +12,7 @@ Feature: Create Employee Roster
     When the broker selects employer type
     And broker enters valid information
     When the broker clicks on the Save Changes button
-
-
+    Then the broker should see a successful message
 
   Scenario: Broker should be able to add employees to the employee roster using Upload Employee Roster button
     Given that a broker exists

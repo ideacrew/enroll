@@ -21,9 +21,9 @@
             </tr>
           </thead>
 
-          <% @enrollments.each do |enrollment| %>
+          <% @enrollments.each_with_index do |enrollment, index| %>
             <tr>
-              <td> <%= radio_button_tag("enrollment_id", enrollment.id, nil) %> </td>
+              <td> <%= radio_button_tag("enrollment_id", enrollment.id, (index.zero? ? true : false)) %> </td>
               <td id="name"><%= enrollment.plan.name %> </td>
               <td><%= enrollment.kind.camelcase %></td>
               <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>

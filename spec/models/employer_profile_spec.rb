@@ -134,7 +134,8 @@ describe EmployerProfile, dbclean: :after_each do
         ActiveJob::Base.queue_adapter.enqueued_jobs = []
         census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
         hbx_enrollment.save!
-        employer_profile1.initial_employee_plan_selection_confirmation(organization.id)
+        employer_profile1.plan_years.first.update_attributes!(:aasm_state => "enrolled")
+        EmployerProfile.update_status_to_binder_paid([organization.id])
         queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
           job_info[:job] == ShopNoticesNotifierJob
         end
@@ -373,6 +374,36 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
+  context "#non_eligible_for_non_owner_enrollee_rule" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:plan_year) { FactoryGirl.create(:future_plan_year) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: plan_year.employer_profile,
+      person: family.primary_applicant.person)}
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+
+    before do
+      census_employee.update_attributes(employer_profile_id: plan_year.employer_profile.id)
+      allow(plan_year).to receive(:benefit_groups).and_return [double("BG", id: "id")]
+    end
+
+    it "should return true if there are any employees who are not yet signed-up" do
+      expect(census_employee.employee_role_id).to eq nil
+      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq true
+    end
+
+    it "should return true if any employee without enrolled exist" do
+      census_employee.update_attributes(employee_role_id: employee_role.id)
+      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq true
+    end
+
+    it "it should return false when all employees are enrolled/waived" do
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id)
+      census_employee.update_attributes(employee_role_id: employee_role.id)
+      expect(plan_year.employer_profile.non_eligible_for_non_owner_enrollee_rule(plan_year)).to eq false
+    end
+  end
+
   context "has hired a broker" do
   end
 
@@ -454,7 +485,7 @@ end
 
 describe EmployerProfile, "given an unlinked, linkable census employee with a family" do
   let(:census_dob) { Date.new(1983,2,15) }
-  let(:census_ssn) { "123456789" }
+  let(:census_ssn) { "123416789" }
 
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
   let(:plan_year) { benefit_group.plan_year }
@@ -572,6 +603,24 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker.size).to eq 2
       expect(employers_with_broker7.size).to eq 1
+    end
+
+    it "should send notification to GA when the broker is terminated on hiring other broker by employer" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer =  organization5.create_employer_profile(entity_kind: "partnership");
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      FactoryGirl.create(:general_agency_account, employer_profile: employer, aasm_state: 'active')
+      
+      employer = Organization.find(employer.organization.id).employer_profile
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
+      queued_job = []
+      queued_job << ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[0][3][:args]).to eq [employer.id.to_s, 'general_agency_terminated']
     end
 
     it 'works with multiple broker_agency_contacts'  do
@@ -1018,6 +1067,20 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
       expect(employer_profile.general_agency_accounts.active.count).to eq 2
       employer_profile.fire_general_agency!
+      expect(employer_profile.active_general_agency_account.blank?).to eq true
+    end
+
+    it "when with active general agency profile must send notification on broker termination" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.active_general_agency_account.blank?).to eq false
+      
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.fire_general_agency!
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'general_agency_terminated']
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end

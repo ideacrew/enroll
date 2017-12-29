@@ -78,8 +78,6 @@ RSpec.describe Employers::BrokerAgencyController do
       it "should be a success" do
         expect(flash[:notice]).to eq("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
-        expect(controller).to receive(:broker_hired_confirmation_notice)
-        controller.broker_hired_confirmation_notice
       end
     end
 
@@ -92,6 +90,32 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should be a success" do
         expect(flash[:error]).to match(/Access not allowed/)
+      end
+    end
+
+    context '#trigger notice' do
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile.id) }
+      let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+      let(:person) { broker_role.person }
+      let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+      let(:organization) { FactoryGirl.create(:organization) }
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, organization: organization) }
+      let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
+
+      it "should call general_agency_hired_notice trigger " do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in(@user)
+        post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role.id, broker_agency_id: broker_agency_profile.id
+        queued_job = []
+        queued_job << ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
+        expect(queued_job[0][1][:args].include?('general_agency_hired_notice')).to be_truthy
+        expect(queued_job[0][1][:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+        expect(queued_job[0][1][:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
       end
     end
   end

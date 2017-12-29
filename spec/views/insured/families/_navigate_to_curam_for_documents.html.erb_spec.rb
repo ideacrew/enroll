@@ -14,7 +14,7 @@ RSpec.describe "insured/families/_navigate_to_curam_for_documents.html.erb" do
     end
 
     it "should have a link" do
-      expect(rendered).to have_link('Medicaid & Tax Credits', href: "https://enroll.dchealthlink.com/saml/navigate_to_assistance")
+      expect(rendered).to have_link('Medicaid & Tax Credits')
     end
 
     it "should have text for documents" do

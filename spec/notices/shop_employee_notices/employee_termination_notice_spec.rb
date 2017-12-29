@@ -15,10 +15,6 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
       :event_name => application_event.event_name,
       :template => application_event.notice_template
   }}
-  let(:hbx_profile) {double}
-  let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
-  let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.next_year.year,11,1), open_enrollment_end_on: Date.new((TimeKeeper.date_of_record+2.years).year,1,31)) }
-  let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year.next_year, end_on: TimeKeeper.date_of_record.end_of_year.next_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31)) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -81,8 +77,6 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
 
   describe "append data" do
     before do
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
       @employee_notice = ShopEmployeeNotices::EmployeeTerminationNotice.new(census_employee, valid_parmas)
@@ -113,8 +107,6 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
 
   describe "render template and generate pdf" do
     before do
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
       @employee_notice = ShopEmployeeNotices::EmployeeTerminationNotice.new(census_employee, valid_parmas)

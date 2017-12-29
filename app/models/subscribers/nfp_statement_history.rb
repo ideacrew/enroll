@@ -17,28 +17,21 @@ module Subscribers
         xml = stringed_key_payload['body']
         eid = stringed_key_payload['employer_id']
 
-
-        Rails.logger.info "BEGIN **********===================**********"
-        Rails.logger.info "Enroll received nfp_statement_summary_success"
-        Rails.logger.info xml
-        Rails.logger.info stringed_key_payload
-        Rails.logger.info "Employer id: #{eid}"
-        Rails.logger.info "END **********===================**********"
-
         response = eval(xml)
 
         ep = Organization.where("hbx_id" => eid).first
 
-        if ep.employer_profile
+        if ep && ep.employer_profile
           employer_profile_account = ep.employer_profile.employer_profile_account || ep.employer_profile.build_employer_profile_account
-          employer_profile_account.update_attributes!(:next_premium_due_on => Date.today,
+          employer_profile_account.update_attributes!(
+           :next_premium_due_on => TimeKeeper.date_of_record, # just a random date, not currently being used.
            :past_due => response[:past_due],
            :adjustments => response[:adjustments],
            :payments => response[:payments],
            :total_due => response[:total_due],
            :previous_balance => response[:previous_balance],
            :new_charges => response[:new_charges],
-           :current_statement_date => response[:current_statement_date]
+           :current_statement_date => Date.strptime(response[:statement_date], "%m/%d/%Y")
            )
 
            employer_profile_account.current_statement_activity.destroy_all
@@ -49,7 +42,7 @@ module Subscribers
              csa.description = line[:description]
              csa.name = line[:name]
              csa.amount = line[:amount]
-             csa.posting_date = line[:posting_date]
+             csa.posting_date = Date.strptime(line[:posting_date], "%m/%d/%Y")
              csa.type = line[:type]
              csa.coverage_month = line[:coverage_month]
              csa.payment_method = line[:payment_method]

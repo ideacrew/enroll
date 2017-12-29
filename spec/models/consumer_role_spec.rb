@@ -308,6 +308,20 @@ context "Verification process and notices" do
       end
     end
 
+    context "DC Residency" do
+      it "returns true if residency status is outstanding and No documents for this type" do
+        person.consumer_role.local_residency_validation = "outstanding"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_truthy
+      end
+
+      it "returns false if residency status is attested and No documents for this type" do
+        person.consumer_role.local_residency_validation = "attested"
+        person.consumer_role.is_state_resident = false
+        expect(person.consumer_role.is_type_outstanding?("DC Residency")).to be_falsey
+      end
+    end
+
     context "Immigration status" do
       it "returns true if lawful_presence fails and No documents for this type" do
         expect(person.consumer_role.is_type_outstanding?("Immigration status")).to be_truthy
@@ -738,7 +752,7 @@ context "Verification process and notices" do
         end
         it "updates residency status" do
           consumer.revert!
-          expect(consumer.is_state_resident?).to eq nil
+          expect(consumer.is_state_resident?).to eq true
         end
       end
     end
@@ -793,6 +807,27 @@ describe "#find_document" do
       expect(found_document).to eq(document)
       expect(found_document.subject).to eq("Certificate of Citizenship")
     end
+  end
+end
+
+describe "#processing_residency_24h?" do
+  let(:consumer_role) {ConsumerRole.new}
+
+  it "returns false if residency determined at attribute is nil" do
+    subject = consumer_role.send(:processing_residency_24h?)
+    expect(subject).to eq false
+  end
+
+  it "returns true if called residency hub today and state resident is nil" do
+    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now)
+    subject = consumer_role.send(:processing_residency_24h?)
+    expect(subject).to eq true
+  end
+
+  it "returns false if residency is already determined in past and state resident is nil" do
+    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now - 2.day)
+    subject = consumer_role.send(:processing_residency_24h?)
+    expect(subject).to eq false
   end
 end
 
@@ -924,6 +959,25 @@ describe "can_trigger_residency?" do
   end
 end
 
+
+
+describe "is_type_verified?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when entered type is DC Residency" do
+
+
+    it "should return true for dc residency verified type" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.is_type_verified?("DC Residency")).to eq true
+    end
+  end
+
+end
+
 RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
   let(:current_state) { c_state }
 
@@ -951,4 +1005,58 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_outstanding
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
+end
+
+describe "#add_type_history_element" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:attr) { {verification_type: "verification_type",
+                action: "action",
+                modifier: "actor",
+                update_reason: "reason"} }
+
+  it "creates verification history record" do
+    person.consumer_role.verification_type_history_elements.delete_all
+    person.consumer_role.add_type_history_element(attr)
+    expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
+end
+
+describe "Verification Tracker" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  context "mongoid history" do
+    it "stores new record with changes" do
+      history_tracker_init =  HistoryTracker.count
+      person.update_attributes(:first_name => "updated")
+      expect(HistoryTracker.count).to be > history_tracker_init
+    end
+  end
+
+  context "mongoid history extension" do
+    it "stores action history element" do
+      history_action_tracker_init =  person.consumer_role.history_action_trackers.count
+      person.update_attributes(:first_name => "first_name updated", :last_name => "last_name updated")
+      person.reload
+      expect(person.consumer_role.history_action_trackers.count).to be > history_action_tracker_init
+    end
+
+    it "associates history element with mongoid history record" do
+      person.update_attributes(:first_name => "first_name updated", :last_name => "last_name updated")
+      person.reload
+      expect(person.consumer_role.history_action_trackers.last.tracking_record).to be_a(HistoryTracker)
+    end
+  end
+end
+
+describe "#add_type_history_element" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:attr) { {verification_type: "verification_type",
+                action: "action",
+                modifier: "actor",
+                update_reason: "reason"} }
+
+  it "creates verification history record" do
+    person.consumer_role.verification_type_history_elements.delete_all
+    person.consumer_role.add_type_history_element(attr)
+    expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
 end

@@ -208,6 +208,9 @@ class Organization
   #   primary_office_location
   # end
 
+  def primary_mailing_address
+    office_locations.map(&:address).detect{|add| add.kind == "mailing"}
+  end
 
   def self.search_by_general_agency(search_content)
     Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})

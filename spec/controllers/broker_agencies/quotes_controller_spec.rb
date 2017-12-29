@@ -189,6 +189,12 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
       expect(response).to have_http_status(:redirect)
     end
 
+    it "should log this issue when invalid received invalid broker_role_id" do
+      expect(controller).to receive(:log)
+      allow(controller).to receive(:raise).and_return nil
+      post :publish_quote, broker_role_id: "person.broker_role.id", id: quote
+    end
+
   end
 
   describe "Creating New Quote " do
@@ -224,6 +230,29 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
       it "should redirect to next step and publish" do
         expect(response).to redirect_to(broker_agencies_broker_role_quote_path(person.broker_role.id,@quote.id))
       end
+    end
+  end
+
+  describe "set_dental_plans" do
+    let(:quote) { double("Quote", id: "id", start_on: Date.new(2018,1,1))}
+
+    before do
+      controller.instance_variable_set(:"@quote", quote)
+      @collection = Mongoid::Criteria.new(nil)
+      allow(@collection).to receive(:count).and_return 0
+    end
+
+    it "should find 2018 plans if quote start on is in 2018" do
+      @collection.selector =  {"active_year" => quote.start_on.year, "market"=>"shop", "coverage_kind"=>"dental"}
+      expect(Plan).to receive(:shop_dental_by_active_year).with(2018).and_return @collection
+      subject.send(:set_dental_plans)
+    end
+
+    it "should find 2017 plans if quote start on is in 2017" do
+      allow(quote).to receive(:start_on).and_return Date.new(2017,10,1)
+      @collection.selector =  {"active_year" => quote.start_on.year, "market"=>"shop", "coverage_kind"=>"dental"}
+      expect(Plan).to receive(:shop_dental_by_active_year).with(2017).and_return @collection
+      subject.send(:set_dental_plans)
     end
   end
 end

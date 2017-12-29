@@ -6,6 +6,5 @@ class EventRequest
   embedded_in :consumer_role
 
   field :requested_at, type: DateTime
-  field :body, type: String #the payload[:body] in the event response
-
+  field :body, type: String #the payload[:body] in the event request
 end

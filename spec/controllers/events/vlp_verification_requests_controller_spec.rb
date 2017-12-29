@@ -8,7 +8,8 @@ describe Events::VlpVerificationRequestsController do
     let(:coverage_start_date) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
     let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
-    before :each do
+
+    before do
       @event_name = ""
       @body = nil
       event_subscriber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, s_at, e_at, m_id, payload|
@@ -17,10 +18,10 @@ describe Events::VlpVerificationRequestsController do
       end
       allow(Time).to receive(:now).and_return(mock_now)
       expect(controller).to receive(:render_to_string).with(
-        "events/lawful_presence/vlp_verification_request", {:formats => ["xml"], :locals => {
-         :individual => person,
-         :coverage_start_date => coverage_start_date
-        }}).and_return(rendered_template)
+          "events/lawful_presence/vlp_verification_request", {:formats => ["xml"], :locals => {
+          :individual => person,
+          :coverage_start_date => coverage_start_date
+      }}).and_return(rendered_template)
       controller.call(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person, :coverage_start_date => coverage_start_date } )
       ActiveSupport::Notifications.unsubscribe(event_subscriber)
     end
@@ -33,6 +34,19 @@ describe Events::VlpVerificationRequestsController do
 
     it "should store request in consumer role" do
       expect(person.consumer_role.lawful_presence_determination.vlp_requests.count).to eq(1)
+    end
+
+    it "stores verification history element" do
+      expect(person.consumer_role.lawful_presence_determination.vlp_requests.count).to be > 0
+    end
+
+    it "stores verification history element with proper verification type" do
+      expect(person.consumer_role.verification_type_history_elements.first.verification_type).to eq "Immigration status"
+    end
+
+    it "stores reference to event_request document" do
+      expect(person.consumer_role.lawful_presence_determination.vlp_requests.first.id).to eq BSON::ObjectId.from_string(
+          person.consumer_role.verification_type_history_elements.first.event_request_record_id)
     end
   end
 end

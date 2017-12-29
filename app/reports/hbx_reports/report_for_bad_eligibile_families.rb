@@ -39,7 +39,7 @@ class ReportForBadEligibileFamilies < MongoidMigrationTask
                   primary_person.last_name,
                   primary_person.hbx_id,
                   tax_household_member.person.first_name,
-                  tax_household_member.last_name,
+                  tax_household_member.person.last_name,
                   tax_household_member.is_ia_eligible,
                   tax_household_member.is_medicaid_chip_eligible
                 ]

@@ -190,18 +190,26 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def set_default_ga
     authorize HbxProfile, :modify_admin_tabs?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
-
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
-      elsif @general_agency_profile.present?
+        broker_fires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s)
+      elsif params[:type] == 'fire'
+        existing_ga_profile = @broker_agency_profile.default_general_agency_profile rescue nil
+        broker_fires_default_ga_notice(existing_ga_profile.id.to_s, @broker_agency_profile.id.to_s) if existing_ga_profile
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
+        @broker_agency_profile.employer_clients.each do |employer_profile|
+          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
+        end
       end
       @broker_agency_profile.save
-      #update_ga_for_employers(@broker_agency_profile, old_default_ga)
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
       @notice = "Changing default general agencies may take a few minutes to update all employers."
+
+      #triggers default GA hired notice to General Agency
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: @broker_agency_profile.default_general_agency_profile, event_object: @broker_agency_profile, notice_event: "ga_hire_notice") if @broker_agency_profile.default_general_agency_profile.present?
 
       @broker_role = current_user.person.broker_role || nil
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
@@ -302,6 +310,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
             employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
             employer_profile.save
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
+            general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
           end
         end
         flash.now[:notice] ="Assign successful."
@@ -378,6 +387,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def redirect_to_show(broker_agency_profile_id)
     redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
+  end
+
+  def broker_fires_default_ga_notice(old_default_ga_id, broker_agency_profile_id)
+    begin
+      ShopNoticesNotifierJob.perform_later(old_default_ga_id, "broker_fires_default_ga_notice", broker_agency_profile_id: broker_agency_profile_id)
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver broker_fires_default_ga_notice to General Agency #{old_default_ga_id} due to #{e}"}) unless Rails.env.test?
+    end
   end
 
   private
@@ -488,7 +505,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def check_general_agency_profile_permissions_set_default
-    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_set_default_ga(self, @broker_agency_profile)
   end

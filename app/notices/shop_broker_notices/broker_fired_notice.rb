@@ -40,25 +40,10 @@ class ShopBrokerNotices::BrokerFiredNotice < ShopBrokerNotice
     notice.termination_date = employer_profile.broker_agency_accounts.unscoped.last.end_on
     notice.broker_agency = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.legal_name.titleize
     append_hbe
-    append_address(employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.organization.primary_office_location.address)
-  end
 
- def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
-  end
-
-  def non_discrimination_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
-  end
-
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-                                 street_1: primary_address.address_1.titleize,
-                                 street_2: primary_address.address_2.titleize,
-                                 city: primary_address.city.titleize,
-                                 state: primary_address.state,
-                                 zip: primary_address.zip
-                             })
+    organization = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.organization
+    address = organization.primary_mailing_address.present? ? organization.primary_mailing_address : organization.primary_office_location.address
+    append_address(address)
   end
 
 end

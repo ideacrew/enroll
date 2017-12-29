@@ -1,7 +1,7 @@
 <%if @error_on_save %>
   <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
     <%@error_on_save.each do |err|%>
-      <li><%=err[1][0]%></li>
+      <li><%=err%></li>
     <%end%>
   </div>
 <%end%>

@@ -178,7 +178,7 @@ module Insured::FamiliesHelper
   end
 
   def enrollment_coverage_end(hbx_enrollment)
-    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
+    if hbx_enrollment.coverage_terminated?
       hbx_enrollment.terminated_on
     elsif hbx_enrollment.coverage_expired?
       if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?
@@ -205,10 +205,6 @@ module Insured::FamiliesHelper
 
   def find_qle_for_sep(sep)
     QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
-  end
-
-  def dual_role_without_shop_sep?
-    @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
   end
 
   def person_has_any_roles?

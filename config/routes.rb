@@ -1,15 +1,24 @@
 Rails.application.routes.draw do
+
+  #mount TransportGateway::Engine, at: "/transport_gateway"
+  #mount TransportProfiles::Engine, at: "/transport_profiles"
+  mount Notifier::Engine, at: "/notifier" 
+  #mount RocketJobMissionControl::Engine => 'rocketjob'
+
   require 'resque/server'
-#  mount Resque::Server, at: '/jobs'
+  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
 
+  match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+
+  post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -88,6 +97,8 @@ Rails.application.routes.draw do
         get :get_user_info
         get :identity_verification
         post :identity_verification_datatable
+        get :view_terminated_hbx_enrollments
+        get :get_user_info
       end
 
       member do
@@ -272,6 +283,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        get 'show_invoice'
         post 'generate_checkbook_urls'
         get "show_invoice"
         get "wells_fargo_sso"
@@ -525,6 +537,7 @@ Rails.application.routes.draw do
       post :fed_hub_request
     end
   end
+
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

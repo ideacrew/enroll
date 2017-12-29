@@ -1,10 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbclean => :after_each do
-  let(:hbx_profile) {double}
-  let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
-  let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.next_year.year,11,1), open_enrollment_end_on: Date.new((TimeKeeper.date_of_record+2.years).year,1,31)) }
-  let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year.next_year, end_on: TimeKeeper.date_of_record.end_of_year.next_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31)) }
+
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
+  let!(:benefit_coverage_period_2018) { FactoryGirl.create(:benefit_coverage_period, start_on: Date.new(2018,1,1), end_on: Date.new(2018,12,31), open_enrollment_start_on: Date.new(2017,11,1), open_enrollment_end_on: Date.new(2018,1,31), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
+  let!(:benefit_coverage_period_2019) {FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: Date.new(2018,11,01), open_enrollment_end_on: Date.new(2019,1,31),start_on: Date.new(2019,1,1),end_on: Date.new(2019,12,31),benefit_sponsorship: benefit_sponsorship)}
+
   let(:plan) { FactoryGirl.create(:plan) }
   let(:plan2) { FactoryGirl.create(:plan) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
@@ -20,7 +22,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
                             :notice_template => 'notices/shop_employee_notices/termination_of_employers_health_coverage',
                             :notice_builder => 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
                             :event_name => 'notice_to_employee_for_missing_binder_payment',
-                            :mpi_indicator => 'MPI_SHOPDIE064',
+                            :mpi_indicator => 'SHOP_D064',
                             :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
                           }
 
@@ -66,12 +68,37 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
   describe "append data" do
     before do
       @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
-    end
-    it "should append data" do
       @employee_notice.append_data
+    end
+
+    it "should append data" do
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
+    end
+
+    context "with current IVL Open Enrollment(2018)" do
+      before do
+        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2017,12,31))
+        @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
+        @employee_notice.append_data
+      end
+
+      it "should append current IVL OE date(2018)" do
+        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2018.open_enrollment_start_on
+        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2018.open_enrollment_end_on
+      end
+    end
+
+    context "after current IVL OE closed(2018)" do
+      before do
+        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2018,02,1))
+        @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
+        @employee_notice.append_data
+      end
+
+      it "should append next year IVL OE dates(2019)" do
+        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2019.open_enrollment_start_on
+        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2019.open_enrollment_end_on
+      end
     end
   end
 
@@ -79,12 +106,15 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
+    end
+    it "should match event_name" do
+      expect(@employee_notice.event_name).to eq "notice_to_employee_for_missing_binder_payment"
     end
     it "should render termination_of_employers_health_coverage" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/termination_of_employers_health_coverage"
+    end
+    it "should match mpi_indicator" do
+      expect(@employee_notice.mpi_indicator).to eq "SHOP_D064"
     end
     it "should generate pdf" do
       @employee_notice.build

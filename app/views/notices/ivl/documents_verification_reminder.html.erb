@@ -34,7 +34,7 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. <strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don't submit them by this deadline.</strong>"],
+ contents: ["You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. <strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.</strong>"],
    heading: 'Send Us Documents', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:

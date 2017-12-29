@@ -444,27 +444,33 @@ describe Family do
   end
 
   context "contingent_enrolled_family_members_due_dates" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:family_member) { FactoryGirl.build_stubbed(:family_member) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let(:family_member) { FactoryGirl.create(:family_member, :family => family, :person => person2) }
+    let(:primary_family_member) { family.primary_family_member }
     before do 
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([family.primary_family_member,family_member])
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([primary_family_member, family_member])
+      allow(person).to receive(:verification_types).and_return(["Immigration status"])
+      allow(person2).to receive(:verification_types).and_return(["Immigration status"])
     end
     it "should return uniq family members duedate" do
       allow(family).to receive(:document_due_date).and_return(TimeKeeper.date_of_record)
       expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
     end
-    it "should return sorted due dates" do 
+    it "should return sorted due dates" do
       allow(family).to receive(:document_due_date).with(family.primary_family_member,"DC Residency").and_return(TimeKeeper.date_of_record)
       allow(family).to receive(:document_due_date).with(family_member,"DC Residency").and_return(TimeKeeper.date_of_record+30)
       allow(family).to receive(:document_due_date).with(family.primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
       allow(family).to receive(:document_due_date).with(family_member,"Immigration status").and_return(TimeKeeper.date_of_record+30)
+
       expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
     end
   end
 
-  context "best_verification_due_date" do 
+  context "best_verification_due_date" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    
+
     it "should earliest duedate when family had two or more due dates" do
       family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
       allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
@@ -1424,7 +1430,7 @@ describe "#all_persons_vlp_documents_status" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let(:family_person) {family.primary_applicant.person}
-    
+
     it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
       family_person.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
       expect(family.all_persons_vlp_documents_status).to eq("None")
@@ -1455,13 +1461,13 @@ describe "#all_persons_vlp_documents_status" do
       family_person.consumer_role.update_attributes(:ssn_rejected => true)
       family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end 
+    end
 
     it "returns all_persons_vlp_documents_status is Partially Uploaded when documents status is verified and other is not uploaded" do
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
       allow(family_person).to receive(:verification_types).and_return ["social Security", "Citizenship"]
       expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
-    end   
+    end
   end
 
   context "vlp documents status for multiple family members" do
@@ -1476,7 +1482,7 @@ describe "#all_persons_vlp_documents_status" do
 
     it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
       person1.consumer_role.vlp_documents.delete_all # Deletes all vlp documents if there is any
-      person2.consumer_role.vlp_documents.delete_all 
+      person2.consumer_role.vlp_documents.delete_all
       expect(family.all_persons_vlp_documents_status).to eq("None")
     end
 
@@ -1494,7 +1500,7 @@ describe "#all_persons_vlp_documents_status" do
       person2.consumer_role.vlp_documents << doc2
       person2.consumer_role.vlp_documents << doc3
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
-    end 
+    end
   end
 end
 
@@ -1555,7 +1561,7 @@ end
 describe Family, '#is_document_not_verified' do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  
+
   it "return true when document is not verified" do
     expect(family.is_document_not_verified("Citizenship", family.primary_family_member.person)).to eq true
   end
@@ -1590,5 +1596,23 @@ describe Family, '#is_document_not_verified' do
         expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
       end
     end
+  end
+end
+
+describe "has_valid_e_case_id" do
+  let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
+
+  it "returns false as e_case_id is nil" do
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
+
+  it "returns true as it has a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "curam_landing_for5a0208eesjdb2c000096")
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
+
+  it "returns false as it don't have a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
+    expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end

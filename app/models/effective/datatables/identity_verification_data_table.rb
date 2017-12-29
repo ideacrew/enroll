@@ -28,9 +28,9 @@ module Effective
       end
       
       def document_type(row)
-        if row.consumer_role.identity_validation == "pending" && row.consumer_role.application_validation != "pending"
+        if row.consumer_role.application_validation == "outstanding" && row.consumer_role.identity_validation == "pending" || row.consumer_role.application_validation == "valid" && row.consumer_role.identity_validation == "pending"
           return "Identity"
-        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation != "pending"
+        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "outstanding" || row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "valid"
           return "Application"
         elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "pending"
           return "Identity/Application"
@@ -39,9 +39,11 @@ module Effective
       
       def document_uploaded_date(row)
         if row.consumer_role.identity_validation == "pending"
-          return row.consumer_role.ridp_documents.where(ridp_verification_type:"Identity").last.uploaded_at
+          ridp_document = row.consumer_role.ridp_documents.where(ridp_verification_type:"Identity").last
+          ridp_document.present? && ridp_document.uploaded_at.present? ? ridp_document.uploaded_at : ""
         elsif row.consumer_role.application_validation == "pending"
-          return row.consumer_role.ridp_documents.where(ridp_verification_type:"Application").last.uploaded_at
+          ridp_document = row.consumer_role.ridp_documents.where(ridp_verification_type:"Application").last
+          ridp_document.present? && ridp_document.uploaded_at.present? ? ridp_document.uploaded_at : ""
         end
       end
 

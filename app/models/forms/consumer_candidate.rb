@@ -12,6 +12,8 @@ module Forms
     attr_accessor :dob_check #hidden input filed for one time DOB warning
     attr_accessor :is_applying_coverage
 
+    validates_with Validations::SocialSecurityValidator
+
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
@@ -26,7 +28,7 @@ module Forms
               numericality: true
     validate :dob_not_in_future
     validate :ssn_or_checkbox
-    validate :uniq_ssn, :uniq_ssn_dob, :invalid_ssn_formats
+    validate :uniq_ssn, :uniq_ssn_dob
     validate :age_less_than_18
     attr_reader :dob
 

@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_denial_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerDenialNotice',
                             :event_name => 'initial_employer_denial',
-                            :mpi_indicator => 'MPI_SHOP2B',
+                            :mpi_indicator => 'SHOP_D003',
                             :title => "Employer Denial Notice"})
                           }
     let(:valid_parmas) {{

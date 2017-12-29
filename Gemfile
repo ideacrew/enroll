@@ -2,7 +2,13 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.3'
+gem 'rails', '4.2.7.1'
+
+# Mount Enroll App component engines
+#not using transport_gateway, transport_profiles
+#gem "transport_gateway",  path: "components/transport_gateway"
+gem "notifier",           path: "components/notifier"
+#gem "transport_profiles", path: "components/transport_profiles"
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
@@ -38,8 +44,7 @@ gem 'nokogiri', '1.6.7.2'
 
 gem 'mongo', '2.1.2'
 gem 'mongoid', '5.0.1'
-gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", branch: "master"
-# gem 'mongoid-history', '~> 5.1.0'
+gem 'mongoid-history'
 gem 'mongoid_userstamp'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'mongoid-versioning'
@@ -111,6 +116,12 @@ gem 'interactor-rails', '2.0.2'
 
 # Httparty
 gem 'httparty'
+
+gem 'ckeditor'
+gem 'redcarpet', '3.4.0'
+gem 'slim', '3.0.8'
+gem 'curl'
+gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

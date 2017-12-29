@@ -16,6 +16,12 @@ FactoryGirl.define do
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
     end
 
+    after :build do |obj, evaluator|
+      if ssn_validator obj
+        stubbed_census_employee_ssn(obj, evaluator)
+      end
+    end
+
     transient do
       benefit_group { build(:benefit_group) }
       renewal_benefit_group { build(:benefit_group) }

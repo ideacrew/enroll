@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
                             :notice_template => 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
                             :event_name => 'initial_employer_first_reminder_to_publish_plan_year',
-                            :mpi_indicator => 'MPI_SHOP26',
+                            :mpi_indicator => 'SHOP_D026',
                             :title => "Reminder to publish Application"})
                           }
     let(:valid_parmas) {{

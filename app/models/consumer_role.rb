@@ -8,6 +8,7 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
+  include Mongoid::History::Trackable
   include DocumentsVerificationStatus
 
   embedded_in :person
@@ -130,10 +131,16 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable
   embeds_many :ridp_documents, as: :documentable
+  embeds_many :vlp_documents, as: :documentable do
+    def uploaded
+      @target.select{|document| document.identifier }
+    end
+  end
+  embeds_many :residency_verification_responses
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
+  embeds_many :verification_type_history_elements
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents, :ridp_documents
 
@@ -146,7 +153,7 @@ class ConsumerRole
 
   validates :citizen_status,
     allow_blank: true,
-    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+    inclusion: { in: CITIZEN_STATUS_KINDS + ACA_ELIGIBLE_CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
   validates :citizenship_result,
     allow_blank: true,
@@ -165,10 +172,42 @@ class ConsumerRole
   embeds_one :lawful_presence_determination, as: :ivl_role
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
+  embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
 
   before_validation :ensure_validation_states, on: [:create, :update]
+
+  track_history   :on => [:five_year_bar,
+                          :aasm_state,
+                          :marital_status,
+                          :ssn_validation,
+                          :native_validation,
+                          :is_state_resident,
+                          :local_residency_validation,
+                          :ssn_update_reason,
+                          :lawful_presence_update_reason,
+                          :native_update_reason,
+                          :residency_update_reason,
+                          :is_applying_coverage,
+                          :ssn_rejected,
+                          :native_rejected,
+                          :lawful_presence_rejected,
+                          :residency_rejected],
+                  :scope => :person,
+                  :modifier_field => :modifier,
+                  :version_field => :tracking_version,
+                  :track_create  => true,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => true
+
+  # used to track history verification actions can be used on any top node model to build history of changes.
+  # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model
+  # might be encapsulated into new verification model further with verification code refactoring
+  embeds_many :history_action_trackers, as: :history_trackable
+
+  #list of the collections we want to track under consumer role model
+  COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
   def ivl_coverage_selected
     if unverified?
@@ -207,7 +246,7 @@ class ConsumerRole
 
   def has_outstanding_documents?
     self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
-  end  
+  end
 
   def has_ridp_docs_for_type?(type)
     self.ridp_documents.any?{ |doc| doc.ridp_verification_type == type && doc.identifier }
@@ -228,7 +267,7 @@ class ConsumerRole
   def is_type_outstanding?(type)
     case type
       when "DC Residency"
-        residency_denied? && !has_docs_for_type?(type)
+        residency_denied? && !has_docs_for_type?(type) && local_residency_outstanding?
       when 'Social Security Number'
         !ssn_verified? && !has_docs_for_type?(type)
       when 'American Indian Status'
@@ -236,6 +275,10 @@ class ConsumerRole
       else
         !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
+  end
+
+  def local_residency_outstanding?
+    self.local_residency_validation == 'outstanding'
   end
 
   def ssn_verified?
@@ -512,7 +555,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :verification_outstanding
     end
 
-    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :mark_residency_pending, :notify_of_eligibility_change, :record_transition] do
+    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
       transitions from: :dhs_pending, to: :unverified
@@ -681,12 +724,19 @@ class ConsumerRole
     family.person_has_an_active_enrollment?(person)
   end
 
+  def add_type_history_element(params)
+    verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
+  end
+
   def can_start_residency_verification? # initial trigger check for coverage purchase
     !person.no_dc_address && person.age_on(TimeKeeper.date_of_record) > 18
   end
 
   def invoke_residency_verification!
-    start_residency_verification_process if can_start_residency_verification?
+    if can_start_residency_verification?
+      mark_residency_pending
+      start_residency_verification_process
+    end
   end
 
   #class methods
@@ -703,18 +753,19 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false,
                       :local_residency_validation => "outstanding")
   end
 
   def mark_residency_pending(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = nil
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => nil,
+                      :local_residency_validation => "pending")
   end
 
   def mark_residency_authorized(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true,
                       :local_residency_validation => "valid")
   end
@@ -732,7 +783,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    is_state_resident.nil?
+    local_residency_validation == "pending" || is_state_resident.nil?
   end
 
   def residency_denied?
@@ -905,8 +956,7 @@ class ConsumerRole
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
       when "DC Residency"
-        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record)
-        mark_residency_authorized
+        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record, :local_residency_validation => "valid")
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
       when "American Indian Status"
@@ -925,11 +975,11 @@ class ConsumerRole
 
   def is_type_verified?(type)
     case type
-      when "Residency"
+      when "DC Residency"
         residency_verified?
-      when 'Social Security Number'
+      when "Social Security Number"
         ssn_verified?
-      when 'American Indian Status'
+      when "American Indian Status"
         native_verified?
       else
         lawful_presence_verified?
@@ -956,13 +1006,13 @@ class ConsumerRole
     end
   end
 
-  #check if consumer purchased a coverage and no response from hub in 24 hours
-  def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  def processing_residency_24h?
+    return false if self.residency_determined_at.nil?
+    residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
   end
 
-  def no_changes_24_h?
-    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
+  def citizenship_immigration_processing?
+    dhs_pending? || ssa_pending?
   end
 
   def sensitive_information_changed(field, person_params)

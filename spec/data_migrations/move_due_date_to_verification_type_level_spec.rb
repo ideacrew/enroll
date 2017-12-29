@@ -20,6 +20,12 @@ describe MoveDueDateToVerificationTypeLevel do
       aasm_state: "enrolled_contingent"
     )}
 
+    let!(:enrollment2) { FactoryGirl.create(:hbx_enrollment,
+      household: person.primary_family.active_household,
+      special_verification_period: nil,
+      aasm_state: "shopping"
+    )}
+
     before do
       allow(subject).to receive(:enrolled_policy).and_return enrollment
     end

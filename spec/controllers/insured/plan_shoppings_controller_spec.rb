@@ -187,7 +187,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:employee_role).and_return(double)
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
       allow(enrollment).to receive(:census_employee).and_return(double)
-      allow(subject).to receive(:ee_plan_selection_confirmation_sep_new_hire).and_return(true)
+      allow(enrollment).to receive(:mid_year_plan_change_notice).and_return(true)
+      allow(enrollment).to receive(:ee_plan_selection_confirmation_sep_new_hire).and_return(true)
     end
 
     it "returns http success" do
@@ -324,6 +325,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       sign_in(user)
+      allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
+      allow(hbx_enrollment).to receive(:census_employee).and_return(double)
+      allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end
@@ -369,7 +373,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
     it "should get success flash message" do
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("")
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
@@ -379,15 +382,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       expect(response).to be_redirect
     end
 
-    it "should redirect to family_account_path as terminate_reason exists" do
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("terminate")
-      allow(hbx_enrollment).to receive(:valid?).and_return(true)
-      post :waive, id: "hbx_id", waiver_reason: "waiver", terminate_reason: "terminate"
-      expect(response).to redirect_to(family_account_path)
-    end
-
     it "should get failure flash message" do
-      allow(hbx_enrollment).to receive(:terminate_reason).and_return("")
       allow(hbx_enrollment).to receive(:valid?).and_return(false)
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:alert]).to eq "Waive Coverage Failed"

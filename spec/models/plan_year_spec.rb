@@ -838,7 +838,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the applicant requests eligibility review" do
             context "and 30 days or less have elapsed since application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 10.days)
                 workflow_plan_year_with_benefit_group.request_eligibility_review!
@@ -849,7 +849,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and review overturns ineligible application determination" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before { workflow_plan_year_with_benefit_group.grant_eligibility! }
 
                 it "should transition application into published status" do
@@ -862,7 +862,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and review affirms ineligible application determination" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before { workflow_plan_year_with_benefit_group.deny_eligibility! }
 
                 it "should transition application back into published_invalid status" do
@@ -872,7 +872,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             end
 
             context "and more than 30 days have elapsed since application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 31.days)
               end
@@ -921,7 +921,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "employees should be able to browse, but not purchase plans"
 
           context "and open enrollment begins" do
-            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
             before do
               # $start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on
               TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
@@ -988,7 +988,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 context "and three of the six employees have enrolled" do
-                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                   before do
                     census_employees[0..2].each do |ee|
                       if ee.active_benefit_group_assignment.may_select_coverage?
@@ -1024,7 +1024,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   end
 
                   context "greater than 100 employees " do
-                    let(:employee_count)    { 101 }
+                    let(:employee_count)    { Settings.aca.shop_market.small_market_active_employee_limit + 1 }
 
                     it "return 0" do
                       expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
@@ -2620,7 +2620,7 @@ describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbcl
   let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
 
   it "should trigger renewal_employee_enrollment_confirmation job in queue" do
-    census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+    census_employee.renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
     hbx_enrollment.save!
     ActiveJob::Base.queue_adapter = :test
     ActiveJob::Base.queue_adapter.enqueued_jobs = []

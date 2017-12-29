@@ -95,4 +95,14 @@ class HbxProfilePolicy < ApplicationPolicy
     return false unless role = user.person && user.person.hbx_staff_role
     role.permission.can_add_sep
   end
+
+  def can_access_identity_verification_sub_tab?
+    return @user.person.hbx_staff_role.permission.can_access_identity_verification_sub_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def can_access_outstanding_verification_sub_tab?
+    return @user.person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
 end

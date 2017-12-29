@@ -410,18 +410,44 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   describe "POST set_default_ga" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let!(:fire_general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:organization) { FactoryGirl.create(:organization) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, broker_agency_profile: broker_agency_profile, organization: organization) }
+    let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
+    let!(:general_agency_account) { FactoryGirl.create(:general_agency_account, general_agency_profile_id: general_agency_profile.id, employer_profile: employer_profile, aasm_state: "inactive")}
     before :each do
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
 
     it "should set default_general_agency_profile" do
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
+    end
+
+    it "should call general_agency_hired_notice trigger " do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
+      expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
+    end
+
+    it "should trigger notice when default_general_agency_profile is set" do
+      allow(broker_agency_profile).to receive(:default_general_agency_profile).and_return(general_agency_profile)
+      sign_in user
+      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).and_return(true)
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
     end
 
     it "should clear default general_agency_profile" do
@@ -430,6 +456,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
 
       sign_in user
+      expect(controller).to receive(:broker_fires_default_ga_notice).with(general_agency_profile.id, broker_agency_profile.id)
       xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq nil
     end
@@ -437,13 +464,21 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should call update_ga_for_employers" do
       sign_in user
       expect(controller).to receive(:notify)
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
     end
 
     it "should get notice" do
       sign_in user
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
       expect(assigns(:notice)).to eq "Changing default general agencies may take a few minutes to update all employers."
+    end
+
+    it "should fire exisitng default GA" do
+      sign_in user
+      broker_agency_profile.default_general_agency_profile = fire_general_agency_profile
+      broker_agency_profile.save
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire', format: :js
+      expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
     end
   end
 

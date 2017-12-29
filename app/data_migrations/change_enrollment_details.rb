@@ -22,6 +22,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       generate_hbx_signature
     when "expire_coverage"
       expire_coverage
+    when "expire_enrollment"
+      expire_enrollment
+    when "transfer_enrollment_from_glue_to_enroll"
+      transfer_enrollment_from_glue_to_enroll
     end
   end
 
@@ -48,7 +52,20 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def revert_termination
     @enrollments.each do |enrollment|
-      enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
+      state = enrollment.aasm_state
+      if enrollment.is_shop?
+        enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
+        enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: state,
+          to_state: "coverage_enrolled"
+        )
+      else
+        enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_selected")
+        enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: state,
+          to_state: "coverage_selected"
+        )
+      end
       enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
       puts "Reverted Enrollment termination" unless Rails.env.test?
     end
@@ -91,5 +108,21 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       enrollment.expire_coverage! if enrollment.may_expire_coverage?
       puts "moved enrollment with hbx_id: #{enrollment.hbx_id} to expired status" unless Rails.env.test?
     end
+  end
+
+  def expire_enrollment
+    @enrollments.each do |enrollment|
+      if enrollment.may_expire_coverage?
+        enrollment.expire_coverage!
+        puts "expire enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+      else
+        puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
+      end
+    end
+  end
+
+  def transfer_enrollment_from_glue_to_enroll
+    ts = TranscriptGenerator.new
+    ts.display_enrollment_transcripts
   end
 end

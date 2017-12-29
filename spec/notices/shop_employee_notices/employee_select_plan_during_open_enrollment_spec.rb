@@ -16,19 +16,20 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
                             :name =>'Notice to employee after they select a plan during Annual Open Enrollment',
                             :notice_template => 'notices/shop_employee_notices/employee_select_plan_during_open_enrollment',
                             :notice_builder => 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
-                            :mpi_indicator => 'MPI_SHOP42',
+                            :mpi_indicator => 'SHOP_D073',
                             :event_name => 'ee_select_plan_during_oe',
                             :title => "Employee Plan Selection Confirmation"})
                           }
 
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year, plan: plan)}  
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year, plan: plan, benefit_group: active_benefit_group)}  
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables)}   
 
   let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
-      :template => application_event.notice_template
+      :template => application_event.notice_template,
+      :options => { :hbx_enrollment_hbx_id => hbx_enrollment.hbx_id.to_s }
   }}
 
   describe "New" do
@@ -55,8 +56,8 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
     before do
       @employee_notice = ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment.new(census_employee, valid_params)
     end
-    it "should build notice with all necessory info" do
 
+    it "should build notice with all necessory info" do
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
@@ -67,16 +68,21 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
     before do
       @employee_notice = ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment.new(census_employee, valid_params)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-    end
-
-    it "should append data" do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
       enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
-      expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
+    end
+    it "should append enrollment effective on date" do
+      expect(@employee_notice.notice.enrollment.effective_on).to eq hbx_enrollment.effective_on
+    end
+    it "shoud append plan name" do
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
-      expect(@employee_notice.notice.enrollment.employee_cost).to eq("0.0")
-      expect(@employee_notice.notice.enrollment.employer_contribution).to eq("0.0")
+    end
+    it "should append employee_cost" do
+      expect(@employee_notice.notice.enrollment.employee_cost).to eq(hbx_enrollment.total_employee_cost.to_s)
+    end
+    it "should append employer_contribution" do
+      expect(@employee_notice.notice.enrollment.employer_contribution).to eq(hbx_enrollment.total_employer_contribution.to_s)
     end
   end
 
@@ -87,11 +93,15 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
       @employee_notice = ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment.new(census_employee, valid_params)
       allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return hbx_enrollment
     end
-
     it "should render employee_select_plan_during_open_enrollment" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_select_plan_during_open_enrollment"
     end
-
+    it "should render event" do
+      expect(@employee_notice.event_name).to eq "ee_select_plan_during_oe"
+    end
+    it "should render mpi_indicator" do
+      expect(@employee_notice.mpi_indicator).to eq "SHOP_D073"
+    end
     it "should generate pdf" do
       @employee_notice.append_data
       @employee_notice.build

@@ -21,7 +21,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibil
                             :notice_template => 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
                             :notice_builder => 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
                             :event_name => 'notify_employee_of_renewing_employer_ineligibility',
-                            :mpi_indicator => 'MPI_SHOP10066',
+                            :mpi_indicator => 'SHOP_D038',
                             :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
                           }
 

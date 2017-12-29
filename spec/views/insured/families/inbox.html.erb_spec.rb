@@ -148,7 +148,7 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
       end
 
       it "should verify if the Curam navigation link exists on the page" do
-        expect(rendered).to have_link('Medicaid & Tax Credits', href: "https://enroll.dchealthlink.com/saml/navigate_to_assistance")
+        expect(rendered).to have_link('Medicaid & Tax Credits')
       end
     end
 

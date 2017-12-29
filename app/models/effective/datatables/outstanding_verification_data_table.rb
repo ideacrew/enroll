@@ -3,7 +3,6 @@ module Effective
   module Datatables
     class OutstandingVerificationDataTable < Effective::MongoidDatatable
       datatable do
-        #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
         table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
@@ -38,10 +37,10 @@ module Effective
       def nested_filter_definition
         filters = {
         documents_uploaded: [
-          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded'},
-          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded'},
-          {scope: 'vlp_none_uploaded', label: 'None Uploaded'},
-          {scope: 'all', label: 'All'},
+          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded', title: "Documents to review for all outstanding verifications"},
+          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded', title: "Documents to review for some outstanding verifications"},
+          {scope: 'vlp_none_uploaded', label: 'None Uploaded', title: "No documents to review"},
+          {scope: 'all', label: 'All', title: "All outstanding verifications"},
         ],
         top_scope: :documents_uploaded
         }

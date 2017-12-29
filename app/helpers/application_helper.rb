@@ -113,6 +113,12 @@ module ApplicationHelper
     timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
 
+  def amount_color_style(amount)
+    return "" if amount.blank?
+    amount > 0 ? "class=red" : ""
+  end
+
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -537,7 +543,6 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
@@ -558,6 +563,15 @@ module ApplicationHelper
     end
   end
 
+  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+    begin
+      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
+        ShopNoticesNotifierJob.perform_later(hbx_enrollment.employer_profile.id.to_s, "notify_employer_when_employee_terminate_coverage", hbx_enrollment: hbx_enrollment.hbx_id.to_s)
+      end
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver employee_terminate_coverage_notice of employee #{hbx_enrollment.census_employee.id.to_s} to #{hbx_enrollment.employer_profile.id.to_s}due to #{e}" }) unless Rails.env.test?
+    end
+  end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
@@ -580,8 +594,8 @@ module ApplicationHelper
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
-  def make_binder_checkbox_disabled(employer)
-    eligibility_criteria(employer)
+  def make_binder_checkbox_disabled(org)
+    eligibility_criteria(org)
     (@participation_count == 0 && @non_owner_participation_rule == true) ? false : true
   end
 
@@ -615,8 +629,9 @@ module ApplicationHelper
     census_employee.new_hire_enrollment_period.present?
   end
 
-  def eligibility_criteria(employer)
-    if employer.show_plan_year.present?
+  def eligibility_criteria(resource)
+    employer = resource.try(:employer_profile)
+    if employer.present? && employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")

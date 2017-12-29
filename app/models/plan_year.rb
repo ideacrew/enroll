@@ -4,6 +4,8 @@ class PlanYear
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::PlanYear
 
   embedded_in :employer_profile
 
@@ -98,6 +100,8 @@ class PlanYear
 
   after_update :update_employee_benefit_packages
 
+  after_save :notify_on_save
+
   def update_employee_benefit_packages
     if self.start_on_changed?
       bg_ids = self.benefit_groups.pluck(:_id)
@@ -153,7 +157,7 @@ class PlanYear
       }},
       {"$match" => {"aasm_state" => {"$nin" => HbxEnrollment::WAIVED_STATUSES}}}
     ])
-    return [] if (enrollment_proxies.count > 100)
+    return [] if (enrollment_proxies.count > Settings.aca.shop_market.small_market_active_employee_limit)
     enrollment_proxies.map do |ep|
       OpenStruct.new(ep)
     end
@@ -164,7 +168,7 @@ class PlanYear
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
       :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-      }).limit(100)
+      }).limit(Settings.aca.shop_market.small_market_active_employee_limit)
 
     families.inject([]) do |enrollments, family|
       valid_enrollments = family.active_household.hbx_enrollments.where({
@@ -531,7 +535,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    if self.employer_profile.census_employees.count < 100
+    if self.employer_profile.census_employees.non_terminated.count <= Settings.aca.shop_market.small_market_active_employee_limit
       #enrolled.count
       enrolled_by_bga.count
     else
@@ -828,7 +832,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -1010,15 +1014,15 @@ class PlanYear
   end
 
   def renewal_employee_enrollment_confirmation
-    begin
-      self.employer_profile.census_employees.non_terminated.each do |ce|
-        enrollment = ce.active_benefit_group_assignment.hbx_enrollment
-        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on == self.start_on
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        enrollment = ce.renewal_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && (enrollment.effective_on == self.start_on)
           ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
         end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
       end
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver notice due to '#{e}' " }
     end
   end
 
