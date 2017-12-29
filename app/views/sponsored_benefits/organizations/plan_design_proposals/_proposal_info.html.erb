@@ -48,8 +48,12 @@ $(function() {
     $(this).on("change", submitPlanDesignProposalInfo);
   })
 
-  $("#forms_plan_design_proposal_effective_date").change(function() {
-    submitPlanDesignProposalInfo();
+  $("#forms_plan_design_proposal_effective_date").change(function(e) {
+      if(e.handled !== true) // This will prevent event triggering more then once
+        {
+            submitPlanDesignProposalInfo();
+            e.handled = true;
+        }
   })
 });
 </script>
