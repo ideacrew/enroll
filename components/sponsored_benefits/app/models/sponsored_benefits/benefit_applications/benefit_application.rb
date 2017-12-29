@@ -74,7 +74,7 @@ module SponsoredBenefits
 
       def open_enrollment_period=(new_open_enrollment_period)
         #open_enrollment_range = SponsoredBenefits.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
-        write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
+        write_attribute(:open_enrollment_period, new_open_enrollment_period) unless new_open_enrollment_period.blank?
       end
 
       def start_on
@@ -226,7 +226,7 @@ module SponsoredBenefits
 
         def enrollment_timetable_by_effective_date(effective_date)
           effective_date            = effective_date.to_date.beginning_of_month
-          effective_period          = effective_date..(effective_date + 1.year - 1.day)
+          effective_period          = effective_date..(effective_date + 1.year - 1.day).end_of_day
           open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
           prior_month               = effective_date - 1.month
           binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
@@ -283,7 +283,7 @@ module SponsoredBenefits
 
           begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
           end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
-          begin_on..end_on
+          begin_on..end_on.end_of_day
         end
 
 
@@ -305,11 +305,11 @@ module SponsoredBenefits
       def open_enrollment_date_checks
         return if effective_period.blank? || effective_period.blank? || open_enrollment_period.blank? || open_enrollment_period.blank?
 
-        if effective_period.begin != effective_period.begin.beginning_of_month
+        if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
           errors.add(:effective_period, "start date must be first day of the month")
         end
 
-        if effective_period.end != effective_period.end.end_of_month
+        if effective_period.end.mday != effective_period.end.end_of_month.mday
           errors.add(:effective_period, "must be last day of the month")
         end
 
