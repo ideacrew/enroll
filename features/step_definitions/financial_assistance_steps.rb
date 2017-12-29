@@ -7,15 +7,15 @@ Given(/^is logged in$/) do
 end
 
 Given(/^a benchmark plan exists$/) do
-  FactoryGirl.create :plan, active_year: 2017, hios_id: "86052DC0400001-01"
+  create_plan
 end
 
 When /^the consumer views their applications$/ do
   visit financial_assistance_applications_path
 end
 
-When(/^they click 'New Financial Assistance Application' button$/) do
-  click_button "Start new application"
+When(/^they click 'Start New Application' button$/) do
+  click_button 'Start new application'
 end
 
 Then(/^they should see a new finanical assistance application$/) do
@@ -34,6 +34,43 @@ end
 
 When(/^they view the financial assistance application$/) do
   visit edit_financial_assistance_application_path(application)
+end
+
+When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
+  click_link 'ADD INCOME & COVERAGE INFO', href: "/financial_assistance/applications/#{consumer.primary_family.application_in_progress.id}/applicants/#{consumer.primary_family.application_in_progress.primary_applicant.id}/step/1"
+end
+
+Then(/^they should be taken to the applicant's Tax Info page$/) do
+  expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
+end
+
+And(/^they visit the applicant's Job income page$/) do
+  visit financial_assistance_application_applicant_incomes_path(application, application.primary_applicant)
+end
+
+And(/^they answer job income question and complete the form for the Job income$/) do
+  choose('has_job_income_true')
+  sleep 1
+  fill_in 'financial_assistance_income[employer_name]', with: "Sample Employer"
+  fill_in 'financial_assistance_income[amount]', with: '23.3'
+  find(:xpath, "(//p[@class='label'][contains(., 'Choose')])[1]").click
+  find_all('.interaction-choice-control-financial-assistance-income-frequency-kind-4')[0].trigger('click')
+  fill_in 'financial_assistance_income[start_on]', with: "11/11/2016"
+  fill_in 'financial_assistance_income[end_on]', with: "11/11/2017"
+  fill_in 'financial_assistance_income[employer_phone][full_phone_number]', with: "2036548484"
+  fill_in 'financial_assistance_income[employer_address][address_1]', with: "12 main st"
+  fill_in 'financial_assistance_income[employer_address][address_2]', with: "beside starbucks"
+  fill_in 'financial_assistance_income[employer_address][city]', with: "washington"
+
+  find(:xpath, "(//p[@class='label'][contains(., 'Choose')])[2]").click
+  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state-5")[0].trigger('click')
+  fill_in 'financial_assistance_income[employer_address][zip]', with: "22046"
+
+  click_button 'Save'
+end
+
+Then(/^they should see the newly added Job income$/) do
+
 end
 
 Then(/^they should be taken back to the application's details page for applicant$/) do
@@ -55,9 +92,6 @@ When(/^they complete and submit the Income and Coverage information$/) do
   click_button 'CONTINUE'
 end
 
-Then(/^they should be taken to the applicant's Tax Info page$/) do
-  expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
-end
 
 Given(/^has added tax information for an applicant$/) do
   # right now this step is unnecessary but not always be
@@ -81,8 +115,8 @@ end
 
 And(/^they complete the form for the income$/) do
   fill_in 'income[amount]', with: '23.3'
-  find_all(".interaction-choice-control-employer-address-state")[1].click
-  find_all(".interaction-choice-control-income-frequency-kind-1")[1].click
+  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state")[0].trigger('click')
+  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state").select('Monthly')
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
   fill_in 'income[employer_name]', with: "Sample Employer 1"
