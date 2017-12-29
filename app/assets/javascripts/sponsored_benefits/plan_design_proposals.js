@@ -2,8 +2,8 @@ $(document).on('ready', initSlider);
 $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers);
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
 $(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
-$(document).on('slideStop', '.quote-setup-tab .benefits-fields .slider', setSliderDisplayVal);
-$(document).on('change', '.quote-setup-tab input.premium-storage-input', reconcileSliderAndInputVal);
+$(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
+$(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
 
 function attachEmployerHealthContributionShowHide() {
@@ -89,10 +89,9 @@ function carrierSelected() {
 }
 
 function planSelected() {
-  
   toggleSliders($("#elected_plan_kind").val());
 
-  var reference_plan_id = $(this).closest('.health-plan-design .reference-plan').find('input').attr('value');
+  var reference_plan_id = $(this).siblings('input').val();
   $("#reference_plan_id").val(reference_plan_id);
   $(this).closest('.benefit-group-fields').find('.health-plan-design .selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
 
@@ -138,6 +137,7 @@ function toggleSliders(plan_kind) {
 function calcEmployerContributions() {
   var reference_plan_id = $('#reference_plan_id').val();
   var plan_option_kind = $("#elected_plan_kind").val();
+
   var url = $("#contribution_url").val();
 
   var premium_pcts = $('.enabled .benefits-fields input.hidden-param').map(function() {
@@ -188,7 +188,6 @@ function calcEmployerContributions() {
   } else {
     data['benefit_group']["relationship_benefits_attributes"] = relation_benefits;
   }
-
     // runs on slider change
   $.ajax({
     type: "GET",
@@ -222,5 +221,5 @@ function formatRadioButtons() {
       console.log($(this).parent())
     });
   })
-  */  
+  */
 }
