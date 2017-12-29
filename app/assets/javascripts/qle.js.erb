@@ -202,6 +202,14 @@ $(function () {
     }
   });
 
+  $(document).on('change', '#effective_on_option', function() {
+    if($(this).val() != ''){
+      $('#qle-submit-date :input[type="submit"]').attr('disabled', false);
+    }else{
+      $('#qle-submit-date :input[type="submit"]').attr("disabled", true);
+    }
+  });
+
   $(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
     if(this.checked) {
       $('#outside-open-enrollment').modal('show');
