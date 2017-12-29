@@ -101,6 +101,31 @@ module SponsoredBenefits
         end
         @proposal.save
       end
+
+      def to_h
+        unless @effective_date.is_a? Date
+          effective_date = Date.strptime(@effective_date, "%Y-%m-%d")
+        else
+          effective_date = @effective_date
+        end
+        sponsorship = @profile.benefit_sponsorships.first
+        {
+          title: "Copy of #{@proposal.title}",
+          effective_date: @effective_date,
+          profile: [
+            benefit_sponsorship: [
+              initial_enrollment_period: effective_date..(effective_date.next_year.prev_day),
+              annual_enrollment_period_begin_month_of_year: effective_date.month,
+              benefit_market: sponsorship.benefit_market,
+              contact_method: sponsorship.contact_method,
+              benefit_application: [
+                effective_period: effective_date..(effective_date.next_year.prev_day),
+                open_enrollment_period: TimeKeeper.date_of_record..effective_date,
+              ]
+            ]
+          ]
+        }
+      end
     end
   end
 end
