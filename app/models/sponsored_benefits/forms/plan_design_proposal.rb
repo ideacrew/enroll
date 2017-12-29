@@ -83,9 +83,10 @@ module SponsoredBenefits
       def ensure_benefit_group
         sponsorship = @profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
-        application.benefit_groups.build
-        application.benefit_groups.first.build_relationship_benefits
-        application.benefit_groups.first.build_composite_tier_contributions
+        # Commented out due to validation errors on Benefit Groups
+        # application.benefit_groups.build
+        # application.benefit_groups.first.build_relationship_benefits
+        # application.benefit_groups.first.build_composite_tier_contributions
       end
 
       def save
@@ -93,12 +94,20 @@ module SponsoredBenefits
 
         if @proposal.persisted?
           @proposal.assign_attributes(title: @title)
-          @proposal.profile.benefit_sponsorships.first.assign_attributes(initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month)
         else
           profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({sic_code: @sic_code})
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
-          @proposal.profile.benefit_sponsorships.first.assign_attributes({initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
         end
+
+        sponsorship = @proposal.profile.benefit_sponsorships.first
+        sponsorship.assign_attributes({initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
+        if sponsorship.present?
+          enrollment_dates = BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date)
+          benefit_application = (sponsorship.benefit_applications.first || sponsorship.benefit_applications.build)
+          benefit_application.effective_period= enrollment_dates[:effective_period]
+          benefit_application.open_enrollment_period= enrollment_dates[:open_enrollment_period]
+        end
+
         @proposal.save
       end
 
