@@ -6,7 +6,6 @@ module SponsoredBenefits
       include Mongoid::Timestamps
 
       embedded_in :organization, class_name: "::Organization"
-      embedded_in :plan_design_proposal, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
 
       field :profile_source, type: String
 

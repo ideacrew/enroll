@@ -8,7 +8,6 @@ module SponsoredBenefits
     before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
 
     def index
-      @plan_design_census_employees = @benefit_application.plan_design_census_employees
     end
 
     def show
@@ -25,6 +24,8 @@ module SponsoredBenefits
 
     def edit
       @census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find(params.require(:id))
+      @census_employee.build_email if @census_employee.email.blank?
+      @census_employee.build_address if @census_employee.address.blank?
 
       respond_to do |format|
         format.js { render "edit" }
@@ -38,7 +39,6 @@ module SponsoredBenefits
       if @plan_design_census_employee.save
         redirect_to :back, :flash => {:success => "Employee record created successfully."}
       else
-        puts @plan_design_census_employee.errors.full_messages
         redirect_to :back, :flash => {:error => "Unable to create employee record."}
       end
     end
