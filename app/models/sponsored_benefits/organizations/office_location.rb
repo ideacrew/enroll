@@ -12,10 +12,7 @@ module SponsoredBenefits
   	  embeds_one :phone, class_name:"SponsoredBenefits::Locations::Phone", cascade_callbacks: true, validate: true
   	  accepts_nested_attributes_for :phone, reject_if: :all_blank, allow_destroy: true
 
-      # Remove validations
-
-      validates_presence_of :address
-  	  #validates_presence_of :phone, if: :primary_or_branch?
+      validates_presence_of :address, class_name:"SponsoredBenefits::Locations::Address"
 
   	  # validate :address_includes_county_for_employers_primary_location
 
