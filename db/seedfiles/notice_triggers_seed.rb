@@ -407,12 +407,12 @@ shop_notice_triggers = [
     title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
     description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
     resource_name: 'employer',
-    event_name: 'initial_employer_invoice_available',
+    event_name: 'initial_employer_first_invoice_available',
     notice_triggers: [
       {
         name: 'Initial Employer first invoice available in the account',
-        notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
+        notice_template: 'notices/shop_employer_notices/initial_employer_first_invoice_available_notice',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable',
         mpi_indicator: 'MPI_SHOP20',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -421,6 +421,27 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
+    ]
+  },
+  {
+    hbx_id: 'SHOP21',
+    title: 'Monthly Invoice Available Notice',
+    description: 'When groups invoice is available in their account, this notice is sent to them.',
+    resource_name: 'employer',
+    event_name: 'employer_invoice_available',
+    notice_triggers: [
+        {
+          name: 'Employer monthly invoice available in the account',
+          notice_template: 'notices/shop_employer_notices/employer_invoice_available_notice',
+          notice_builder: 'ShopEmployerNotices::EmployerInvoiceAvailable',
+          mpi_indicator: 'SHOP_D021',
+          notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employer"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+          }
+        }
     ]
   },
   {
@@ -761,7 +782,28 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
+  {
+    hbx_id: 'SHOP_D042',
+    title: 'Confirmation of Election To Terminate Coverage',
+    description: 'Employee Terminating coverage after QLE',
+    resource_name: 'employer',
+    event_name: 'notify_employee_confirming_coverage_termination',
+    notice_triggers: [
+      {
+        name: 'Notice to employer when employee terminates coverage',
+        notice_template: 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
+        notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
+        mpi_indicator: 'SHOP_D042',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
