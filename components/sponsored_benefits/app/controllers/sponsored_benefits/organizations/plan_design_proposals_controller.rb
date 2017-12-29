@@ -75,16 +75,6 @@ module SponsoredBenefits
 
     private
 
-    helper_method :customer, :broker, :plan_design_organization
-
-    def broker
-      @broker ||= SponsoredBenefits::Organizations::BrokerAgencyProfile.find(plan_design_organization.owner_profile_id)
-    end
-
-    def customer
-      @customer ||= ::EmployerProfile.find(plan_design_organization.customer_profile_id)
-    end
-
     def effective_datatable
       ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
     end
@@ -97,15 +87,6 @@ module SponsoredBenefits
     def broker_agency_profile
       @broker_agency_profile = @plan_design_organization.broker_agency_profile
     end
-
-
-    # def benefit_sponsorship
-    #   broker.benefit_sponsorships.first || broker.benefit_sponsorships.new
-    # end
-
-    # def benefit_sponsorship_applications
-    #   @benefit_sponsorship_applicatios ||= benefit_sponsorship.plan_design_proposals
-    # end
 
     def load_plan_design_proposal
       proposal_id = params[:id] || params[:plan_design_proposal_id]

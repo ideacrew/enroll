@@ -16,12 +16,28 @@
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), 'static'],
-             ['Publish Quote', sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), 'post_ajax'],
+             ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), disabled_if_published(row)],
+             publish_or_view_published_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), show_link: sponsored_benefits.organizations_plan_design_proposal_path(row.id)),
+             ['Copy Quote', organizations_plan_design_proposal_proposal_copies_path(row.id), 'post'],
              ['Remove Quote', sponsored_benefits.organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quotes_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
+        end
+
+        def disabled_if_published(row)
+          return "disabled" if row.published?
+          "static"
+        end
+
+        def publish_or_view_published_link(row:, publish_link:, show_link:)
+          return ['Publish Quote', publish_link, disabled_if_invalid(row)] unless row.published?
+          ['View Published Quote', show_link, 'static']
+        end
+
+        def disabled_if_invalid(row)
+          return "disabled" unless row.can_quote_be_published?
+          'static'
         end
 
         def proposal_sponsorship(row)
