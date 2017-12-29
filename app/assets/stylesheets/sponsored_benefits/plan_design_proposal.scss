@@ -49,6 +49,11 @@ $brand-primary: $mhc-dark-blue;
 
 
 .plan_design_proposals {
+  
+  .reference-plans {
+    max-height:400px;
+    overflow-y: scroll;
+  }
   /* Style Benefit Model Selection of BQT */
   ul.nav.nav-tabs, .plan-options .col-xs-3 a {
     border-bottom: none;
@@ -334,4 +339,38 @@ $brand-primary: $mhc-dark-blue;
     }
   }
 
+  #pdp-bms {
+    input[type=radio] {
+      display: none;
+    }
+    input[type=radio] + label {
+
+      &>i {
+        font-size: 28px;
+        color: #b7b7b7;
+
+
+
+        &:first-of-type {
+          display: inline-block;
+
+        }
+        &:last-of-type {
+          display: none;
+        }
+      }
+    }
+    input[type=radio]:checked + label {
+
+      &>i {
+        color: #69A30D;
+        &:first-of-type {
+          display: none;
+        }
+        &:last-of-type {
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
