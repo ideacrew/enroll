@@ -23,7 +23,7 @@
       <%when "delete with confirm"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', data: { confirm: line[3] } %>
 			<% when "delete ajax with confirm"%>
-				<%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] } %>
+				<%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method=> 'delete', data: { confirm: line[3] } %>
       <% when "delete ajax with confirm and elementId"%>
         <%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4] %>
       <%end%>
