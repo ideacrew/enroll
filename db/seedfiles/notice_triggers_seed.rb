@@ -750,6 +750,50 @@ shop_notice_triggers = [
   },
 
   {
+    hbx_id: 'SHOP_D055',
+    title: 'Change to your Insurance Coverage',
+    description: 'Dependent EE coverage Termination due to Age-Off on policy when turn 26 - Congressional',
+    resource_name: 'employee_role',
+    event_name: 'employee_dependent_age_off_termination_congressional',
+    notice_triggers: [
+      {
+        name: 'Notice to EE of DPT Termination due to Age-Off (Congressional)',
+        notice_template: 'notices/shop_employee_notices/employee_dependent_age_off_termination',
+        notice_builder: 'ShopEmployeeNotices::EmployeeDependentAgeOffTermination',
+        mpi_indicator: 'SHOP_D055',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  
+  {
+    hbx_id: 'SHOP_D056',
+    title: 'Change to your Insurance Coverage',
+    description: 'Dependent EE coverage Termination due to Age-Off on policy when turn 26 - Non-Congressional',
+    resource_name: 'employee_role',
+    event_name: 'employee_dependent_age_off_termination_non_congressional',
+    notice_triggers: [
+      {
+        name: 'Notice to EE of DPT Termination due to Age-Off (Non-Congressional)',
+        notice_template: 'notices/shop_employee_notices/employee_dependent_age_off_termination',
+        notice_builder: 'ShopEmployeeNotices::EmployeeDependentAgeOffTermination',
+        mpi_indicator: 'SHOP_D056',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
     hbx_id: 'SHOP_D052',
     title: 'Confirmation - Broker Fired',
     description: 'Broker gets terminated after employer selects change broker',
