@@ -3,11 +3,34 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :load_plan_design_organization, except: [:destroy, :publish]
+    before_action :load_plan_design_organization, except: [:destroy, :publish, :link_from_quote]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish]
 
     def index
       @datatable = effective_datatable
+    end
+
+    def link_from_quote
+      employer_profile_id = params.fetch(:plan_design_organization_id, nil)
+      quote_claim_code = params.fetch(:plan_design_organization_id, nil).try(:upcase)
+
+      claim_code_status = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
+
+      if claim_code_status == "invalid"
+        flash[:error] = 'Quote claim code not found.'
+      elsif claim_code_status == "claimed"
+        flash[:error] = 'Quote claim code already claimed.'
+      else
+        if SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote_claim_code)
+          flash[:notice] = 'Code claimed with success. Your Plan Year has been created.'
+        else
+          flash[:error] = 'There was issue claiming this quote.'
+        end
+
+      end
+
+      redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
+
     end
 
     def publish
