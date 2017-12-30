@@ -48,17 +48,18 @@
         end
 
         def ee_count(row)
-          return 'N/A' if row.is_prospect?
+          return 'N/A' if row.is_prospect? || row.broker_relationship_inactive?
           row.employer_profile.roster_size
         end
 
         def er_state(row)
           return 'N/A' if row.is_prospect?
+          return 'Former Client' if row.broker_relationship_inactive?
           row.employer_profile.aasm_state.capitalize
         end
 
         def er_fein(row)
-          return 'N/A' if row.is_prospect?
+          return 'N/A' if row.is_prospect? || row.broker_relationship_inactive?
           row.fein
         end
 
