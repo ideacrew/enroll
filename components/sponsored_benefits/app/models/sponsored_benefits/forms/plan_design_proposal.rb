@@ -17,8 +17,10 @@ module SponsoredBenefits
         ensure_proposal
         ensure_profile
         ensure_sic_zip_county
-        # Commented out due to validation errors. Benefit group needs be initialized during plan comparision.
-        # ensure_benefit_group
+      end
+
+      def build_benefit_group
+        ensure_benefit_group
       end
 
       def assign_wrapper_attributes(attrs = {})
@@ -82,8 +84,8 @@ module SponsoredBenefits
       end
 
       def ensure_benefit_group
-        sponsorship = @profile.benefit_sponsorships.first
-        application = sponsorship.benefit_applications.first        
+        sponsorship = @proposal.profile.benefit_sponsorships.first
+        application = sponsorship.benefit_applications.first
         application.benefit_groups.build
         application.benefit_groups.first.build_relationship_benefits
         application.benefit_groups.first.build_composite_tier_contributions
