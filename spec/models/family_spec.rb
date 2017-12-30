@@ -1616,3 +1616,31 @@ describe "has_valid_e_case_id" do
     expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end
+
+describe Family, "#take_initial_application_snapshot" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:existing_snapshot) { InitialApplicationSnapshot.new }
+
+  context "snapshot already exists" do
+    before do
+      family.initial_application_snapshot = existing_snapshot
+      family.take_application_snapshot
+    end
+    it "doesn't create new snapshot" do
+      expect(family.initial_application_snapshot).to eq existing_snapshot
+    end
+  end
+
+  context "no existing snapshot" do
+    before do
+      family.take_application_snapshot
+    end
+    it "creates initial application snapshot" do
+      expect(family.initial_application_snapshot).not_to be_nil
+    end
+    it "creates initial application snapshot" do
+      expect(family.initial_application_snapshot.family_member_snapshots.count).to eq family.family_members.count
+    end
+  end
+end

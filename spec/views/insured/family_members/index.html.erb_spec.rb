@@ -51,7 +51,7 @@ describe "insured/family_members/index.html.erb" do
 
     it "should call individual_progress" do
       expect(rendered).to match /Verify Identity/
-      expect(rendered).to have_selector("a[href='/insured/families/find_sep?consumer_role_id=#{consumer_role.id}']", text: 'Continue')
+      expect(rendered).to have_selector("a[href='/insured/families/find_sep?add_snapshot=true&consumer_role_id=#{consumer_role.id}']", text: 'Continue')
     end
   end
 end
