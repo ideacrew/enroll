@@ -3,14 +3,15 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :load_plan_design_organization, except: [:destroy, :publish, :link_from_quote]
+    before_action :load_plan_design_organization, except: [:destroy, :publish, :claim]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish]
 
     def index
       @datatable = effective_datatable
     end
 
-    def link_from_quote
+    def claim
+      binding.pry
       employer_profile_id = params.fetch(:plan_design_organization_id, nil)
       quote_claim_code = params.fetch(:plan_design_organization_id, nil).try(:upcase)
 
