@@ -39,7 +39,7 @@
 - unless applicant.age_left_foster_care.blank?
   %age_left_foster_care= applicant.age_left_foster_care
 - unless applicant.foster_care_us_state.blank?
-  %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{applicant.foster_care_us_state.downcase.gsub(" ","_")}"
+  %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==applicant.foster_care_us_state.upcase end.first.downcase.gsub(' ','_')}"
 - unless applicant.had_medicaid_during_foster_care.blank?
   %had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
 - if applicant.is_pregnant.present?
