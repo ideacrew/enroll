@@ -1,25 +1,21 @@
 module SponsoredBenefits
   module Organizations
-    class PlanDesignProposals::ContributionsController < ApplicationController
+    class PlanDesignProposals::BenefitGroupsController < ApplicationController
 
-      def index
-        @plan = ::Plan.find(benefit_group.reference_plan_id)
-        if benefit_group.sole_source?
-          benefit_group.build_estimated_composite_rates
-        end
-        benefit_group.set_bounding_cost_plans
-        @employer_contribution_amount = benefit_group.monthly_employer_contribution_amount(@plan)
-        @min_employee_cost = benefit_group.monthly_min_employee_cost()
-        @max_employee_cost = benefit_group.monthly_max_employee_cost
-
-        @benefit_group_costs = benefit_group.employee_costs_for_reference_plan
+      def create
+        benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
+        plan_design_form.assign_benefit_group(benefit_group)
       end
 
       private
-        helper_method :plan_design_proposal, :benefit_group
+        helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal
 
         def plan_design_proposal
-          @plan_design_proposal ||= PlanDesignProposal.find(params[:plan_design_proposal_id])
+          @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id])
+        end
+
+        def plan_design_organization
+          @plan_design_organization ||= plan_design_proposal.plan_design_organization
         end
 
         def sponsorship
@@ -28,6 +24,10 @@ module SponsoredBenefits
 
         def benefit_group
           @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
+        end
+
+        def plan_design_form
+          SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id])
         end
 
         def benefit_group_params
