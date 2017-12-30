@@ -83,6 +83,13 @@ module SponsoredBenefits
         end
       end
 
+      def assign_benefit_group(benefit_group)
+        sponsorship = @proposal.profile.benefit_sponsorships.first
+        application = @proposal.benefit_applications.first
+        application.benefit_groups << benefit_group
+        @proposal.save!
+      end
+
       def ensure_benefit_group
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first

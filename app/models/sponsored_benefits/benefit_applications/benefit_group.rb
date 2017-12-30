@@ -5,12 +5,7 @@ module SponsoredBenefits
       delegate :effective_period, to: :benefit_application
       delegate :sic_code, to: :benefit_application
       delegate :rating_area, to: :benefit_application
-
-      def census_employees
-        ## point to engine benefit_group_assignment
-        ## these will need an 'active' scope
-        PlanDesignCensusEmployee.find_all_by_benefit_group
-      end
+      delegate :census_employees, to: :benefit_application
 
       def targeted_census_employees
         target_object = persisted? ? self : benefit_application.benefit_sponsorship
@@ -24,6 +19,31 @@ module SponsoredBenefits
           :rating_area => rating_area,
           :estimate_group_size? => true
         )
+      end
+
+      def employee_costs_for_reference_plan
+          plan = reference_plan
+
+          employee_costs = census_employees.active.inject({}) do |census_employees, employee|
+            costs = {
+              ref_plan_cost: employee_cost_for_plan(employee, plan)
+            }
+
+            if !single_plan_type?
+              costs.merge!({
+                lowest_plan_cost: employee_cost_for_plan(employee, lowest_cost_plan),
+                highest_plan_cost: employee_cost_for_plan(employee, highest_cost_plan)
+                })
+            end
+            census_employees[employee.id] = costs
+            census_employees
+          end
+
+          employee_costs.merge!({
+            ref_plan_employer_cost: monthly_employer_contribution_amount(plan),
+            lowest_plan_employer_cost: monthly_employer_contribution_amount(lowest_cost_plan),
+            highest_plan_employer_cost: monthly_employer_contribution_amount(highest_cost_plan)
+            })
       end
 
     end

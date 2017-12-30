@@ -27,6 +27,7 @@ SponsoredBenefits::Engine.routes.draw do
       resources :contributions, controller: 'plan_design_proposals/contributions', only: [:index]
       resources :plan_selections, controller: 'plan_design_proposals/plan_selections', only: [:new]
       resources :proposal_copies, controller: 'plan_design_proposals/proposal_copies', only: [:create]
+      resources :benefit_groups, controller: 'plan_design_proposals/benefit_groups', only: [:create]
       post :publish
     end
 

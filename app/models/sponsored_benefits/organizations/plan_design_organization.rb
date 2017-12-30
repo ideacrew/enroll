@@ -49,6 +49,7 @@ module SponsoredBenefits
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
       scope :draft_proposals, -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
+      
       def employer_profile
         ::EmployerProfile.find(customer_profile_id)
       end
