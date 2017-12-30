@@ -2738,5 +2738,15 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
       expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
     end
+
+    shared_examples_for "trigger 'ee_select_plan_during_oe' hook" do |event|
+
+      it "should call 'ee_select_plan_during_oe' hook" do
+        expect(HbxEnrollment.aasm.state_machine.events[event].transitions[0].opts[:after].include?(:ee_select_plan_during_oe)).to eq true
+      end
+    end
+
+    it_behaves_like "trigger 'ee_select_plan_during_oe' hook", :force_select_coverage
+    it_behaves_like "trigger 'ee_select_plan_during_oe' hook", :select_coverage
   end
 end
