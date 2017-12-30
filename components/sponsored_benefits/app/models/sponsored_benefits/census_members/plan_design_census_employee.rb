@@ -89,6 +89,11 @@ module SponsoredBenefits
         end
       end
 
+      def is_eligible?
+        ## Placeholder
+        true
+      end
+      
       def allow_nil_ssn_updates_dependents
         census_dependents.each do |cd|
           if cd.ssn.blank?
@@ -144,7 +149,7 @@ module SponsoredBenefits
       def expected_to_enroll_or_valid_waive?
         true
       end
-      
+
       def composite_rating_tier
         return ::CompositeRatingTier::EMPLOYEE_ONLY if self.census_dependents.empty?
         relationships = self.census_dependents.map(&:employee_relationship)
