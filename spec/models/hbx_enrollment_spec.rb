@@ -2668,7 +2668,7 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should trigger ee_select_plan_during_oe job in queue" do
       allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
-      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(hbx_enrollment).to receive_message_chain(:benefit_group, :plan_year, :open_enrollment_contains?).and_return(true)
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
 
