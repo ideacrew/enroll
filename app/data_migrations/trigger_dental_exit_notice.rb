@@ -7,7 +7,7 @@ class TriggerDentalExitNotice < MongoidMigrationTask
     organizations = Organization.where(:"employer_profile.plan_years" => {:"$elemMatch" => 
       {
         :"start_on".in => employer_groups,
-        :"aasm_state".in => PlanYear::RENEWING
+        :"aasm_state".in => PlanYear::RENEWING + ["renewing_application_ineligible", "renewing_canceled"]
       }
     })
 
