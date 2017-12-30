@@ -22,7 +22,7 @@
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
              ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
              ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
-             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), 'ajax'],
+             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
              ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
                                 remove_employer_link_type(row),
                                 "Are you sure you want to remove this employer?"]
@@ -39,22 +39,27 @@
           end
         end
 
+        def edit_employer_link_type(employer)
+          employer.is_prospect? ? 'ajax' : 'disabled'
+        end
+
         scopes do
           scope :legal_name, "Hello"
         end
 
         def ee_count(row)
-          return 'N/A' if row.is_prospect?
+          return 'N/A' if row.is_prospect? || row.broker_relationship_inactive?
           row.employer_profile.roster_size
         end
 
         def er_state(row)
           return 'N/A' if row.is_prospect?
+          return 'Former Client' if row.broker_relationship_inactive?
           row.employer_profile.aasm_state.capitalize
         end
 
         def er_fein(row)
-          return 'N/A' if row.is_prospect?
+          return 'N/A' if row.is_prospect? || row.broker_relationship_inactive?
           row.fein
         end
 
