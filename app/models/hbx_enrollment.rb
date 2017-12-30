@@ -146,6 +146,8 @@ class HbxEnrollment
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
+  scope :by_created_datetime_range,  ->(start_at, end_at){ where(:created_at => { "$gte" => start_at, "$lte" => end_at} )}
+  scope :by_submitted_datetime_range,  ->(start_at, end_at){ where(:submitted_at => { "$gte" => start_at, "$lte" => end_at} )}
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :by_hbx_id,            ->(hbx_id) { where(hbx_id: hbx_id) }
@@ -1120,7 +1122,6 @@ class HbxEnrollment
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
-
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).enrolled_and_renewing.to_a
@@ -1445,6 +1446,30 @@ class HbxEnrollment
         end
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employee plan selection during OE notice to #{self.census_employee.id.to_s} due to #{e.backtrace}" }
+      end
+    end
+  end
+
+  def ee_plan_selection_confirmation_sep_new_hire
+    if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
+      if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
+        begin
+          census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
+        rescue Exception => e
+          (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
+        end
+      end
+    end
+  end
+
+  def notify_employee_confirming_coverage_termination
+    if is_shop? && census_employee.present?
+      begin
+        census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
+        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s)
+      rescue Exception => e
+        (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" })
       end
     end
   end
