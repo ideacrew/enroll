@@ -6,10 +6,15 @@ module SponsoredBenefits
       delegate :sic_code, to: :benefit_application
       delegate :rating_area, to: :benefit_application
       delegate :census_employees, to: :benefit_application
+      delegate :plan_design_organization, to: :benefit_application
 
       def targeted_census_employees
         target_object = persisted? ? self : benefit_application.benefit_sponsorship
         target_object.census_employees
+      end
+
+      def employer_profile
+        plan_design_organization
       end
 
       def plan_year
