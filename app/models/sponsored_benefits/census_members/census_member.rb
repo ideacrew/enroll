@@ -34,7 +34,7 @@ module SponsoredBenefits
     accepts_nested_attributes_for :email, allow_destroy: true
 
     validates_presence_of :first_name, :last_name, :dob, :employee_relationship
-  
+
     validates :gender, presence: true, unless: :plan_design_model?
     validates :gender, allow_blank: true, inclusion: { in: GENDER_KINDS, message: "must be selected" }
 

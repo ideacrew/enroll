@@ -6,6 +6,11 @@ $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .s
 $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
 
+$(document).ready(function() {
+  // Sets One Plan to active on page load
+  $('li.sole-source-tab').find('label').trigger('click');;
+});
+
 function attachEmployerHealthContributionShowHide() {
   var offering_id = $(this).attr("data-offering-id");
   var option_kind = $(this).attr("data-offering-kind");
@@ -69,7 +74,8 @@ function carrierSelected() {
   var elected_plan_kind = $(this).attr('value');
 
   $("#elected_plan_kind").val(elected_plan_kind);
-
+  $("#reference_plan_id").val("");
+  
   if (elected_plan_kind == "single_carrier") {
     $(this).closest('.health-plan-design').find('.carriers-tab').show();
     $(this).closest('.health-plan-design').find('.plan-options').slideDown();
@@ -221,9 +227,3 @@ function formatRadioButtons() {
     });
   })
 }
-
-$(document).ready(function() {
-    // Sets One Plan to active on page load
-    button = $('li.sole-source-tab').find('label');
-    button.trigger('click');
-})
