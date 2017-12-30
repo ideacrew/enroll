@@ -25,17 +25,20 @@ RSpec.describe VerificationHelper, :type => :helper do
       before do
         uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
         person.consumer_role.revert!(verification_attr) unless current_state
+        person.consumer_role.tribal_id = "444444444" if verification_type == "American Indian Status"
         if curam
           person.consumer_role.import!(verification_attr) if current_state == "valid"
           person.consumer_role.vlp_authority = "curam"
         else
           if current_state == "valid"
-            person.consumer_role.ssn_validation = "valid"
-            person.consumer_role.native_validation = "valid"
+            person.consumer_role.update_attributes(:ssn_validation => "valid",
+                                                   :native_validation => "valid")
+            person.consumer_role.mark_residency_authorized
             person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
           else
             person.consumer_role.ssn_validation = "outstanding"
             person.consumer_role.native_validation = "outstanding"
+            person.consumer_role.mark_residency_denied
             person.consumer_role.lawful_presence_determination.deny!(verification_attr)
           end
         end
@@ -59,6 +62,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
       it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", "curam", false
+      it_behaves_like "verification type status", "outstanding", "Residency", true, "in review", false, false
     end
 
     context "admin role" do
@@ -66,6 +70,36 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
       it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
+    end
+
+    context 'verification type status attested' do
+      before :each do
+        person.dob = Date.new(2010,11,10)
+      end
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
+      end
+
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
+      end
+
+      it 'does not return attested if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.update_attributes!(local_residency_validation: 'valid')
+        expect(helper.verification_type_status('DC Residency', person)).not_to eq('attested')
+      end
+
+      it 'does not return attested if age <= 18 and type is social security number ' do
+        expect(helper.verification_type_status('Social Security Number', person)).not_to eq('attested')
+      end
+
+      it 'returns outstanding if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.native_validation = "outstanding"
+        person.consumer_role.mark_residency_denied
+        expect(helper.verification_type_status('DC Residency', person)).to eq('outstanding')
+      end
     end
   end
 
@@ -340,6 +374,30 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
       end
     end
+    context 'DC Residency' do
+      it 'returns in review if documents for Residency  uploaded' do
+        person.consumer_role.local_residency_validation = 'pending'
+        person.consumer_role.is_state_resident = false
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "DC Residency")
+        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+      end
+      it 'returns verified if residency is valid' do
+        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return true
+        person.consumer_role.local_residency_validation = 'valid'
+        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+      end
+      it 'returns outstanding for residency outstanding' do
+        person.consumer_role.local_residency_validation = 'outstanding'
+        person.consumer_role.vlp_documents = []
+        expect(helper.show_v_type('DC Residency', person)).to eq('Outstanding')
+      end
+      it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
+        person.consumer_role.local_residency_validation = 'outstanding'
+        allow_any_instance_of(ConsumerRole).to receive(:processing_residency_24h?).and_return true
+        person.consumer_role.vlp_documents = []
+        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+      end
+    end
   end
 
   describe "#documents_list" do
@@ -372,17 +430,44 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#build_admin_actions_list" do
-    shared_examples_for "admin actions dropdown list" do |type, status, actions|
+    shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
       before do
         allow(helper).to receive(:verification_type_status).and_return status
       end
       it "returns admin actions array" do
-        expect(helper.build_admin_actions_list(person, type)).to eq actions
+        person.consumer_role.update_attributes(aasm_state: "#{state}")
+        expect(helper.build_admin_actions_list(type, person)).to eq actions
       end
     end
 
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+  end
+
+  describe "#build_reject_reason_list" do
+    shared_examples_for "reject reason dropdown list" do |type, reason_in, reason_out|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return "in review"
+      end
+      it "includes #{reason_in} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to include reason_in
+      end
+      it "don't include #{reason_out} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to_not include reason_out
+      end
+    end
+
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", "4 weeks"
+    it_behaves_like "reject reason dropdown list", "Immigration status", "Expired", "Too old"
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", nil
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Illegible", "Expired"
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Wrong Type", "Too old"
+    it_behaves_like "reject reason dropdown list", "American Indian Status", "Wrong Person", "Expired"
   end
 end

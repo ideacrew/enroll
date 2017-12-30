@@ -12,5 +12,6 @@ module PdfTemplates
     attribute :last_name, String
     attribute :assignment_date, Date
     attribute :full_name, String
+    attribute :terminated_on, Date
   end
 end

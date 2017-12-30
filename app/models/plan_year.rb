@@ -289,14 +289,14 @@ class PlanYear
   end
 
   def carriers_offered
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.carriers_offered
     end.uniq
   end
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.dental_carriers_offered
     end.uniq
   end
@@ -786,7 +786,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -828,7 +828,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -918,7 +918,7 @@ class PlanYear
                             :enrolled, :enrolling, :active, :application_ineligible,
                             :renewing_application_ineligible, :published_invalid,
                             :eligibility_review, :published, :publish_pending
-                          ], to: :draft
+                          ], to: :draft, :after => [:cancel_enrollments]
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -929,7 +929,7 @@ class PlanYear
     # Admin ability to reset renewing plan year application
     event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling,
-        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft
+        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft, :after => [:cancel_enrollments]
     end
 
     event :cancel_renewal, :after => :record_transition do
@@ -941,6 +941,11 @@ class PlanYear
     end
   end
 
+  def cancel_enrollments
+    self.hbx_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+  end
 
   def trigger_passive_renewals
     open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
@@ -1106,15 +1111,6 @@ class PlanYear
       self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
-  def initial_employer_open_enrollment_begins
-    return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    begin
-      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial open enrollment notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
