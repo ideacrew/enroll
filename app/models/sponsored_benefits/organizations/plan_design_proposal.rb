@@ -30,35 +30,75 @@ module SponsoredBenefits
       scope :published, -> { any_in(aasm_state: %w(published renewing_published)) }
       scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
 
-      def self.find(id)
-        organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals._id" => BSON::ObjectId.from_string(id)).first
-        organization.plan_design_proposals.detect{|proposal| proposal.id == BSON::ObjectId.from_string(id)}
-      end
+      # class methods
+      class << self
 
-      def self.claim_code_status?(quote_claim_code)
-        cc = self.where("claim_code" => quote_claim_code).first
-        if cc.nil?
-          return "invalid"
-        else
-          return cc.aasm_state
+        def find(id)
+          organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals._id" => BSON::ObjectId.from_string(id)).first
+          organization.plan_design_proposals.detect{|proposal| proposal.id == BSON::ObjectId.from_string(id)}
         end
-      end
 
-      def self.build_plan_year_from_quote(employer_profile_id, quote_claim_code)
-        employer_profile = EmployerProfile.find(employer_profile_id)
-        organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
-          "plan_design_proposals.claim_code" => quote_claim_code,
-          "plan_design_proposals.aasm_state" => "published"
-        ).first
+        def claim_code_status?(quote_claim_code)
+          quote = find_quote(quote_claim_code)
+          if quote.present?
+            return quote.aasm_state # quote is present, return its current status.
+          else
+            return "invalid" # quote is not present, return invalid(replicating the same functionality as in dc enroll.)
+          end
+        end
 
-        quote = organization.plan_design_proposals.detect{ |pdp| pdp.claim_code == quote_claim_code }
+        def find_quote(quote_claim_code)
+          # search plan_design_proposal with published status and user entered claim code.
+          organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+            "plan_design_proposals.claim_code" => quote_claim_code,
+            "plan_design_proposals.aasm_state" => "published"
+          ).first
 
-        if quote.present? && quote_claim_code.present? && quote.published?
-          plan_year = employer_profile.plan_years.build({
-            start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
-            open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
-            fte_count: quote.member_count
-          })
+          return nil if organization.blank?
+
+          # retrieve the quote that the user entered to claim on the benefits page in employer portal.
+          organization.plan_design_proposals.detect{ |pdp| pdp.claim_code == quote_claim_code }
+        end
+
+        # this method creates a draft plan year from a valid claim code entered on benefits page(in employer portal).
+        def build_plan_year_from_quote(employer_profile_id, quote_claim_code)
+          # find the employer_profile, we need this later in the process when we are ready to assign the draft plan year
+          # that was created from benefit application.
+          employer_profile = EmployerProfile.find(employer_profile_id)
+
+          # find the quote.
+          quote = find_quote(quote_claim_code)
+
+          # only if the quote is present, then go to the next steps.
+          if quote.present? && quote_claim_code.present? && quote.published?
+
+            # retrieve the benefit sponsorship that was automatically built when a quote was created.
+            bs = quote.profile.benefit_sponsorships.first
+
+            # get the benefit application and call to_plan_year on it, which will create a draft plan year.
+            ba = bs.benefit_applications.first
+
+            # this will create plan year, benefit groups, relationship benefits, composite_tier_contributions, etc.
+            py = ba.to_plan_year
+
+            # if plan year is successfully created in the above step, it will return plan year object.
+            if py.present?
+
+              # we will assign the draft plan year to the employer_profile and save.
+              employer_profile.plan_years << py
+              employer_profile.save
+
+              # we will claim the quote and transition its status from published to claimed.
+              quote.claim!
+              return true
+            else
+              # if draft plan year was not created, return false.
+              return false
+            end
+          end
+
+          # quote is not present, return false.
+          return false
         end
 
       end
@@ -110,7 +150,6 @@ module SponsoredBenefits
           transitions from: :renewing_draft, to: :renewing_expired, :guard => :can_be_expired?
         end
       end
-
 
     end
   end
