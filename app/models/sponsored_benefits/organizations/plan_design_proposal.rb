@@ -64,24 +64,25 @@ module SponsoredBenefits
 
         # this method creates a draft plan year from a valid claim code entered on benefits page(in employer portal).
         def build_plan_year_from_quote(employer_profile_id, quote)
-          # find the employer_profile, we need this later in the process when we are ready to assign the draft plan year
-          # that was created from benefit application.
-          employer_profile = EmployerProfile.find(employer_profile_id)
 
           # only if the quote is present, then go to the next steps.
           if quote.present? && quote_claim_code.present? && quote.published?
 
+          ## may require some refactoring
             # retrieve the benefit sponsorship that was automatically built when a quote was created.
             bs = quote.profile.benefit_sponsorships.first
 
             # get the benefit application and call to_plan_year on it, which will create a draft plan year.
             ba = bs.benefit_applications.first
+          ## end may require some refactoring
 
             # this will create plan year, benefit groups, relationship benefits, composite_tier_contributions, etc.
             py = ba.to_plan_year
 
             # if plan year is successfully created in the above step, it will return plan year object.
             if py.present?
+              # find the employer_profile.
+              employer_profile = EmployerProfile.find(employer_profile_id)
 
               # we will assign the draft plan year to the employer_profile and save.
               employer_profile.plan_years << py
@@ -117,7 +118,7 @@ module SponsoredBenefits
       end
 
       def employer_claim_code
-         4.times.map{generate_character}.join + '-' + 4.times.map{generate_character}.join
+        4.times.map{generate_character}.join + '-' + 4.times.map{generate_character}.join
       end
 
       def set_employer_claim_code
