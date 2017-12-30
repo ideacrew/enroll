@@ -38,7 +38,7 @@ module SponsoredBenefits
       begin_on    = range_period.split("..")[0]
       end_on      = range_period.split("..")[1]
       date_range  = Date.strptime(beginning)..Date.strptime(ending)
-    when Time
+    when Time, DateTime
       begin_on    = range_period.begin.to_date
       end_on      = range_period.end.to_date
       date_range  = begin_on..end_on
