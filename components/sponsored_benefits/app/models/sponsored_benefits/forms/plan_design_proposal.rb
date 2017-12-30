@@ -84,9 +84,15 @@ module SponsoredBenefits
       end
 
       def assign_benefit_group(benefit_group)
+        if benefit_group.sole_source?
+          benefit_group.build_relationship_benefits
+        else
+          benefit_group.build_composite_tier_contributions
+        end
         sponsorship = @proposal.profile.benefit_sponsorships.first
-        application = @proposal.benefit_applications.first
+        application = sponsorship.benefit_applications.first
         application.benefit_groups << benefit_group
+        ## this is not saving even though it claims to be valid
         @proposal.save!
       end
 
