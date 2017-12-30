@@ -1,4 +1,4 @@
-<% offering_id = f.object.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.id %>
+<% offering_id = f.object.proposal.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.id %>
 
 <div class="health-plan-design benefits-setup-tab quote-setup-tab">
   <ul class="nav nav-tabs">
@@ -34,7 +34,7 @@
           <i class="fa fa-dot-circle-o"></i>
           <div class="pdp_carrier_title">
             <% if check_plan_options_title %>
-                <%= fetch_plan_title_for_single_carrier %> 
+                <%= fetch_plan_title_for_single_carrier %>
             <% else %>
                 By carrier
             <% end %>
@@ -59,7 +59,7 @@
       </li>
     <% end %>
   </ul>
-  
+
   <div class="col-xs-12 plan-options" style="display: none;">
     <div class="col-xs-12 carriers-tab tab-container" style="display: none;">
       <br><br>

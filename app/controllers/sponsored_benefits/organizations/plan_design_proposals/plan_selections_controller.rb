@@ -3,7 +3,7 @@ module SponsoredBenefits
     class PlanDesignProposals::PlanSelectionsController < ApplicationController
 
       def new
-
+        plan_design_form.build_benefit_group
       end
 
       private
