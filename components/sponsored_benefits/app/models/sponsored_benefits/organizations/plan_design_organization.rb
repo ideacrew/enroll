@@ -73,6 +73,12 @@ module SponsoredBenefits
         customer_profile_id.nil?
       end
 
+      def expire_proposals
+        plan_design_proposals.each do |proposal|
+          proposal.expire! if SponsoredBenefits::Organizations::PlanDesignProposal::EXPIRABLE_STATES.include? proposal.aasm_state
+        end
+      end
+
       class << self
         def find_by_owner_and_customer(owner_id, customer_id)
           where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id), :"customer_profile_id" => BSON::ObjectId.from_string(customer_id)).first
