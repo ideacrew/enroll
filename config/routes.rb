@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
   mount TransportGateway::Engine,       at: "/transport_gateway"
   mount TransportProfiles::Engine,      at: "/transport_profiles"
-  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits" , :as => "sponsored_benefits_engine"
+  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
   mount Notifier::Engine, at: "/notifier"
 
   # SponsoredBenefits::Engine.routes.draw do
