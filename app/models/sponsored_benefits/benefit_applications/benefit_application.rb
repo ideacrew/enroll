@@ -138,12 +138,12 @@ module SponsoredBenefits
 
 
       def to_plan_year
-        return unless benefit_sponsorship.present && enrollment_period.present? && open_enrollment_period.present?
+        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" unless benefit_groups.size <= 1
 
         # Attribute Map
-        start_on                        = enrollment_period.begin
-        end_on                          = enrollment_period.end
+        start_on                        = effective_period.begin
+        end_on                          = effective_period.end
         open_enrollment_period_start_on = open_enrollment_period.begin
         open_enrollment_period_end_on   = open_enrollment_period.end
 
@@ -176,8 +176,8 @@ module SponsoredBenefits
 
         ::PlanYear.new( start_on: start_on,
                         end_on: end_on,
-                        open_enrollment_period_start_on: open_enrollment_period_start_on,
-                        open_enrollment_period_end_on: open_enrollment_period_end_on,
+                        open_enrollment_start_on: open_enrollment_period_start_on,
+                        open_enrollment_end_on: open_enrollment_period_end_on,
                         benefit_groups: cloned_benefit_groups,
                       )
       end
