@@ -418,6 +418,7 @@ $(document).ready(function() {
        $(clonedForm).find('select').selectric();
        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
        $(this).addClass("hidden");
+       e.stopImmediatePropagation();
    });
 
   /* edit existing other income */
