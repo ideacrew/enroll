@@ -6,6 +6,7 @@ module SponsoredBenefits
       include AASM
 
       RENEWAL_STATES = %w(renewing_draft renewing_published renewing_claimed renewing_expired)
+      EXPIRABLE_STATES = %w(draft renewing_draft)
 
       embedded_in :plan_design_organization, class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
@@ -36,6 +37,10 @@ module SponsoredBenefits
 
       def can_quote_be_published?
         self.valid?
+      end
+
+      def can_be_expired?
+        self.valid? && !plan_design_organization.is_prospect?
       end
 
       def generate_character
@@ -70,6 +75,11 @@ module SponsoredBenefits
 
         event :claim do
           transitions from: :published, to: :claimed
+        end
+
+        event :expire do
+          transitions from: :draft, to: :expired, :guard => :can_be_expired?
+          transitions from: :renewing_draft, to: :renewing_expired, :guard => :can_be_expired?
         end
       end
 
