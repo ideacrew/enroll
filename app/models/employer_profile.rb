@@ -283,6 +283,10 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
   end
 
+  def is_conversion?
+    self.profile_source.to_s == "conversion"
+  end
+
   def is_converting?
     self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end
@@ -1039,10 +1043,6 @@ class EmployerProfile
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.first.employer_profile
-  end
-
-  def is_conversion?
-    self.profile_source == "conversion"
   end
 
   def generate_and_deliver_checkbook_urls_for_employees
