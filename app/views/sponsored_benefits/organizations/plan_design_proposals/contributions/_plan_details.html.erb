@@ -5,13 +5,6 @@
   <h1>Your Reference Plan</h1>
 </div>
 
-<div id="employer_cost_info_btn" class="col-xs-6" style="padding-top: 10px;">
-  <div class="btn btn-default btn-right pull-right" style="margin-right: 0;">
-    Employee Detail Costs
-  </div>
-  <!--  employee_costs_employers_employer_profile_plan_years_path(@employer_profile) -->
-  <%= link_to "Employee Costs", '#', id: "employee_costs_link", class: "hidden" %>
-</div>
 </div>
 <%= render "employers/plan_years/employee_costs_modal" %>
 
@@ -20,10 +13,7 @@
     <header class="row">
       <h5 style="color: #69A30D; font-size: 18px;"><strong><%= @plan.name %></strong></h5>
     </header>
-  </section>
-  <section class="col-xs-6">
-    <h4 class="change-dental-reference-plan pull-right" style="display: none;">Change Reference Plan?</h4>
-      <% render partial: "employers/plan_years/dental_reference_plans_options_modal" %>
+    <p> Deductible: <%= @plan.deductible %> / <%= @plan.family_deductible %></p>
   </section>
   <h2></h2>
   <table>
