@@ -103,7 +103,7 @@ module SponsoredBenefits
             :annual_enrollment_period_begin_month_of_year,
             benefit_application: [
               :effective_period,
-              :open_enrollment_period
+              :open_enrollment_period,
             ]
           ]
         ]

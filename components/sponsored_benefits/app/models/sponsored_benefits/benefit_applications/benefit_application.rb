@@ -8,6 +8,7 @@ module SponsoredBenefits
 
       delegate :sic_code, to: :benefit_sponsorship
       delegate :rating_area, to: :benefit_sponsorship
+      delegate :census_employees, to: :benefit_sponsorship
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date

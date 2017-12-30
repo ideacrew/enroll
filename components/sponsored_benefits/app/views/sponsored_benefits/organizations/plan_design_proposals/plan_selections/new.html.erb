@@ -4,7 +4,8 @@
      <div class="container plan_design_proposals">
       <%= render 'shared/engines/horizontal_status', step:2 %>
       <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
-      <%= render 'plan_selection_form', f: f %>
+        <%= render 'plan_selection_form', f: f %>
+        <%= f.submit "Save", id: "submitPlanDesignProposal" %>
       <% end %>
       <div class="row">
         <div class="col-md-3">

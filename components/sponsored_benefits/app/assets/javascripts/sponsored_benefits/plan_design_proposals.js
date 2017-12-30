@@ -5,6 +5,7 @@ $(document).on('click', '.reference-plan input[type=radio] + label', planSelecte
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
 $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
+$(document).on('submit', '#new_forms_plan_design_proposal', submitPlanDesignProposal);
 
 $(document).ready(function() {
   // Sets One Plan to active on page load
@@ -75,7 +76,7 @@ function carrierSelected() {
 
   $("#elected_plan_kind").val(elected_plan_kind);
   $("#reference_plan_id").val("");
-  
+
   if (elected_plan_kind == "single_carrier") {
     $(this).closest('.health-plan-design').find('.carriers-tab').show();
     $(this).closest('.health-plan-design').find('.plan-options').slideDown();
@@ -141,10 +142,31 @@ function toggleSliders(plan_kind) {
 }
 
 function calcEmployerContributions() {
-  var reference_plan_id = $('#reference_plan_id').val();
-  var plan_option_kind = $("#elected_plan_kind").val();
+  data = buildBenefitGroupParams();
+  if (data == undefined) {
+    return
+  }
 
   var url = $("#contribution_url").val();
+
+  $.ajax({
+    type: "GET",
+    url: url,
+    dataType: 'script',
+    data: data
+  }).done(function() {
+    // do something on completion?
+  });
+
+}
+
+function buildBenefitGroupParams() {
+  var reference_plan_id = $('#reference_plan_id').val();
+  if (reference_plan_id == "" || reference_plan_id == undefined) {
+    return
+  }
+
+  var plan_option_kind = $("#elected_plan_kind").val();
 
   var premium_pcts = $('.enabled .benefits-fields input.hidden-param').map(function() {
     return $(this).val();
@@ -153,9 +175,7 @@ function calcEmployerContributions() {
     return $(this).is(":checked");
   }).get();
 
-  if (reference_plan_id == "" || reference_plan_id == undefined) {
-    return
-  }
+
 
   var composite_rating_tier_types = [ 'employee_only', 'family', 'employee_and_spouse', 'employee_and_one_or_more_dependents']
   var relationship_benefit_types = [ 'employee', 'spouse', 'domestic_partner', 'child_under_26', 'child_26_and_over']
@@ -194,16 +214,7 @@ function calcEmployerContributions() {
   } else {
     data['benefit_group']["relationship_benefits_attributes"] = relation_benefits;
   }
-    // runs on slider change
-  $.ajax({
-    type: "GET",
-    url: url,
-    dataType: 'script',
-    data: data
-  }).done(function() {
-    // do something on completion?
-  });
-
+  return data;
 }
 
 function initSlider() {
@@ -226,4 +237,9 @@ function formatRadioButtons() {
       input.attr('checked', true)
     });
   })
+}
+
+function submitPlanDesignProposal(event) {
+  console.log( "Handler for .submit() called." );
+  event.preventDefault();
 }
