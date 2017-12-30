@@ -58,6 +58,7 @@ module SponsoredBenefits
           plan_design_organization.has_active_broker_relationship = false
           plan_design_organization.sic_code ||= employer.sic_code
           plan_design_organization.save!
+          plan_design_organization.expire_proposals
         end
       end
 
