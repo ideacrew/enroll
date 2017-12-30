@@ -1,6 +1,6 @@
 module SponsoredBenefits
   module CensusMembers
-    class PlanDesignCensusEmployee < CensusMember
+    class PlanDesignCensusEmployee < SponsoredBenefits::CensusMembers::CensusMember
 
       include AASM
       include Sortable
