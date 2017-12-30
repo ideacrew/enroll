@@ -27,36 +27,54 @@ module SponsoredBenefits
 
     def edit
       @organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
-      get_sic_codes
+
+      if @organization.is_prospect?
+        get_sic_codes
+      else
+        flash[:error] = "Editing of Client employer records not allowed"
+        redirect_to employers_organizations_broker_agency_profile_path(@organization.broker_agency_profile)
+      end
     end
 
     def update
       pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
-      pdo.assign_attributes(organization_params)
-      ola = organization_params[:office_locations_attributes]
 
-      if ola.blank?
-        flash[:error] = "Prospect Employer must have one Primary Office Location."
-        redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
-      elsif pdo.save
-        flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
-        redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+      if pdo.is_prospect?
+        pdo.assign_attributes(organization_params)
+        ola = organization_params[:office_locations_attributes]
+
+        if ola.blank?
+          flash[:error] = "Prospect Employer must have one Primary Office Location."
+          redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+        elsif pdo.save
+          flash[:success] = "Prospect Employer (#{pdo.legal_name}) Updated Successfully."
+          redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
+        else
+          init_organization(organization_params)
+          render :edit
+        end
       else
-        init_organization(organization_params)
-        render :edit
+        flash[:error] = "Updating of Client employer records not allowed"
+        redirect_to employers_organizations_broker_agency_profile_path(pdo.broker_agency_profile)
       end
     end
 
     def destroy
       organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
-      if organization.plan_design_proposals.blank?
-        organization.destroy
-        message = "Prospect Employer Removed Successfully."
+
+      if organization.is_prospect?
+        if organization.plan_design_proposals.blank?
+          organization.destroy
+          message = "Prospect Employer Removed Successfully."
+        else
+          message = "Employer #{organization.legal_name}, has existing quotes.
+                                Please remove any quotes for this employer before removing."
+        end
+        redirect_to employers_organizations_broker_agency_profile_path(organization.broker_agency_profile), status: 303, notice: message
       else
-        message = "Employer #{organization.legal_name}, has existing quotes.
-                              Please remove any quotes for this employer before removing."
+        flash[:error] = "Removing of Client employer records not allowed"
+        redirect_to employers_organizations_broker_agency_profile_path(organization.broker_agency_profile), status: 303
       end
-      redirect_to employers_organizations_broker_agency_profile_path(organization.broker_agency_profile), status: 303, notice: message
     end
 
   private
