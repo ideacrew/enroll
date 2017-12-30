@@ -8,6 +8,7 @@ module PdfTemplates
     attribute :employer_contribution, String
     attribute :phone, String
     attribute :effective_on, Date
+    attribute :terminated_on, Date
     attribute :selected_on, Date
     attribute :created_at, Date
     attribute :aptc_amount, String
