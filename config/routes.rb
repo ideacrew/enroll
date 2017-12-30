@@ -5,9 +5,6 @@ Rails.application.routes.draw do
   mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
   mount Notifier::Engine, at: "/notifier"
 
-  # SponsoredBenefits::Engine.routes.draw do
-  # end
-
   require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
