@@ -11,27 +11,28 @@ module SponsoredBenefits
     end
 
     def claim
-      binding.pry
+      # TODO FIXME: update routes.rb to send the plan_design_organization_id parameter as employer_profile_id.
       employer_profile_id = params.fetch(:plan_design_organization_id, nil)
+
       quote_claim_code = params.fetch(:plan_design_organization_id, nil).try(:upcase)
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
       # replicating the code as in dc enroll
       if claim_code_status == "invalid"
-        flash[:error] = 'Quote claim code not found.'
+        flash[:error] = "Quote claim code not found."
       elsif claim_code_status == "claimed"
-        flash[:error] = 'Quote claim code already claimed.'
+        flash[:error] = "Quote claim code already claimed."
       else
         if SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote)
-          flash[:notice] = 'Code claimed with success. Your Plan Year has been created.'
+          flash[:notice] = "Code claimed with success. Your Plan Year has been created."
         else
-          flash[:error] = 'There was issue claiming this quote.'
+          flash[:error] = "There was issue claiming this quote."
         end
       end
 
       # #TODO FIXME: Route to the benefits page in employer portal
-      redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
+      redirect_to employers_employer_profile_path(@employer_profile, tab: "benefits")
     end
 
     def publish
