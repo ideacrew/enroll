@@ -812,12 +812,12 @@ describe Person do
 
     context "should not call notify" do
       it "when change consumer_role's bookmark_url" do
-        expect(person1).to receive(:notify).exactly(0).times
+        expect(person1).to receive(:notify).exactly(1).times
         person1.consumer_role.update_attribute(:bookmark_url, '/families/home')
       end
 
       it "when change employee_role's bookmark_url" do
-        expect(person2).to receive(:notify).exactly(0).times
+        expect(person2).to receive(:notify).exactly(1).times
         person2.employee_roles.last.update_attribute(:bookmark_url, '/families/home')
       end
 
