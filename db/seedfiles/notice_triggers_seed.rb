@@ -795,7 +795,7 @@ shop_notice_triggers = [
 
   {
     hbx_id: 'SHOP51',
-    title: 'You have been hired/removed as a broker',
+    title: 'You have been removed as a broker',
     description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
     resource_name: 'broker_role',
     event_name: 'broker_fired_confirmation_to_broker',
@@ -992,8 +992,8 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'D048',
-    title: 'You have been hired as a broker',
+    hbx_id: 'DB0048',
+    title: 'You have been Hired as a Broker',
     description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
     resource_name: 'broker_role',
     event_name: 'broker_hired',
@@ -1014,7 +1014,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'D047',
+    hbx_id: 'DY0047',
     title: 'You have been Hired as their Broker Agency',
     description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
     resource_name: 'broker_role',
@@ -1325,17 +1325,17 @@ shop_notice_triggers = [
     hbx_id: 'SHOP_D042',
     title: 'Confirmation of Election To Terminate Coverage',
     description: 'Employee Terminating coverage after QLE',
-    resource_name: 'employer',
+    resource_name: 'employee_role',
     event_name: 'notify_employee_confirming_coverage_termination',
     notice_triggers: [
       {
-        name: 'Notice to employer when employee terminates coverage',
+        name: 'Notice to employee when employee terminates coverage',
         notice_template: 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
         notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
         mpi_indicator: 'SHOP_D042',
         notice_trigger_element_group: {
           market_places: ['shop'],
-          primary_recipients: ["employer"],
+          primary_recipients: ["employee"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
