@@ -171,7 +171,8 @@ module SponsoredBenefits
         it "returns a success response (i.e. to display the 'new' template)" do
           valid_attributes["dob"] = nil
           post :create, {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}, valid_session
-          expect(flash[:error]).to eq "Unable to create employee record."
+          expect(flash[:error]).to eq "Unable to create employee record. [\"Dob can't be blank\", \"Dob can't be blank\"]"
+
           expect(response).to redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(organization, plan_design_proposal)
         end
       end
