@@ -27,7 +27,7 @@ module SponsoredBenefits
         if SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote)
           flash[:notice] = "Code claimed with success. Your Plan Year has been created."
         else
-          flash[:error] = "There was issue claiming this quote."
+          flash[:error] = "There was an issue claiming this quote."
         end
       end
 
