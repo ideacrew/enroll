@@ -207,18 +207,22 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
-      expect(controller).to receive(:broker_hired)
-      expect(controller).to receive(:broker_agency_hired)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
 
     end
 
-    it "should send notice to broker and agency" do
+    it "should send notice to employer, broker and agency" do
       @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
       @org2.broker_agency_profile.save
-      expect(controller).to receive(:broker_hired)
-      expect(controller).to receive(:broker_agency_hired)#.with(no_args)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired"]}).to eq true
+      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_agency_hired"]}).to eq true
+      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired_confirmation_notice"]}).to eq true
     end
 
     context "send_broker_assigned_msg" do
