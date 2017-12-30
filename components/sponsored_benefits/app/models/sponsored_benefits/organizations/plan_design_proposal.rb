@@ -33,20 +33,13 @@ module SponsoredBenefits
       # class methods
       class << self
 
+        # find plan_design_proposal object by id
         def find(id)
           organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals._id" => BSON::ObjectId.from_string(id)).first
           organization.plan_design_proposals.detect{|proposal| proposal.id == BSON::ObjectId.from_string(id)}
         end
 
-        def claim_code_status?(quote_claim_code)
-          quote = find_quote(quote_claim_code)
-          if quote.present?
-            return quote.aasm_state # quote is present, return its current status.
-          else
-            return "invalid" # quote is not present, return invalid(replicating the same functionality as in dc enroll.)
-          end
-        end
-
+        # find plan_design_proposal object by claim_code
         def find_quote(quote_claim_code)
           # search plan_design_proposal with published status and user entered claim code.
           organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
@@ -60,14 +53,20 @@ module SponsoredBenefits
           organization.plan_design_proposals.detect{ |pdp| pdp.claim_code == quote_claim_code }
         end
 
+        def claim_code_status?(quote_claim_code)
+          quote = find_quote(quote_claim_code) # search for the quote that is in published status
+          if quote.present?
+            return [quote.aasm_state, quote] # quote is present, return its current status.
+          else
+            return "invalid" # quote is not present, return invalid(replicating the same functionality as in dc enroll.)
+          end
+        end
+
         # this method creates a draft plan year from a valid claim code entered on benefits page(in employer portal).
-        def build_plan_year_from_quote(employer_profile_id, quote_claim_code)
+        def build_plan_year_from_quote(employer_profile_id, quote)
           # find the employer_profile, we need this later in the process when we are ready to assign the draft plan year
           # that was created from benefit application.
           employer_profile = EmployerProfile.find(employer_profile_id)
-
-          # find the quote.
-          quote = find_quote(quote_claim_code)
 
           # only if the quote is present, then go to the next steps.
           if quote.present? && quote_claim_code.present? && quote.published?
