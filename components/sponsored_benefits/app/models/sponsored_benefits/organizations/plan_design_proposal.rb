@@ -35,6 +35,34 @@ module SponsoredBenefits
         organization.plan_design_proposals.detect{|proposal| proposal.id == BSON::ObjectId.from_string(id)}
       end
 
+      def self.claim_code_status?(quote_claim_code)
+        cc = self.where("claim_code" => quote_claim_code).first
+        if cc.nil?
+          return "invalid"
+        else
+          return cc.aasm_state
+        end
+      end
+
+      def self.build_plan_year_from_quote(employer_profile_id, quote_claim_code)
+        employer_profile = EmployerProfile.find(employer_profile_id)
+        organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+          "plan_design_proposals.claim_code" => quote_claim_code,
+          "plan_design_proposals.aasm_state" => "published"
+        ).first
+
+        quote = organization.plan_design_proposals.detect{ |pdp| pdp.claim_code == quote_claim_code }
+
+        if quote.present? && quote_claim_code.present? && quote.published?
+          plan_year = employer_profile.plan_years.build({
+            start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
+            open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
+            fte_count: quote.member_count
+          })
+        end
+
+      end
+
       def can_quote_be_published?
         self.valid?
       end
