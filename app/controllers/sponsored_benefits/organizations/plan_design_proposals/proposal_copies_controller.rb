@@ -26,8 +26,15 @@ module SponsoredBenefits
             ce.gender = employee.gender
             ce.ssn = employee.ssn
             ce.dob = employee.dob
-            ce.census_dependents.each do |dependent|
-              ce.census_dependents << dependent
+            employee.census_dependents.each do |dependent|
+              new_dependent = SponsoredBenefits::CensusMembers::CensusDependent.new.tap do |dep|
+                dep.first_name = dependent.first_name
+                dep.last_name = dependent.last_name
+                dep.gender = dependent.gender
+                dep.employee_relationship = dependent.employee_relationship
+                dep.dob = dependent.dob
+              end
+              ce.census_dependents << new_dependent
             end
             ce.address = employee.address
             ce.email = employee.email
