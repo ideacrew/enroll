@@ -55,7 +55,7 @@ module SponsoredBenefits
 
       def prepopulate_attributes
         @title = @proposal.title
-        @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.min.strftime("%Y-%m-%d")
+        @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.begin.strftime("%Y-%m-%d")
         @quote_date = @proposal.updated_at.strftime("%m/%d/%Y")
       end
 
