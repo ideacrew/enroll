@@ -56,7 +56,7 @@
             <div class="col-md-1">
               <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-9 no-pd">
               <%= label %>
             </div>
           </div>
