@@ -28,7 +28,7 @@ module SponsoredBenefits
       scope :renewing, ->{ any_in(aasm_state: RENEWAL_STATES) }
       scope :draft, -> { any_in(aasm_state: %w(draft renewing_draft)) }
       scope :published, -> { any_in(aasm_state: %w(published renewing_published)) }
-      scope :expired, -> { where(:'effective_date'.lt => TimeKeeper.date_of_record) }
+      scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
 
       def self.find(id)
         organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals._id" => BSON::ObjectId.from_string(id)).first
