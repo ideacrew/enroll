@@ -14,7 +14,7 @@ class UpdateCitizenStatus < MongoidMigrationTask
       begin
         fix_citizen_status(person) if STATES_TO_FIX.include? lpd(person).citizen_status
       rescue
-        $stderr.puts "Issue migrating person: person #{person.id}, HBX id  #{person.hbx_id}"
+        $stderr.puts "Issue migrating person: person #{person.id}, HBX id  #{person.hbx_id}" unless Rails.env.test?
       end
     end
   end
