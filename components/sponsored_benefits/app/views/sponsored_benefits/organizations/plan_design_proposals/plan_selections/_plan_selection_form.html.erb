@@ -36,7 +36,7 @@
         <h3 class="panel-title">Employer Contributions</h3>
       </div>
       <div class="panel-body">
-        <p>Specify contribution levels for each enrolle type.</p>
+        <p>Specify contribution levels for each enrollee type.</p>
         <%= f.fields_for :profile, f.object.profile do |pr| %>
           <%= pr.fields_for :benefit_sponsorship, pr.object.benefit_sponsorships.first do |s| %>
             <%= s.fields_for :benefit_application, s.object.benefit_applications.first do |ba| %>
