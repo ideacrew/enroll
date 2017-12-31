@@ -16,7 +16,6 @@ module SponsoredBenefits
         if plan_design_proposal.save
           render json: { url: new_organizations_plan_design_proposal_plan_review_path(plan_design_proposal) }
         else
-          puts 'did not save'
           flash[:error] = "Something went wrong"
         end
       end
