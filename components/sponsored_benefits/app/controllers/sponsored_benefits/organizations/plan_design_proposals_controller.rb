@@ -20,7 +20,7 @@ module SponsoredBenefits
 
       # replicating the code as in dc enroll
       if claim_code_status == "invalid"
-        flash[:error] = "Quote claim code not found."
+        flash[:error] = "No quote matching this code could be found. Please contact your broker representative."
       elsif claim_code_status == "claimed"
         flash[:error] = "Quote claim code already claimed."
       else
