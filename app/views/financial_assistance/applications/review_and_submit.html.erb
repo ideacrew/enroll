@@ -43,7 +43,7 @@
                       <%= start_to_end_dates(embedded_document) %>
                       <span class= "ml10">
                         <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
-                          <i class="fa fa-pencil fa-2x"></i>
+                          <i class="fa fa-pencil fa-lg"></i>
                         <% end %>
                       </span>
                     </td>
@@ -70,7 +70,7 @@
               <div class="col-md-11"><span></span>
                 <i class="fa fa-user blue-icon"></i> <%= applicant.person.full_name %></div>
                 <div class="col-md-1">
-                  <!-- <a><span class="fa fa-pencil fa-2x" aria-hidden="true"></span></a> -->
+                  <!-- <a><span class="fa fa-pencil fa-lg" aria-hidden="true"></span></a> -->
                 </div>
               </div>
 
@@ -104,7 +104,7 @@
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
                     <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 2) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
                 </div>
@@ -124,11 +124,11 @@
                   <div class="col-md-1">
                     <% if applicant.incomes.present? %>
                     <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                     <% else %>
                     <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                     <% end %>
                   </div>
@@ -157,11 +157,11 @@
                   <div class="col-md-1">
                     <% if applicant.deductions.present? %>
                     <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                     <% else %>
                     <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                     <% end %>
                   </div>
@@ -178,11 +178,11 @@
                   <div class="col-md-1">
                     <% if applicant.benefits.present? %>
                     <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                     <% else %>
                     <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-2x"></i>
+                    <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                     <% end %>
                   </div>
@@ -205,7 +205,7 @@
                 <div class="col-md-11">OTHER QUESTIONS</div>
                 <div class="col-md-1">
                   <%= link_to other_questions_financial_assistance_application_applicant_path(@application, applicant) do %>
-                  <i class="fa fa-pencil fa-2x"></i>
+                  <i class="fa fa-pencil fa-lg"></i>
                   <% end %>
                 </div>
               </div>
