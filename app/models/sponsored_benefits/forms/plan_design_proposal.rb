@@ -103,6 +103,8 @@ module SponsoredBenefits
       end
 
       def construct_new_benefit_group
+        sponsorship = @proposal.profile.benefit_sponsorships.first
+        application = sponsorship.benefit_applications.first
         application.benefit_groups.build
         application.benefit_groups.first.build_relationship_benefits
         application.benefit_groups.first.build_composite_tier_contributions
