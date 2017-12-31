@@ -49,7 +49,9 @@ $brand-primary: $mhc-dark-blue;
 
 
 .plan_design_proposals {
-  
+  .employer-cost-text {
+    color:$primary-black;
+  }
   .reference-plans {
     max-height:400px;
     overflow-y: scroll;

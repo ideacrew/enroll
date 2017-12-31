@@ -5,13 +5,18 @@
       <%= render 'shared/engines/horizontal_status', step:2 %>
       <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
         <%= render 'plan_selection_form', f: f %>
-        <%= f.submit "Save", id: "submitPlanDesignProposal" %>
-      <% end %>
-      <div class="row">
-        <div class="col-md-3">
-          <%= link_to 'Return to Quote Management', url_for(:back), class:'btn btn-primary' %>
+        <div class="row">
+          <div class="col-md-12">
+            <%= link_to 'Return to Quote Management', url_for(:back), class:'btn btn-primary' %>
+            <div class="pull-right">
+              <%= f.submit "Save Quote", id: "submitPlanDesignProposal", class:'btn btn-primary' %>
+              <%= f.submit "Copy Quote", id: "#", class:'btn btn-primary' %>
+              <%= f.submit "Review Quote", id: "#", class:'btn btn-primary' %>
+              <%= f.submit "Publish Quote", id: "#", class:'btn btn-primary' %>
+            </div>
+          </div>
         </div>
-      </div>
+      <% end %>
     </div>
     </div>
   </div>
