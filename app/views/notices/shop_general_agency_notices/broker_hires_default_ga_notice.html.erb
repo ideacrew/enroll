@@ -15,7 +15,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><strong><%= notice.general_agency.broker_fullname.upcase %> HAS REMOVED YOU AS THEIR DEFAULT GENERAL AGENCY</strong></td>
+      <td style="padding-top: 10px"><strong><%= notice.general_agency.broker_fullname.upcase %> HAS ASSIGNED YOU AS THEIR DEFAULT GENERAL AGENCY</strong></td>
     </tr>
   </tbody>
 </table>
@@ -29,12 +29,14 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', locals: {
- content: "This notice is to inform you that <strong>#{notice.general_agency_name}</strong> has been removed as the default general agency for <strong>#{notice.general_agency.broker_fullname}</strong> as of <strong>#{TimeKeeper.date_of_record}.</strong> You will no longer be authorized to access <strong>#{notice.general_agency.broker_fullname}</strong>’s #{Settings.site.short_name} Account or take action on behalf of any clients of <strong>#{notice.general_agency.broker_fullname}</strong>. If you were assigned as the General Agency for any clients of <strong>#{notice.general_agency.broker_fullname}</strong>, you will receive a separate notification specific to those groups."} %>
-<br>
+ content: "Congratulations! You have been selected as the default General Agency for <strong>#{notice.general_agency.broker_fullname}</strong> as of <strong>#{TimeKeeper.date_of_record}</strong>. If you were assigned as the General Agency for any clients of <strong>#{TimeKeeper.date_of_record}</strong>, you will receive a separate notification specific to those groups."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', locals: {
+ content: "If you need resources in assisting your new client, please look to <a href=#{Settings.site.forms}>DCHealthLink.com/forms</a>", top_margin: '10px', bottom_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: ["Please contact #{Settings.site.short_name} with any questions:"],
-    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+    heading: '<strong>For Questions or Assistance:</strong>', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["By calling #{notice.hbe.phone}",

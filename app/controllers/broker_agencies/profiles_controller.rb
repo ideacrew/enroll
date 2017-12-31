@@ -194,10 +194,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
-        broker_fires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s)
+        broker_fires_or_hires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s, "broker_fires_default_ga_notice")
       elsif params[:type] == 'fire'
         existing_ga_profile = @broker_agency_profile.default_general_agency_profile rescue nil
-        broker_fires_default_ga_notice(existing_ga_profile.id.to_s, @broker_agency_profile.id.to_s) if existing_ga_profile
+        broker_fires_or_hires_default_ga_notice(existing_ga_profile.id.to_s, @broker_agency_profile.id.to_s, "broker_fires_default_ga_notice") if existing_ga_profile
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
         @broker_agency_profile.employer_clients.each do |employer_profile|
           @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
@@ -205,6 +205,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       end
       @broker_agency_profile.save
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
+      broker_fires_or_hires_default_ga_notice(@broker_agency_profile.default_general_agency_profile.id.to_s, @broker_agency_profile.id.to_s, "broker_hires_default_ga_notice") if @broker_agency_profile.default_general_agency_profile.present?
       @notice = "Changing default general agencies may take a few minutes to update all employers."
 
       #triggers default GA hired notice to General Agency
@@ -389,11 +390,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
   end
 
-  def broker_fires_default_ga_notice(old_default_ga_id, broker_agency_profile_id)
+  def broker_fires_or_hires_default_ga_notice(default_ga_id, broker_agency_profile_id, event)
     begin
-      ShopNoticesNotifierJob.perform_later(old_default_ga_id, "broker_fires_default_ga_notice", broker_agency_profile_id: broker_agency_profile_id)
+      ShopNoticesNotifierJob.perform_later(default_ga_id, event, broker_agency_profile_id: broker_agency_profile_id)
     rescue Exception => e
-      (Rails.logger.error {"Unable to deliver broker_fires_default_ga_notice to General Agency #{old_default_ga_id} due to #{e}"}) unless Rails.env.test?
+      (Rails.logger.error {"Unable to deliver #{event}.humanize to General Agency #{default_ga_id} due to #{e}"}) unless Rails.env.test?
     end
   end
 
