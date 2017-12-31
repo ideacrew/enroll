@@ -4,7 +4,14 @@
       class PlanDesignProposalsDatatable < ::Effective::MongoidDatatable
         datatable do
 
-          table_column :title, :label => 'Quote Name', :proc => Proc.new { |row| row.title }, :sortable => false, :filter => false
+          table_column :title, :label => 'Quote Name', :proc => Proc.new { |row|
+              if row.published?
+                ## will become link to view-only page
+                row.title
+              else
+                link_to row.title, sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row)
+              end
+              }, :sortable => false, :filter => false
           table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row| proposal_sponsorship(row).initial_enrollment_period.begin.strftime("%Y - %m - %d") }, :sortable => true, :filter => false
           table_column :claim_code, :label => 'Claim Code', :proc => Proc.new { |row| row.claim_code || 'Not Published' }, :sortable => false, :filter => false
           table_column :employees, :label => 'Employees', :proc => Proc.new { |row| proposal_sponsorship(row).census_employees.count }, :sortable => false, :filter => false

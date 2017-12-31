@@ -1,0 +1,42 @@
+<div class="col-md-8">
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th>Benefit Model Selection</th>
+        <td><%= @plan.plan_type.try(:upcase) %></td>
+      </tr>
+      <tr>
+        <th>Plan Name</th>
+        <td><%= @plan.name %></td>
+      </tr>
+      <tr>
+        <th>Plan Coverage Level</th>
+        <td><%= display_dental_metal_level @plan %></td>
+      </tr>
+      <tr>
+        <th>Network</th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Plan Carrier</th>
+        <td><%= @plan.carrier_profile.legal_name %></td>
+      </tr>
+      <tr>
+        <th>Deductible - Medical</th>
+        <td><%= @plan.deductible %> / <%= @plan.family_deductible %></td>
+      </tr>
+      <tr>
+        <th>Maximum Out of Pocket Costs</th>
+        <td><%= @plan.deductible %> / <%= @plan.family_deductible %></td>
+      </tr>
+      <tr>
+        <th>Summary of Benefits and Coverage (SBC)</th>
+        <td><a>View SBC</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="col-md-4">
+  <h2 class="text-center employer-cost-text">Estimated Maximum Monthly Employer Cost</h2>
+  <h2 class="employee-monthly-cost-max text-center"></h2>
+</div>
