@@ -79,6 +79,28 @@ module SponsoredBenefits
         end
       end
 
+      def calculate_start_on_options
+        calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+      end
+
+      def calculate_start_on_dates
+        if employer_profile.active_plan_year.present?
+          [employer_profile.active_plan_year.start_on.next_year]
+        else
+          SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates
+        end
+      end
+
+      def build_proposal_from_existing_employer_profile
+        builder = SponsoredBenefits::BenefitApplications::PlanDesignProposalBuilder.new(self, calculate_start_on_dates[0])
+        builder.add_plan_design_profile
+        builder.add_benefit_application
+        builder.add_plan_design_employees
+        builder.plan_design_organization.save
+        builder.census_employees.each{|ce| ce.save}
+        builder.plan_design_proposal
+      end
+
       class << self
         def find_by_owner_and_customer(owner_id, customer_id)
           where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id), :"customer_profile_id" => BSON::ObjectId.from_string(customer_id)).first
