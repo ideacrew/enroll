@@ -70,12 +70,12 @@ module SponsoredBenefits
 
       def effective_period=(new_effective_period)
         effective_range = SponsoredBenefits.tidy_date_range(new_effective_period, :effective_period)
-        write_attribute(:effective_period, new_effective_period) unless new_effective_period.blank?
+        write_attribute(:effective_period, effective_range) unless effective_range.blank?
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
         open_enrollment_range = SponsoredBenefits.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
-        write_attribute(:open_enrollment_period, new_open_enrollment_period) unless new_open_enrollment_period.blank?
+        write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
       end
 
       def start_on
