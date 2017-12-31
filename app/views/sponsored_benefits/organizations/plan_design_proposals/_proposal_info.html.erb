@@ -4,7 +4,7 @@
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.select :effective_date, options_for_select(::PlanYear.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"}, disabled: read_only %>
+    <%= f.select :effective_date, options_for_select(@plan_design_organization.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"}, disabled: read_only %>
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">

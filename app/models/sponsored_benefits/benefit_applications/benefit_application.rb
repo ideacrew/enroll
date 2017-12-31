@@ -223,6 +223,20 @@ module SponsoredBenefits
 
 
       class << self
+        def calculate_start_on_dates
+          start_on = if TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true)
+            TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+          else
+            TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+          end
+
+          end_on = TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+          dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
+        end
+
+        def calculate_start_on_options
+          calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+        end
 
         def enrollment_timetable_by_effective_date(effective_date)
           effective_date            = effective_date.to_date.beginning_of_month
