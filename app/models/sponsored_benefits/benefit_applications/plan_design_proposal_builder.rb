@@ -47,8 +47,9 @@ module SponsoredBenefits
     
       def plan_design_proposal
         # Perform Validations
-        raise "required employer permission" unless has_access?
-        @plan_design_proposal
+        if has_access?          
+          @plan_design_proposal
+        end
       end
 
       private
@@ -58,7 +59,17 @@ module SponsoredBenefits
       #   One-time Quote Access
       #   No Access
       def has_access?
-       true
+        broker_agency_accounts =  @employer_profile.broker_agency_accounts.where(broker_agency_profile_id: plan_design_organization.broker_agency_profile.id)
+        
+        if broker_agency_accounts.present? && broker_agency_accounts.any?{|acc| acc.is_active?}
+          return true
+        end
+
+        if broker_agency_accounts.present?
+          raise "You no longer have permission to import employer information."
+        end
+      
+        raise "You don't have permission to import employer information. Request One-time access."
       end
 
       def benefit_sponsorship
