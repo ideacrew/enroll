@@ -16,6 +16,20 @@
           table_column :claim_code, :label => 'Claim Code', :proc => Proc.new { |row| row.claim_code || 'Not Published' }, :sortable => false, :filter => false
           table_column :employees, :label => 'Employees', :proc => Proc.new { |row| proposal_sponsorship(row).census_employees.count }, :sortable => false, :filter => false
           table_column :families, :label => "Families", :proc => Proc.new { |row| proposal_sponsorship(row).census_employees.where({ "census_dependents.0" => { "$exists" => true } }).count }, :sortable => false, :filter => false
+          table_column :plan_option_kind, :label => "Plan Type", :proc => Proc.new { |row|
+            if has_assigned_benefit_group?(row)
+              benefit_group(row).plan_option_kind.humanize
+            else
+              "Unassigned"
+            end
+          }, :sortable => false, :filter => false
+          table_column :reference_plan, :label => "Reference Plan", :proc => Proc.new { |row|
+            if has_assigned_benefit_group?(row)
+              benefit_group(row).reference_plan.name
+            else
+              "Unassigned"
+            end
+          }, :sortable => false, :filter => false
           table_column :state, :label => 'State', :proc => Proc.new { |row| row.aasm_state.capitalize }, :sortable => false, :filter => false
 
           #table_column :claim_date, :label => 'Claim Date', :proc => Proc.new { |row| row.claim_date }, :sortable => false, :filter => false
@@ -31,6 +45,17 @@
             ]
             render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "quotes_actions_#{row.id.to_s}"}, formats: :html
           }, :filter => false, :sortable => false
+        end
+
+        def has_assigned_benefit_group?(row)
+          return false if proposal_sponsorship(row).benefit_applications.empty?
+          application = proposal_sponsorship(row).benefit_applications.first
+          application.benefit_groups.present?
+        end
+
+        def benefit_group(row)
+          return nil unless has_assigned_benefit_group?(row)
+          proposal_sponsorship(row).benefit_applications.first.benefit_groups.first
         end
 
         def edit_quote_link_type(row)

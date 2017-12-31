@@ -4,7 +4,7 @@ module SponsoredBenefits
     include DataTablesAdapter
 
     before_action :load_plan_design_organization, except: [:destroy, :publish]
-    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish]
+    before_action :load_plan_design_proposal, only: [:update, :destroy, :publish]
 
     def index
       @datatable = effective_datatable
@@ -51,7 +51,7 @@ module SponsoredBenefits
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
           organization: @plan_design_organization
         }.merge(plan_design_proposal_params))
-      
+
       respond_to do |format|
         if @plan_design_proposal.save
           flash[:success] = "Quote information saved successfully."
