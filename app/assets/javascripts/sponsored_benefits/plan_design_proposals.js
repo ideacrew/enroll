@@ -240,6 +240,13 @@ function formatRadioButtons() {
 }
 
 function submitPlanDesignProposal(event) {
-  console.log( "Handler for .submit() called." );
   event.preventDefault();
+
+  data = buildBenefitGroupParams();
+  url = $("#benefit_groups_url").val();
+  $.ajax({
+    type: "POST",
+    data: data,
+    url: url
+  });
 }

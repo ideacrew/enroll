@@ -3,7 +3,7 @@
 <%= hidden_field_tag :reference_plan_id, '' %>
 <%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
 <%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
-
+<%= hidden_field_tag :benefit_groups_url, organizations_plan_design_proposal_benefit_groups_path(plan_design_proposal.id) %>
 <div class="row">
   <div class="col-md-12">
       <div class="hidden">
