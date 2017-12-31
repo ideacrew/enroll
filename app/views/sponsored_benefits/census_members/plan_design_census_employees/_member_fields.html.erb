@@ -80,6 +80,8 @@
   </div>
 </div>
 <br/>
+<%= render 'census_employee_fields', f: f, required: false %>
+<br/>
 <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
   <%= render 'sponsored_benefits/census_members/shared/address_fields', f: address, required: false %>
 <% end %>

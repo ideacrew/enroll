@@ -90,6 +90,8 @@ module SponsoredBenefits
           :dob,
           :ssn,
           :gender,
+          :hired_on,
+          :is_business_owner,
           address: [
             :kind, :address_1, :address_2, :city, :state, :zip
           ],

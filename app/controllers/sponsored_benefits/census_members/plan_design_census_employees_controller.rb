@@ -120,6 +120,8 @@ module SponsoredBenefits
        :dob,
        :ssn,
        :gender,
+       :hired_on,
+       :is_business_owner,
        address_attributes: [:kind, :address_1, :address_2, :city, :state, :zip],
        email_attributes: [:kind, :address],
        census_dependents_attributes: [:id, :first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender, :_destroy])
