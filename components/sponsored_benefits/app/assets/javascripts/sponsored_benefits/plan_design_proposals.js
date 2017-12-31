@@ -5,7 +5,9 @@ $(document).on('click', '.reference-plan input[type=radio] + label', planSelecte
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
 $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
-$(document).on('submit', '#new_forms_plan_design_proposal', submitPlanDesignProposal);
+$(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDesignProposal);
+$(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
+$(document).on('click', '#submitPlanDesignProposal', saveProposal);
 
 $(document).ready(function() {
   // Sets One Plan to active on page load
@@ -239,14 +241,28 @@ function formatRadioButtons() {
   })
 }
 
-function submitPlanDesignProposal(event) {
+function preventSubmitPlanDesignProposal(event) {
   event.preventDefault();
+}
 
+function saveProposal(event) {
   data = buildBenefitGroupParams();
   url = $("#benefit_groups_url").val();
   $.ajax({
     type: "POST",
     data: data,
     url: url
+  });
+}
+
+function saveProposalAndNavigateToReview(event) {
+  data = buildBenefitGroupParams();
+  url = $("#benefit_groups_url").val();
+  $.ajax({
+    type: "POST",
+    data: data,
+    url: url
+  }).done(function(data) {
+    window.location.href = data.url;
   });
 }
