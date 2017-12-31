@@ -4,7 +4,7 @@ module SponsoredBenefits
     include DataTablesAdapter
 
     before_action :load_plan_design_organization, except: [:destroy, :publish]
-    before_action :load_plan_design_proposal, only: [:update, :destroy, :publish]
+    before_action :load_plan_design_proposal, only: [:destroy, :publish]
 
     def index
       @datatable = effective_datatable
