@@ -53,24 +53,45 @@ And(/^they answer job income question and complete the form for the Job income$/
   sleep 1
   fill_in 'financial_assistance_income[employer_name]', with: "Sample Employer"
   fill_in 'financial_assistance_income[amount]', with: '23.3'
-  find(:xpath, "(//p[@class='label'][contains(., 'Choose')])[1]").click
-  find_all('.interaction-choice-control-financial-assistance-income-frequency-kind-4')[0].trigger('click')
+  find_all(".interaction-choice-control-financial-assistance-income-frequency-kind")[1].trigger('click')
+  find_all('.interaction-choice-control-financial-assistance-income-frequency-kind-7')[1].trigger('click')
   fill_in 'financial_assistance_income[start_on]', with: "11/11/2016"
   fill_in 'financial_assistance_income[end_on]', with: "11/11/2017"
+  page.find('.darkblue').click
   fill_in 'financial_assistance_income[employer_phone][full_phone_number]', with: "2036548484"
   fill_in 'financial_assistance_income[employer_address][address_1]', with: "12 main st"
   fill_in 'financial_assistance_income[employer_address][address_2]', with: "beside starbucks"
   fill_in 'financial_assistance_income[employer_address][city]', with: "washington"
 
-  find(:xpath, "(//p[@class='label'][contains(., 'Choose')])[2]").click
-  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state-5")[0].trigger('click')
+  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state")[2].trigger('click')
+  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state-5")[1].trigger('click')
   fill_in 'financial_assistance_income[employer_address][zip]', with: "22046"
 
   click_button 'Save'
 end
 
-Then(/^they should see the newly added Job income$/) do
+Given(/^they answer job income question and complete the form with incorrect data format$/) do
+  choose('has_job_income_true')
+  sleep 1
+  fill_in 'financial_assistance_income[employer_name]', with: "Sample Employer"
+  fill_in 'financial_assistance_income[amount]', with: '23.3'
+  find_all(".interaction-choice-control-financial-assistance-income-frequency-kind")[1].trigger('click')
+  find_all('.interaction-choice-control-financial-assistance-income-frequency-kind-7')[1].trigger('click')
+  fill_in 'financial_assistance_income[start_on]', with: "11/11/16"
+  page.find('.darkblue').click
+end
 
+Then(/^I should see a JS alert$/) do
+  page.accept_alert
+end
+
+Then(/^they should see the newly added Job income$/) do
+  page.should have_content('Sample Employer')
+end
+
+Then(/^they should see the dates in correct format$/) do
+  page.should have_content('11/11/2016')
+  page.should have_content('11/11/2017')
 end
 
 Then(/^they should be taken back to the application's details page for applicant$/) do
