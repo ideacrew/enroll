@@ -13,8 +13,9 @@ module Factories
     end
 
     def save_renewal_enrollment(renewal_enrollment, active_enrollment, options={})
-      if renewal_enrollment.save
-        renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
+      if renewal_enrollment.save # This will generate hbx_id to enrollment
+        renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment)) # After save, so that it will handle state machine hooks
+        renewal_enrollment.save
         renewal_enrollment
       else
         message = "Enrollment: #{active_enrollment.id}, \n" \
