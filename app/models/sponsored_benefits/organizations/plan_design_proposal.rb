@@ -66,7 +66,7 @@ module SponsoredBenefits
         def build_plan_year_from_quote(employer_profile_id, quote)
 
           # only if the quote is present, then go to the next steps.
-          if quote.present? && quote_claim_code.present? && quote.published?
+          if quote.present? && quote.published?
 
           ## may require some refactoring
             # retrieve the benefit sponsorship that was automatically built when a quote was created.
