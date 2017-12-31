@@ -663,10 +663,32 @@ shop_notice_triggers = [
     event_name: 'broker_fires_default_ga_notice',
     notice_triggers: [
       {
-        name: 'Default GA Hired - include date of appointment/termination',
+        name: 'Default GA Fired',
         notice_template: 'notices/shop_general_agency_notices/broker_fires_default_ga_notice',
         notice_builder: 'ShopGeneralAgencyNotices::DefaultGeneralAgencyFiredNotice',
         mpi_indicator: 'SHOP_D089',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["general_agent_profile"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'SHOP_D088',
+    title: 'Broker has hired you as their default general agency',
+    description: 'When a broker selects a default GA in their account, a notice is sent to the GAs agency mail inbox alerting them of the appointment.',
+    resource_name: 'general_agent_profile',
+    event_name: 'broker_hires_default_ga_notice',
+    notice_triggers: [
+      {
+        name: 'Default GA Hired',
+        notice_template: 'notices/shop_general_agency_notices/broker_hires_default_ga_notice',
+        notice_builder: 'ShopGeneralAgencyNotices::DefaultGeneralAgencyHiredNotice',
+        mpi_indicator: 'SHOP_D088',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["general_agent_profile"],
