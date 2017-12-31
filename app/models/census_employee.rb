@@ -532,41 +532,11 @@ class CensusEmployee < CensusMember
     end
 
     def advance_day(new_date)
-      CensusEmployee.employee_dependent_age_off_termination(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
-    end
-
-    def employee_dependent_age_off_termination(new_date)
-      if new_date.mday == 1
-        Family.all_with_multiple_family_members.by_enrollment_shop_market.each do |family|
-          begin
-            primary_person = family.primary_applicant.person
-            employee_roles = primary_person.active_employee_roles
-            employee_roles.each do |employee_role|
-              enrollments = employee_role.census_employee.active_benefit_group_assignment.hbx_enrollments
-              enrollments.each do |enrollment|
-                if (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).include? enrollment.aasm_state
-                  covered_members = enrollment.hbx_enrollment_members.map{|member| member.person}
-                  covered_members_ids = covered_members.flat_map(&:_id).uniq
-                  relations = primary_person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "child")}
-                  if relations.present?
-                    aged_off_dependents =  relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
-                    next if aged_off_dependents.empty?
-                    dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
-                    ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "employee_dependent_age_off_termination", dep_hbx_ids: dep_hbx_ids )
-                  end
-                end
-              end
-            end
-          rescue => e
-            Rails.logger.error {"Unable to deliver employee_dependent_age_off_termination notice to: #{family.primary_applicant.person.hbx_id} due to #{e.backtrace}"}
-          end
-        end
-      end
     end
 
     def initial_employee_open_enrollment_notice(date)
