@@ -272,7 +272,7 @@
                   type: signature_inputs
                   id: 'middle_name_thank_you'
                   name: middle_name_thank_you
-                  placeholder: Middle Name *
+                  placeholder: Middle Name
                   required: false
                 - gutter: 4
                   type: signature_inputs
