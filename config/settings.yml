@@ -24,7 +24,8 @@ site:
   make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
-  broker_quoting_enabled: true
+  broker_quoting_enabled: false
+  broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']

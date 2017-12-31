@@ -11,10 +11,10 @@ module SponsoredBenefits
     end
 
     def claim
-      # TODO FIXME: update routes.rb to send the plan_design_organization_id parameter as employer_profile_id.
-      employer_profile_id = params.fetch(:plan_design_organization_id, nil)
+      # TODO FIXME: update routes.rb to send the plan_design_proposal_id parameter as employer_profile_id.
+      employer_profile_id = params.fetch(:plan_design_proposal_id, nil)
 
-      quote_claim_code = params.fetch(:plan_design_organization_id, nil).try(:upcase)
+      quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
@@ -31,8 +31,7 @@ module SponsoredBenefits
         end
       end
 
-      # #TODO FIXME: Route to the benefits page in employer portal
-      redirect_to employers_employer_profile_path(@employer_profile, tab: "benefits")
+      redirect_to main_app.employers_employer_profile_path(id: employer_profile_id , tab: "benefits")
     end
 
     def publish
