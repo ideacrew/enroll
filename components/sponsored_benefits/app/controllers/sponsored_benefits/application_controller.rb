@@ -19,7 +19,7 @@ module SponsoredBenefits
         end
 
         if active_user.has_hbx_staff_role? && params[:plan_design_proposal_id].present?
-          org = SponsoredBenefits::Organizations::PlanDesignProposa.find(params[:plan_design_proposal_id]).plan_design_organization
+          org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id]).plan_design_organization
           @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
         end
       end
