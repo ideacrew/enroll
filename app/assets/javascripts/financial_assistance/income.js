@@ -139,7 +139,7 @@ $(document).ready(function() {
       incomeEl.find('.display-income').addClass('hidden');
       incomeEl.find('.income-edit-form').removeClass('hidden');
       $(incomeEl).find('select').selectric();
-      $(incomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      $(incomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
       startEditingIncome($(this).parents('.income').attr('id'));
     });
 
@@ -237,7 +237,7 @@ $(document).ready(function() {
         var length = incomeListEl.find(".income").length;
         $(clonedForm).find('select').selectric();
         //$(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
-        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
 
     $('#has_job_income_true').click(function(e) {
@@ -255,7 +255,7 @@ $(document).ready(function() {
       .appendTo(incomeListEl);
       var length = incomeListEl.find(".income").length;
       $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
 
     $('#has_self_employment_income_true').click(function(e) {
@@ -272,7 +272,7 @@ $(document).ready(function() {
       .appendTo(incomeListEl);
       var length = incomeListEl.find(".income").length;
       $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     });
 
     /* Condtional Display Job Income Question */
@@ -378,7 +378,7 @@ $(document).ready(function() {
       .appendTo(otherIncomeListEl);
       startEditingIncome($(this).parents('.other-income-kind').attr('id'));
       $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     }
     else {
       e.preventDefault();
@@ -416,7 +416,7 @@ $(document).ready(function() {
            .appendTo(otherIncomeListEl);
         startEditingIncome($(this).parents('.other-income-kind').attr('id'));
        $(clonedForm).find('select').selectric();
-       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
        $(this).addClass("hidden");
        e.stopImmediatePropagation();
    });
@@ -429,7 +429,7 @@ $(document).ready(function() {
     otherIncomeEl.find('.edit-other-income-form').removeClass('hidden');
     startEditingIncome($(this).parents('.other-income-kind').attr('id'));
 
-    $(otherIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+    $(otherIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
   });
 
   /* destroy existing other income */

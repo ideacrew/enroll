@@ -29,7 +29,7 @@ FactoryGirl.define do
         FactoryGirl.build(:family_member, is_primary_applicant: true, is_active: true, person: family.person, family: family)
 
         { 'Kelly' => 'spouse', 'Danny' => 'child' }.each do |first_name, relationship|
-          person = FactoryGirl.build(:person, first_name: first_name, last_name: family.person.last_name)
+          person = FactoryGirl.create(:person, :with_consumer_role, first_name: first_name, last_name: family.person.last_name)
           family.person.person_relationships.push PersonRelationship.new(kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id)
           person.person_relationships = [ PersonRelationship.new(kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id) ]
           person.save
