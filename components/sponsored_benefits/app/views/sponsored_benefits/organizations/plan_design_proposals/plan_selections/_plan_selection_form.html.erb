@@ -3,7 +3,7 @@
 <%= hidden_field_tag :reference_plan_id, '' %>
 <%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
 <%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
-
+<%= hidden_field_tag :benefit_groups_url, organizations_plan_design_proposal_benefit_groups_path(plan_design_proposal.id) %>
 <div class="row">
   <div class="col-md-12">
       <div class="hidden">
@@ -99,6 +99,7 @@
           <br />
           <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
           <div class="selected-plan"></div>
+          <div class="employee-costs"></div>
         </div>
       </div>
     </div>

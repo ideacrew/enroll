@@ -55,7 +55,7 @@ module SponsoredBenefits
 
       def prepopulate_attributes
         @title = @proposal.title
-        @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.min.strftime("%Y-%m-%d")
+        @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.begin.strftime("%Y-%m-%d")
         @quote_date = @proposal.updated_at.strftime("%m/%d/%Y")
       end
 
@@ -81,6 +81,19 @@ module SponsoredBenefits
         if sponsorship.benefit_applications.empty?
           sponsorship.benefit_applications.build
         end
+      end
+
+      def assign_benefit_group(benefit_group)
+        if benefit_group.sole_source?
+          benefit_group.build_relationship_benefits
+        else
+          benefit_group.build_composite_tier_contributions
+        end
+        sponsorship = @proposal.profile.benefit_sponsorships.first
+        application = sponsorship.benefit_applications.first
+        application.benefit_groups << benefit_group
+        ## this is not saving even though it claims to be valid
+        @proposal.save!
       end
 
       def ensure_benefit_group

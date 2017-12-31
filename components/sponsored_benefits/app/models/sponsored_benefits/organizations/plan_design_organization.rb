@@ -49,6 +49,7 @@ module SponsoredBenefits
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
       scope :draft_proposals, -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
+      
       def employer_profile
         ::EmployerProfile.find(customer_profile_id)
       end
@@ -70,6 +71,34 @@ module SponsoredBenefits
 
       def is_prospect?
         customer_profile_id.nil?
+      end
+
+      def expire_proposals
+        plan_design_proposals.each do |proposal|
+          proposal.expire! if SponsoredBenefits::Organizations::PlanDesignProposal::EXPIRABLE_STATES.include? proposal.aasm_state
+        end
+      end
+
+      def calculate_start_on_options
+        calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+      end
+
+      def calculate_start_on_dates
+        if employer_profile.active_plan_year.present?
+          [employer_profile.active_plan_year.start_on.next_year]
+        else
+          SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates
+        end
+      end
+
+      def build_proposal_from_existing_employer_profile
+        builder = SponsoredBenefits::BenefitApplications::PlanDesignProposalBuilder.new(self, calculate_start_on_dates[0])
+        builder.add_plan_design_profile
+        builder.add_benefit_application
+        builder.add_plan_design_employees
+        builder.plan_design_organization.save
+        builder.census_employees.each{|ce| ce.save}
+        builder.plan_design_proposal
       end
 
       class << self

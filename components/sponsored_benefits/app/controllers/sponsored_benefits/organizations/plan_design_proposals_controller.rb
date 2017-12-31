@@ -18,12 +18,23 @@ module SponsoredBenefits
         flash[:error] = "Quote failed to publish.".html_safe
       end
       redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
-
     end
 
     def new
-      @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization, proposal_id: params[:proposal_id])
-      init_employee_datatable
+      if @plan_design_organization.employer_profile.present?
+        begin
+          plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
+          flash[:success] = "Imported quote and employee information from your client #{@plan_design_organization.employer_profile.legal_name}."
+          redirect_to action: :edit, id: plan_design_proposal.id
+        rescue Exception => e
+          flash[:error] = e.to_s
+          @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
+          init_employee_datatable
+        end
+      else
+        @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization)
+        init_employee_datatable
+      end
     end
 
     def show
@@ -38,9 +49,9 @@ module SponsoredBenefits
 
     def create
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
-        organization: @plan_design_organization
+          organization: @plan_design_organization
         }.merge(plan_design_proposal_params))
-
+      
       respond_to do |format|
         if @plan_design_proposal.save
           flash[:success] = "Quote information saved successfully."
@@ -103,7 +114,7 @@ module SponsoredBenefits
             :annual_enrollment_period_begin_month_of_year,
             benefit_application: [
               :effective_period,
-              :open_enrollment_period
+              :open_enrollment_period,
             ]
           ]
         ]
