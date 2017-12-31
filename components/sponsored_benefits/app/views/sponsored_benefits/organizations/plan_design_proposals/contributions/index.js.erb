@@ -1,4 +1,4 @@
-$('.selected-plan').html("<%= escape_javascript(render(partial: 'sponsored_benefits/organizations/plan_design_proposals/contributions/plan_details')).html_safe %>")
+$('.selected-plan').html("<%= escape_javascript(render(partial: 'sponsored_benefits/organizations/plan_design_proposals/contributions/pdp_plan_details')).html_safe %>")
 $(".selected-plan h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
 $(".selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $(".selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
