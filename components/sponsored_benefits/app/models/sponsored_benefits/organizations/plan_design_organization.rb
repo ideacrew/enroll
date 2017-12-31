@@ -49,7 +49,7 @@ module SponsoredBenefits
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
       scope :draft_proposals, -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
-      
+
       def employer_profile
         ::EmployerProfile.find(customer_profile_id)
       end
@@ -84,7 +84,7 @@ module SponsoredBenefits
       end
 
       def calculate_start_on_dates
-        if employer_profile.active_plan_year.present?
+        if employer_profile.try(:active_plan_year).present?
           [employer_profile.active_plan_year.start_on.next_year]
         else
           SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates
