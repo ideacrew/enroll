@@ -31,6 +31,11 @@ module SponsoredBenefits
       def effective_date
         benefit_sponsorships.first.initial_enrollment_period.begin
       end
+
+      def benefit_application
+        bs = benefit_sponsorships.first
+        bs.benefit_applications.first
+      end
     end
   end
 end
