@@ -92,6 +92,7 @@ module SponsoredBenefits
           :gender,
           :hired_on,
           :is_business_owner,
+          :aasm_state,
           address: [
             :kind, :address_1, :address_2, :city, :state, :zip
           ],
