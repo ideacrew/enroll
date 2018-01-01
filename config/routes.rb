@@ -18,6 +18,7 @@ SponsoredBenefits::Engine.routes.draw do
     resources :plan_design_organizations do
       resources :plan_design_proposals do
         resources :contributions, controller: 'plan_design_proposals/contributions', only: [:index]
+        get :view_published, on: :member
       end
       resources :carriers, controller: 'plan_design_proposals/carriers', only: [:index]
       resources :plans, controller: 'plan_design_proposals/plans', only: [:index]
