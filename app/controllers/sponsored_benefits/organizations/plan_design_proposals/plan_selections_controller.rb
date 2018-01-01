@@ -7,7 +7,7 @@ module SponsoredBenefits
       end
 
       private
-      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal
+      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group
 
       def plan_design_proposal
         @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id])
