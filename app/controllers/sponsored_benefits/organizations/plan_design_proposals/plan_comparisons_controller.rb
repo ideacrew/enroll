@@ -3,7 +3,6 @@ module SponsoredBenefits
     class PlanDesignProposals::PlanComparisonsController < ApplicationController
 
         def new
-          @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(requested_plans, plan_design_proposal.effective_date.year, "Health")
           @sort_by = params[:sort_by].rstrip
           # Sorting by the same parameter alternates between ascending and descending
           @order = @sort_by == session[:sort_by_copay] ? -1 : 1
@@ -11,7 +10,7 @@ module SponsoredBenefits
           if @sort_by && @sort_by.length > 0
             @sort_by = @sort_by.strip
             sort_array = []
-            @qhps.each do |qhp|
+            qhps.each do |qhp|
               sort_array.push( [qhp, get_visit_cost(qhp,@sort_by)]  )
             end
             sort_array.sort!{|a,b| a[1]*@order <=> b[1]*@order}
@@ -20,11 +19,14 @@ module SponsoredBenefits
         end
 
         def export
-
+          render pdf: 'plan_comparison_export',
+                 template: 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/_export.html.erb',
+                 disposition: 'attachment',
+                 locals: { qhps: qhps }
         end
 
         private
-        helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :visit_types
+        helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :visit_types, :qhps
 
         def plan_design_proposal
           @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id])
@@ -38,8 +40,12 @@ module SponsoredBenefits
           @plans ||= ::Plan.where(:_id => { '$in': params[:plans] } ).map(&:hios_id)
         end
 
+        def qhps
+          @qhps ||= ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(requested_plans, plan_design_proposal.effective_date.year, "Health")
+        end
+
         def visit_types
-          ::Products::Qhp::VISIT_TYPES
+          @visit_types ||= ::Products::Qhp::VISIT_TYPES
         end
     end
   end
