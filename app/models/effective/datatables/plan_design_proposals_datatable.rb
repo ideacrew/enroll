@@ -69,8 +69,12 @@
         end
 
         def disabled_if_invalid(row)
-          return "disabled" unless row.can_quote_be_published?
-          'static'
+          if row.published?
+            'static'
+          else
+            return "disabled" unless row.can_quote_be_published?
+            'post'
+          end
         end
 
         def proposal_sponsorship(row)
