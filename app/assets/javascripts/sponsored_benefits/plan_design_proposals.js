@@ -1,4 +1,3 @@
-$(document).on('ready', initSlider);
 $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers);
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
 $(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
@@ -10,11 +9,12 @@ $(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToRe
 $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '.interaction-click-control-compare-plans', comparePlans);
 
-$(document).ready(function() {
-  // Sets One Plan to active on page load
-  $('li.sole-source-tab').find('label').trigger('click');;
-});
+$(document).on('ready', pageInit);
 
+function pageInit() {
+  $('li.sole-source-tab').find('label').trigger('click');
+  initSlider();
+}
 function comparePlans() {
   var selected_plans = [];
   $('.reference-plan input').each(function(index) {
