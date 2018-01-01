@@ -288,6 +288,19 @@ function comparisonPlans() {
   });
 }
 
+function viewComparisons() {
+  var url = $("#plan_comparison_url").val();
+
+    $.ajax({
+      type: "GET",
+      url: url,
+      dataType: 'script',
+      data: { plans: selected_rpids, sort_by: '' },
+    }).done(function() {
+      $('#compare_plans_table').dragtable({dragaccept: '.movable'});
+    });
+}
+
 function removeA(arr) {
     var what, a = arguments, L = a.length, ax;
     while (L > 1 && arr.length) {
