@@ -71,43 +71,18 @@ module SponsoredBenefits
           end
         end
 
+
         # this method creates a draft plan year from a valid claim code entered on benefits page(in employer portal).
         def build_plan_year_from_quote(employer_profile_id, quote)
-
-          # only if the quote is present, then go to the next steps.
-          if quote.present? && quote.published?
-
-          ## may require some refactoring
-            # retrieve the benefit sponsorship that was automatically built when a quote was created.
-            bs = quote.profile.benefit_sponsorships.first
-
-            # get the benefit application and call to_plan_year on it, which will create a draft plan year.
-            ba = bs.benefit_applications.first
-          ## end may require some refactoring
-
-            # this will create plan year, benefit groups, relationship benefits, composite_tier_contributions, etc.
-            py = ba.to_plan_year
-
-            # if plan year is successfully created in the above step, it will return plan year object.
-            if py.present?
-              # find the employer_profile.
-              employer_profile = EmployerProfile.find(employer_profile_id)
-
-              # we will assign the draft plan year to the employer_profile and save.
-              employer_profile.plan_years << py
-              employer_profile.save
-
-              # we will claim the quote and transition its status from published to claimed.
-              quote.claim!
-              return true
-            else
-              # if draft plan year was not created, return false.
-              return false
-            end
+          employer_profile = EmployerProfile.find(employer_profile_id)
+          builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(quote, employer_profile)
+          if builder.add_plan_year
+            quote.claim_date = TimeKeeper.date_of_record
+            quote.claim!
+            return true
+          else
+            return false # if draft plan year was not created, return false.
           end
-
-          # quote is not present, return false.
-          return false
         end
 
       end

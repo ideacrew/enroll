@@ -3,14 +3,24 @@ module SponsoredBenefits
   module BenefitApplications
     class EmployerProfileBuilder
 
+      attr_reader :plan_design_organization,
+                  :plan_design_proposal,
+                  :benefit_application,
+                  :employer_profile
 
-      def initialize(plan_design_proposal)
+
+      def initialize(plan_design_proposal, employer_profile=nil)
 
         @plan_design_proposal = plan_design_proposal
         @plan_design_organization = @plan_design_proposal.plan_design_organization
-        @profile = @plan_design_proposal.profile
 
-        @employer_profile = ::EmployerProfile.find_or_create_by_plan_design_organization(@plan_design_organization)
+        @profile = @plan_design_proposal.profile
+        @benefit_application = @profile.benefit_application
+
+        # TODO #FIXME We dont have owner_profile_id in plan design organization for new prospect employers
+        # So we dont have a mapping from plan design organization to ::EmployerProfile.
+        # If this is not correct, then we need to fix the below line.
+        @employer_profile = employer_profile || ::EmployerProfile.find_or_create_by_plan_design_organization(@plan_design_organization)
         @employer_profile_exists = @employer_profile.persisted?
       end
 
@@ -19,7 +29,8 @@ module SponsoredBenefits
       end
 
       def add_plan_year
-        @employer_profile.plan_years.build = @benefit_application[0].to_plan_year
+        @employer_profile.plan_years << @benefit_application.to_plan_year
+        @employer_profile.save
       end
 
       # Output the employer_profile
