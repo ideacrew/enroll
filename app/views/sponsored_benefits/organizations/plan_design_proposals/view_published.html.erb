@@ -1,1 +1,20 @@
-View Published Quote
+<div class="container" id="myTabContent">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %> <%= link_to "View all quotes for this employer", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id), remote: true, class: "pull-right" %></h3>
+        </div>
+        <div class="panel-body">
+          <%= render 'proposal_info_readonly' %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="pull-right">
+      <%#= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id), class:'btn btn-primary' %>
+    </div>
+  </div>
+</div>
