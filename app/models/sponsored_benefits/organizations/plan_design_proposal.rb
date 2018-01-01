@@ -30,6 +30,15 @@ module SponsoredBenefits
       scope :published, -> { any_in(aasm_state: %w(published renewing_published)) }
       scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
 
+      def active_benefit_group
+        return nil if profile.benefit_sponsorships.empty?
+        sponsorship = profile.benefit_sponsorships.first
+        return nil if sponsorship.benefit_applications.empty?
+        application = sponsorship.benefit_applications.first
+        return nil if application.benefit_groups.empty?
+        application.benefit_groups.first
+      end
+
       # class methods
       class << self
 
