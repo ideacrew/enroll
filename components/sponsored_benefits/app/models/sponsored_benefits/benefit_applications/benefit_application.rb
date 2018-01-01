@@ -241,7 +241,7 @@ module SponsoredBenefits
 
         def enrollment_timetable_by_effective_date(effective_date)
           effective_date            = effective_date.to_date.beginning_of_month
-          effective_period          = effective_date..(effective_date + 1.year - 1.day).end_of_day
+          effective_period          = effective_date..(effective_date.to_date + 1.year - 1.day)
           open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
           prior_month               = effective_date - 1.month
           binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
