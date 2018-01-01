@@ -69,9 +69,9 @@ module SponsoredBenefits
     def view_published
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
       @census_employees = sponsorship.census_employees
-      benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
-      @plan = Plan.find(benefit_group.reference_plan_id)
-      @employer_contribution_amount = benefit_group.monthly_employer_contribution_amount(@plan)
+      @benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
+      @plan = Plan.find(@benefit_group.reference_plan_id)
+      @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
     end
 
     def edit
