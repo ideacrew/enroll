@@ -4,6 +4,7 @@
       <h3> View Published Quote </h3>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/proposal_info_readonly" %>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_roster" %>
+      <!--Employer Costs Start-->
       <div class="panel panel-default table">
         <div class="panel-heading">
           <h3 class="panel-title">Health Plan Information</h3>
@@ -12,6 +13,37 @@
           <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details" %>
         </div>
       </div>
+      <!--Employer Costs End-->
+      <!--Employee Costs Start-->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="col-md-3">
+                <h3>Employee Costs</h3>
+              </div>
+              <div class="col-md-7">
+                <br />
+                <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
+              </div>
+              <div class="col-md-2">
+                <br />
+                <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+              </div>
+              <div class="collapse" id="collapseExample">
+                <div class="employee-costs">
+                  <% if @benefit_group.sole_source? %>
+                    <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
+                  <% else %>
+                    <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group} %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Employee Costs End-->
     </div>
   </div>
   <br />
