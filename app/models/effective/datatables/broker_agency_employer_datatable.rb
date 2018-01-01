@@ -14,7 +14,16 @@
           table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
           table_column :ee_count, :label => 'EE Count', :proc => Proc.new { |row| ee_count(row) }, :sortable => false, :filter => false
           table_column :er_state, :label => 'ER State', :proc => Proc.new { |row| er_state(row) }, :sortable => false, :filter => false
-          table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row| row.try(:employer_profile).try(:registered_on) }, :sortable => false, :filter => false
+          table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row|
+
+            active_plan_year_start = row.try(:employer_profile).try(:latest_plan_year).try(:start_on)
+            if active_plan_year_start.nil?
+              "No Active Plan"
+            else
+              active_plan_year_start
+            end
+
+            }, :sortable => false, :filter => false
           #table_column :broker, :label => 'Broker', :proc => Proc.new { |row| row.employer_profile.active_broker.full_name }, :sortable => false, :filter => false
 
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
