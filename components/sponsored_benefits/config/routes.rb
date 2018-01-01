@@ -30,6 +30,7 @@ SponsoredBenefits::Engine.routes.draw do
       resources :proposal_copies, controller: 'plan_design_proposals/proposal_copies', only: [:create]
       resources :benefit_groups, controller: 'plan_design_proposals/benefit_groups', only: [:create]
       post :publish
+      get :claim
     end
 
     resource :office_locations do
