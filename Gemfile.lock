@@ -489,6 +489,7 @@ GEM
     pry-stack_explorer (0.4.9.2)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
+    puma (3.11.0)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
     rack (1.6.8)
@@ -776,6 +777,7 @@ DEPENDENCIES
   pry-rails
   pry-remote
   pry-stack_explorer
+  puma
   pundit (~> 1.0.1)
   railroady (~> 1.5.2)
   rails (= 4.2.7.1)
