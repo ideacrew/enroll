@@ -1,22 +1,11 @@
-
-<%= hidden_field_tag 'current_sort', @sort_by  %>
-<%= hidden_field_tag 'plan_ids' %>
 <div class="container-fluid">
-  <h3>Plan Comparison Chart</h3>
-  <ul style="padding-left: 18px;">
-    <li> Plans can be rearranged by dragging the beginning of the company name </li>
-    <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li>
-  </ul>
+  <h3 style='text-align:center'>Plan Comparison Chart</h3>
   <div class="mygrid-wrapper-div">
    <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
         <tr>
           <th class="row-title">Plans</th>
           <% qhps.each do |qhp|%>
-            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'>
-              <%= hidden_field_tag 'plan_id-#{qhp.plan.id}', qhp.plan.id, class: 'plan_id' %>
-              <%  carrier_name = CarrierProfile.find(qhp.plan.carrier_profile_id).organization.legal_name.gsub(/united health care/i, 'uhic')%>
-              <%=  image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", {width: 80}) if carrier_name.present? %>
-            </th>
+            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_logo(Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
           <% end %>
         </tr>
         <tr>
@@ -67,17 +56,19 @@
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
+           <% if qhp.plan.sbc_document.present? %>
             <th colspan="2">
               <div class="plan_comparison">
-                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.plan } %>
+                <% key, bucket = get_key_and_bucket(qhp.plan.sbc_document.identifier) %>
+                <% link_text = qhp.plan.coverage_kind == 'health' ? "Summary of Benefits and Coverage" : 'Plan Summary' %>
+                <%= link_to link_text, root_url + document_download_path(bucket, key) +
+                                                  "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
+                                                  pdf&disposition=inline" %>
               </div>
             </th>
+            <%end%>
           <% end %>
         </tr>
     </table>
   </div>
-  <br>
-  <!--  download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id)  -->
-    <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-info", target: "_blank" %>
-  <br><br>
 </div>
