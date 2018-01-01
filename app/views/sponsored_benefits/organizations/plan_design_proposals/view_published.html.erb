@@ -4,6 +4,14 @@
       <h3> View Published Quote </h3>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/proposal_info_readonly" %>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_roster" %>
+      <div class="panel panel-default table">
+        <div class="panel-heading">
+          <h3 class="panel-title">Health Plan Information</h3>
+        </div>
+        <div class="panel-body">
+          <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details" %>
+        </div>
+      </div>
     </div>
   </div>
   <br />
@@ -13,3 +21,5 @@
     </div>
   </div>
 </div>
+
+<script>$(".employer-cost-text").append("<br /> <%= number_to_currency(@employer_contribution_amount.to_f) %>");</script>
