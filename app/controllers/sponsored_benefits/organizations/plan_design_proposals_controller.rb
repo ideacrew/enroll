@@ -41,7 +41,7 @@ module SponsoredBenefits
       else
         flash[:error] = "Quote failed to publish.".html_safe
       end
-      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization)
+      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization)
     end
 
     def new
