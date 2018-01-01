@@ -114,6 +114,7 @@ module SponsoredBenefits
         application.benefit_groups.build
         application.benefit_groups.first.build_relationship_benefits
         application.benefit_groups.first.build_composite_tier_contributions
+        application.benefit_groups.first
       end
 
       def save

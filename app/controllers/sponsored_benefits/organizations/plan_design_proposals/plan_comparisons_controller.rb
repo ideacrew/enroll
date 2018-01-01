@@ -19,6 +19,10 @@ module SponsoredBenefits
           end
         end
 
+        def export
+
+        end
+
         private
         helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :visit_types
 
