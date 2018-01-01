@@ -3,11 +3,35 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :load_plan_design_organization, except: [:destroy, :publish]
-    before_action :load_plan_design_proposal, only: [:destroy, :publish]
+    before_action :load_plan_design_organization, except: [:destroy, :publish, :claim]
+    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish]
 
     def index
       @datatable = effective_datatable
+    end
+
+    def claim
+      # TODO FIXME: update routes.rb to send the plan_design_proposal_id parameter as employer_profile_id.
+      employer_profile_id = params.fetch(:plan_design_proposal_id, nil)
+
+      quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
+
+      claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
+
+      # replicating the code as in dc enroll
+      if claim_code_status == "invalid"
+        flash[:error] = "No quote matching this code could be found. Please contact your broker representative."
+      elsif claim_code_status == "claimed"
+        flash[:error] = "Quote claim code already claimed."
+      else
+        if SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote)
+          flash[:notice] = "Code claimed with success. Your Plan Year has been created."
+        else
+          flash[:error] = "There was an issue claiming this quote."
+        end
+      end
+
+      redirect_to main_app.employers_employer_profile_path(id: employer_profile_id , tab: "benefits")
     end
 
     def publish
