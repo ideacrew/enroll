@@ -74,6 +74,12 @@ module SponsoredBenefits
         end
       end
 
+      def is_included_in_participation_rate?
+        true
+        # coverage_terminated_on.nil? ||
+        # coverage_terminated_on >= active_benefit_group_assignment.start_on
+      end
+
       def check_census_dependents_relationship
         return true if census_dependents.blank?
 
@@ -93,7 +99,7 @@ module SponsoredBenefits
         ## Placeholder
         true
       end
-      
+
       def allow_nil_ssn_updates_dependents
         census_dependents.each do |cd|
           if cd.ssn.blank?
