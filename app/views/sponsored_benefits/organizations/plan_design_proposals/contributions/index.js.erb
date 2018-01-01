@@ -4,7 +4,7 @@ $(".selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min
 $(".selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
 
 <% if benefit_group.sole_source? %>
-  $(".employee-costs").html("<%= escape_javascript(render(partial: 'employee_composite_costs', locals: { benefit_group: benefit_group })).html_safe %>");
+  $(".employee-costs").html("<%= escape_javascript(render(partial: 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', locals: { benefit_group: benefit_group })).html_safe %>");
 <% else %>
-  $(".employee-costs").html("<%= escape_javascript(render(partial: 'benefit_group_cost_summary', locals: { benefit_group: benefit_group })).html_safe %>");
+  $(".employee-costs").html("<%= escape_javascript(render(partial: 'sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary', locals: { benefit_group: benefit_group })).html_safe %>");
 <% end %>
