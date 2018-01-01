@@ -414,4 +414,12 @@ $brand-primary: $mhc-dark-blue;
       }
     }
   }
+  .reference-plan {
+    input[type=checkbox] {
+      display:inline;
+      width:15px;
+      height:15px;
+      margin-top:15px;
+    }
+  }
 }
