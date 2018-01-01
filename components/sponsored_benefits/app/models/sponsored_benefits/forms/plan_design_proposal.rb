@@ -139,6 +139,18 @@ module SponsoredBenefits
         @proposal.save!
       end
 
+      def has_reference_plan_assigned?
+        sponsorship = @proposal.profile.benefit_sponsorships.first
+        application = sponsorship.benefit_applications.first
+        return false unless application.present?
+        return false if application.benefit_groups.empty?
+
+        benefit_group = application.benefit_groups.first
+
+        return benefit_group.reference_plan_id.present?
+      end
+
+
       def to_h
         unless @effective_date.is_a? Date
           effective_date = Date.strptime(@effective_date, "%Y-%m-%d")
