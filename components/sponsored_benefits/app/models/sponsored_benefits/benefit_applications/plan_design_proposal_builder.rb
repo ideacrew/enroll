@@ -42,7 +42,17 @@ module SponsoredBenefits
       def add_plan_design_employee(census_employee)
         plan_design_census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(serialize_attributes(census_employee.attributes))
         plan_design_census_employee.benefit_sponsorship_id = benefit_sponsorship.id
+        plan_design_census_employee.ssn= census_employee.ssn if census_employee.ssn.present?
+        census_employee.census_dependents.each do |dependent|
+          plan_design_census_employee.census_dependents << build_census_dependent(dependent)
+        end
         plan_design_census_employee
+      end
+
+      def build_census_dependent(dependent)
+        plan_design_dependent = SponsoredBenefits::CensusMembers::CensusDependent.new(dependent_attributes(dependent.attributes))
+        plan_design_dependent.ssn= dependent.ssn if dependent.ssn.present?
+        plan_design_dependent
       end
     
       def plan_design_proposal
@@ -88,7 +98,6 @@ module SponsoredBenefits
           :last_name,
           :name_sfx,
           :dob,
-          :ssn,
           :gender,
           :hired_on,
           :is_business_owner,
@@ -98,10 +107,19 @@ module SponsoredBenefits
           ],
           email: [
             :kind, :address
-          ],
-          census_dependents: [
-            :id, :first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender
           ])
+      end
+
+      def dependent_attributes(attributes)
+        params = ActionController::Parameters.new(attributes)
+        params.permit(
+          :first_name,
+          :middle_name,
+          :last_name,
+          :dob,
+          :employee_relationship,
+          :gender
+          )
       end
     end
   end
