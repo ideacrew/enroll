@@ -77,7 +77,7 @@ module Effective
                     {scope: 'active_alone', label: 'Active only'},
                     {scope: 'active', label: 'Active & COBRA'},
                     {scope: 'by_cobra', label: 'COBRA only'},
-                    {scope: 'terminated', label: 'Terminated'},
+                    # {scope: 'terminated', label: 'Terminated'},
                     {scope: 'all', label: 'All'}
                 ],
             top_scope: :employees
