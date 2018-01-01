@@ -4,6 +4,8 @@
 <%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
 <%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :benefit_groups_url, organizations_plan_design_proposal_benefit_groups_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :plan_comparison_url, new_organizations_plan_design_proposal_plan_comparison_path(plan_design_proposal.id) %>
+
 <div class="row">
   <div class="col-md-12">
       <div class="hidden">
@@ -67,13 +69,15 @@
         </div>
         <div class="col-md-12">
           <div class="col-md-6 col-md-offset-4">
-            <%= link_to "Download PDF", {}, class:'btn btn-default'%> <%= link_to "Compare Plans", {}, class:'btn btn-primary'%>
+            <%= link_to "Download PDF", {}, class:'btn btn-default'%> <%= link_to "Compare Plans", '#', class:'btn btn-primary'%>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<div class="plan-comparison-container"></div>
 
 <div class="row">
   <div class="col-md-12">
