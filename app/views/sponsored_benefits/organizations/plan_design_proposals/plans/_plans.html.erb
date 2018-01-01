@@ -23,6 +23,8 @@
           <span>
             <%= render partial: "shared/network_data", locals: {plan: plan} %>
           </span>
+          <br />
+          <span><%= check_box_tag "#{@location_id}", plan.id, false, id:'plan-comparison' %> </span><span>Include in comparison</span>
           <br/>
         </div>
       </div>

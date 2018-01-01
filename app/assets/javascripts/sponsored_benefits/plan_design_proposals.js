@@ -2,6 +2,7 @@ $(document).on('ready', initSlider);
 $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers);
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
 $(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
+$(document).on('click', '.reference-plan input[type=checkbox]', comparisonPlans);
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
 $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
@@ -75,6 +76,7 @@ function hidePlanContainer() {
 function carrierSelected() {
   $('.tab-container').hide();
   var elected_plan_kind = $(this).attr('value');
+  selected_rpids = [];
 
   $("#elected_plan_kind").val(elected_plan_kind);
   $("#reference_plan_id").val("");
@@ -98,7 +100,6 @@ function carrierSelected() {
 }
 
 function planSelected() {
-  formatRadioButtons();
   toggleSliders($("#elected_plan_kind").val());
 
   var reference_plan_id = $(this).siblings('input').val();
@@ -108,6 +109,7 @@ function planSelected() {
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $('.health-plan-design .selected-plan').show();
     calcEmployerContributions();
+    $(this).siblings('input').attr('checked', true);
   };
 }
 
@@ -265,4 +267,34 @@ function saveProposalAndNavigateToReview(event) {
   }).done(function(data) {
     window.location.href = data.url;
   });
+}
+
+selected_rpids = [];
+
+function comparisonPlans() {
+  $(this).each(function() {
+    let value = $(this).val();
+    if ($(this).is(":checked") && $.unique(selected_rpids).length <= 3) {
+      selected_rpids.push(value)
+    }
+    if (!$(this).is(":checked")) {
+      removeA($.unique(selected_rpids), value);
+    }
+    if ($.unique(selected_rpids).length > 3) {
+      alert("You can only compare up to 3 plans");
+      $(this).attr('checked', false);
+      removeA($.unique(selected_rpids), value);
+    }
+  });
+}
+
+function removeA(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
 }
