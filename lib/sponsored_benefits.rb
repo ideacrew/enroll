@@ -29,7 +29,7 @@ module SponsoredBenefits
   # Ensure class type and integrity of date period ranges
   def self.tidy_date_range(range_period, attribute = nil)
 
-    return range_period if (range_period.begin.class == Date) && (range_is_increasing? range_period)
+    return range_period if (range_period.begin.class == Date) && (range_period.end.class == Date) && (range_is_increasing? range_period)
 
     case range_period.begin.class
     when Date
