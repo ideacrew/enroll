@@ -10,6 +10,7 @@ module SponsoredBenefits
       delegate :rating_area, to: :benefit_sponsorship
       delegate :census_employees, to: :benefit_sponsorship
       delegate :plan_design_organization, to: :benefit_sponsorship
+      
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date
@@ -106,19 +107,13 @@ module SponsoredBenefits
       def is_coverage_effective_eligible?
       end
 
-      def employer_profile
-        benefit_sponsorship.benefit_sponsorable
-      end
-
-      def plan_design_census_employees
-        CensusMembers::PlanDesignCensusEmployee.where(:benefit_application_id => self.id)
-      end
-
+      # def employer_profile
+      #   benefit_sponsorship.benefit_sponsorable
+      # end
 
       def default_benefit_group
         benefit_groups.detect(&:default)
       end
-
 
       def minimum_employer_contribution
         unless benefit_groups.size == 0
@@ -138,75 +133,28 @@ module SponsoredBenefits
 
       def to_plan_year
         return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
-        raise "Invalid number of benefit_groups: #{benefit_groups.size}" unless benefit_groups.size <= 1
-
-        start_on                        = effective_period.begin
-        end_on                          = effective_period.end
-        open_enrollment_period_start_on = open_enrollment_period.begin
-        open_enrollment_period_end_on   = open_enrollment_period.end
+        raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
         # CCA-specific attributes (move to subclass)
-        recorded_sic_code               = ""
-        recorded_rating_area            = ""
+        # recorded_sic_code               = ""
+        # recorded_rating_area            = ""
 
-        py = ::PlanYear.new(
-          start_on: start_on,
-          end_on: end_on,
-          open_enrollment_start_on: open_enrollment_period_start_on,
-          open_enrollment_end_on: open_enrollment_period_end_on
-        )
+        plan_year = ::PlanYear.new(
+            start_on: effective_period.begin,
+            end_on: effective_period.end,
+            open_enrollment_start_on: open_enrollment_period.begin,
+            open_enrollment_end_on: open_enrollment_period.end
+          )
 
-        cloned_benefit_groups = []
-        benefit_groups.each do |bg|
-          bg.attributes.delete("_type")
-          cloned_benefit_groups << ::BenefitGroup.new(bg.attributes)
+        copied_benefit_groups = []
+        benefit_groups.each do |benefit_group|
+          benefit_group.attributes.delete("_type")
+          copied_benefit_groups << ::BenefitGroup.new(benefit_group.attributes)
         end
 
-        py.benefit_groups = cloned_benefit_groups
-
-        py
+        plan_year.benefit_groups = copied_benefit_groups
+        plan_year
       end
-
-      ## This Plan Year code is refactored in section below.  Remove this section once the values are properly mapped in new context ##
-
-      # def shop_enrollment_timetable(new_effective_date)
-      #   effective_date = new_effective_date.to_date.beginning_of_month
-      #   prior_month = effective_date - 1.month
-      #   plan_year_start_on = effective_date
-      #   plan_year_end_on = effective_date + 1.year - 1.day
-
-      #   employer_initial_application_earliest_start_on = (effective_date +
-      #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months +
-      #     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
-
-      #   employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
-      #   employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
-
-
-      #   open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-      #   open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-      #   open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_open_enrollment_monthly_end_on}").to_date
-      #   binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_binder_payment_due_on}")
-      #   advertised_due_date_of_month          = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentAdvBeginDueDayOfMonth}").to_date
-
-
-      #   timetable = {
-      #     effective_date: effective_date,
-      #     plan_year_start_on: plan_year_start_on,
-      #     plan_year_end_on: plan_year_end_on,
-      #     employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
-      #     employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
-      #     employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
-      #     open_enrollment_earliest_start_on: open_enrollment_earliest_start_on,
-      #     open_enrollment_latest_start_on: open_enrollment_latest_start_on,
-      #     open_enrollment_latest_end_on: open_enrollment_latest_end_on,
-      #     binder_payment_due_date: binder_payment_due_date,
-      #     advertised_due_date_of_month: advertised_due_date_of_month
-      #   }
-
-      #   timetable
-      # end
-
 
       class << self
         def calculate_start_on_dates
