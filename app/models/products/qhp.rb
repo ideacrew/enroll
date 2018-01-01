@@ -102,8 +102,8 @@ class Products::Qhp
   index({"state_postal_code" => 1})
   index({"national_network" => 1})
   index({"tin" => 1}, {sparse: true})
-
   index({"qhp_benefits.benefit_type_code" => 1})
+  index({"standard_component_id" => 1, "active_year" => 1})
 
   def plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan

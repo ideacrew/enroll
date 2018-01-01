@@ -749,6 +749,11 @@ class CensusEmployee < CensusMember
     is_inactive? && coverage_terminated_on.present?
   end
 
+  def is_included_in_participation_rate?
+    coverage_terminated_on.nil? ||
+    coverage_terminated_on >= active_benefit_group_assignment.start_on
+  end
+
   def enrollments_for_display
     enrollments = []
 

@@ -136,14 +136,12 @@ module SponsoredBenefits
         end
       end
 
-
       def to_plan_year
-        return unless benefit_sponsorship.present && enrollment_period.present? && open_enrollment_period.present?
+        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" unless benefit_groups.size <= 1
 
-        # Attribute Map
-        start_on                        = enrollment_period.begin
-        end_on                          = enrollment_period.end
+        start_on                        = effective_period.begin
+        end_on                          = effective_period.end
         open_enrollment_period_start_on = open_enrollment_period.begin
         open_enrollment_period_end_on   = open_enrollment_period.end
 
@@ -151,35 +149,22 @@ module SponsoredBenefits
         recorded_sic_code               = ""
         recorded_rating_area            = ""
 
-        # TODO: BenefitGroups and CensusEmployee BenefitGroupAssigments use IDs for association.  Ruby clone creates a
-        # new instance with a new ID.  However, given the requirements specify only one benefit_group is supported by Plan Design,
-        # the mapping straightforward.
+        py = ::PlanYear.new(
+          start_on: start_on,
+          end_on: end_on,
+          open_enrollment_start_on: open_enrollment_period_start_on,
+          open_enrollment_end_on: open_enrollment_period_end_on
+        )
 
-        benefit_group_assignments = []
-        cloned_benefit_groups = benefit_groups.reduce([]) do |list, benefit_group|
-
-          source_benefit_group_id = benefit_groups.pluck(:_id).first
-          employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id" => source_benefit_group_id })
-
-          cloned_benefit_group = benefit_group.clone
-          cloned_benefit_group_id = cloned_benefit_group.id
-
-          employees.each do |census_employee|
-            census_employee.benefit_group_assignments.where(:benefit_group_id => bg_id).each do |assignment|
-              assignment.update(benefit_group_id = cloned_benefit_group_id)
-            end
-          end
-
-          # list <<
-
+        cloned_benefit_groups = []
+        benefit_groups.each do |bg|
+          bg.attributes.delete("_type")
+          cloned_benefit_groups << ::BenefitGroup.new(bg.attributes)
         end
 
-        ::PlanYear.new( start_on: start_on,
-                        end_on: end_on,
-                        open_enrollment_period_start_on: open_enrollment_period_start_on,
-                        open_enrollment_period_end_on: open_enrollment_period_end_on,
-                        benefit_groups: cloned_benefit_groups,
-                      )
+        py.benefit_groups = cloned_benefit_groups
+
+        py
       end
 
       ## This Plan Year code is refactored in section below.  Remove this section once the values are properly mapped in new context ##
@@ -241,7 +226,7 @@ module SponsoredBenefits
 
         def enrollment_timetable_by_effective_date(effective_date)
           effective_date            = effective_date.to_date.beginning_of_month
-          effective_period          = effective_date..(effective_date + 1.year - 1.day).end_of_day
+          effective_period          = effective_date..(effective_date + 1.year - 1.day)
           open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
           prior_month               = effective_date - 1.month
           binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
@@ -298,7 +283,7 @@ module SponsoredBenefits
 
           begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
           end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
-          begin_on..end_on.end_of_day
+          begin_on..end_on
         end
 
 
