@@ -99,7 +99,13 @@ module SponsoredBenefits
       def ensure_benefit_group
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
-        return application.benefit_groups.first || construct_new_benefit_group
+        benefit_group = application.benefit_groups.first || construct_new_benefit_group
+        if benefit_group.relationship_benefits.empty?
+          benefit_group.build_relationship_benefits
+        end
+        if benefit_group.composite_tier_contributions.empty?
+          benefit_group.build_composite_tier_contributions
+        end
       end
 
       def construct_new_benefit_group
