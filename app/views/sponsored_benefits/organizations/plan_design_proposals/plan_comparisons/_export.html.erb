@@ -6,7 +6,7 @@
         <tr>
           <th class="row-title">Plans</th>
           <% qhps.each do |qhp|%>
-            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_logo(Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
+            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_pdf_logo(::Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
           <% end %>
         </tr>
         <tr>
