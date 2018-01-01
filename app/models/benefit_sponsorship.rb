@@ -18,7 +18,10 @@ class BenefitSponsorship
 
   accepts_nested_attributes_for :benefit_coverage_periods, :geographic_rating_areas
 
-  validates_presence_of :service_markets
+  # Query Census member collection
+  def census_employees
+    @census_employees = CensusMembers::PlanDesignCensusEmployee.by_benefit_sponsorship(self)
+  end
 
   def current_benefit_coverage_period
     benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }

@@ -4,7 +4,7 @@ module SponsoredBenefits
   RSpec.describe CensusMembers::PlanDesignCensusEmployee, type: :model, dbclean: :after_each do
 
 
-    let(:employer_profile) { create(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile) }
+    # let(:employer_profile) { create(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile) }
     
     let(:first_name){ "Lynyrd" }
     let(:middle_name){ "Rattlesnake" }
@@ -15,12 +15,12 @@ module SponsoredBenefits
     let(:gender){ "male" }
     let(:hired_on){ TimeKeeper.date_of_record - 14.days }
     let(:is_business_owner){ false }
-    let(:address) { Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
+    let(:address) { Locations::Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
     let(:autocomplete) { " lynyrd skynyrd" }
 
     let(:valid_params){
       {
-        employer_profile: employer_profile,
+        # employer_profile: employer_profile,
         first_name: first_name,
         middle_name: middle_name,
         last_name: last_name,
