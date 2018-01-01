@@ -67,6 +67,8 @@ module SponsoredBenefits
     end
 
     def view_published
+      @sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
+      @census_employees = @sponsorship.census_employees
     end
 
     def edit
