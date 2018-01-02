@@ -77,6 +77,7 @@ module SponsoredBenefits
           employer_profile = EmployerProfile.find(employer_profile_id)
           builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(quote, employer_profile)
           if builder.add_plan_year
+            # builder.add_census_members
             quote.claim_date = TimeKeeper.date_of_record
             quote.claim!
             return true
