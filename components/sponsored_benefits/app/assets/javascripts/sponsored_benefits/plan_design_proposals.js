@@ -17,6 +17,7 @@ $(document).on('ready', pageInit);
 function pageInit() {
   $('li.sole-source-tab').find('label').trigger('click');
   initSlider();
+  $('.loading-plans-button').hide();
 }
 
 function attachEmployerHealthContributionShowHide() {
@@ -295,6 +296,8 @@ function comparisonPlans() {
 
 function viewComparisons() {
   var url = $("#plan_comparison_url").val();
+  $('.view-plans-button').hide();
+  $('.loading-plans-button').show();
 
     $.ajax({
       type: "GET",
@@ -303,6 +306,8 @@ function viewComparisons() {
       data: { plans: selected_rpids, sort_by: '' },
     }).done(function() {
       $('#compare_plans_table').dragtable({dragaccept: '.movable'});
+      $('.view-plans-button').show();
+      $('.loading-plans-button').hide();
     });
     
     $('.plan-comparison-container').show();
