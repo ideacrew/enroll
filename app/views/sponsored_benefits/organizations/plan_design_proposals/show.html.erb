@@ -1,7 +1,7 @@
 <div class="container" id="myTabContent">
   <div class="row">
     <div class="col-md-12">
-      <h3> View Quote </h3>
+      <h3> Viewing <%= @plan_design_proposal.aasm_state.capitalize %> Quote </h3>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/proposal_info_readonly" %>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_roster" %>
       <!--Employer Costs Start-->
@@ -65,9 +65,11 @@
   </div>
   <br />
   <div class="row">
-    <div class="pull-right">
-      <%#= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id), class:'btn btn-primary' %>
-    </div>
+    <div class="col-md-12">
+      <div class="pull-left">
+        <%= link_to "Back to all Quotes", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization), class:"btn btn-primary new-plan-design-proposal"  %>
+      </div>
+  </div>
   </div>
 </div>
 
