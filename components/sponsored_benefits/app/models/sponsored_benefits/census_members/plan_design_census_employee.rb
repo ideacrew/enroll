@@ -113,20 +113,20 @@ module SponsoredBenefits
       end
 
       def employer_profile=(new_employer_profile)
-        raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(SponsoredBenefits::Organizations::PlanDesignProfile)
+        raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile)
         self.employer_profile_id = new_employer_profile._id
         @employer_profile = new_employer_profile
-      end
-
-      def benefit_application=(benefit_application)
-        raise ArgumentError.new("expected Benefit Application") unless benefit_application.is_a?(SponsoredBenefits::BenefitApplications::BenefitApplication)
-        self.benefit_application_id = benefit_application._id
-        @benefit_application = benefit_application
       end
 
       def employer_profile
         return @employer_profile if defined? @employer_profile
         @employer_profile = Organizations::PlanDesignProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+      end
+
+      def benefit_sponsorship=(benefit_sponsorship)
+        raise ArgumentError.new("expected Benefit Sponsorship") unless benefit_sponsorship.is_a?(SponsoredBenefits::BenefitSponsorships::BenefitSponsorship)
+        self.benefit_sponsorship_id = benefit_sponsorship._id
+        @benefit_sponsorship = benefit_sponsorship
       end
 
       def benefit_sponsorship
@@ -136,16 +136,6 @@ module SponsoredBenefits
 
       def plan_design_proposal
         benefit_sponsorship.benefit_sponsorable.plan_design_proposal
-      end
-
-      def benefit_application
-        return @benefit_application if defined? @benefit_application
-        if employer_profile.present?
-          employer_profile.benefit_sponsorships.each do |sponsorship|
-            @benefit_application = sponsorship.benefit_applications.detect{|application| application.id  == benefit_application_id}
-          end
-        end
-        @benefit_application
       end
 
       def is_cobra_status?
