@@ -103,11 +103,52 @@ module SponsoredBenefits
       end
     end
 
+    context "#to_plan_year" do
+      let!(:benefit_group)            { FactoryGirl.create(:benefit_group) }
+      let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
+      let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
+        benefit_market: "aca_shop_cca",
+        enrollment_frequency: "rolling_month"
+      )}
+
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+      let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+      let(:office_location) { OfficeLocation.new(
+          is_primary: true,
+          address: address,
+          phone: phone
+        )
+      }
+
+      let(:plan_design_organization)  { SponsoredBenefits::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
+      let(:plan_design_proposal)      { SponsoredBenefits::Organizations::PlanDesignProposal.new(title: "New Proposal") }
+      let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
+
+      before(:each) do
+        plan_design_organization.plan_design_proposals << [plan_design_proposal]
+        plan_design_proposal.profile = profile
+        profile.benefit_sponsorships = [benefit_sponsorship]
+        benefit_sponsorship.benefit_applications = [benefit_application]
+        benefit_application.benefit_groups = [benefit_group]
+        plan_design_organization.save
+      end
+
+      it "should instantiate a plan year object and must have correct values assigned" do
+        plan_year = benefit_application.to_plan_year
+        expect(plan_year.class).to eq PlanYear
+        expect(plan_year.benefit_groups.present?).to eq true
+        expect(plan_year.start_on).to eq benefit_application.effective_period.begin
+        expect(plan_year.end_on).to eq benefit_application.effective_period.end
+        expect(plan_year.open_enrollment_start_on).to eq benefit_application.open_enrollment_period.begin
+        expect(plan_year.open_enrollment_end_on).to eq benefit_application.open_enrollment_period.end
+      end
+    end
+
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplication }
-      let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on - 
+      let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
-      let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on - 
+      let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.days }
 
       it "should return the day of month deadline for an open enrollment standard period to begin" do
@@ -191,7 +232,7 @@ module SponsoredBenefits
         let(:effective_date)                  { Date.new(2018,3,1) }
 
         let(:prior_month)                     { effective_date - 1.month }
-        let(:late_open_enrollment_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on - 
+        let(:late_open_enrollment_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                                 Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
         let(:open_enrollment_end_day)         { Settings.aca.shop_market.open_enrollment.monthly_end_on }
         let(:open_enrollment_end_on)          { Date.new(prior_month.year, prior_month.month, open_enrollment_end_day) }
@@ -199,11 +240,11 @@ module SponsoredBenefits
         let(:late_open_enrollment_begin_on)   { Date.new(prior_month.year, prior_month.month, late_open_enrollment_begin_day) }
         let(:late_open_enrollment_period)     { late_open_enrollment_begin_on..open_enrollment_end_on }
 
-        let(:valid_timetable)                 { 
-                                                { 
-                                                    effective_date:                 Date.new(2018,3,1), 
+        let(:valid_timetable)                 {
+                                                {
+                                                    effective_date:                 Date.new(2018,3,1),
                                                     effective_period:               Date.new(2018,3,1)..Date.new(2019,2,28),
-                                                    open_enrollment_period:         Date.new(2018,1,1)..open_enrollment_end_on, 
+                                                    open_enrollment_period:         Date.new(2018,1,1)..open_enrollment_end_on,
                                                     open_enrollment_period_minimum: late_open_enrollment_period,
                                                     binder_payment_due_on:          Date.new(2018,2,23)
                                                   }
