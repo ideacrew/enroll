@@ -20,7 +20,7 @@ module SponsoredBenefits
         # TODO #FIXME We dont have owner_profile_id in plan design organization for new prospect employers
         # So we dont have a mapping from plan design organization to ::EmployerProfile.
         # If this is not correct, then we need to fix the below line.
-        @employer_profile = employer_profile || ::EmployerProfile.find_or_create_by_plan_design_organization(@plan_design_organization)
+        @employer_profile = employer_profile #|| ::EmployerProfile.find_or_create_by_plan_design_organization(@plan_design_organization)
         @employer_profile_exists = @employer_profile.persisted?
       end
 
