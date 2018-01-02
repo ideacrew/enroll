@@ -69,6 +69,7 @@ function fetchCarriers() {
   displayActiveCarriers();
   hidePlanContainer();
   toggleSliders(selected_carrier_level);
+  clearComparisons();
 }
 
 function displayActiveCarriers() {
