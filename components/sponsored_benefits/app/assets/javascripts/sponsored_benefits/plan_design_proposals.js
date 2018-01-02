@@ -337,6 +337,8 @@ function saveProposal(event) {
       type: "POST",
       data: data,
       url: url
+    }).done(function(){
+      $('.success-message').html('Plan successfully updated!');
     });
   }
 

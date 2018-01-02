@@ -49,6 +49,9 @@ $brand-primary: $mhc-dark-blue;
 
 
 .plan_design_proposals {
+  .success-message {
+    color: green;
+  }
   table.benefit-group-contribution-table {
     padding: 0 2%;
     margin: auto;
@@ -218,7 +221,7 @@ $brand-primary: $mhc-dark-blue;
     }
     .reference-plan-info {
       margin-top:-12px;
-    } 
+    }
     .reference-plan, .dental-reference-plan {
       height: 175px;
       padding: 0;
@@ -429,7 +432,7 @@ $brand-primary: $mhc-dark-blue;
   #view-comparison {
     float:left;
   }
-  
+
   .glyphicon-refresh-animate {
       -animation: spin .7s infinite linear;
       -webkit-animation: spin2 .7s infinite linear;
