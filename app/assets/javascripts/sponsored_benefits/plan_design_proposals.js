@@ -38,6 +38,7 @@ function fetchCarriers() {
   var plan_design_organization_id = $('#plan_design_organization_id').val();
   $(this).closest('.health-plan-design').find('.nav-tabs li').removeClass('active');
   $(this).closest('li').addClass('active');
+  hideDetailComparisons;
 
   $.ajax({
     type: "GET",
@@ -61,7 +62,6 @@ function fetchCarriers() {
 function displayActiveCarriers() {
   $(this).closest('.health-plan-design').find('.nav-tabs li').removeClass('active');
   $(this).closest('li').addClass('active');
-
   $(this).closest('.health-plan-design').find('.nav-tabs li.active label').attr('style', '');
   $(this).closest('.health-plan-design').find('.nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
 
@@ -322,6 +322,7 @@ function clearComparisons() {
 }
 
 function hideDetailComparisons() {
+  selected_rpids = [];
   $('.plan-comparison-container').hide();
 }
 
