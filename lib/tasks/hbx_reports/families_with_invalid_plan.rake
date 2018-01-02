@@ -23,6 +23,17 @@ namespace :reports do
 
     file_name = "#{Rails.root}/public/families_with_invalid_shop_plan.csv"
 
+    families = Family.where(:"households.hbx_enrollments" =>
+      {:"$elemMatch" =>
+        {
+          :plan_id => {:"$in" => invalid_plan_ids},
+          :aasm_state => {:"$in" => HbxEnrollment::ENROLLED_STATUSES},
+          :kind => {:"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
+        }
+      }
+    )
+
+
     def employment_status(person, employee_role_id)
       return nil if employee_role_id.nil?
       person.active_employee_roles.map(&:id).include? employee_role_id
@@ -30,16 +41,6 @@ namespace :reports do
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
-
-      families = Family.where(:"households.hbx_enrollments" =>
-        {:"$elemMatch" =>
-          {
-            :plan_id => {:"$in" => invalid_plan_ids},
-            :aasm_state => {:"$in" => HbxEnrollment::ENROLLED_STATUSES},
-            :kind => {:"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
-          }
-        }
-      )
 
       families.each do |family|
         person = family.primary_applicant.person
