@@ -85,41 +85,6 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
       expect(@employee_notice.notice.sep.title).to eq title
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on+1.year
     end
-
-    context "with current IVL Open Enrollment(2018)" do
-
-      before do
-        @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-        @employee_notice.append_data
-        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2017,12,31))
-      end
-
-      it "should append current IVL OE date(2018)" do
-        @employee_notice.append_data
-        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2017,12,31))
-        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2018.open_enrollment_start_on
-        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2018.open_enrollment_end_on
-        expect(@employee_notice.notice.enrollment.effective_on).to eq benefit_coverage_period_2018.start_on
-        expect(@employee_notice.notice.enrollment.plan_year).to eq benefit_coverage_period_2018.start_on.year
-      end
-
-    end
-
-    context "after current IVL OE closed(2018)" do
-
-      before do
-        allow(TimeKeeper).to receive_message_chain(:date_of_record).and_return(Date.new(2018,02,01))
-        @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-        @employee_notice.append_data
-      end
-
-      it "should append next year IVL OE date(2019)" do
-        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq benefit_coverage_period_2019.open_enrollment_start_on
-        expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq benefit_coverage_period_2019.open_enrollment_end_on
-        expect(@employee_notice.notice.enrollment.effective_on).to eq benefit_coverage_period_2019.start_on
-        expect(@employee_notice.notice.enrollment.plan_year).to eq benefit_coverage_period_2019.start_on.year
-      end
-    end
   end
 
 end
