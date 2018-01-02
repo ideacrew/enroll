@@ -135,4 +135,47 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
     end
   end
 
+  describe "append_unverified_individuals" do
+
+    before :each do
+      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      allow(hbx_enrollment).to receive("plan").and_return(plan)
+      allow(person).to receive("primary_family").and_return(family)
+      @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
+    end
+
+    context "immigration" do
+      before :each do
+        allow(person).to receive(:verification_types).and_return(['Immigration status'])
+      end
+
+      it "should have immigration pdf template" do
+        @reminder_notice.build
+        expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy
+      end
+
+      it "should not return citizenship pdf template if person is outstanding due to immigration" do
+        @reminder_notice.build
+        expect(@reminder_notice.notice.dhs_unverified.present?).to be_falsey
+      end
+    end
+
+    context "citizenship" do
+      before :each do
+        allow(person).to receive(:verification_types).and_return(['Citizenship'])
+        allow(person.consumer_role).to receive(:outstanding_verification_types).and_return(['Citizenship'])
+      end
+
+      it "should have citizenship pdf template" do
+        person.consumer_role.update_attributes!(citizen_status: "us_citizen")
+        @reminder_notice.build
+        expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
+      end
+
+      it "should not return immigration pdf template if person is outstanding due to citizenship" do
+        @reminder_notice.build
+        expect(@reminder_notice.notice.immigration_unverified.present?).to be_falsey
+      end
+    end
+  end
 end
