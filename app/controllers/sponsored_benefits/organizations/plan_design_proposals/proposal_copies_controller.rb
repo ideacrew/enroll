@@ -12,7 +12,8 @@ module SponsoredBenefits
         else
           flash[:error] = "Something went wrong"
         end
-        redirect_to organizations_plan_design_organization_plan_design_proposals_path(plan_design_organization)
+          redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, new_plan_design_proposal) 
+        end
       end
 
       private
