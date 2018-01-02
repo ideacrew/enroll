@@ -86,10 +86,16 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
   end
 
   def plan_year_query(i)
-    {
-      :start_on => Date.new(TimeKeeper.date_of_record.year,i,1), 
-      :aasm_state.in => ['active', 'expired']
-    }
+    if TimeKeeper.date_of_record.month == 12
+      {
+        :start_on => Date.new(TimeKeeper.date_of_record.year,i,1), 
+        :aasm_state.in => ['active', 'expired']
+      }
+    else
+      {
+        :aasm_state.in => ['active', 'expired']
+      }
+    end
   end
 
   def enrollment_query(plan_year)
