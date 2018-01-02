@@ -10,7 +10,15 @@
           <h3 class="panel-title">Health Plan Information</h3>
         </div>
         <div class="panel-body">
-          <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details" %>
+          <% if @plan %>
+            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details" %>
+          <% else %>
+            <div class="row">
+              <div class="col-xs-12">
+                No Reference Plan Assigned
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
       <!--Employer Costs End-->
@@ -30,12 +38,21 @@
                 <br />
                 <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
               </div>
+
               <div class="collapse" id="collapseExample">
                 <div class="employee-costs">
-                  <% if @benefit_group.sole_source? %>
-                    <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
+                  <% if @benefit_group %>
+                    <% if @benefit_group.sole_source? %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
+                    <% else %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group} %>
+                    <% end %>
                   <% else %>
-                    <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group} %>
+                    <div class="row">
+                      <div class="col-md-3">
+                        No Reference Plan Assigned
+                      </div>
+                    </div>
                   <% end %>
                 </div>
               </div>
