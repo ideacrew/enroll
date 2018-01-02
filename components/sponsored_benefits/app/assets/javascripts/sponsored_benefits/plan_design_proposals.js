@@ -168,11 +168,14 @@ function toggleSliders(plan_kind) {
 
 function calcEmployerContributions() {
   data = buildBenefitGroupParams();
+
   if (proposalIsInvalid(data)) {
     disableActionButtons();
-    return;
   } else {
     enableActionButtons();
+  }
+  if (data == undefined || data == {}) {
+    return;
   }
 
   var url = $("#contribution_url").val();
@@ -272,12 +275,12 @@ function preventSubmitPlanDesignProposal(event) {
 function disableActionButtons() {
   data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)){
-    $('.health-plan-design .save-action').attr('disabled', 'disabled');
+    $('.plan_design_proposals .save-action').attr('disabled', 'disabled');
   }
 }
 
 function enableActionButtons() {
-  $('.save-action').removeAttr('disabled');
+  $('.plan_design_proposals .save-action').removeAttr('disabled');
 }
 
 function contributionLevelsAreValid(benefit_group) {
@@ -306,16 +309,18 @@ function checkContributionLevels(contributions) {
     }
     return obj;
   });
-  var contributions_are_valid = false;
+  var contributions_are_valid = [];
 
   values_to_check.forEach(function(contribution){
     if(contribution.relationship == 'employee' || contribution.relationship == 'employee_only') {
-      contributions_are_valid = (contribution.premium_pct >= minimum_employee_contribution);
+      contributions_are_valid.push((contribution.premium_pct >= minimum_employee_contribution));
     } else if (contribution.relationship == 'family'){
-      contributions_are_valid = (contribution.premium_pct >= minimum_family_contribution);
+      contributions_are_valid.push((contribution.premium_pct >= minimum_family_contribution));
     }
   });
-  return contributions_are_valid;
+  return contributions_are_valid.every(function(val) {
+    return val == true;
+  });
 }
 
 function proposalIsInvalid(data) {
