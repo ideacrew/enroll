@@ -29,6 +29,7 @@ function pageInit() {
   }
   initSlider();
   $('.loading-plans-button').hide();
+  disableCompareButton();
 }
 
 function attachEmployerHealthContributionShowHide() {
@@ -49,6 +50,7 @@ function fetchCarriers() {
   var plan_design_organization_id = $('#plan_design_organization_id').val();
   $(this).closest('.health-plan-design').find('.nav-tabs li').removeClass('active');
   $(this).closest('li').addClass('active');
+  hideDetailComparisons;
 
   $.ajax({
     type: "GET",
@@ -72,7 +74,6 @@ function fetchCarriers() {
 function displayActiveCarriers() {
   $(this).closest('.health-plan-design').find('.nav-tabs li').removeClass('active');
   $(this).closest('li').addClass('active');
-
   $(this).closest('.health-plan-design').find('.nav-tabs li.active label').attr('style', '');
   $(this).closest('.health-plan-design').find('.nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
 
@@ -405,6 +406,7 @@ function comparisonPlans() {
       removeA($.unique(selected_rpids), value);
     }
   });
+  disableCompareButton();
 }
 
 function viewComparisons() {
@@ -431,11 +433,24 @@ function clearComparisons() {
     var checkboxes = $(this).find('input[type=checkbox]');
     checkboxes.attr('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
+    disableCompareButton();
   });
 }
 
 function hideDetailComparisons() {
+  selected_rpids = [];
   $('.plan-comparison-container').hide();
+}
+
+function disableCompareButton() {
+  $('#view-comparison').addClass('disabled');
+  $('#clear-comparison').addClass('disabled');
+  $('.reference-plan input[type=checkbox]').each(function() {
+    if ($(this).is(":checked")) {
+      $('#view-comparison').removeClass('disabled');
+      $('#clear-comparison').removeClass('disabled');
+    }
+  });
 }
 
 function removeA(arr) {
