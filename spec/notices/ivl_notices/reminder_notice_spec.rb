@@ -177,5 +177,27 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
         expect(@reminder_notice.notice.immigration_unverified.present?).to be_falsey
       end
     end
+
+    context "both citizenship and immigration" do
+
+      before :each do
+        allow(person).to receive(:verification_types).and_return(['Citizenship', 'Immigration status'])
+        allow(person.consumer_role).to receive(:outstanding_verification_types).and_return(['Citizenship', 'Immigration status'])
+      end
+
+      it "should return immigration pdf template and  citizenship pdf template" do
+        person.consumer_role.update_attributes!(citizen_status: "us_citizen")
+        @reminder_notice.build
+        expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
+        expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy
+      end
+
+      it "should not return any other pdf templates" do
+        @reminder_notice.build
+        expect(@reminder_notice.notice.american_indian_unverified.present?).to be_falsey
+        expect(@reminder_notice.notice.residency_inconsistency.present?).to be_falsey
+        expect(@reminder_notice.notice.ssa_unverified.present?).to be_falsey
+      end
+    end
   end
 end
