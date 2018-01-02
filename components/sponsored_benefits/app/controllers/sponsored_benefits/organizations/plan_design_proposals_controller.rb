@@ -4,7 +4,7 @@ module SponsoredBenefits
     include DataTablesAdapter
 
     before_action :load_plan_design_organization, except: [:destroy, :publish, :claim]
-    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :view_published]
+    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :view_quote]
 
     def index
       @datatable = effective_datatable
@@ -66,12 +66,14 @@ module SponsoredBenefits
       # plan_design_proposal
     end
 
-    def view_published
+    def view_quote
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
       @census_employees = sponsorship.census_employees
       @benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
-      @plan = Plan.find(@benefit_group.reference_plan_id)
-      @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
+      if @benefit_group
+        @plan = Plan.find(@benefit_group.reference_plan_id)
+        @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
+      end
     end
 
     def edit

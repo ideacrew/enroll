@@ -39,7 +39,7 @@
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
              ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), edit_quote_link_type(row)],
-             publish_or_view_published_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), show_link: sponsored_benefits.view_published_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row)),
+             publish_or_view_quote_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), show_link: sponsored_benefits.view_quote_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row)),
              ['Copy Quote', sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(row.id), 'post'],
              ['Remove Quote', sponsored_benefits.organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
             ]
@@ -63,9 +63,10 @@
           "static"
         end
 
-        def publish_or_view_published_link(row:, publish_link:, show_link:)
-          return ['Publish Quote', publish_link, disabled_if_invalid(row)] unless row.published?
-          ['View Published Quote', show_link, 'static']
+        def publish_or_view_quote_link(row:, publish_link:, show_link:)
+          return ['View Published Quote', show_link, 'static'] if row.published?
+          return ['View Expired Quote', show_link, 'static'] if row.expired?
+          ['Publish Quote', publish_link, disabled_if_invalid(row)]
         end
 
         def disabled_if_invalid(row)
