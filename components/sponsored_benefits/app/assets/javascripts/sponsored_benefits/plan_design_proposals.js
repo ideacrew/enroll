@@ -351,7 +351,13 @@ function saveProposalAndCopy(event) {
       url: url
     }).done(function(data) {
       var copy_url = $('#copy_proposal_url').val();
-      $.post(copy_url);
+      $.ajax({
+        url: copy_url,
+        type: 'POST',
+        success: function(data) {
+          window.location.href = data.url;
+        }
+      });
     });
   }
 }
@@ -368,7 +374,13 @@ function saveProposalAndPublish(event) {
       url: url
     }).done(function(data) {
       var publish_url = $('#publish_proposal_url').val();
-      $.post(publish_url);
+      $.ajax({
+        url: publish_url,
+        type: 'POST',
+        success: function(data) {
+          window.location.href = data.url;
+        }
+      });
     });
   }
 }
