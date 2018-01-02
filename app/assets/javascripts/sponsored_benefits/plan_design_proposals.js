@@ -8,32 +8,16 @@ $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attach
 $(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDesignProposal);
 $(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
 $(document).on('click', '#submitPlanDesignProposal', saveProposal);
+$(document).on('click', '#clear-comparison', clearComparisons);
+$(document).on('click', '#view-comparison', viewComparisons);
+$(document).on('click', '#hide-detail-comparisons', hideDetailComparisons);
 
 $(document).on('ready', pageInit);
 
 function pageInit() {
   $('li.sole-source-tab').find('label').trigger('click');
   initSlider();
-}
-function comparePlans() {
-  var selected_plans = [];
-  $('.reference-plan input').each(function(index) {
-    if(index < 3) {
-      selected_plans.push($(this).val());
-    }
-  });
-
-  var url = $("#plan_comparison_url").val();
-
-  $.ajax({
-    type: "GET",
-    url: url,
-    dataType: 'script',
-    data: { plans: selected_plans, sort_by: '' },
-  }).done(function() {
-    $('#compare_plans_table').dragtable({dragaccept: '.movable'});
-  });
-
+  $('.loading-plans-button').hide();
 }
 
 function attachEmployerHealthContributionShowHide() {
@@ -98,6 +82,7 @@ function carrierSelected() {
   $('.tab-container').hide();
   var elected_plan_kind = $(this).attr('value');
   selected_rpids = [];
+  $('.plan-comparison-container').hide();
 
   $("#elected_plan_kind").val(elected_plan_kind);
   $("#reference_plan_id").val("");
@@ -311,6 +296,8 @@ function comparisonPlans() {
 
 function viewComparisons() {
   var url = $("#plan_comparison_url").val();
+  $('.view-plans-button').hide();
+  $('.loading-plans-button').show();
 
     $.ajax({
       type: "GET",
@@ -319,7 +306,23 @@ function viewComparisons() {
       data: { plans: selected_rpids, sort_by: '' },
     }).done(function() {
       $('#compare_plans_table').dragtable({dragaccept: '.movable'});
+      $('.view-plans-button').show();
+      $('.loading-plans-button').hide();
     });
+    
+    $('.plan-comparison-container').show();
+}
+
+function clearComparisons() {
+  $('.reference-plan').each(function() {
+    var checkboxes = $(this).find('input[type=checkbox]');
+    checkboxes.attr('checked', false);
+    removeA($.unique(selected_rpids), checkboxes.val());
+  });
+}
+
+function hideDetailComparisons() {
+  $('.plan-comparison-container').hide();
 }
 
 function removeA(arr) {

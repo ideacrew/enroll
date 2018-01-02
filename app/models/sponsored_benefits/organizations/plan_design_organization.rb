@@ -91,6 +91,14 @@ module SponsoredBenefits
         end
       end
 
+      def new_proposal_state
+        if employer_profile.present? && employer_profile.active_plan_year.present?
+          'renewing_draft'
+        else
+          'draft'
+        end
+      end
+
       def build_proposal_from_existing_employer_profile
         builder = SponsoredBenefits::BenefitApplications::PlanDesignProposalBuilder.new(self, calculate_start_on_dates[0])
         builder.add_plan_design_profile
@@ -98,6 +106,7 @@ module SponsoredBenefits
         builder.add_plan_design_employees
         builder.plan_design_organization.save
         builder.census_employees.each{|ce| ce.save}
+        builder.add_proposal_state(new_proposal_state)
         builder.plan_design_proposal
       end
 
