@@ -444,4 +444,7 @@ $brand-primary: $mhc-dark-blue;
       from { transform: scale(1) rotate(0deg);}
       to { transform: scale(1) rotate(360deg);}
   }
+  .sq-btn-grp {
+    margin-top:-40px;
+  }
 }
