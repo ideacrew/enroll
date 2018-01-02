@@ -15,7 +15,7 @@ field_names = %w(
 
 file_2 = "#{Rails.root}/public/ivl_catastrophic_notice_report.csv"
 
-event_kind = ApplicationEventKind.where(:event_name => 'final_catastrophic_plan_2016').first
+event_kind = ApplicationEventKind.where(:event_name => 'final_catastrophic_plan').first
 notice_trigger = event_kind.notice_triggers.first
 
 CSV.open(file_2, "w", force_quotes: true) do |csv|
@@ -28,7 +28,7 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
                       template: notice_trigger.notice_template,
                       subject: event_kind.title,
-                      event_name: 'final_catastrophic_plan_2016',
+                      event_name: 'final_catastrophic_plan',
                       mpi_indicator: notice_trigger.mpi_indicator
                       }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
                       )

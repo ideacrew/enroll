@@ -55,5 +55,4 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
       x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
     end.join(' ')
   end
-
 end

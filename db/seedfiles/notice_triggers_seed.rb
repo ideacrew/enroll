@@ -1156,7 +1156,7 @@ ivl_notice_triggers = [
     title: 'Important Tax Information about your Catastrophic Health Coverage',
     description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
     resource_name: 'consumer_role',
-    event_name: 'final_catastrophic_plan_2016',
+    event_name: 'final_catastrophic_plan',
     notice_triggers: [
       {
         name: 'Final Catastrophic Plan Notice',
