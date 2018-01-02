@@ -1,4 +1,5 @@
 $('.reference-plans').html("<%= escape_javascript(render(partial: 'plans', locals: { :plans => @plans })).html_safe %>")
 $('.reference-plans').show();
 hideDetailComparisons();
+clearComparisons();
 
