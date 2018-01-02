@@ -94,6 +94,11 @@ class CoverageHousehold
 
     # household.save
   end
+
+  def remove_coverage_household_member(coverage_household_member_id, family_member_id)
+    chm = coverage_household_members.where(id: coverage_household_member_id).and(family_member_id: family_member_id).first
+      chm.destroy
+  end
   
   def notify_the_user(member)
     if member.person && (role = member.person.consumer_role)

@@ -5,13 +5,23 @@ class RemoveCoverageHouseholdMember < MongoidMigrationTask
     begin
       person = Person.where(hbx_id: ENV['person_hbx_id'])
       family_member = FamilyMember.find(ENV['family_member_id'].to_s)
+      coverage_household_member_id = ENV['coverage_household_member_id'].to_s
+      remove_type = ENV['remove_type'].to_s
+      ch = person.first.primary_family.active_household.coverage_households.where(:is_immediate_family => true).first
+      coverage_household_members = ch.coverage_household_members.where(family_member_id: family_member.id)
+      puts "total coverage household members for a family member(#{family_member.id}) before delete: #{coverage_household_members.count}" unless Rails.env.test?
       if person.blank?
         puts "Invalid hbx_id of person"  unless Rails.env.test?
-      else
+      elsif !coverage_household_member_id.nil? && coverage_household_members.count > 1 && remove_type == "remove_duplicate_chm"
+        chm = ch.remove_coverage_household_member(coverage_household_member_id, family_member.id)
+        coverage_household_members = ch.coverage_household_members.where(family_member_id: family_member.id)
+        puts "removed duplicate coverage household member: #{coverage_household_member_id}" unless Rails.env.test?
+        puts "total coverage household members for a family member(#{family_member.id}) after delete: #{coverage_household_members.count}" unless Rails.env.test?
+      else remove_type == "remove_fm_from_ch"
         ch = person.first.primary_family.active_household.coverage_households.where(:is_immediate_family => true).first
         chm = ch.remove_family_member(family_member)
         ch.save
-        puts "remove family member from coverage household: #{family_member.id}" unless Rails.env.test?
+        puts "removed family member from coverage household: #{family_member.id}" unless Rails.env.test?
       end
     rescue Exception => e
       puts e.message
