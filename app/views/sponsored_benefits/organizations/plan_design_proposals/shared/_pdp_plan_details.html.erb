@@ -3,7 +3,7 @@
     <tbody>
       <tr>
         <th>Benefit Model Selection</th>
-        <td></td>
+        <td><%= Settings.plan_option_titles.send(@benefit_group.plan_option_kind.to_sym) %></td>
       </tr>
       <tr>
         <th>Plan Name</th>
@@ -12,10 +12,6 @@
       <tr>
         <th>Plan Coverage Level</th>
         <td><%= display_dental_metal_level @plan %></td>
-      </tr>
-      <tr>
-        <th>Network</th>
-        <td></td>
       </tr>
       <tr>
         <th>Plan Carrier</th>
