@@ -9,6 +9,7 @@ $(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDes
 $(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
 $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '#clear-comparison', clearComparisons);
+$(document).on('click', '#view-comparison', viewComparisons);
 
 $(document).on('ready', pageInit);
 
@@ -79,6 +80,7 @@ function carrierSelected() {
   $('.tab-container').hide();
   var elected_plan_kind = $(this).attr('value');
   selected_rpids = [];
+  $('.plan-comparison-container').hide();
 
   $("#elected_plan_kind").val(elected_plan_kind);
   $("#reference_plan_id").val("");
@@ -301,6 +303,8 @@ function viewComparisons() {
     }).done(function() {
       $('#compare_plans_table').dragtable({dragaccept: '.movable'});
     });
+    
+    $('.plan-comparison-container').show();
 }
 
 function clearComparisons() {
