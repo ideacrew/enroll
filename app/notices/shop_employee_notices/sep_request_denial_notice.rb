@@ -43,4 +43,5 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
       :open_enrollment_start_on => open_enrollment_py.start_on,
       :start_on => upcoming_plan_year_start_on
       })
+  end
 end
