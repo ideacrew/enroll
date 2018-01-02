@@ -3,8 +3,8 @@ module SponsoredBenefits
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
 
-    before_action :load_plan_design_organization, except: [:destroy, :publish, :claim]
-    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :view_quote]
+    before_action :load_plan_design_organization, except: [:destroy, :publish, :claim, :show]
+    before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
 
     def index
       @datatable = effective_datatable
@@ -62,17 +62,13 @@ module SponsoredBenefits
     end
 
     def show
-      # load relevant quote (not nested)
-      # plan_design_proposal
-    end
-
-    def view_quote
-      sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
-      @census_employees = sponsorship.census_employees
-      @benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
+      @plan_design_organization = @plan_design_proposal.plan_design_organization
+      @benefit_group = @plan_design_proposal.active_benefit_group
       if @benefit_group
-        @plan = Plan.find(@benefit_group.reference_plan_id)
-        @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
+        @census_employees = @benefit_group.targeted_census_employees
+        @plan = @benefit_group.reference_plan
+        @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
+        @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
       end
     end
 

@@ -39,6 +39,12 @@ module SponsoredBenefits
         application.benefit_groups.first
       end
 
+      def active_census_employees
+        return nil if profile.benefit_sponsorships.empty?
+        sponsorship = profile.benefit_sponsorships.first
+        sponsorship.census_employees
+      end
+
       # class methods
       class << self
 
