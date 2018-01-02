@@ -69,6 +69,7 @@ function fetchCarriers() {
   displayActiveCarriers();
   hidePlanContainer();
   toggleSliders(selected_carrier_level);
+  clearComparisons();
 }
 
 function displayActiveCarriers() {
@@ -129,6 +130,8 @@ function planSelected() {
     calcEmployerContributions();
     $(this).siblings('input').attr('checked', true);
   };
+  
+  clearComparisons();
 }
 
 // function reconcileSliderAndInputVal() {
