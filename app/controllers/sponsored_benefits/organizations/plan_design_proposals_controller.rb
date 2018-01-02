@@ -24,10 +24,11 @@ module SponsoredBenefits
       elsif claim_code_status == "claimed"
         flash[:error] = "Quote claim code already claimed."
       else
-        if SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote)
+        begin
+          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote)
           flash[:notice] = "Code claimed with success. Your Plan Year has been created."
-        else
-          flash[:error] = "There was an issue claiming this quote."
+        rescue Exception => e
+          flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end
       end
 
