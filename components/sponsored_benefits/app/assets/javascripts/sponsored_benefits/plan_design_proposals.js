@@ -130,7 +130,7 @@ function planSelected() {
     calcEmployerContributions();
     $(this).siblings('input').attr('checked', true);
   };
-  
+
   clearComparisons();
 }
 
@@ -357,8 +357,13 @@ function saveProposalAndCopy(event) {
       $.ajax({
         url: copy_url,
         type: 'POST',
+        dataType: 'json',
         success: function(data) {
           window.location.href = data.url;
+        },
+        error: function(data) {
+          resp = $.parseJSON(data.responseText);
+          console.log(resp);
         }
       });
     });
