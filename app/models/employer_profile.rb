@@ -148,6 +148,10 @@ class EmployerProfile
     @broker_agency_profile = new_broker_agency
   end
 
+  def has_active_state?
+    ACTIVE_STATES.include?(self.aasm_state)
+  end
+
   def fire_broker_agency(terminate_on = today)
     return unless active_broker_agency_account
     SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: active_broker_agency_account.broker_agency_profile, employer: self) if organization
@@ -300,6 +304,10 @@ class EmployerProfile
 
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
+  end
+
+  def plan_years_with_drafts_statuses
+    plan_years.draft.size > 0
   end
 
   def is_conversion?
