@@ -5,15 +5,15 @@ module SponsoredBenefits
       def create
         new_plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({ organization: plan_design_organization }.merge(plan_design_form.to_h))
         existing_roster = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(plan_design_form.proposal.profile.benefit_sponsorships.first)
-
         if new_plan_design_proposal.save
-          assign_roster_employees(sponsorship: new_plan_design_proposal.proposal.profile.benefit_sponsorships.first, roster: existing_roster)
+          sponsorship = new_plan_design_proposal.proposal.profile.benefit_sponsorships.first
+          #assign_benefit_group(proposal: new_plan_design_proposal.proposal, sponsorship: sponsorship, old_sponsorship: plan_design_form.proposal.profile.benefit_sponsorships.first)
+          assign_roster_employees(sponsorship: sponsorship, roster: existing_roster)
           flash[:success] = "Proposal successfully copied"
         else
           flash[:error] = "Something went wrong"
         end
-          redirect_to edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, new_plan_design_proposal) 
-        end
+        render json: { url: edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, new_plan_design_proposal.proposal.id) }
       end
 
       private
@@ -44,6 +44,35 @@ module SponsoredBenefits
           census_employee.save!
         end
       end
+
+      # def assign_benefit_group(proposal:, sponsorship:, old_sponsorship:)
+      #   old_application = old_sponsorship.benefit_applications.first
+      #   return if old_application.benefit_groups.empty?
+      #   bg = old_application.benefit_groups.first
+      #   new_application = sponsorship.benefit_applications.first
+      #
+      #   new_bg = new_application.benefit_groups.build({
+      #     title: bg.title,
+      #     reference_plan_id: bg.reference_plan_id,
+      #     plan_option_kind: bg.plan_option_kind,
+      #     elected_plans: bg.elected_plans
+      #   })
+      #
+      #   bg.composite_tier_contributions.each do |contribution|
+      #     pp contribution.clone
+      #     new_bg.composite_tier_contributions << contribution.clone
+      #   end
+      #   bg.relationship_benefits.each do |rb|
+      #     pp rb.clone
+      #     new_bg.relationship_benefits << rb.clone
+      #   end
+      #   pp new_bg.relationship_benefits.count
+      #   pp new_bg.composite_tier_contributions.count
+      #   new_bg.estimate_composite_rates
+      #   pp new_bg
+      #   pp new_bg.valid?
+      #   proposal.save!
+      # end
 
       def plan_design_proposal
         @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id])
