@@ -64,8 +64,10 @@ module SponsoredBenefits
     def show
       @plan_design_organization = @plan_design_proposal.plan_design_organization
       @benefit_group = @plan_design_proposal.active_benefit_group
+      sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
+      @census_employees = sponsorship.census_employees
+
       if @benefit_group
-        @census_employees = @benefit_group.targeted_census_employees
         @plan = @benefit_group.reference_plan
         @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
         @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
