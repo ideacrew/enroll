@@ -8,6 +8,8 @@ namespace :recurring do
           primary_person = family.primary_applicant.person
           employee_roles = primary_person.active_employee_roles
           employee_roles.each do |employee_role|
+            next if (employee_role.benefit_group.nil?)
+            ben_grp = employee_role.benefit_group.is_congress
             enrollments = employee_role.census_employee.active_benefit_group_assignment.hbx_enrollments
             enrollments.select{|e| (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).include?(e.aasm_state)}
             if enrollments.present?
@@ -17,10 +19,12 @@ namespace :recurring do
               covered_members_ids = covered_members.flat_map(&:_id)
               relations = primary_person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "child")}
               if relations.present?
-                aged_off_dependents =  relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
+                aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
                 next if aged_off_dependents.empty?
                 dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
-                ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "employee_dependent_age_off_termination", dep_hbx_ids: dep_hbx_ids )
+                event_name = ben_grp ? "employee_dependent_age_off_termination_congressional" : "employee_dependent_age_off_termination_non_congressional"
+                ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, event_name, dep_hbx_ids: dep_hbx_ids )
+                puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}"
               end
             end
           end

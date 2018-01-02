@@ -2,9 +2,11 @@ require 'rails_helper'
 require 'rake'
 
 describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_each do
-  let!(:person) { FactoryGirl.create(:person, :with_employee_role) }
-  let!(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible") }
-  let!(:plan_year) { FactoryGirl.create(:plan_year) }
+  let!(:person) { FactoryGirl.create(:person) }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile, benefit_group_id: active_benefit_group.id)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible", employee_role_id: employee_role.id,) }
+  let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, :aasm_state => 'active')}
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
   let!(:person2) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
@@ -39,6 +41,6 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_
       job_info[:job] == ShopNoticesNotifierJob
     end
     expect(queued_job[:args].first).to eq census_employee.id.to_s
-    expect(queued_job[:args].second).to eq "employee_dependent_age_off_termination"
+    expect(queued_job[:args].second).to eq "employee_dependent_age_off_termination_non_congressional"
   end
 end
