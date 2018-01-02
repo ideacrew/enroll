@@ -66,7 +66,7 @@
         def publish_or_view_quote_link(row:, publish_link:, show_link:)
           return ['View Published Quote', show_link, 'static'] if row.published?
           return ['View Expired Quote', show_link, 'static'] if row.expired?
-          ['Publish Quote', publish_link, disabled_if_invalid(row)]
+          ['View Published Quote', show_link, 'disabled']
         end
 
         def disabled_if_invalid(row)
