@@ -18,6 +18,7 @@ function pageInit() {
   $('li.sole-source-tab').find('label').trigger('click');
   initSlider();
   $('.loading-plans-button').hide();
+  disableCompareButton();
 }
 
 function attachEmployerHealthContributionShowHide() {
@@ -292,6 +293,7 @@ function comparisonPlans() {
       removeA($.unique(selected_rpids), value);
     }
   });
+  disableCompareButton();
 }
 
 function viewComparisons() {
@@ -324,6 +326,15 @@ function clearComparisons() {
 function hideDetailComparisons() {
   selected_rpids = [];
   $('.plan-comparison-container').hide();
+}
+
+function disableCompareButton() {
+  $('#view-comparison').addClass('disabled');
+  $('.reference-plan input[type=checkbox]').each(function() {
+    if ($(this).is(":checked")) {
+      $('#view-comparison').removeClass('disabled');
+    }
+  });
 }
 
 function removeA(arr) {
