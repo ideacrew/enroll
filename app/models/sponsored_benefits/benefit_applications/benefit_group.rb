@@ -9,7 +9,7 @@ module SponsoredBenefits
       delegate :plan_design_organization, to: :benefit_application
 
       def targeted_census_employees
-        target_object = persisted? ? self : benefit_application.benefit_sponsorship
+        target_object = persisted? ? benefit_application.benefit_sponsorship : benefit_application.benefit_sponsorship
         target_object.census_employees
       end
 
