@@ -3,7 +3,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   attr_accessor :census_employee
 
   def initialize(census_employee, args = {})
-    @qle_reported_date = args[:options][:qle_reported_date]
+    @qle_reported_date = Date.strptime(args[:options][:qle_reported_date].to_s,"%m/%d/%Y")
     @qle_title = args[:options][:qle_title]
     super(census_employee, args)
   end
@@ -43,16 +43,4 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
       :open_enrollment_start_on => open_enrollment_py.start_on,
       :start_on => upcoming_plan_year_start_on
       })
-
-    ben_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    current_open_enrollment_coverage = ben_sponsorship.benefit_coverage_periods.where(open_enrollment_end_on: Date.strptime(Settings.aca.individual_market.open_enrollment.end_on,"%m/%d/%Y")).first
-    bc_period = current_open_enrollment_coverage.open_enrollment_end_on >= TimeKeeper.date_of_record ? current_open_enrollment_coverage : ben_sponsorship.renewal_benefit_coverage_period
-
-    notice.enrollment = PdfTemplates::Enrollment.new({
-              :effective_on => bc_period.start_on,
-              :plan_year => bc_period.start_on.year,
-              :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
-              :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
-              })
-  end
 end
