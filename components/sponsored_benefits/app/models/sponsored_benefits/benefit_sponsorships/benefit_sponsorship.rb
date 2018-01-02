@@ -35,7 +35,7 @@ module SponsoredBenefits
       # Store separate initial and on-going enrollment renewal values to handle mid-year start situations
       field :initial_enrollment_period, type: Range
       field :annual_enrollment_period_begin_month, type: Integer
-      field :enrollment_frequency, type: Symbol
+      field :enrollment_frequency, type: Symbol, default: :rolling_month
       field :contact_method, type: String, default: "Paper and Electronic communications"
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
