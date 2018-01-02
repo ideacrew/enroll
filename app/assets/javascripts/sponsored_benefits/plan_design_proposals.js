@@ -273,7 +273,7 @@ selected_rpids = [];
 
 function comparisonPlans() {
   $(this).each(function() {
-    let value = $(this).val();
+    var value = $(this).val();
     if ($(this).is(":checked") && $.unique(selected_rpids).length <= 3) {
       selected_rpids.push(value)
     }
