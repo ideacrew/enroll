@@ -1,21 +1,32 @@
 $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers);
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
 $(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
-$(document).on('click', '.reference-plan input[type=checkbox]', comparisonPlans);
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
-$(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
+$(document).on('click', '.plan_design_proposals .checkbox', calcEmployerContributions);
+// $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
-$(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDesignProposal);
-$(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
-$(document).on('click', '#submitPlanDesignProposal', saveProposal);
+
+$(document).on('click', '.reference-plan input[type=checkbox]', comparisonPlans);
 $(document).on('click', '#clear-comparison', clearComparisons);
 $(document).on('click', '#view-comparison', viewComparisons);
 $(document).on('click', '#hide-detail-comparisons', hideDetailComparisons);
 
+
+$(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDesignProposal);
+$(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
+$(document).on('click', '#submitPlanDesignProposal', saveProposal);
+$(document).on('click', '#copyPlanDesignProposal', saveProposalAndCopy);
+$(document).on('click', '#publishPlanDesignProposal', saveProposalAndPublish);
+
 $(document).on('ready', pageInit);
 
 function pageInit() {
-  $('li.sole-source-tab').find('label').trigger('click');
+  if ($("#reference_plan_id").val() != '') {
+
+  } else {
+    disableActionButtons();
+    $('li.sole-source-tab').find('label').trigger('click');
+  }
   initSlider();
   $('.loading-plans-button').hide();
 }
@@ -119,21 +130,21 @@ function planSelected() {
   };
 }
 
-function reconcileSliderAndInputVal() {
-  if ( $(this).hasClass('hidden-param') )  {
-    var hidden = parseInt($(this).val());
-    if (hidden < 0) {
-      hidden = 0;
-    } else if (hidden > 100) {
-      hidden = 100;
-    }
-    var mySlider = $(this).closest('.form-group').find('input.slider');
-    mySlider.bootstrapSlider('setValue', hidden);
-    $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
-    $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
-    $(this).val(hidden);
-  }
-}
+// function reconcileSliderAndInputVal() {
+//   if ( $(this).hasClass('hidden-param') )  {
+//     var hidden = parseInt($(this).val());
+//     if (hidden < 0) {
+//       hidden = 0;
+//     } else if (hidden > 100) {
+//       hidden = 100;
+//     }
+//     var mySlider = $(this).closest('.form-group').find('input.slider');
+//     mySlider.bootstrapSlider('setValue', hidden);
+//     $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
+//     $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
+//     $(this).val(hidden);
+//   }
+// }
 
 function setSliderDisplayVal(slideEvt) {
   $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
@@ -153,8 +164,11 @@ function toggleSliders(plan_kind) {
 
 function calcEmployerContributions() {
   data = buildBenefitGroupParams();
-  if (data == undefined) {
-    return
+  if (proposalIsInvalid(data)) {
+    disableActionButtons();
+    return;
+  } else {
+    enableActionButtons();
   }
 
   var url = $("#contribution_url").val();
@@ -173,7 +187,7 @@ function calcEmployerContributions() {
 function buildBenefitGroupParams() {
   var reference_plan_id = $('#reference_plan_id').val();
   if (reference_plan_id == "" || reference_plan_id == undefined) {
-    return
+    return {};
   }
 
   var plan_option_kind = $("#elected_plan_kind").val();
@@ -184,8 +198,6 @@ function buildBenefitGroupParams() {
   var is_offered = $('.enabled .benefits-fields .checkbox label > input[type=checkbox]').map(function() {
     return $(this).is(":checked");
   }).get();
-
-
 
   var composite_rating_tier_types = [ 'employee_only', 'family', 'employee_and_spouse', 'employee_and_one_or_more_dependents']
   var relationship_benefit_types = [ 'employee', 'spouse', 'domestic_partner', 'child_under_26', 'child_26_and_over']
@@ -253,26 +265,127 @@ function preventSubmitPlanDesignProposal(event) {
   event.preventDefault();
 }
 
-function saveProposal(event) {
+function disableActionButtons() {
   data = buildBenefitGroupParams();
-  url = $("#benefit_groups_url").val();
-  $.ajax({
-    type: "POST",
-    data: data,
-    url: url
+  if (proposalIsInvalid(data)){
+    $('.health-plan-design .save-action').attr('disabled', 'disabled');
+  }
+}
+
+function enableActionButtons() {
+  $('.save-action').removeAttr('disabled');
+}
+
+function contributionLevelsAreValid(benefit_group) {
+  if ('composite_tier_contributions_attributes' in benefit_group) {
+    var contributions = benefit_group['composite_tier_contributions_attributes'];
+    return checkContributionLevels(Object.values(contributions));
+  } else if ('relationship_benefits_attributes' in benefit_group) {
+    var contributions = benefit_group['relationship_benefits_attributes'];
+    return checkContributionLevels(Object.values(contributions));
+  } else {
+    return false;
+  }
+}
+
+function checkContributionLevels(contributions) {
+  var minimum_employee_contribution = $("#employer_min_employee_contribution").val();
+  var minimum_family_contribution = $("#employer_min_family_contribution").val();
+  var offered_contributions = contributions.filter(function( obj ) {
+    return obj.offered;
   });
+
+  values_to_check = offered_contributions.map(function(obj) {
+    if('composite_rating_tier' in obj) {
+      obj.relationship = obj.composite_rating_tier;
+      obj.premium_pct = obj.employer_contribution_percent;
+    }
+    return obj;
+  });
+  var contributions_are_valid = false;
+
+  values_to_check.forEach(function(contribution){
+    if(contribution.relationship == 'employee' || contribution.relationship == 'employee_only') {
+      contributions_are_valid = (contribution.premium_pct >= minimum_employee_contribution);
+    } else if (contribution.relationship == 'family'){
+      contributions_are_valid = (contribution.premium_pct >= minimum_family_contribution);
+    }
+  });
+  return contributions_are_valid;
+}
+
+function proposalIsInvalid(data) {
+  if (data == undefined || data == {} || !('benefit_group' in data)) {
+    return true;
+  } else {
+    return !contributionLevelsAreValid(data['benefit_group']);
+  }
+}
+
+function saveProposal(event) {
+  var data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data)) {
+    // handle error messaging
+    return;
+  } else {
+    url = $("#benefit_groups_url").val();
+    $.ajax({
+      type: "POST",
+      data: data,
+      url: url
+    });
+  }
+
+}
+
+function saveProposalAndCopy(event) {
+  var data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data)) {
+
+  } else {
+    url = $("#benefit_groups_url").val();
+    $.ajax({
+      type: "POST",
+      data: data,
+      url: url
+    }).done(function(data) {
+      var copy_url = $('#copy_proposal_url').val();
+      $.post(copy_url);
+    });
+  }
+}
+
+function saveProposalAndPublish(event) {
+  data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data)) {
+
+  } else {
+    var url = $("#benefit_groups_url").val();
+    $.ajax({
+      type: "POST",
+      data: data,
+      url: url
+    }).done(function(data) {
+      var publish_url = $('#publish_proposal_url').val();
+      $.post(publish_url);
+    });
+  }
 }
 
 function saveProposalAndNavigateToReview(event) {
-  data = buildBenefitGroupParams();
-  url = $("#benefit_groups_url").val();
-  $.ajax({
-    type: "POST",
-    data: data,
-    url: url
-  }).done(function(data) {
-    window.location.href = data.url;
-  });
+  var data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data)) {
+
+  } else {
+    var url = $("#benefit_groups_url").val();
+    $.ajax({
+      type: "POST",
+      data: data,
+      url: url
+    }).done(function(data) {
+      window.location.href = data.url;
+    });
+  }
 }
 
 selected_rpids = [];
@@ -309,7 +422,7 @@ function viewComparisons() {
       $('.view-plans-button').show();
       $('.loading-plans-button').hide();
     });
-    
+
     $('.plan-comparison-container').show();
 }
 
