@@ -2,7 +2,10 @@
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
      <div class="container plan_design_proposals">
-      <%= render 'shared/engines/horizontal_status', step:2 %>
+      <%= render 'shared/engines/horizontal_status', step:2, links: [
+                      sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal),
+                      sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal)
+                      ] %>
       <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
         <%= render 'plan_selection_form', f: f %>
         <div class="row">
