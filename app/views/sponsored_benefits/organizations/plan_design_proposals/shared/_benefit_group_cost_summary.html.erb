@@ -25,7 +25,7 @@
       </thead>
       <tbody id="employee_index_scroll">
         <% if benefit_group.census_employees.any? %>
-          <%= render 'employee_costs', benefit_group: benefit_group %>
+          <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_costs', benefit_group: benefit_group %>
         <% else %>
         <tr> <td> No employees enrolled.</td></tr>
         <% end %>
