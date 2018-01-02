@@ -3,6 +3,15 @@ module SponsoredBenefits
     class PlanDesignProposals::PlanReviewsController < ApplicationController
 
       def new
+        @plan_design_organization = plan_design_organization
+        @benefit_group = benefit_group
+        @census_employees = sponsorship.census_employees
+
+        if @benefit_group
+          @plan = @benefit_group.reference_plan
+          @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
+          @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
+        end
       end
 
       private
