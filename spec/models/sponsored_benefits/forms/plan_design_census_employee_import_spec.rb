@@ -3,20 +3,20 @@ require 'rails_helper'
 RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :model, dbclean: :after_each do
 
   let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census.xlsx') }
+  let(:file) { double("", :tempfile => tempfile) }
 
-  let(:file) {
-    double("", :tempfile => tempfile)
-  }
+  let(:broker_agency_profile_id) { "216735" }
+  let!(:organization) { create(:plan_design_organization, :with_profile, sic_code: '0197') }
+  let(:plan_design_proposal) { organization.plan_design_proposals[0] }
+  let(:employer_profile) { plan_design_proposal.profile }
+  let(:benefit_sponsorship) { employer_profile.benefit_sponsorships[0] }
 
-  let(:employer_profile) { FactoryGirl.create(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile) }
+  let(:sheet) { Roo::Spreadsheet.open(file.tempfile.path).sheet(0) }
+  let(:subject) { SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: file, employer_profile: employer_profile}) }
 
-  let(:sheet) {
-    Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
-  }
-
-  let(:subject) {
-    SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: file, employer_profile: employer_profile})
-  }
+  before do
+    subject.proposal = plan_design_proposal
+  end
 
   context "initialize without employer_role and file" do
     it "throws exception" do
@@ -66,16 +66,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
   end
 
   context "relationship field is empty" do
-
     let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 2.xlsx') }
-    let(:file) {
-      double("", :tempfile => tempfile)
-    }
-    let(:employer_profile) { FactoryGirl.create(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile) }
-
-    let(:sheet) {
-      Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
-    }
     let(:subject) {
       SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: file, employer_profile: employer_profile})
     }
@@ -95,9 +86,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
 
   context "terminate employee" do
     let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 3.xlsx') }
-    let(:file) { double("", :tempfile => tempfile) }
-    let(:employer_profile) { FactoryGirl.create(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile) }
-    let(:census_employee) { FactoryGirl.create(:sponsored_benefits_census_members_plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), employer_profile: employer_profile}) }
+    let(:census_employee) { FactoryGirl.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
 
     context "employee does not exist" do
       it "should fail" do
