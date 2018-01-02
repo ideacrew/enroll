@@ -42,7 +42,7 @@ module SponsoredBenefits
       else
         flash[:error] = "Quote failed to publish.".html_safe
       end
-      redirect_to organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization)
+      render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal) }
     end
 
     def new
@@ -65,8 +65,10 @@ module SponsoredBenefits
     def show
       @plan_design_organization = @plan_design_proposal.plan_design_organization
       @benefit_group = @plan_design_proposal.active_benefit_group
+      sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
+      @census_employees = sponsorship.census_employees
+
       if @benefit_group
-        @census_employees = @benefit_group.targeted_census_employees
         @plan = @benefit_group.reference_plan
         @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
         @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
