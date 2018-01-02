@@ -320,6 +320,7 @@ function clearComparisons() {
     var checkboxes = $(this).find('input[type=checkbox]');
     checkboxes.attr('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
+    disableCompareButton();
   });
 }
 
@@ -330,9 +331,11 @@ function hideDetailComparisons() {
 
 function disableCompareButton() {
   $('#view-comparison').addClass('disabled');
+  $('#clear-comparison').addClass('disabled');
   $('.reference-plan input[type=checkbox]').each(function() {
     if ($(this).is(":checked")) {
       $('#view-comparison').removeClass('disabled');
+      $('#clear-comparison').removeClass('disabled');
     }
   });
 }
