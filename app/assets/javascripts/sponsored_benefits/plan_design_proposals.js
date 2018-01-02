@@ -10,6 +10,7 @@ $(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToRe
 $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '#clear-comparison', clearComparisons);
 $(document).on('click', '#view-comparison', viewComparisons);
+$(document).on('click', '#hide-detail-comparisons', hideDetailComparisons);
 
 $(document).on('ready', pageInit);
 
@@ -313,6 +314,10 @@ function clearComparisons() {
     checkboxes.attr('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
   });
+}
+
+function hideDetailComparisons() {
+  $('.plan-comparison-container').hide();
 }
 
 function removeA(arr) {
