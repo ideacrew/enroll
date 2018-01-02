@@ -68,8 +68,9 @@
           Plans Types here
         </div>
         <div class="col-md-12">
-          <div class="col-md-6 col-md-offset-4">
-            <%= link_to "Download PDF", {}, class:'btn btn-default'%> <%= link_to "Compare Plans", '#', class:'btn btn-primary', onclick:'viewComparisons()' %>
+          <div class="col-md-6 col-md-offset-5">
+            <%= link_to "Compare Plans", '#',class:'btn btn-primary', onclick:'viewComparisons()' %>
+            <%= button_to "Clear All", {}, class:'btn btn-primary', id:'clear-comparison' %>
           </div>
         </div>
       </div>
@@ -83,7 +84,7 @@
   </script>
 <% end %>
 
-<div class="plan-comparison-container"></div>
+<div class="plan-comparison-container" id="pdp-pcc"></div>
 
 <div class="row">
   <div class="col-md-12">

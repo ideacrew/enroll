@@ -4,8 +4,8 @@
 <div class="container-fluid">
   <h3>Plan Comparison Chart</h3>
   <ul style="padding-left: 18px;">
-    <li> Plans can be rearranged by dragging the beginning of the company name </li>
-    <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li>
+    <!-- <li> Plans can be rearranged by dragging the beginning of the company name </li> -->
+    <!-- <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li> -->
   </ul>
   <div class="mygrid-wrapper-div">
    <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
@@ -78,6 +78,8 @@
   </div>
   <br>
   <!--  download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id)  -->
-    <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-info", target: "_blank" %>
+  <div class="col-md-offset-5">
+    <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-default", target: "_blank" %>
+  </div>
   <br><br>
 </div>
