@@ -49,6 +49,10 @@ module SponsoredBenefits
         plan_design_census_employee
       end
 
+      def add_proposal_state(aasm_state)
+        @plan_design_proposal.aasm_state = aasm_state
+      end
+
       def build_census_dependent(dependent)
         plan_design_dependent = SponsoredBenefits::CensusMembers::CensusDependent.new(dependent_attributes(dependent.attributes))
         plan_design_dependent.ssn= dependent.ssn if dependent.ssn.present?
