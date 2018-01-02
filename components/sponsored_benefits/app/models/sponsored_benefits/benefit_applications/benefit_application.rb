@@ -136,15 +136,8 @@ module SponsoredBenefits
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
         # CCA-specific attributes (move to subclass)
-        # recorded_sic_code               = ""
-        # recorded_rating_area            = ""
-
-        plan_year = ::PlanYear.new(
-            start_on: effective_period.begin,
-            end_on: effective_period.end,
-            open_enrollment_start_on: open_enrollment_period.begin,
-            open_enrollment_end_on: open_enrollment_period.end
-          )
+        recorded_sic_code               = ""
+        recorded_rating_area            = ""
 
         copied_benefit_groups = []
         benefit_groups.each do |benefit_group|
@@ -152,8 +145,13 @@ module SponsoredBenefits
           copied_benefit_groups << ::BenefitGroup.new(benefit_group.attributes)
         end
 
-        plan_year.benefit_groups = copied_benefit_groups
-        plan_year
+        ::PlanYear.new(
+          start_on: effective_period.begin,
+          end_on: effective_period.end,
+          open_enrollment_start_on: open_enrollment_period.begin,
+          open_enrollment_end_on: open_enrollment_period.end,
+          benefit_groups: copied_benefit_groups
+        )
       end
 
       class << self
