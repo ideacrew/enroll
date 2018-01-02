@@ -130,6 +130,8 @@ function planSelected() {
     calcEmployerContributions();
     $(this).siblings('input').attr('checked', true);
   };
+  
+  clearComparisons();
 }
 
 // function reconcileSliderAndInputVal() {
