@@ -65,7 +65,7 @@ module SponsoredBenefits
         # match by DOB
       def find_employee(record)
         # employees = employee_klass.find_by_benefit_sponsorship(benefit_sponsorship)
-        employees = employee_klass.where(benefit_sponsorship_id: benefit_sponsorship.id)
+        employees = employee_klass.by_benefit_sponsorship(benefit_sponsorship)
 
         ssn_query = record[:ssn]
         dob_query = record[:dob]
