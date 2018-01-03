@@ -80,6 +80,26 @@ module SponsoredBenefits
       end
     end
 
+    def bulk_employee_upload
+      @census_employee_import = SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: params.require(:file), proposal: @plan_design_proposal})
+
+      respond_to do |format|
+        if @census_employee_import.save
+          format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
+        else
+          format.html { redirect_to :back, :flash => { :success => "Roster upload failed."} }
+        end
+      end
+    end
+
+    def export_plan_design_employees
+      sponsorship = @plan_design_proposal.profile.benefit_sponsorships[0]
+     
+      respond_to do |format|
+        format.csv { send_data sponsorship.census_employees.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+      end
+    end
+
     def expected_selection
       if params[:ids].present?
         begin
