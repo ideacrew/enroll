@@ -2,6 +2,7 @@ $mhc-dark-blue: #005e81;
 $mhc-blue: #247dc5;
 $mhc-dark-gray: #706f6d;
 $mhc-gray: #6d6e70;
+$mhc-light-gray:#9b9b9b;
 $mhc-orange: #c56c24;
 $mhc-red: #812200;
 
@@ -51,6 +52,39 @@ $brand-primary: $mhc-dark-blue;
 .plan_design_proposals {
   .success-message {
     color: green;
+  }
+  .custom-heading {
+    background-color:#fff !important;
+  }
+  .custom-heading h3 {
+    color:$primary-orange;
+  }
+  table.borderless td, table.borderless th {
+       border: none !important;
+  }
+  .border-bottom {
+    border-bottom:1px solid $mhc-light-gray;
+  }
+  .th-gray {
+    color:$mhc-light-gray;
+  }
+  .pr-close {
+    margin-top:-17px;
+    color:$mhc-light-gray;
+  }
+  .pr-close-button {
+    margin-left:10px;
+  }
+  .pr-pdf {
+    margin-top:10px;
+    padding-right:10px;
+  }
+  .pr-star {
+    margin-top:65px;
+    color:$mhc-orange;
+  }
+  .toggle-text {
+    margin-top:-30px;
   }
   table.benefit-group-contribution-table {
     padding: 0 2%;
@@ -504,3 +538,4 @@ $brand-primary: $mhc-dark-blue;
     }
   }
 }
+
