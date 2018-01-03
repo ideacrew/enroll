@@ -394,7 +394,6 @@ function saveProposalAndCopy(event) {
         },
         error: function(data) {
           resp = $.parseJSON(data.responseText);
-          console.log(resp);
         }
       });
     });
@@ -418,6 +417,10 @@ function saveProposalAndPublish(event) {
         type: 'POST',
         success: function(data) {
           window.location.href = data.url;
+        },
+        error: function(data) {
+          var resp = $.parseJSON(data.responseText);
+          window.location.href = resp.url;
         }
       });
     });
