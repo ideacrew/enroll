@@ -906,6 +906,20 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
 end
 
+describe "#add_type_history_element" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:attr) { {verification_type: "verification_type",
+                action: "action",
+                modifier: "actor",
+                update_reason: "reason"} }
+
+  it "creates verification history record" do
+    person.consumer_role.verification_type_history_elements.delete_all
+    person.consumer_role.add_type_history_element(attr)
+    expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
+end
+
 describe "Verification Tracker" do
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
   context "mongoid history" do
