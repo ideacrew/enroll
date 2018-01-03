@@ -110,7 +110,7 @@ function planSelected() {
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $('.health-plan-design .selected-plan').show();
     calcEmployerContributions();
-    $(this).siblings('input').attr('checked', true);
+    $(this).siblings('input').prop('checked', true);
   };
   
   clearComparisons();
@@ -241,7 +241,7 @@ function formatRadioButtons() {
   $('.fa-circle-o').each(function() {
     $(this).click(function() {
       input = $(this).closest('div').find('input');
-      input.attr('checked', true)
+      input.prop('checked', true)
     });
   })
 }
