@@ -25,6 +25,22 @@ module SponsoredBenefits
                  locals: { qhps: qhps }
         end
 
+        def csv
+          @qhps = qhps.each do |qhp|
+            if plan_design_proposal.active_benefit_group
+              qhp[:total_employee_cost] = plan_design_proposal.active_benefit_group.monthly_employer_contribution_amount(qhp.plan)
+            else
+              qhp[:total_employee_cost] = 0.00
+            end
+            # qhp[:total_employee_cost] = ::UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
+          end
+          respond_to do |format|
+            format.csv do
+              send_data(::Products::Qhp.csv_for(qhps, visit_types), type: csv_content_type, filename: "comparsion_plans.csv")
+            end
+          end
+        end
+
         private
         helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :visit_types, :qhps
 
@@ -46,6 +62,15 @@ module SponsoredBenefits
 
         def visit_types
           @visit_types ||= ::Products::Qhp::VISIT_TYPES
+        end
+
+        def csv_content_type
+          case request.user_agent
+            when /windows/i
+              'application/vnd.ms-excel'
+            else
+              'text/csv'
+          end
         end
     end
   end
