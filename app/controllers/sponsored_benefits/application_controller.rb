@@ -10,18 +10,19 @@ module SponsoredBenefits
       end
 
       def set_broker_agency_profile_from_user
+        current_uri = request.env['PATH_INFO']
         if current_person.broker_role.present?
           @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id)
-        end
-
-        if active_user.has_hbx_staff_role? && params[:plan_design_organization_id].present?
+        elsif active_user.has_hbx_staff_role? && params[:plan_design_organization_id].present?
           @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
         elsif params[:plan_design_proposal_id].present?
           org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id]).plan_design_organization
           @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
         elsif params[:id].present?
-          org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:id]).plan_design_organization
-          @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
+          unless current_uri.include? 'broker_agency_profile'
+            org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:id]).plan_design_organization
+            @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
+          end
         end
       end
 

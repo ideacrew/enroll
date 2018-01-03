@@ -1,0 +1,100 @@
+<%= wicked_pdf_stylesheet_link_tag "application" -%>
+<%= wicked_pdf_stylesheet_link_tag "sponsored_benefits/application" -%>
+
+<div class="container plan-details-export">
+  <div class="row">
+    <div class="panel col-xs-12">
+      <h1>Quote Name: <%= plan_design_proposal.title %></h1>
+      <h5>Claim Code: <% plan_design_proposal.claim_code %></h5>
+      <h5>Effective Date: <%= plan_design_proposal.effective_date.strftime('%d %B %Y') %></h5>
+
+      <p>Costs are based on the roster associated with this quote: <%= plan_design_proposal.active_census_employees.count %> employee(s) and <%= plan_design_proposal.active_census_familes.count %> families</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel col-xs-12">
+      <table class="proposal-roster-table">
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Relationship Name</th>
+        </tr>
+        <% plan_design_proposal.active_census_employees.each do |employee| %>
+          <tr class="employee">
+            <td><%= employee.first_name %></td>
+            <td><%= employee.last_name %></td>
+            <td><%= employee.employee_relationship %></td>
+          </tr>
+          <% employee.census_dependents.each do |dependent| %>
+            <tr class="dependent">
+              <td><%= dependent.first_name %></td>
+              <td><%= dependent.last_name %></td>
+              <td><%= dependent.employee_relationship %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="panel col-xs-12">
+      <h5>Coverage Year: <%= sponsorship.initial_enrollment_period_to_s %></h5>
+      <table class="reference-plan-table">
+        <tr>
+          <th>Reference Plan</th>
+          <th>Carrier</th>
+          <th>Type</th>
+          <th>Metal Level</th>
+          <th>Plans By</th>
+        </tr>
+        <tr>
+          <td><%= @plan.name %></td>
+          <td><%= @plan.carrier_profile.legal_name %></td>
+          <td><%= @plan.plan_type %></td>
+          <td><%= @plan.metal_level %></td>
+          <td><%= @benefit_group.plan_option_kind.humanize %></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel col-xs-12">
+      <% if @benefit_group.plan_option_kind != 'sole_source' %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', benefit_group: @benefit_group %>
+      <% else %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group %>
+      <% end %>
+      <!--Health Estimated Cost: start-->
+      <div class="panel benefitgroup col-xs-12 referenceplan home est">
+        <div class="plan-details">
+          <div class="col-xs-4">
+            <div class="row">
+              <span>Employer Estimated Maximum Monthly Cost</span>
+              <h2><%= number_to_currency(@benefit_group.monthly_employer_contribution_amount) %></h2>
+            </div>
+          </div>
+          <div class="col-xs-8">
+            <div class="row">
+              <table>
+                <tr>
+                  <th colspan="2"></th>
+                  <th>Min</th>
+                  <th>Max</th>
+                </tr>
+                <tr>
+                  <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                  <td><%= number_to_currency(@benefit_group.monthly_min_employee_cost) %></td>
+                  <td><%= number_to_currency(@benefit_group.monthly_max_employee_cost) %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% if sbc_included %>
+    <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps %>
+  <% end %>
+</div>
