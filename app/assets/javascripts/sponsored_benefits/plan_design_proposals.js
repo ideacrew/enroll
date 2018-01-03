@@ -18,6 +18,8 @@ $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '#copyPlanDesignProposal', saveProposalAndCopy);
 $(document).on('click', '#publishPlanDesignProposal', saveProposalAndPublish);
 
+$(document).on('click', '#downloadReferencePlanDetailsButton', checkIfSbcIncluded);
+
 $(document).on('ready', pageInit);
 
 function pageInit() {
@@ -70,6 +72,15 @@ function fetchCarriers() {
   hidePlanContainer();
   toggleSliders(selected_carrier_level);
   clearComparisons();
+}
+
+function checkIfSbcIncluded(event) {
+  if ($("#include_sbc").prop('checked')) {
+      var href = $(this).attr('href') +"?sbc_included=true";
+  } else {
+    var href = $(this).attr('href')
+  }
+  $(this).attr('href', href);
 }
 
 function displayActiveCarriers() {
@@ -174,7 +185,7 @@ function calcEmployerContributions() {
   } else {
     enableActionButtons();
   }
-  if (data == undefined || data == {}) {
+  if (data == undefined || data == {} || !('benefit_group' in data)) {
     return;
   }
 

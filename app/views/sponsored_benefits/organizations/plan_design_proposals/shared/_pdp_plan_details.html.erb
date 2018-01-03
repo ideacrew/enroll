@@ -35,4 +35,8 @@
 <div class="col-md-4">
   <h2 class="text-center employer-cost-text">Estimated Maximum Monthly Employer Cost</h2>
   <h2 class="employer-monthly-cost text-center"></h2>
+  <div class="text-center">
+    <%= link_to "Download PDF", sponsored_benefits.new_organizations_plan_design_proposal_plan_export_path(@plan_design_proposal), class: 'btn btn-default', id: 'downloadReferencePlanDetailsButton' %>
+    <label class="sbc-download-label" for="sbc-checkbox"><%= check_box_tag "include_sbc", true, true, class: "sbc-download-checkbox" %> Include SBC</label>
+  </div>
 </div>

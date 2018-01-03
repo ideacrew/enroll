@@ -45,6 +45,10 @@ module SponsoredBenefits
         sponsorship.census_employees
       end
 
+      def active_census_familes
+        active_census_employees.where({ "census_dependents.0" => { "$exists" => true } })
+      end
+
       # class methods
       class << self
 
