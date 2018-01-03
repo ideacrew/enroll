@@ -8,7 +8,6 @@ module SponsoredBenefits
                   :benefit_application,
                   :employer_profile
 
-
       def initialize(plan_design_proposal, employer_profile=nil)
 
         @plan_design_proposal = plan_design_proposal
@@ -24,14 +23,33 @@ module SponsoredBenefits
         @employer_profile_exists = @employer_profile.persisted?
       end
 
+      def quote_valid?
+        validate_effective_date
+      end
+
+      def validate_effective_date
+        if @employer_profile.present? && @employer_profile.active_plan_year.present?
+          if @employer_profile.active_plan_year.start_on.next_year != plan_design_proposal.effective_date
+            raise "Quote effective date is invalid."
+          end
+        end
+        return true
+      end
+
       def add_employer_profile
         add_census_members unless @employer_profile_exists
       end
 
       def add_plan_year
         @employer_profile.plan_years << @benefit_application.to_plan_year
-        @employer_profile.save
+
+        if @employer_profile.active_plan_year.present?
+          @employer_profile.plan_years[0].renew_plan_year if @employer_profile.plan_years[0].may_renew_plan_year?
+        end
+
+        @employer_profile.save!
       end
+
 
       # Output the employer_profile
       def employer_profile
