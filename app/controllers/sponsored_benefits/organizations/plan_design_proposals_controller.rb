@@ -11,9 +11,8 @@ module SponsoredBenefits
     end
 
     def claim
-      # TODO FIXME: update routes.rb to send the plan_design_proposal_id parameter as employer_profile_id.
       # TODO FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
-      employer_profile_id = params.fetch(:plan_design_proposal_id, nil)
+      employer_profile_id = params.fetch(:employer_profile_id, nil)
       employer_profile = EmployerProfile.find(employer_profile_id)
 
       quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
