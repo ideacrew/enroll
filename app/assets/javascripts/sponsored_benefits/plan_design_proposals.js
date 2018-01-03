@@ -75,12 +75,25 @@ function fetchCarriers() {
 }
 
 function checkIfSbcIncluded(event) {
-  if ($("#include_sbc").prop('checked')) {
-      var href = $(this).attr('href') +"?sbc_included=true";
+  var data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data)) {
+    // handle error messaging
+    return;
   } else {
-    var href = $(this).attr('href')
+    url = $("#benefit_groups_url").val();
+    $.ajax({
+      type: "POST",
+      data: data,
+      url: url
+    }).done(function(){
+      if ($("#include_sbc").prop('checked')) {
+          var href = $(this).attr('href') +"?sbc_included=true";
+      } else {
+        var href = $(this).attr('href')
+      }
+      $(this).attr('href', href);
+    });
   }
-  $(this).attr('href', href);
 }
 
 function displayActiveCarriers() {
