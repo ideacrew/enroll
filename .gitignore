@@ -64,3 +64,6 @@ plan_xmls.zip
 
 # Ignore rspec state files
 **/spec/examples.txt
+
+# Ignore .orig files
+*.orig
