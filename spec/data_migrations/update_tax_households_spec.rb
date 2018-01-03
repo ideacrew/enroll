@@ -20,13 +20,13 @@ describe UpdateTaxHouseholds, dbclean: :after_each do
                                                          max_aptc: {"cents" => 283.00, "currency_iso" => "USD"})}
 
     let!(:family2) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:tax_household2) {FactoryGirl.create(:tax_household, household: family2.active_household, effective_starting_on: Date.new(2017, 1, 1), effective_ending_on: Date.new(2017, 12, 31))}
+    let!(:tax_household2) {FactoryGirl.create(:tax_household, household: family2.active_household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), effective_ending_on: Date.new(TimeKeeper.date_of_record.year, 12, 31))}
     let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2, determined_at: eligibility_date,
                                                           determined_on: eligibility_date,
                                                           max_aptc: {"cents" => 50.00, "currency_iso" => "USD"})}
 
     let!(:family3) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:tax_household3) {FactoryGirl.create(:tax_household, household: family3.active_household, effective_starting_on: Date.new(2016, 1, 1), effective_ending_on: Date.new(2016, 12, 31))}
+    let!(:tax_household3) {FactoryGirl.create(:tax_household, household: family3.active_household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 1, 1), effective_ending_on: Date.new(TimeKeeper.date_of_record.year-1, 12, 31))}
     let!(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3, determined_at: eligibility_date,
                                                           determined_on: eligibility_date,
                                                           max_aptc: {"cents" => 1.00, "currency_iso" => "USD"})}
