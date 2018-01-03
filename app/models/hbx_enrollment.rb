@@ -146,6 +146,8 @@ class HbxEnrollment
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
+  scope :by_created_datetime_range,  ->(start_at, end_at){ where(:created_at => { "$gte" => start_at, "$lte" => end_at} )}
+  scope :by_submitted_datetime_range,  ->(start_at, end_at){ where(:submitted_at => { "$gte" => start_at, "$lte" => end_at} )}
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :by_hbx_id,            ->(hbx_id) { where(hbx_id: hbx_id) }
@@ -1368,7 +1370,16 @@ class HbxEnrollment
       return special_enrollment_period.qualifying_life_event_kind.reason
     end
     return "open_enrollment" if !is_shop?
+    if is_shop? && is_cobra_status?
+      if cobra_eligibility_date == effective_on
+        return "employer_sponsored_cobra"
+      end
+    end
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
+  end
+
+  def cobra_eligibility_date
+    employee_role.census_employee.cobra_begin_date
   end
 
   def check_for_renewal_event_kind
@@ -1390,6 +1401,7 @@ class HbxEnrollment
       return special_enrollment_period.qle_on
     end
     return nil if !is_shop?
+    return self.employee_role.census_employee.cobra_begin_date if is_shop? && is_cobra_status?
     new_hire_enrollment_for_shop? ? benefit_group_assignment.census_employee.hired_on : nil
   end
 
@@ -1399,6 +1411,7 @@ class HbxEnrollment
       return true
     end
     return false unless is_shop?
+    return true if is_shop? && is_cobra_status?
     new_hire_enrollment_for_shop?
   end
 
@@ -1419,7 +1432,7 @@ class HbxEnrollment
 
   def set_submitted_at
     if submitted_at.blank?
-      write_attribute(:submitted_at, TimeKeeper.date_of_record)
+      write_attribute(:submitted_at, Time.now)
     end
   end
 

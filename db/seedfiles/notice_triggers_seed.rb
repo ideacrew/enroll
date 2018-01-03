@@ -761,6 +761,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP_DAG043',
+    title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
+    description: 'Group termination confirmation for advance request',
+    resource_name: 'employer',
+    event_name: 'group_advance_termination_confirmation',
+    notice_triggers: [
+      {
+        name: 'Confirmation notice to employer after group termination',
+        notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
+        notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
+        mpi_indicator: 'MPI_D043',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+           primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D092',
     title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
     description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',
@@ -1246,6 +1267,27 @@ ivl_notice_triggers = [
         name: 'Enrollment Notice',
         notice_template: 'notices/ivl/enrollment_notice',
         notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
+        mpi_indicator: 'IVL_ENR',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_ENR',
+    title: 'Your Health or Dental Plan Enrollment and Payment Deadline',
+    description: 'This is an Enrollment Notice and is sent for people who got enrolled in a Particular Date Range',
+    resource_name: 'consumer_role',
+    event_name: 'enrollment_notice_with_date_range',
+    notice_triggers: [
+      {
+        name: 'Enrollment Notice',
+        notice_template: 'notices/ivl/enrollment_notice',
+        notice_builder: 'IvlNotices::EnrollmentNoticeBuilderWithDateRange',
         mpi_indicator: 'IVL_ENR',
         notice_trigger_element_group: {
           market_places: ['individual'],
