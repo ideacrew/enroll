@@ -12,27 +12,32 @@ module SponsoredBenefits
 
     def claim
       # TODO FIXME: update routes.rb to send the plan_design_proposal_id parameter as employer_profile_id.
+      # TODO FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
       employer_profile_id = params.fetch(:plan_design_proposal_id, nil)
+      employer_profile = EmployerProfile.find(employer_profile_id)
 
       quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
-      # replicating the code as in dc enroll
-      if claim_code_status == "invalid"
+      error_message = check_if_county_zip_are_same(quote, employer_profile) if quote.present?
+
+      if error_message.present?
+        flash[:error] = error_message
+      elsif claim_code_status == "invalid"
         flash[:error] = "No quote matching this code could be found. Please contact your broker representative."
       elsif claim_code_status == "claimed"
         flash[:error] = "Quote claim code already claimed."
       else
         begin
-          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile_id, quote)
+          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile, quote)
           flash[:notice] = "Code claimed with success. Your Plan Year has been created."
         rescue Exception => e
           flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end
       end
 
-      redirect_to main_app.employers_employer_profile_path(id: employer_profile_id , tab: "benefits")
+      redirect_to main_app.employers_employer_profile_path(employer_profile, tab: "benefits")
     end
 
     def publish
@@ -152,6 +157,14 @@ module SponsoredBenefits
           ]
         ]
         )
+    end
+
+    def check_if_county_zip_are_same(quote, employer_profile)
+      employer_profile_address = employer_profile.organization.try(:primary_office_location).try(:address)
+      if quote.try(:plan_design_organization).try(:office_location_zip) != employer_profile_address.try(:zip) ||
+        quote.try(:plan_design_organization).try(:office_location_county) != employer_profile_address.try(:county)
+        "Unable to claim quote. The Zip/County information used by this quote does not match your Employer record. Please contact the Broker who provided this quote to you."
+      end
     end
 
     def employee_datatable(sponsorship)

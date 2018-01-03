@@ -27,6 +27,14 @@ module SponsoredBenefits
   	  #   end
   	  # end
 
+      def county
+        address.present? ? address.county : ""
+      end
+
+      def zip
+        address.present? ? address.zip : ""
+      end
+
 
 
   	  # def parent

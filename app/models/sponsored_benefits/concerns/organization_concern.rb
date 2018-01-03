@@ -94,6 +94,14 @@ module SponsoredBenefits
         end
       end
 
+      def office_location_county
+        primary_office_location.county
+      end
+
+      def office_location_zip
+        primary_office_location.zip
+      end
+
       def primary_office_location
         office_locations.detect(&:is_primary?)
       end
