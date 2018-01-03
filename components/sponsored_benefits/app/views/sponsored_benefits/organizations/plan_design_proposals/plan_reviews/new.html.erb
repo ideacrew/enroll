@@ -1,114 +1,12 @@
 <div class="profile-content top-pd" id="myTabContent">
   <div class="tab-row">
     <div class="tab-content">
-     <div class="container plan-design-proposal">
-      <%= render 'shared/engines/horizontal_status', step:3 %>
+      <div class="container plan-design-proposal">
+        <%= render 'shared/engines/horizontal_status', step:3, links: generate_breadcrumb_links(plan_design_proposal, @plan_design_organization) %>
+      </div>
     </div>
-    </div>
-    <div class="container plan_design_proposals">
-      
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <div class="col-md-2">
-            <i class="fa fa-star fa-5x pr-star" aria-hidden="true"></i>
-          </div>
-          <div class="col-md-10">
-            <h3><%= @plan.name %></h3>
-            <a class="pull-right toggle-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true">Hide Details</a>
-            <div class="collapse in" id="collapseExample">
-            <table class="table borderless">
-              <tbody>
-                <tr class="borderless">
-                  <th style="width:150px" class="th-gray">Coverage Year</th>
-                    <td>Some Data</td>
-                </tr>
-                <tr class="borderless">
-                  <th style="width:150px" class="th-gray">Eligibility</th>
-                  <td>Some Data</td>
-                </tr>
-              </tbody>
-            </table>
-            <table class="table borderless">
-              <tbody>
-                <tr class="borderless">
-                  <th class="th-gray">Reference Plan</th>
-                  <th class="th-gray">Carrier</th>
-                  <th class="th-gray">Type</th>
-                  <th class="th-gray">Metal Level</th>
-                  <th class="th-gray">Plans By</th>
-                </tr>
-                <tr class="borderless">
-                  <td><%= @plan.name %></td>
-                  <td><%= @plan.carrier_profile.legal_name %></td>
-                  <td><%= @plan.plan_type %></td>
-                  <td><%= @plan.metal_level %></td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="col-md-12 no-pd">
-              <%#= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', locals: { benefit_group: @benefit_group } %>
-            </div>
-            <br />
-            <div class="col-md-4 no-pd">
-              <p class="th-gray">Employer Estimated Maximum Monthly Cost</p>
-              <h3 class="text-center">$ Cost Here</h3>
-            </div>
-            <div class="col-md-8">
-              <table class="table borderless">
-                <tbody>
-                  <tr class="border-bottom">
-                    <th style="width:490px"></th>
-                    <th class="th-gray" style="width:200px">Mix</th>
-                    <th class="th-gray" style="width:200px">Max</th>
-                  </tr>
-                  <tr>
-                    <td style="width:490px">Total Estimated Monthly Cost for Plan Participants</td>
-                    <td style="width:200px">$ 0.01</td>
-                    <td style="width:200px">$ 0.02</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      </div>
-      
-      <div class="col-md-12 no-pd">
-        <a><i class="fa fa-info-circle" aria-hidden="true"></i> Note: Your monthly cost is based on final employee enrollment.</a>
-      </div>
-      <br /><br />
-      <div class="col-md-12 no-pd">
-        <div class="panel panel-default">
-          <div class="panel-heading custom-heading">
-            <h3 class="panel-title"><%= @plan.name %> - Details</h3> <span class="glyphicon glyphicon-remove pull-right pr-close" aria-hidden="true"></span>
-          </div>
-          <div class="panel-body">
-            Panel content
-          </div>
-          <div class="panel-footer custom-heading">
-              <%= link_to 'Download PDF',{}, class:'btn btn-default'%>
-              <%= link_to 'Close',{}, class:'btn btn-default pull-right pr-close-button'%>
-              <%= link_to 'More Details',{}, class:'btn btn-default pull-right'%>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-md-offset-5">
-        To finalize your quote and make it available to your client, click publish Quote.  Once you publish your quote, you cannot make edits to it.  If you want to make edits to your qupte now, click Update Roster or Select Benefits.
-      </div>
-      <div class="col-md-3">
-        <%= link_to 'Return to Quote Management', url_for(:back), class:'btn btn-primary' %>
-      </div>
-      <div class="col-md-7 col-md-offset-5 sq-btn-grp">
-        <%= button_tag "Download PDF", id: "submitPlanDesignProposal", class:'btn btn-default' %>
-        <%= button_tag "Update Roster", id: "updateRoster", class:'btn btn-primary save-action' %>
-        <%= button_tag "Select Health Benefits", id: "selectHealthBenefitsProposal", class:'btn btn-primary save-action' %>
-        <%= button_tag "Publish Quote", id: "publishPlanDesignProposal", class:'btn btn-primary save-action' %>
-        <div class="success-message"></div>
-      </div>
-      
-    </div>
-</div>
+    <%= render 'new' %>
+  </div>
 </div>
 
 <script>

@@ -29,7 +29,11 @@ SponsoredBenefits::Engine.routes.draw do
     resources :plan_design_proposals, only: [:destroy, :create, :show] do
       resources :contributions, controller: 'plan_design_proposals/contributions', only: [:index]
       resources :plan_selections, controller: 'plan_design_proposals/plan_selections', only: [:new]
-      resources :plan_reviews, controller: 'plan_design_proposals/plan_reviews', only: [:new]
+      resources :plan_reviews, controller: 'plan_design_proposals/plan_reviews', only: [:new] do
+        collection do
+          get :show
+        end
+      end
       resources :proposal_copies, controller: 'plan_design_proposals/proposal_copies', only: [:create]
       resources :benefit_groups, controller: 'plan_design_proposals/benefit_groups', only: [:create]
       resources :plan_comparisons, controller: 'plan_design_proposals/plan_comparisons', only: [:new] do

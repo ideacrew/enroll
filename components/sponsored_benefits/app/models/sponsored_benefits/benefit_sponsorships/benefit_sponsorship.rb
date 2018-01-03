@@ -72,7 +72,7 @@ module SponsoredBenefits
       def initial_enrollment_period_to_s
         date_start = initial_enrollment_period.begin
         date_end = initial_enrollment_period.end
-        "#{date_start.day} #{date_start.strftime('%B %Y')} - #{date_end.day} #{date_end.strftime('%B %Y')}"
+        "#{date_start.strftime('%B')} #{date_start.day.ordinalize} #{date_start.strftime('%Y')}  -  #{date_end.strftime('%B')} #{date_end.day.ordinalize} #{date_end.strftime('%Y')}"
       end
 
       def census_employees

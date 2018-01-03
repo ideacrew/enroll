@@ -2,9 +2,9 @@ module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
-
     before_action :load_plan_design_organization, except: [:destroy, :publish, :claim, :show]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
+    before_action :published_plans_are_view_only, only: [:edit]
 
     def index
       @datatable = effective_datatable
@@ -46,7 +46,10 @@ module SponsoredBenefits
       else
         flash[:error] = "Quote failed to publish.".html_safe
       end
-      render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal) }
+      respond_to do |format|
+        format.js { render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal) } }
+        format.html { redirect_to organizations_plan_design_proposal_path(@plan_design_proposal) }
+      end
     end
 
     def new
@@ -122,6 +125,7 @@ module SponsoredBenefits
     end
 
     private
+    helper_method :generate_breadcrumb_links
 
     def effective_datatable
       ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
@@ -174,6 +178,12 @@ module SponsoredBenefits
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
       @census_employees = sponsorship.census_employees
       @datatable = employee_datatable(sponsorship)
+    end
+
+    def published_plans_are_view_only
+      if @plan_design_proposal.published?
+        redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
+      end
     end
   end
 end
