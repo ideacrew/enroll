@@ -70,7 +70,6 @@
             quotes:[
                   { scope: 'all', label: 'All'},
                   { scope: 'initial', label: 'Initial'},
-                  { scope: 'renewing', label: 'Renewing'},
                   { scope: 'draft', label: "Draft" },
                   { scope: 'published', label: "Published" },
                   { scope: 'expired', label: "Expired" },
