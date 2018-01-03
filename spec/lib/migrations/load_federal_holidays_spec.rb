@@ -25,7 +25,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Tue, 04 Jul 2017".to_date
+                                                  start_time: "Wed, 04 Jul 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -33,7 +33,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Mon, 16 Jan 2017".to_date
+                                                  start_time: "Mon, 15 Jan 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -41,7 +41,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: " Mon, 20 Feb 2017".to_date
+                                                  start_time: " Mon, 19 Feb 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -49,7 +49,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Mon, 29 May 2017".to_date
+                                                  start_time: "Mon, 28 May 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -57,7 +57,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Mon, 04 Sep 2017".to_date
+                                                  start_time: "Mon, 03 Sep 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -65,7 +65,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Mon, 09 Oct 2017".to_date
+                                                  start_time: "Mon, 08 Oct 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -73,7 +73,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Thu, 23 Nov 2017".to_date
+                                                  start_time: "Thur, 22 Nov 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -81,7 +81,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Fri, 10 Nov 2017".to_date
+                                                  start_time: "Mon, 12 Nov 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -89,7 +89,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Mon, 02 Jan 2017".to_date
+                                                  start_time: "Mon, 01 Jan 2018".to_date
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
@@ -97,7 +97,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
-                                                  start_time: "Mon, 25 Dec 2017".to_date
+                                                  start_time: "Tue, 25 Dec 2018".to_date
                                                 }
     end
 
