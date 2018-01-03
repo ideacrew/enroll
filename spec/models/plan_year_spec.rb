@@ -1980,7 +1980,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year_end_on) { Date.new(calendar_year + 1, 3, 31) }
     let(:open_enrollment_start_on) { Date.new(calendar_year, 2, 3) }
     let(:open_enrollment_end_on) { Date.new(calendar_year, 3, 13) }
-    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+    let(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: open_enrollment_start_on,
@@ -1998,6 +1998,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 10.days)
+      plan_year
     end
 
     after do
@@ -2021,7 +2022,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:plan_year_end_on) { Date.new(calendar_year + 1, 3, 31) }
       let(:open_enrollment_start_on) { Date.new(calendar_year, 2, 1) }
       let(:open_enrollment_end_on) { Date.new(calendar_year, 3, 13) }
-      let!(:plan_year) { FactoryGirl.create(:plan_year,
+      let(:plan_year) { FactoryGirl.create(:plan_year,
                                               start_on: plan_year_start_on,
                                               end_on: plan_year_end_on,
                                               open_enrollment_start_on: open_enrollment_start_on,
@@ -2029,20 +2030,21 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                               employer_profile: employer_profile,
                                               aasm_state: 'renewing_draft'
                                             )}
-      let!(:benefit_group)            { FactoryGirl.build(:benefit_group,
+      let(:benefit_group)            { FactoryGirl.build(:benefit_group,
                                                             title: 'blue collar',
                                                             plan_year: plan_year) }
 
-      let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment,
+      let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment,
                                                             benefit_group: benefit_group) }
 
-      let!(:census_employee) { FactoryGirl.create(:census_employee,
+      let(:census_employee) { FactoryGirl.create(:census_employee,
                                                     employer_profile: employer_profile,
                                                     benefit_group_assignments: [benefit_group_assignment]
                               ) }
       before do
         refresh_mailbox
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on + 10.days)
+        census_employee
         plan_year.publish!
       end
 
