@@ -16,6 +16,7 @@ module SponsoredBenefits
       field :hired_on, type: Date
       field :aasm_state, type: String
       field :expected_selection, type: String, default: "enroll"
+      field :employment_terminated_on, type: Date
 
       # field :employer_profile_id, type: BSON::ObjectId
       field :benefit_sponsorship_id, type: BSON::ObjectId
@@ -206,7 +207,7 @@ module SponsoredBenefits
                 census_member.gender
               ]
 
-              if census_member.is_a?(CensusEmployee)
+              if census_member.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
                 values += [
                   census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
                   census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
