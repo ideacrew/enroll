@@ -12,6 +12,8 @@ SponsoredBenefits::Engine.routes.draw do
 
   namespace :organizations do
 
+    get "plan_design_proposals/:employer_profile_id/claim", to: "plan_design_proposals#claim", as: "plan_design_proposal_claim"
+
     resources :broker_agency_profiles, only: :employers do
       get :employers, on: :member
     end
@@ -33,10 +35,10 @@ SponsoredBenefits::Engine.routes.draw do
       resources :plan_comparisons, controller: 'plan_design_proposals/plan_comparisons', only: [:new] do
         collection do
           get :export
+          get :csv, defaults: { format: :csv }
         end
       end
       post :publish
-      get :claim
 
       resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:new] do
       end
