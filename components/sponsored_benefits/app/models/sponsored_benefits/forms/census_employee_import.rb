@@ -325,7 +325,7 @@ module SponsoredBenefits
 
       def parse_date(cell)
         return nil if cell.blank?
-        return DateTime.strptime(cell.sanitize_value, "%d/%m/%Y") rescue raise ImportErrorValue, cell if cell.class == String
+        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, cell if cell.class == String
         return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
         # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
