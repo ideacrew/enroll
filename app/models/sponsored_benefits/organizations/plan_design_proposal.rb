@@ -31,6 +31,7 @@ module SponsoredBenefits
       scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
 
       def active_benefit_group
+        return nil if profile.nil?
         return nil if profile.benefit_sponsorships.empty?
         sponsorship = profile.benefit_sponsorships.first
         return nil if sponsorship.benefit_applications.empty?
