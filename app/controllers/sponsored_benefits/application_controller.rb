@@ -19,7 +19,7 @@ module SponsoredBenefits
         elsif params[:plan_design_proposal_id].present?
           org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id]).plan_design_organization
           @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
-        elsif params[:id].present?
+        elsif params[:id].present? && controller_name == "plan_design_proposals"
           org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:id]).plan_design_organization
           @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
         end
