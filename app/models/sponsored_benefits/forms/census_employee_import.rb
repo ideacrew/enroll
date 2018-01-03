@@ -333,9 +333,9 @@ module SponsoredBenefits
       end
 
       def parse_ssn(cell)
-        cell.blank? ? nil : cell.to_s.gsub(/\D/, '')
+        cell.blank? ? nil : prepend_zeros(cell.to_s.gsub(/\D/, ''), 9)
       end
-
+      
       def parse_boolean(cell)
         cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
       end
@@ -422,6 +422,11 @@ module SponsoredBenefits
       def sanitize_value(value)
         value = value.to_s.split('.')[0] if value.is_a? Float
         value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
+      end
+
+      def prepend_zeros(number, n)
+        (n - number.to_s.size).times { number.prepend('0') }
+        number
       end
     end
 
