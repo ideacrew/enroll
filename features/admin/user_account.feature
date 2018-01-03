@@ -1,4 +1,3 @@
-@individual_enabled
 Feature: User Account page
   In order for the Hbx admin to acsess user accounts
 
@@ -30,3 +29,16 @@ Feature: User Account page
     When I click Employee and Unlocked button
     Then I should only see unlocked user with employee role
     
+  Scenario: Search for an user
+    Given a Hbx admin with read and write permissions and employers
+    And a user exists with employer staff role
+    And a user exists with employee role
+    And a user exists with broker role
+    When Hbx AdminEnrollments logs on to the Hbx Portal
+    And Hbx Admin click on User Accounts
+    Then Hbx Admin should see searchbox
+    When he enters an user name search box
+    Then he should see a result with the user name
+    When he enter person hbx id
+    Then he should see a result with hbx id
+

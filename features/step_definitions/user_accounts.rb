@@ -145,3 +145,21 @@ Then(/^I should only see user with broker role$/)do
   expect(page).to have_content("Locked")
   expect(page).to have_content("Unlocked")
 end
+
+When(/^he enters an user name search box$/)do
+  page.find("input[type='search']").set(@user_1.oim_id)
+end
+
+Then(/^he should see a result with the user name$/) do
+  expect(page).to have_content(@user_1.oim_id)
+  expect(page).to have_no_content(@user_2.oim_id)
+end
+
+When(/^he enter person hbx id$/)do
+  page.find("input[type='search']").set(@user_1.person.hbx_id)
+end
+
+Then(/^he should see a result with hbx id$/) do
+  expect(page).to have_content(@user_1.person.hbx_id)
+  expect(page).to have_no_content(@user_2.person.hbx_id)
+end
