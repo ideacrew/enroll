@@ -3,6 +3,6 @@ When(/^the user clicks ADD\/EDIT INCOME & COVERAGE INFO button for a given house
 end
 
 When(/^applicant should see and confirm modal dialog box$/) do
-  expect(page).to have_content('Unsaved Tax Info Changes')
-  click_button "Continue"
+  expect(page).to have_content('You Have Unsaved Changes')
+  click_button "LEAVE WITHOUT SAVING"
 end
