@@ -20,7 +20,11 @@ module SponsoredBenefits
           @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
         elsif params[:id].present?
           unless current_uri.include? 'broker_agency_profile'
-            org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:id]).plan_design_organization
+            org = if controller_name == "plan_design_proposals"
+              SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:id]).plan_design_organization
+            elsif controller_name == "plan_design_organizations"
+              SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
+            end
             @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
           end
         end
