@@ -5,6 +5,7 @@ SponsoredBenefits::Engine.routes.draw do
       collection do
         post :bulk_employee_upload
         post :expected_selection
+        get  :export_plan_design_employees
       end
     end
   end
