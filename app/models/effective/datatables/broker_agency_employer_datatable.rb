@@ -2,8 +2,8 @@
   module Effective
     module Datatables
       class BrokerAgencyEmployerDatatable < ::Effective::MongoidDatatable
-        datatable do
 
+        datatable do
           table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
             if row.broker_relationship_inactive?
               row.legal_name
@@ -24,8 +24,7 @@
             end
 
             }, :sortable => false, :filter => false
-          #table_column :broker, :label => 'Broker', :proc => Proc.new { |row| row.employer_profile.active_broker.full_name }, :sortable => false, :filter => false
-
+          table_column :broker, :label => 'Broker', :proc => Proc.new { |row| broker_name(row) }, :sortable => false, :filter => false
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
@@ -50,6 +49,10 @@
 
         def edit_employer_link_type(employer)
           employer.is_prospect? ? 'ajax' : 'disabled'
+        end
+
+        def broker_name(row)
+          row.broker_agency_profile.primary_broker_role.person.full_name
         end
 
         scopes do
