@@ -353,7 +353,8 @@ module SponsoredBenefits
       end
 
       def save
-        if imported_census_employees.compact.map(&:valid?).all? && (imported_census_employees.exclude? nil)
+
+        if imported_census_employees.compact.map(&:valid?).all? # && (imported_census_employees.exclude? nil)
           if self.errors.present? || !self.valid?
             return false
           end
