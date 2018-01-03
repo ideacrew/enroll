@@ -32,6 +32,7 @@ SponsoredBenefits::Engine.routes.draw do
       resources :plan_comparisons, controller: 'plan_design_proposals/plan_comparisons', only: [:new] do
         collection do
           get :export
+          get :csv, defaults: { format: :csv }
         end
       end
       post :publish
