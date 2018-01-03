@@ -279,9 +279,9 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
           expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
         end
 
-        it "should return false if employer has both published and draft plan years" do
+        it "should return true if employer has both published and draft plan years" do
           employer_profile_1.update_attributes(plan_years: [draft_plan_year, published_plan_year])
-          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq false
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
         end
       end
 
