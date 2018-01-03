@@ -37,6 +37,9 @@ SponsoredBenefits::Engine.routes.draw do
       post :publish
       get :claim
 
+      resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:new] do
+      end
+
     end
 
     resource :office_locations do
