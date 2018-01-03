@@ -185,7 +185,7 @@ function calcEmployerContributions() {
   } else {
     enableActionButtons();
   }
-  if (data == undefined || data == {}) {
+  if (data == undefined || data == {} || !('benefit_group' in data)) {
     return;
   }
 
