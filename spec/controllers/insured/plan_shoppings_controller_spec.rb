@@ -305,7 +305,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "POST terminate" do
-    let(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected"}) }
+    let(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id}) }
+    let(:terminate_reason) { "terminate_reason" }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
@@ -331,6 +337,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       post :terminate, id: "hbx_id"
       expect(enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
+    end
+
+    it "should create a new inactive enrollment" do
+      allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
+      expect(enrollment.termination_submitted_on).to eq nil
+      post :terminate, id: "hbx_id", terminate_reason: terminate_reason
+      expect(enrollment.terminate_reason).to eq terminate_reason
     end
   end
 

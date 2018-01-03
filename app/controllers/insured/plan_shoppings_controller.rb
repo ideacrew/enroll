@@ -94,12 +94,13 @@ class Insured::PlanShoppingsController < ApplicationController
   def waive
     person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-
     # Create a new hbx_enrollment for the waived enrollment.
     unless hbx_enrollment.shopping?
+      benefit_group = hbx_enrollment.benefit_group
+      benefit_group_assignment = hbx_enrollment.benefit_group_assignment
       employee_role = @person.employee_roles.active.last if employee_role.blank? and @person.has_active_employee_role?
       coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
-      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+      waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
       waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
       waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
       waived_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
@@ -141,7 +142,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
       hbx_enrollment.notify_employee_confirming_coverage_termination
-      waive
+      waive # to create a waiver for termination
     else
       redirect_to :back
     end
