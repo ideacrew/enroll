@@ -19,7 +19,7 @@ module SponsoredBenefits
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
-      error_message = check_if_county_zip_are_same(quote, employer_profile) if quote.present?
+      error_message = quote.present? ? check_if_county_zip_are_same(quote, employer_profile) : ""
 
       if error_message.present?
         flash[:error] = error_message
