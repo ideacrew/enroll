@@ -89,7 +89,7 @@
     To finalize your quote and make it available to your client, click publish Quote.  Once you publish your quote, you cannot make edits to it.  If you want to make edits to your qupte now, click Update Roster or Select Benefits.
   </div>
   <div class="col-md-3">
-    <%= link_to 'Return to Quote Management', url_for(:back), class:'btn btn-primary' %>
+    <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization), class:'btn btn-primary' %>
   </div>
   <div class="col-md-7 col-md-offset-5 sq-btn-grp">
     <%= link_to "Download PDF", sponsored_benefits.organizations_plan_design_proposal_plan_reviews_path(@plan_design_proposal), id: "submitPlanDesignProposal", class:'btn btn-default' %>
