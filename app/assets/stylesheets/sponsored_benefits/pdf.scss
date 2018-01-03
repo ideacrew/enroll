@@ -1,0 +1,42 @@
+@import "variables";
+@import url('https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700');
+
+@import "bootstrap";
+@import "dragtable";
+@import "custom";
+
+.compare-table {
+  tr {
+    td:first-of-type, th:first-of-type {
+      background-color: #E8E8E8;
+      border: none;
+      text-align: left;
+      vertical-align: center;
+      font-size: 12px;
+      &.row-title {
+        font-size: 24px;
+        color: #414141;
+        font-weight: 600;
+      }
+    }
+    th, td {
+      text-align: center;
+      vertical-align: center;
+      img {
+      }
+    }
+    td, th {
+      border-left: 1px solid #ddd;
+      border-right: none;
+      &:first-of-type {
+
+      }
+    }
+
+  }
+  .row-title {
+    font-size: 24px;
+    color: #414141;
+    font-weight: 600;
+  }
+}
