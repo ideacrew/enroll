@@ -9,6 +9,7 @@ module PdfTemplates
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
+    attribute :employer_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
@@ -22,7 +23,6 @@ module PdfTemplates
     attribute :reference_plan, Object
     attribute :family_contribution, String
     attribute :data, Hash
-    attribute :plan_year, String
     attribute :coverage_end_on, Date
     attribute :coverage_start_on, Date
     attribute :to, String
