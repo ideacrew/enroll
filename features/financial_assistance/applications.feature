@@ -6,75 +6,29 @@ Feature: Start a new Financial Assistance Application
 
   Scenario: A consumer wants to start a new financial assistance application
     When the consumer views their applications
-    And they click 'New Financial Assistance Application' button
+    And they click 'Start New Application' button
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
 
   Scenario: A consumer enters tax information for an application's applicant
     Given the consumer has started a financial assistance application
     When they view the financial assistance application
-    And they click edit for an applicant
-    And they complete and submit the Income and Coverage information
+    And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
 
-  Scenario: A consumer adds income for an application's applicant
+  Scenario: A consumer adds Job income for an application's applicant
     Given the consumer has started a financial assistance application
     And has added tax information for an applicant
-    And they visit the applicant's Income page
-    When they click on the 'Add Income' button
-    And they complete the form for the income
-    Then they should be taken back to the applicant's detail page
-    And they should see the newly added income
+    And they visit the applicant's Job income page
+    And they answer job income question and complete the form for the Job income
+    Then they should see the newly added Job income
+    And they should see the dates in correct format
 
-  Scenario: A consumer adds benefit for an application's applicant
+  Scenario: A consumer adds Job income with incorrect date format
     Given the consumer has started a financial assistance application
     And has added tax information for an applicant
-    And they visit the applicant's Benefits page
-    When they click on 'Add Benefit' button
-    And they complete the form for the benefit
-    Then they should be taken back to the applicant's detail page
-    And they should see the newly added benefit
+    And they visit the applicant's Job income page
+    And they answer job income question and complete the form with incorrect data format
+    Then I should see a JS alert
 
-  Scenario: A consumer adds deduction for an application's applicant
-    Given the consumer has started a financial assistance application
-    And has added tax information for an applicant
-    And they visit the applicant's Deductions page
-    When they click on the 'Add Income Adjustment' button
-    And they complete the form for the deduction
-    Then they should be taken back to the applicant's detail page
-    And they should see the newly added deduction
 
-  Scenario: A consumer removes an income for an application's applicant
-    Given the consumer has started a financial assistance application
-    And has added tax information for an applicant
-    And the consumer has an income
-    And they visit the applicant's Income page
-    When they click on 'Remove Income' button
-    Then they should be taken back to the application's details page for income
-    And the income should be no longer be shown
-
-  Scenario: A consumer removes an benefit for an application's applicant
-    Given the consumer has started a financial assistance application
-    And has added tax information for an applicant
-    And the consumer has a benefit
-    And they visit the applicant's Benefits page
-    When they click on 'Remove Benefit' button
-    Then they should be taken back to the application's details page for benefit
-    And the benefit should be no longer be shown
-
-  Scenario: A consumer removes an deduction for an application's applicant
-    Given the consumer has started a financial assistance application
-    And has added tax information for an applicant
-    And the consumer has a deduction
-    And they visit the applicant's Deductions page
-    When they click on 'Remove Deduction' button
-    Then they should be taken back to the application's details page for deduction
-    And the deduction should be no longer be shown
-
-  Scenario: A consumer reviews and submits an application
-    Given the consumer has completed a financial assistance application
-    When they view the financial assistance application for review
-    And click the 'Review and Continue' button
-    And they review and submit the application
-    Then they are taken back to view all applications
-    And they will see that their application has been submitted

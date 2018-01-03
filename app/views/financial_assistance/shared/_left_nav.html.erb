@@ -18,7 +18,7 @@
               <div class="col-md-2 row fa fa-check applicant-check"></div>
               <div class="col-md-offset-2 col-md-8 p0"> Tax Info </div>
             <% else %>
-              <div class="pdl20"> Job Income </div>
+              <div class="pdl20"> Tax Info </div>
             <% end %>
           <% end %>
         </li>
@@ -112,9 +112,9 @@
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w no-hover-disable">
         <% if @application.ready_for_attestation? and @application.is_draft? %>
-          <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
+          <%= link_to "Review & Submit", review_and_submit_financial_assistance_application_path(@application) %>
         <% else %>
-          <a href="javascript:void(0);" class="cna">Review and Submit</a>
+          <a href="javascript:void(0);" class="cna">Review & Submit</a>
         <% end %>
       </li>
     <% end %>

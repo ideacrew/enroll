@@ -15,7 +15,7 @@
 
         <div class="focus_effect module">
           <% @current_step.sections.each do |section| %>
-            <div class="margin-bottom-30">
+            <div class="margin-bottom-30 margin-bottom-adjustment">
               <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
             </div>
           <% end %>
