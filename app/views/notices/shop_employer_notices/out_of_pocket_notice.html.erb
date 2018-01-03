@@ -14,7 +14,7 @@
   <table class="total_table" border="0">
     <tbody>
       <tr>
-        <td>Dear <%= notice.employer_name %>:  </td>
+        <td>Dear <strong><%= notice.employer_name %>:</strong></td>
       </tr>
     </tbody>
   </table>
@@ -32,7 +32,7 @@
     content: "With this anonymous tool, your employees can find every plan that you choose to make available to them through #{Settings.site.short_name}, and then compare plans based on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers CHECKBOOK has over 35 years of experience helping consumers choose the best plans."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "</strong>Who can I share my custom Plan Match instructions with?</strong>"} %>
+    content: "<strong>Who can I share my custom Plan Match instructions with?</strong>"} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "Plan Match is a tool for your employees who are eligible for the health plan(s) you offer through #{Settings.site.short_name}. Plan Match can be used anonymously by your eligible employees and their family members to compare health plan options and find the right health plan for their needs and budget. Employees can also use Plan Match during the year when they experience a life event, such as marriage, birth, or loss of other coverage, to help determine the right health plan for them under their new circumstances. Because Plan Match is truly anonymous, you could even share it with prospective employees who want to see what health plan options are available as part of your benefits offerings."} %>
@@ -45,7 +45,7 @@
 
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
    contents: [""],
-     heading: 'For Questions or Assistance:', sub_heading: ''} %>
+     heading: '<strong>For Questions or Assistance:</strong>', sub_heading: ''} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
    previous: "Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
