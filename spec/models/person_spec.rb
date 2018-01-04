@@ -516,6 +516,11 @@ describe Person do
     it 'ssn present, dob not present then should return empty array' do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
+
+    it 'ssn present, dob present, first_name, last_name present and person inactive' do
+      @p4.update_attributes(is_active:false)
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
+    end
   end
 
   describe '.active', :dbclean => :after_each do

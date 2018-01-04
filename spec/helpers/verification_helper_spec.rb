@@ -374,6 +374,30 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
       end
     end
+    context 'DC Residency' do
+      it 'returns in review if documents for Residency  uploaded' do
+        person.consumer_role.local_residency_validation = 'pending'
+        person.consumer_role.is_state_resident = false
+        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "DC Residency")
+        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+      end
+      it 'returns verified if residency is valid' do
+        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return true
+        person.consumer_role.local_residency_validation = 'valid'
+        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+      end
+      it 'returns outstanding for residency outstanding' do
+        person.consumer_role.local_residency_validation = 'outstanding'
+        person.consumer_role.vlp_documents = []
+        expect(helper.show_v_type('DC Residency', person)).to eq('Outstanding')
+      end
+      it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
+        person.consumer_role.local_residency_validation = 'outstanding'
+        allow_any_instance_of(ConsumerRole).to receive(:processing_residency_24h?).and_return true
+        person.consumer_role.vlp_documents = []
+        expect(helper.show_v_type('DC Residency', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
+      end
+    end
   end
 
   describe "#documents_list" do
@@ -406,17 +430,126 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#build_admin_actions_list" do
-    shared_examples_for "admin actions dropdown list" do |type, status, actions|
+    shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
       before do
         allow(helper).to receive(:verification_type_status).and_return status
       end
       it "returns admin actions array" do
-        expect(helper.build_admin_actions_list(person, type)).to eq actions
+        person.consumer_role.update_attributes(aasm_state: "#{state}")
+        expect(helper.build_admin_actions_list(type, person)).to eq actions
       end
     end
 
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+  end
+
+  describe "#request response details" do
+    let(:residency_request_body) { "<?xml version='1.0' encoding='utf-8' ?>\n
+                                    <residency_verification_request xmlns='http://openhbx.org/api/terms/1.0'>\n
+                                    <individual>\n    <id>\n      <id>5a0b2901635d695b94000008</id>\n    </id>\n
+                                    <person>\n      <id>\n
+                                    ...
+                                    </person_demographics>\n  </individual>\n</residency_verification_request>\n" }
+    let(:ssa_request_body)       { "<?xml version='1.0' encoding='utf-8'?> <ssa_verification_request xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <id> <id>5a0b2901635d695b94000008</id> </id> <person> <id>
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#5c51371d9c04441899b29fb79086c4a0</id> </id>
+                                    ...
+                                    <created_at>2017-11-14T17:33:53Z</created_at> <modified_at>2017-12-09T18:20:48Z</modified_at>
+                                    </person_demographics> </ssa_verification_request> " }
+    let(:vlp_request_body)       { "<?xml version='1.0' encoding='utf-8'?> <lawful_presence_request xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <individual> <id> <id>5a12f461635d690fa20000dd</id> </id> <person> <id>
+                                    ...
+                                    </immigration_information> <check_five_year_bar>false</check_five_year_bar>
+                                    <requested_coverage_start_date>20171120</requested_coverage_start_date> </lawful_presence_request> " }
+    let(:residency_response_body) { "<?xml version='1.0' encoding='utf-8' ?>\n
+                                    <residency_verification_response xmlns='http://openhbx.org/api/terms/1.0'>\n
+                                    <individual>\n    <id>\n      <id>5a0b2901635d695b94000008</id>\n    </id>\n
+                                    <person>\n      <id>\n
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#5c51371d9c04441899b29fb79086c4a0</id>\n
+                                    </id>\n      <person_name>\n
+                                    <person_surname>vtuser5</person_surname>\n
+                                    <person_given_name>vtuser5</person_given_name>\n
+                                    </person_name>\n      <addresses>\n        <address>\n
+                                    ...
+                                    <modified_at>2017-12-09T16:13:31Z</modified_at>\n
+                                    </person_demographics>\n  </individual>\n</residency_verification_request>\n" }
+    let(:ssa_response_body)      { "<?xml version='1.0' encoding='utf-8'?> <ssa_verification_response xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <id> <id>5a0b2901635d695b94000008</id> </id> <person> <id>
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#5c51371d9c04441899b29fb79086c4a0</id> </id>
+                                    <person_name> <person_surname>vtuser5</person_surname> <person_given_name>vtuser5</person_given_name> </person_name>
+                                    ...
+                                    <birth_date>19851106</birth_date> <is_incarcerated>false</is_incarcerated>
+                                    <created_at>2017-11-14T17:33:53Z</created_at> <modified_at>2017-12-09T18:20:48Z</modified_at>
+                                    </person_demographics> </ssa_verification_request> " }
+    let(:vlp_response_body)     { "<?xml version='1.0' encoding='utf-8'?> <lawful_presence_response xmlns='http://openhbx.org/api/terms/1.0'>
+                                    <individual> <id> <id>5a12f461635d690fa20000dd</id> </id> <person> <id>
+                                    <id>urn:openhbx:hbx:dc0:resources:v1:person:hbx_id#2486ddcfe00c40fb95fc590195065fc4</id> </id>
+                                    ...
+                                    <has_document_I20>false</has_document_I20> <has_document_DS2019>false</has_document_DS2019> </documents>
+                                    </immigration_information> <check_five_year_bar>false</check_five_year_bar>
+                                    <requested_coverage_start_date>20171120</requested_coverage_start_date> </lawful_presence_request> " }
+
+    let(:ssa_request)              { EventRequest.new(requested_at: DateTime.now, body: ssa_request_body) }
+    let(:vlp_request)              { EventRequest.new(requested_at: DateTime.now, body: vlp_request_body) }
+    let(:local_residency_request)  { EventRequest.new(requested_at: DateTime.now, body: residency_request_body) }
+    let(:local_residency_response) { EventResponse.new(received_at: DateTime.now, body: residency_response_body) }
+    let(:ssa_response)             { EventResponse.new(received_at: DateTime.now, body: ssa_response_body) }
+    let(:vlp_response)             { EventResponse.new(received_at: DateTime.now, body: vlp_response_body) }
+    let(:records)                  { person.consumer_role.verification_type_history_elements }
+
+    shared_examples_for "request response details" do |type, event, result|
+      before do
+        if event == "local_residency_request" || event == "local_residency_response"
+          person.consumer_role.send(event.pluralize) << send(event)
+        else
+          person.consumer_role.lawful_presence_determination.send(event.pluralize) << send(event)
+        end
+        if event.split('_').last == "request"
+          records << [VerificationTypeHistoryElement.new(verification_type:type, event_request_record_id: send(event).id)]
+        elsif event.split('_').last == "response"
+          records << [VerificationTypeHistoryElement.new(verification_type:type, event_response_record_id: send(event).id)]
+        end
+      end
+      it "returns event body" do
+        expect(helper.request_response_details(person, records.first, type).children.first.name).to eq result
+      end
+    end
+
+    it_behaves_like "request response details", "DC Residency", "local_residency_request", "residency_verification_request"
+    it_behaves_like "request response details", "Social Security Number", "ssa_request", "ssa_verification_request"
+    it_behaves_like "request response details", "Citizenship", "ssa_request", "ssa_verification_request"
+    it_behaves_like "request response details", "Immigration status", "vlp_request", "lawful_presence_request"
+    it_behaves_like "request response details", "DC Residency", "local_residency_response", "residency_verification_response"
+    it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
+    it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
+    it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
+  end
+
+  describe "#build_reject_reason_list" do
+    shared_examples_for "reject reason dropdown list" do |type, reason_in, reason_out|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return "in review"
+      end
+      it "includes #{reason_in} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to include reason_in
+      end
+      it "don't include #{reason_out} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to_not include reason_out
+      end
+    end
+
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", "4 weeks"
+    it_behaves_like "reject reason dropdown list", "Immigration status", "Expired", "Too old"
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", nil
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Illegible", "Expired"
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Wrong Type", "Too old"
+    it_behaves_like "reject reason dropdown list", "American Indian Status", "Wrong Person", "Expired"
   end
 end

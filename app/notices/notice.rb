@@ -71,12 +71,14 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
+
           locals: { recipient: recipient, notice: notice}
           }),
         }
     }
 
     footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
+
     options.merge!({footer: {
       content: ApplicationController.new.render_to_string({
         template: footer,
@@ -106,7 +108,7 @@ class Notice
     rescue Exception => e
       puts "#{e} #{e.backtrace}"
     end
-
+    # notice_path
     # clear_tmp
   end
 
