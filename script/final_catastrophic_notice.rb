@@ -59,6 +59,7 @@ CSV.open(file_2, "w", force_quotes: true) do |csv|
           hbx_enrollment.aasm_state,
           hbx_enrollment.effective_on.to_s
         ]
+        puts "CAT Notice is sent to primary person with hbx_id: #{person.hbx_id} and enrollment_hbx_id: #{hbx_enrollment.hbx_id}"
       rescue Exception => e
         puts "Unable to deliver to #{person.hbx_id} for the following error #{e.backtrace}"
       end
