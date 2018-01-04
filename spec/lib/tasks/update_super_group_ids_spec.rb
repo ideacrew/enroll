@@ -3,7 +3,7 @@ Rake.application.rake_require "tasks/update_super_group_ids"
 Rake::Task.define_task(:environment)
 
 RSpec.describe 'Migrating carrier specific super group Id', :type => :task do
-  let(:plan) { FactoryGirl.build(:plan, hios_id: "88806MA0030001-01") }
+  let(:plan) { FactoryGirl.build(:plan, hios_id: "88806MA0030001-01", active_year: 2017) }
   let(:default_plan) { FactoryGirl.build(:plan) }
   let(:plan_non_super_group) { FactoryGirl.create(:plan, hios_id: "22222MA0030001-01") }
 
