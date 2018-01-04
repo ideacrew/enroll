@@ -125,7 +125,6 @@ module SponsoredBenefits
     end
 
     private
-    helper_method :generate_breadcrumb_links
 
     def effective_datatable
       ::Effective::Datatables::PlanDesignProposalsDatatable.new(organization_id: @plan_design_organization._id)
