@@ -1,7 +1,7 @@
 module SponsoredBenefits
   class ApplicationController < ActionController::Base
     before_action :set_broker_agency_profile_from_user
-
+    layout 'single_column'
     private
       helper_method :active_tab, :generate_breadcrumb_links
 

@@ -21,6 +21,7 @@ $(document).on('click', '#publishPlanDesignProposal', saveProposalAndPublish);
 $(document).on('click', '#downloadReferencePlanDetailsButton', checkIfSbcIncluded);
 
 $(document).on('ready', pageInit);
+$(document).on('page:load', pageInit);
 
 function pageInit() {
   if ($("#reference_plan_id").val() != '') {
@@ -29,6 +30,7 @@ function pageInit() {
     disableActionButtons();
     $('li.sole-source-tab').find('label').trigger('click');
   }
+  initSlider();
   $('.loading-plans-button').hide();
   disableCompareButton();
 }
@@ -270,7 +272,7 @@ function buildBenefitGroupParams() {
 }
 
 function initSlider() {
-  $('.benefits-fields input.hidden-param').each(function() {
+  $('.benefits-fields input.hidden-param, .dental-benefits-fields input.hidden-param').each(function() {
     $(this).closest('.form-group').find('.slider').attr('data-slider-value', $(this).val());
     $(this).closest('.form-group').find('.slide-label').html($(this).val()+"%");
   });
@@ -278,7 +280,9 @@ function initSlider() {
   $('.benefits-fields .slider').bootstrapSlider({
     formatter: function(value) {
       return 'Contribution Percentage: ' + value + '%';
-    }
+    },
+    max: 100,
+    min: 0
   });
 }
 
@@ -296,6 +300,8 @@ function preventSubmitPlanDesignProposal(event) {
 }
 
 function disableActionButtons() {
+  var minimum_employee_contribution = $("#employer_min_employee_contribution").val();
+  var minimum_family_contribution = $("#employer_min_family_contribution").val();
   data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)){
     $(function () {
@@ -305,8 +311,8 @@ function disableActionButtons() {
     $('.plan_design_proposals .sq-btn-grp').attr({
      'data-toggle': "tooltip",
      'data-placement': "top",
-      'data-title':"Employer premium contribution for Family Health Plans must be at least 33%, and Employee Only Health Plans must be at least 50%"
-    })
+      'data-title':"Employer premium contribution for Family Health Plans must be at least" + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
+   })
   }
 }
 
