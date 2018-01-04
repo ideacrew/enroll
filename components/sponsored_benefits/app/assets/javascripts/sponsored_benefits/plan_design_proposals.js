@@ -10,7 +10,7 @@ $(document).on('click', '.reference-plan input[type=checkbox]', comparisonPlans)
 $(document).on('click', '#clear-comparison', clearComparisons);
 $(document).on('click', '#view-comparison', viewComparisons);
 $(document).on('click', '#hide-detail-comparisons', hideDetailComparisons);
-
+$(document).on('click', '.plan-type-filters .plan-search-option', sortPlans);
 
 $(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDesignProposal);
 $(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
@@ -516,4 +516,44 @@ function removeA(arr) {
         }
     }
     return arr;
+}
+
+function sortPlans() {
+  var $box = $(this).children('input').first();
+
+  if ($box.is(":checked")) {
+    // the name of the box is retrieved using the .attr() method
+    // as it is assumed and expected to be immutable
+    var group = "input:checkbox[data-search-type='" + $box.data("search-type") + "']";
+    // the checked state of the group/box on the other hand will change
+    // and the current value is retrieved using .prop() method
+    $(group).prop("checked", false);
+    $box.prop("checked", true);
+  } else {
+    $box.prop("checked", false);
+  }
+
+  var plans = $('.reference-plan');
+  var search_types = {};
+
+  $('.plan-search-option input').each(function(index) {
+    var option = $(this);
+    var option_is_checked = option.prop('checked');
+    if (option_is_checked) {
+      search_types[option.data('search-type').replace(/_/,'-')] = option.val();
+    }
+  });
+  plans.parent().removeClass('hidden');
+  plans.each(function(index) {
+    var plan = $(this);
+    var plan_matches = [];
+    Object.keys(search_types).forEach(function(item) {
+      var plan_value = plan.data(item);
+      plan_matches.push((search_types[item].toString() === plan_value.toString()));
+    });
+    if(plan_matches.every(function(option){ return option; })) {
+    } else {
+      plan.parent().addClass('hidden');
+    }
+  });
 }

@@ -435,6 +435,10 @@ class Plan
     (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
   end
 
+  def plan_deductible
+    deductible_integer
+  end
+
   def hsa_plan?
     name = self.name
     regex = name.match("HSA")
@@ -443,6 +447,12 @@ class Plan
     else
       return false
     end
+  end
+
+  def plan_hsa
+    name = self.name
+    regex = name.match("HSA")
+    regex.present? ? 'Yes': 'No'
   end
 
   def renewal_plan_type
@@ -528,6 +538,22 @@ class Plan
       else
         shop_dental_plans year
       end
+    end
+
+    def search_options(plans)
+      options ={
+        'plan_type': [],
+        'plan_hsa': [],
+        'metal_level': [],
+        'plan_deductible': []
+      }
+      options.each do |option, value|
+        collected = plans.collect { |plan| plan.send(option) }.uniq.sort
+        unless collected.none?
+          options[option] = collected
+        end
+      end
+      options
     end
 
     def shop_health_plans year
