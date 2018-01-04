@@ -8,6 +8,9 @@
     <div class='hide' id='collection_scope'><%= @plan_design_organization._id %> </div>
     <div class="row container">
       <div class="col-sm-12">
+        <div class="row no pd">
+          <h2 class="">Manage Quote for <%= @plan_design_organization.legal_name %></h2>
+        </div>
       <div class="pull-left">
         <%= link_to "Back to Employer Index", employers_organizations_broker_agency_profile_path(@plan_design_organization.broker_agency_profile.id), class:"btn btn-primary new-plan-design-proposal"  %>
       </div>
