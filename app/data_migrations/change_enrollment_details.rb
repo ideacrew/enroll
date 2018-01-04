@@ -87,7 +87,11 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def cancel_enr(enrollments)
     enrollments.each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-      puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        if enrollment.aasm_state == "coverage_canceled"
+          puts "enrollment with hbx_id: #{enrollment.hbx_id} can not be cancelled" unless Rails.env.test?
+        else
+          puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        end
     end
   end
 
