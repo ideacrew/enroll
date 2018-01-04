@@ -23,6 +23,7 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
   let!(:catastrophic_plan_notice) { IvlNotices::FinalCatastrophicPlanNotice.new(person.consumer_role, valid_params) }
 
   before :each do
+    catastrophic_plan_notice.append_hbe
     catastrophic_plan_notice.build
     render file: "notices/ivl/final_catastrophic_plan_letter", locals: {notice: notice}
   end
