@@ -27,7 +27,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each
 
     context "it creates SicCodeRatingFactorSet correctly" do
       subject { SicCodeRatingFactorSet.first }
-      it_should_behave_like "a rate factor", {    active_year: 2017,
+      it_should_behave_like "a rate factor", {    active_year: 2018,
                                                   default_factor_value: 1.0
                                               }
 
@@ -53,7 +53,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each
         EmployerGroupSizeRatingFactorSet.where(carrier_profile_id: carrier_profile.id).first
       end
 
-      it_should_behave_like "a rate factor", {    active_year: 2017,
+      it_should_behave_like "a rate factor", {    active_year: 2018,
                                                   default_factor_value: 1.0
                                               }
       it 'creates employer group size codes' do
@@ -74,7 +74,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each
 
     context "it creates EmployerParticipationRateRatingFactorSet correctly" do
       subject { EmployerParticipationRateRatingFactorSet.first }
-      it_should_behave_like "a rate factor", {    active_year: 2017,
+      it_should_behave_like "a rate factor", {    active_year: 2018,
                                                   default_factor_value: 1.0
                                               }
       it 'creates employer participation rate codes' do
@@ -95,10 +95,11 @@ RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each
 
     context "it creates CompositeRatingTierFactorSet correctly" do
       subject { CompositeRatingTierFactorSet.first }
-      it_should_behave_like "a rate factor", {    active_year: 2017,
+      it_should_behave_like "a rate factor", {    active_year: 2018,
                                                   default_factor_value: 1.0
                                               }
       it 'creates composite rating codes' do
+        binding.pry
         expect(CompositeRatingTierFactorSet.count).to be(4)
       end
 
@@ -116,7 +117,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each
     private
 
     def invoke_task
-      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "#{Rails.root}/spec/test_data/plan_data/rate_factors/2017/SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
+      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "#{Rails.root}/spec/test_data/plan_data/rate_factors/2018/SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
     end
   end
 end
