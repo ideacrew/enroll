@@ -14,6 +14,7 @@ module SponsoredBenefits
           when "sole_source"
             offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:active_year])
           end
+        @search_options = ::Plan.search_options(@plans)
       end
 
       private

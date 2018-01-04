@@ -78,10 +78,10 @@
   <div class="col-md-12 no-pd">
     <div class="panel panel-default">
       <div class="panel-heading custom-heading">
-        <h3 class="panel-title"><%= @plan.name %> - Details</h3> <span class="glyphicon glyphicon-remove pull-right pr-close" aria-hidden="true"></span>
+        <h3 class="panel-title"><%= @plan.name %> - Details</h3>
       </div>
       <div class="panel-body">
-        <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps, single_plan_displayed: true %>
       </div>
     </div>
   </div>

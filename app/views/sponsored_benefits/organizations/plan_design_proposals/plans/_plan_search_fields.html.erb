@@ -1,0 +1,10 @@
+<ul>
+  <% search_options.each do |title, options| %>
+    <% next if options.empty? %>
+    <li><%= title.to_s.humanize %>
+      <% options.each do |option| %>
+        <label for="<%= option %>" class="plan-search-option" data-search-type="<%= title.to_s %>" data-value="<%= option %>"><%= check_box_tag "#{option}", option, false, class: 'checkbox plan-filter-checkbox', :'data-search-type' => title.to_s  %> <% if option.is_a? String %> <%= option.capitalize %> <% else %> $<%= number_with_delimiter(option, :delimiter => ',') %><% end %></label>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

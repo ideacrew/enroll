@@ -50,6 +50,18 @@ $brand-primary: $mhc-dark-blue;
 
 
 .plan_design_proposals {
+
+  .plan-type-filters {
+    ul {
+      list-style: none;
+    }
+    input.plan-filter-checkbox[type=checkbox] {
+      display: inline-block;
+    }
+    label {
+      display: block;
+    }
+  }
   .success-message {
     color: green;
   }
@@ -364,8 +376,9 @@ $brand-primary: $mhc-dark-blue;
     display: block;
   }
  input.sbc-download-checkbox[type=checkbox] {
-   display:inline;
+   display: inline;
  }
+
  input[type=checkbox] {
     display: none;
     + label > i.fa {
@@ -538,4 +551,3 @@ $brand-primary: $mhc-dark-blue;
     }
   }
 }
-

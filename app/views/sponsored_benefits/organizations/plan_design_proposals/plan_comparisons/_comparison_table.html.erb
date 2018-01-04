@@ -1,8 +1,9 @@
 
 <%= hidden_field_tag 'current_sort', @sort_by  %>
 <%= hidden_field_tag 'plan_ids' %>
+<% single_plan_displayed ||= false %>
 <div class="container-fluid">
-  <h3>Plan Comparison Chart</h3>
+  <% unless single_plan_displayed %><h3>Plan Comparison Chart</h3><% end %>
   <ul style="padding-left: 18px;">
     <!-- <li> Plans can be rearranged by dragging the beginning of the company name </li> -->
     <!-- <li> Use <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> to sort by copay </li> -->
@@ -77,11 +78,12 @@
     </table>
   </div>
   <br>
-  <!--  download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id)  -->
-  <div class="col-md-offset-5">
-    <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-default", target: "_blank" %>
-    <%= link_to "Export to CSV",  sponsored_benefits.csv_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans]), class: 'btn btn-default', target: "_blank" %>
-    <button class="btn btn-default" id="hide-detail-comparisons">Hide Details</button>
-  </div>
+  <% unless single_plan_displayed %>
+    <div class="col-md-offset-5">
+      <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-default", target: "_blank" %>
+      <%= link_to "Export to CSV",  sponsored_benefits.csv_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans]), class: 'btn btn-default', target: "_blank" %>
+      <button class="btn btn-default" id="hide-detail-comparisons">Hide Details</button>
+    </div>
+  <% end %>
   <br><br>
 </div>
