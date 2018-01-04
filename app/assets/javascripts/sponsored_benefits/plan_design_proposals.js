@@ -299,7 +299,15 @@ function preventSubmitPlanDesignProposal(event) {
 function disableActionButtons() {
   data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)){
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
     $('.plan_design_proposals .save-action').attr('disabled', 'disabled');
+    $('.plan_design_proposals .sq-btn-grp').attr({
+     'data-toggle': "tooltip",
+     'data-placement': "top",
+      'title':"Employer premium contribution for Family Health Plans must be at least 33%, and Employee Only Health Plans must be at least 50%"
+    })
   }
 }
 
