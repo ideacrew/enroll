@@ -430,7 +430,7 @@ shop_notice_triggers = [
         name: 'Employee Eligibility Notice',
         notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
         notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
-        mpi_indicator: 'DAE053',
+        mpi_indicator: 'SHOP_D053',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
