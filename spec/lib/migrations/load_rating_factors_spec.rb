@@ -99,7 +99,6 @@ RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each
                                                   default_factor_value: 1.0
                                               }
       it 'creates composite rating codes' do
-        binding.pry
         expect(CompositeRatingTierFactorSet.count).to be(4)
       end
 
