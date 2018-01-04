@@ -25,10 +25,10 @@ RSpec.describe FinancialAssistance::Application, type: :model do
   let!(:eligibility_determination1) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household1) }
   let!(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household2) }
   let!(:eligibility_determination3) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household3) }
-  let!(:application2) { FactoryGirl.create(:application, family: family, assistance_year: 2017, aasm_state: "denied") }
-  let!(:application3) { FactoryGirl.create(:application, family: family, assistance_year: 2017, aasm_state: "determination_response_error") }
-  let!(:application4) { FactoryGirl.create(:application, family: family, assistance_year: 2017) }
-  let!(:application5) { FactoryGirl.create(:application, family: family, assistance_year: 2017) }
+  let!(:application2) { FactoryGirl.create(:application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: "denied") }
+  let!(:application3) { FactoryGirl.create(:application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: "determination_response_error") }
+  let!(:application4) { FactoryGirl.create(:application, family: family, assistance_year: TimeKeeper.date_of_record.year) }
+  let!(:application5) { FactoryGirl.create(:application, family: family, assistance_year: TimeKeeper.date_of_record.year) }
   let!(:applicant1) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family.primary_applicant.id) }
   let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household2.id, application: application, family_member_id: family_member2.id) }
   let!(:applicant3) { FactoryGirl.create(:applicant, tax_household_id: tax_household3.id, application: application, family_member_id: family_member3.id) }
@@ -124,7 +124,7 @@ RSpec.describe FinancialAssistance::Application, type: :model do
 
     context "check the validity of an application" do
       let!(:valid_application) { FactoryGirl.create(:application, family: family, hbx_id: "345332", applicant_kind: "user and/or family", request_kind: "request-kind",
-                                                    motivation_kind: "motivation-kind", us_state: "DC", is_ridp_verified: true, assistance_year: 2017, aasm_state: "draft",
+                                                    motivation_kind: "motivation-kind", us_state: "DC", is_ridp_verified: true, assistance_year: TimeKeeper.date_of_record.year, aasm_state: "draft",
                                                     medicaid_terms: true, attestation_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true,
                                                     report_change_terms: true, parent_living_out_of_home_terms: true, applicants: [applicant_primary]) }
       let!(:invalid_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft", applicants: [applicant_primary2]) }
