@@ -471,7 +471,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -785,7 +785,8 @@ class CensusEmployee < CensusMember
   end
 
   def is_included_in_participation_rate?
-    coverage_terminated_on.nil? ||
+    return true if coverage_terminated_on.nil?
+    return false if active_benefit_group_assignment.nil?
     coverage_terminated_on >= active_benefit_group_assignment.start_on
   end
 
