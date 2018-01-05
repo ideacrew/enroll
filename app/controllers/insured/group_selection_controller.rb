@@ -104,7 +104,6 @@ class Insured::GroupSelectionController < ApplicationController
     if hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_benefit(term_date)
-      hbx_enrollment.propogate_terminate(term_date)
       redirect_to family_account_path
     else
       redirect_to :back
