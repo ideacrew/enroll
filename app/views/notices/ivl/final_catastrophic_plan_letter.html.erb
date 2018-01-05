@@ -1,6 +1,8 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -39,8 +41,10 @@ content: "For more information on these topics, consult a tax adviser or visit t
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "The #{Settings.site.short_name} Team"} %>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+content: "The #{Settings.site.short_name} Team", bottom_margin: '15px'} %>
+
+<hr>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",

@@ -38,7 +38,8 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
   end
 
   it "should render the partials" do
-    render partial: "notices/shared/logo"
+    render partial: 'notices/shared/cover_page', :locals => {notice: notice}
+    render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice}
     render partial: "notices/shared/date", :locals => {notice: notice}
     render partial: "notices/shared/address", :locals => {notice: notice}
     render partial: 'notices/shared/paragraph', :locals => {content: "The #{Settings.site.short_name} Team"}
