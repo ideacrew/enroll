@@ -80,3 +80,4 @@ Capybara.register_driver :poltergeist do |app|
   }
   Capybara::Poltergeist::Driver.new(app, options)
 end
+Capybara.default_max_wait_time = 10 # will not change the default_max_wait in my_session

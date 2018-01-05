@@ -10,6 +10,20 @@ Before do |scenario|
   else
     raise("Unhandled class, look in features/support/screenshots.rb")
   end
+  restart_phantomjs
+end
+
+def restart_phantomjs
+  puts "-> Restarting phantomjs: iterating through capybara sessions..."
+  session_pool = Capybara.send('session_pool')
+  session_pool.each do |mode,session|
+    driver = session.driver
+    if driver.is_a?(Capybara::Poltergeist::Driver)
+      driver.restart
+    else
+      puts msg += "not poltergeist: #{driver.class}"
+    end
+  end
 end
 
 module Screenshots
