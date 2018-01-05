@@ -1183,7 +1183,7 @@ ivl_notice_triggers = [
         name: 'Final Catastrophic Plan Notice',
         notice_template: 'notices/ivl/final_catastrophic_plan_letter',
         notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
-        mpi_indicator: 'MPI_CAT16',
+        mpi_indicator: 'IVL_CAP',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],

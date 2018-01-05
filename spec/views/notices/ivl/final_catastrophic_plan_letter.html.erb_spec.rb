@@ -10,7 +10,7 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
                             :notice_template => 'notices/ivl/final_catastrophic_plan_letter',
                             :notice_builder => 'IvlNotices::FinalCatastrophicPlanNotice',
                             :event_name => 'final_catastrophic_plan',
-                            :mpi_indicator => 'MPI_CAT16',
+                            :mpi_indicator => 'IVL_CAP',
                             :title => "Important Tax Information about your Catastrophic Health Coverage"})
                           }
   let(:valid_params) {{

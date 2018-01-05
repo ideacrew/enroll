@@ -8,7 +8,7 @@ RSpec.describe IvlNotices::FinalCatastrophicPlanNotice, dbclean: :after_each do
                             :notice_template => 'notices/ivl/final_catastrophic_plan_letter',
                             :notice_builder => 'IvlNotices::FinalCatastrophicPlanNotice',
                             :event_name => 'final_catastrophic_plan',
-                            :mpi_indicator => 'MPI_CAT16',
+                            :mpi_indicator => 'IVL_CAP',
                             :title => "Important Tax Information about your Catastrophic Health Coverage"})
                           }
   let(:valid_params) {{
@@ -78,6 +78,10 @@ RSpec.describe IvlNotices::FinalCatastrophicPlanNotice, dbclean: :after_each do
     it "should receive store_paper_notice" do
       expect(@catastrophic_plan_notice).to receive :store_paper_notice
       @catastrophic_plan_notice.store_paper_notice
+    end
+
+    it "should have an mpi_indicator" do
+      expect(@catastrophic_plan_notice.mpi_indicator).to eq application_event.mpi_indicator
     end
   end
 

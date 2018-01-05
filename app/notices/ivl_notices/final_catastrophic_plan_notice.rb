@@ -30,6 +30,7 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
   end
 
   def build
+    notice.mpi_indicator = self.mpi_indicator
     family = recipient.primary_family
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
