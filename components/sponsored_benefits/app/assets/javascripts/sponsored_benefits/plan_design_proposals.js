@@ -2,7 +2,7 @@ $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers)
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
 $(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
-$(document).on('click', '.plan_design_proposals .checkbox', calcEmployerContributions);
+$(document).on('click', '.plan_design_proposals .checkbox', calcPlanDesignContributions);
 // $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
 $(document).on('click', ".health-plan-design li:has(label.elected_plan)", attachEmployerHealthContributionShowHide);
 
@@ -152,7 +152,7 @@ function planSelected() {
 
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $('.health-plan-design .selected-plan').show();
-    calcEmployerContributions();
+    calcPlanDesignContributions();
     $(this).siblings('input').prop('checked', true);
   };
 
@@ -178,7 +178,7 @@ function planSelected() {
 function setSliderDisplayVal(slideEvt) {
   $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
   $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
-  calcEmployerContributions();
+  calcPlanDesignContributions();
 }
 
 function toggleSliders(plan_kind) {
@@ -191,7 +191,7 @@ function toggleSliders(plan_kind) {
   }
 }
 
-function calcEmployerContributions() {
+function calcPlanDesignContributions() {
   data = buildBenefitGroupParams();
 
   if (proposalIsInvalid(data)) {
