@@ -17,6 +17,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
       aasm_state: "published"
     )
   }
+
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
   let!(:census_employee) {
     FactoryGirl.create(:census_employee,
@@ -27,25 +28,15 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
       employer_profile: employer_profile
     )
   }
-  let!(:benefit_group_assignment) {
-    FactoryGirl.create(:benefit_group_assignment,
-      benefit_group: benefit_group,
-      census_employee: census_employee,
-      start_on: TimeKeeper.date_of_record
-    )
-  }
 
-  let!(:employee_role) {
-    FactoryGirl.create(:employee_role, employer_profile: employer_profile)
+  let(:employee_role) {
+    FactoryGirl.build(:employee_role, employer_profile: employer_profile)
   }
 
   describe "After performing the link" do
 
     before(:each) do
       Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
-      census_employee.save
-      employee_role.save
-      employer_profile.save
     end
 
     it "should set employee role id on the census employee" do
@@ -53,19 +44,19 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     end
 
     it "should set employer profile id on the employee_role" do
-      expect(p(employee_role).employer_profile_id).to eq employer_profile.id
+      expect(employee_role.employer_profile_id).to eq employer_profile.id
     end
 
     it "should set census employee id on the employee_role" do
-      expect(p(employee_role).census_employee_id).to eq census_employee.id
+      expect(employee_role.census_employee_id).to eq census_employee.id
     end
 
     it "should set hired on on the employee_role" do
-      expect(p(employee_role).hired_on).to eq hired_on
+      expect(employee_role.hired_on).to eq hired_on
     end
 
     it "should set terminated on on the employee_role" do
-      expect(p(employee_role).terminated_on).to eq terminated_on
+      expect(employee_role.terminated_on).to eq terminated_on
     end
   end
 end
