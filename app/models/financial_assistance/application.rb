@@ -628,7 +628,7 @@ private
   end
 
   def set_benchmark_plan_id
-    benchmark_plan_id = Plan.where(active_year: 2017, hios_id: "86052DC0400001-01").first.id
+    benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
     write_attribute(:benchmark_plan_id, benchmark_plan_id)
   end
 
