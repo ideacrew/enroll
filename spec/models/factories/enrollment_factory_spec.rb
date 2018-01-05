@@ -40,7 +40,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     end
 
     it "should set employee role id on the census employee" do
-      expect(p(census_employee).employee_role_id).to eq employee_role.id
+      expect(census_employee.employee_role_id).to eq employee_role.id
     end
 
     it "should set employer profile id on the employee_role" do

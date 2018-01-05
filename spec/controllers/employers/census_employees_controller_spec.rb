@@ -97,7 +97,7 @@ RSpec.describe Employers::CensusEmployeesController do
     end
   end
 
-  describe "PUT update" do
+  describe "PUT update", dbclean: :after_each do
 
     let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
     let(:employer) {
@@ -132,6 +132,7 @@ RSpec.describe Employers::CensusEmployeesController do
       }
     }
 
+    let!(:user) { create(:user, person: person)}
     let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
     let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, employer_profile_id: employer.id, hired_on: "2014-11-11", first_name: "aqzz", last_name: "White", dob: "11/11/1990", ssn: "123123123", gender: "male", benefit_group: benefit_group) }
@@ -178,7 +179,7 @@ RSpec.describe Employers::CensusEmployeesController do
     end
 
     it "should have aasm state as eligible when there is no matching record found and employee_role_linked in reverse case" do
-      expect(census_employee.reload.aasm_state).to eq "eligible"
+      expect(census_employee.aasm_state).to eq "eligible"
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params.merge(dob: person.dob, census_dependents_attributes: {}))
       post :update, :id => census_employee.id, :employer_profile_id => employer.id, census_employee: {}
       expect(census_employee.reload.aasm_state).to eq "employee_role_linked"
