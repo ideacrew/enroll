@@ -1,4 +1,4 @@
-# rails runner script/final_catastrophic_notice.rb <file_name>, Example: rails runner script/final_catastrophic_notice.rb cat_plans_glue_data_set.csv
+# rails runner script/final_catastrophic_notice.rb <file_name>, Example: rails runner script/final_catastrophic_notice.rb cat_plans_glue_data_set.csv -e production
 file_1 = ARGV[0]
 
 if !file_1.present?
@@ -27,7 +27,7 @@ field_names = %w(
         primary_last_name
       )
 
-file_2 = "#{Rails.root}/public/ivl_catastrophic_notice_report.csv"
+file_2 = "#{Rails.root}/ivl_catastrophic_notice_report.csv"
 
 event_kind = ApplicationEventKind.where(:event_name => 'final_catastrophic_plan').first
 notice_trigger = event_kind.notice_triggers.first
