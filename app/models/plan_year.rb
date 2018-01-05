@@ -795,9 +795,9 @@ class PlanYear
     state :active               # Published plan year is in-force
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
-    state :renewing_published, :after_enter => :link_census_employees
+    state :renewing_published
     state :renewing_publish_pending
-    state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites, :link_census_employees]
+    state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
@@ -1007,7 +1007,6 @@ class PlanYear
   def link_census_employees
     self.employer_profile.census_employees.eligible_without_term_pending.each do |census_employee|
       census_employee.save # This assigns default benefit package if none
-      census_employee.construct_employee_role_for_match_person
     end
   end
 
