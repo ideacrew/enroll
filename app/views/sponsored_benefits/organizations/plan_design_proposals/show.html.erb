@@ -1,7 +1,8 @@
 <div class="container" id="myTabContent">
   <div class="row">
     <div class="col-md-12">
-      <h3> Viewing <%= @plan_design_proposal.aasm_state.capitalize %> Quote </h3>
+      <h3>Viewing <%= @plan_design_proposal.aasm_state.capitalize %> Quote </h3>
+      <h4>Claim Code: <%= @plan_design_proposal.claim_code %></h4>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/proposal_info_readonly" %>
       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_roster" %>
       <!--Employer Costs Start-->
