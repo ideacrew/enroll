@@ -144,12 +144,11 @@ module SponsoredBenefits
       end
 
       def expected_to_enroll?
-        ## placeholder, todo: implement
-        true
+        expected_selection == 'enroll'
       end
 
       def expected_to_enroll_or_valid_waive?
-        true
+        %w(enroll waive).include?  expected_selection
       end
 
       def composite_rating_tier
