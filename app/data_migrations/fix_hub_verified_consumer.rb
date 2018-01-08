@@ -2,7 +2,9 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixHubVerifiedConsumer < MongoidMigrationTask
   def migrate
-    people = get_people
+    event_name = ENV['event_name']
+    people = get_people if event_name == "fix_outstanding_people"
+    people = get_unverified_people if event_name == "fix_unverified_people"
     people.each do |person|
       person.verification_types.each do |v_type|
         if type_verified_by_hub(person, v_type)
@@ -82,6 +84,26 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
         {"consumer_role.aasm_state"=>"verification_outstanding"},
         {'$and' => [
             {"consumer_role.aasm_state"=>{'$in' => ["fully_verified", "sci_verified"]}},
+            { '$or' => [
+                {"consumer_role.lawful_presence_determination.ssa_responses" => {'$exists' => true}},
+                {"consumer_role.lawful_presence_determination.vlp_responses" => {'$exists' => true}}
+            ]},
+            { '$or' => [
+                {"consumer_role.ssn_validation" => {'$in' => [
+                    "outstanding", "pending"
+                ]}},
+                {"consumer_role.citizen_status" => {'$in' => [
+                    "not_lawfully_present_in_us", "non_native_not_lawfully_present_in_us", "ssn_pass_citizenship_fails_with_SSA", "non_native_citizen"
+                ]}}
+            ]}
+        ]}
+    ]})
+  end
+
+  def get_unverified_people
+    Person.where({'$and' => [
+        {"consumer_role.aasm_state"=>"unverified"},
+        {'$and' => [
             { '$or' => [
                 {"consumer_role.lawful_presence_determination.ssa_responses" => {'$exists' => true}},
                 {"consumer_role.lawful_presence_determination.vlp_responses" => {'$exists' => true}}
