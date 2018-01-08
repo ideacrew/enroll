@@ -51,11 +51,6 @@ module SponsoredBenefits
       skip("Add a hash of attributes invalid for your model")
     }
 
-    # This should return the minimal set of values that should be in the session
-    # in order to pass any filters (e.g. authentication) defined in
-    # CensusMembers::PlanDesignCensusEmployeesController. Be sure to keep this updated too.
-    let(:valid_session) { {} }
-
     let(:plan_design_proposal) { organization.plan_design_proposals[0] }
     let(:employer_profile) { plan_design_proposal.profile }
     let(:benefit_sponsorship) { employer_profile.benefit_sponsorships[0] }
@@ -196,7 +191,7 @@ module SponsoredBenefits
         "1"=>{"first_name"=>"Lara", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"1979-12-01", "employee_relationship"=>"spouse", "_destroy"=>"false", "ssn"=>""}
         }}
 
-      let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes) }
+      let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(benefit_sponsorship: benefit_sponsorship)) }
 
       context "with valid params" do
 
@@ -213,7 +208,7 @@ module SponsoredBenefits
         end
 
         context "when dependent deleted" do 
-          let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(census_dependents_attributes: census_dependents_attributes)) }
+          let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(census_dependents_attributes: census_dependents_attributes, benefit_sponsorship: benefit_sponsorship)) }
           let(:spouse) { census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'spouse' } }
           let(:child) { census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'child_under_26'} }
           let(:delete_dependents_attributes) {{
@@ -231,7 +226,7 @@ module SponsoredBenefits
         end
 
         context "update employee or dependnet information" do
-          let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(census_dependents_attributes: census_dependents_attributes)) }
+          let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(census_dependents_attributes: census_dependents_attributes, benefit_sponsorship: benefit_sponsorship)) }
           let(:spouse) { census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'spouse' } }
           let(:child) { census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'child_under_26'} }
 

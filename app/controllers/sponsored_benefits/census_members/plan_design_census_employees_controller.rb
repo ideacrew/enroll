@@ -75,8 +75,16 @@ module SponsoredBenefits
         if @census_employee_import.save
           format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
         else
-          format.html { redirect_to :back, :flash => { :success => "Roster upload failed."} }
+          format.html { redirect_to :back, :flash => { :error => "Roster upload failed."} }
         end
+      end
+    end
+
+    def export_plan_design_employees
+      sponsorship = @plan_design_proposal.profile.benefit_sponsorships[0]
+     
+      respond_to do |format|
+        format.csv { send_data sponsorship.census_employees.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
       end
     end
 

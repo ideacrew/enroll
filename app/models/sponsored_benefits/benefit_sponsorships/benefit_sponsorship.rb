@@ -35,7 +35,7 @@ module SponsoredBenefits
       # Store separate initial and on-going enrollment renewal values to handle mid-year start situations
       field :initial_enrollment_period, type: Range
       field :annual_enrollment_period_begin_month, type: Integer
-      field :enrollment_frequency, type: Symbol
+      field :enrollment_frequency, type: Symbol, default: :rolling_month
       field :contact_method, type: String, default: "Paper and Electronic communications"
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
@@ -67,6 +67,12 @@ module SponsoredBenefits
       def initial_enrollment_period=(new_initial_enrollment_period)
         initial_enrollment_range = SponsoredBenefits.tidy_date_range(new_initial_enrollment_period, :initial_enrollment_period)
         write_attribute(:initial_enrollment_period, initial_enrollment_range) if initial_enrollment_range.present?
+      end
+
+      def initial_enrollment_period_to_s
+        date_start = initial_enrollment_period.begin
+        date_end = initial_enrollment_period.end
+        "#{date_start.strftime('%B')} #{date_start.day.ordinalize} #{date_start.strftime('%Y')}  -  #{date_end.strftime('%B')} #{date_end.day.ordinalize} #{date_end.strftime('%Y')}"
       end
 
       def census_employees

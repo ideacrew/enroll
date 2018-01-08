@@ -39,7 +39,7 @@
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
              ['Edit Quote', sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), edit_quote_link_type(row)],
-             publish_or_view_quote_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), show_link: sponsored_benefits.view_quote_organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row)),
+             publish_or_view_quote_link(row: row, publish_link: sponsored_benefits.organizations_plan_design_proposal_publish_path(row.id), show_link: sponsored_benefits.organizations_plan_design_proposal_path(row)),
              ['Copy Quote', sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(row.id), 'post'],
              ['Remove Quote', sponsored_benefits.organizations_plan_design_organization_plan_design_proposal_path(row.plan_design_organization, row), 'delete with confirm', "Are you sure? This will permanently delete the quote information"]
             ]
@@ -59,14 +59,15 @@
         end
 
         def edit_quote_link_type(row)
-          return "disabled" if row.published? || row.expired?
+          return "disabled" if row.published? || row.expired? || row.claimed?
           "static"
         end
 
         def publish_or_view_quote_link(row:, publish_link:, show_link:)
           return ['View Published Quote', show_link, 'static'] if row.published?
           return ['View Expired Quote', show_link, 'static'] if row.expired?
-          ['Publish Quote', publish_link, disabled_if_invalid(row)]
+          return ['View Claimed Quote', show_link, 'static'] if row.claimed?
+          ['View Published Quote', show_link, 'disabled']
         end
 
         def disabled_if_invalid(row)
@@ -116,7 +117,6 @@
             quotes:[
                   { scope: 'all', label: 'All'},
                   { scope: 'initial', label: 'Initial'},
-                  { scope: 'renewing', label: 'Renewing'},
                   { scope: 'draft', label: "Draft" },
                   { scope: 'published', label: "Published" },
                   { scope: 'expired', label: "Expired" },

@@ -9,7 +9,7 @@ module SponsoredBenefits
         end
         benefit_group.set_bounding_cost_plans
         @employer_contribution_amount = benefit_group.monthly_employer_contribution_amount(@plan)
-        @min_employee_cost = benefit_group.monthly_min_employee_cost()
+        @min_employee_cost = benefit_group.monthly_min_employee_cost
         @max_employee_cost = benefit_group.monthly_max_employee_cost
 
         @benefit_group_costs = benefit_group.employee_costs_for_reference_plan

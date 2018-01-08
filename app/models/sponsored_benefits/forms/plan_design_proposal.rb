@@ -111,10 +111,10 @@ module SponsoredBenefits
       def construct_new_benefit_group
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
-        application.benefit_groups.build
-        application.benefit_groups.first.build_relationship_benefits
-        application.benefit_groups.first.build_composite_tier_contributions
-        application.benefit_groups.first
+        benefit_group = application.benefit_groups.build
+        benefit_group.build_relationship_benefits
+        benefit_group.build_composite_tier_contributions
+        benefit_group
       end
 
       def save

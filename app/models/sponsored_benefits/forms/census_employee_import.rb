@@ -325,7 +325,7 @@ module SponsoredBenefits
 
       def parse_date(cell)
         return nil if cell.blank?
-        return DateTime.strptime(cell.sanitize_value, "%d/%m/%Y") rescue raise ImportErrorValue, cell if cell.class == String
+        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, cell if cell.class == String
         return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
         # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
@@ -333,9 +333,9 @@ module SponsoredBenefits
       end
 
       def parse_ssn(cell)
-        cell.blank? ? nil : cell.to_s.gsub(/\D/, '')
+        cell.blank? ? nil : prepend_zeros(cell.to_s.gsub(/\D/, ''), 9)
       end
-
+      
       def parse_boolean(cell)
         cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
       end
@@ -353,7 +353,8 @@ module SponsoredBenefits
       end
 
       def save
-        if imported_census_employees.compact.map(&:valid?).all? && (imported_census_employees.exclude? nil)
+
+        if imported_census_employees.compact.map(&:valid?).all? # && (imported_census_employees.exclude? nil)
           if self.errors.present? || !self.valid?
             return false
           end
@@ -421,6 +422,11 @@ module SponsoredBenefits
       def sanitize_value(value)
         value = value.to_s.split('.')[0] if value.is_a? Float
         value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
+      end
+
+      def prepend_zeros(number, n)
+        (n - number.to_s.size).times { number.prepend('0') }
+        number
       end
     end
 

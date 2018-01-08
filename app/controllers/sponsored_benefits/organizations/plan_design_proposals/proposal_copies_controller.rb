@@ -7,12 +7,21 @@ module SponsoredBenefits
         existing_roster = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(plan_design_form.proposal.profile.benefit_sponsorships.first)
 
         if new_plan_design_proposal.save
-          assign_roster_employees(sponsorship: new_plan_design_proposal.proposal.profile.benefit_sponsorships.first, roster: existing_roster)
+          proposal = SponsoredBenefits::Organizations::PlanDesignProposal.find(new_plan_design_proposal.proposal.id)
+          sponsorship = proposal.profile.benefit_sponsorships.first
+          assign_benefit_group(sponsorship: sponsorship, old_sponsorship: plan_design_form.proposal.profile.benefit_sponsorships.first)
+          assign_roster_employees(sponsorship: sponsorship, roster: existing_roster)
+
+          proposal.plan_design_organization.save!
           flash[:success] = "Proposal successfully copied"
         else
           flash[:error] = "Something went wrong"
         end
-        redirect_to organizations_plan_design_organization_plan_design_proposals_path(plan_design_organization)
+        response_url = edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, new_plan_design_proposal.proposal.id)
+        respond_to do |format|
+          format.html { redirect_to response_url }
+          format.js { render json: { url: response_url }.to_json, content_type: 'application/json' }
+        end
       end
 
       private
@@ -42,6 +51,30 @@ module SponsoredBenefits
           end
           census_employee.save!
         end
+      end
+
+      def assign_benefit_group(sponsorship:, old_sponsorship:)
+        old_application = old_sponsorship.benefit_applications.first
+        return if old_application.benefit_groups.empty?
+        bg = old_application.benefit_groups.first
+        new_application = sponsorship.benefit_applications.first
+
+        new_bg = new_application.benefit_groups.build({
+          title: bg.title,
+          reference_plan_id: bg.reference_plan_id,
+          plan_option_kind: bg.plan_option_kind,
+          elected_plans: bg.elected_plans
+        })
+
+        bg.composite_tier_contributions.each do |contribution|
+          new_bg.composite_tier_contributions << contribution.clone
+        end
+        bg.relationship_benefits.each do |rb|
+          new_bg.relationship_benefits << rb.clone
+        end
+
+        new_bg.estimate_composite_rates
+        new_application.benefit_sponsorship.benefit_sponsorable.save!
       end
 
       def plan_design_proposal
