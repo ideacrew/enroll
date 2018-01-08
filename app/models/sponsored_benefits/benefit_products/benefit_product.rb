@@ -37,6 +37,12 @@ module SponsoredBenefits
         SponsoredBenefits::Organizations::IssuerProfile.find(issuer_profile_id)
       end
 
+      def sponsor_eligibility_policies
+      end
+
+      def member_eligibility_policies
+      end
+
       # builders: sponsor (rating area, sic), effective_date
 
       ## Dates
