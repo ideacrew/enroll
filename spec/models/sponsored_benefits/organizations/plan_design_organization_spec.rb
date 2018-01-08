@@ -5,7 +5,7 @@ module SponsoredBenefits
 
     describe "#expire proposals for non Prospect Employer" do
       let!(:organization) { create(:plan_design_organization,
-                              customer_profile_id: "1234",
+                              sponsor_profile_id: "1234",
                               owner_profile_id: "5678",
                               legal_name: "ABC Company",
                               sic_code: "0345" ) }
@@ -39,7 +39,7 @@ module SponsoredBenefits
 
     describe "#expire proposals for Prospect" do
       let!(:organization) { create(:plan_design_organization,
-                        customer_profile_id: nil,
+                        sponsor_profile_id: nil,
                         owner_profile_id: "5678",
                         legal_name: "ABC Company",
                         sic_code: "0345" ) }

@@ -14,13 +14,14 @@ module Queries
 
     def build_scope()
       return [] if @plan_design_organization.nil?
-      case @custom_attributes[:clients]
-      when "active_clients"
-        @plan_design_organization.active_clients
-      when "inactive_clients"
-        @plan_design_organization.inactive_clients
-      when "prospect_employers"
-        @plan_design_organization.prospect_employers
+
+      case @custom_attributes[:sponsors]
+      when "active_sponsors"
+        @plan_design_organization.active_sponsors
+      when "inactive_sponsors"
+        @plan_design_organization.inactive_sponsors
+      when "prospect_sponsors"
+        @plan_design_organization.prospect_sponsors
       else
         if @search_string.present?
           @plan_design_organization.datatable_search(@search_string)

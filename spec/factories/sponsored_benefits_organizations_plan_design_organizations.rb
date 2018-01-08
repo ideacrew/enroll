@@ -3,7 +3,7 @@ FactoryGirl.define do
     legal_name  "Turner Agency, Inc"
     dba         "Turner Brokers"
 
-    sequence :customer_profile_id do |n|
+    sequence :sponsor_profile_id do |n|
       "12345#{n}"
     end
 
