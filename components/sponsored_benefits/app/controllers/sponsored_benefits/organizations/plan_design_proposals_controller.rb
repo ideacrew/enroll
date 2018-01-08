@@ -180,7 +180,7 @@ module SponsoredBenefits
     end
 
     def published_plans_are_view_only
-      if @plan_design_proposal.published?
+      if @plan_design_proposal.published? || @plan_design_proposal.claimed?
         redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
       end
     end
