@@ -31,7 +31,7 @@ module SponsoredBenefits
         def assign_employer(broker_agency:, employer:, office_locations:)
           org = find_or_initialize_broker_profile(broker_agency)
 
-          plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_customer(broker_agency.id, employer.id)
+          plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency.id, employer.id)
 
           if plan_design_organization
             plan_design_organization.has_active_broker_relationship = true
@@ -40,7 +40,7 @@ module SponsoredBenefits
           else
             org.broker_agency_profile.plan_design_organizations.new().tap do |org|
               org.owner_profile_id = broker_agency._id
-              org.customer_profile_id = employer._id
+              org.sponsor_profile_id = employer._id
               org.office_locations = office_locations
               org.fein = employer.fein
               org.legal_name = employer.legal_name
@@ -53,7 +53,7 @@ module SponsoredBenefits
 
         def unassign_broker(broker_agency:, employer:)
           return if broker_agency.nil?
-          plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_customer(broker_agency.id, employer.id)
+          plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency.id, employer.id)
           return unless plan_design_organization.present?
           plan_design_organization.has_active_broker_relationship = false
           plan_design_organization.sic_code ||= employer.sic_code

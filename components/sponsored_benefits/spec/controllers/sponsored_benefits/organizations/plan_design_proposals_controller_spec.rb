@@ -8,11 +8,11 @@ module SponsoredBenefits
     let(:current_person) { double(:current_person) }
     let(:broker_role) { double(:broker_role, broker_agency_profile_id: '12345') }
     let(:datatable) { double(:datatable) }
-    let(:customer) { double(:customer, id: '555', sic_code: '1111') }
+    let(:sponsor) { double(:sponsor, id: '555', sic_code: '1111') }
     let(:active_user) { double(:has_hbx_staff_role? => false) }
 
     let!(:plan_design_organization) { 
-      create(:plan_design_organization, customer_profile_id: customer.id, owner_profile_id: '12345', plan_design_proposals: [ plan_design_proposal ], sic_code: customer.sic_code ) 
+      create(:plan_design_organization, sponsor_profile_id: sponsor.id, owner_profile_id: '12345', plan_design_proposals: [ plan_design_proposal ], sic_code: sponsor.sic_code ) 
     }
 
     let!(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }

@@ -8,7 +8,7 @@
             if row.broker_relationship_inactive?
               row.legal_name
             else
-              (link_to row.legal_name, main_app.employers_employer_profile_path(id: row.customer_profile_id, :tab=>'home'))
+              (link_to row.legal_name, main_app.employers_employer_profile_path(id: row.sponsor_profile_id, :tab=>'home'))
             end
             }, :sortable => false, :filter => false
           table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
@@ -106,13 +106,13 @@
 
         def nested_filter_definition
           {
-            clients:[
+            sponsors:[
                   { scope: 'all', label: 'All'},
-                  { scope: 'active_clients', label: 'Active'},
-                  { scope: 'inactive_clients', label: 'Inactive'},
-                  { scope: 'prospect_employers', label: "Prospects" }
+                  { scope: 'active_sponsors', label: 'Active'},
+                  { scope: 'inactive_sponsors', label: 'Inactive'},
+                  { scope: 'prospect_sponsors', label: "Prospects" }
                 ],
-            top_scope: :clients
+            top_scope: :sponsors
           }
         end
 
