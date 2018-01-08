@@ -29,6 +29,7 @@ module SponsoredBenefits
       scope :draft, -> { any_in(aasm_state: %w(draft renewing_draft)) }
       scope :published, -> { any_in(aasm_state: %w(published renewing_published)) }
       scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
+      scope :claimed, -> { any_in(aasm_state: %w(claimed renewing_claimed)) }
 
       def active_benefit_group
         return nil if profile.nil?
