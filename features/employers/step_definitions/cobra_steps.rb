@@ -159,8 +159,8 @@ And(/^.+ should see census employee created success message for (.*)$/) do |name
   expect(page).to have_content(person[:last_name])
 end
 
-Then(/employer should see the message Your employee was successfully added to your roster on page/) do
-  expect(page).to have_content('Your employee was successfully added to your roster')
+Then(/employer should see the message Census Employee is successfully created/) do
+  expect(page).to have_content('Census Employee is successfully created.')
   person = people_for_cobra['Jack Employee']
   expect(page).to have_content(person[:first_name])
   expect(page).to have_content(person[:last_name])

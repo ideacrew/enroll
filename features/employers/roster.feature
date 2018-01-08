@@ -57,7 +57,7 @@ Feature: Employer can view their employees
     When they visit the Employee Roster
     And clicks on the Add New Employee button
     Then fill the form with hired date as future date
-    Then employer should see the message Your employee was successfully added to your roster on page
+    Then employer should see the message Census Employee is successfully created
     And employer logs out
 
   Scenario: When ER searches for an EE on the roster through different tabs
