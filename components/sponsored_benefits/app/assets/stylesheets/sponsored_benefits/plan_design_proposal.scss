@@ -379,11 +379,14 @@ $brand-primary: $mhc-dark-blue;
    display: inline;
  }
 
- input[type=checkbox] {
+ .benefits-fields input[type=checkbox] {
     display: none;
     + label > i.fa {
       color: #69A30D;
     }
+  }
+  table input[type=checkbox] {
+    display: inline-block;
   }
   .checkbox {
     display: block;
