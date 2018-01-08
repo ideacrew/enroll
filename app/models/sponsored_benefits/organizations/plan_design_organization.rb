@@ -9,10 +9,6 @@ module SponsoredBenefits
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'
 
-      # field :profile_kind, type: String, default: ":plan_design_profile"
-
-      field :has_active_broker_relationship, type: Boolean, default: false
-
       # Registered legal name
       field :legal_name, type: String
 
@@ -29,35 +25,52 @@ module SponsoredBenefits
       field :owner_profile_id,    type: BSON::ObjectId
       field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
 
-      # Plan design customer profile type & ID
-      field :customer_profile_id,         type: BSON::ObjectId
-      field :customer_profile_class_name, type: String, default: "::EmployerProfile"
+      # Plan design sponsor profile type & ID
+      field :sponsor_profile_id,         type: BSON::ObjectId
+      field :sponsor_profile_class_name, type: String, default: "::EmployerProfile"
+
+      field :has_active_broker_relationship, type: Boolean, default: false
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
 
-      validates_presence_of :legal_name, :sic_code
-      validates_uniqueness_of :owner_profile_id, :scope => :customer_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
-      validates_uniqueness_of :customer_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.customer_profile_id.nil? }
+      validates_presence_of   :legal_name, :sic_code, :has_active_broker_relationship
+      validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
+      validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
 
-      scope :find_by_proposal,  -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
-      scope :find_by_customer,  -> (customer_id) { where(:"customer_profile_id" => BSON::ObjectId.from_string(customer_id)) }
-      scope :find_by_owner,     -> (owner_id) { where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id)) }
 
-      scope :active_clients, -> { where(:has_active_broker_relationship => true) }
-      scope :inactive_clients, -> { where(:has_active_broker_relationship => false) }
-      scope :prospect_employers, -> { where(:customer_profile_id => nil) }
-      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      index({"owner_profile_id" => 1})
+      index({"sponsor_profile_id" => 1})
+      index({"has_active_broker_relationship" => 1})
+      index({"plan_design_proposal._id" => 1})
+      index({"plan_design_proposals.aasm_state" => 1})
 
-      scope :draft_proposals, -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
+
+      # TODO These scopes must use both the Profile Class and ID.  Change to pass in profile instance
+      scope :find_by_owner,       -> (owner_id) { where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id)) }
+      scope :find_by_sponsor,     -> (sponsor_id) { where(:"sponsor_profile_id" => BSON::ObjectId.from_string(sponsor_id)) }
+
+      scope :find_by_proposal,    -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
+
+      scope :active_sponsors,     -> { where(:has_active_broker_relationship => true) }
+      scope :inactive_sponsors,   -> { where(:has_active_broker_relationship => false) }
+      scope :prospect_sponsors,   -> { where(:sponsor_profile_id => nil) }
+
+      scope :draft_proposals,     -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
+
+      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, 
+                                                                      {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
+
+
 
       def employer_profile
-        ::EmployerProfile.find(customer_profile_id)
+        ::EmployerProfile.find(sponsor_profile_id)
       end
 
       def broker_agency_profile
         ::BrokerAgencyProfile.find(owner_profile_id)
       end
 
+      # TODO Move this method to BenefitMarket Model
       def service_areas_available_on(date)
         if use_simple_employer_calculation_model?
           return []
@@ -70,7 +83,7 @@ module SponsoredBenefits
       end
 
       def is_prospect?
-        customer_profile_id.nil?
+        sponsor_profile_id.nil?
       end
 
       def expire_proposals
@@ -111,8 +124,9 @@ module SponsoredBenefits
       end
 
       class << self
-        def find_by_owner_and_customer(owner_id, customer_id)
-          where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id), :"customer_profile_id" => BSON::ObjectId.from_string(customer_id)).first
+        #TODO Pass object instances, not IDs
+        def find_by_owner_and_sponsor(owner_id, sponsor_id)
+          where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id), :"sponsor_profile_id" => BSON::ObjectId.from_string(sponsor_id)).first
         end
       end
 

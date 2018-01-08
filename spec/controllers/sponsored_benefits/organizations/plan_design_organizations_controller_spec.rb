@@ -21,12 +21,12 @@ module SponsoredBenefits
     let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
                                     legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization) }
     let(:old_broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
-    let!(:plan_design_organization) { create(:plan_design_organization, customer_profile_id: employer.id,
+    let!(:plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: employer.id,
                                                                         owner_profile_id: broker_agency_profile_id,
                                                                         legal_name: employer.name,
                                                                         sic_code: employer.sic_code ) }
 
-    let!(:prospect_plan_design_organization) { create(:plan_design_organization, customer_profile_id: nil,
+    let!(:prospect_plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: nil,
                                                                     owner_profile_id: broker_agency_profile_id,
                                                                     legal_name: employer.name,
                                                                     sic_code: employer.sic_code ) }
@@ -239,7 +239,7 @@ module SponsoredBenefits
           end
 
           context "when attempting to delete plan design organizations without existing quotes" do
-            let!(:prospect_plan_design_organization) { create(:plan_design_organization, customer_profile_id: nil, owner_profile_id: broker_agency_profile.id,
+            let!(:prospect_plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: nil, owner_profile_id: broker_agency_profile.id,
                                                                                 legal_name: 'ABC Company', sic_code: '0197' ) }
 
             it "destroys the requested prospect_plan_design_organization" do
@@ -255,7 +255,7 @@ module SponsoredBenefits
           end
 
           context "when attempting to delete plan design organizations with existing quotes" do
-            let!(:prospect_plan_design_organization) { create(:plan_design_organization, customer_profile_id: '1', owner_profile_id: '12345',
+            let!(:prospect_plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: '1', owner_profile_id: '12345',
                                                       plan_design_proposals: [ plan_design_proposal ], sic_code: '0197' ) }
             let(:plan_design_proposal) { build(:plan_design_proposal) }
 
