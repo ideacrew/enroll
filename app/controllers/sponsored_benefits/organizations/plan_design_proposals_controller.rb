@@ -5,6 +5,7 @@ module SponsoredBenefits
     before_action :load_plan_design_organization, except: [:destroy, :publish, :claim, :show]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
     before_action :published_plans_are_view_only, only: [:edit]
+    before_action :claimed_quotes_are_view_only, only: [:edit]
 
     def index
       @datatable = effective_datatable
@@ -180,7 +181,13 @@ module SponsoredBenefits
     end
 
     def published_plans_are_view_only
-      if @plan_design_proposal.published? || @plan_design_proposal.claimed?
+      if @plan_design_proposal.published?
+        redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
+      end
+    end
+
+    def claimed_quotes_are_view_only
+      if @plan_design_proposal.claimed?
         redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
       end
     end
