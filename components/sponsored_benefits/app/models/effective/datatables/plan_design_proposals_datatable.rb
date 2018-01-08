@@ -59,13 +59,14 @@
         end
 
         def edit_quote_link_type(row)
-          return "disabled" if row.published? || row.expired?
+          return "disabled" if row.published? || row.expired? || row.claimed?
           "static"
         end
 
         def publish_or_view_quote_link(row:, publish_link:, show_link:)
           return ['View Published Quote', show_link, 'static'] if row.published?
           return ['View Expired Quote', show_link, 'static'] if row.expired?
+          return ['View Claimed Quote', show_link, 'static'] if row.claimed?
           ['View Published Quote', show_link, 'disabled']
         end
 
