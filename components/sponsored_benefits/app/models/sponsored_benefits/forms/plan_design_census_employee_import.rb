@@ -1,6 +1,6 @@
 module SponsoredBenefits
   module Forms
-    class PlanDesignCensusEmployeeImport < CensusEmployeeImport
+    class PlanDesignCensusEmployeeImport < SponsoredBenefits::Forms::CensusEmployeeImport
 
       attr_accessor :proposal
 

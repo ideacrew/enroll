@@ -411,7 +411,7 @@ class BenefitGroup
     pcd = if @is_congress
       decorated_plan(plan, ce)
     elsif plan_option_kind == 'sole_source' && !plan.dental?
-      CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+      CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
     else
       PlanCostDecorator.new(plan, ce, self, reference_plan)
     end

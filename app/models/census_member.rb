@@ -51,4 +51,27 @@ class CensusMember
     end
     write_attribute(:gender, val.downcase)
   end
+
+  def relationship_string
+    if is_a?(CensusEmployee)
+      "employee"
+    else
+      relationship_mapping[employee_relationship]
+    end
+  end
+
+  def relationship_mapping
+    {
+      "self" => "employee",
+      "spouse" => "spouse",
+      "domestic_partner" => "domestic partner",
+      "child_under_26" => "child",
+      "disabled_child_26_and_over" => "disabled child"
+    }
+  end
+
+  def email_address
+    return nil unless email.present?
+    email.address
+  end
 end

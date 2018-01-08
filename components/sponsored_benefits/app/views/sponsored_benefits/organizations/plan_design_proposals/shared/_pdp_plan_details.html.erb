@@ -3,7 +3,7 @@
     <tbody>
       <tr>
         <th>Benefit Model Selection</th>
-        <td></td>
+        <td><%= Settings.plan_option_titles.send(@benefit_group.plan_option_kind.to_sym) %></td>
       </tr>
       <tr>
         <th>Plan Name</th>
@@ -12,10 +12,6 @@
       <tr>
         <th>Plan Coverage Level</th>
         <td><%= display_dental_metal_level @plan %></td>
-      </tr>
-      <tr>
-        <th>Network</th>
-        <td></td>
       </tr>
       <tr>
         <th>Plan Carrier</th>
@@ -39,4 +35,8 @@
 <div class="col-md-4">
   <h2 class="text-center employer-cost-text">Estimated Maximum Monthly Employer Cost</h2>
   <h2 class="employer-monthly-cost text-center"></h2>
+  <div class="text-center">
+    <%= link_to "Download PDF", sponsored_benefits.new_organizations_plan_design_proposal_plan_export_path(@plan_design_proposal), class: 'btn btn-default', id: 'downloadReferencePlanDetailsButton' %>
+    <label class="sbc-download-label" for="sbc-checkbox"><%= check_box_tag "include_sbc", true, true, class: "sbc-download-checkbox" %> Include SBC</label>
+  </div>
 </div>

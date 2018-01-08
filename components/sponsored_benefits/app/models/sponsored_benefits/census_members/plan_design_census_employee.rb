@@ -16,6 +16,7 @@ module SponsoredBenefits
       field :hired_on, type: Date
       field :aasm_state, type: String
       field :expected_selection, type: String, default: "enroll"
+      field :employment_terminated_on, type: Date
 
       # field :employer_profile_id, type: BSON::ObjectId
       field :benefit_sponsorship_id, type: BSON::ObjectId
@@ -158,6 +159,74 @@ module SponsoredBenefits
           relationships.many? ? ::CompositeRatingTier::FAMILY : ::CompositeRatingTier::EMPLOYEE_AND_SPOUSE
         else
           ::CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
+        end
+      end
+
+      def self.to_csv
+
+        columns = [
+          "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
+          "Relationship (EE, Spouse, Domestic Partner, or Child)",
+          "Last Name",
+          "First Name",
+          "Middle Name or Initial (optional)",
+          "Suffix (optional)",
+          "Email Address",
+          "SSN / TIN (Required for EE & enter without dashes)",
+          "Date of Birth (MM/DD/YYYY)",
+          "Gender",
+          "Date of Hire",
+          "Date of Termination (optional)",
+          "Is Business Owner?",
+          "Benefit Group (optional)",
+          "Plan Year (Optional)",
+          "Address Kind(Optional)",
+          "Address Line 1(Optional)",
+          "Address Line 2(Optional)",
+          "City(Optional)",
+          "State(Optional)",
+          "Zip(Optional)"
+        ]
+
+        CSV.generate(headers: true) do |csv|
+          csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
+          csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
+          csv << columns
+          all.each do |census_employee|
+            ([census_employee] + census_employee.census_dependents.to_a).each do |census_member|
+              values = [
+                census_member.employer_assigned_family_id,
+                census_member.relationship_string,
+                census_member.last_name,
+                census_member.first_name,
+                census_member.middle_name,
+                census_member.name_sfx,
+                census_member.email_address,
+                census_member.ssn,
+                census_member.dob.strftime("%m/%d/%Y"),
+                census_member.gender
+              ]
+
+              if census_member.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+                values += [
+                  census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
+                  census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
+                  census_member.is_business_owner ? "yes" : "no"
+                ]
+              else
+                values += ["", "", "no"]
+              end
+
+              values += 2.times.collect{ "" }
+              if census_member.address.present?
+                values += census_member.address.to_a
+              else
+                values += 6.times.collect{ "" }
+              end
+
+              csv << values
+            end
+          end
         end
       end
 

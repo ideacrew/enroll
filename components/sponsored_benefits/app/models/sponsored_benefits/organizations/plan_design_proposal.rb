@@ -29,14 +29,26 @@ module SponsoredBenefits
       scope :draft, -> { any_in(aasm_state: %w(draft renewing_draft)) }
       scope :published, -> { any_in(aasm_state: %w(published renewing_published)) }
       scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
+      scope :claimed, -> { any_in(aasm_state: %w(claimed renewing_claimed)) }
 
       def active_benefit_group
+        return nil if profile.nil?
         return nil if profile.benefit_sponsorships.empty?
         sponsorship = profile.benefit_sponsorships.first
         return nil if sponsorship.benefit_applications.empty?
         application = sponsorship.benefit_applications.first
         return nil if application.benefit_groups.empty?
         application.benefit_groups.first
+      end
+
+      def active_census_employees
+        return nil if profile.benefit_sponsorships.empty?
+        sponsorship = profile.benefit_sponsorships.first
+        sponsorship.census_employees
+      end
+
+      def active_census_familes
+        active_census_employees.where({ "census_dependents.0" => { "$exists" => true } })
       end
 
       # class methods
@@ -73,19 +85,15 @@ module SponsoredBenefits
 
 
         # this method creates a draft plan year from a valid claim code entered on benefits page(in employer portal).
-        def build_plan_year_from_quote(employer_profile_id, quote)
-          employer_profile = EmployerProfile.find(employer_profile_id)
+        def build_plan_year_from_quote(employer_profile, quote)
           builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(quote, employer_profile)
-          if builder.add_plan_year
+          if builder.quote_valid?
+            builder.add_plan_year
             # builder.add_census_members
             quote.claim_date = TimeKeeper.date_of_record
             quote.claim!
-            return true
-          else
-            return false # if draft plan year was not created, return false.
           end
         end
-
       end
 
       def can_quote_be_published?
