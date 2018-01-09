@@ -102,11 +102,6 @@ def update_aptc(row)
   return unless person.primary_family
   @household = person.primary_family.active_household
 
-  if @household.tax_households.present?
-    active_tax_households = @household.tax_households.active_tax_household
-    active_tax_households.update_all(effective_ending_on: Date.new(2017,12,31)) if active_tax_households
-  end
-
   th = @household.tax_households.build(
     allocated_aptc: 0.0,
     effective_starting_on: Date.new(2018,1,1),
