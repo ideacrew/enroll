@@ -642,8 +642,6 @@ class MetalLevel
     metal_level = safe_assign(metal_level)
     my_level = self.name.upcase
     compared_level = metal_level.name.upcase
-    pp "#{my_level} compared to #{compared_level}"
-    pp METAL_LEVEL_ORDER.index(my_level) <=> METAL_LEVEL_ORDER.index(compared_level)
     METAL_LEVEL_ORDER.index(my_level) <=> METAL_LEVEL_ORDER.index(compared_level)
   end
 
