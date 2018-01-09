@@ -19,9 +19,6 @@
   </div>
   <% end %>
 <% else %>
-  <br><br>
-  <p class="twenty plan_heading_text">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explaned %></p>
-  <br/>
   <% reference_plans = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>
       <% reference_plans = reference_plans_for_metal_level - ['dental'] %>
