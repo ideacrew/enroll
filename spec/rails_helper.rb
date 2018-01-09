@@ -65,6 +65,7 @@ RSpec.configure do |config|
   config.extend ControllerMacros, :type => :controller #real logins for integration testing
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
+  config.include FederalHolidaysHelper
 
   config.infer_spec_type_from_file_location!
 
