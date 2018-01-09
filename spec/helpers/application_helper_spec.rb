@@ -408,15 +408,4 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
   end
-
-  describe "#irs_url" do
-
-    it "should return the url of the IRS" do
-      expect(helper.irs_url).to eq 'www.irs.gov'
-    end
-
-    it "should not be a nil" do
-      expect(helper.irs_url).not_to eq nil
-    end
-  end
 end

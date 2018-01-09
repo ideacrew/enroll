@@ -33,10 +33,10 @@ content: "You will not receive any tax forms from #{Settings.site.short_name} fo
 content: "You may receive a tax form from your health insurance company.  Health insurance companies are encouraged (but not required) to provide a tax form for those enrolled in catastrophic coverage.  Contact your insurance company directly for more information on this tax form."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "#{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. If you have questions about this letter or your catastrophic health plan, go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at (855) 532-5465."} %>
+content: "#{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. If you have questions about this letter or your catastrophic health plan, go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{irs_url}>IRS.gov</a>."} %>
+content: "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
 
 <br>
 

@@ -651,9 +651,5 @@ module ApplicationHelper
   def previous_year
     TimeKeeper.date_of_record.year - 1
   end
-
-  def irs_url
-    "www.irs.gov"
-  end
 end
 
