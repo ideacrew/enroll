@@ -649,7 +649,7 @@ module ApplicationHelper
   end
 
   def previous_year
-    TimeKeeper.date_of_record.year - 1
+    TimeKeeper.date_of_record.prev_year.year
   end
 end
 
