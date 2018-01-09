@@ -99,7 +99,11 @@
                     <div class="enroll-checkbox">
                       <div class="checkbox">
                         <label>
+                        <%unless broker_carrier_appointments_enabled?%>
                           <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", value == "true" ? true : false %>
+                        <%else%>
+                          <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", true, disabled: true %>
+                        <%end%>
                           <%= label_tag "person[broker_role_attributes][carrier_appointments][#{name}]" do %>
                             <i class="fa fa-check-square-o fa-2x"></i>
                             <i class="fa fa-square-o fa-2x"></i>
@@ -119,6 +123,9 @@
                   </div>
                 </div>
               <% end %>
+              <%if broker_carrier_appointments_enabled?%>
+                <p class="text-info"><span class="glyphicon glyphicon-info-sign"></span>Note: Carrier appointments for broker are not necessary for participation in <%="#{site_long_name}"%>.</p>
+              <%end%>
             </td>
           </tr>
           <% disabled = (broker_or_staff_role.active? || broker_or_staff_role.agency_pending?) ? true : false %>
