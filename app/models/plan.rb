@@ -548,7 +548,13 @@ class Plan
         'plan_deductible': []
       }
       options.each do |option, value|
-        collected = plans.collect { |plan| plan.send(option) }.uniq.sort
+        collected = plans.collect { |plan|
+          if option == :metal_level
+            MetalLevel.new(plan.send(option))
+          else
+            plan.send(option)
+          end
+        }.uniq.sort
         unless collected.none?
           options[option] = collected
         end
@@ -618,4 +624,44 @@ class Plan
       feature_array
     end
   end
+end
+
+class MetalLevel
+  include Comparable
+  attr_reader :name
+  METAL_LEVEL_ORDER = %w(BRONZE SILVER GOLD PLATINUM)
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    @name
+  end
+
+  def <=>(metal_level)
+    metal_level = safe_assign(metal_level)
+    my_level = self.name.upcase
+    compared_level = metal_level.name.upcase
+    pp "#{my_level} compared to #{compared_level}"
+    pp METAL_LEVEL_ORDER.index(my_level) <=> METAL_LEVEL_ORDER.index(compared_level)
+    METAL_LEVEL_ORDER.index(my_level) <=> METAL_LEVEL_ORDER.index(compared_level)
+  end
+
+  def eql?(metal_level)
+    metal_level = safe_assign(metal_level)
+    METAL_LEVEL_ORDER.index(self.name) ==  METAL_LEVEL_ORDER.index(metal_level.name)
+  end
+
+  def hash
+    @name.hash
+  end
+
+  private
+
+    def safe_assign(metal_level)
+      if metal_level.is_a? String
+        metal_level = MetalLevel.new(metal_level)
+      end
+      metal_level
+    end
 end
