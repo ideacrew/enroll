@@ -32,7 +32,7 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
     expect(rendered).to have_selector('h3', text: 'TAX INFORMATION FOR YOUR CATASTROPHIC HEALTH PLAN')
     expect(rendered).to match /Dear #{person.full_name}:/
     expect(rendered).to match /You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}./
-    expect(rendered).to match /For more information on these topics, consult a tax adviser or visit the IRS website at <a href='www.irs.gov'./
+    expect(rendered).to match "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{irs_url}>IRS.gov</a>."
     expect(rendered).to match /If you have questions or concerns, we’re here to help./
     expect(rendered).to match /The #{Settings.site.short_name} Team/
   end

@@ -36,7 +36,9 @@ content: "You may receive a tax form from your health insurance company.  Health
 content: "#{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. If you have questions about this letter or your catastrophic health plan, go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at (855) 532-5465."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "For more information on these topics, consult a tax adviser or visit the IRS website at <a href='www.irs.gov'."} %>
+content: "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{irs_url}>IRS.gov</a>."} %>
+
+<br>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help."} %>
