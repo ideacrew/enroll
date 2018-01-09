@@ -159,22 +159,6 @@ function planSelected() {
   clearComparisons();
 }
 
-// function reconcileSliderAndInputVal() {
-//   if ( $(this).hasClass('hidden-param') )  {
-//     var hidden = parseInt($(this).val());
-//     if (hidden < 0) {
-//       hidden = 0;
-//     } else if (hidden > 100) {
-//       hidden = 100;
-//     }
-//     var mySlider = $(this).closest('.form-group').find('input.slider');
-//     mySlider.bootstrapSlider('setValue', hidden);
-//     $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
-//     $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
-//     $(this).val(hidden);
-//   }
-// }
-
 function setSliderDisplayVal(slideEvt) {
   $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
   $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
@@ -282,7 +266,8 @@ function initSlider() {
       return 'Contribution Percentage: ' + value + '%';
     },
     max: 100,
-    min: 0
+    min: 0,
+    step: 1
   });
 }
 
