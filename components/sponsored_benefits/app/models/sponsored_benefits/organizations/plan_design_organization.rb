@@ -41,8 +41,8 @@ module SponsoredBenefits
       index({"owner_profile_id" => 1})
       index({"sponsor_profile_id" => 1})
       index({"has_active_broker_relationship" => 1})
-      index({"plan_design_proposal._id" => 1})
-      index({"plan_design_proposals.aasm_state" => 1})
+      index({"plan_design_proposals._id" => 1})
+      index({"plan_design_proposals.aasm_state" => 1, "plan_design_proposals.claim_code" => 1})
 
 
       # TODO These scopes must use both the Profile Class and ID.  Change to pass in profile instance
@@ -113,6 +113,9 @@ module SponsoredBenefits
       end
 
       def build_proposal_from_existing_employer_profile
+
+        # TODO Use Subclass that belongs to this set, e.g. SponsoredBenefits::BenefitApplications::AcaShopCcaPlanDesignProposalBuilder
+
         builder = SponsoredBenefits::BenefitApplications::PlanDesignProposalBuilder.new(self, calculate_start_on_dates[0])
         builder.add_plan_design_profile
         builder.add_benefit_application
