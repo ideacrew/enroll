@@ -2,6 +2,9 @@ require 'csv'
 @pdc = 0
 @slcsp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.slcsp_id
 @wrong_ssn_counter = 0
+@current_date = TimeKeeper.date_of_record
+@current_year = @current_date.year
+@next_year  = @current_year+1
 
 def check_duplicated
   valid_people = {}
@@ -57,7 +60,7 @@ def check_and_run
   running = []
 
   CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
-    ssn, hbx_id, aptc, csr = row_with_ssn
+    ssn, hbx_id, aptc, csr , loaded_e_pdc_id = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
@@ -66,22 +69,21 @@ def check_and_run
     unless person
       person = Person.by_hbx_id(hbx_id).first rescue nil
     end
-
     if person
       unless person.primary_family
         not_run << {no_family: ssn}
         puts "Person with ssn: #{ssn} has no family."
         next
       end
-      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2018).try(:latest_eligibility_determination)
-      if deter && deter.e_pdc_id =~ /MANUALLY_10_06_2017LOADING/
+      deter = person.primary_family.active_household.latest_active_tax_household_with_year(@next_year).try(:latest_eligibility_determination)
+      if deter && deter.e_pdc_id.chop == loaded_e_pdc_id.to_s
         deter.update_attributes(max_aptc: aptc)
         deter.csr_percent_as_integer = csr
         deter.save
         ran << person.hbx_id
         print 'r'
       else
-        row=[person.hbx_id, aptc, csr]
+        row=[person.hbx_id, aptc, csr,loaded_e_pdc_id]
         update_aptc(row)
         running << person.hbx_id
         print '#'
@@ -104,7 +106,7 @@ def update_aptc(row)
 
   th = @household.tax_households.build(
     allocated_aptc: 0.0,
-    effective_starting_on: Date.new(2018,1,1),
+    effective_starting_on: Date.new(@next_year,1,1),
     is_eligibility_determined: true,
     submitted_at: Date.today
   )
@@ -118,7 +120,7 @@ def update_aptc(row)
   @pdc+=1
 
   deter = th.eligibility_determinations.build(
-    e_pdc_id: "MANUALLY_10_06_2017LOADING" + @pdc.to_s,
+    e_pdc_id: row[3].to_s + @pdc.to_s,
     benchmark_plan_id: @slcsp,
     max_aptc: row[1],
     csr_percent_as_integer: row[2],
