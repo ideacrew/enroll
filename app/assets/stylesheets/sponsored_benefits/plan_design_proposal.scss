@@ -54,6 +54,7 @@ $brand-primary: $mhc-dark-blue;
   .plan-type-filters {
     ul {
       list-style: none;
+      padding-left: 10%;
     }
     input.plan-filter-checkbox[type=checkbox] {
       display: inline-block;

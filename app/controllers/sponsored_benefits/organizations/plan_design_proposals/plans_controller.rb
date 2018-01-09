@@ -15,6 +15,12 @@ module SponsoredBenefits
             offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:active_year])
           end
         @search_options = ::Plan.search_options(@plans)
+        @search_option_titles = {
+                'plan_type': 'HMO / PPO',
+                'plan_hsa': 'HSA - Compatible',
+                'metal_level': 'Metal Level',
+                'plan_deductible': 'Individual deductible (in network)'
+              }
       end
 
       private
