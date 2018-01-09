@@ -64,8 +64,8 @@ module SponsoredBenefits
         def find_quote(quote_claim_code)
           # search plan_design_proposal with published status and user entered claim code.
           organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
-            "plan_design_proposals.claim_code" => quote_claim_code,
-            "plan_design_proposals.aasm_state" => "published"
+            "plan_design_proposals.aasm_state" => "published",
+            "plan_design_proposals.claim_code" => quote_claim_code
           ).first
 
           return nil if organization.blank?
