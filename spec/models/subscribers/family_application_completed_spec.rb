@@ -393,7 +393,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
         expect(tax_household_db.current_max_aptc).to eq max_aptc
-        expect(tax_household_db.effective_ending_on).to be_truthy
+        expect(tax_household_db.effective_ending_on).to eq nil
       end
 
       it "should have a new tax household with the same aptc data" do
