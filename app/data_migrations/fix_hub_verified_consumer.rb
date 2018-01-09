@@ -2,14 +2,16 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixHubVerifiedConsumer < MongoidMigrationTask
   def migrate
-    event_name = ENV['event_name']
-    people = get_people if event_name == "fix_outstanding_people"
-    people = get_unverified_people if event_name == "fix_unverified_people"
-    people.each do |person|
-      person.verification_types.each do |v_type|
-        if type_verified_by_hub(person, v_type)
-          update_verification_type(person, v_type)
-          puts "Person TYPE verified person: #{person.id} type: #{v_type}" unless Rails.env.test?
+    events = ENV['event_name'] ? [ ENV['event_name'] ] : [ "fix_outstanding_people", "fix_unverified_people"]
+    events.each do |event_name|
+      people = get_people if event_name == "fix_outstanding_people"
+      people = get_unverified_people if event_name == "fix_unverified_people"
+      people.each do |person|
+        person.verification_types.each do |v_type|
+          if type_verified_by_hub(person, v_type)
+            update_verification_type(person, v_type)
+            puts "Person TYPE verified person: #{person.id} type: #{v_type}" unless Rails.env.test?
+          end
         end
       end
     end
