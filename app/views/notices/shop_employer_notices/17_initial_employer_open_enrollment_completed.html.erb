@@ -1,7 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -31,22 +31,22 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "#{Settings.site.short_name} now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online."}%>
 
-<%= render partial: 'notices/shared/paragraph_no_top_margin', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "<a href='https://www.e-BillExpress.com/ebpp/DCHealthPay'>https://www.e-BillExpress.com/ebpp/DCHealthPay'.</a>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>To make a secure electronic check payment by phone</strong>"} %>
 
-<%= render partial: 'notices/shared/paragraph_no_top_margin', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Call #{Settings.contact_center.phone_number} (LINK)"} %>
 
-<%= render partial: 'notices/shared/paragraph_no_top_margin', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Select your language (1 for English, 2 for Spanish, additional language options available)"} %>
 
-<%= render partial: 'notices/shared/paragraph_no_top_margin', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Select option for Small Business Employer"} %>
 
-<%= render partial: 'notices/shared/paragraph_no_top_margin', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Select option for Need to Make a Payment"} %>
 <br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
