@@ -46,15 +46,15 @@
           <th>Carrier</th>
           <th>Type</th>
           <th>Metal Level</th>
-          <th>Plans By</th>
+          <th>Offering By</th>
         </tr>
         <tbody>
           <tr>
             <td><%= @plan.name %></td>
             <td><%= @plan.carrier_profile.legal_name %></td>
-            <td><%= @plan.plan_type %></td>
-            <td><%= @plan.metal_level %></td>
-            <td><%= @benefit_group.plan_option_kind.humanize %></td>
+            <td><%= @plan.plan_type.upcase %></td>
+            <td><%= @plan.metal_level.capitalize %></td>
+            <td><%= Settings.plan_option_titles.send(@benefit_group.plan_option_kind.to_sym) %></td>
           </tr>
         </tbody>
       </table>
@@ -101,5 +101,3 @@
     <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps %>
   <% end %>
 </div>
-
-
