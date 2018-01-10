@@ -12,7 +12,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
     let(:coverage_household_members) {[double("coverage household member 2", family_member: family_member2), double("coverage household member 1", family_member: family_member1), double("coverage household member 3", family_member: family_member3)]}
     # let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
-    let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false)}
+    let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", coverage_kind: "health", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false)}
+    let(:coverage_kind) { hbx_enrollment.coverage_kind }
     let(:current_user) {FactoryGirl.create(:user)}
 
     before(:each) do
@@ -21,6 +22,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:coverage_household, coverage_household)
       assign(:market_kind, 'shop')
       assign(:hbx_enrollment, hbx_enrollment)
+      assign(:coverage_kind, coverage_kind)
       sign_in current_user
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
@@ -614,7 +616,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('h3', text: 'Marketplace')
     end
-    
+
     it "should not see employer-sponsored coverage radio option" do
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       render file: "insured/group_selection/new.html.erb"

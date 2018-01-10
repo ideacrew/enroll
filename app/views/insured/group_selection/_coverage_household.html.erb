@@ -38,8 +38,8 @@
 
             <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role) %>
 
-            <td class='<%= "health_errors_#{employee_role.id}" %>'><%= "This dependent is ineligible for employer-sponsored health coverage."  if !is_health_coverage && !is_health_coverage.nil? %></td>
-            <td class='<%= "dental_errors_#{employee_role.id}" %>'><%= "This dependent is ineligible for employer-sponsored dental coverage."  if !is_dental_coverage && !is_dental_coverage.nil? %></td>
+            <td class='<%= "health_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_health_coverage && !is_health_coverage.nil? %></td>
+            <td class='<%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_dental_coverage && !is_dental_coverage.nil? %></td>
           <% end %>
 
           <td class="ivl_errors"><%= raw(errors.join(', ')) if errors.present? %></td>
