@@ -63,7 +63,6 @@ module SponsoredBenefits
     end
 
     context "#to_plan_year" do
-      let!(:sponsored_benefits_benefit_group)            { FactoryGirl.create(:sponsored_benefits_benefit_group) }
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
@@ -88,7 +87,7 @@ module SponsoredBenefits
         plan_design_proposal.profile = profile
         profile.benefit_sponsorships = [benefit_sponsorship]
         benefit_sponsorship.benefit_applications = [benefit_application]
-        benefit_application.benefit_groups = [benefit_group]
+        benefit_application.benefit_groups.build
         plan_design_organization.save
       end
 
@@ -104,7 +103,6 @@ module SponsoredBenefits
     end
 
     context "#to_plan_year" do
-      let!(:sponsored_benefits_benefit_group)            { FactoryGirl.create(:sponsored_benefits_benefit_group) }
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
@@ -129,7 +127,7 @@ module SponsoredBenefits
         plan_design_proposal.profile = profile
         profile.benefit_sponsorships = [benefit_sponsorship]
         benefit_sponsorship.benefit_applications = [benefit_application]
-        benefit_application.benefit_groups = [benefit_group]
+        benefit_application.benefit_groups.build
         plan_design_organization.save
       end
 

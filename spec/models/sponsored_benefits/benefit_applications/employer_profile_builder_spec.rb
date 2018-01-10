@@ -19,8 +19,7 @@ module SponsoredBenefits
 
     context "add_plan_year" do
 
-      let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-      let!(:benefit_group)            { FactoryGirl.create(:benefit_group) }
+      let(:employer_profile)          { EmployerProfile.new }
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
@@ -45,11 +44,12 @@ module SponsoredBenefits
         plan_design_proposal.profile = profile
         profile.benefit_sponsorships = [benefit_sponsorship]
         benefit_sponsorship.benefit_applications = [benefit_application]
-        benefit_application.benefit_groups = [benefit_group]
+        benefit_application.benefit_groups.build
         plan_design_organization.save
       end
 
       it "should successfully add plan year to employer profile with published quote" do
+        allow(employer_profile).to receive(:active_plan_year).and_return(nil)
         plan_design_proposal.publish!
         builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(plan_design_proposal, employer_profile)
         expect(employer_profile.plan_years.present?).to eq false
