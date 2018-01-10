@@ -11,13 +11,13 @@ class BenefitSponsorship
   SERVICE_MARKET_KINDS = %w(shop individual coverall)
 
   field :service_markets, type: Array, default: []
+  validates_presence_of :service_markets
 
   # 2015, 2016, etc. (aka plan_year)
   embeds_many :benefit_coverage_periods
   embeds_many :geographic_rating_areas
 
   accepts_nested_attributes_for :benefit_coverage_periods, :geographic_rating_areas
-
   # Query Census member collection
   def census_employees
     @census_employees = CensusMembers::PlanDesignCensusEmployee.by_benefit_sponsorship(self)
