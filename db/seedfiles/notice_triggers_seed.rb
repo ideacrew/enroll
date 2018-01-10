@@ -1285,7 +1285,7 @@ ivl_notice_triggers = [
     event_name: 'ivl_tax_cover_letter_notice',
     notice_triggers: [
       {
-        name: 'Final Catastrophic Plan Notice',
+        name: '1095A Tax Cover Letter Notice',
         notice_template: 'notices/ivl/ivl_tax_cover_letter_notice',
         notice_builder: 'IvlNotices::IvlTaxCoverLetterPlanNotice',
         mpi_indicator: 'IVL_TAX',
