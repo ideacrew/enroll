@@ -25,7 +25,7 @@ $(document).on('page:load', pageInit);
 
 function pageInit() {
   if ($("#reference_plan_id").val() != '') {
-
+    calcPlanDesignContributions();
   } else {
     disableActionButtons();
     $('li.sole-source-tab').find('label').trigger('click');
