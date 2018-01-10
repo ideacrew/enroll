@@ -17,6 +17,7 @@ site:
   forms: "https://dchealthlink.com/forms"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
+  irs_url: "https://www.irs.gov/"
 
   social_media:
     facebook_url: ""
