@@ -75,6 +75,18 @@
     <a><i class="fa fa-info-circle" aria-hidden="true"></i> Note: Your monthly cost is based on final employee enrollment.</a>
   </div>
   <br /><br />
+  <% unless @benefit_group.sole_source? %>
+    <div class="col-md-12 no-pd">
+      <div class="panel panel-default">
+        <div class="panel-heading custom-heading">
+          <h3 class="panel-title">Employee Costs</h3>
+        </div>
+        <div class="panel-body">
+          <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary', benefit_group: @benefit_group %>
+        </div>
+      </div>
+    </div>
+  <% end %>
   <div class="col-md-12 no-pd">
     <div class="panel panel-default">
       <div class="panel-heading custom-heading">
