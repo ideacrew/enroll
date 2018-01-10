@@ -48,7 +48,7 @@
         <br />
         <div class="col-md-4 no-pd">
           <p class="th-gray">Employer Estimated Maximum Monthly Cost</p>
-          <h3 class="text-center">$<%= @employer_contribution_amount %></h3>
+          <h3 class="text-center"><%= number_to_currency(@employer_contribution_amount) %></h3>
         </div>
         <div class="col-md-8">
           <table class="table borderless">
@@ -60,8 +60,8 @@
               </tr>
               <tr>
                 <td style="width:490px">Total Estimated Monthly Cost for Plan Participants</td>
-                <td style="width:200px">$<%= @min_employee_cost %></td>
-                <td style="width:200px">$<%= @max_employee_cost %></td>
+                <td style="width:200px"><%= number_to_currency(@min_employee_cost) %></td>
+                <td style="width:200px"><%= number_to_currency(@max_employee_cost) %></td>
               </tr>
             </tbody>
           </table>
