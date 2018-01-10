@@ -1,4 +1,4 @@
-<%= wicked_pdf_stylesheet_link_tag "pdf" -%>
+<%= stylesheet_link_tag  wicked_pdf_asset_base64("pdf") %>
 <div class="container-fluid">
   <h3 style='text-align:center'>Plan Comparison Chart</h3>
   <div class="mygrid-wrapper-div">
@@ -53,7 +53,7 @@
             <th colspan="1"> COINSURANCE </th>
           <% end %>
         </tr>
-        <%= render partial: "plan_visit_types", locals: {qhps: qhps} %>
+        <%= render partial: "sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/plan_visit_types", locals: {qhps: qhps} %>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
