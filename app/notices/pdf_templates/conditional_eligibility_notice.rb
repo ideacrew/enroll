@@ -37,6 +37,7 @@ module PdfTemplates
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
     attribute :current_year, String
+    attribute :is_an_aqhp_hbx_enrollment, Boolean
 
 
     def other_enrollments
