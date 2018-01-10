@@ -18,7 +18,9 @@ $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '#copyPlanDesignProposal', saveProposalAndCopy);
 $(document).on('click', '#publishPlanDesignProposal', saveProposalAndPublish);
 
-$(document).on('click', '#downloadReferencePlanDetailsButton', checkIfSbcIncluded);
+$(document).on('click', '#downloadReferencePlanDetailsButton.plan-not-saved', checkIfSbcIncluded);
+$(document).on('click', '#downloadReferencePlanDetailsButton.plan-saved', sendPdf);
+
 
 $(document).on('ready', pageInit);
 $(document).on('page:load', pageInit);
@@ -83,10 +85,17 @@ function setSBC(plan) {
   }
 }
 
+function sendPdf(event) {
+  $(this).addClass('plan-not-saved');
+  $(this).removeClass('plan-saved');
+  window.location.href = $(this).attr('href');
+}
+
 function checkIfSbcIncluded(event) {
   var elem_id = $(this).attr('id');
   var obj = $('#'+elem_id);
   if(obj.hasClass('plan-not-saved')) {
+      event.preventDefault();
       var data = buildBenefitGroupParams();
       if (proposalIsInvalid(data)) {
         // handle error messaging
@@ -99,11 +108,10 @@ function checkIfSbcIncluded(event) {
           url: url
         }).done(function(){
           obj.removeClass('plan-not-saved');
+          obj.addClass('plan-saved');
           obj.click();
         });
       }
-    } else {
-      obj.addClass('plan-not-saved');
     }
 }
 
