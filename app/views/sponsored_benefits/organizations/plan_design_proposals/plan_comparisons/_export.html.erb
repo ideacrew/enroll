@@ -57,17 +57,11 @@
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
-           <% if qhp.plan.sbc_document.present? %>
             <th colspan="2">
               <div class="plan_comparison">
-                <% key, bucket = get_key_and_bucket(qhp.plan.sbc_document.identifier) %>
-                <% link_text = qhp.plan.coverage_kind == 'health' ? "Summary of Benefits and Coverage" : 'Plan Summary' %>
-                <%= link_to link_text, main_app.broker_agencies_broker_role_quotes_root_url(@broker_agency_profile.primary_broker_role_id) + main_app.document_download_path(bucket, key) +
-                                                  "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
-                                                  pdf&disposition=inline" %>
+                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.plan } %>
               </div>
             </th>
-            <%end%>
           <% end %>
         </tr>
     </table>
