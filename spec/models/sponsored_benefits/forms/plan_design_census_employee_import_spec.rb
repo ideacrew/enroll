@@ -86,16 +86,16 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
 
   context "terminate employee" do
     let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 3.xlsx') }
-    let(:census_employee) { FactoryGirl.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
 
     context "employee does not exist" do
-      it "should fail" do
-        expect(subject.save).to be_falsey
-        expect(subject.errors.messages[:base]).to include("Row 4: Employee/Dependent not found or not active")
+      it "should load none" do
+        expect(subject.imported_census_employees.compact.empty?).to be_truthy
       end
     end
 
     context "employee exists" do
+      let(:census_employee) { FactoryGirl.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
+
       before do
         allow(subject).to receive(:find_employee).and_return(census_employee)
         allow(subject).to receive(:is_employee_terminable?).with(census_employee).and_return(true)
