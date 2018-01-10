@@ -83,22 +83,28 @@ function setSBC(plan) {
   }
 }
 
-
 function checkIfSbcIncluded(event) {
-  var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
-    // handle error messaging
-    return;
-  } else {
-    url = $("#benefit_groups_url").val();
-    $.ajax({
-      type: "POST",
-      data: data,
-      url: url
-    }).done(function(){
-      // Something
-    });
-  }
+  var elem_id = $(this).attr('id');
+  var obj = $('#'+elem_id);
+  if(obj.hasClass('plan-not-saved')) {
+      var data = buildBenefitGroupParams();
+      if (proposalIsInvalid(data)) {
+        // handle error messaging
+        return;
+      } else {
+        url = $("#benefit_groups_url").val();
+        $.ajax({
+          type: "POST",
+          data: data,
+          url: url
+        }).done(function(){
+          obj.removeClass('plan-not-saved');
+          obj.click();
+        });
+      }
+    } else {
+      obj.addClass('plan-not-saved');
+    }
 }
 
 function displayActiveCarriers() {
@@ -297,10 +303,10 @@ function disableActionButtons() {
       $('[data-toggle="tooltip"]').tooltip()
     });
     $('.plan_design_proposals .save-action').attr('disabled', 'disabled');
-    $('.plan_design_proposals .sq-btn-grp').attr({
+    $('.plan_design_proposals .plan-selection-button-group').attr({
      'data-toggle': "tooltip",
      'data-placement': "top",
-      'data-title':"Employer premium contribution for Family Health Plans must be at least" + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
+      'data-title':"Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
    })
   }
 }
