@@ -1,5 +1,4 @@
-<!-- <%= wicked_pdf_stylesheet_link_tag "application" -%> -->
-<%= wicked_pdf_stylesheet_link_tag "plan_review_pdf" -%>
+<%= stylesheet_link_tag wicked_pdf_asset_base64("plan_review_pdf") %>
 
 <div class="container plan-details-export">
   <div class="row">
@@ -98,6 +97,6 @@
     </div>
   </div>
   <% if sbc_included %>
-    <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps %>
+    <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/export', qhps: @qhps %>
   <% end %>
 </div>
