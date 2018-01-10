@@ -9,7 +9,7 @@ class RemoveResidentRole < MongoidMigrationTask
     people.each do |person|
       # initialize flag to be true at the beginning of each iteration
       remove_resident_role = true
-      person.primary_family && person.primary_family.households.first.hbx_enrollments.each do |enrollment|
+      person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
         # set flag to false
         if enrollment.kind == "coverall"
           remove_resident_role = false
