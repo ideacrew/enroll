@@ -93,6 +93,7 @@ class CensusEmployee < CensusMember
   scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
   scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+  scope :expected_to_enroll,->{ where(expected_selection: 'enroll') }
 
   # scope :emplyee_profiles_active_cobra,        ->{ where(aasm_state: "eligible") }
   scope :employee_profiles_terminated,         ->{ where(aasm_state: "employment_terminated")}

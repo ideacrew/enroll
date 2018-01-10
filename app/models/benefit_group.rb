@@ -359,12 +359,15 @@ class BenefitGroup
       build_composite_tier_contributions
       estimate_composite_rates
     end
-    targeted_census_employees_participation.collect do |ce|
+    targeted_census_employees.active.expected_to_enroll.collect do |ce|
+      next unless ce.is_included_in_participation_rate?
+
       if plan_option_kind == 'sole_source'
         pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
         pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
       end
+
       pcd.total_employer_contribution
     end.sum
   end
