@@ -24,7 +24,7 @@ namespace :recurring do
                 dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
                 event_name = ben_grp ? "employee_dependent_age_off_termination_congressional" : "employee_dependent_age_off_termination_non_congressional"
                 ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, event_name, dep_hbx_ids: dep_hbx_ids )
-                puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}"
+                puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?
               end
             end
           end
