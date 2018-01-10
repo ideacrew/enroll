@@ -5,7 +5,7 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
   let(:user) {FactoryGirl.create(:user, :person=>person)}
   let(:person_params){{"dob"=>person.id, "first_name"=>person.first_name,"gender"=>person.gender,"last_name"=>person.last_name,"middle_name"=>"","name_sfx"=>"","ssn"=>person.ssn,"user_id"=>person.id}}
   let(:count) { Settings.aca.market_kinds.include?("individual") ? 3 : 2 }
-  
+
   before :each do
     assign(:person, person)
     assign(:person_params, person_params)

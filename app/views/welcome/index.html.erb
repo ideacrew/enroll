@@ -1,4 +1,3 @@
-
 <div class="container home module welcome">
   <br/>
   <br/>
@@ -6,7 +5,7 @@
   <br/>
   <h1 class="no-buffer">
     <strong>
-      Welcome to <%= "#{site_short_name}" %>
+      <%= l10n('.welcome_to_site_name', short_name: Settings.site.short_name) %>
     </strong>
   </h1>
   <h3 class="no-buffer">
@@ -15,23 +14,24 @@
   <br/>
   <% if user_signed_in? %>
     <strong>
-      Welcome <%= current_user.oim_id %> <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
+      <%= l10n(".signed_in_as", current_user: current_user.oim_id) %>
+      <%= link_to(l10n('.sign_out'), destroy_user_session_path, class: 'btn btn-primary', :method => :delete) %>
     </strong>
     <br/>
     <br/>
   <% end %>
-  <%= link_to "Employee Portal", privacy_insured_employee_index_path, class: "btn btn-default" %>
+  <%= link_to l10n(".employee_portal"), privacy_insured_employee_index_path, class: "btn btn-default" %>
   <% if individual_market_is_enabled? %>
-    <%= link_to "Consumer/Family Portal", privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>
-    <%= link_to "Assisted Consumer/Family Portal", privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default" %>
+    <%= link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>
+    <%= link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default" %>
   <% end %>
-  <%= link_to "Returning User", family_account_path, class: "btn btn-default" %>
-  <%= link_to "Employer Portal", new_employers_employer_profile_path, class: "btn btn-default" %>
-  <%= link_to "Broker Agency Portal", broker_agencies_root_path, class: "btn btn-default" %>
-  <%= link_to "General Agency Portal", general_agencies_root_path, class: "btn btn-default" if general_agency_enabled? %>
-  <%= link_to "HBX Portal", exchanges_hbx_profiles_root_path, class: "btn btn-default" %>
+  <%= link_to l10n(".returning_user"), family_account_path, class: "btn btn-default" %>
+  <%= link_to l10n(".employer_portal"), new_employers_employer_profile_path, class: "btn btn-default" %>
+  <%= link_to l10n(".broker_agency_portal"), broker_agencies_root_path, class: "btn btn-default" %>
+  <%= link_to l10n(".general_agency_portal"), general_agencies_root_path, class: "btn btn-default" if general_agency_enabled? %>
+  <%= link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-default" %>
   <% if !user_signed_in? %>
-    <%= link_to "Broker Registration", broker_registration_path, class: "btn btn-default" %>
-    <%= link_to "General Agency Registration", general_agency_registration_path, class: "btn btn-default" if general_agency_enabled? %>
+    <%= link_to l10n(".broker_registration"), broker_registration_path, class: "btn btn-default" %>
+    <%= link_to l10n(".general_agency_registration"), general_agency_registration_path, class: "btn btn-default" if general_agency_enabled? %>
   <% end %>
 </div>

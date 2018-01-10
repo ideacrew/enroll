@@ -25,7 +25,7 @@ $(document).on('page:load', pageInit);
 
 function pageInit() {
   if ($("#reference_plan_id").val() != '') {
-
+    calcPlanDesignContributions();
   } else {
     disableActionButtons();
     $('li.sole-source-tab').find('label').trigger('click');
@@ -75,6 +75,15 @@ function fetchCarriers() {
   clearComparisons();
 }
 
+function setSBC(plan) {
+  if ($("#include_sbc").prop('checked')) {
+   $('#downloadReferencePlanDetailsButton').attr('href',plan+"?sbc_included=true");
+  } else {
+   $('#downloadReferencePlanDetailsButton').attr('href',plan);
+  }
+}
+
+
 function checkIfSbcIncluded(event) {
   var data = buildBenefitGroupParams();
   if (proposalIsInvalid(data)) {
@@ -87,12 +96,7 @@ function checkIfSbcIncluded(event) {
       data: data,
       url: url
     }).done(function(){
-      if ($("#include_sbc").prop('checked')) {
-          var href = $(this).attr('href') +"?sbc_included=true";
-      } else {
-        var href = $(this).attr('href')
-      }
-      $(this).attr('href', href);
+      // Something
     });
   }
 }

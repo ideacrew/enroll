@@ -9,6 +9,15 @@ Rails.application.routes.draw do
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
+  namespace :uis do
+    resources :bootstrap3_examples do
+      collection do
+        get :index
+        get :components
+        get :getting_started
+      end
+    end
+  end
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }

@@ -49,6 +49,10 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.before :each, type: :controller do
+    request.env['HTTP_ACCEPT_LANGUAGE'] = "en"
+  end
+
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.
 =begin

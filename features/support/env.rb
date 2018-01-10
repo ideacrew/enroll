@@ -14,7 +14,7 @@ require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
-
+Dir[File.expand_path(Rails.root.to_s + "/db/seedfiles/english_translations_seed.rb")].each { |f| load f }
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
 

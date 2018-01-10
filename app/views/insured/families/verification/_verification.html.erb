@@ -2,9 +2,9 @@
   <div class="col-xs-6">
     <h4>
       <% if enrollment_group_unverified?(@person) && verification_needed?(@person) %>
-          Document Due Date:&nbsp;&nbsp;
+          <%= l10n("document_due_date") %>:&nbsp;&nbsp;
           <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (Past Due)</span>
+              <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (<%= l10n("past_due") %>)</span>
           <% else %>
               <span class="label label-warning"><%= verification_due_date(@person.primary_family) %></span>
           <% end %>
@@ -17,10 +17,10 @@
     <table class="table table-striped table-hover table-sm">
       <thead class="thead-default">
       <tr>
-        <th>Family Member</th>
-        <th>Verification Type</th>
-        <th>Status</th>
-        <th>Documents</th>
+        <th><%= l10n("family_member") %></th>
+        <th><%= l10n("verification_type") %></th>
+        <th><%= l10n("status") %></th>
+        <th><%= l10n("documents") %></th>
         <th></th>
       </tr>
       </thead>
@@ -54,14 +54,14 @@
 <div class="row">
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
-        <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
+        <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
     <% elsif show_send_button_for_consumer? %>
-        <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id), class: "btn btn-success btn-sm", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
+        <%= link_to l10n("insured.families.verification.send_documents_for_review"), enrollment_docs_state_documents_path(:person_id => @person.id), class: "btn btn-success btn-sm", method: :put, data: { confirm: l10n("insured.families.verification.send_documents_for_review_confirm") } %>
     <% end %>
   </div>
   <div class="col-xs-6">
     <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
-      Documents FAQ
+      <%= l10n("insured.families.verification.documents_FAQ") %>
     </a>
   </div>
 </div>
