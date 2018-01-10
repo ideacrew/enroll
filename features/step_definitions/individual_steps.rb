@@ -516,6 +516,39 @@ Then(/^\w+ enters demographic information$/) do
   fill_in 'person[emails_attributes][0][address]', with: "user#{rand(1000)}@example.com"
 end
 
+Then(/^Individual should see demographic questions$/) do
+  expect(page).to have_content(/Are you a US Citizen or US National?/i)
+  expect(page).to have_content(/Are you currently incarcerated?/i)
+end
+
+And(/^Individual click on no for us citizen$/) do
+  find(:xpath, '//*[@id="consumer_fields"]/div[1]/div[3]/div/label/span').click
+end
+
+Then(/Individual should see immigration question$/) do
+  expect(page).to have_content(/Do you have eligible immigration status?/i)
+end
+
+And(/^Individual click on yes for immigration status$/) do
+  find(:xpath, '//*[@id="eligible_immigration_status_container"]/div[2]/div/label/span').click
+end
+
+And(/^Individual selected I-551 document type$/) do
+  find(:xpath, '//*[@id="immigration_doc_type_select"]/div/div[2]/p').click
+  find(:xpath, '//*[@id="immigration_doc_type_select"]/div/div[3]/div/ul/li[3]').click
+end
+
+Then(/^Individual should see input boxes for alien number, card number, expiration date$/) do
+  wait_for_ajax
+  expect(page).to have_xpath('//*[@id="person_consumer_role_vlp_documents_attributes_0_alien_number"]')
+  expect(page).to have_xpath('//*[@id="person_consumer_role_vlp_documents_attributes_0_card_number"]')
+  expect(page).to have_xpath('//*[@id="doc_date_field"]')
+end
+
+And(/^Individual should not see text instructions on page$/) do
+  expect(page).not_to have_content(/When entering an Alien Number, only include the numbers/i)
+end
+
 And(/^\w+ is an Employee$/) do
   wait_and_confirm_text /Employer/i
 end
