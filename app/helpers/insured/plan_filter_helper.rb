@@ -1,4 +1,6 @@
 module Insured::PlanFilterHelper
+  include Config::SiteHelper
+  
   def find_my_doctor
     if @market_kind == "individual"
       link_to('Find Your Doctor', 'https://dc.checkbookhealth.org/dc/', target: '_blank')

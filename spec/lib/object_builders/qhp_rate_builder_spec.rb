@@ -3,7 +3,7 @@ require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder')
 
 describe QhpRateBuilder do
 
-  let(:plan){ FactoryGirl.create(:plan) }
+  let(:plan){ FactoryGirl.create(:plan, active_year: 2017) }
   let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
 
   it "should return qhp builder object" do
