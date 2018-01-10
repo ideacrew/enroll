@@ -4,7 +4,12 @@ module SponsoredBenefits
       before_action :published_plans_are_view_only
 
       def new
-        plan_design_form.build_benefit_group
+        if plan_design_organization.try(:employer_profile).try(:active_plan_year).present?
+          flash[:error] = "This client has an active plan year, and is not due for renewal. You cannot create new quotes for this client at this time."
+          redirect_to sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(plan_design_organization, plan_design_proposal)
+        else
+          plan_design_form.build_benefit_group
+        end
       end
 
       private
