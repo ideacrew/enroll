@@ -103,7 +103,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
-                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 2) do %>
+                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
                     <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -122,14 +122,8 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">Income</div>
                   <div class="col-md-1">
-                    <% if applicant.incomes.present? %>
                     <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
-                    <% end %>
-                    <% else %>
-                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
-                    <% end %>
                     <% end %>
                   </div>
                 </div>
@@ -155,14 +149,8 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">Income Adjustments</div>
                   <div class="col-md-1">
-                    <% if applicant.deductions.present? %>
                     <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
-                    <% end %>
-                    <% else %>
-                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
-                    <% end %>
                     <% end %>
                   </div>
                 </div>
@@ -176,14 +164,8 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">Health Coverage</div>
                   <div class="col-md-1">
-                    <% if applicant.benefits.present? %>
                     <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
-                    <% end %>
-                    <% else %>
-                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
-                    <% end %>
                     <% end %>
                   </div>
                 </div>
