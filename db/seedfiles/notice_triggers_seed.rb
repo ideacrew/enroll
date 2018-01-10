@@ -2843,7 +2843,7 @@ elsif Settings.aca.state_abbreviation == "DC"
           }
         }
       ]
-    },
+    }
   ]
 else
   puts "No state selected"
