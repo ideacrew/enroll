@@ -52,6 +52,7 @@ module SponsoredBenefits
       scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
       scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
       scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+      scope :expected_to_enroll,->{ where(expected_selection: 'enroll') }
 
       def initialize(*args)
         super(*args)

@@ -105,9 +105,9 @@
   </div>
   <div class="col-md-7 col-md-offset-5 sq-btn-grp">
     <%= link_to "Download PDF", sponsored_benefits.organizations_plan_design_proposal_plan_reviews_path(@plan_design_proposal), id: "submitPlanDesignProposal", class:'btn btn-default' %>
-    <%= link_to "Update Roster", sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal), class:'btn btn-primary save-action' %>
-    <%= link_to "Select Health Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal), class:'btn btn-primary save-action' %>
-    <%= link_to "Publish Quote", sponsored_benefits.organizations_plan_design_proposal_publish_path(@plan_design_proposal), method: :post, class:'btn btn-primary save-action' %>
+    <%= link_to "Update Roster", sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal), class:'btn btn-primary' %>
+    <%= link_to "Select Health Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal), class:'btn btn-primary' %>
+    <%= link_to "Publish Quote", sponsored_benefits.organizations_plan_design_proposal_publish_path(@plan_design_proposal), method: :post, class:'btn btn-primary' %>
     <div class="success-message"></div>
   </div>
 </div>
