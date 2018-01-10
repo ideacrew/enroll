@@ -891,7 +891,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_DR2',
-    title: 'DON’T FORGET - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+    title: "Don't Forget - You Must Submit Documents by the Deadline to Keep Your Insurance",
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
@@ -912,7 +912,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_DR3',
-    title: 'TIME SENSITIVE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+    title: 'Time Sensitive - You Must Submit Documents by the Deadline to Keep Your Insurance',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
@@ -933,7 +933,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVL_DR4',
-    title: 'FINAL NOTICE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+    title: 'Final Notice - You Must Submit Documents by the Deadline to Keep Your Insurance',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',
