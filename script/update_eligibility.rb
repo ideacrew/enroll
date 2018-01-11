@@ -5,6 +5,7 @@ require 'csv'
 @current_date = TimeKeeper.date_of_record
 @current_year = @current_date.year
 @next_year  = @current_year+1
+@e_pdc_id = "MANUALLY_#{@current_date.month}_#{@current_date.month}_#{@current_date.year}LOADING"
 
 def check_duplicated
   valid_people = {}
@@ -60,7 +61,7 @@ def check_and_run
   running = []
 
   CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
-    ssn, hbx_id, aptc, csr , loaded_e_pdc_id = row_with_ssn
+    ssn, hbx_id, aptc, csr = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
@@ -76,14 +77,14 @@ def check_and_run
         next
       end
       deter = person.primary_family.active_household.latest_active_tax_household_with_year(@next_year).try(:latest_eligibility_determination)
-      if deter && deter.e_pdc_id.chop == loaded_e_pdc_id.to_s
+      if deter && deter.e_pdc_id.chop == @e_pdc_id
         deter.update_attributes(max_aptc: aptc)
         deter.csr_percent_as_integer = csr
         deter.save
         ran << person.hbx_id
         print 'r'
       else
-        row=[person.hbx_id, aptc, csr,loaded_e_pdc_id]
+        row=[person.hbx_id, aptc, csr]
         update_aptc(row)
         running << person.hbx_id
         print '#'
@@ -120,7 +121,7 @@ def update_aptc(row)
   @pdc+=1
 
   deter = th.eligibility_determinations.build(
-    e_pdc_id: row[3].to_s + @pdc.to_s,
+    e_pdc_id: @e_pdc_id + @pdc.to_s,
     benchmark_plan_id: @slcsp,
     max_aptc: row[1],
     csr_percent_as_integer: row[2],
@@ -128,6 +129,8 @@ def update_aptc(row)
   )
   deter.csr_percent_as_integer = row[2]
   deter.save
+
+  @household.end_multiple_thh
 
   th.save!
 

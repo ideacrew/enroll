@@ -68,20 +68,20 @@ describe Subscribers::FamilyApplicationCompleted do
         let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
-            person: {
-              "first_name" => primary.person.name_first.upcase,
-              "last_name" => primary.person.name_last.downcase,
-              "middle_name" => primary.person.name_middle,
-              "name_pfx" => primary.person.name_pfx,
-              "name_sfx" => primary.person.name_sfx,
-              "dob" => primary.person_demographics.birth_date,
-              "ssn" => primary.person_demographics.ssn,
-              "no_ssn" => "1",
-              "gender" => primary.person_demographics.sex.split('#').last
-            }
+              addresses: [],
+              phones: [],
+              emails: [],
+              person: {
+                  "first_name" => primary.person.name_first.upcase,
+                  "last_name" => primary.person.name_last.downcase,
+                  "middle_name" => primary.person.name_middle,
+                  "name_pfx" => primary.person.name_pfx,
+                  "name_sfx" => primary.person.name_sfx,
+                  "dob" => primary.person_demographics.birth_date,
+                  "ssn" => primary.person_demographics.ssn,
+                  "no_ssn" => "1",
+                  "gender" => primary.person_demographics.sex.split('#').last
+              }
           }
         end
 
@@ -113,20 +113,20 @@ describe Subscribers::FamilyApplicationCompleted do
         let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
-            person: {
-              "first_name" => primary.person.name_first.upcase,
-              "last_name" => primary.person.name_last.downcase,
-              "middle_name" => primary.person.name_middle,
-              "name_pfx" => primary.person.name_pfx,
-              "name_sfx" => primary.person.name_sfx,
-              "dob" => primary.person_demographics.birth_date,
-              "ssn" => primary.person_demographics.ssn,
-              "no_ssn" => "1",
-              "gender" => primary.person_demographics.sex.split('#').last
-            }
+              addresses: [],
+              phones: [],
+              emails: [],
+              person: {
+                  "first_name" => primary.person.name_first.upcase,
+                  "last_name" => primary.person.name_last.downcase,
+                  "middle_name" => primary.person.name_middle,
+                  "name_pfx" => primary.person.name_pfx,
+                  "name_sfx" => primary.person.name_sfx,
+                  "dob" => primary.person_demographics.birth_date,
+                  "ssn" => primary.person_demographics.ssn,
+                  "no_ssn" => "1",
+                  "gender" => primary.person_demographics.sex.split('#').last
+              }
           }
         end
 
@@ -161,20 +161,20 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:person) { consumer_role.person }
       let(:ua_params) do
         {
-          addresses: [],
-          phones: [],
-          emails: [],
-          person: {
-            "first_name" => primary.person.name_first.upcase,
-            "last_name" => primary.person.name_last.downcase,
-            "middle_name" => primary.person.name_middle,
-            "name_pfx" => primary.person.name_pfx,
-            "name_sfx" => primary.person.name_sfx,
-            "dob" => primary.person_demographics.birth_date,
-            "ssn" => primary.person_demographics.ssn,
-            "no_ssn" => "1",
-            "gender" => primary.person_demographics.sex.split('#').last
-          }
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+                "first_name" => primary.person.name_first.upcase,
+                "last_name" => primary.person.name_last.downcase,
+                "middle_name" => primary.person.name_middle,
+                "name_pfx" => primary.person.name_pfx,
+                "name_sfx" => primary.person.name_sfx,
+                "dob" => primary.person_demographics.birth_date,
+                "ssn" => primary.person_demographics.ssn,
+                "no_ssn" => "1",
+                "gender" => primary.person_demographics.sex.split('#').last
+            }
         }
       end
 
@@ -253,20 +253,20 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:person) { consumer_role.person }
       let(:ua_params) do
         {
-          addresses: [],
-          phones: [],
-          emails: [],
-          person: {
-            "first_name" => primary.person.name_first.upcase,
-            "last_name" => primary.person.name_last.downcase,
-            "middle_name" => primary.person.name_middle,
-            "name_pfx" => primary.person.name_pfx,
-            "name_sfx" => primary.person.name_sfx,
-            "dob" => primary.person_demographics.birth_date,
-            "ssn" => primary.person_demographics.ssn,
-            "no_ssn" => "1",
-            "gender" => primary.person_demographics.sex.split('#').last
-          }
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+                "first_name" => primary.person.name_first.upcase,
+                "last_name" => primary.person.name_last.downcase,
+                "middle_name" => primary.person.name_middle,
+                "name_pfx" => primary.person.name_pfx,
+                "name_sfx" => primary.person.name_sfx,
+                "dob" => primary.person_demographics.birth_date,
+                "ssn" => primary.person_demographics.ssn,
+                "no_ssn" => "1",
+                "gender" => primary.person_demographics.sex.split('#').last
+            }
         }
       end
 
@@ -325,20 +325,20 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:person) { consumer_role.person }
       let(:ua_params) do
         {
-          addresses: [],
-          phones: [],
-          emails: [],
-          person: {
-            "first_name" => primary.person.name_first,
-            "last_name" => primary.person.name_last,
-            "middle_name" => primary.person.name_middle,
-            "name_pfx" => primary.person.name_pfx,
-            "name_sfx" => primary.person.name_sfx,
-            "dob" => primary.person_demographics.birth_date,
-            "ssn" => primary.person_demographics.ssn,
-            "no_ssn" => "",
-            "gender" => primary.person_demographics.sex.split('#').last
-          }
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+                "first_name" => primary.person.name_first,
+                "last_name" => primary.person.name_last,
+                "middle_name" => primary.person.name_middle,
+                "name_pfx" => primary.person.name_pfx,
+                "name_sfx" => primary.person.name_sfx,
+                "dob" => primary.person_demographics.birth_date,
+                "ssn" => primary.person_demographics.ssn,
+                "no_ssn" => "",
+                "gender" => primary.person_demographics.sex.split('#').last
+            }
         }
       end
 
@@ -393,7 +393,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
         expect(tax_household_db.current_max_aptc).to eq max_aptc
-        expect(tax_household_db.effective_ending_on).to eq nil
+        expect(tax_household_db.effective_ending_on).to be_truthy
       end
 
       it "should have a new tax household with the same aptc data" do
@@ -426,24 +426,24 @@ describe Subscribers::FamilyApplicationCompleted do
           dob: dependent.person_demographics.birth_date,
           ssn: dependent.person_demographics.ssn == "999999999" ? "" : dependent.person_demographics.ssn ,
           gender: dependent.person_demographics.sex.split('#').last
-        )}
+      )}
       let(:person) { consumer_role.person }
       let(:ua_params) do
         {
-          addresses: [],
-          phones: [],
-          emails: [],
-          person: {
-            "first_name" => primary.person.name_first,
-            "last_name" => primary.person.name_last,
-            "middle_name" => primary.person.name_middle,
-            "name_pfx" => primary.person.name_pfx,
-            "name_sfx" => primary.person.name_sfx,
-            "dob" => primary.person_demographics.birth_date,
-            "ssn" => primary.person_demographics.ssn,
-            "no_ssn" => "",
-            "gender" => primary.person_demographics.sex.split('#').last
-          }
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+                "first_name" => primary.person.name_first,
+                "last_name" => primary.person.name_last,
+                "middle_name" => primary.person.name_middle,
+                "name_pfx" => primary.person.name_pfx,
+                "name_sfx" => primary.person.name_sfx,
+                "dob" => primary.person_demographics.birth_date,
+                "ssn" => primary.person_demographics.ssn,
+                "no_ssn" => "",
+                "gender" => primary.person_demographics.sex.split('#').last
+            }
         }
       end
 
@@ -575,8 +575,8 @@ describe '.search_person' do
   let(:subject) {Subscribers::FamilyApplicationCompleted.new}
   let(:verified_family_member) {
     double(
-      person: double(name_last: db_person.last_name, name_first: db_person.first_name),
-      person_demographics: double(birth_date: db_person.dob, ssn: db_person.ssn)
+        person: double(name_last: db_person.last_name, name_first: db_person.first_name),
+        person_demographics: double(birth_date: db_person.dob, ssn: db_person.ssn)
     )
   }
   let(:ssn_demographics) { double(birth_date: db_person.dob, ssn: '123123123') }
@@ -617,3 +617,4 @@ describe '.search_person' do
     end
   end
 end
+
