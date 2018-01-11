@@ -19,10 +19,12 @@ class RemoveResidentRole < MongoidMigrationTask
           # indicates enrollment needs to be fixed as well
           if enrollment.kind == "coverall"
             enrollment.kind = "individual"
-            enrollment.save
             if person.consumer_role.nil?
               clone_resident_role(person.resident_role)
+              enrollment.consumer_role_id = person.consumer_role.id
+              enrollment.resident_role_id = nil
             end
+            enrollment.save!
           end
           person.resident_role.destroy
           puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
@@ -44,6 +46,5 @@ class RemoveResidentRole < MongoidMigrationTask
     c_role.documents = r_role.paper_applications
     c_role.person = r_role.person
     c_role.save!
-
   end
 end
