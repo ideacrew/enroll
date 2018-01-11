@@ -10,7 +10,6 @@ class RemoveResidentRole < MongoidMigrationTask
 
   def migrate
     correct_assignments = ENV['coverall_ids'].to_s.split(',')
-    binding.pry
     # using the p_to_fix_id variable to test individual cases before running on the entire system
     if ENV['p_to_fix_id'].nil?
       people = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
