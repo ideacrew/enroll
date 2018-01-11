@@ -39,18 +39,6 @@ describe RemoveResidentRole do
       expect(person2.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to eq(person2.consumer_role.id)
       expect(person2.consumer_role).not_to be_nil
     end
-
-    #it "sets the kind attribute on the enrollment for person2 to individual" do
-     # expect(person2.primary_family.active_household.hbx_enrollments.first.kind).to eq("individual")
-    #end
-
-    #it "removes the reference to the destroyed resident role on the enrollment" do
-     # expect(person2.primary_family.active_household.hbx_enrollments.first.resident_role_id).to be(nil)
-    #end
-
-    #it "sets the enrollment to reference the new consumer role created for the person" do
-     # expect(person2.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to eq(person2.consumer_role.id)
-    #end
   end
 
   describe "remove resident role for person with coverall enrollment and no consumer_role" do
