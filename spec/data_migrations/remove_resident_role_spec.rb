@@ -53,7 +53,7 @@ describe RemoveResidentRole do
   end
 
   describe "remove resident role for person with coverall enrollment and no consumer_role", dbclean: :after_each do
-    let!(:person1) { FactoryGirl.create(:person, :with_resident_role, ssn: 111111111)}
+    let!(:person1) { FactoryGirl.create(:person, :with_resident_role, ssn: 123654321)}
     let!(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
     let!(:ivl_enrollment) do
       FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: primary_family.active_household,
