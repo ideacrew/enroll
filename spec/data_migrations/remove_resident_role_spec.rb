@@ -85,7 +85,7 @@ describe RemoveResidentRole do
       expect(person1.primary_family.active_household.hbx_enrollments.first.resident_role_id).to be(nil)
     end
 
-    it "sets the consumer_role_id of person1's enrollmet to the new consumer_role.id associated with perosn1" do
+    it "sets the consumer_role_id of person1's enrollmet to the new consumer_role.id associated with person1" do
       expect(person1.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to eq(person1.consumer_role.id)
     end
   end
