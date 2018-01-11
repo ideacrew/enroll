@@ -24,7 +24,7 @@ class RemoveResidentRole < MongoidMigrationTask
           if enrollment.kind == "coverall"
             enrollment.kind = "individual"
             if person.consumer_role.nil?
-              clone_resident_role(person.resident_role)
+              copy_resident_role_to_consumer_role(person.resident_role)
               enrollment.consumer_role_id = person.consumer_role.id
               enrollment.resident_role_id = nil
             end
@@ -37,7 +37,7 @@ class RemoveResidentRole < MongoidMigrationTask
     end
   end
 
-  def clone_resident_role(r_role)
+  def copy_resident_role_to_consumer_role(r_role)
     c_role = ConsumerRole.new
     c_role.is_applicant = r_role.is_applicant
     c_role.is_active = r_role.is_active
