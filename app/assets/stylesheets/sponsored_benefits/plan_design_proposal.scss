@@ -270,7 +270,7 @@ $brand-primary: $mhc-dark-blue;
       margin-top:-12px;
     }
     .reference-plan, .dental-reference-plan {
-      height: 175px;
+      height: 185px;
       padding: 0;
       cursor: pointer;
       padding-top: 20px;
@@ -283,6 +283,9 @@ $brand-primary: $mhc-dark-blue;
           &:hover {
             text-decoration: underline;
           }
+        }
+        .compare-pb {
+          margin-bottom:0;
         }
       }
       .col-xs-2:first-of-type {
