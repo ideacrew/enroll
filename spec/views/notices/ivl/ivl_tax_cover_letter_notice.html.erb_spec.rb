@@ -34,7 +34,7 @@ RSpec.describe "notices/ivl/ivl_tax_cover_letter_notice.html.erb" do
 
   it "should display the text" do
     expect(rendered).to have_selector('h3', text: 'YOUR 1095-A HEALTH COVERAGE TAX FORM')
-    expect(rendered).to match /Dear #{person.full_name}:/
+    expect(rendered).not_to match /Dear #{person.full_name}:/
     expect(rendered).to match /This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone/
     expect(rendered).to match /If you have questions or concerns, we’re here to help./
     expect(rendered).to match /The #{Settings.site.short_name} Team/

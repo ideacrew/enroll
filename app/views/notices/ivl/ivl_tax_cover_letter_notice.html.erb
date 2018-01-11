@@ -1,8 +1,126 @@
-<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<div class="page-break">
+
+  <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+
+  <table class="total_table address" border="0">
+    <tbody>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td>                   </td>
+      </tr>
+      <tr class="fssize1">
+        <td>                   </td>
+      </tr>
+      <tr>
+      <td>                   </td>
+      <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+      <% if (display_mpi_indicator.nil? && !notice.shop?) %>
+        <td style="text-align: right;"><%= notice.mpi_indicator %></td>
+      <% end %>
+      </tr>
+      <tr>
+        <td>
+          <br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <br></br>
+      </tr>
+      <tr>
+        <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
+        <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 18px; text-align: center;">
+          The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
+        </td>
+      </tr>
+      <tr>
+        <br></br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="total_table" border="0" style="margin-top: 260px;">
+    <tbody>
+      <tr>
+        <td><%= notice.mpi_indicator %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td style="color: #b3b3b3; font-size: 18px; text-align: center; padding-top: 300px;">
+          This page intentionally left blank.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <br>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table address" border="0">
+  <tbody>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td>                   </td>
+    </tr>
+    <tr class="fssize1">
+      <td>                   </td>
+    </tr>
+    <tr class="fssize1">
+      <td>                   </td>
+    </tr>
+    <tr>
+    <td>                   </td>
+    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+    <% if (display_mpi_indicator.nil? && !notice.shop?) %>
+      <td style="text-align: right;"><%= notice.mpi_indicator %></td>
+    <% end %>
+    </tr>
+    <tr>
+      <td>
+        <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+  <td></br></br></td>
+  </tr>
+    <tr class="wid50">
+      <td align="left"></td>
+    </tr>
+  <tr>
+  <td>                   </td>
+  </tr>
+  </tbody>
+</table>
 
 <table class="total_table" border="0">
   <tbody>
@@ -15,7 +133,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:</td>
+      <td>Dear                  </td>
     </tr>
   </tbody>
 </table>
@@ -29,7 +147,7 @@ content: "Federal law requires most Americans to have a minimum level of health 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "We are required by federal law to send a copy of your Form 1095-A to you and the Internal Revenue Service (IRS). You may need this form to complete your federal tax return for #{previous_year}. Please keep it for your records.  You can also download a copy of your tax form at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."} %>
 
-<% if notice.is_an_aqhp_hbx_enrollment %>
+<% if notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Form 1095-A is also called the Health Insurance Marketplace Statement. It shows how long you or someone in your household had health insurance through #{Settings.site.short_name} last year. Since you received an advance premium tax credit, your Form 1095-A also shows how much of your tax credit was applied to your premium each month."} %>
 <% else %>
@@ -40,7 +158,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: [""], heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '12px', bottom_margin: '8px'} %>
 
-<% if notice.is_an_aqhp_hbx_enrollment %>
+<% if notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Because you received a tax credit in #{previous_year}, you must complete IRS Premium Tax Credit Form 8962 when you file your federal taxes.  You’ll need the information on Form 1095-A to fill out Form 8962."} %>
 
@@ -55,7 +173,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
       listings: ["The IRS may reject your federal tax return or delay payment of any refund you are owed.", "You will not be able to receive assistance paying for a private health plan in the future."]} %>
 <% end %>
 
-<% if !notice.is_an_aqhp_hbx_enrollment %>
+<% if !notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "You’ll use the information on your Form 1095-A to show that you or someone in your household had health insurance in #{previous_year}. If you want to see if you qualify for a premium tax credit, you’ll need the information on your Form 1095-A to complete the IRS Premium Tax Credit Form 8962.  You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
 <% end %>
@@ -76,7 +194,7 @@ content: "IRS Form 1095-A has three sections:"} %>
       <td>
         <ul style="list-style: circle solid;">
         <li style="margin-top: 0px;">
-          <% if !notice.is_an_aqhp_hbx_enrollment %>
+          <% if !notice.is_an_aqhp_cover_letter %>
             <strong>Part I</strong> includes information about the primary recipient. Your spouse’s information is not listed because you didn’t receive an advance premium tax credit, and the IRS tells us not to include their information here. Part I also lists when your health insurance started and ended.<br>
           <% else %>
             <strong>Part I</strong> includes information about the primary recipient. Part I also lists when your health insurance started and ended.<br>
@@ -105,7 +223,7 @@ content: "IRS Form 1095-A has three sections:"} %>
   </tbody>
 </table>
 
-<% if notice.is_an_aqhp_hbx_enrollment %>
+<% if notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}."} %>
 <% else %>

@@ -52,8 +52,8 @@ RSpec.describe IvlNotices::IvlTaxCoverLetterPlanNotice, dbclean: :after_each do
       expect(@ivl_tax_cover_letter_notice.notice.primary_address.present?).to be_truthy
     end
 
-    it "should receive a primary_fullname" do
-      expect(@ivl_tax_cover_letter_notice.notice.primary_fullname).to eq person.full_name
+    it "should not receive a primary_fullname" do
+      expect(@ivl_tax_cover_letter_notice.notice.primary_fullname).to eq ""
     end
 
     it "should receive attach_taglines" do
