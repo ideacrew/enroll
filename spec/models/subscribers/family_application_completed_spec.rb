@@ -172,20 +172,20 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person) { consumer_role.person }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
-            person: {
-              "first_name" => primary.person.name_first.upcase,
-              "last_name" => primary.person.name_last.downcase,
-              "middle_name" => primary.person.name_middle,
-              "name_pfx" => primary.person.name_pfx,
-              "name_sfx" => primary.person.name_sfx,
-              "dob" => primary.person_demographics.birth_date,
-              "ssn" => primary.person_demographics.ssn,
-              "no_ssn" => "1",
-              "gender" => primary.person_demographics.sex.split('#').last
-            }
+              addresses: [],
+              phones: [],
+              emails: [],
+              person: {
+                  "first_name" => primary.person.name_first.upcase,
+                  "last_name" => primary.person.name_last.downcase,
+                  "middle_name" => primary.person.name_middle,
+                  "name_pfx" => primary.person.name_pfx,
+                  "name_sfx" => primary.person.name_sfx,
+                  "dob" => primary.person_demographics.birth_date,
+                  "ssn" => primary.person_demographics.ssn,
+                  "no_ssn" => "1",
+                  "gender" => primary.person_demographics.sex.split('#').last
+              }
           }
         end
 
@@ -265,20 +265,20 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:person) { consumer_role.person }
         let(:ua_params) do
           {
-            addresses: [],
-            phones: [],
-            emails: [],
-            person: {
-              "first_name" => primary.person.name_first.upcase,
-              "last_name" => primary.person.name_last.downcase,
-              "middle_name" => primary.person.name_middle,
-              "name_pfx" => primary.person.name_pfx,
-              "name_sfx" => primary.person.name_sfx,
-              "dob" => primary.person_demographics.birth_date,
-              "ssn" => primary.person_demographics.ssn,
-              "no_ssn" => "1",
-              "gender" => primary.person_demographics.sex.split('#').last
-            }
+              addresses: [],
+              phones: [],
+              emails: [],
+              person: {
+                  "first_name" => primary.person.name_first.upcase,
+                  "last_name" => primary.person.name_last.downcase,
+                  "middle_name" => primary.person.name_middle,
+                  "name_pfx" => primary.person.name_pfx,
+                  "name_sfx" => primary.person.name_sfx,
+                  "dob" => primary.person_demographics.birth_date,
+                  "ssn" => primary.person_demographics.ssn,
+                  "no_ssn" => "1",
+                  "gender" => primary.person_demographics.sex.split('#').last
+              }
           }
         end
 

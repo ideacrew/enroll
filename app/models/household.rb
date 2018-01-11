@@ -86,6 +86,11 @@ class Household
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
 
+      # if tax_households.present?
+      #   latest_tax_household = tax_households.where(effective_ending_on: nil).last
+      #   latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
+      # end
+
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
@@ -128,9 +133,30 @@ class Household
         determined_on: latest_eligibility_determination.determination_date
       )
 
+      if tax_households.present?
+        end_multiple_thh({date: verified_tax_household.start_date})
+      end
+
       th.save!
     end
   end
+
+  # End multiple tax households for an year except the latest one in that year
+  def end_multiple_thh(options = {})
+    all_active_thh = tax_households.active_tax_household
+    all_active_thh.group_by(&:effective_starting_on).select {|k, v| v.size > 1}.each_pair do |k, v|
+      ath = tax_households.active_tax_household.tax_household_with_year(k.year).order_by(:'effective_starting_on'.asc)
+      c = ath.count
+      if options.present?
+        # for curam importer
+        ath.limit(c-1).update_all(effective_ending_on: options[:date]) if ath
+      else
+        #for update eligibility manually
+        ath.limit(c-1).update_all(effective_ending_on: Date.new(k.year, 12, 31)) if ath
+      end
+    end
+  end
+
 
   def add_tax_household_family_member(family_member, verified_tax_household_member)
     th = latest_active_tax_household
