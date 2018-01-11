@@ -9,7 +9,6 @@ module PdfTemplates
     attribute :primary_identifier, String
     attribute :employee_fullname, String
     attribute :mpi_indicator, String
-    attribute :aasm_state, String
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
@@ -35,6 +34,7 @@ module PdfTemplates
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
+    attribute :aasm_state, String
 
     def shop?
       return true

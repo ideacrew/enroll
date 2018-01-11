@@ -857,7 +857,7 @@ class PlanYear
     state :canceled,          :after_enter => :cancel_application             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft
+    state :renewing_draft#, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -1257,15 +1257,6 @@ class PlanYear
     end
   end
 
-  def initial_employer_ineligibility_notice
-    return true if benefit_groups.any? { |bg| bg.is_congress? }
-    begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
   def initial_employer_open_enrollment_begins
     return true if (benefit_groups.any?{|bg| bg.is_congress?})
     begin
@@ -1337,6 +1328,15 @@ class PlanYear
     end
     if transmit_employers_immediately?
       employer_profile.transmit_renewal_eligible_event
+    end
+  end
+
+  def initial_employer_ineligibility_notice
+    return true if benefit_groups.any? { |bg| bg.is_congress? }
+    begin
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
@@ -1434,7 +1434,7 @@ class PlanYear
 
     if (start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
       errors.add(:start_on, "may not start application before " \
-        "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
+                 "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
     if !['canceled', 'suspended', 'terminated','termination_pending'].include?(aasm_state)

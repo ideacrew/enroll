@@ -44,17 +44,17 @@ module Factories
             if passive_renewals.blank?
               if active_enrollment.present? && active_enrollment.inactive?
                 renew_enrollment(enrollment: active_enrollment, waiver: true)
-                trigger_notice { "employee_open_enrollment_unenrolled" }
+                census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_plan_year}) unless disable_notifications
               elsif renewal_plan_offered_by_er?(active_enrollment)
-                renew_enrollment(enrollment: active_enrollment)
-                trigger_notice { "employee_open_enrollment_auto_renewal" }
+                renewal_enrollment = renew_enrollment(enrollment: active_enrollment)
+                census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: renewing_plan_year}) unless (renewal_enrollment.coverage_kind == "dental" || disable_notifications)
               else
-                trigger_notice { "employee_open_enrollment_no_auto_renewal" }
+                census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewing_plan_year}) unless disable_notifications
               end
             end
           end
         elsif find_renewal_enrollments.blank?
-          trigger_notice { "employee_open_enrollment_unenrolled" }
+          census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_plan_year}) unless disable_notifications
         end
       rescue Exception => e
         "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
@@ -73,10 +73,10 @@ module Factories
 
     def renewal_plan_offered_by_er?(enrollment)
       plan = enrollment.plan
-      if plan.present? || plan.renewal_plan_id.present?
+      if plan.present? || plan.renewal_plan(renewing_plan_year.start_on).present?
         benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
         elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
-        elected_plan_ids.include?(plan.renewal_plan_id)
+        elected_plan_ids.include?(plan.renewal_plan(renewing_plan_year.start_on).id)
       else
        false
      end
@@ -126,18 +126,6 @@ module Factories
         coverage_kind: coverage_kind
       }).renew_coverage
     end
-
-    def trigger_notice
-      if !disable_notifications && coverage_kind == 'health'
-        notice_name = yield
-        begin
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
-        rescue Exception => e
-          Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
-        end
-      end
-    end
-
 
     # relationship offered in renewal plan year and member active in enrollment.
     def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
