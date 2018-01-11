@@ -1805,8 +1805,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       primary_person.person_relationships << PersonRelationship.new(relative_id: other_child_person1.id, kind: "child")
       primary_person.person_relationships << PersonRelationship.new(relative_id: other_child_person2.id, kind: "child")
       primary_person.save
-      other_child_person1.dob = Date.new(date.year, 8, date.beginning_of_month.day) - 26.years
-      other_child_person2.dob = Date.new(date.year, 8, date.beginning_of_month.day) - 26.years
+      other_child_person1.dob = Date.new(date.year, date.month, date.beginning_of_month.day) - 26.years
+      other_child_person2.dob = Date.new(date.year, date.month, date.beginning_of_month.day) - 26.years
       other_child_person1.save
       other_child_person2.save
       family.save
