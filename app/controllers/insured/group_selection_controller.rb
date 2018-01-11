@@ -9,7 +9,7 @@ class Insured::GroupSelectionController < ApplicationController
     set_bookmark_url
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-    @effective_on_date = params[:effective_on_date]
+    @effective_on_date = build_hbx_enrollment.effective_on #building hbx enrollment before hand to display correct effective date on CCH page
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
       if params[:hbx_enrollment_id].present?
