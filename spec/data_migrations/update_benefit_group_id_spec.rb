@@ -14,12 +14,12 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
     let(:household) {Household.new}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person, households: [household])}
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", benefit_group_id: nil)}
     before(:each) do
       ENV['benefit_group_id'] = benefit_group.id
-      ENV['hbx_id'] = person.hbx_id
+      ENV['enrollment_hbx_id'] = hbx2.hbx_id
       allow(person).to receive(:primary_family).and_return(family)
-      allow(family).to receive(:active_household).and_return(household)
-      hbx2 = FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", benefit_group_id: nil)
+      allow(family).to receive(:active_household).and_return(household)     
       hbx2.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record - 30.days)
       hbx2.save
     end
