@@ -12,7 +12,7 @@ describe RemoveResidentRole do
     end
   end
 
-  describe "remove resident role for person with no enrollments" do
+  describe "remove resident role for person with consumer and resident roles", dbclean: :after_each do
     let!(:person1) { FactoryGirl.create(:person, :with_resident_role, id:'58e3dc7dqwewqewqe') }
     let!(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person2) }
@@ -31,17 +31,28 @@ describe RemoveResidentRole do
       person2.reload
     end
 
-    it "deletes the resident role for person2 and not for person1" do
+    it "deletes the resident role for person2" do
       expect(person1.resident_role).not_to be_nil
-      expect(person2.resident_role).to be(nil)
+    end
+
+    it "does not delete the resident role for person1" do
+      expect(person1.resident_role).not_to be_nil
+    end
+
+    it "sets the kind attribute on person2's enrollment to individual" do
       expect(person2.primary_family.active_household.hbx_enrollments.first.kind).to eq("individual")
+    end
+
+    it "sets the resident_role_id on person2's enrollment to nil" do
       expect(person2.primary_family.active_household.hbx_enrollments.first.resident_role_id).to be(nil)
+    end
+
+    it "sets the consumer_role_id on person2's enrollment to be the consumer role of person2" do
       expect(person2.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to eq(person2.consumer_role.id)
-      expect(person2.consumer_role).not_to be_nil
     end
   end
 
-  describe "remove resident role for person with coverall enrollment and no consumer_role" do
+  describe "remove resident role for person with coverall enrollment and no consumer_role", dbclean: :after_each do
     let!(:person1) { FactoryGirl.create(:person, :with_resident_role, ssn: 111111111)}
     let!(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
     let!(:ivl_enrollment) do
@@ -58,11 +69,23 @@ describe RemoveResidentRole do
       person1.reload
     end
 
-    it "deletes the resident role for person1 and creates a consumer role as well" do
-      expect(person1.consumer_role).not_to be_nil
+    it "deletes the resident role for person1" do
       expect(person1.resident_role).to be(nil)
+    end
+
+    it "creates a consumer role and associates it with person1" do
+      expect(person1.consumer_role).not_to be_nil
+    end
+
+    it "sets the kind attribute of person1's enrollment to individual" do
       expect(person1.primary_family.active_household.hbx_enrollments.first.kind).to eq("individual")
+    end
+
+    it "sets the resident_role_id for person1's enrollment to nil" do
       expect(person1.primary_family.active_household.hbx_enrollments.first.resident_role_id).to be(nil)
+    end
+
+    it "sets the consumer_role_id of person1's enrollmet to the new consumer_role.id associated with perosn1" do
       expect(person1.primary_family.active_household.hbx_enrollments.first.consumer_role_id).to eq(person1.consumer_role.id)
     end
   end
