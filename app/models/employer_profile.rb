@@ -325,6 +325,16 @@ class EmployerProfile
     self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end
 
+  # It will check whether employer is regular or convesion
+  # It will add additional check on conversion employers with plan year is in PlanYear::RENEWING
+  #
+  # @return [Boolean]
+  #  @return true if employer is conversion employer && plan year is renewal related states
+  #  @return false other wise
+  def is_converting_with_renewal_state?
+    is_converting? && PlanYear::RENEWING.include?(published_plan_year.aasm_state)
+  end
+
   def find_plan_year_by_effective_date(target_date)
     plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(aasm_state: "expired")).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)

@@ -147,4 +147,8 @@ module Config::SiteHelper
   def site_document_verification_checklist_url
     Settings.site.document_verification_checklist_url
   end
+
+  def site_invoice_bill_url
+    Settings.site.invoice_bill_url
+  end
 end
