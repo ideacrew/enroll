@@ -9,9 +9,14 @@ class RemoveResidentRole < MongoidMigrationTask
   # designated as coverall.
 
   def migrate
-    correct_assignments = ['58b71497f1244e4a42000095', '572a6491f1244e025a00007f',
-      '58b9d9da082e7653ea000106', '58e3dc7d50526c33c5000187']
-    people = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
+    correct_assignments = ENV['coverall_ids'].to_s.split(',')
+    binding.pry
+    # using the p_to_fix_id variable to test individual cases before running on the entire system
+    if ENV['p_to_fix_id'].nil?
+      people = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
+    else
+      people = Person.where(id: ENV['p_to_fix_id'].to_s).first
+    end
     people.each do |person|
       # exclude the valid coverall enrollments
       unless correct_assignments.include?(person.id.to_s)
