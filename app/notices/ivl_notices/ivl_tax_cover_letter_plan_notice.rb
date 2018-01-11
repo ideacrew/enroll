@@ -12,6 +12,10 @@ class IvlNotices::IvlTaxCoverLetterPlanNotice < IvlNotice
     super(args)
   end
 
+  def attach_1095a_form
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', '1095a.pdf')]
+  end
+
   def deliver
     append_hbe
     build
@@ -19,6 +23,7 @@ class IvlNotices::IvlTaxCoverLetterPlanNotice < IvlNotice
     attach_blank_page(notice_path)
     attach_non_discrimination
     attach_taglines
+    attach_1095a_form
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -31,10 +36,10 @@ class IvlNotices::IvlTaxCoverLetterPlanNotice < IvlNotice
   end
 
   def build
-    notice.is_an_aqhp_hbx_enrollment = (@true_or_false.present? && @true_or_false.to_s.downcase == "true") ? true : false
+    notice.is_an_aqhp_cover_letter = (@true_or_false.present? && @true_or_false.to_s.downcase == "true") ? true : false
     notice.mpi_indicator = self.mpi_indicator
     family = recipient.primary_family
-    notice.primary_fullname = recipient.full_name.titleize || ""
+    notice.primary_fullname = ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else  
@@ -45,17 +50,11 @@ class IvlNotices::IvlTaxCoverLetterPlanNotice < IvlNotice
 
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
+      street_1: "",
+      street_2: "",
+      city: "",
+      state: "",
+      zip: ""
       })
-  end
-
-  def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x| 
-      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
-    end.join(' ')
   end
 end
