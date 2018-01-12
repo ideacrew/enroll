@@ -47,14 +47,19 @@ module Factories
         default_benefit_group = @employer_profile.plan_years.published.first.benefit_groups.first
       end
 
-      @employer_profile.census_employees.exists("benefit_group_assignments" => false).each do |ce|
+      @employer_profile.census_employees.non_terminated.exists("benefit_group_assignments" => false).each do |ce|
         ce.add_benefit_group_assignment(default_benefit_group, default_benefit_group.start_on)
         ce.add_renew_benefit_group_assignment(renewing_group)
         ce.save!
       end
 
       @employer_profile.census_employees.non_terminated.each do |ce|
+
         begin
+          if CensusEmployee::PENDING_STATES.include?(ce.aasm_state)
+            next if ce.coverage_terminated_on.blank? || ce.coverage_terminated_on < @renewing_plan_year.start_on
+          end
+
           @logger.debug "renewing: #{ce.full_name}"
           person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
 

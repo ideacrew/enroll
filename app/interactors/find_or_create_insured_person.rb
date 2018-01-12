@@ -3,7 +3,12 @@ class FindOrCreateInsuredPerson
 
   def call
     user = context.user
-    people = Person.match_by_id_info(ssn: context.ssn, dob: context.dob, last_name: context.last_name, first_name: context.first_name)
+    people = Person.match_by_id_info(
+      ssn: context.ssn,
+      dob: context.dob,
+      last_name: context.last_name,
+      first_name: context.first_name
+      )
     person, is_new = nil, nil
     case people.count
     when 1
@@ -19,6 +24,7 @@ class FindOrCreateInsuredPerson
       user = person.user if context.role_type == User::ROLES[:consumer]
       person, is_new = person, false
     when 0
+      return if context.ssn.present? && Person.where(encrypted_ssn: Person.encrypt_ssn(context.ssn)).present?
       if user.try(:person).try(:present?)
         if user.person.first_name.downcase == context.first_name.downcase and
           user.person.last_name.downcase == context.last_name.downcase # if user enters lowercase during matching.
@@ -46,8 +52,7 @@ class FindOrCreateInsuredPerson
           ssn: context.ssn,
           no_ssn: context.no_ssn,
           dob: context.dob,
-          gender: context.gender,
-        ), true
+          gender: context.gender), true
       end
     else
       # what am I doing here?  More than one person had the same SSN?

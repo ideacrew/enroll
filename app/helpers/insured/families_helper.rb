@@ -14,8 +14,10 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.kind == 'employer_sponsored'
+    if hbx_enrollment.is_shop?
       hbx_enrollment.total_employee_cost
+    elsif hbx_enrollment.kind == 'coverall'
+      hbx_enrollment.total_premium
     else
       hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
     end
@@ -127,6 +129,7 @@ module Insured::FamiliesHelper
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
+    return false if !hbx_enrollment.is_shop?
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
@@ -190,12 +193,13 @@ module Insured::FamiliesHelper
   def build_link_for_sep_type(sep, link_title=nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
+    return if qle.blank?
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
        qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
+      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: "btn btn-default"
     end
   end
 
@@ -203,7 +207,38 @@ module Insured::FamiliesHelper
     QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
   end
 
-  def dual_role_without_shop_sep?
-    @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
+  def person_has_any_roles?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? 
+  end
+
+  def is_strictly_open_enrollment_case?
+    is_under_open_enrollment? && @family.active_seps.blank?
+  end
+
+  def tax_info_url
+    if ENV['AWS_ENV'] == 'prod'
+      "https://dchealthlink.com/individuals/tax-documents"
+    else
+      "https://staging.dchealthlink.com/individuals/tax-documents"
+    end
+  end
+
+  def show_download_tax_documents_button?
+    if @person.ssn.blank?
+      false
+    elsif @person.consumer_role.blank?
+      false
+    elsif @person.consumer_role.present? 
+      true
+    end
+  end
+  def is_applying_coverage_value_personal(person)
+    first_checked = true
+    second_checked = false
+    if person.consumer_role.present?
+      first_checked = person.consumer_role.is_applying_coverage
+      second_checked = !person.consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
   end
 end
