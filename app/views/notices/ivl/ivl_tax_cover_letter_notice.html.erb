@@ -151,7 +151,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: [""], heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '12px', bottom_margin: '8px'} %>
+ contents: [""], heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '12px'} %>
 
 <% if notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
