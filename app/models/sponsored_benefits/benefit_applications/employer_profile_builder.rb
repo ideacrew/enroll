@@ -41,11 +41,12 @@ module SponsoredBenefits
       end
 
       def add_plan_year
-        @employer_profile.plan_years << @benefit_application.to_plan_year
+        quote_plan_year = @benefit_application.to_plan_year
 
         if @employer_profile.active_plan_year.present?
-          @employer_profile.plan_years[0].renew_plan_year if @employer_profile.plan_years[0].may_renew_plan_year?
+          quote_plan_year.renew_plan_year if quote_plan_year.may_renew_plan_year?
         end
+        @employer_profile.plan_years << quote_plan_year
 
         @employer_profile.save!
       end
