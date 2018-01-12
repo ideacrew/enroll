@@ -130,6 +130,7 @@ var EmployerProfile = ( function( window, undefined ) {
             if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
               editvalidatedbgemployeepremiums = true
               editvalidated = true;
+              editvalidatedbgfamilypremiums = true;
             } else {
 
               $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
