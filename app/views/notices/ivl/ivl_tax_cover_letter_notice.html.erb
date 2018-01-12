@@ -154,7 +154,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
  contents: [""], heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '12px'} %>
 
 <% if notice.is_an_aqhp_cover_letter %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "Because you received a tax credit in #{previous_year}, you must complete IRS Premium Tax Credit Form 8962 when you file your federal taxes.  You’ll need the information on Form 1095-A to fill out Form 8962."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -180,7 +180,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: [""], heading: 'Understanding Form 1095-A', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "IRS Form 1095-A has three sections:"} %>
 
 <table class="total_table" border="0" style="page-break-inside: avoid; display:block;">
