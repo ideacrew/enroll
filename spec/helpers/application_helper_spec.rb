@@ -372,6 +372,26 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "Has New Hire Enrollment" do
+    let(:user) { double("User") }
+    let(:census_employee1) { double("CensusEmployee") }
+    let(:census_employee2) { double("CensusEmployee") }
+    let(:date1) {TimeKeeper.datetime_of_record + 20.days}
+    let(:date2) {TimeKeeper.datetime_of_record - 5.days}
+    before do
+       allow(census_employee1).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 20.days .. TimeKeeper.datetime_of_record - 10.days)
+       allow(census_employee2).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 10.days .. TimeKeeper.datetime_of_record)
+    end
+
+    it "should return false if the date on record does not fall under new hire enrollment period" do
+      expect(helper.has_new_hire_enrollment_period?(census_employee1)).to eq false
+    end
+
+    it "should return true if the date on record falls under new hire enrollment period" do
+      expect(helper.has_new_hire_enrollment_period?(census_employee2)).to eq true
+    end
+  end
+
   describe "#is_new_paper_application?" do
     let(:person_id) { double }
     let(:admin_user) { FactoryGirl.create(:user, :hbx_staff)}
