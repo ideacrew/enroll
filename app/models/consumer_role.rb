@@ -112,6 +112,7 @@ class ConsumerRole
   end
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
+  embeds_many :verification_type_history_elements
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
@@ -143,6 +144,7 @@ class ConsumerRole
   embeds_one :lawful_presence_determination, as: :ivl_role
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
+  embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
 
@@ -513,7 +515,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :verification_outstanding
     end
 
-    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :mark_residency_pending, :notify_of_eligibility_change, :record_transition] do
+    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
       transitions from: :dhs_pending, to: :unverified
@@ -666,12 +668,19 @@ class ConsumerRole
     family.person_has_an_active_enrollment?(person)
   end
 
+  def add_type_history_element(params)
+    verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
+  end
+
   def can_start_residency_verification? # initial trigger check for coverage purchase
     !person.no_dc_address && person.age_on(TimeKeeper.date_of_record) > 18
   end
 
   def invoke_residency_verification!
-    start_residency_verification_process if can_start_residency_verification?
+    if can_start_residency_verification?
+      mark_residency_pending
+      start_residency_verification_process
+    end
   end
 
   #class methods
@@ -688,19 +697,19 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false,
                       :local_residency_validation => "outstanding")
   end
 
   def mark_residency_pending(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil,
                       :local_residency_validation => "pending")
   end
 
   def mark_residency_authorized(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true,
                       :local_residency_validation => "valid")
   end
@@ -899,6 +908,11 @@ class ConsumerRole
 
   def citizenship_immigration_processing?
     dhs_pending? || ssa_pending?
+  end
+
+  def processing_residency_24h?
+    return false if self.residency_determined_at.nil?
+    residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
   end
 
   def sensitive_information_changed(field, person_params)
