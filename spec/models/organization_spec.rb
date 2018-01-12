@@ -285,9 +285,9 @@ RSpec.describe Organization, dbclean: :after_each do
 
       context 'by_broker_agency_profile' do
         let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-        let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
+        let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "shop", primary_broker_role_id: "8754985")}
         let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-        let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+        let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "shop", primary_broker_role_id: "7754985")}
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do

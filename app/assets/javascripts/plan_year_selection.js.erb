@@ -1,4 +1,5 @@
 var plan_year_selection_loader;
+
 ready = function() {
 
   // match health with dental offering selections
@@ -280,7 +281,8 @@ ready = function() {
 
   });
 
-  $(".benefits-fields .slider").on("slideStop", function(slideEvt) {
+  $(".plan-year-setup .benefits-fields .slider").on("slideStop", function(slideEvt) {
+
     $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
     $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
 
@@ -319,7 +321,7 @@ ready = function() {
     });
 
     // MAKE SLIDER AND ADJACENT INPUT FIELD MIRROR EACHOTHER
-    $(document).on('change', 'input.premium-storage-input', function() {
+    $(document).on('change', '.plan-year-setup input.premium-storage-input', function() {
       if ( $(this).hasClass('slider') ) {
         $(this).on("slideStop", function(slideEvt) {
           var data = $(this).val();
@@ -391,7 +393,7 @@ ready = function() {
 
       });
 
-    $(document).on('change', '.nav-tabs li input', function() {
+    $(document).on('change', '.health .nav-tabs li input', function() {
       if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
         EmployerProfile.validateEditPlanYear();
 
@@ -436,7 +438,7 @@ ready = function() {
 
     //toggle plan options checkbox through parent anchor
 
-    $(document).on('click', '.plan-options a', function() {
+    $(document).on('click', '.health .plan-options a', function() {
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
         if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
           EmployerProfile.validateEditPlanYear();

@@ -188,7 +188,13 @@ module Employers::EmployerHelper
     end
   end
 
-
+  def show_or_hide_claim_quote_button(employer_profile)
+    return true if employer_profile.show_plan_year.blank?
+    return true if employer_profile.plan_years_with_drafts_statuses
+    return true if employer_profile.has_active_state? && employer_profile.show_plan_year.try(:terminated_on).present? && employer_profile.show_plan_year.terminated_on > TimeKeeper.date_of_record
+    return false if !employer_profile.plan_years_with_drafts_statuses && employer_profile.published_plan_year.present?
+    false
+  end
 
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
