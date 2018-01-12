@@ -116,4 +116,65 @@ namespace :seed do
     end
     load_irs_families_seed
   end
+
+  desc "Load the core29 families data"
+  task :core29_people => :environment do
+    file_user = File.open("db/seedfiles/core_faa_families.json", "r")
+    contents_user = file_user.read
+    file_user.close
+
+    data_user = JSON.load(contents_user)
+    puts "Loading #{data_user.count} user."
+
+    num_success = data_user.reduce(0) do |acc, ud|
+      u = Hash[*ud.flatten]
+      begin
+        user_email = u["user"].first["email"]
+        user_oim_id = u["user"].first["oim_id"]
+        existing_user = User.all.where(email: user_email).and(oim_id: user_oim_id).first
+        if existing_user.present?
+          existing_user.person.primary_family.destroy if existing_user.person.primary_family.present?
+          if existing_user.person.person_relationships.count >0
+            existing_user.person.person_relationships.each do |a|
+              Person.where(id: a.relative_id).first.destroy
+            end
+          end
+          existing_user.person.destroy if existing_user.person.present?
+          existing_user.destroy
+        end
+        user = User.create!(u["user"])
+        person = Person.new(u["person"].first)
+        ssn = generate_ssn
+        person.ssn = ssn
+        person.save!
+
+        attr_count = u.count
+        dependent_count = attr_count-5
+        while u.count >5 && dependent_count!=0 do
+          puts "in dependent"
+          dependent = Person.new(u["dependent#{dependent_count}"].first["dependent"].first)
+
+          if !u["dependent#{dependent_count}"].first["dependent"].first["no_ssn"].present?
+            ssn = generate_ssn
+            dependent.ssn = ssn
+          end
+          dependent.save!
+          person.person_relationships.new(kind: u["dependent#{dependent_count}"].first["kind"], relative_id: dependent.id)
+          person.save!
+          dependent_count=dependent_count-1
+        end
+
+        person.update_attributes(user: user.first)
+        consumer_role = ConsumerRole.new(u["consumer_role"].first)
+        consumer_role.update_attributes(person: person)
+        consumer_role.save!
+        Family.new.build_from_person(person).save!
+      rescue
+        raise ud.inspect
+      end
+      # user.valid? ? acc + 1 : acc
+    end
+    puts "Loaded #{num_success} person successfully."
+  end
+
 end
