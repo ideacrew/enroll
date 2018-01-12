@@ -222,7 +222,7 @@ content: "IRS Form 1095-A has three sections:"} %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}."} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You only need to fill out Form 8962 if you want to see if you qualified for a premium tax credit in #{previous_year}."} %>
 <% end %>
 
