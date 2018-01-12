@@ -137,7 +137,7 @@
 content: "This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone in your household enrolled in a private health insurance plan through #{Settings.site.short_name} in #{previous_year}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Federal law requires most Americans to have a minimum level of health coverage. This requirement is known as the individual mandate. Your enrollment in a private health insurance plan meets this requirement. We report your enrollment status each month to the Internal Revenue Service (IRS).  These reports allow the IRS to verify the months that you were enrolled in coverage through #{Settings.site.short_name}."} %>
+content: "Federal law requires most Americans to have a minimum level of health coverage. This requirement is known as the individual mandate, and it’s still in effect for the #{previous_year} and #{previous_year + 1} tax years. Your enrollment in a private health insurance plan meets this requirement. We report your enrollment status each month to the Internal Revenue Service (IRS).  These reports allow the IRS to verify the months that you were enrolled in coverage through #{Settings.site.short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "We are required by federal law to send a copy of your Form 1095-A to you and the Internal Revenue Service (IRS). You may need this form to complete your federal tax return for #{previous_year}. Please keep it for your records.  You can also download a copy of your tax form at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."} %>
