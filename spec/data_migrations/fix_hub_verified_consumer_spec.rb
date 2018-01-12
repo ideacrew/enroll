@@ -187,7 +187,6 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
 
   describe "consumer has verification_outstanding status" do
     before :each do
-      allow(ENV).to receive(:[]).with("event_name").and_return("fix_outstanding_people")
       person.consumer_role.aasm_state = "verification_outstanding"
       person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
     end
@@ -256,50 +255,6 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
         it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
         it_behaves_like "consumer verification types", "set", "Immigration status", "verification_successful"
         it_behaves_like "consumer verification status", "updates", "verification_outstanding", "fully_verified"
-      end
-    end
-  end
-
-  describe "consumer has unverified status" do
-    before :each do
-      allow(ENV).to receive(:[]).with("event_name").and_return("fix_unverified_people")
-      person.consumer_role.aasm_state = "unverified"
-      person.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
-    end
-    describe "SSN, Citizenship, SSA Hub response" do
-      context "SSA response: SSN - ok, Citizenship - ok" do
-        before :each do
-          person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_true
-          person.save!
-          subject.migrate
-          person.reload
-        end
-        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Citizenship"]
-        it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
-        it_behaves_like "consumer verification types", "set", "Citizenship", "verification_successful"
-        it_behaves_like "consumer verification status", "updates", "unverified", "fully_verified"
-      end
-      context "SSA response: SSN - ok, Citizenship - fail" do
-        before :each do
-          person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
-          person.save!
-          subject.migrate
-          person.reload
-        end
-        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Citizenship"]
-        it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
-        it_behaves_like "consumer verification status", "remains", "unverified", "unverified"
-      end
-      context "SSA response: SSN - fail" do
-        before :each do
-          person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_false
-          person.save!
-          subject.migrate
-          person.reload
-        end
-        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Citizenship"]
-        it_behaves_like "consumer verification types", "set", "Social Security Number", "pending"
-        it_behaves_like "consumer verification status", "remains", "unverified", "unverified"
       end
     end
   end

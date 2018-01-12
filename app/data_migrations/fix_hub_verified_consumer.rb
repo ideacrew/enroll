@@ -2,16 +2,12 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixHubVerifiedConsumer < MongoidMigrationTask
   def migrate
-    events = ENV['event_name'] ? [ ENV['event_name'] ] : [ "fix_outstanding_people", "fix_unverified_people"]
-    events.each do |event_name|
-      people = get_people if event_name == "fix_outstanding_people"
-      people = get_unverified_people if event_name == "fix_unverified_people"
-      people.each do |person|
-        person.verification_types.each do |v_type|
-          if type_verified_by_hub(person, v_type)
-            update_verification_type(person, v_type)
-            puts "Person TYPE verified person: #{person.id} type: #{v_type}" unless Rails.env.test?
-          end
+    people = get_people
+    people.each do |person|
+      person.verification_types.each do |v_type|
+        if type_verified_by_hub(person, v_type)
+          update_verification_type(person, v_type)
+          puts "Person TYPE verified person: #{person.id} type: #{v_type}" unless Rails.env.test?
         end
       end
     end
@@ -102,26 +98,6 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
     ]})
   end
 
-  def get_unverified_people
-    Person.where({'$and' => [
-        {"consumer_role.aasm_state"=>"unverified"},
-        {'$and' => [
-            { '$or' => [
-                {"consumer_role.lawful_presence_determination.ssa_responses" => {'$exists' => true}},
-                {"consumer_role.lawful_presence_determination.vlp_responses" => {'$exists' => true}}
-            ]},
-            { '$or' => [
-                {"consumer_role.ssn_validation" => {'$in' => [
-                    "outstanding", "pending"
-                ]}},
-                {"consumer_role.citizen_status" => {'$in' => [
-                    "not_lawfully_present_in_us", "non_native_not_lawfully_present_in_us", "ssn_pass_citizenship_fails_with_SSA", "non_native_citizen"
-                ]}}
-            ]}
-        ]}
-    ]})
-  end
-
   def ssa_response(person)
     person.consumer_role.lawful_presence_determination.ssa_responses.sort_by(&:received_at).last
   end
@@ -130,4 +106,3 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
     person.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last.try(:body)
   end
 end
-
