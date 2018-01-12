@@ -11,7 +11,7 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     notice_subject = ENV['notice_name'].titleize
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
-    employer_profile = EmployerProfile.find_by_fein(ENV['fein'].to_i)
+    employer_profile = EmployerProfile.find_by_fein(ENV['fein'])
 
     if employer_profile.present?
       upload_and_send_secure_message(employer_profile, notice_path, notice_title, notice_subject)
