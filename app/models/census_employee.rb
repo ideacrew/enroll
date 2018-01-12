@@ -190,15 +190,6 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def employee_record_claimed?(new_employee_role = nil)
-    if new_employee_role.present?
-      new_employee_role.person.user.present?
-    else
-      return false unless employee_role
-      employee_role.person.user.present?
-    end
-  end
-
   def employee_role=(new_employee_role)
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
@@ -206,7 +197,7 @@ class CensusEmployee < CensusMember
     if (self.employer_profile_id == new_employee_role.employer_profile._id)
       self.employee_role_id = new_employee_role._id
       @employee_role = new_employee_role
-      self.link_employee_role! if employee_record_claimed?(new_employee_role)
+      self.link_employee_role! if self.may_link_employee_role?
     else
       message =  "Identifying information mismatch error linking employee role: "\
                  "#{new_employee_role.inspect} "\
@@ -455,7 +446,7 @@ class CensusEmployee < CensusMember
       send_invite! if _id_changed?
 
       if employee_role.present?
-        self.link_employee_role! if may_link_employee_role? && employee_record_claimed?
+        self.link_employee_role! if may_link_employee_role?
       else
         construct_employee_role_for_match_person
       end
