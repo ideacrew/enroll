@@ -23,14 +23,26 @@ class RemoveResidentRole < MongoidMigrationTask
           # indicates enrollment needs to be fixed as well
           if enrollment.kind == "coverall"
             enrollment.kind = "individual"
-            if person.consumer_role.nil?
+            # check for all members on enrollment to remove all resident roles
+            if enrollment.hbx_enrollment_members.size > 1
+              enrollment_members = get_members_as_people_for_enrollment(enrollment.hbx_id)
+              enrollment_members.each do |member|
+                if member.consumer_role.nil?
+                  copy_resident_role_to_consumer_role(member.resident_role)
+                end
+                member.resident_role.destroy
+              end
+              enrollment.consumer_role_id = person.consumer_role.id
+              enrollment.resident_role_id = nil
+            elsif person.consumer_role.nil?
               copy_resident_role_to_consumer_role(person.resident_role)
               enrollment.consumer_role_id = person.consumer_role.id
               enrollment.resident_role_id = nil
             end
             enrollment.save!
           end
-          person.resident_role.destroy
+          # this will already be done if there are multiple members on the enrollment
+          person.resident_role.destroy if enrollment.hbx_enrollment_members.size == 1
           puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
         end
       end
@@ -50,5 +62,9 @@ class RemoveResidentRole < MongoidMigrationTask
     c_role.documents = r_role.paper_applications
     c_role.person = r_role.person
     c_role.save!
+  end
+
+  def get_members_as_people_for_enrollment(id)
+
   end
 end
