@@ -73,10 +73,11 @@
       border: 1px solid #c3c3c3;
     }
 
-    background: transparent;
+    background: #ffffff;
     a {
      background: #ffffff;
      font-weight: normal;
+      width: 99%;
    }
   }
 
@@ -85,13 +86,38 @@
     border: 1px solid #c3c3c3;
     display: table;
     width: 100%;
+    min-height: 54px;
     a {
       height: 50px;
       line-height: 18px;
       vertical-align: middle;
       display: table-cell;
+      padding-top:4px;
+      padding-bottom:4px;
     }
   }
+
+  li.active.applicant-nav {
+    span.applicant-check
+    {
+        margin-left:-4px;
+    }
+  }
+
+  .no-check
+  {
+    padding-left: 45px !important;
+  }
+
+  li.active
+  {
+    a.no-check
+    {
+      padding-left: 37px !important;
+    }
+  }
+
+
 
   li:first-child {
     border: 0px;
@@ -107,6 +133,8 @@
 
   .applicant-check {
     color: #69A30D;
+    padding-left: 16px;
+    padding-top:17px;
   }
   .cna {
     cursor: not-allowed !important;
