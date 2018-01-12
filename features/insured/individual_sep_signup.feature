@@ -26,6 +26,7 @@ Feature: Insured Plan Shopping on Individual market
     When I click on continue button on group selection page during a sep
     And I select three plans to compare
     And I should not see any plan which premium is 0
+    Then I should see the Catastrophic metal level
     And I select a plan on plan shopping page
     And I click on purchase button on confirmation page
     And I click on continue button to go to the individual home page

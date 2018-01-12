@@ -724,6 +724,15 @@ Then(/^.+ should see the list of plans$/) do
   screenshot("plan_shopping")
 end
 
+Then(/^I should( not)? see the (.*?) metal level$/) do |negate, element|
+  sleep 1
+    if negate
+      expect(page).to have_no_css("#plan-metal-level-#{element.downcase}")
+    else
+      expect(page.find("#plan-metal-level-#{element.downcase}", visible: :all)).not_to be_nil
+    end
+end
+
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
   employer_profile = CensusEmployee.where(first_name: people[named_person][:first_name]).first.employee_role.employer_profile
   # cannot select a SEP date from expired plan year on 31st.
