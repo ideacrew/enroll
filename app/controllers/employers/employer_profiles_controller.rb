@@ -126,7 +126,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         @current_plan_year.ensure_benefit_group_is_valid if @current_plan_year
-        sort_plan_years(@employer_profile.plan_years)
+        sort_plan_years(@employer_profile.plan_years.non_canceled)
       when 'documents'
         @datatable = Effective::Datatables::EmployerDocumentDatatable.new({employer_profile_id: params[:id]})
         @documents = []
@@ -157,7 +157,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @tab ||= params[:tab]
     if @tab == 'benefits'
       @current_plan_year = @employer_profile.active_plan_year
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
+      @plan_years = @employer_profile.plan_years.non_canceled.order(id: :desc)
     elsif @tab == 'employees'
       data_table_params = {id: @employer_profile.id, scopes: params[:scopes]}
       if @employer_profile.renewing_plan_year.present?

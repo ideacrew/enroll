@@ -109,7 +109,7 @@ class PlanYear
     )
   }
 
-  scope :non_canceled, -> { not_in(aasm_state: ['canceled, renewing_canceled']) }
+  scope :non_canceled, -> { not_in(aasm_state: %w(canceled renewing_canceled)) }
 
   after_update :update_employee_benefit_packages
 
