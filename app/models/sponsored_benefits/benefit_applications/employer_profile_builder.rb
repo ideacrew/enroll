@@ -46,9 +46,24 @@ module SponsoredBenefits
         if @employer_profile.active_plan_year.present?
           quote_plan_year.renew_plan_year if quote_plan_year.may_renew_plan_year?
         end
-        @employer_profile.plan_years << quote_plan_year
 
+        if quote_plan_year.valid? && @employer_profile.valid?
+          @employer_profile.plan_years.each do |plan_year|
+            next unless plan_year.start_on == quote_plan_year.start_on
+            if plan_year.is_renewing?
+              plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+            else
+              plan_year.cancel! if plan_year.may_cancel?
+            end
+          end
+        end
+
+        @employer_profile.plan_years << quote_plan_year
         @employer_profile.save!
+
+        @employer_profile.census_employees.each do |census_employee|
+          census_employee.save
+        end
       end
 
 
