@@ -28,11 +28,16 @@ module SponsoredBenefits
       end
 
       def validate_effective_date
-        if @employer_profile.present? && @employer_profile.active_plan_year.present?
-          if @employer_profile.active_plan_year.start_on.next_year != plan_design_proposal.effective_date
-            raise "Quote effective date is invalid."
+        if @employer_profile.present?
+          if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
+            base_plan_year = @employer_profile.active_plan_year || @employer_profile.published_plan_year
+
+            if base_plan_year.start_on.next_year != plan_design_proposal.effective_date
+              raise "Quote effective date is invalid"
+            end
           end
         end
+
         return true
       end
 
@@ -43,7 +48,7 @@ module SponsoredBenefits
       def add_plan_year
         quote_plan_year = @benefit_application.to_plan_year
 
-        if @employer_profile.active_plan_year.present?
+        if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
           quote_plan_year.renew_plan_year if quote_plan_year.may_renew_plan_year?
         end
 
