@@ -653,12 +653,13 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
-  def check_for_critical_changes(person_params, family)
-    if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
-      redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
-    end
+  def sensitive_information_changed?(person_params)
+    person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+  end
 
-    trigger_residency! if can_trigger_residency?(person_params["no_dc_address"], family)
+  def check_for_critical_changes(info_changed, family, no_dc_address)
+    redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person) && info_changed
+    trigger_residency! if can_trigger_residency?(no_dc_address, family)
   end
 
   def can_trigger_residency?(no_dc_address, family) # trigger for change in address

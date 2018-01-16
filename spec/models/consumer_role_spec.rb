@@ -678,7 +678,7 @@ context "Verification process and notices" do
         else
           expect(subject).to_not receive(:redetermine_verification!)
         end
-        subject.check_for_critical_changes(params, family)
+        subject.check_for_critical_changes(subject.sensitive_information_changed?(params), family, nil)
       end
     end
     mask_hash.each do |field, action|

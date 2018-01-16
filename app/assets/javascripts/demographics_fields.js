@@ -54,7 +54,6 @@ function applyListenersFor(target) {
   // target is person or dependent
   $("input[name='" + target + "[us_citizen]']").change(function() {
     $('#vlp_documents_container').hide();
-    $('#vlp_documents_container .vlp_doc_area').html("");
     $("input[name='" + target + "[naturalized_citizen]']").attr('checked', false);
     $("input[name='" + target + "[eligible_immigration_status]']").attr('checked', false);
     if ($(this).val() == 'true') {
@@ -79,7 +78,6 @@ function applyListenersFor(target) {
       $('#vlp_documents_container').hide();
       $('#naturalization_doc_type_select').hide();
       $('#immigration_doc_type_select').hide();
-      $('#vlp_documents_container .vlp_doc_area').html("");
     }
   });
 
@@ -92,7 +90,6 @@ function applyListenersFor(target) {
       $('#vlp_documents_container').hide();
       $('#naturalization_doc_type_select').hide();
       $('#immigration_doc_type_select').hide();
-      $('#vlp_documents_container .vlp_doc_area').html("");
     }
   });
 
@@ -101,7 +98,6 @@ function applyListenersFor(target) {
       $('#tribal_container').show();
     } else {
       $('#tribal_container').hide();
-      $('#tribal_id').val("");
     }
   });
 
