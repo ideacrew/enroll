@@ -27,6 +27,68 @@ class IvlNotice < Notice
     end
   end
 
+  def attach_required_documents
+    generate_custom_notice('notices/ivl/documents_section')
+    attach_blank_page(custom_notice_path)
+    join_pdfs [notice_path, custom_notice_path]
+    clear_tmp
+  end
+
+  def generate_custom_notice(custom_template)
+    File.open(custom_notice_path, 'wb') do |file|
+      file << self.pdf_custom(custom_template)
+    end
+  end
+
+  def pdf_custom(custom_template)
+    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options_custom)
+  end
+
+  def pdf_options_custom
+    options = {
+      margin:  {
+        top: 15,
+        bottom: 20,
+        left: 22,
+        right: 22
+      },
+      disable_smart_shrinking: true,
+      dpi: 96,
+      page_size: 'Letter',
+      formats: :html,
+      encoding: 'utf8',
+      header: {
+        content: ApplicationController.new.render_to_string({
+          template: 'notices/shared/header_for_documents.html.erb',
+          layout: false,
+          locals: { recipient: recipient, notice: notice}
+          }),
+        }
+    }
+    options.merge!({footer: {
+      content: ApplicationController.new.render_to_string({
+        template: "notices/shared/footer_ivl.html.erb",
+        layout: false,
+        locals: {notice: notice}
+      })
+    }})
+    options
+  end
+
+  def clear_tmp
+    File.delete(custom_notice_path)
+  end
+
+  def custom_notice_path
+    Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")
+  end
+
+  def generate_custom_notice(custom_template)
+    File.open(custom_notice_path, 'wb') do |file|
+      file << self.pdf_custom(custom_template)
+    end
+  end
+
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
       url: Settings.site.home_url,
