@@ -62,5 +62,17 @@ describe FakesController do
     VlpDocument::VLP_DOCUMENT_KINDS.each do |document|
       it_behaves_like "returns vlp document subject", document, "eligible_immigration_status"
     end
+
+    context "consumer role having invalid vlp document" do
+      let(:invalid_document) { FactoryGirl.build(:vlp_document, subject: "I-551 (Permanent Resident Card)", alien_number: "243")}
+
+      before do
+        consumer_role.vlp_documents = [invalid_document]
+      end
+
+      it "should not return subject" do
+        expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).to be_nil
+      end
+    end
   end
 end

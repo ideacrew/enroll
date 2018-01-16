@@ -49,7 +49,7 @@ module VlpDoc
     return nil if consumer_role.blank? || consumer_role.vlp_documents.empty?
     naturalized_citizen_docs = ["Certificate of Citizenship", "Naturalization Certificate"]
     docs_for_status = consumer_role.citizen_status == "naturalized_citizen" ? naturalized_citizen_docs : VlpDocument::VLP_DOCUMENT_KINDS
-    docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject=>{"$in" => docs_for_status})
-    docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
+    docs_for_status_uploaded = consumer_role.vlp_documents.order_by(:updated_at => 'desc').where(:subject=>{"$in" => docs_for_status}).select { |doc| doc.valid? }
+    docs_for_status_uploaded.any? ? docs_for_status_uploaded.first.subject : nil
   end
 end
