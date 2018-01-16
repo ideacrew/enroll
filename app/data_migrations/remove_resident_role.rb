@@ -12,8 +12,10 @@ class RemoveResidentRole < MongoidMigrationTask
     correct_assignments = ENV['coverall_ids'].to_s.split(',')
     # using the p_to_fix_id variable to test individual cases before running on the entire system
     if ENV['p_to_fix_id'].nil?
+      puts "Here"
       people = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
     else
+      puts "successfully passed the environment id"
       people = Person.where(id: ENV['p_to_fix_id'].to_s).first
     end
     people.each do |person|
@@ -21,14 +23,18 @@ class RemoveResidentRole < MongoidMigrationTask
       unless correct_assignments.include?(person.id.to_s)
         person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
           # indicates enrollment needs to be fixed as well
-          if enrollment.kind == "coverall"
+          if enrollment.kind == "coverall" || enrollment.kind == "individual"
             enrollment.kind = "individual"
             # check for all members on enrollment to remove all resident roles
             if enrollment.hbx_enrollment_members.size > 1
               enrollment_members = get_members_as_people_for_enrollment(enrollment.hbx_id)
               enrollment_members.each do |member|
-                if member.consumer_role.nil?
+                if member.consumer_role.nil? && member.resident_role.present?
                   copy_resident_role_to_consumer_role(member.resident_role)
+                # this branch should never be true but including to be throrough
+                elsif member.consumer_role.nil? && member.resident_role.nil?
+                  member.consumer_role = ConsumerRole.new()
+                  member.consumer_role.save!
                 end
                 member.resident_role.destroy
               end
