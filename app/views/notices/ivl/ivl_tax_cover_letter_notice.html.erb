@@ -207,7 +207,7 @@ content: "IRS Form 1095-A has three sections:"} %>
             <li style="margin-top: 0px;">
               Column B shows the cost of the Second Lowest Cost Silver Plan for any months you received tax credit savings. If this column is blank, and you would like to claim the premium tax credit on your taxes, you can use the Second Lowest Cost Silver Plan calculator at <a href="<%= Settings.site.home_url %>"><%= notice.hbe.short_url %></a> to find out what to enter for this column.
             </li>
-            <li style="margin-top: 0px;">
+            <li style="margin-top: 0px; margin-bottom: 0px;">
               Column C shows the amount of any tax credit paid directly to your health insurance company each month. 
             </li>
           </ul>
@@ -220,10 +220,10 @@ content: "IRS Form 1095-A has three sections:"} %>
 
 <% if notice.is_an_aqhp_cover_letter %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}."} %>
+  content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You must fill out Form 8962 because you received an advance premium tax credit for #{previous_year}.", top_margin: '0px'} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You only need to fill out Form 8962 if you want to see if you qualified for a premium tax credit in #{previous_year}."} %>
+  content: "The back of your Form 1095-A has instructions on how to fill out Form 8962. You only need to fill out Form 8962 if you want to see if you qualified for a premium tax credit in #{previous_year}.", top_margin: '0px'} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
