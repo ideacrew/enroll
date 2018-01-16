@@ -161,7 +161,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
   content: "The IRS requires you to use Form 8962 to report the amount of advance premium tax credit you received in #{previous_year}. You can download Form 8962 directly from the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "If your income is higher than what you told us when you applied for the tax credit, you may have to repay some or all of the tax credit to the IRS. If your income is lower than what you told us, you may get an additional credit on your tax return.", bottom_margin: '8px'} %>
+  content: "If your income is higher than what you told us when you applied for the tax credit, you may have to repay some or all of the tax credit to the IRS. If your income is lower than what you told us, you may get an additional credit on your tax return.", bottom_margin: '8px', top_margin: '10px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "If you do not include Form 8962 when you file your federal taxes:",
