@@ -87,6 +87,26 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
+  context "add_household_coverage_member" do 
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:household) {FactoryGirl.create(:household, family: family)}
+    let(:person)  { FactoryGirl.create(:person)}
+    let(:family_member) { FactoryGirl.create(:family_member, family: family, person: person)}
+    let(:coverage_household) { double "coverage_household" }
+    it "should add memeber to coverage if immediate family" do
+      allow(household).to receive(:immediate_family_coverage_household).and_return(coverage_household)
+      allow(family_member).to receive(:primary_relationship ).and_return("spouse")
+      expect(coverage_household).to receive(:add_coverage_household_member).once
+      household.add_household_coverage_member(family_member)
+    end
+
+    it "should remove memeber to coverage if NOT immediate family" do
+      allow(household).to receive(:immediate_family_coverage_household).and_return(coverage_household)
+      allow(family_member).to receive(:primary_relationship ).and_return("father")
+      expect(coverage_household).to receive(:remove_family_member).once
+      household.add_household_coverage_member(family_member)
+    end
+  end
 
   context "enrolled_including_waived_hbx_enrollments" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}

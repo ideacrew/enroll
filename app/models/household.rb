@@ -33,27 +33,6 @@ class Household
 
   # after_build :build_irs_group
 
-  def active_hbx_enrollments
-    actives = hbx_enrollments.collect() do |list, enrollment|
-      if enrollment.plan.present? &&
-         (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
-         (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
-
-        list << enrollment
-      end
-      list
-    end
-    actives.sort! { |a,b| a.submitted_at <=> b.submitted_at }
-  end
-
-  def renewing_hbx_enrollments
-    active_hbx_enrollments.reject { |en| !HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) }
-  end
-
-  def renewing_individual_market_hbx_enrollments
-    renewing_hbx_enrollments.reject { |en| en.enrollment_kind != 'individual' }
-  end
-
   def add_household_coverage_member(family_member)
     if Family::IMMEDIATE_FAMILY.include?(family_member.primary_relationship)
       immediate_family_coverage_household.add_coverage_household_member(family_member)
