@@ -477,6 +477,15 @@ RSpec.describe VerificationHelper, :type => :helper do
       it 'returns outstanding if identity_validation is outstanding' do
         person.consumer_role.application_validation = 'outstanding'
         expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
+        person.consumer_role.is_state_resident = false
+        person.consumer_role.vlp_documents = []
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq('Outstanding')
+      end
+      it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
+        person.consumer_role.is_state_resident = false
+        person.consumer_role.local_residency_validation = "pending"
+        person.consumer_role.vlp_documents = []
+        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
   end
@@ -689,5 +698,26 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
+  end
+
+  describe "#build_reject_reason_list" do
+    shared_examples_for "reject reason dropdown list" do |type, reason_in, reason_out|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return "review"
+      end
+      it "includes #{reason_in} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to include reason_in
+      end
+      it "don't include #{reason_out} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to_not include reason_out
+      end
+    end
+
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", "4 weeks"
+    it_behaves_like "reject reason dropdown list", "Immigration status", "Expired", "Too old"
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", nil
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Illegible", "Expired"
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Wrong Type", "Too old"
+    it_behaves_like "reject reason dropdown list", "American Indian Status", "Wrong Person", "Expired"
   end
 end

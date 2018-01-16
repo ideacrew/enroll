@@ -759,7 +759,7 @@ class ConsumerRole
   end
 
   def mark_residency_pending(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil,
                       :local_residency_validation => "pending")
   end
@@ -1006,13 +1006,13 @@ class ConsumerRole
     end
   end
 
+  def citizenship_immigration_processing?
+    dhs_pending? || ssa_pending?
+  end
+
   def processing_residency_24h?
     return false if self.residency_determined_at.nil?
     residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
-  end
-
-  def citizenship_immigration_processing?
-    dhs_pending? || ssa_pending?
   end
 
   def sensitive_information_changed(field, person_params)
