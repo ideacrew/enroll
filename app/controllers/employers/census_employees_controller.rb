@@ -20,6 +20,9 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if @census_employee.save
       flash[:notice] = "Census Employee is successfully created."
+      if @census_employee.active_benefit_group_assignment.blank?
+        flash[:notice] = "Your employee was successfully added to your roster."
+      end
       redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
       begin

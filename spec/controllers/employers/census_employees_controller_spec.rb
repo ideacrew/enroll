@@ -72,7 +72,7 @@ RSpec.describe Employers::CensusEmployeesController do
     context "get flash notice" do
       it "with benefit_group_id" do
         allow(census_employee).to receive(:save).and_return(true)
-        allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
+        allow(census_employee).to receive(:active_benefit_group_assignment).and_return(true)
         post :create, :employer_profile_id => employer_profile_id, census_employee: {}
         expect(flash[:notice]).to eq "Census Employee is successfully created."
       end
@@ -83,6 +83,12 @@ RSpec.describe Employers::CensusEmployeesController do
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(assigns(:reload)).to eq true
       expect(response).to render_template("new")
+    end
+
+    it "should return success flash notice as roster added when no ER benefits present" do
+      allow(census_employee).to receive(:save).and_return(true)
+      post :create, :employer_profile_id => employer_profile_id, census_employee: {}
+      expect(flash[:notice]).to eq "Your employee was successfully added to your roster."
     end
   end
 
