@@ -15,7 +15,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><%= notice.primary_fullname %>:</td>
+      <td>Dear <%= notice.primary_fullname %>:</td>
     </tr>
   </tbody>
 </table>
@@ -40,11 +40,13 @@ content: "For more information on these topics, consult a tax adviser or visit t
 
 <br>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you have questions or concerns, we’re here to help."} %>
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you have questions or concerns, we’re here to help."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+</div>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
