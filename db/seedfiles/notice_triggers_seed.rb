@@ -1993,6 +1993,27 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVL_TAX',
+    title: 'Your 1095-A Health Coverage Tax Form',
+    description: 'Notice to be sent out to all the people who got 1095a form for the year 2017',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_tax_cover_letter_notice',
+    notice_triggers: [
+      {
+        name: '1095A Tax Cover Letter Notice',
+        notice_template: 'notices/ivl/ivl_tax_cover_letter_notice',
+        notice_builder: 'IvlNotices::IvlTaxCoverLetterPlanNotice',
+        mpi_indicator: 'IVL_TAX',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
