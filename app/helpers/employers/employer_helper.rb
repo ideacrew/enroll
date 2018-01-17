@@ -196,6 +196,17 @@ module Employers::EmployerHelper
     false
   end
 
+  def claim_quote_warnings(employer_profile)
+    plan_year = employer_profile.plan_years.draft[0]
+    return [], "#claimQuoteModal" unless plan_year
+
+    if plan_year.is_renewing?
+      return ["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+    else
+      return ["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+    end
+  end
+
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state

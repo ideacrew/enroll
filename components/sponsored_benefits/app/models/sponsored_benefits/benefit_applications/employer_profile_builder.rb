@@ -28,11 +28,16 @@ module SponsoredBenefits
       end
 
       def validate_effective_date
-        if @employer_profile.present? && @employer_profile.active_plan_year.present?
-          if @employer_profile.active_plan_year.start_on.next_year != plan_design_proposal.effective_date
-            raise "Quote effective date is invalid."
+        if @employer_profile.present?
+          if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
+            base_plan_year = @employer_profile.active_plan_year || @employer_profile.published_plan_year
+
+            if base_plan_year.start_on.next_year != plan_design_proposal.effective_date
+              raise "Quote effective date is invalid"
+            end
           end
         end
+
         return true
       end
 
@@ -41,13 +46,29 @@ module SponsoredBenefits
       end
 
       def add_plan_year
-        @employer_profile.plan_years << @benefit_application.to_plan_year
+        quote_plan_year = @benefit_application.to_plan_year
 
-        if @employer_profile.active_plan_year.present?
-          @employer_profile.plan_years[0].renew_plan_year if @employer_profile.plan_years[0].may_renew_plan_year?
+        if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
+          quote_plan_year.renew_plan_year if quote_plan_year.may_renew_plan_year?
         end
 
+        if quote_plan_year.valid? && @employer_profile.valid?
+          @employer_profile.plan_years.each do |plan_year|
+            next unless plan_year.start_on == quote_plan_year.start_on
+            if plan_year.is_renewing?
+              plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+            else
+              plan_year.cancel! if plan_year.may_cancel?
+            end
+          end
+        end
+
+        @employer_profile.plan_years << quote_plan_year
         @employer_profile.save!
+
+        @employer_profile.census_employees.each do |census_employee|
+          census_employee.save
+        end
       end
 
 
