@@ -234,6 +234,14 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def can_trigger_sep_confirmation_notice?
+    if employer_profile.is_renewing_employer?
+      employer_profile.renewing_plan_year_oe_closed_and_is_valid?
+    elsif employer_profile.is_new_employer?
+      employer_profile.binder_paid? || employer_profile.enrolled?
+    end
+  end
+
   def active_and_renewing_benefit_group_assignments
     result = []
     result << active_benefit_group_assignment if !active_benefit_group_assignment.nil? 

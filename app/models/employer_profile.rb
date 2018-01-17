@@ -364,6 +364,11 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
+  def renewing_plan_year_oe_closed_and_is_valid?
+    return false unless renewing_plan_year.present?
+    renewing_plan_year.is_open_enrollment_closed? && renewing_plan_year.is_enrollment_valid?
+  end
+
   def is_transmit_xml_button_disabled?
     if self.renewing_plan_year.present?
       binder_criteria_satisfied?
