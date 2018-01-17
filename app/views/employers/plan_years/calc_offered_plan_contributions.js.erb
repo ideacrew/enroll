@@ -116,17 +116,24 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
        url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
      });
      
+      var plan_options = $(this).closest('.benefit-group-fields').find('.health .plan-options');
+      plan_options.slideDown();
+
       $('.tab-container').hide();
       if (selected_carrier_level == 'sole_source') {
         $('.sole-source-plan-tab').show();
+        plan_options.find('.sole-source-plan-tab').show();
       } else if (selected_carrier_level == 'single_plan') {
         $('.single-plan-tab').show();
+        plan_options.find('.single-plan-tab').show();
       } else if (selected_carrier_level == 'metal_level') {
         $('.metal-level-tab').show();
+        plan_options.find('.metals-tab').show();
       } else if (selected_carrier_level == 'single_carrier') {
         $('.single-carrier-tab').show();
+        plan_options.find('.carriers-tab').show();
       }
-      $(this).closest('.benefit-group-fields').find('.health .plan-options').slideDown();
+      $('.health .nav li input:checked').parent().addClass('active');
 
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
