@@ -4,6 +4,7 @@ Given(/^the user is applying for a CONSUMER role$/) do
   fill_in "user_password", with: user_sign_up[:password]
   fill_in "user_password_confirmation", with: user_sign_up[:password_confirmation]
   click_button "Create account"
+  create_plan
 end
 
 And(/the primary member has filled mandatory information required$/) do
