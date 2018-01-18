@@ -22,6 +22,8 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     Then Primary Broker should see broker registration successful message
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
+    And I select the all security question and give the answer
+    When I have submit the security questions
     And Hbx Admin clicks on the Brokers dropdown
     And Hbx Admin clicks on the Broker Applications option
     Then Hbx Admin should see the list of broker applicants
