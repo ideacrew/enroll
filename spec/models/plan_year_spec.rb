@@ -2584,3 +2584,79 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
     end
   end
 end
+
+describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all do
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+  context 'initial employer profile' do
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: aasm_state, start_on: start_on) }
+    let(:plan_year) { employer_profile.plan_years.where(aasm_state: aasm_state)[0]}
+    let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
+    let(:quiet_period_end) { 
+      quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months)
+      TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.initial_application.quiet_period.mday))
+    }
+
+    context 'when enrolling' do
+      let(:aasm_state) { 'enrolling' }
+
+      it 'should return initial employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+
+    context 'when plan year active' do
+      let(:aasm_state) { 'active' }
+
+      it 'should return initial employer quiet period' do 
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+  end
+
+  context 'renewing employer profile' do 
+    let!(:employer_profile) {
+      create(:employer_with_renewing_planyear, start_on: start_on, 
+        renewal_plan_year_state: aasm_state
+      )
+    }
+
+    let!(:plan_year) { 
+      plan_year = employer_profile.plan_years.where(aasm_state: aasm_state)[0]
+      plan_year.workflow_state_transitions.build(from_state: :renewing_draft, to_state: :renewing_enrolling)
+      employer_profile.plan_years.detect{|py| py.active?}.update(aasm_state: 'expired')
+      plan_year.update(aasm_state: 'active')
+      plan_year
+    }
+
+    let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
+    let(:quiet_period_end) { 
+      quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months)
+      TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.renewal_application.quiet_period.mday))
+    }
+
+    context "when plan year renewing" do
+      let(:aasm_state) { 'renewing_enrolling' }
+
+      it 'should return renewing employer quiet period' do 
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+
+    context "when plan year active" do
+      let(:aasm_state) { 'renewing_enrolled' }
+
+      it 'should return renewing employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+  end
+end
