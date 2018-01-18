@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.shared_examples "a federal holiday" do
    it { expect(holiday).to be_an_instance_of(Hash) }
 
-   it 'each element should be an instance of Hash' do      
-     holiday.each do |attribute, value|        
-       expect(subject.send(attribute)).to eq(value)        
+   it 'each element should be an instance of Hash' do
+     holiday.each do |attribute, value|
+       expect(subject.send(attribute)).to eq(value)
      end
    end
 end
@@ -51,7 +51,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
                                                   one_time: true,
                                                   start_time: nth_wday(3, 1, 2, Date.today.year).strftime("%a, %d %b %Y").to_date
                                                 } }
-      end                                          
+      end
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
       subject { ScheduledEvent.find_by(event_name: 'Memorial Day') }
@@ -65,7 +65,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
       subject { ScheduledEvent.find_by(event_name: 'Labor Day') }
-      it_should_behave_like "a federal holiday" do 
+      it_should_behave_like "a federal holiday" do
       let(:holiday){ { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
@@ -105,7 +105,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
       subject { ScheduledEvent.find_by(event_name: 'New Year Day') }
-      it_should_behave_like "a federal holiday" do 
+      it_should_behave_like "a federal holiday" do
       let(:holiday){ { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
@@ -115,7 +115,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
       subject { ScheduledEvent.find_by(event_name: 'Christmas Day') }
-      it_should_behave_like "a federal holiday" do 
+      it_should_behave_like "a federal holiday" do
       let(:holiday){ { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
