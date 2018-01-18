@@ -17,7 +17,7 @@ end
 
 def build_csv_report(file_name, organizations)
   CSV.open("#{Rails.root}/public/#{file_name}", "w", force_quotes: true) do |csv|
-    csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID"]
+    csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID","EE active health","active health HIOS ID","EE active dental","active denatl HIOS ID","EE renewal health","renewal health HIOS ID","EE renewal dental","renewal dental HIOS ID"]
     organizations.each do |organization|
       employer_profile = organization.employer_profile
       next if employer_profile.census_employees.blank?
@@ -64,6 +64,24 @@ def build_employee_row(employee, employer_data)
     employee.aasm_state.humanize,
     employee.employee_role.try(:hbx_id)
   ]
+
+  if employee.active_benefit_group_assignment.present? &&  employee.active_benefit_group_assignment.active_and_waived_enrollments.present?
+    health_enrollment= employee.active_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "health"}.first
+    dental_enrollment= employee.active_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "dental"}.first
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : ['', ''])
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : ['', ''])
+  else
+    data += ['', '','','']
+  end
+
+  if employee.renewal_benefit_group_assignment.present? &&  employee.renewal_benefit_group_assignment.active_and_waived_enrollments.present?
+    health_enrollment= employee.renewal_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "health"}.first
+    dental_enrollment= employee.renewal_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "dental"}.first
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : ['', ''])
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : ['', ''])
+  else
+    data += ['', '','','']
+  end
 
   data
 end
