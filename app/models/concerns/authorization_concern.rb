@@ -68,6 +68,10 @@ module AuthorizationConcern
       self.locked_at.nil? ? 'unlocked' : 'locked'
     end
 
+    def locked?
+      self.locked_at.present?
+    end
+
     def password_required?
       !persisted? || !password.nil? || !password_confirmation.nil?
     end

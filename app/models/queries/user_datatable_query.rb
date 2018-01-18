@@ -47,7 +47,11 @@ module Queries
             user.all
           end
         else
-          user.all
+          if @search_string.present?
+            user.datatable_search(@search_string)
+          else
+            user.all
+          end
       end
     end
 
