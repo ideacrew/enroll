@@ -23,7 +23,7 @@ describe DeactivatingFamilyMember, dbclean: :after_each do
       allow(person).to receive(:primary_family).and_return(family)
     end
 
-    it "should remove duplicate family member" do
+    it "should deactivate duplicate family member" do
       family_member_id=family_member.id
       expect(person.primary_family.family_members.where(id:family_member_id).first.is_active).to eq true     
       subject.migrate 
