@@ -31,7 +31,7 @@ end
   "nothing": <%= raw checkbox_column.to_json %>,
   "fein": <%= raw employer_datatable_entry.fein.to_json %>,
   "legal_name" : <%= raw legal_name.to_json %>,
-  "ee_count": <%= raw employer_datatable_entry.roster_size.to_i.to_json %>,
+  "ee_count": "N/A",
   "er_state": <%= raw employer_datatable_entry.aasm_state.humanize.to_json %>,
   "broker": <%= raw broker.to_json %>,
   "general_agency": <%= raw general_agency.to_json %>,
