@@ -13,7 +13,6 @@ Feature: This gives the user access to application level navigation for applican
     Then the answer to "To make it easier to determine my eligibility..." is defaulted to "I AGREE"
     When the user clicks CONTINUE
     Then the user should navigate to the Submit Your Application page
-    And the field corresponding to renewal should be defaulted to 5 years in the data model
 
   Scenario: User selects "I DISAGREE"
     Given the user selects I DISAGREE
