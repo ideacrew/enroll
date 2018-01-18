@@ -22,6 +22,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       generate_hbx_signature(enrollments)
     when "expire_enrollment"
       expire_enrollment(enrollments)
+    when "transfer_enrollment_from_glue_to_enroll"
+      transfer_enrollment_from_glue_to_enroll
     end
   end
 
@@ -87,7 +89,11 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def cancel_enr(enrollments)
     enrollments.each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-      puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        if enrollment.aasm_state == "coverage_canceled"
+          puts "enrollment with hbx_id: #{enrollment.hbx_id} can not be cancelled" unless Rails.env.test?
+        else
+          puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        end
     end
   end
 
@@ -108,5 +114,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
       end
     end
+  end
+
+  def transfer_enrollment_from_glue_to_enroll
+    ts = TranscriptGenerator.new
+    ts.display_enrollment_transcripts
   end
 end
