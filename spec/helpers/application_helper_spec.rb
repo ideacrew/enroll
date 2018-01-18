@@ -393,4 +393,19 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
+
+  describe "#previous_year" do
+
+    it "should return past year" do
+      expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
+    end
+
+    it "should not return current year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year)
+    end
+
+    it "should not return next year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
+    end
+  end
 end
