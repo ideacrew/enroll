@@ -3,7 +3,7 @@ require 'csv'
 namespace :report do
 
   desc "List of all people in the enroll database"
-  task :enrollments_of_verification_pending => :environment do
+  task :member_enrollments_having_verification_pending => :environment do
     year = ENV['year'].to_i
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
