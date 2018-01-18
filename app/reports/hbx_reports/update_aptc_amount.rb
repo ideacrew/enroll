@@ -19,7 +19,7 @@ class UpdateAptcAmount < MongoidMigrationTask
             count += 1
           end
         end
-      rescue
+      rescue => e
         puts "Bad family record #{family.id}, Reason: #{e.backtrace}" unless Rails.env.test?
       end
     end
