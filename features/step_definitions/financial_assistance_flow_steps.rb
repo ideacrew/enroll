@@ -69,7 +69,7 @@ Given(/^the user is on the Help Paying For Coverage page$/) do
 end
 
 When(/^the user clicks CONTINUE$/) do
-  find('.btn', text: 'CONTINUE').click
+  find('.interaction-click-control-continue').click
 end
 
 When(/^the answer to Do you want to apply for Medicaid… is NIL$/) do

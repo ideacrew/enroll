@@ -95,7 +95,7 @@ end
 
 
 Then(/^the user should navigate to the (.*) page$/) do |type|
-    type << " for" unless type.eql?("Your Preferences")
+    type << " for" unless type.eql?("Your Preferences") || type.eql?("Submit Your Application")
     expect(page).to have_content("#{type}")
 end
 
