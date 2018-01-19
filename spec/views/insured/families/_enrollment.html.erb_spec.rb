@@ -96,7 +96,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
     it "should open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{root_path + "document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"http://test.host/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should display the title" do
@@ -175,10 +175,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should display future_enrollment_termination_date when coverage_termination_pending" do
       expect(rendered).to match /Future enrollment termination date:/
     end
-    
+
     it "should not show a Plan End if cobra" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      expect(rendered).not_to match /plan ending/i 
+      expect(rendered).not_to match /plan ending/i
     end
   end
 
