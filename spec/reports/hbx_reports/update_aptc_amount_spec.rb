@@ -14,19 +14,27 @@ describe UpdateAptcAmount do
                                              hbx_enrollment_members: [hbx_enrollment_member1],
                                              effective_on: Date.parse("2017-1-1"),
                                              plan: plan,
-                                             applied_aptc_amount: 550.98
+                                             applied_aptc_amount: 550.98,
+                                             consumer_role_id: person1.consumer_role.id
                                              )}
+  let(:tax_household) { FactoryGirl.create(:tax_household, household: family1.households.first) }
+  let!(:eligibility_determination) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household) }
+
   subject {UpdateAptcAmount.new(given_task_name, double(:current_scope => nil))}
+
   describe "correct data input" do
+
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
     end
+
     it "should update aptc amount if plan exists and ehb value is greater than 0" do
     	hbx_enrollment1.reload
     	subject.migrate
     	hbx_enrollment1.reload
     	expect(hbx_enrollment1.applied_aptc_amount.to_f).to eql ((hbx_enrollment1.total_premium * hbx_enrollment1.plan.ehb).round(2))
     end
+
     it "should do nothing if applied_aptc_amount is equal or less than ehb_premium" do
       expect(hbx_enrollment1.applied_aptc_amount.to_f).to eql (550.98)
     end
