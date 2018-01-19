@@ -268,7 +268,7 @@ When(/Employee select a past qle date/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find('.interaction-click-control-continue').click
   end
 end
 
@@ -276,7 +276,7 @@ When(/Employee select a qle date based on expired plan year/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find('.interaction-click-control-continue').click
   end
 end
 

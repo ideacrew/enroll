@@ -377,6 +377,26 @@ And(/^.+ should be able to enter sole source plan year, benefits, relationship b
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
+def enter_plan_year_info
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
+
+  screenshot("employer_add_plan_year")
+  find('.interaction-field-control-plan-year-fte-count').click
+
+  fill_in "plan_year[fte_count]", :with => "35"
+  fill_in "plan_year[pte_count]", :with => "15"
+  fill_in "plan_year[msp_count]", :with => "3"
+
+  find('.interaction-click-control-continue').click
+
+  # Benefit Group
+  fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
+
+  find('.interaction-choice-control-plan-year-start-on', :visible => true).click
+  find('li.interaction-choice-control-plan-year-start-on-1').click
+end
+
 And(/^.+ should be able to enter single carrier plan year, benefits, relationship benefits for cobra$/) do
   enter_plan_year_info
 

@@ -15,7 +15,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:date_mock_object) { double("Date", day: 13)}
   describe "ModelEvent" do
     after(:each) do
-      DatabaseCleaner.clean_with(:truncation)
+     DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
     end
     context "when renewal employer 2 days prior to publish due date" do
       it "should trigger model event" do
@@ -27,7 +27,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
 
   describe "NoticeTrigger" do
     after(:each) do
-      DatabaseCleaner.clean_with(:truncation)
+      DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
     end
     context "when renewal application created" do
       subject { Observers::NoticeObserver.new }

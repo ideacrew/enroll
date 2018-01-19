@@ -427,7 +427,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should have back to my account link" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector("a[href='/families/home']", text: 'Back to my account')
+      expect(rendered).to have_selector("a[href='/families/home']", text: 'Back To My Account')
     end
 
     it "should see dental radio option" do
@@ -447,7 +447,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should display effective on date" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to match(/Effective Date/)
+      expect(rendered).to match(/EFFECTIVE DATE/i)
     end
   end
 

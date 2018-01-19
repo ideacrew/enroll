@@ -269,6 +269,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display a link to download employer guidance pdf" do
+      render partial: "employers/employer_profiles/my_account/employer_welcome"
       expect(rendered).to have_selector(".icon-left-download", text: /Download Step-by-Step Instructions/i)
     end
 
