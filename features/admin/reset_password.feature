@@ -13,6 +13,7 @@ Feature: Reset password of user
     When Hbx Admin clicks on the Action button of primary applicant
     Then Hbx Admin should see Reset Password link in action drop down
     When Hbx Admin clicks on Reset Password link in action drop down
+    And Hbx admin confirms password send
     Then the reset password email should be sent to the user
 
 
