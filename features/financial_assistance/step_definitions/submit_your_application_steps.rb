@@ -19,8 +19,8 @@ Given(/^all required checkboxes are checked$/) do
 end
 
 Given(/^the applicant has signed their name$/) do
-  fill_in "first_name_thank_you", with: "John"
-  fill_in "last_name_thank_you", with: "Smith1"
+  fill_in "first_name_thank_you", with: application.primary_applicant.person.first_name
+  fill_in "last_name_thank_you", with: application.primary_applicant.person.last_name
 end
 
 Then(/^the submit button will be enabled$/) do
