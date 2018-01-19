@@ -42,6 +42,7 @@ class BrokerAgencyProfile
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_many :documents, as: :documentable
+
   accepts_nested_attributes_for :inbox
 
   has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact

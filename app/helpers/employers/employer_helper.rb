@@ -14,7 +14,7 @@ module Employers::EmployerHelper
       return employee_state.humanize
     end
   end
-  
+
   def enrollment_state(census_employee=nil)
     humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
@@ -144,7 +144,7 @@ module Employers::EmployerHelper
     end.html_safe
   end
 
-  def cobra_button(census_employee)    
+  def cobra_button(census_employee)
     disabled = true
     if census_employee.is_cobra_coverage_eligible?
       if current_user.has_hbx_staff_role? || !census_employee.cobra_eligibility_expired?
@@ -195,6 +195,25 @@ module Employers::EmployerHelper
     end
   end
 
+  def show_or_hide_claim_quote_button(employer_profile)
+    return true if employer_profile.show_plan_year.blank?
+    return true if employer_profile.plan_years_with_drafts_statuses
+    return true if employer_profile.has_active_state? && employer_profile.show_plan_year.try(:terminated_on).present? && employer_profile.show_plan_year.terminated_on > TimeKeeper.date_of_record
+    return false if !employer_profile.plan_years_with_drafts_statuses && employer_profile.published_plan_year.present?
+    false
+  end
+
+  def claim_quote_warnings(employer_profile)
+    plan_year = employer_profile.plan_years.draft[0]
+    return [], "#claimQuoteModal" unless plan_year
+
+    if plan_year.is_renewing?
+      return ["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+    else
+      return ["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+    end
+  end
+
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_TERMINATED_STATES.include? census_employee.aasm_state
@@ -212,7 +231,7 @@ module Employers::EmployerHelper
   end
 
   def selected_benefit_plan(plan)
-    case plan 
+    case plan
       when 'single_carrier' then fetch_plan_title_for_single_carrier
       when 'metal_level' then fetch_plan_title_for_metal_level
       when 'single_plan','sole_source' then 'A Single Plan'

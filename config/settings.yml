@@ -5,8 +5,6 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   main_web_address_url: "https://www.MAhealthconnector.org"
   home_business_url: "https://www.mahealthconnector.org/business/"
-  help_url: "https://www.mahealthconnector.org/business/help-center"
-  faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
   nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   help_url: "https://www.mahealthconnector.org/business/help-center"
@@ -27,6 +25,7 @@ site:
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
+  broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']

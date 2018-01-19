@@ -14,6 +14,7 @@ class PlanYear
   PUBLISHED = %w(published enrolling enrolled active suspended)
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
+  DRAFT_STATES = %w(draft renewing_draft)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
 
@@ -72,6 +73,7 @@ class PlanYear
   scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
+  scope :draft,             ->{ any_in(aasm_state: DRAFT_STATES) }
 
   scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
 

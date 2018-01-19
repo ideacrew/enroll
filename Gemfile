@@ -7,7 +7,7 @@ gem 'rails', '4.2.7.1'
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "notifier",           path: "components/notifier"
 gem "transport_profiles", path: "components/transport_profiles"
-
+gem "sponsored_benefits", path: "components/sponsored_benefits"
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 
@@ -165,6 +165,8 @@ group :development, :test do
   gem 'byebug', '8.2.2'
   gem 'rspec_junit_formatter', '0.2.3'
   gem "parallel_tests"
+
+  gem 'puma'
 end
 
 group :test do

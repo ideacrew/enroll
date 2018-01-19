@@ -1,5 +1,6 @@
 class AchRecord
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   ROUTING_NUMBER_LENGTH = 9
 
@@ -11,4 +12,6 @@ class AchRecord
   validates_presence_of :routing_number, :bank_name
   validates :routing_number, length: { is: ROUTING_NUMBER_LENGTH }
   validates_confirmation_of :routing_number
+
+  index({routing_number: 1}, { unique: true })
 end
