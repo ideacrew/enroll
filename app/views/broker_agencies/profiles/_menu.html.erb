@@ -22,7 +22,7 @@
           <% end %>
         </li>
         <% if @staff_role %>
-          <% if site_broker_enabled? %>
+          <% if site_broker_claim_quoting_enabled? %>
             <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab") %>>
               <%= link_to(broker_agencies_profile_applicants_path(@broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
                 <span class="hidden-xs"><%= l10n("brokers")%></span>

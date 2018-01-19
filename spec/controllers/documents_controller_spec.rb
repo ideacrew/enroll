@@ -114,6 +114,17 @@ RSpec.describe DocumentsController, :type => :controller do
       it_behaves_like "update verification type", "Immigration", "SAVE system", "verify", "lawful_presence_update_reason", "SAVE system"
     end
 
+    it 'updates verification type if verification reason is expired' do
+      initial_value = person.consumer_role.lawful_presence_update_reason
+      params = { person_id: person.id, verification_type: 'Citizenship', verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
+      put :update_verification_type, params
+      person.reload
+      updated_value = person.consumer_role.lawful_presence_update_reason
+
+      expect(person.consumer_role.lawful_presence_update_reason).to eq({"v_type"=>"Citizenship", "update_reason"=>"Expired"})
+      expect(initial_value).to_not eq(updated_value)
+    end
+
     context "redirection" do
       it "should redirect to back" do
         post :update_verification_type, person_id: person.id
