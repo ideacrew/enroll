@@ -86,7 +86,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
 
     it "should return planyear warnings" do
       if plan_year.start_on.yday != 1
-        expect(@employer_notice.notice.plan_year.warnings).to eq ["At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
+        expect(@employer_notice.notice.plan_year.warnings).to eq ["At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
       else
         expect(@employer_notice.notice.plan_year.warnings).to eq []
       end
