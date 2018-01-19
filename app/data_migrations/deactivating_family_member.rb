@@ -8,7 +8,8 @@ class DeactivatingFamilyMember < MongoidMigrationTask
       if family_member.nil?
         puts "No family member found" unless Rails.env.test?
       else
-        family_member.update_attributes!(is_active: "false")
+        family_member.family.remove_family_member(family_member.person)
+        family_member.family.save!
         puts "deactivating the duplicate dependent with family member id: #{family_member.id}" unless Rails.env.test?
       end   
     rescue Exception => e
