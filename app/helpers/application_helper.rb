@@ -648,5 +648,8 @@ module ApplicationHelper
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
+  def previous_year
+    TimeKeeper.date_of_record.prev_year.year
+  end
 end
 
