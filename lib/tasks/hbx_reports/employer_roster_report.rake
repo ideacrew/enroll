@@ -68,19 +68,19 @@ def build_employee_row(employee, employer_data)
   if employee.active_benefit_group_assignment.present? &&  employee.active_benefit_group_assignment.active_and_waived_enrollments.present?
     health_enrollment= employee.active_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "health"}.first
     dental_enrollment= employee.active_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "dental"}.first
-    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : ['', ''])
-    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : ['', ''])
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
   else
-    data += ['', '','','']
+    data += add_data(4,'')
   end
 
   if employee.renewal_benefit_group_assignment.present? &&  employee.renewal_benefit_group_assignment.active_and_waived_enrollments.present?
     health_enrollment= employee.renewal_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "health"}.first
     dental_enrollment= employee.renewal_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "dental"}.first
-    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : ['', ''])
-    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : ['', ''])
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
   else
-    data += ['', '','','']
+    data += add_data(4,'')
   end
 
   data
@@ -100,4 +100,8 @@ end
 def format_date(date)
   return '' if date.blank?
   date.strftime("%m/%d/%Y")
+end
+
+def add_data(count,expression)
+  return Array.new(count,expression)
 end
