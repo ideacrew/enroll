@@ -251,8 +251,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
       end
       context "individual market user" do
-        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
-        let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
 
         it "selects only 'individual' and 'both' market brokers" do
           allow(subject).to receive(:current_user).and_return(user)
@@ -263,8 +263,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
           end
         end
         context "SHOP market user" do
-          let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
-          let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+          let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+          let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
           it "selects only 'shop' and 'both' market brokers" do
             allow(subject).to receive(:current_user).and_return(user)
@@ -293,8 +293,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
       end
       context "SHOP market user" do
-        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
-        let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
         it "selects only 'shop' market brokers" do
           allow(subject).to receive(:current_user).and_return(user)
