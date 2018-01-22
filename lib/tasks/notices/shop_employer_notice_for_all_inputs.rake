@@ -4,34 +4,41 @@
 namespace :notice do
   desc "Generate shop employer notices"
   task :shop_employer_notice_event => :environment do |task, args|
-    @employer_ids = ENV['employer_ids'].try(:split, " ")
-    @hbx_ids = ENV['hbx_ids'].try(:split, " ")
-    @feins = ENV['feins'].try(:split, " ")
+
+    @employer_ids = ENV['employer_ids']
+    @hbx_ids = ENV['hbx_ids']
+    @feins = ENV['feins']
     @event_name = ENV['event']
+
     if @event_name
       case
-        when @employer_ids
-          @employer_ids.each do | employer_id |
-            employer_profile_id = EmployerProfile.find(employer_id).id.to_s
-            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name) if employer_profile_id
-          end
-        when @hbx_ids
-          @hbx_ids.each do |hbx_id|
-            employer_profile_id = Organization.where(hbx_id: hbx_id).first.employer_profile.id.to_s
-            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name) if employer_profile_id
-            puts "Notice Triggered Successfully"
-          end
-        when @feins
-          @feins.each do |fein_id|
-            employer_profile_id = Organization.where(fein: fein_id).first.employer_profile.id.to_s
-            ShopNoticesNotifierJob.perform_later(employer_profile_id, @event_name) if employer_profile_id
-            puts "Notice Triggered Successfully"
-          end
-        else
-          puts "Please provide either hbx_id or feins as arguments"
+      when @employer_ids
+        @employer_ids.split(' ').each do |employer_id|
+          employer_profile = EmployerProfile.find(employer_id)
+          trigger_notice(employer_profile) if employer_profile
+          puts "#{@event_name} - notice triggered successfully for employer_id - #{employer_id}" unless Rails.env.test?
+        end
+      when @hbx_ids
+        @hbx_ids.split(' ').each do |hbx_id|
+          employer_profile = Organization.where(hbx_id: hbx_id).first.employer_profile
+          trigger_notice(employer_profile) if employer_profile
+          puts "#{@event_name} - notice triggered successfully for #{hbx_id}" unless Rails.env.test?
+        end
+      when @feins
+        @feins.split(' ').each do |fein_id|
+          employer_profile = Organization.where(fein: fein_id).first.employer_profile
+          trigger_notice(employer_profile) if employer_profile
+          puts "#{@event_name} - notice triggered successfully for fein_id - #{fein_id}" unless Rails.env.test?
+        end
+      else
+        puts "Please provide either hbx_id or feins as arguments" unless Rails.env.test?
       end
-    else
-       puts "Please specify the type of event name which we want to trigger"
     end
+  end
+
+  def trigger_notice(employer_profile)
+    observer = Observers::Observer.new
+    plan_year = employer_profile.plan_years.first
+    observer.trigger_notice(recipient: employer_profile, event_object: plan_year, notice_event: @event_name)
   end
 end
