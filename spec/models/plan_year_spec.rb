@@ -2161,16 +2161,6 @@ describe PlanYear, "which has the concept of export eligibility" do
     end
   end
 
-  EXPORTABLE_STATES.each do |astate|
-    describe "in #{astate} state" do
-      let(:export_state) { astate}
-      it "is not eligible for export" do
-        expect(subject.eligible_for_export?).to eq true
-      end
-    end
-  end
-
-
   describe PlanYear, "state machine transitions -- unhappy path" do
 
     context "an initial employer publishes a valid application and begins open enrollment" do
