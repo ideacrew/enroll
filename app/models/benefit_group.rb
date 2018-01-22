@@ -360,11 +360,13 @@ class BenefitGroup
       estimate_composite_rates
     end
     targeted_census_employees.active.collect do |ce|
-      pcd = if self.sole_source? && (!plan.dental?)
-        CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+
+      if plan_option_kind == 'sole_source'
+        pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
-        PlanCostDecorator.new(plan, ce, self, reference_plan)
+        pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
       end
+
       pcd.total_employer_contribution
     end.sum
   end
@@ -372,11 +374,11 @@ class BenefitGroup
   def monthly_employee_cost(coverage_kind=nil)
     rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
     return 0 if targeted_census_employees.count > 100
-    targeted_census_employees.active.collect do |ce|
-      pcd = if self.sole_source? && (!rp.dental?)
-        CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
+    targeted_census_employees_participation.collect do |ce|
+      if plan_option_kind == 'sole_source'
+        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
-        PlanCostDecorator.new(rp, ce, self, rp)
+        pcd = PlanCostDecorator.new(rp, ce, self, rp)
       end
       pcd.total_employee_cost
     end
@@ -387,7 +389,19 @@ class BenefitGroup
   end
 
   def monthly_max_employee_cost(coverage_kind = nil)
-    monthly_employee_cost(coverage_kind).max
+    return 0 if targeted_census_employees.count > 100
+    targeted_census_employees_participation.collect do |ce|
+      if plan_option_kind == 'sole_source'
+        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+      else
+        if coverage_kind == 'dental'
+          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+        else
+          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+        end
+      end
+      pcd.total_employee_cost
+    end.max
   end
 
   def targeted_census_employees
@@ -399,7 +413,7 @@ class BenefitGroup
     pcd = if @is_congress
       decorated_plan(plan, ce)
     elsif plan_option_kind == 'sole_source' && !plan.dental?
-      CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+      CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
     else
       PlanCostDecorator.new(plan, ce, self, reference_plan)
     end
@@ -526,14 +540,18 @@ class BenefitGroup
     EmployerParticipationRateRatingFactorSet.value_for(carrier_id, year, participation_rate * 100.0)
   end
 
+  def targeted_census_employees_participation
+    targeted_census_employees.select{|ce| ce.is_included_in_participation_rate?}
+  end
+
   def participation_rate
-    total_employees = targeted_census_employees.count
+    total_employees = targeted_census_employees_participation.count
     return(0.0) if total_employees < 1
     waived_and_active_count = if plan_year.estimate_group_size?
-                                targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
-                              else
-                                all_active_and_waived_health_enrollments.length
-                              end
+                          targeted_census_employees_participation.select{|ce| ce.expected_to_enroll_or_valid_waive?}.length
+                        else
+                          all_active_and_waived_health_enrollments.length
+                        end
     waived_and_active_count/(total_employees * 1.0)
   end
 
@@ -588,7 +606,7 @@ class BenefitGroup
   # year status
   def group_size_count
     if plan_year.estimate_group_size?
-      targeted_census_employees.select { |ce| ce.expected_to_enroll? }.length
+      targeted_census_employees_participation.select { |ce| ce.expected_to_enroll? }.length
     else
       all_active_health_enrollments.length
     end
@@ -596,7 +614,7 @@ class BenefitGroup
 
   def composite_rating_enrollment_objects
     if plan_year.estimate_group_size?
-      targeted_census_employees.select { |ce| ce.expected_to_enroll? }
+      targeted_census_employees_participation.select { |ce| ce.expected_to_enroll? }
     else
       all_active_health_enrollments
     end

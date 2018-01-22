@@ -36,7 +36,7 @@
 
           <%= render "shared/plan_year_fields", f: f %>
 </div>
-          <div style="<%= @plan_year.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab">
+          <div style="<%= @plan_year.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab plan-year-setup">
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
