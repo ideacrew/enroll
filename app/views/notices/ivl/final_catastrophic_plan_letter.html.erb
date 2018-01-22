@@ -24,7 +24,7 @@
 content: "You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Federal law requires most Americans to have a minimum level of health coverage. This requirement is known as the individual mandate. Your enrollment in a catastrophic plan meets this requirement. We report your enrollment status each month to the Internal Revenue Service (IRS).  These reports allow the IRS to verify the months that you were enrolled in coverage through #{Settings.site.short_name}."} %>
+content: "Federal law requires most Americans to have a minimum level of health coverage through 2018. This requirement is known as the individual mandate. Your enrollment in a catastrophic plan meets this requirement. We report your enrollment status each month to the Internal Revenue Service (IRS).  These reports allow the IRS to verify the months that you were enrolled in coverage through #{Settings.site.short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "You will not receive any tax forms from #{Settings.site.short_name} for your enrollment in a catastrophic health plan, because these plans do not qualify for an advance premium tax credit.  Only those enrolled in plans that qualify for an advance premium tax credit receive a tax form from #{Settings.site.short_name}."} %>
@@ -40,11 +40,13 @@ content: "For more information on these topics, consult a tax adviser or visit t
 
 <br>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you have questions or concerns, we’re here to help."} %>
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "If you have questions or concerns, we’re here to help."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+</div>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
