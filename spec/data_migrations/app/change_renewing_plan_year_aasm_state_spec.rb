@@ -30,7 +30,6 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
-      allow(ENV).to receive(:[]).with("py_state_to").and_return('')
     end
 
     it "should update aasm_state of plan year" do
@@ -55,12 +54,25 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       end
     end
 
-    it "should update aasm_state of plan year to renewing_enrolled when ENV['py_state_to'] present" do
-      allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
+    it "should update aasm_state of plan year to renewing_enrolled when OE closed and has valid enrollment" do
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_open_enrollment_closed?).and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:may_activate?).and_return(false)
       census_employee.reload
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_enrolled"
+    end
+
+    it "should update aasm_state of plan year to active if plan year can be activated" do
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_open_enrollment_closed?).and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:can_be_activated?).and_return(true)
+      census_employee.reload
+      subject.migrate
+      plan_year.reload
+      puts plan_year.inspect
+      expect(plan_year.aasm_state).to eq "active"
     end
   end
 end
