@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/dchbx/acapi.git
-  revision: 68001c0c7fec6632f47cb738cfd112e6a94692ca
-  branch: development
+  revision: a0248fd948e1a3c1d2faaf0abf5077a2b1db9203
+  branch: 1.0.0
   specs:
-    acapi (0.0.1)
+    acapi (1.0.0)
       activesupport (~> 4.2.0)
       bunny (~> 1.7.0)
 
