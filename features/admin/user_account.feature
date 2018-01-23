@@ -1,7 +1,7 @@
 Feature: User Account page
-  In order for the Hbx admin to acsess user accounts
+  In order for the Hbx admin to access user accounts
 
-  Scenario: Search for an employer
+  Scenario: Successful attempt to Search for an employer
     Given a Hbx admin with read and write permissions and employers
     And a user exists with employer staff role
     And a user exists with employee role
@@ -36,9 +36,9 @@ Feature: User Account page
     And a user exists with broker role
     When Hbx AdminEnrollments logs on to the Hbx Portal
     And Hbx Admin click on User Accounts
-    Then Hbx Admin should see searchbox
-    When he enters an user name search box
-    Then he should see a result with the user name
-    When he enter person hbx id
-    Then he should see a result with hbx id
+    Then Hbx Admin should see search box
+    When a user enters an user name search box
+    Then a user should see a result with the user name
+    When a user enter person hbx id
+    Then a user should see a result with hbx id
 
