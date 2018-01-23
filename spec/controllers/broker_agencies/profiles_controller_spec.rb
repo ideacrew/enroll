@@ -443,13 +443,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
     end
 
-    it "should trigger notice when default_general_agency_profile is set" do
-      allow(broker_agency_profile).to receive(:default_general_agency_profile).and_return(general_agency_profile)
-      sign_in user
-      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).and_return(true)
-      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
-    end
-
     it "should clear default general_agency_profile" do
       broker_agency_profile.default_general_agency_profile = general_agency_profile
       broker_agency_profile.save

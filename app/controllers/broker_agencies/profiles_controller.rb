@@ -208,10 +208,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       broker_fires_or_hires_default_ga_notice(@broker_agency_profile.default_general_agency_profile.id.to_s, @broker_agency_profile.id.to_s, "broker_hires_default_ga_notice") if @broker_agency_profile.default_general_agency_profile.present?
       @notice = "Changing default general agencies may take a few minutes to update all employers."
 
-      #triggers default GA hired notice to General Agency
-      observer = Observers::Observer.new
-      observer.trigger_notice(recipient: @broker_agency_profile.default_general_agency_profile, event_object: @broker_agency_profile, notice_event: "ga_hire_notice") if @broker_agency_profile.default_general_agency_profile.present?
-
       @broker_role = current_user.person.broker_role || nil
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
     end
