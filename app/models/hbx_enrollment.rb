@@ -1595,7 +1595,7 @@ class HbxEnrollment
 
   def ee_plan_selection_confirmation_sep_new_hire
     if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
-      if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
+      if census_employee.can_trigger_sep_confirmation_notice? && ((census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record) || special_enrollment_period.present?)
         begin
           census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
           ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)

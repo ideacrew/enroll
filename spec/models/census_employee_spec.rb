@@ -1533,6 +1533,36 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "can_trigger_sep_confirmation_notice?" do
+    let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
+    let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+
+    context "for initial employer" do
+
+      it "should return false when the employer is not in biner paid/enrolled state" do
+        expect(census_employee.can_trigger_sep_confirmation_notice?).to be_falsey
+      end
+
+      it "should return true when the employer is binder paid" do
+        employer_profile.update_attributes!(:aasm_state => "binder_paid")
+        expect(census_employee.can_trigger_sep_confirmation_notice?).to be_truthy
+      end
+    end
+
+    context "for renewing employer" do
+      let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
+      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
+
+      it "should return true" do
+        allow(renewal_plan_year).to receive(:is_enrollment_valid?).and_return true
+        allow(renewal_plan_year).to receive(:is_open_enrollment_closed?).and_return true
+        expect(census_employee.can_trigger_sep_confirmation_notice?).to be_truthy
+      end
+    end
+  end
 
   context "is_linked?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
@@ -1897,7 +1927,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:user)          { double("user") }
     let(:employee_role) {FactoryGirl.create(:employee_role)}
 
-
     it 'should allow Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
       allow(user).to receive(:has_hbx_staff_role?).and_return true # Admin
       allow(person).to receive(:employee_roles).and_return [employee_role]
@@ -2026,10 +2055,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(second_civil_servant.aasm_state).to eq employee_linked_state
         end
       end
-
     end
-
-
   end
 
   describe "#trigger_notice" do

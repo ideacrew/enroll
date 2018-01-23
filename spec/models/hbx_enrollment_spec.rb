@@ -3009,6 +3009,7 @@ describe HbxEnrollment, dbclean: :after_all do
     let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
 
     before :each do
+      census_employee.employer_profile.update_attributes(:aasm_state => "binder_paid")
       @household = mikes_family.households.first
     end
 
