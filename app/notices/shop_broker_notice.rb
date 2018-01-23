@@ -29,7 +29,7 @@ class ShopBrokerNotice < Notice
 
   def upload_and_send_secure_message
     doc_uri = upload_to_amazonS3
-    notice  = create_recipient_document(doc_uri)
+    notice = create_recipient_document(doc_uri)
     create_secure_inbox_message(notice)
   end
 
@@ -40,10 +40,6 @@ class ShopBrokerNotice < Notice
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: employer_profile.legal_name })
     message.save!
   end
-
-
-
-
 
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
