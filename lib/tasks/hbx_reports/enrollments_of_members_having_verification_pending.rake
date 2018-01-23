@@ -29,7 +29,7 @@ namespace :report do
 
         outstanding_people.each do |person|
           person.families.each do |family|
-            active_enrollments = family.active_household.hbx_enrollments.enrolled.where(:"hbx_enrollment_members.applicant_id" => family.family_members.where(person_id: person.id).first.id).and(:"hbx_enrollment_members.coverage_start_on" => Date.new(year, 1, 1)..Date.new(year, 12, 31))
+            active_enrollments = family.active_household.hbx_enrollments.enrolled.where(:"hbx_enrollment_members.applicant_id" => family.family_members.where(person_id: person.id).first.id).and(:"effective_on" => Date.new(year, 1, 1)..Date.new(year, 12, 31))
             if active_enrollments.present?
               active_enrollments.each do |enrollment|
                 if enrollment.aasm_state == "coverage_selected"
