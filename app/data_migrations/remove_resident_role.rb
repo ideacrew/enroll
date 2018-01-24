@@ -42,12 +42,13 @@ class RemoveResidentRole < MongoidMigrationTask
               end
               # need to explicitly reload person object
               person_reload = Person.find(person.id)
-              enrollment.consumer_role_id = person.consumer_role.id
+              enrollment.consumer_role_id = person_reload.consumer_role.id
               enrollment.resident_role_id = nil
               enrollment.save!
             end
             # avoid unnecessary destroy calls and remove resident role for person with shop enrollments only
-            person.resident_role.destroy if person.resident_role.present?
+            person_reload = Person.find(person.id)
+            person_reload.resident_role.destroy if person_reload.resident_role.present?
             puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
           end
         rescue Exception => e
