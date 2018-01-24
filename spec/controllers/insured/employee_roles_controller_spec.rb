@@ -196,6 +196,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)
+        allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         post :create, :employment_relationship => employment_relationship_properties
       end
 
@@ -221,6 +222,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       before :each do
         allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
         allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([nil, nil])
+        allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         request.env["HTTP_REFERER"] = "/"
         sign_in(user)
         post :create, :employment_relationship => employment_relationship_properties
@@ -243,7 +245,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
-    let(:user) { double("User",id: user_id ) }
+    let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
 
     before(:each) do
       sign_in(user)
@@ -278,6 +280,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("no_match")
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+          expect(response).to render_template("employee_ineligibility_notice")
         end
 
         context "that find a matching employee" do

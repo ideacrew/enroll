@@ -7,7 +7,7 @@ Then(/^Hbx Admin should not see an New DC Resident Application link$/) do
 end
 
 When(/^Hbx Admin clicks on New DC Resident Application link$/) do
-  click_link "New DC Resident Application"
+  find(:xpath, "//*[@id='inbox']/div/div[3]/div/span/div[1]/ul/li[3]/a").trigger('click')
 end
 
 Then(/^Hbx Admin should see New DC Resident Personal Information page$/) do
@@ -61,6 +61,7 @@ When(/Hbx Admin select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  find('h1').click
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end

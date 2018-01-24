@@ -4,7 +4,7 @@
 .container.pd-container
   #new_person_wrapper
     .row
-      = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
+      = form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f|
         .col-lg-2.col-md-2.col-sm-2.col-xs-12
           = render  partial: 'shared/left_nav.html.erb'
         .col-lg-10.col-md-10.col-sm-10.col-xs-12.row
@@ -16,6 +16,3 @@
             = render 'insured/consumer_roles/remote_search_form', f: f
           .col-lg-3.col-md-3.col-sm-3.col-xs-12
             = render  partial: 'shared/individual_progress', locals: {step: '1'}
-          /= render  partial: 'shared/right_nav.html.erb'
-
-

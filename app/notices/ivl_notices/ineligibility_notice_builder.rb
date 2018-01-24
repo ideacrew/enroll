@@ -48,6 +48,7 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
 
     PdfTemplates::Individual.new({
       first_name: person.first_name.titleize,
+      last_name: person.last_name.titleize,
       full_name: person.full_name.titleize,
       :age => person.age_on(TimeKeeper.date_of_record),
       :reason_for_ineligibility =>  reason_for_ineligibility

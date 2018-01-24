@@ -1,8 +1,9 @@
 <% content_for :horizontal_status do %>
-<% if show_component(request.path) %>
-<%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% if show_component(request.path) %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
 <% end %>
-<% end %>
+
 <div class="container <%=pundit_class Family, :updateable?%>">
   <div class="row">
     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
@@ -31,7 +32,7 @@
               </ul>
               <p>
                 <br/>
-                Select one of the following options:
+                Please select one of the following options to continue:
               </p>
             </div>
           </div>

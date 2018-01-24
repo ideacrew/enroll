@@ -14,12 +14,11 @@ class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
       if user.nil?
         puts "person with hbx_id  #{hbx_id_1} has no user" unless Rails.env.test?
       else
-        person2.user=person1.user
-        person1.unset(:user)
-        person1.save
-        person2.save
+        user_id = person1.user_id
+        person1.unset(:user_id)
+        person2.set(user_id: user_id)
+        puts "move the user account from  #{hbx_id_1} to #{hbx_id_2}" unless Rails.env.test?
       end
     end
   end
 end
-

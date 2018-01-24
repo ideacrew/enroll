@@ -8,7 +8,8 @@
       = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
         .col-lg-10.col-md-10.col-sm-10.col-xs-12.row
           .col-lg-9.col-md-9.col-sm-9.col-xs-12
-            %h3 Personal Information
+          %h3
+            = l10n("personal_information")
             = render 'insured/consumer_roles/remote_search_form', f: f
             #person_search_results
               = render 'no_match'

@@ -195,14 +195,18 @@ class PeopleController < ApplicationController
   def update
     sanitize_person_params
     @person = find_person(params[:id])
+    @family = @person.primary_family
     clean_duplicate_addresses
     @person.updated_by = current_user.oim_id unless current_user.nil?
-
     if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
+    end
+
+    if @person.has_active_consumer_role?
+      @person.consumer_role.check_for_critical_changes(person_params, @family)
     end
 
     respond_to do |format|
@@ -385,6 +389,7 @@ private
       :no_dc_address,
       :no_dc_address_reason, 
       :id,
+      :consumer_role,
       :is_applying_coverage
     ]
   end
@@ -397,5 +402,4 @@ private
     @old_addresses = @person.addresses
     @person.addresses = [] #fix unexpected duplicates issue
   end
-
 end

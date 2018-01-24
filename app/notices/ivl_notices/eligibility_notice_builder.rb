@@ -61,6 +61,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     PdfTemplates::Individual.new({
       tax_household: append_tax_households(applicant.tax_household),
       first_name: applicant.person.first_name.titleize,
+      last_name: applicant.person.last_name.titleize,
       full_name: applicant.person.full_name.titleize,
       age: applicant.person.age_on(TimeKeeper.date_of_record),
       is_medicaid_chip_eligible: applicant.is_medicaid_chip_eligible,

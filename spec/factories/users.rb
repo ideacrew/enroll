@@ -34,6 +34,10 @@ FactoryGirl.define do
     end
   end
 
+  trait :with_hbx_staff_role do
+    roles ["hbx_staff"]
+  end
+
   trait :consumer do
     roles ["consumer"]
   end
@@ -109,6 +113,12 @@ FactoryGirl.define do
       else
         create :consumer_role, person: user.person, dob: user.person.dob
       end
+    end
+  end
+
+  trait :with_resident_role do
+    after :create do |user|
+      FactoryGirl.create :person, :with_resident_role, :with_family, :user => user
     end
   end
 

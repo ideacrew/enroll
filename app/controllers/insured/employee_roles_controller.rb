@@ -28,11 +28,14 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
+        first_name = @person_params[:first_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
         respond_to do |format|
           format.html { render 'no_match' }
         end
+        # Sends an external email to EE when the EE match fails
+        UserMailer.send_employee_ineligibility_notice(current_user.email, first_name).deliver_now unless current_user.email.blank?
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
         respond_to do |format|
@@ -49,7 +52,7 @@ class Insured::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
-    census_employees = CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a
+    census_employees = actual_user.person.present? ? CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a : []
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
     if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
@@ -62,7 +65,8 @@ class Insured::EmployeeRolesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to :back, alert: "You can not enroll as another employee"}
+        log("Refs #19220 We have an SSN collision for the employee belonging to employer #{@employment_relationship.census_employee.employer_profile.parent.legal_name}", :severity=>'error')
+        format.html { redirect_to :back, alert: "You can not enroll as another employee. Please reach out to customer service for assistance"}
       end
     end
   end

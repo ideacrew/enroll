@@ -132,7 +132,9 @@ class HbxProfile
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension
   IndividualEnrollmentDueDayOfMonth = 19
-  IndividualEnrollmentTerminationMinimum = 14.days
+
+  #New Rule There is no 14 days rule for termination
+  # IndividualEnrollmentTerminationMinimum = 14.days
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,

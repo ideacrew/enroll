@@ -77,7 +77,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
-      allow(family).to receive(:active_seps).and_return([sep])
+      allow(family).to receive(:latest_active_sep).and_return sep
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
       allow(user).to receive(:has_employee_role?).and_return(true)
@@ -601,6 +601,13 @@ RSpec.describe Insured::FamiliesController do
         expect(assigns(:future_qualified_date)).to eq(false)
       end
 
+      it "trigger sep_request_denial_notice for unqualified date when qle market kind is shop" do
+        qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop')
+        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+        expect(controller).to receive(:sep_request_denial_notice)
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+      end
+
       it "future_qualified_date should return nil when qle market kind is indiviual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
@@ -609,6 +616,13 @@ RSpec.describe Insured::FamiliesController do
         expect(response).to have_http_status(:success)
         expect(assigns(:qualified_date)).to eq true
         expect(assigns(:future_qualified_date)).to eq(nil)
+      end
+      it "should not trigger sep_request_denial_notice unqualified date  when qle market kind is individual" do
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
+        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+        expect(controller).not_to receive(:sep_request_denial_notice)
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
       end
     end
 
