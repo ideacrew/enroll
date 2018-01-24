@@ -1,7 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class RemoveResidentRole < MongoidMigrationTask
-  
+
   # this script will remove the resident role from any person who is not in the
   # explicit list of people who should have received the resident role and have a
   # corresponding coverall enrollment. For people not in this group this rake task
@@ -20,30 +20,38 @@ class RemoveResidentRole < MongoidMigrationTask
     people.each do |person|
       # exclude the valid coverall enrollments
       unless correct_assignments.include?(person.id.to_s)
-        person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
-          # indicates enrollment needs to be fixed as well
-          if enrollment.kind == "coverall" || enrollment.kind == "individual"
-            enrollment.kind = "individual"
-            # check for all members on enrollment to remove all resident roles
-            if enrollment.hbx_enrollment_members.size > 1
-              enrollment.hbx_enrollment_members.each do |member|
-                if member.person.consumer_role.present?
-                  member.person.resident_role.destroy if member.person.resident_role.present?
-                elsif member.person.resident_role.present?
-                    copy_resident_role_to_consumer_role(member.person.resident_role)
-                    member.person.resident_role.destroy
+        begin
+          person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
+            # first fix any enrollments - can only be inividual or coverall kinds
+            if enrollment.kind == "coverall" || enrollment.kind == "individual"
+              enrollment.kind = "individual"
+              # check for all members on enrollment to remove all resident roles
+              if enrollment.hbx_enrollment_members.size > 1
+                enrollment.hbx_enrollment_members.each do |member|
+                  if member.person.consumer_role.present?
+                    member.person.resident_role.destroy if member.person.resident_role.present?
+                  elsif member.person.resident_role.present?
+                      copy_resident_role_to_consumer_role(member.person.resident_role)
+                      member.person.resident_role.destroy
+                  end
                 end
+                enrollment.reload
+                #at this point everyone should have a consumer role
+              elsif person.consumer_role.nil?
+                copy_resident_role_to_consumer_role(person.resident_role)
               end
-            elsif person.consumer_role.nil?
-              copy_resident_role_to_consumer_role(person.resident_role)
+              # need to explicitly reload person object
+              person_reload = Person.find(person.id)
+              enrollment.consumer_role_id = person.consumer_role.id
+              enrollment.resident_role_id = nil
+              enrollment.save!
             end
-            enrollment.consumer_role_id = person.consumer_role.id
-            enrollment.resident_role_id = nil
-            enrollment.save!
+            # avoid unnecessary destroy calls and remove resident role for person with shop enrollments only
+            person.resident_role.destroy if person.resident_role.present?
+            puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
           end
-          # avoid unnecessary destroy calls
-          person.resident_role.destroy if person.resident_role.present?
-          puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
+        rescue Exception => e
+          puts e.backtrace
         end
       end
     end
