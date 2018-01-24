@@ -276,7 +276,8 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     end
   end
 
-   context "person already exists" do
+
+  context "person already exists" do
     let(:attributes) { {
       first_name: "test1",
       last_name: "test1",
@@ -289,10 +290,10 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     before do
       person.update_attributes(other_attributes)
       subject.instance_variable_set("@office_locations", organization.office_locations)
-      subject.match_or_create_person
+      subject.match_or_create_person # I need to trigger this twice in "SPEC" to see failure.
     end
 
-    it "should not throw any error" do
+    it "should not throw any error" do #19754
       subject.match_or_create_person
       person.reload
       expect(person.update_attributes(middle_name: "test")).to eq true
