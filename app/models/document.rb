@@ -15,7 +15,7 @@ class Document
   # Entity responsible for making the resource - person, organization or service
   field :creator, type: String, default: "dchl"
 
-  # Controlled vocabulary w/classification codes.
+  # Controlled vocabulary w/classification codes. Mapped to ConsumerRole::VLP_DOCUMENT_KINDS
   field :subject, type: String
 
   # May include but is not limited to: an abstract, a table of contents, a graphical representation, or a free-text account of the resource

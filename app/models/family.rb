@@ -963,12 +963,6 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
-  def tax_documents
-    documents.select do |doc|
-      (doc.subject == '1095A') && (doc.is_a? TaxDocument)
-    end
-  end
-
   def create_dep_consumer_role
     if dependents.any?
       dependents.each do |member|

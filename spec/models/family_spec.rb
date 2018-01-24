@@ -1323,32 +1323,6 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
   end
 end
 
-describe Family, ".tax_documents", dbclean: :after_each do
-  let(:family) { FactoryGirl.build(:family)}
-
-  context "had no tax documents" do
-    before do
-      family.documents = []
-    end
-
-    it "should return no documents" do
-      expect(family.tax_documents).to eq([])
-    end
-  end
-
-  context "had a tax document" do
-    let(:tax_document) { FactoryGirl.build(:tax_document)}
-
-    before do
-      family.documents = [tax_document]
-    end
-
-    it "should return 1 documents" do
-      expect(family.tax_documents).to eq([tax_document])
-    end
-  end
-end
-
 describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
 
@@ -1357,7 +1331,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
   let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year)}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-
+  
   let!(:enrollments) {
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
@@ -1369,7 +1343,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
                        plan_id: plan.id,
                        aasm_state: 'auto_renewing'
     )
-
+  
     FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "dental",
@@ -1380,7 +1354,7 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
                        plan_id: dental_plan.id,
                        aasm_state: 'auto_renewing'
     )
-
+   
   }
   context 'when family exists with passive renewals ' do
     before do
