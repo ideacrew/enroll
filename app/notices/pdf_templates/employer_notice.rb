@@ -5,10 +5,12 @@ module PdfTemplates
     attribute :notification_type, String
     attribute :mpi_indicator, String
     attribute :primary_fullname, String
+    attribute :employee_fullname, String
     attribute :primary_identifier, String
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
+    attribute :enrollment, PdfTemplates::Enrollment
     attribute :employer_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :broker, PdfTemplates::Broker
@@ -29,6 +31,7 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :employee_email, String
 
     def shop?
       return true
