@@ -133,7 +133,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package_with_current_date_start_on) { FactoryGirl.build(:benefit_package) }
 
     it "should return true when csr_kind is blank" do
-      allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(consumer_role).to receive(:latest_active_tax_households_with_year).and_return [tax_household]
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
