@@ -17,7 +17,6 @@ class UpdateConversionFlag < MongoidMigrationTask
       attestation = emp.employer_attestation.blank?  ? emp.build_employer_attestation : emp.employer_attestation
       attestation.submit! if attestation.may_submit?
       attestation.approve! if attestation.may_approve?
-      attestation.updated_by_id = "test"
       attestation.save
       puts "Employer Attestation approved for #{fein}" unless Rails.env.test?
       end
