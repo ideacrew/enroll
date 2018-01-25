@@ -76,12 +76,13 @@ class RemoveResidentRole < MongoidMigrationTask
         results << [person_reload.hbx_id, "N", "N", "N", enrollment.hbx_id] unless Rails.env.test?
         puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
 
-        results << ["remaining people with resident roles after the task is done updating"]
-        remaining_people_with_resident_roles = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
-        remaining_people_with_resident_roles.each do |survivor|
-          results << survivor.hbx_id
+        unless Rails.env.test?
+          results << ["remaining people with resident roles after the task is done updating"]
+          remaining_people_with_resident_roles = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
+          remaining_people_with_resident_roles.each do |survivor|
+            results << survivor.hbx_id
+          end
         end
-        
       end
     end
   end
