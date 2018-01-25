@@ -19,7 +19,7 @@ class RemoveResidentRole < MongoidMigrationTask
     end
     people.each do |person|
       # exclude the valid coverall enrollments
-      unless correct_assignments.include?(person.id.to_s)
+      unless correct_assignments.include?(person.hbx_id.to_s)
         begin
           person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
             # first fix any enrollments - can only be inividual or coverall kinds
@@ -35,8 +35,6 @@ class RemoveResidentRole < MongoidMigrationTask
                       member.person.resident_role.destroy
                   end
                 end
-                enrollment.reload
-                #at this point everyone should have a consumer role
               elsif person.consumer_role.nil?
                 copy_resident_role_to_consumer_role(person.resident_role)
               end
