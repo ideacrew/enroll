@@ -14,7 +14,7 @@ class ShopEmployerNotices::EeMidYearPlanChangeNotice < ShopEmployerNotice
     non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
-    send_generic_notice_alert
+    send_generic_notice_alert unless self.hbx_enrollment.benefit_group.is_congress
     send_generic_notice_alert_to_broker_and_ga
   end
 

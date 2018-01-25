@@ -20,7 +20,7 @@ RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNotice do
                           :notice_template => 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
                           :notice_builder => 'ShopEmployerNotices::EeMidYearPlanChangeNotice',
                           :event_name => 'ee_mid_year_plan_change_congressional_notice',
-                          :mpi_indicator => 'SHOP_D037',
+                          :mpi_indicator => 'SHOP_D046',
                           :title => "Employee has made a change to their employer-sponsored coverage selection"})
                         }
 
@@ -85,9 +85,19 @@ RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNotice do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = ShopEmployerNotices::EeMidYearPlanChangeNotice.new(employer_profile, valid_params)
     end
+
     it "should render notice" do
       expect(@employer_notice.template).to eq "notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional"
     end
+
+    it "should match mpi_indicator" do
+      expect(application_event.mpi_indicator).to eq "SHOP_D046"
+    end
+
+    it "should match event_name" do
+      expect(application_event.event_name).to eq "ee_mid_year_plan_change_congressional_notice"
+    end
+
     it "should generate pdf" do
       @employer_notice.append_data
       @employer_notice.build
