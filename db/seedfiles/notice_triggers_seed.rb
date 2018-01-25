@@ -655,7 +655,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP_D037',
+    hbx_id: 'SHOP_D046',
     title: 'Employee has made a change to their employer-sponsored coverage selection',
     description: 'Employee mid year plan change when an eligiblity determination is reached',
     resource_name: 'employer',
@@ -665,7 +665,7 @@ shop_notice_triggers = [
         name: 'Employee Mid-Year Plan change Congressional',
         notice_template: 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
         notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNotice',
-        mpi_indicator: 'SHOP_D037',
+        mpi_indicator: 'SHOP_D046',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -676,7 +676,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP_D040',
+    hbx_id: 'SHOP_D045',
     title: 'Employee has made a change to their employer-sponsored coverage selection',
     description: 'Employee mid year plan change when an eligiblity determination is reached',
     resource_name: 'employer',
@@ -686,7 +686,7 @@ shop_notice_triggers = [
         name: 'Employee Mid-Year Plan change Non-Congressional',
         notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change_non_congressional',
         notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNotice',
-        mpi_indicator: 'SHOP_D040',
+        mpi_indicator: 'SHOP_D045',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
