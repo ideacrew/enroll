@@ -1,4 +1,5 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
+require "csv"
 
 class RemoveResidentRole < MongoidMigrationTask
 
@@ -9,6 +10,11 @@ class RemoveResidentRole < MongoidMigrationTask
   # designated as coverall.
 
   def migrate
+    # create output file to record changes made by this migration
+    results = CSV.open("results_of_resident_role_data_fix.csv", "wb") unless Rails.env.test?
+    results << ["hbx_id's for valid coverall enrollments"] unless Rails.env.test?
+    results << ["19921907", "19931367", "19934866", "2482530", "19921423", "19935890", "19965516", "19800086"] unless Rails.env.test?
+
     correct_assignments = ENV['coverall_ids'].to_s.split(',')
     # using the p_to_fix_id variable to test individual cases before running on the entire system
     if ENV['p_to_fix_id'].nil?
@@ -17,6 +23,10 @@ class RemoveResidentRole < MongoidMigrationTask
       people = []
       people << Person.where(id: ENV['p_to_fix_id'].to_s).first
     end
+
+    results << ["The number of people with resident roles at the start of the rake task: #{people.size}"] unless Rails.env.test?
+    results << ["person.hbx_id", "pre-existing consumer role", "created new consumer role", "multiple members", "enrollment.hbx_id"] unless Rails.env.test?
+
     people.each do |person|
       # exclude the valid coverall enrollments
       unless correct_assignments.include?(person.hbx_id.to_s)
@@ -30,14 +40,18 @@ class RemoveResidentRole < MongoidMigrationTask
                 enrollment.hbx_enrollment_members.each do |member|
                   if member.person.consumer_role.present?
                     member.person.resident_role.destroy if member.person.resident_role.present?
+                    results << [member.person.hbx_id, "Y", "N", "Y", enrollment.hbx_id] unless Rails.env.test?
                   elsif member.person.resident_role.present?
                       copy_resident_role_to_consumer_role(member.person.resident_role)
                       member.person.resident_role.destroy
+                      results << [member.person.hbx_id, "N", "Y", "Y", enrollment.hbx_id] unless Rails.env.test?
                   end
                 end
               elsif person.consumer_role.nil?
                 copy_resident_role_to_consumer_role(person.resident_role)
+                results << [member.person.hbx_id, "N", "Y", "N", enrollment.hbx_id] unless Rails.env.test?
               end
+              results << [member.person.hbx_id, "Y", "N", "N", enrollment.hbx_id] unless Rails.env.test?
               # need to explicitly reload person object
               person_reload = Person.find(person.id)
               enrollment.consumer_role_id = person_reload.consumer_role.id
@@ -46,6 +60,7 @@ class RemoveResidentRole < MongoidMigrationTask
             end
             # avoid unnecessary destroy calls and remove resident role for person with shop enrollments only
             person_reload ||= Person.find(person.id)
+            results << [person_reload.hbx_id, "N", "N", "N", enrollment.hbx_id] unless Rails.env.test?
             person_reload.resident_role.destroy if person_reload.resident_role.present?
             puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
           rescue Exception => e
@@ -57,7 +72,16 @@ class RemoveResidentRole < MongoidMigrationTask
         person_reload ||= Person.find(person.id)
         copy_resident_role_to_consumer_role(person_reload.resident_role) if person_reload.consumer_role.nil?
         person_reload.resident_role.destroy if person_reload.resident_role.present?
+        results << ["people with incorrect resident_role and no enrollments"] unless Rails.env.test?
+        results << [person_reload.hbx_id, "N", "N", "N", enrollment.hbx_id] unless Rails.env.test?
         puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
+
+        results << ["remaining people with resident roles after the task is done updating"]
+        remaining_people_with_resident_roles = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
+        remaining_people_with_resident_roles.each do |survivor|
+          results << survivor.hbx_id
+        end
+        
       end
     end
   end
