@@ -10,8 +10,8 @@ site:
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
   forms: "https://dchealthlink.com/forms"
+  healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
-  website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
 
   social_media:
