@@ -13,7 +13,7 @@ describe RemoveResidentRole do
   end
 
   describe "remove resident role for person with consumer and resident roles", dbclean: :after_each do
-    let!(:person1) { FactoryGirl.create(:person, :with_resident_role, id:'58e3dc7dqwewqewqe') }
+    let!(:person1) { FactoryGirl.create(:person, :with_resident_role, hbx_id:'58e3dc7dqwewqewqe') }
     let!(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person2) }
     let!(:ivl_enrollment) do
@@ -32,7 +32,7 @@ describe RemoveResidentRole do
     end
 
     it "deletes the resident role for person2" do
-      expect(person1.resident_role).not_to be_nil
+      expect(person2.resident_role).to be_nil
     end
 
     it "does not delete the resident role for person1" do
