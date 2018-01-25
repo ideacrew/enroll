@@ -374,7 +374,7 @@ shop_notice_triggers = [
       }
     ]
   },
-  
+
   {
     hbx_id: 'DIG017',
     title: 'Open Enrollment Completed',
@@ -418,7 +418,7 @@ shop_notice_triggers = [
       }
     ]
   },
-  
+
   {
     hbx_id: 'DAE053',
     title: 'Eligible to Apply for Employer-sponsored Health Insurance',
@@ -770,7 +770,7 @@ shop_notice_triggers = [
       }
     ]
   },
-  
+
   {
     hbx_id: 'SHOP_D056',
     title: 'Change to your Insurance Coverage',
@@ -812,7 +812,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ]    
+    ]
   },
 
   {
@@ -968,7 +968,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
   {
     hbx_id: 'SHOP_D046',
     title: 'Employee has made a change to their employer-sponsored coverage selection',
@@ -1034,10 +1033,9 @@ shop_notice_triggers = [
       }
     ]
   },
-
   {
-    hbx_id: 'DB0048',
-    title: 'You have been Hired as a Broker',
+    hbx_id: 'D048',
+    title: 'You have been hired as a broker',
     description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
     resource_name: 'broker_role',
     event_name: 'broker_hired',
@@ -1058,7 +1056,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'DY0047',
+    hbx_id: 'D047',
     title: 'You have been Hired as their Broker Agency',
     description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
     resource_name: 'broker_role',
@@ -1166,29 +1164,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
-  {
-    hbx_id: 'SHOP_D091',
-    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
-    description: 'Notify Employers of their Dental Carriers are Exiting',
-    resource_name: 'employer',
-    event_name: 'employer_renewal_dental_carriers_exiting_notice',
-    notice_triggers: [
-      {
-        name: 'Notice to Renewal ERs Dental Carriers are Exiting SHOP in 2018',
-        notice_template: 'notices/shop_employer_notices/employer_renewal_dental_carriers_exiting_notice',
-        notice_builder: 'ShopEmployerNotices::EmployerRenewalDentalCarriersExitingNotice',
-        mpi_indicator: 'SHOP_D091',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-
   {
     hbx_id: 'SHOP_DAG043',
     title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
@@ -1205,6 +1180,27 @@ shop_notice_triggers = [
           market_places: ['shop'],
           primary_recipients: ["employer"],
            primary_recipient_delivery_method: ["secure_message"],
+           secondary_recipients: []
+         }
+       }
+     ]
+   },
+   {
+    hbx_id: 'SHOP_D091',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Employers of their Dental Carriers are Exiting',
+    resource_name: 'employer',
+    event_name: 'employer_renewal_dental_carriers_exiting_notice',
+    notice_triggers: [
+      {
+        name: 'Notice to Renewal ERs Dental Carriers are Exiting SHOP in 2018',
+        notice_template: 'notices/shop_employer_notices/employer_renewal_dental_carriers_exiting_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerRenewalDentalCarriersExitingNotice',
+        mpi_indicator: 'SHOP_D091',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
       }
@@ -1321,12 +1317,12 @@ shop_notice_triggers = [
     ]
   },
 
-  {                
+  {
     hbx_id: 'SHOP_D064',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
     resource_name: 'employee_role',
-    event_name: 'notice_to_employee_for_missing_binder_payment', 
+    event_name: 'notice_to_employee_for_missing_binder_payment',
     notice_triggers: [
       {
         name: "Notice to EEs that ER’s plan year will not be written",

@@ -401,6 +401,21 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#previous_year" do
+
+    it "should return past year" do
+      expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
+    end
+
+    it "should not return current year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year)
+    end
+
+    it "should not return next year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
+    end
+  end
+
   describe ".notify_employer_when_employee_terminate_coverage" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
     let(:person) {FactoryGirl.create(:person)}
@@ -412,7 +427,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:employee_role) { FactoryGirl.create(:employee_role)}
     let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id)}
-    
+
     it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
       allow(enrollment).to receive(:is_shop?).and_return(true)
       allow(enrollment).to receive(:enrollment_kind).and_return('health')
@@ -428,21 +443,6 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
       expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
       expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
-    end
-  end
-
-  describe "#previous_year" do
-
-    it "should return past year" do
-      expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
-    end
-
-    it "should not return current year" do
-      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year)
-    end
-
-    it "should not return next year" do
-      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
   end
 end
