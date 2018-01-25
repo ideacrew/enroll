@@ -54,6 +54,11 @@ class RemoveResidentRole < MongoidMigrationTask
         rescue Exception => e
           puts e.backtrace
         end
+        # in case there are no enrollments for the person
+        person_reload ||= Person.find(person.id)
+        copy_resident_role_to_consumer_role(person_reload.resident_role) if person_reload.consumer_role.nil?
+        person_reload.resident_role.destroy if person_reload.resident_role.present?
+        puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
       end
     end
   end
