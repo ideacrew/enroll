@@ -24,9 +24,68 @@ shop_notice_triggers = [
             }
         ]
     },
-
   # {
-  #   hbx_id: 'SHOP2',
+  #   hbx_id: 'SHOP1A',
+  #   title: 'Initial Employer SHOP Application Approval',
+  #   description: 'ER application requirements met SHOP participation approved',
+  #   resource_name: 'employer',
+  #   event_name: 'application_accepted',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Employer notice trigger',
+  #       notice_template: 'notices/shop_employer_notices/1a_application_approval',
+  #       notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
+  #   hbx_id: 'SHOP1B',
+  #   title: 'Request for Clarifying Documentation',
+  #   description: 'User has 30 calendar days to respond to this notice from the notice date',
+  #   resource_name: 'employer',
+  #   event_name: 'application_declined',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Employer notice trigger',
+  #       notice_template: 'notices/shop_employer_notices/1b_request_documents',
+  #       notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
+  #   hbx_id: 'SHOP1C',
+  #   title: 'Approval of Employer SHOP Application after Request for Clarifying Documentation',
+  #   description: 'ER application requirements met SHOP participation approved',
+  #   resource_name: 'employer',
+  #   event_name: 'benefit_coverage_initial_binder_paid',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Employer notice trigger',
+  #       notice_template: 'notices/shop_employer_notices/1c_application_approval',
+  #       notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
+  #   hbx_id: 'SHOP_D002',
   #   title: 'Employer Approval Notice',
   #   description: 'Application to Offer Group Health Coverage in DC Health Link',
   #   resource_name: 'employer',
@@ -36,7 +95,7 @@ shop_notice_triggers = [
   #       name: 'Initial Employer SHOP Approval Notice',
   #       notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
   #       notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
-  #       mpi_indicator: 'MPI_SHOP2A',
+  #       mpi_indicator: 'SHOP_D002',
   #       notice_trigger_element_group: {
   #         market_places: ['shop'],
   #         primary_recipients: ["employer"],
@@ -68,6 +127,27 @@ shop_notice_triggers = [
   #   ]
   # },
   # {
+  #   hbx_id: 'SHOP3A',
+  #   title: 'Plan Offerings Finalized',
+  #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
+  #   resource_name: 'employer',
+  #   event_name: 'planyear_renewal_3a',
+  #   notice_triggers: [
+  #     {
+  #       name: 'PlanYear Renewal',
+  #       notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
+  #       notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
+  #       mpi_indicator: 'MPI_SHOPRA',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  {
   #   hbx_id: 'DRG007',
   #   title: 'Plan Offerings Finalized',
   #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
@@ -88,67 +168,27 @@ shop_notice_triggers = [
   #     }
   #   ]
   # },
-
-    # {
-    #   hbx_id: 'SHOP1A',
-    #   title: 'Initial Employer SHOP Application Approval',
-    #   description: 'ER application requirements met SHOP participation approved',
-    #   resource_name: 'employer',
-    #   event_name: 'application_accepted',
-    #   notice_triggers: [
-    #     {
-    #       name: 'Employer notice trigger',
-    #       notice_template: 'notices/shop_employer_notices/1a_application_approval',
-    #       notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-    #       notice_trigger_element_group: {
-    #         market_places: ['shop'],
-    #         primary_recipients: ["employer"],
-    #         primary_recipient_delivery_method: ["secure_message"],
-    #         secondary_recipients: []
-    #       }
-    #     }
-    #   ]
-    # },
-    # {
-    #   hbx_id: 'SHOP1B',
-    #   title: 'Request for Clarifying Documentation',
-    #   description: 'User has 30 calendar days to respond to this notice from the notice date',
-    #   resource_name: 'employer',
-    #   event_name: 'application_declined',
-    #   notice_triggers: [
-    #     {
-    #       name: 'Employer notice trigger',
-    #       notice_template: 'notices/shop_employer_notices/1b_request_documents',
-    #       notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-    #       notice_trigger_element_group: {
-    #         market_places: ['shop'],
-    #         primary_recipients: ["employer"],
-    #         primary_recipient_delivery_method: ["secure_message"],
-    #         secondary_recipients: []
-    #       }
-    #     }
-    #   ]
-    # },
-    # {
-    #   hbx_id: 'SHOP1C',
-    #   title: 'Approval of Employer SHOP Application after Request for Clarifying Documentation',
-    #   description: 'ER application requirements met SHOP participation approved',
-    #   resource_name: 'employer',
-    #   event_name: 'benefit_coverage_initial_binder_paid',
-    #   notice_triggers: [
-    #     {
-    #       name: 'Employer notice trigger',
-    #       notice_template: 'notices/shop_employer_notices/1c_application_approval',
-    #       notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-    #       notice_trigger_element_group: {
-    #         market_places: ['shop'],
-    #         primary_recipients: ["employer"],
-    #         primary_recipient_delivery_method: ["secure_message"],
-    #         secondary_recipients: []
-    #       }
-    #     }
-    #   ]
-    # },
+  # {
+  #   hbx_id: 'SHOP2',
+  #   title: 'Employer Approval Notice',
+  #   description: 'Application to Offer Group Health Coverage in DC Health Link',
+  #   resource_name: 'employer',
+  #   event_name: 'initial_employer_approval',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Initial Employer SHOP Approval Notice',
+  #       notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
+  #       notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
+  #       mpi_indicator: 'MPI_SHOP2A',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
   # {
   #   hbx_id: 'SHOP_Out_of_pocket_notice',
   #   title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
@@ -236,28 +276,6 @@ shop_notice_triggers = [
             }
         ]
     },
-
-    # {
-    #   hbx_id: 'SHOP3A',
-    #   title: 'Plan Offerings Finalized',
-    #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
-    #   resource_name: 'employer',
-    #   event_name: 'planyear_renewal_3a',
-    #   notice_triggers: [
-    #     {
-    #       name: 'PlanYear Renewal',
-    #       notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
-    #       notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-    #       mpi_indicator: 'MPI_SHOPRA',
-    #       notice_trigger_element_group: {
-    #         market_places: ['shop'],
-    #         primary_recipients: ["employer"],
-    #         primary_recipient_delivery_method: ["secure_message"],
-    #         secondary_recipients: []
-    #       }
-    #     }
-    #   ]
-    # },
     # {
     #   hbx_id: 'SHOP3B',
     #   title: 'Plan Offerings Finalized',
