@@ -25,13 +25,14 @@ class RemoveResidentRole < MongoidMigrationTask
     end
 
     results << ["The number of people with resident roles at the start of the rake task: #{people.size}"] unless Rails.env.test?
-    results << ["person.hbx_id", "pre-existing consumer role", "created new consumer role", "multiple members", "enrollment.hbx_id"] unless Rails.env.test?
 
     people.each do |person|
       # exclude the valid coverall enrollments
       unless correct_assignments.include?(person.hbx_id.to_s)
         person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
           begin
+            results << ["************************"]
+            results << ["person.hbx_id", "pre-existing consumer role", "created new consumer role", "multiple members", "enrollment.hbx_id"] unless Rails.env.test?
             # first fix any enrollments - can only be inividual or coverall kinds
             if enrollment.kind == "coverall" || enrollment.kind == "individual"
               enrollment.kind = "individual"
@@ -70,7 +71,9 @@ class RemoveResidentRole < MongoidMigrationTask
         # in case there are no enrollments for the person
         # conditional checks verify that this is a person that never entered the main block
         person_reload ||= Person.find(person.id)
-        copy_resident_role_to_consumer_role(person_reload.resident_role) if person_reload.consumer_role.nil?
+        if person_reload.resident_role.present? && person_reload.consumer_role.nil?
+          copy_resident_role_to_consumer_role(person_reload.resident_role)
+        end
         person_reload.resident_role.destroy if person_reload.resident_role.present?
         results << ["people with incorrect resident_role and no enrollments"] unless Rails.env.test?
         results << [person_reload.hbx_id, "N", "N", "N"] unless Rails.env.test?
@@ -81,7 +84,7 @@ class RemoveResidentRole < MongoidMigrationTask
       results << ["remaining people with resident roles after the task is done updating"]
       remaining_people_with_resident_roles = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
       remaining_people_with_resident_roles.each do |survivor|
-        results << survivor.hbx_id
+        results << [survivor.hbx_id]
       end
     end
   end
