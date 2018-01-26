@@ -35,7 +35,7 @@ FactoryGirl.define do
       end
       after :create do |organization, evaluator|
         start_on = (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year
-        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active", :start_on => start_on, :end_on => start_on + 1.year - 1.day, :open_enrollment_start_on => (start_on - 30).beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days, :open_enrollment_end_on => (start_on - 30).beginning_of_month + 1.weeks + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days, fte_count: 5
+        active_plan_year = FactoryGirl.create :plan_year, employer_profile: organization.employer_profile, aasm_state: "active", :start_on => start_on, :end_on => start_on + 1.year - 1.day, fte_count: 5
         start_on = (TimeKeeper.date_of_record + 2.months).beginning_of_month
         renewing_plan_year = FactoryGirl.create(:future_plan_year, employer_profile: organization.employer_profile, aasm_state: "renewing_enrolling")
         benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
