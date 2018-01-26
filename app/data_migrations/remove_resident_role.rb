@@ -31,7 +31,7 @@ class RemoveResidentRole < MongoidMigrationTask
       unless correct_assignments.include?(person.hbx_id.to_s)
         person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
           begin
-            results << ["************************"]
+            results << ["************************"] unless Rails.env.test?
             results << ["person.hbx_id", "pre-existing consumer role", "created new consumer role", "multiple members", "enrollment.hbx_id"] unless Rails.env.test?
             # first fix any enrollments - can only be inividual or coverall kinds
             if enrollment.kind == "coverall" || enrollment.kind == "individual"
