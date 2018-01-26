@@ -35,6 +35,10 @@ class TaxHousehold
     eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
+  def group_by_year
+    effective_starting_on.year
+  end
+
   def current_csr_eligibility_kind
     latest_eligibility_determination.csr_eligibility_kind
   end
