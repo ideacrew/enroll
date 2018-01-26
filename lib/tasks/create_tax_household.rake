@@ -8,7 +8,7 @@ namespace :task do
     hbx_id = ENV['hbx_id'].to_s
     max_aptc = ENV['max_aptc'].to_s
     csr = ENV['csr'].to_s
-    date = ENV['date']
+    date = ENV['effective_date']
     slcsp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
 
     effective_date = date.to_date
