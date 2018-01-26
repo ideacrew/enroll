@@ -139,7 +139,7 @@ RSpec.describe Employers::CensusEmployeesController do
     }
 
     let!(:user) { create(:user, person: person)}
-    let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
+    let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 123123714) }
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
     let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, employer_profile_id: employer.id, hired_on: "2014-11-11", first_name: "aqzz", last_name: "White", dob: "11/11/1990", ssn: "123123123", gender: "male", benefit_group: benefit_group) }
 
