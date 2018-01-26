@@ -848,10 +848,10 @@ class PlanYear
 
     state :publish_pending      # Plan application as submitted has warnings
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
-    state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+    state :published,         :after_enter => [:accept_application, :link_census_employees]     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
+    state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -1084,6 +1084,12 @@ class PlanYear
       rescue Exception => e
         Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
       end
+    end
+  end
+
+  def link_census_employees
+    self.employer_profile.census_employees.eligible_without_term_pending.each do |census_employee|
+      census_employee.save # This assigns default benefit package if none
     end
   end
 

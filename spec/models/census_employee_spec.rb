@@ -243,6 +243,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 context "using matching ssn and dob" do
                   let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
+                  let!(:user)     { FactoryGirl.create(:user, person: valid_employee_role.person) }
 
                   it "should return the roster instance" do
                     expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
@@ -259,7 +260,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { initial_census_employee.employee_role = valid_employee_role }
+                      before { 
+                        initial_census_employee.employee_role = valid_employee_role 
+                      }
 
                       it "should link the roster instance and employer role" do
                         expect(initial_census_employee.employee_role_linked?).to be_truthy
@@ -559,6 +562,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                                               dob: existing_census_employee.dob,
                                               gender: existing_census_employee.gender
                                             )}
+      let!(:user) { create(:user, person: person)}
       let!(:employee_role)                { EmployeeRole.create(
                                               person: person,
                                               hired_on: existing_census_employee.hired_on,
