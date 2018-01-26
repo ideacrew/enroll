@@ -14,4 +14,4 @@ Background: new applicant navigation to the FAA Household Info page
 Scenario: new applicant navigation to the FAA Household Info page
   Given that the user is on the Application Checklist page
   When the user clicks CONTINUE
-  Then the user will navigate to the FAA Household Info page
+  Then the user will navigate to the FAA Household Infor: Family Members page

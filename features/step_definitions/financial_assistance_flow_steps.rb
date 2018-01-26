@@ -129,3 +129,23 @@ Then(/^next time the user logs in the user will Help Paying For Coverage page$/)
   fill_in "user_password", with: user_sign_up[:password]
   click_button "Sign in"
 end
+
+Then(/^saves a YES answer to the question: Do you want to apply for Medicaid…$/) do
+  find(:xpath, '//label[@for="radio1"]').click
+  find('.btn', text: 'CONTINUE').click
+end
+
+Given(/^that the user is on the Application Checklist page$/) do
+  visit application_checklist_financial_assistance_applications_path
+end
+
+Then(/^the user will navigate to the FAA Household Infor: Family Members page$/) do
+  expect(page).to have_content('Household Info: Family Members')
+end
+
+Then(/^the next time the user logs in the user will see Application checklist page$/) do
+  visit "/users/sign_in"
+  fill_in "user_login", with: user_sign_up[:oim_id]
+  fill_in "user_password", with: user_sign_up[:password]
+  click_button "Sign in"
+end
