@@ -11,10 +11,8 @@ class FixSpecialEnrollmentPeriod < MongoidMigrationTask
           if sep.errors.keys.include?(:next_poss_effective_date)
             pos_effective_date = person.first.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten.map(&:end_on).max
             sep.update_attributes(:next_poss_effective_date => pos_effective_date)
-            sep.save
           end
         end
-        family.save
       end
     rescue Exception => e
       puts e.message
