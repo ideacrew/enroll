@@ -236,18 +236,18 @@ describe "multiple taxhouseholds for a family", type: :model, dbclean: :after_ea
 
   it "should be the latest one in the year 2018" do
     latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year)
-    expect(latest_active_thh).to be tax_household10
+    expect(latest_active_thh).to be tax_household11
     household.end_multiple_thh
     latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year)
-    expect(latest_active_thh).to be tax_household10
+    expect(latest_active_thh).to be tax_household11
   end
 
   it "should be the latest one in the year 2017" do
     latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year-1)
-    expect(latest_active_thh).to be tax_household6
+    expect(latest_active_thh).to be tax_household7
     household.end_multiple_thh
     latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year-1)
-    expect(latest_active_thh).to be tax_household6
+    expect(latest_active_thh).to be tax_household7
   end
 
 end
