@@ -370,7 +370,6 @@ var PersonValidations = (function(window, undefined) {
       };
 
       if(doc_errors.length) {
-        e.preventDefault();
         $('html,body').animate({scrollTop: 0});
         $(".alert.alert-alert").remove();
 
@@ -385,10 +384,18 @@ var PersonValidations = (function(window, undefined) {
         error_str += ul
 
         if($(".my-account-page").length) {
-          $(".my-account-page").prepend("<div class='alert alert-alert'>" + error_str)
+          $(".my-account-page").prepend("<div class='alert alert-alert'>" + error_str);
         } else {
-          $("#personal_info").prepend("<div class='alert alert-alert'>" + error_str)
+          if ($("#personal_info").length) {
+            $("#personal_info").prepend("<div class='alert alert-alert'>" + error_str);
+          } else {
+            $(".house").prepend("<div class='alert alert-alert'>" + error_str);
+          };
         };
+        e.preventDefault();
+        e.stopPropagation();
+      } else {
+        $(".alert.alert-alert").remove();
       }
     }
   }
@@ -411,7 +418,7 @@ $(document).ready(function() {
   applyListeners();
   validationForIndianTribeMember();
 
-  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
+  $('html').on('submit', 'form.edit_person, form.new_dependent, form.edit_dependent', function(e) {
     PersonValidations.validationForUsCitizenOrUsNational(e);
     PersonValidations.validationForNaturalizedCitizen(e);
     PersonValidations.validationForEligibleImmigrationStatuses(e);
