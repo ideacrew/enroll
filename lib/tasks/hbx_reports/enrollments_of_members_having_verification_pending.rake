@@ -40,7 +40,7 @@ namespace :report do
                           person.first_name,
                           person.last_name,
                           person.consumer_role.aasm_state,
-                          enrollment.id,
+                          enrollment.hbx_id,
                           enrollment.kind,
                           enrollment.effective_on,
                           enrollment.aasm_state
