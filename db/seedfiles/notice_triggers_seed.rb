@@ -361,6 +361,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'DAE053',
+    title: 'Eligible to Apply for Employer-sponsored Health Insurance',
+    description: 'This notices goes to all the employees who have successfully matched their employer.',
+    resource_name: 'employee_role',
+    event_name: 'employee_eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Employee Eligibility Notice',
+        notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
+        notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
+        mpi_indicator: 'SHOP_D053',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D018',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
