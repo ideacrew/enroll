@@ -74,7 +74,6 @@ module Forms
           :contact_method => contact_method,
           :sic_code => sic_code,
           :employer_attestation => ::EmployerAttestation.new(),
-          :contact_method => contact_method
         }),
         :office_locations => office_locations
       )
