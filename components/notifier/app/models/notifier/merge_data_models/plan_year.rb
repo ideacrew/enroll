@@ -15,6 +15,7 @@ module Notifier
     attribute :renewal_py_submit_soft_due_date, String
     attribute :renewal_py_submit_due_date, String
     attribute :binder_payment_due_date, String
+    attribute :monthly_employer_contribution_amount, Money
 
     # Following date fileds are defined to allow business enter tokens like <Current Plan Year END On Date, MM/DD/YYYY, + 60 Days>
     attribute :current_py_start_on, Date

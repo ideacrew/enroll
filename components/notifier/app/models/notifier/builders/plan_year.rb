@@ -31,6 +31,13 @@ module Notifier
       end
     end
 
+    def plan_year_monthly_employer_contribution_amount
+      if current_plan_year.present?
+        payment = current_plan_year.benefit_groups.map(&:monthly_employer_contribution_amount)
+        merge_model.plan_year.monthly_employer_contribution_amount = payment.inject(0){ |sum,a| sum+a }
+      end
+    end
+
     def plan_year_current_py_oe_end_date
       if current_plan_year.present?
         merge_model.plan_year.current_py_oe_end_date = format_date(current_plan_year.open_enrollment_end_on)

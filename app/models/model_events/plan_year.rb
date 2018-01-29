@@ -99,9 +99,9 @@ module ModelEvents
         end
 
         #initial employers misses binder payment deadline
-        binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
+        binder_next_day = self.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
         if new_date == binder_next_day
-          is_initial_employer_no_binder_payment_received == true
+          is_initial_employer_no_binder_payment_received = true
         end
 
         # renewal_application with un-published plan year, send notice 2 days prior to the publish due date i.e 13th of the month
