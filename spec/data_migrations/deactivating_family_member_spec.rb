@@ -13,17 +13,22 @@ describe DeactivatingFamilyMember, dbclean: :after_each do
   end
 
   describe "add family member to coverage household", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent)}
+
+    let(:person) { FactoryGirl.create(:person) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:family_member){FactoryGirl.create(:family_member, family: family,is_primary_applicant: false, is_active: true)}
 
     before do
-      @dependent = family.family_members.where(is_primary_applicant: false).first
-      allow(ENV).to receive(:[]).with("family_member_id").and_return(@dependent.id)
+      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
+      allow(person).to receive(:primary_family).and_return(family)
     end
 
-    it "should deactivate duplicate family member" do  
+    it "should deactivate duplicate family member" do
+      family_member_id=family_member.id
+      expect(person.primary_family.family_members.where(id:family_member_id).first.is_active).to eq true     
       subject.migrate 
-      @dependent.reload
-      expect(@dependent.is_active).to eq false
+      family.reload
+      expect(person.primary_family.family_members.where(id:family_member_id).first.is_active).to eq false
     end
   end
 end
