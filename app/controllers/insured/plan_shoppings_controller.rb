@@ -59,6 +59,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @enrollment.ee_plan_selection_confirmation_sep_new_hire
 
+    @enrollment.mid_year_plan_change_notice
+    
     send_receipt_emails if @person.emails.first
   end
 
@@ -114,6 +116,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
