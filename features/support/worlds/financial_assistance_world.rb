@@ -22,7 +22,8 @@ module FinancialAssistanceWorld
   end
 
   def create_plan
-    FactoryGirl.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01")
+    hbx_profile = FactoryGirl.create(:hbx_profile)
+    benefit_package = hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
   end
 end
 World(FinancialAssistanceWorld)

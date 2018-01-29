@@ -11,17 +11,17 @@ Feature:    A dedicated page that gives the user prior notice that that applicat
     And saves a YES answer to the question: Do you want to apply for Medicaid…
     
   Scenario: User navigates forward via the CONTINUE button
-    Given the user has navigated to Application checklist page
-    When the user clicks on CONTINUE
+    Given that the user is on the Application Checklist page
+    When the user clicks CONTINUE
     Then the user will navigate to the FAA Household Infor: Family Members page
     
   Scenario: User clicks previous or the back browser button.
-    Given the user is on the Application checklist page
+    Given that the user is on the Application Checklist page
     When the user clicks the PREVIOUS link
-    Then the user navigates to the Help Paying for Coverage page
+    Then The user will navigate to the Help Paying for Coverage page
     
   Scenario: User clicks Save & Exit
-    Given the user is on the Application checklist page
+    Given that the user is on the Application Checklist page
     When the user clicks the SAVE & EXIT link
     And successfully logs out
     Then the next time the user logs in the user will see Application checklist page
