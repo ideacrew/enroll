@@ -83,7 +83,6 @@ module Observers
     end
 
     def plan_year_date_change(model_event)
-      current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
         if model_event.event_key == :renewal_employer_publish_plan_year_reminder_after_soft_dead_line
           trigger_on_queried_records("renewal_employer_publish_plan_year_reminder_after_soft_dead_line")
@@ -97,6 +96,14 @@ module Observers
           trigger_on_queried_records("renewal_plan_year_publish_dead_line")
         end
 
+        if model_event.event_key == :initial_employer_no_binder_payment_received
+          EmployerProfile.initial_employers_enrolled_plan_year_state.each do |org|
+            if !org.employer_profile.binder_paid?
+              py = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
+              trigger_notice(recipient: org.employer_profile, event_object: py, notice_event: "initial_employer_no_binder_payment_received")
+            end
+          end
+        end
       end
     end
 
