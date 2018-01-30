@@ -11,7 +11,7 @@ describe CloneConsumerRole do
     end
   end
 
-  describe "move the user from person1 to person2 " do
+  describe "move the user from person1 to person2 ", dbclean: :after_each do
     let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:person2) { FactoryGirl.create(:person) }
 
