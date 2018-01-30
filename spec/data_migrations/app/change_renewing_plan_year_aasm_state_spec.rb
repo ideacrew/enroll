@@ -71,7 +71,6 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       census_employee.reload
       subject.migrate
       plan_year.reload
-      puts plan_year.inspect
       expect(plan_year.aasm_state).to eq "active"
     end
   end
