@@ -20,7 +20,7 @@ class RemoveResidentRole < MongoidMigrationTask
       people = Person.where("resident_role" => {"$exists" => true, "$ne" => nil})
     else
       people = []
-      people << Person.where(id: ENV['p_to_fix_id'].to_s).first
+      people << Person.where(hbx_id: ENV['p_to_fix_id'].to_s).first
     end
 
     results << ["The number of people with resident roles at the start of the rake task: #{people.size}"] unless Rails.env.test?
@@ -31,6 +31,7 @@ class RemoveResidentRole < MongoidMigrationTask
         person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
           begin
             results << ["************************"] unless Rails.env.test?
+            results << ["Beginning for hbx enrollment: #{enrollment.hbx_id}"] unless Rails.env.test?
             results << ["person.hbx_id", "pre-existing consumer role", "created new consumer role", "multiple members", "enrollment.hbx_id"] unless Rails.env.test?
             # first fix any enrollments - can only be inividual or coverall kinds
             if enrollment.kind == "coverall" || enrollment.kind == "individual"
@@ -49,9 +50,9 @@ class RemoveResidentRole < MongoidMigrationTask
                 end
               elsif person.consumer_role.nil?
                 copy_resident_role_to_consumer_role(person.resident_role)
-                results << [member.person.hbx_id, "N", "Y", "N", enrollment.hbx_id] unless Rails.env.test?
+                results << [person.hbx_id, "N", "Y", "N", enrollment.hbx_id] unless Rails.env.test?
               end
-              results << [member.person.hbx_id, "Y", "N", "N", enrollment.hbx_id] unless Rails.env.test?
+              results << [person.hbx_id, "Y", "N", "N", enrollment.hbx_id] unless Rails.env.test?
               # need to explicitly reload person object
               person_reload = Person.find(person.id)
               enrollment.consumer_role_id = person_reload.consumer_role.id
@@ -63,6 +64,8 @@ class RemoveResidentRole < MongoidMigrationTask
             results << [person_reload.hbx_id, "N", "N", "N", enrollment.hbx_id] unless Rails.env.test?
             person_reload.resident_role.destroy if person_reload.resident_role.present?
             puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
+            results << ["End for hbx enrollment: #{enrollment.hbx_id}"] unless Rails.env.test?
+            results << ["************************"] unless Rails.env.test?
           rescue Exception => e
             puts e.backtrace
           end
