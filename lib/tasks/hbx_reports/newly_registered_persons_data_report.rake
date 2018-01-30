@@ -42,7 +42,7 @@ namespace :reports do
            Active_Employee_Role
          )
       count = 0
-      file_name = "#{Rails.root}/public/new_registered_persons_data_report.csv"
+      file_name = "#{Rails.root}/lib/tasks/hbx_reports/new_registered_persons_data_report.csv"
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -104,8 +104,8 @@ namespace :reports do
                   fm.person.home_address.try(:state),
                   fm.person.home_address.try(:zip),
                   fm.person.ethnicity,
-                  primary_fm.person.consumer_role.present?,
-                  primary_fm.person.active_employee_roles.present?
+                  fm.person.consumer_role.present?,
+                  fm.person.active_employee_roles.present?
               ]
               count += 1
             rescue
