@@ -35,7 +35,7 @@ class Insured::PlanShoppingsController < ApplicationController
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
-    plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
+    plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id,params[:market_kind])
 
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
@@ -57,7 +57,10 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @enrollment.ee_plan_selection_confirmation_sep_new_hire
 
+    @enrollment.mid_year_plan_change_notice
+    
     send_receipt_emails if @person.emails.first
   end
 
@@ -113,6 +116,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
@@ -133,7 +137,8 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      
+      notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+      hbx_enrollment.notify_employee_confirming_coverage_termination
       redirect_to family_account_path
     else
       redirect_to :back
