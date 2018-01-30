@@ -153,8 +153,8 @@ aca:
       ineligible_period_after_application_denial:
         days: 90
       quiet_period:
-        month_offset: -1
-        mday: 28
+        month_offset: 0
+        mday: 8
 
     renewal_application:
       earliest_start_prior_to_effective_on:
@@ -169,7 +169,7 @@ aca:
           days: 5
       quiet_period:
         month_offset: -1
-        mday: 15
+        mday: 28
 
     benefit_period:
       length_minimum:
