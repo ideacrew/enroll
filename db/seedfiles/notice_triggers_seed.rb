@@ -383,7 +383,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'DAG058',
-    title: 'EE Ineligibility Notice – Terminated from Roster',
+    title: 'Ineligible for SHOP Coverage Offered through DC Health Link',
     description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
     resource_name: 'employee_role',
     event_name: 'employee_termination_notice',
@@ -392,7 +392,7 @@ shop_notice_triggers = [
         name: 'Employee Termination Notice',
         notice_template: 'notices/shop_employee_notices/employee_termination_notice',
         notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
-        mpi_indicator: 'DAG058',
+        mpi_indicator: 'SHOP_D058',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
