@@ -537,12 +537,21 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"
+    end
+  end
+
+  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+    begin
+      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
+        ShopNoticesNotifierJob.perform_later(hbx_enrollment.employer_profile.id.to_s, "notify_employer_when_employee_terminate_coverage", hbx_enrollment: hbx_enrollment.hbx_id.to_s)
+      end
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver employee_terminate_coverage_notice of employee #{hbx_enrollment.census_employee.id.to_s} to #{hbx_enrollment.employer_profile.id.to_s}due to #{e}" }) unless Rails.env.test?
     end
   end
 
@@ -648,4 +657,9 @@ module ApplicationHelper
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
+
+  def previous_year
+    TimeKeeper.date_of_record.prev_year.year
+  end
 end
+
