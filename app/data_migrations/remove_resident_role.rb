@@ -65,7 +65,6 @@ class RemoveResidentRole < MongoidMigrationTask
             results << [person_reload.hbx_id, "N", "N", "N", enrollment.hbx_id] unless Rails.env.test?
             person_reload.resident_role.destroy if person_reload.resident_role.present?
             puts "removed resident role for Person: #{person.hbx_id}" unless Rails.env.test?
-            results <<  unless Rails.env.test?
             results << ["End for hbx enrollment: #{enrollment.hbx_id}"] unless Rails.env.test?
             results << ["************************"] unless Rails.env.test?
           rescue Exception => e
