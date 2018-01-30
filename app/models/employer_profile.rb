@@ -149,6 +149,11 @@ class EmployerProfile
     active_broker_agency_account.save!
     employer_broker_fired
     notify_broker_terminated
+    broker_fired_confirmation_to_broker
+  end
+
+  def broker_fired_confirmation_to_broker
+      trigger_notices('broker_fired_confirmation_to_broker')   
   end
 
   def employer_broker_fired
@@ -275,8 +280,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present? 
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -1065,7 +1070,11 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+    end
   end
 
 private
