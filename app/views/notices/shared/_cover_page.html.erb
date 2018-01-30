@@ -1,5 +1,4 @@
 <div class="page-break">
-
   <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 
   <% if notice.shop? %>
@@ -7,7 +6,6 @@
   <% else %>
     <%= render partial: 'notices/shared/address', :locals => {notice: notice, show_mpi_indicator: false} %>
   <% end %>
-
 
   <table class="total_table" border="0">
     <tbody>
@@ -24,13 +22,15 @@
           The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
         </td>
       </tr>
-      <tr>
-        <br></br>
-      </tr>
+      <% if notice.shop? %>
+        <tr>
+          <br></br>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 
-   <table class="total_table" border="0" style="margin-top: 260px;">
+  <table class="total_table" border="0" style="margin-top: 260px;">
     <tbody>
       <tr>
         <td><%= notice.mpi_indicator %></td>

@@ -77,7 +77,8 @@ if missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
-  puts "Processing Plan Mapping ..."
+  puts "Processing Plan Mapping for plans  ..."
+  system "bundle exec rake xml:plan_cross_walk_old"
   system "bundle exec rake xml:plan_cross_walk"
   puts "Processing Plan Mapping completed"
   puts "*"*80
@@ -93,7 +94,7 @@ if missing_plan_dumps
 
   puts "*"*80
   puts "importing provider_directory_urls and rx_formulary_urls for plans"
-  system "bundle exec rake import:provider_and_rx_formulary_url"
+  system "bundle exec rake import:common_data_from_master_xml"
   puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
   puts "*"*80
 
@@ -103,6 +104,11 @@ if missing_plan_dumps
   puts "::: Mapping Plans to SBC pdfs seed complete :::"
 
   puts "*"*80
+  puts "::: Updating network info for 2017 plans :::"
+  system "bundle exec rake import:network_information"
+  puts "::: Updating network info for 2017 plans complete:::"
+
+  # puts "*"*80
   system "bundle exec rake migrations:cat_age_off_renewal_plan"
   puts "*"*80
 
@@ -158,6 +164,7 @@ puts "Loading benefit packages."
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2017_seed')
+system "bundle exec rake import:benefit_package_2018"
 puts "::: benefit packages seed complete :::"
 
 puts "*"*80

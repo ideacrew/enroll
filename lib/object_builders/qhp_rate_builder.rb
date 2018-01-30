@@ -8,9 +8,16 @@ class QhpRateBuilder
     @action = "new"
   end
 
-  def add(rates_hash, action)
-    @rates_array = @rates_array + rates_hash[:items]
-    @action = action
+  def add(rates_hash, action, year)
+    if year < 2018
+      @rates_array = @rates_array + rates_hash[:items]
+      @action = action
+    else
+      rates_hash[:plan_rate_group_attributes].each do |rate_group_attributes|
+        @rates_array = @rates_array + rate_group_attributes[:items]
+        @action = action
+      end
+    end
   end
 
   def run
@@ -64,8 +71,12 @@ class QhpRateBuilder
 
   def assign_age
     case(@rate[:age_number])
+    when "0-14"
+      14
     when "0-20"
       20
+    when "64 and over"
+      64
     when "65 and over"
       65
     else
