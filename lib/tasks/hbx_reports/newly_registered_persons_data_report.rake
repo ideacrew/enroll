@@ -42,7 +42,8 @@ namespace :reports do
            Active_Employee_Role
          )
       count = 0
-      file_name = "#{Rails.root}/lib/tasks/hbx_reports/new_registered_persons_data_report.csv"
+      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+      file_name = "#{Rails.root}/hbx_report/new_registered_persons_data_report.csv"
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
