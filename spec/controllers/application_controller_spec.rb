@@ -238,10 +238,10 @@ RSpec.describe ApplicationController do
         person.user = user2
       end
 
-      it 'returns nil if person has consumer role with user_id and current user is admin' do
+      it 'updates bookmark url if person has consumer role with user_id and current user is admin' do
         bookmark_url = "http://localhost:3000/insured/consumer_role/5a2ec91b16676709f7000034/edit"
         value = subject.send(:save_bookmark, role, bookmark_url)
-        expect(value).to eq(nil)
+        expect(value).to eq(true)
       end
     end
   end
