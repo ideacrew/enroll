@@ -51,6 +51,7 @@ module SponsoredBenefits
     field :is_congress, type: Boolean, default: false
     field :_type, type: String, default: self.name
 
+    delegate :plan_year, to: :benefit_application, allow_nil: true
 
     embeds_many :composite_tier_contributions, cascade_callbacks: true
     accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
@@ -333,9 +334,10 @@ module SponsoredBenefits
       plan_option_kind == "single_plan"
     end
 
+
     def elected_plans_by_option_kind
       start_on = benefit_application.effective_period.begin
-      @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, benefit_application.effective_period.begin.year)
+      @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on.year)
 
       case plan_option_kind
       when "sole_source"

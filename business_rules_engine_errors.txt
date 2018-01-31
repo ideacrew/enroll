@@ -1,0 +1,602 @@
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08a813c8d64d7f617d5b
+Current state: enrollment_ineligible
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08aa13c8d64d7f61858b
+Current state: enrollment_open
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08b113c8d64d7f61aa7a
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08b313c8d64d7f61b183
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08b413c8d64d7f61b88c
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08b613c8d64d7f61bf95
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08b813c8d64d7f61c69e
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08b913c8d64d7f61cda7
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08bb13c8d64d7f61d512
+Current state: imported
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08be13c8d64d7f61de6a
+Current state: imported
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08c313c8d64d7f61f5f1
+Current state: draft
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:benefit_application_fte_count=>"validated successfully", :benefit_application_contains_benefit_packages=>"validated successfully", :benefit_packages_contains_reference_plans=>"validated successfully", :all_employees_are_assigned_benefit_package=>"validated successfully", :employer_profile_eligible=>"validated successfully", :employer_primary_office_location=>"validated successfully", :all_contribution_levels_min_met=>"validated successfully", :open_enrollment_period_minimum=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 20:59
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08cd13c8d64d7f6221df
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d013c8d64d7f62243e
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d013c8d64d7f622457
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d013c8d64d7f622472
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d013c8d64d7f62248d
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d113c8d64d7f6224aa
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d113c8d64d7f6224c7
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d113c8d64d7f6224e4
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d113c8d64d7f622501
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08d113c8d64d7f622520
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08f113c8d64d7f6284ca
+Current state: enrollment_ineligible
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08f113c8d64d7f62855a
+Current state: enrollment_ineligible
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08f313c8d64d7f628db4
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08f313c8d64d7f628e44
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08f513c8d64d7f629347
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:00
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca08f513c8d64d7f62945d
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca094913c8d64d7f637640
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca094913c8d64d7f6377a5
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca094a13c8d64d7f63790b
+Current state: enrollment_closed
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{:minimum_participation_rule=>"Number of eligible members enrolling: (0) is less than minimum required: 0.0", :non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll", :minimum_eligible_member_count=>"At least one member must be eligible to enroll"}
+{}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca096713c8d64d7f63d33a
+Current state: active
+Non Biz Owner Count: 5
+Members Eligible to Enroll: 5
+Ratio: 1.0
+{}
+{:minimum_participation_rule=>"validated successfully", :non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca096a13c8d64d7f63dbea
+Current state: active
+Non Biz Owner Count: 3
+Members Eligible to Enroll: 5
+Ratio: 0.6
+{:minimum_participation_rule=>"Number of eligible members enrolling: (3) is less than minimum required: 3.75"}
+{:non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca096d13c8d64d7f63e41a
+Current state: active
+Non Biz Owner Count: 5
+Members Eligible to Enroll: 5
+Ratio: 1.0
+{}
+{:non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca097013c8d64d7f63ecca
+Current state: active
+Non Biz Owner Count: 3
+Members Eligible to Enroll: 5
+Ratio: 0.6
+{}
+{:non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca097313c8d64d7f63f4fa
+Current state: active
+Non Biz Owner Count: 5
+Members Eligible to Enroll: 5
+Ratio: 1.0
+{}
+{:non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca097613c8d64d7f63fdaa
+Current state: active
+Non Biz Owner Count: 3
+Members Eligible to Enroll: 5
+Ratio: 0.6
+{}
+{:non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca097813c8d64d7f6405da
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 5
+Ratio: 0.0
+{:non_business_owner_enrollment_count=>"At least 1.0 non-owner employee must enroll"}
+{:minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca097a13c8d64d7f640d49
+Current state: active
+Non Biz Owner Count: 5
+Members Eligible to Enroll: 5
+Ratio: 1.0
+{}
+{:minimum_participation_rule=>"validated successfully", :non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca097d13c8d64d7f6415f9
+Current state: active
+Non Biz Owner Count: 3
+Members Eligible to Enroll: 5
+Ratio: 0.6
+{:minimum_participation_rule=>"Number of eligible members enrolling: (3) is less than minimum required: 3.75"}
+{:non_business_owner_enrollment_count=>"validated successfully", :minimum_eligible_member_count=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca098013c8d64d7f641e01
+Current state: active
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:stubbed_rule_one=>"validated successfully", :stubbed_rule_two=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:02
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca098213c8d64d7f6425c7
+Current state: draft
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:benefit_application_fte_count=>"validated successfully", :benefit_application_contains_benefit_packages=>"validated successfully", :benefit_packages_contains_reference_plans=>"validated successfully", :all_employees_are_assigned_benefit_package=>"validated successfully", :employer_profile_eligible=>"validated successfully", :employer_primary_office_location=>"validated successfully", :all_contribution_levels_min_met=>"validated successfully", :within_last_day_to_publish=>"Plan year was published before 07/06/2019 on 07/04/2019 ", :open_enrollment_period_minimum=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:03
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca098613c8d64d7f643411
+Current state: draft
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:benefit_application_fte_count=>"validated successfully", :benefit_application_contains_benefit_packages=>"validated successfully", :benefit_packages_contains_reference_plans=>"validated successfully", :all_employees_are_assigned_benefit_package=>"validated successfully", :employer_profile_eligible=>"validated successfully", :employer_primary_office_location=>"validated successfully", :all_contribution_levels_min_met=>"validated successfully", :within_last_day_to_publish=>"Plan year was published before 07/06/2019 on 07/04/2019 ", :open_enrollment_period_minimum=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+
+
+---------
+05/01/2019 21:03
+BenefitSponsors::BenefitApplications::BenefitApplication
+5cca099613c8d64d7f646614
+Current state: pending
+Non Biz Owner Count: 0
+Members Eligible to Enroll: 0
+Ratio: 0
+{}
+{:benefit_application_fte_count=>"validated successfully", :benefit_application_contains_benefit_packages=>"validated successfully", :benefit_packages_contains_reference_plans=>"validated successfully", :all_employees_are_assigned_benefit_package=>"validated successfully", :employer_profile_eligible=>"validated successfully", :employer_primary_office_location=>"validated successfully", :all_contribution_levels_min_met=>"validated successfully", :within_last_day_to_publish=>"Plan year was published before 05/06/2019 on 05/03/2019 ", :open_enrollment_period_minimum=>"validated successfully"}
+ACME Widgets, Inc.
+---------
+

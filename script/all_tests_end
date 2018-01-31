@@ -1,4 +1,0 @@
-bundle exec cucumber features/integration/employee_sign_up.feature -r features/step_definitions/integration_steps.rb
-bundle exec cucumber features/employers/create_employer.feature -r features/step_definitions/integration_steps.rb -r features/step_definitions/employers_steps.rb
-bundle exec cucumber features/brokers/create_broker_agency_profiles.feature -r features/step_definitions/integration_steps.rb -r features/step_definitions/email_steps.rb -r features/step_definitions/brokers_steps.rb -r features/support/env.rb
-bundle exec cucumber features/insured/individual_signup.feature -r features/step_definitions/integration_steps.rb -r features/step_definitions/individual_steps.rb -r features/support/env.rb

@@ -1,0 +1,25 @@
+<div id="new_employee_form">
+</div>
+
+<div class= "effectivedatatable">
+  <%#= raw render_datatable(@datatable) %>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  $('.buttons-csv').hide()
+  $('.buttons-excel').hide()
+  </script>
+
+  <%#= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+
+  <div class="row">
+    <div class="col-md-9">
+      <%# if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+      <%#= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+      <%# end %>
+    </div>
+    <div class="col-md-3 text-right content-bottom">
+      <h4><%#= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+    </div>
+  </div>

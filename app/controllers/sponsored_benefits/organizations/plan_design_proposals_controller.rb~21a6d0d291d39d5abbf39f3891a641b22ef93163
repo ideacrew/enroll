@@ -92,7 +92,7 @@ module SponsoredBenefits
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
           organization: @plan_design_organization
         }.merge(plan_design_proposal_params))
-
+      
       respond_to do |format|
         if @plan_design_proposal.save
           flash[:success] = "Quote information saved successfully."

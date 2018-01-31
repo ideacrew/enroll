@@ -1,0 +1,39 @@
+<div class="tab-content" id="myTabContent">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-10">
+      <div class="top-pd">
+        <span class="flash_message"></span>
+      </div>
+       <%= form_for @plan_design_proposal, url: {action: "create"} do |f| %>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %></h3>
+        </div>
+        <div class="panel-body">
+            <%= render 'shared/error_messages', :object => @plan_design_proposal %>
+            <%= render 'form', f: f %>
+        </div>
+        </div>
+        <div class="pull-right">
+          <%= f.submit "Save Quote", class: "btn btn-primary" %>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-10">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Employee Roster</h3>
+        </div>
+        <div class="panel-body">
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
