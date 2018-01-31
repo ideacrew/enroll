@@ -1,0 +1,3 @@
+rspec
+RAILS_ENV=test rake db:seed
+echo Please restart your test rails server.

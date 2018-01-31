@@ -1,0 +1,13 @@
+
+<% if @employer_invoice.errors.present? %>
+		<% @employer_invoice.errors.each do |error| %>
+		<%=error%>
+	<%end%>
+<%else%>
+	Invoices for the following employer ID generated successfully.<br>
+
+<% @organizations.each do |organization| %>
+	<%=organization.fein %> - <%=organization.legal_name %><br>
+<%end%>
+
+<%end%>

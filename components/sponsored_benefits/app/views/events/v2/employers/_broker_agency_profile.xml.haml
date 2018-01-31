@@ -1,0 +1,41 @@
+%broker_agency_profile
+  %npn= broker_agency_profile.corporate_npn
+  %primary_broker
+    %id
+      %id= broker_agency_profile.primary_broker_role_id
+    %person
+      %id
+        %id= broker_agency_profile.primary_broker_role.person.id
+      = render :partial => "events/v2/shared/person_name", :object => broker_agency_profile.primary_broker_role.person
+      -#%job_title= field not available
+      -#%department= field not available
+      - if broker_agency_profile.primary_broker_role.person.addresses.present?
+        %addresses
+          = render partial: 'events/v2/addresses/address', collection: broker_agency_profile.primary_broker_role.person.addresses
+      %emails
+        = render partial: "events/v2/emails/email", :locals => {email:broker_agency_profile.primary_broker_role.person.work_email_or_best}
+      - if broker_agency_profile.primary_broker_role.person.phones.present?
+        %phones
+          = render partial: "events/v2/phones/phone", collection: broker_agency_profile.primary_broker_role.person.phones
+    %npn=broker_agency_profile.primary_broker_role.npn
+  %brokers
+    - broker_agency_profile.brokers.each do |broker|
+      %broker
+        %id
+          %id= broker.id
+        %person
+          %id
+            %id= broker.person.id
+          = render :partial => "events/v2/shared/person_name", :object => broker.person
+          -#%job_title= field not available
+          -#%department= field not available
+          - if broker.person.addresses.present?
+            %addresses
+              = render partial: "events/v2/addresses/address", collection: broker.person.addresses
+          - if broker.person.emails.present?
+            %emails
+              = render partial: "events/v2/emails/email",  :locals => {email:broker.person.work_email_or_best}
+          - if broker.person.phones.present?
+            %phones
+              = render partial: "events/v2/phones/phone", collection: broker.person.phones
+        %npn= broker.npn

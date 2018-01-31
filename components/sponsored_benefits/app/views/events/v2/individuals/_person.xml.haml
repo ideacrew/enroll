@@ -1,0 +1,12 @@
+%person
+  %id
+    %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{person.hbx_id}"
+  = render :partial => "events/v2/shared/person_name", :object => person
+  - if person.addresses.any?
+    %addresses
+      = render :partial => "events/v2/addresses/address", :collection => person.addresses
+  %emails
+    = render :partial => "events/v2/emails/email", :locals => { email: person.work_email_or_best}
+  - if person.phones.any?
+    %phones
+      = render :partial => "events/v2/phones/phone", :collection => person.phones
