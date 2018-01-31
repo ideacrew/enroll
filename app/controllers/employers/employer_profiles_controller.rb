@@ -576,9 +576,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def get_sic_codes
-   @grouped_options = {}
-   SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
-    @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} - #{sc.sic_code}", sc.sic_code]}
-   end
+    @grouped_options = Caches::SicCodesCache.load
   end
 end
