@@ -36,9 +36,10 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     latest_application.tax_households.each do |th|
       notice.tax_households << append_tax_households(th)
     end
-
-    notice.ivl_open_enrollment_start_on = Settings.aca.individual_market.open_enrollment.start_on
-    notice.ivl_open_enrollment_end_on = Settings.aca.individual_market.open_enrollment.end_on
+    hbx = HbxProfile.current_hbx
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
 
   def append_tax_households(th)
