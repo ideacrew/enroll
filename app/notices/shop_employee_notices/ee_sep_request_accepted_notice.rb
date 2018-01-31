@@ -20,7 +20,6 @@ class ShopEmployeeNotices::EeSepRequestAcceptedNotice < ShopEmployeeNotice
   end
 
   def append_data
-    sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
     notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({
       :qle_on => @qle_on,
       :end_on => @end_on,
