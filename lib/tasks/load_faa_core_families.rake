@@ -14,13 +14,13 @@ namespace :seed do
       hashed_data = Hash[*ud.flatten]
       begin
 
-        #destroy existing core_29 families
+        #destroy existing core family
         user_email = hashed_data["user"].first["email"]
         user_oim_id = hashed_data["user"].first["oim_id"]
         existing_user = User.all.where(email: user_email).and(oim_id: user_oim_id).first
 
         if existing_user.present?
-          destroy_core29_families(existing_user)
+          destroy_core_family(existing_user)
         end
 
         #create user record
@@ -92,7 +92,6 @@ namespace :seed do
         end
 
         #build matrix relationship between for all members
-
         if hashed_data["relation_ships"].first["rs1"].first["kind"].present?
           if hashed_data["relation_ships"].first.count >0
             count = hashed_data["relation_ships"].count
@@ -142,7 +141,7 @@ def generate_relation(person_id, dependent_id, kind, family_id)
   successor.add_relationship(predecessor, PersonRelationship::InverseMap[kind], family_id)
 end
 
-def destroy_core29_families(existing_user)
+def destroy_core_family(existing_user)
   relationships = existing_user.person.person_relationships if existing_user.person.person_relationships.present?
   if relationships.present? && relationships.count >0
     relationships.each do |person_relationship|
