@@ -18,6 +18,7 @@ def people_for_cobra
       password: 'aA1!aA1!aA1!'
     },
     "Jack Doe" => {
+      username: "JackDoe123",
       first_name: "Jack",
       last_name: "Doe",
       dob: '10/11/1978',
@@ -45,6 +46,27 @@ When(/^(.*) create a new account for employer$/) do |named_person|
   fill_in "user[password_confirmation]", :with => person[:password]
   screenshot("create_account")
   find(".interaction-click-control-create-account").click
+end
+
+Then(/^I fill employer signup form for (.*?)$/) do |named_person|
+  find('.interaction-click-control-create-account').click
+  person = people_for_cobra[named_person]
+  fill_in "user[oim_id]", :with => person[:username]
+  fill_in "user[password]", :with => person[:password]
+  fill_in "user[password_confirmation]", :with => person[:password]
+  sleep 1
+end
+
+Then(/^I can see the optional Email field$/) do
+  find('.interaction-field-control-user-email', visible: true)
+end
+
+Then(/^I fill out the email address with (.*?)$/) do |email|
+  fill_in 'user[email]', with: email
+end
+
+Then 'I submit button to create account' do
+  find('.interaction-click-control-create-account').click
 end
 
 Then(/^Employer should see a form to enter information about employee, address and dependents details for Jack Cobra$/) do

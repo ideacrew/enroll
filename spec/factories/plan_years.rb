@@ -8,7 +8,7 @@ FactoryGirl.define do
 
     end_on { start_on + 1.year - 1.day }
     open_enrollment_start_on { (start_on - 30).beginning_of_month }
-    open_enrollment_end_on { open_enrollment_start_on + 1.weeks }
+    open_enrollment_end_on { (open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.monthly_end_on.days) - 1.day }
     fte_count { 5 }
   end
 
