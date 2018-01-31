@@ -8,7 +8,7 @@ namespace :seed do
     contents_user = file_user.read
     file_user.close
     data_user = JSON.load(contents_user)
-    puts "Loading core #{data_user.count} scenarios"
+    puts "Loading #{data_user.count} people and their families for the core-29 scenarios"
 
     data_user.reduce(0) do |acc, ud|
       hashed_data = Hash[*ud.flatten]
