@@ -1,8 +1,0 @@
-if ($("#broker_applicants_roster").length > 0) {
-  $('#broker_applicants').html("<%= escape_javascript(render "shared/brokers/applicants", url: exchanges_broker_applicants_path, index_url: exchanges_broker_applicants_path(status: @status)) %>");
-}
-else {
-  setTabContent("<%= escape_javascript render "shared/brokers/applicants_index", url: exchanges_broker_applicants_path, index_url: exchanges_broker_applicants_path(status: @status) %>")
-  set_active_ontab("#brokers-tab");
-  enableBrokerApplicantFilters();
-}

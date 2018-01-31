@@ -1,4 +1,0 @@
-<ridp:residency_verification_response
-        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-        xmlns:ridp='http://openhbx.org/api/terms/1.0'
-        xsi:schemaLocation='http://openhbx.org/api/terms/1.0 file:/Users/tevans/proj/cv_example_builder/verification_services.xsd'>urn:openhbx:terms:v1:address_verification#ADDRESS_NOT_IN_AREA</ridp:residency_verification_response>

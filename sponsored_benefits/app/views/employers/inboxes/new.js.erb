@@ -1,7 +1,0 @@
-$('#inbox_provider_form').hide();
-$('#message_form').show();
-$('#message_form').html("<%= escape_javascript(render "shared/inboxes/form") %>");
-$(".btn-danger").click(function(){
-  $('#message_form').hide();
-  $('#inbox_provider_form').show();
-});

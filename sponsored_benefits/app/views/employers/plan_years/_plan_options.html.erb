@@ -1,6 +1,0 @@
-<option>SELECT REFERENCE PLAN</option>
-<% @plans.each do |plan| %>
-  <option value='<%= plan.id %>'>
-    <%= "#{@carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}" %>
-  </option>
-<% end %>

@@ -1,1 +1,0 @@
-$('.effective-datatable').DataTable().draw()
