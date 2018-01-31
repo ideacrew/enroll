@@ -131,11 +131,10 @@ system "bundle exec rake update_seed:qualifying_life_event"
 puts "::: complete :::"
 
 puts "*"*80
-puts "Loading sanitized people, families, faa_core_families, employers, and census."
+puts "Loading sanitized people, families, employers, and census."
 load_tasks = %w(
   seed:people
   seed:families
-  seed:faa_core_families
   hbx:employers:add[db/seedfiles/employers.csv,db/seedfiles/blacklist.csv]
   hbx:employers:census:add[db/seedfiles/census.csv]
 )
