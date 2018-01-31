@@ -1481,649 +1481,456 @@ shop_notice_triggers = [
 ]
 
 ivl_notice_triggers = [
-    {
-        hbx_id: 'VerificationBacklog',
-        title: 'Documents needed to confirm eligibility for your plan',
-        description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
-        resource_name: 'consumer_role',
-        event_name: 'verifications_backlog',
-        notice_triggers: [
-            {
-                name: 'Outstanding Verification Notification',
-                notice_template: 'notices/ivl/verifications_backlog_notice',
-                notice_builder: 'IvlNotices::ConsumerNotice',
-                mpi_indicator: 'MPI_IVLV5B',
-                notice_trigger_element_group: {
-                    market_places: ['individual'],
-                    primary_recipients: ["consumer"],
-                    primary_recipient_delivery_method: ["secure_message", "paper"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-    {
-        hbx_id: 'Notice20A',
-        title: 'Request for Additional Information - First Reminder',
-        description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
-        resource_name: 'consumer_role',
-        event_name: 'first_verifications_reminder',
-        notice_triggers: [
-            {
-                name: 'First Outstanding Verification Notification',
-                notice_template: 'notices/ivl/documents_verification_reminder1',
-                notice_builder: 'IvlNotices::ConsumerNotice',
-                mpi_indicator: 'MPI_IVLV20A',
-                notice_trigger_element_group: {
-                    market_places: ['individual'],
-                    primary_recipients: ["consumer"],
-                    primary_recipient_delivery_method: ["secure_message", "paper"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-    {
-        hbx_id: 'Notice20B',
-        title: 'Request for Additional Information - Second Reminder',
-        description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
-        resource_name: 'consumer_role',
-        event_name: 'second_verifications_reminder',
-        notice_triggers: [
-            {
-                name: 'Second Outstanding Verification Notification',
-                notice_template: 'notices/ivl/documents_verification_reminder2',
-                notice_builder: 'IvlNotices::ConsumerNotice',
-                mpi_indicator: 'MPI_IVLV20B',
-                notice_trigger_element_group: {
-                    market_places: ['individual'],
-                    primary_recipients: ["consumer"],
-                    primary_recipient_delivery_method: ["secure_message", "paper"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-    {
-        hbx_id: 'Notice21',
-        title: 'Request for Additional Information - Third Reminder',
-        description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
-        resource_name: 'consumer_role',
-        event_name: 'third_verifications_reminder',
-        notice_triggers: [
-            {
-                name: 'Third Outstanding Verification Notification',
-                notice_template: 'notices/ivl/documents_verification_reminder3',
-                notice_builder: 'IvlNotices::ConsumerNotice',
-                mpi_indicator: 'MPI_IVLV21',
-                notice_trigger_element_group: {
-                    market_places: ['individual'],
-                    primary_recipients: ["consumer"],
-                    primary_recipient_delivery_method: ["secure_message", "paper"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-    {
-        hbx_id: 'Notice22',
-        title: 'Request for Additional Information - Fourth Reminder',
-        description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
-        resource_name: 'consumer_role',
-        event_name: 'fourth_verifications_reminder',
-        notice_triggers: [
-            {
-                name: 'Fourth Outstanding Verification Notification',
-                notice_template: 'notices/ivl/documents_verification_reminder4',
-                notice_builder: 'IvlNotices::ConsumerNotice',
-                mpi_indicator: 'MPI_IVLV22',
-                notice_trigger_element_group: {
-                    market_places: ['individual'],
-                    primary_recipients: ["consumer"],
-                    primary_recipient_delivery_method: ["secure_message", "paper"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
+#   {
+#     hbx_id: 'VerificationBacklog',
+#     title: 'Documents needed to confirm eligibility for your plan',
+#     description: 'Should be triggered for thoso who completed Enroll App application but verifications pending',
+#     resource_name: 'consumer_role',
+#     event_name: 'verifications_backlog',
+#     notice_triggers: [
+#       {
+#         name: 'Outstanding Verification Notification',
+#         notice_template: 'notices/ivl/verifications_backlog_notice',
+#         notice_builder: 'IvlNotices::ReminderNotice',
+#         mpi_indicator: 'MPI_IVLV5B',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_DR1',
+#     title: 'Reminder - You Must Submit Documents by the Deadline to Keep Your Insurance',
+#     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+#     resource_name: 'consumer_role',
+#     event_name: 'first_verifications_reminder',
+#     notice_triggers: [
+#       {
+#         name: 'First Outstanding Verification Notification',
+#         notice_template: 'notices/ivl/documents_verification_reminder',
+#         notice_builder: 'IvlNotices::ReminderNotice',
+#         mpi_indicator: 'IVL_DR1',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_DR2',
+#     title: 'DON’T FORGET - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+#     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+#     resource_name: 'consumer_role',
+#     event_name: 'second_verifications_reminder',
+#     notice_triggers: [
+#       {
+#         name: 'Second Outstanding Verification Notification',
+#         notice_template: 'notices/ivl/documents_verification_reminder',
+#         notice_builder: 'IvlNotices::ReminderNotice',
+#         mpi_indicator: 'IVL_DR2',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_DR3',
+#     title: 'TIME SENSITIVE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+#     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+#     resource_name: 'consumer_role',
+#     event_name: 'third_verifications_reminder',
+#     notice_triggers: [
+#       {
+#         name: 'Third Outstanding Verification Notification',
+#         notice_template: 'notices/ivl/documents_verification_reminder',
+#         notice_builder: 'IvlNotices::ReminderNotice',
+#         mpi_indicator: 'IVL_DR3',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_DR4',
+#     title: 'FINAL NOTICE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
+#     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
+#     resource_name: 'consumer_role',
+#     event_name: 'fourth_verifications_reminder',
+#     notice_triggers: [
+#       {
+#         name: 'Fourth Outstanding Verification Notification',
+#         notice_template: 'notices/ivl/documents_verification_reminder',
+#         notice_builder: 'IvlNotices::ReminderNotice',
+#         mpi_indicator: 'IVL_DR4',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
+#   {
+#     hbx_id: 'IVL_PRE_1',
+#     title: 'Update your information at DC Health Link by October 15',
+#     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
+#     resource_name: 'consumer_role',
+#     event_name: 'projected_eligibility_notice_1',
+#     notice_triggers: [
+#       {
+#         name: 'September Projected Renewal Notice',
+#         notice_template: 'notices/ivl/projected_eligibility_notice',
+#         notice_builder: 'IvlNotices::IvlRenewalNotice',
+#         mpi_indicator: 'IVL_PRE',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
-    # {
-    #     hbx_id: 'IVLR1',
-    #     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    #     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_1',
-    #     notice_triggers: [
-    #         {
-    #             name: 'September Projected Renewal Notice',
-    #             notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
-    #             notice_builder: 'IvlNotices::IvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR1',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
-  # {
-  #   hbx_id: 'IVL_PRE_2',
-  #   title: 'Update your information at DC Health Link by October 15',
-  #   description: 'Notice to be sent out to individuals with AQHP(Assisted)',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'projected_eligibility_notice_2',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
+#   {
+#     hbx_id: 'IVL_PRE_2',
+#     title: 'Update your information at DC Health Link by October 15',
+#     description: 'Notice to be sent out to individuals with AQHP(Assisted)',
+#     resource_name: 'consumer_role',
+#     event_name: 'projected_eligibility_notice_2',
+#     notice_triggers: [
+#       {
+#         name: 'September Projected Renewal Notice',
+#         notice_template: 'notices/ivl/projected_eligibility_notice',
+#         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
+#         mpi_indicator: 'IVL_PRE',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
-  # {
-  #   hbx_id: 'IVL_FEL_AQHP',
-  #   title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
-  #   description: 'Final Eligibility Notice will be sent to all AQHP individuals',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'final_eligibility_notice_aqhp',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Final Eligibility Notice for AQHP individuals',
-  #       notice_template: 'notices/ivl/final_eligibility_notice_aqhp',
-  #       notice_builder: 'IvlNotices::FinalEligibilityNoticeAqhp',
-  #       mpi_indicator: 'IVL_FEL',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
+#   {
+#     hbx_id: 'IVL_FEL_AQHP',
+#     title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
+#     description: 'Final Eligibility Notice will be sent to all AQHP individuals',
+#     resource_name: 'consumer_role',
+#     event_name: 'final_eligibility_notice_aqhp',
+#     notice_triggers: [
+#       {
+#         name: 'Final Eligibility Notice for AQHP individuals',
+#         notice_template: 'notices/ivl/final_eligibility_notice_aqhp',
+#         notice_builder: 'IvlNotices::FinalEligibilityNoticeAqhp',
+#         mpi_indicator: 'IVL_FEL',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
-  # {
-  #   hbx_id: 'IVL_FEL_UQHP',
-  #   title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
-  #   description: 'Final Eligibility Notice will be sent to all UQHP individuals',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'final_eligibility_notice_uqhp',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Final Eligibility Notice for UQHP individuals',
-  #       notice_template: 'notices/ivl/final_eligibility_notice_uqhp',
-  #       notice_builder: 'IvlNotices::FinalEligibilityNoticeUqhp',
-  #       mpi_indicator: 'IVL_FEL',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
+#   {
+#     hbx_id: 'IVL_FEL_UQHP',
+#     title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
+#     description: 'Final Eligibility Notice will be sent to all UQHP individuals',
+#     resource_name: 'consumer_role',
+#     event_name: 'final_eligibility_notice_uqhp',
+#     notice_triggers: [
+#       {
+#         name: 'Final Eligibility Notice for UQHP individuals',
+#         notice_template: 'notices/ivl/final_eligibility_notice_uqhp',
+#         notice_builder: 'IvlNotices::FinalEligibilityNoticeUqhp',
+#         mpi_indicator: 'IVL_FEL',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
-  # {
-  #   hbx_id: 'IVLR2',
-  #   title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-  #   description: 'Notice to be sent out to individuals staying in APTC only',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_2',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
+#   {
+#     hbx_id: 'IVL_FRE',
+#     title: 'Review Your Insurance Plan Enrollment and Pay Your Bill Now',
+#     description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
+#     resource_name: 'consumer_role',
+#     event_name: 'final_eligibility_notice_renewal_uqhp',
+#     notice_triggers: [
+#         {
+#             name: 'Final Eligibility Notice for UQHP/AQHP individuals',
+#             notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
+#             notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalUqhp',
+#             mpi_indicator: 'IVL_FRE',
+#             notice_trigger_element_group: {
+#                 market_places: ['individual'],
+#                 primary_recipients: ["consumer"],
+#                 primary_recipient_delivery_method: ["secure_message", "paper"],
+#                 secondary_recipients: []
+#             }
+#         }
+#     ]
+#   },
 
-    # {
-    #     hbx_id: 'IVLR1',
-    #     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    #     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_1_second_batch',
-    #     notice_triggers: [
-    #         {
-    #             name: 'September Projected Renewal Notice',
-    #             notice_template: 'notices/ivl/ivlr1_notice_second_batch_without_ea_data',
-    #             notice_builder: 'IvlNotices::IvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR1B',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
+#   {
+#     hbx_id: 'IVL_FRE',
+#     title: 'Review Your Insurance Plan Enrollment and Pay Your Bill Now',
+#     description: 'Final Eligibility Notice will be sent to all UQHP/AQHP individuals',
+#     resource_name: 'consumer_role',
+#     event_name: 'final_eligibility_notice_renewal_aqhp',
+#     notice_triggers: [
+#         {
+#             name: 'Final Eligibility Notice for UQHP/AQHP individuals',
+#             notice_template: 'notices/ivl/final_eligibility_notice_uqhp_aqhp',
+#             notice_builder: 'IvlNotices::FinalEligibilityNoticeRenewalAqhp',
+#             mpi_indicator: 'IVL_FRE',
+#             notice_trigger_element_group: {
+#                 market_places: ['individual'],
+#                 primary_recipients: ["consumer"],
+#                 primary_recipient_delivery_method: ["secure_message", "paper"],
+#                 secondary_recipients: []
+#             }
+#         }
+#     ]
+#     },
 
-    # {
-    #     hbx_id: 'IVLR2',
-    #     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    #     description: 'Notice to be sent out to individuals staying in APTC only',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_2',
-    #     notice_triggers: [
-    #         {
-    #             name: 'September Projected Renewal Notice',
-    #             notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
-    #             notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR2',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
+#   {
+#     hbx_id: 'IVLR2',
+#     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+#     description: 'Notice to be sent out to individuals staying in APTC only',
+#     resource_name: 'consumer_role',
+#     event_name: 'ivl_renewal_notice_2',
+#     notice_triggers: [
+#       {
+#         name: 'September Projected Renewal Notice',
+#         notice_template: 'notices/ivl/projected_eligibility_notice',
+#         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
+#         mpi_indicator: 'IVL_PRE',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
-    # {
-    #     hbx_id: 'IVLR3',
-    #     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    #     description: 'Notice to be sent out to individuals moving from APTC to Medicaid',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_3',
-    #     notice_triggers: [
-    #         {
-    #             name: 'September Projected Renewal Notice',
-    #             notice_template: 'notices/ivl/IVLR_3_APTC_Medicaid',
-    #             notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR3',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
+#   {
+#     hbx_id: 'IVLR3',
+#     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+#     description: 'Notice to be sent out to individuals moving from APTC to Medicaid',
+#     resource_name: 'consumer_role',
+#     event_name: 'ivl_renewal_notice_3',
+#     notice_triggers: [
+#       {
+#         name: 'September Projected Renewal Notice',
+#         notice_template: 'notices/ivl/projected_eligibility_notice',
+#         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
+#         mpi_indicator: 'IVL_PRE',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 
-    # {
-    #     hbx_id: 'IVLR4',
-    #     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    #     description: 'Notice to be sent out to individuals moving from APTC to UQHP',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_4',
-    #     notice_triggers: [
-    #         {
-    #             name: 'September Projected Renewal Notice',
-    #             notice_template: 'notices/ivl/IVLR4_APTC_uqhp',
-    #             notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR4',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
-    # {
-    #     hbx_id: 'IVLR8',
-    #     title: '2017 Insurance Renewal Notice and Opportunity to Change Plans',
-    #     description: 'Notice to be sent out to individuals staying on UQHP',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_8',
-    #     notice_triggers: [
-    #         {
-    #             name: 'September Projected Renewal Notice - UQHP',
-    #             notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
-    #             notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR8',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
-    # {
-    #     hbx_id: 'IVLR9',
-    #     title: 'Your 2017 Final Insurance Enrollment Notice',
-    #     description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_9',
-    #     notice_triggers: [
-    #         {
-    #             name: 'December Final Insurance Enrollment Notice',
-    #             notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
-    #             notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR9',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
-    # {
-    #     hbx_id: 'IVLR10',
-    #     title: 'Your 2017 Final Insurance Enrollment Notice',
-    #     description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'ivl_renewal_notice_10',
-    #     notice_triggers: [
-    #         {
-    #             name: 'December Final Insurance Enrollment Notice',
-    #             notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
-    #             notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
-    #             mpi_indicator: 'MPI_IVLR10',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
-    # {
-    #     hbx_id: 'IVL_CAT16',
-    #     title: 'Important Tax Information about your Catastrophic Health Coverage',
-    #     description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
-    #     resource_name: 'consumer_role',
-    #     event_name: 'final_catastrophic_plan_2016',
-    #     notice_triggers: [
-    #         {
-    #             name: 'Final Catastrophic Plan Notice',
-    #             notice_template: 'notices/ivl/final_catastrophic_plan_letter',
-    #             notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
-    #             mpi_indicator: 'MPI_CAT16',
-    #             notice_trigger_element_group: {
-    #                 market_places: ['individual'],
-    #                 primary_recipients: ["consumer"],
-    #                 primary_recipient_delivery_method: ["secure_message", "paper"],
-    #                 secondary_recipients: []
-    #             }
-    #         }
-    #     ]
-    # },
-  # {
-  #   hbx_id: 'IVL_PRE_1',
-  #   title: 'Update your information at DC Health Link by October 15',
-  #   description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'projected_eligibility_notice_1',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::IvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-
-  # {
-  #   hbx_id: 'IVL_PRE_2',
-  #   title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-  #   description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'projected_eligibility_notice_2',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::IvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-
-  # {
-  #   hbx_id: 'IVLR2',
-  #   title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-  #   description: 'Notice to be sent out to individuals staying in APTC only',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_2',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-
-  # {
-  #   hbx_id: 'IVLR3',
-  #   title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-  #   description: 'Notice to be sent out to individuals moving from APTC to Medicaid',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_3',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-
-  # {
-  #   hbx_id: 'IVLR4',
-  #   title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-  #   description: 'Notice to be sent out to individuals moving from APTC to UQHP',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_4',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice',
-  #       notice_template: 'notices/ivl/projected_eligibility_notice',
-  #       notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-  #       mpi_indicator: 'IVL_PRE',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVLR8',
-  #   title: '2017 Insurance Renewal Notice and Opportunity to Change Plans',
-  #   description: 'Notice to be sent out to individuals staying on UQHP',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_8',
-  #   notice_triggers: [
-  #     {
-  #       name: 'September Projected Renewal Notice - UQHP',
-  #       notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
-  #       notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
-  #       mpi_indicator: 'MPI_IVLR8',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVLR9',
-  #   title: 'Your 2017 Final Insurance Enrollment Notice',
-  #   description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_9',
-  #   notice_triggers: [
-  #     {
-  #       name: 'December Final Insurance Enrollment Notice',
-  #       notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
-  #       notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
-  #       mpi_indicator: 'MPI_IVLR9',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVLR10',
-  #   title: 'Your 2017 Final Insurance Enrollment Notice',
-  #   description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ivl_renewal_notice_10',
-  #   notice_triggers: [
-  #     {
-  #       name: 'December Final Insurance Enrollment Notice',
-  #       notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
-  #       notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
-  #       mpi_indicator: 'MPI_IVLR10',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVL_CAT16',
-  #   title: 'Important Tax Information about your Catastrophic Health Coverage',
-  #   description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'final_catastrophic_plan_2016',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Final Catastrophic Plan Notice',
-  #       notice_template: 'notices/ivl/final_catastrophic_plan_letter',
-  #       notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
-  #       mpi_indicator: 'MPI_CAT16',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVL_ELA',
-  #   title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
-  #   description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'eligibility_notice',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Eligibilty Notice',
-  #       notice_template: 'notices/ivl/eligibility_notice',
-  #       notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
-  #       mpi_indicator: 'IVL_ELA',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVL_NEL',
-  #   title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',
-  #   description: 'Notice will be sent to the household if everyone in the household is ineligible',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'ineligibility_notice',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Ineligibilty Notice',
-  #       notice_template: 'notices/ivl/ineligibility_notice',
-  #       notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
-  #       mpi_indicator: 'IVL_NEL',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'IVL_ENR',
-  #   title: 'Enrollment notice',
-  #   description: 'Notice will be sent to families after their enrollment is done.',
-  #   resource_name: 'consumer_role',
-  #   event_name: 'enrollment_notice',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Enrollment Notice',
-  #       notice_template: 'notices/ivl/enrollment_notice',
-  #       notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
-  #       mpi_indicator: 'IVL_ENR',
-  #       notice_trigger_element_group: {
-  #         market_places: ['individual'],
-  #         primary_recipients: ["consumer"],
-  #         primary_recipient_delivery_method: ["secure_message", "paper"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
+#   {
+#     hbx_id: 'IVLR4',
+#     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+#     description: 'Notice to be sent out to individuals moving from APTC to UQHP',
+#     resource_name: 'consumer_role',
+#     event_name: 'ivl_renewal_notice_4',
+#     notice_triggers: [
+#       {
+#         name: 'September Projected Renewal Notice',
+#         notice_template: 'notices/ivl/projected_eligibility_notice',
+#         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
+#         mpi_indicator: 'IVL_PRE',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVLR8',
+#     title: '2017 Insurance Renewal Notice and Opportunity to Change Plans',
+#     description: 'Notice to be sent out to individuals staying on UQHP',
+#     resource_name: 'consumer_role',
+#     event_name: 'ivl_renewal_notice_8',
+#     notice_triggers: [
+#       {
+#         name: 'September Projected Renewal Notice - UQHP',
+#         notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
+#         notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
+#         mpi_indicator: 'MPI_IVLR8',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVLR9',
+#     title: 'Your 2017 Final Insurance Enrollment Notice',
+#     description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
+#     resource_name: 'consumer_role',
+#     event_name: 'ivl_renewal_notice_9',
+#     notice_triggers: [
+#       {
+#         name: 'December Final Insurance Enrollment Notice',
+#         notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
+#         notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
+#         mpi_indicator: 'MPI_IVLR9',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVLR10',
+#     title: 'Your 2017 Final Insurance Enrollment Notice',
+#     description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
+#     resource_name: 'consumer_role',
+#     event_name: 'ivl_renewal_notice_10',
+#     notice_triggers: [
+#       {
+#         name: 'December Final Insurance Enrollment Notice',
+#         notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
+#         notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
+#         mpi_indicator: 'MPI_IVLR10',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_CAT16',
+#     title: 'Important Tax Information about your Catastrophic Health Coverage',
+#     description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2016 for at least one month',
+#     resource_name: 'consumer_role',
+#     event_name: 'final_catastrophic_plan_2016',
+#     notice_triggers: [
+#       {
+#         name: 'Final Catastrophic Plan Notice',
+#         notice_template: 'notices/ivl/final_catastrophic_plan_letter',
+#         notice_builder: 'IvlNotices::FinalCatastrophicPlanNotice',
+#         mpi_indicator: 'MPI_CAT16',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_ELA',
+#     title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
+#     description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
+#     resource_name: 'consumer_role',
+#     event_name: 'eligibility_notice',
+#     notice_triggers: [
+#       {
+#         name: 'Eligibilty Notice',
+#         notice_template: 'notices/ivl/eligibility_notice',
+#         notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
+#         mpi_indicator: 'IVL_ELA',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_NEL',
+#     title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',
+#     description: 'Notice will be sent to the household if everyone in the household is ineligible',
+#     resource_name: 'consumer_role',
+#     event_name: 'ineligibility_notice',
+#     notice_triggers: [
+#       {
+#         name: 'Ineligibilty Notice',
+#         notice_template: 'notices/ivl/ineligibility_notice',
+#         notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
+#         mpi_indicator: 'IVL_NEL',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
+#   {
+#     hbx_id: 'IVL_ENR',
+#     title: 'Your Health or Dental Plan Enrollment and Payment Deadline',
+#     description: 'Notice will be sent to families after their enrollment is done.',
+#     resource_name: 'consumer_role',
+#     event_name: 'enrollment_notice',
+#     notice_triggers: [
+#       {
+#         name: 'Enrollment Notice',
+#         notice_template: 'notices/ivl/enrollment_notice',
+#         notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
+#         mpi_indicator: 'IVL_ENR',
+#         notice_trigger_element_group: {
+#           market_places: ['individual'],
+#           primary_recipients: ["consumer"],
+#           primary_recipient_delivery_method: ["secure_message", "paper"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   },
 ]
 
 shop_notice_triggers.each do |trigger_params|
