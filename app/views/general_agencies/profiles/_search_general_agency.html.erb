@@ -1,0 +1,27 @@
+<% @general_agency_profiles.each do |agency| %>
+  <br />
+
+  <div class="row">
+    <div class="col-md-9 col-sm-9 col-xs-12">
+      <div class="table-responsive">
+        <table class="table table-border">
+          <tbody>
+            <tr>
+              <th>Legal Name:</th>
+              <td><%= agency.try(:legal_name) %></td>
+            </tr>
+
+            <tr>
+              <th>FEIN:</th>
+              <td><%= agency.try(:fein) %></td>
+            </tr>
+
+            <tr>
+              <td colspan="2"><a href="javascript:void(0)" class='btn btn-primary select-general-agency pull-right' data-general_agency_profile_id="<%= agency._id %>">select this general agency</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% end %>

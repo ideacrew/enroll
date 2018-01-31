@@ -1,0 +1,15 @@
+%ga_assignment
+  %general_agency
+    - ga = general_agency_assignment.general_agency_profile
+    %id
+      %id= ga.organization.hbx_id
+    %name= ga.legal_name.strip
+    - if !ga.dba.blank?
+      %dba= ga.dba.strip
+    - if !ga.corporate_npn.blank?
+      %npn= ga.corporate_npn
+    - if !ga.fein.blank?
+      %fein= ga.fein
+  %start_on= simple_date_for(general_agency_assignment.start_on)
+  - if !general_agency_assignment.end_on.blank?
+    %end_on= simple_date_for(general_agency_assignment.end_on)

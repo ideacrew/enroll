@@ -1,0 +1,15 @@
+<div class="module shop-for-plans-widget">
+  <div class="panel panel-default" id='shop-for-plans-widget'>
+    <div class="panel-body">
+      <div class="row flex">
+      <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+        <%= link_to l10n("insured.families.medicaid_and_tax_credits"), navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
+      </div>
+      <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+        <div class='image-area'></div>
+        <strong><%= l10n("insured.families.apply_for_medicaid_widget") %></strong>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>

@@ -1,0 +1,3 @@
+class HbxPolicyError < StandardError
+
+end

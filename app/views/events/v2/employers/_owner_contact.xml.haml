@@ -1,0 +1,15 @@
+%contact
+  %id
+    %id= owner_contact.hbx_id
+  = render :partial => "events/v2/shared/person_name", :object => owner_contact
+  - addresses = owner_contact.addresses.select do |a| ['mailing', 'work', 'home'].include? a.kind end
+  - unless addresses.empty?
+    %addresses
+      = render :partial => "events/v2/addresses/address", :collection => addresses
+  - if owner_contact.work_email_or_best.present?
+    %emails
+      = render :partial => "events/v2/emails/email", :locals => {email:owner_contact.work_email_or_best}
+  - phones = owner_contact.phones.select do |p| ['work', 'home', 'main'].include? p.kind end
+  - unless phones.empty?
+    %phones
+      = render :partial => "events/v2/phones/phone", :collection => phones
