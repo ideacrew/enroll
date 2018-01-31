@@ -210,7 +210,6 @@ shop_notice_triggers = [
   #     }
   #   ]
   # },
-
   # {
   #   hbx_id: 'SHOP5',
   #   title: 'Group Renewal Available',
@@ -232,7 +231,27 @@ shop_notice_triggers = [
   #     }
   #   ]
   # },
-
+  # {
+  #   hbx_id: 'SHOP_Out_of_pocket_notice',
+  #   title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
+  #   description: 'Out of pocket calculator notifier',
+  #   resource_name: 'employer',
+  #   event_name: 'out_of_pocker_url_notifier',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Out of pocket Notice',
+  #       notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
+  #       notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
+  #       mpi_indicator: 'MPI',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: [""],
+  #         primary_recipient_delivery_method: ["email"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
     {
         hbx_id: 'SHOP_M002',
         title: 'Approval of Application to Offer Group Health Coverage through the Health Connector',
@@ -447,29 +466,6 @@ shop_notice_triggers = [
           }
         ]
       },
-
-    # {
-    #   hbx_id: 'SHOP16',
-    #   title: 'Application to Offer Group Health Coverage in DC Health Link',
-    #   description: 'When Employer application meets minimum participation and non-owner requirements',
-    #   resource_name: 'employer',
-    #   event_name: 'initial_eligibile_employer_open_enrollment_begins',
-    #   notice_triggers: [
-    #     {
-    #       name: 'Initial Eligible Employer open enrollment begins',
-    #       notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
-    #       notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
-    #       mpi_indicator: 'MPI_SHOP16',
-    #       notice_trigger_element_group: {
-    #         market_places: ['shop'],
-    #         primary_recipients: ["employer"],
-    #         primary_recipient_delivery_method: ["secure_message"],
-    #         secondary_recipients: []
-    #       }
-    #     }
-    #   ]
-    # },
-
     # {
     #   hbx_id: 'SHOP16_B',
     #   title: 'Initial Eligible Employee Open Enrollment Period begins',
