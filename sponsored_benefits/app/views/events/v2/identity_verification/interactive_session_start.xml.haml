@@ -1,0 +1,7 @@
+!!! XML
+%interactive_verification_start{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %individual
+    %id
+      %id= individual.id
+    = render :partial => "events/v2/individuals/person", :object => individual
+    = render :partial => "events/v2/individuals/person_demographics", :object => individual

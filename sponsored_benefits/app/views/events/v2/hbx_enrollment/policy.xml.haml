@@ -1,0 +1,28 @@
+!!! XML
+%policy{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance" }
+  %id
+    %id= hbx_enrollment.hbx_id
+  - if hbx_enrollment.broker_agency_account
+    = render :partial => "events/v2/shared/broker", :object => hbx_enrollment.broker_agency_account, as: :broker_agency_account
+  %enrollees
+    = render :partial => "events/v2/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member, :locals => { :hbx_enrollment => hbx_enrollment, :subscriber => hbx_enrollment.subscriber }
+  %enrollment
+    = render :partial => "events/v2/hbx_enrollment/plan", :locals=> {:hbx_enrollment => hbx_enrollment}
+    - if hbx_enrollment.is_shop?
+      %shop_market
+        %employer_link
+          - employer = hbx_enrollment.census_employee.employer_profile
+          %id
+            %id= "urn:openhbx:terms:v1:employer:fein##{employer.fein}"
+          %name= employer.legal_name
+        %total_employer_responsible_amount=(hbx_enrollment.total_employer_contribution).round(2)
+    - else
+      %individual_market
+        %is_carrier_to_bill true
+        %applied_aptc_amount= (hbx_enrollment.applied_aptc_amount).round(2)
+    %premium_total_amount= hbx_enrollment.total_premium.round(2)
+    %total_responsible_amount= (hbx_enrollment.is_shop? ? (hbx_enrollment.total_employee_cost) : (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)).round(2)
+    = render :partial => "events/v2/hbx_enrollment/eligibility_event", :object => hbx_enrollment
+  %request_submitted_timestamp= simple_date_for(hbx_enrollment.created_at) if hbx_enrollment.created_at
+  %market= hbx_enrollment.is_shop? ? "shop" : "individual"
+  %is_active= hbx_enrollment.is_active
