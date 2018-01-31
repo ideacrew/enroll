@@ -32,7 +32,7 @@
  content: "Congratulations! You have been selected as the default General Agency for <strong>#{notice.general_agency.broker_fullname}</strong> as of <strong>#{TimeKeeper.date_of_record}</strong>. If you were assigned as the General Agency for any clients of <strong>#{notice.general_agency.broker_fullname}</strong>, you will receive a separate notification specific to those groups."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', locals: {
- content: "If you need resources in assisting your new client, please look to <a href=#{Settings.site.forms}>DCHealthLink.com/forms</a>", top_margin: '10px', bottom_margin: '10px'} %>
+ content: "If you need resources in assisting your new client, please look to <a href=#{Settings.site.home_forms_url}>DCHealthLink.com/forms</a>", top_margin: '10px', bottom_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: ["Please contact #{Settings.site.short_name} with any questions:"],
