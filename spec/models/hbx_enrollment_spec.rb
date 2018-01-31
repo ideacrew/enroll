@@ -2393,7 +2393,6 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           expect(passive_renewal).not_to be_nil
           enrollment.terminate_coverage!
           enrollment.update_renewal_coverage
-          expect(enrollment.terminated_on).to be <= enrollment.benefit_group.end_on
           expect(passive_renewal.coverage_canceled?).to be_truthy
           passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
           expect(passive_waiver.present?).to be_truthy
@@ -2739,6 +2738,84 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(queued_job[:args].include?('notify_employee_confirming_coverage_termination')).to be_truthy
       expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
       expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
+    end
+  end
+end
+
+
+describe HbxEnrollment, '.propogate_terminate', type: :model, dbclean: :after_all do
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active')}
+  let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+  let!(:census_employees){
+    FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  }
+
+  let!(:plan) {
+    FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  }
+
+  let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+  let!(:family) {
+    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    ce.update_attributes({employee_role: employee_role})
+    Family.find_or_build_from_employee_role(employee_role)
+  }
+
+  let(:person) { family.primary_applicant.person }
+
+  context 'Employer Sponsored Coverage' do
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         coverage_kind: "health",
+                         effective_on: benefit_group.start_on,
+                         enrollment_kind: "open_enrollment",
+                         kind: "employer_sponsored",
+                         benefit_group_id: benefit_group.id,
+                         employee_role_id: person.active_employee_roles.first.id,
+                         benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                         plan_id: plan.id
+      )
+    }
+
+    context 'Past Termination Date' do
+      before do
+        allow(enrollment).to receive_message_chain("benefit_group.end_on") { TimeKeeper.date_of_record }
+      end
+
+      it "should Terminate with current date" do
+        enrollment.propogate_terminate
+        expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record
+      end
+    end
+
+    context 'Termination Date equals TimeKeeper Date of Record' do
+      before do
+        allow(enrollment).to receive_message_chain("benefit_group.end_on") { TimeKeeper.date_of_record.end_of_month }
+      end
+
+
+      it "should Terminate with future date" do
+        enrollment.propogate_terminate
+        expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record.end_of_month
+      end
+    end
+
+    context 'Future Termination Date' do
+      before do
+        allow(enrollment).to receive_message_chain("benefit_group.end_on") { TimeKeeper.date_of_record +  1.years }
+      end
+
+
+      it "should Terminate with future date" do
+        enrollment.propogate_terminate
+        expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record.end_of_month
+      end
     end
   end
 end
