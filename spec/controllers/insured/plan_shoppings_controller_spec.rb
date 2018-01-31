@@ -186,9 +186,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(enrollment).to receive(:employee_role).and_return(double)
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
-      allow(enrollment).to receive(:census_employee).and_return(double)
-      allow(enrollment).to receive(:mid_year_plan_change_notice).and_return(true)
       allow(enrollment).to receive(:ee_plan_selection_confirmation_sep_new_hire).and_return(true)
+      allow(enrollment).to receive(:mid_year_plan_change_notice).and_return(true)
+      allow(enrollment).to receive(:census_employee).and_return(double)
     end
 
     it "returns http success" do

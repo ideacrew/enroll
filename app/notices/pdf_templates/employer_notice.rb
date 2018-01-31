@@ -32,9 +32,9 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :employee_email, String
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
     attribute :employee, PdfTemplates::EmployeeNotice
-    attribute :employee_email, String
 
     def shop?
       return true
