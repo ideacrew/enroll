@@ -1,6 +1,6 @@
 require 'csv'
 # This is a weekly report that pulls the newly enrolled people in that time period.
-# The task to run is RAILS_ENV=production bundle exec rake reports:new_people:total_new_people_list
+# The task to run is RAILS_ENV=production bundle exec rake reports:new_people:total_new_people_list start_date="11/1/2017" end_date="1/30/2018"
 namespace :reports do
   namespace :new_people do
 
