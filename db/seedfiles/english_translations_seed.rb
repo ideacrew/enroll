@@ -6,7 +6,10 @@ puts "*"*80
 puts "::: Generating English Translations :::"
 
 MAIN_TRANSLATIONS = {
-  "en.shared.my_portal_links.my_insured_portal" => "My Insured Portal"
+  "en.shared.my_portal_links.my_insured_portal" => "My Insured Portal",
+  "en.shared.my_portal_links.my_broker_agency_portal" => "My Broker Agency Portal",
+  "en.shared.my_portal_links.my_employer_portal" => "My Employer Portal"
+
 }
 translations = [
   BOOTSTRAP_EXAMPLE_TRANSLATIONS,
