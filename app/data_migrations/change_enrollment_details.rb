@@ -27,7 +27,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def revert_enrollment(enrollments)
     enrollments.each do |enrollment|
       enrollment.update_attributes(aasm_state: "coverage_enrolled")
-      puts "Moved enrollment to Enrolled status from canceled state" unless Rails.env.test?
+      puts "Moved enrollment to Enrolled status" unless Rails.env.test?
     end
   end
 
