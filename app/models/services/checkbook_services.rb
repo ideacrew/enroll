@@ -31,7 +31,6 @@ module CheckbookServices
     def construct_body
     {
       "remote_access_key": Settings.checkbook_services.remote_access_key,
-      # "remote_access_key": "cd535a89-49ea-4ea6-862f-e9558e8bef50",
       "reference_id": "9F03A78ADF324AFDBFBEF8E838770132",
       "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"),
       "employee_coverage_date": census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"), #census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
