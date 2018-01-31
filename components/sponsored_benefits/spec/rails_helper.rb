@@ -1,29 +1,12 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-ENV['RAILS_ENV'] ||= 'test'
 require 'spec_helper'
+ENV['RAILS_ENV'] ||= 'test'
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
-require 'shoulda/matchers'
-require 'database_cleaner'
-require 'capybara/rails'
-require 'capybara/rspec'
-require 'factory_bot_rails'
 
-
-FactoryBot.definition_file_paths = [
-  File.expand_path(File.join(File.dirname(__FILE__),'../../benefit_markets/spec/factories')),
-  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
-]
-# FactoryBot.find_definitions
-
-# Shoulda::Matchers.configure do |config|
-#   config.integrate do |with|
-#     with.test_framework :rspec
-#   end
-# end
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -50,7 +33,7 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  # config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = true
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
@@ -65,19 +48,13 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
-  DatabaseCleaner.strategy = :truncation
   config.infer_spec_type_from_file_location!
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
-#  config.include ModelMatcherHelpers, :type => :model
-  config.include Mongoid::Matchers, type: :model
-  config.include Devise::TestHelpers, :type => :controller
-  config.include Devise::TestHelpers, :type => :view
-  config.include FactoryBot::Syntax::Methods
-  config.include Capybara::DSL
+  config.include FactoryGirl::Syntax::Methods
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean

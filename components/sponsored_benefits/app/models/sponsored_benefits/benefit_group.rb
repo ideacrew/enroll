@@ -58,9 +58,6 @@ module SponsoredBenefits
     embeds_many :relationship_benefits, cascade_callbacks: true
     accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
-    embeds_many :dental_relationship_benefits, cascade_callbacks: true
-    accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
-
 
     #TODO add following attributes: :title,
     validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
@@ -244,12 +241,6 @@ module SponsoredBenefits
     def build_composite_tier_contributions
       self.composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
         self.composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
-      end
-    end
-
-    def build_dental_relationship_benefits
-      self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-         self.dental_relationship_benefits.build(relationship: relationship, offered: true)
       end
     end
 

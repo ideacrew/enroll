@@ -196,7 +196,7 @@ $brand-primary: $mhc-dark-blue;
 
     }
     input[type=radio] {
-      /*display: none;*/
+      display: none;
     }
     input[type=radio] + label {
 
@@ -234,7 +234,8 @@ $brand-primary: $mhc-dark-blue;
   }
   .pdp_carrier_title {
     width:auto;
-    margin-left:25px;
+    margin-top:-25px;
+    margin-left:35px;
     font-size:13px;
   }
   .plan_heading_text {
@@ -323,7 +324,7 @@ $brand-primary: $mhc-dark-blue;
       }
 
       input[type=radio] {
-        /*display: none;*/
+        display: none;
       }
       input[type=radio] + label {
         position: relative;
@@ -438,6 +439,40 @@ $brand-primary: $mhc-dark-blue;
     }
   }
 
+  #pdp-bms {
+    input[type=radio] {
+      display: none;
+    }
+    input[type=radio] + label {
+
+      &>i {
+        font-size: 28px;
+        color: #b7b7b7;
+
+
+
+        &:first-of-type {
+          display: inline-block;
+
+        }
+        &:last-of-type {
+          display: none;
+        }
+      }
+    }
+    input[type=radio]:checked + label {
+
+      &>i {
+        color: #69A30D;
+        &:first-of-type {
+          display: none;
+        }
+        &:last-of-type {
+          display: inline-block;
+        }
+      }
+    }
+  }
   .reference-plan {
     input[type=checkbox] {
       display:inline;
@@ -474,13 +509,6 @@ $brand-primary: $mhc-dark-blue;
   .benefits-adjustmets {
     margin-left:-30px;
   }
-}
-
-.pdp-titles-class {
-  color:$mhc-orange;
-}
-.pdp-titles-class:hover {
-  cursor:pointer;
 }
 
 .plan-details-export {

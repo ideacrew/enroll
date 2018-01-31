@@ -6,7 +6,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
   let(:file) { double("", :tempfile => tempfile) }
 
   let(:broker_agency_profile_id) { "216735" }
-  let!(:organization) { create(:sponsored_benefits_plan_design_organization, :with_profile, sic_code: '0197') }
+  let!(:organization) { create(:plan_design_organization, :with_profile, sic_code: '0197') }
   let(:plan_design_proposal) { organization.plan_design_proposals[0] }
   let(:employer_profile) { plan_design_proposal.profile }
   let(:benefit_sponsorship) { employer_profile.benefit_sponsorships[0] }
@@ -94,7 +94,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
     end
 
     context "employee exists" do
-      let(:census_employee) { FactoryBot.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
+      let(:census_employee) { FactoryGirl.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
 
       before do
         allow(subject).to receive(:find_employee).and_return(census_employee)

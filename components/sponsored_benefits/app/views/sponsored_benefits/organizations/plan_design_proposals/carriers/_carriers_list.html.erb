@@ -1,78 +1,52 @@
-<% if selected_carrier_level == 'sole_source' %>
+<% if selected_carrier_level != 'metal_level' %>
   <% carrier_names.each_pair do |ck, cv| %>
   <div class="col-xs-4 carriers">
-    <div class="col-xs-3">
-      <%= radio_button_tag "sole_source", "#{ck}", false,  :onclick => "$('#sole_source_#{ck}_link').click()" %>
-    </div>
     <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
     carrier_id: "#{ck}",
     selected_carrier_level: selected_carrier_level,
-    active_year: active_year), remote: true, :id => "sole_source_#{ck}_link" do %><% end %>
-    <div class="col-xs-9">
-        <label for="sole_source_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
+    active_year: active_year), remote: true do %>
+    <div class="col-xs-3">
+      <%= radio_button_tag :carrier_for_elected_plan, "#{ck}", false %>
+      <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      <% end %>
     </div>
-
+    <% end %>
+    <div class="col-xs-9">
+          <h3><%= cv %></h3>
+    </div>
   </div>
   <% end %>
-<% elsif selected_carrier_level == 'single_carrier'  %>
-  <% carrier_names.each_pair do |ck, cv| %>
-  <div class="col-xs-4 carriers">
-
-    <div class="col-xs-3">
-      <%= radio_button_tag "single_carrier", "#{ck}", false, :onclick => "$('#single_carrier_#{ck}_link').click()" %>
-    </div>
-
-    <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
-    carrier_id: "#{ck}",
-    selected_carrier_level: selected_carrier_level,
-    active_year: active_year), remote: true, :id => "single_carrier_#{ck}_link" do %><% end %>
-    <div class="col-xs-9">
-        <label for="single_carrier_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
-    </div>
-
-
-  </div>
-<% end %>
-<% elsif selected_carrier_level == 'single_plan'  %>
-  <% carrier_names.each_pair do |ck, cv| %>
-  <div class="col-xs-4 carriers">
-    <div class="col-xs-3">
-      <%= radio_button_tag "single_plan", "#{ck}", false, :onclick => "$('#single_plan_#{ck}_link').click()" %>
-    </div>
-
-    <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
-    carrier_id: "#{ck}",
-    selected_carrier_level: selected_carrier_level,
-    kind: kind,
-    active_year: active_year), remote: true, :id => "single_plan_#{ck}_link" do %><% end %>
-    <div class="col-xs-9">
-        <label for="single_plan_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
-    </div>
-  </div>
-<% end %>
 <% else %>
-  <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
+  <% reference_plans = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>
-      <% metal_levels = enabled_metal_levels_for_single_carrier - ['dental'] %>
+      <% reference_plans = reference_plans_for_metal_level - ['dental'] %>
   <% end %>
-  <form>
-  <% metal_levels.each_with_index do |kind, index| %>
-    <div class="col-xs-4 metals">
-
-      <div class="col-xs-3">
-        <%= radio_button_tag :metal_level_for_elected_plan, kind, false, :onclick => "$('##{kind}_link').click()" %>
-      </div>
-
-        <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
+  <% reference_plans.each do |kind| %>
+    <div class="col-xs-3 metals">
+      <div class="col-xs-12 row">
+        <%= link_to organizations_plan_design_organization_plans_path(@plan_design_organization,
           selected_carrier_level: 'metal_level',
           metal_level: kind,
-          active_year: active_year), remote: true, :id => "#{kind}_link" do %><% end %>
-
-            <div class="col-xs-9">
-               <label for="metal_level_for_elected_plan_<%= kind %>"><h3 class="pdp-titles-class"><%= kind.titleize %></h3></label>
+          active_year: active_year), remote: true do %>
+            <div class="col-xs-3">
+              <%= radio_button_tag :metal_level_for_elected_plan, kind %>
+              <%= label_tag "metal_level_for_elected_plan_#{kind}" do %>
+                <i class="fa fa-circle-o"></i>
+                <i class="fa fa-dot-circle-o"></i>
+              <% end %>
             </div>
+        <% end %>
 
+        <div class="col-xs-9">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3><%= kind.titleize %></h3>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   <% end %>
-</form>
 <% end %>

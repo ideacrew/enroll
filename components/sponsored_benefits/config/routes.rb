@@ -35,7 +35,7 @@ SponsoredBenefits::Engine.routes.draw do
         end
       end
       resources :proposal_copies, controller: 'plan_design_proposals/proposal_copies', only: [:create]
-      resources :benefit_groups, controller: 'plan_design_proposals/benefit_groups', only: [:create, :destroy]
+      resources :benefit_groups, controller: 'plan_design_proposals/benefit_groups', only: [:create]
       resources :plan_comparisons, controller: 'plan_design_proposals/plan_comparisons', only: [:new] do
         collection do
           get :export
@@ -44,7 +44,7 @@ SponsoredBenefits::Engine.routes.draw do
       end
       post :publish
 
-      resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:create] do
+      resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:new] do
       end
 
     end

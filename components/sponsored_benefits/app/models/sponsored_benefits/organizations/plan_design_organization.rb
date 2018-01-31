@@ -7,7 +7,7 @@ module SponsoredBenefits
       include Concerns::OrganizationConcern
       include Concerns::AcaRatingAreaConfigConcern
 
-      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization', optional: true
+      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'
 
       # Registered legal name
       field :legal_name, type: String
@@ -23,24 +23,17 @@ module SponsoredBenefits
 
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
-      field :owner_profile_class_name,  type: String, default: "::BenefitSponsors::Organizations::Profile"
+      field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
 
       # Plan design sponsor profile type & ID
       field :sponsor_profile_id,         type: BSON::ObjectId
-      field :sponsor_profile_class_name, type: String, default: "::BenefitSponsors::Organizations::Profile"
-
-      #temporary fields to store old model profile data as history while migrating
-      field :past_owner_profile_id,type: BSON::ObjectId
-      field :past_owner_profile_class_name,type: String
-      field :past_sponsor_profile_id,type: BSON::ObjectId
-      field :past_sponsor_profile_class_name,type: String
+      field :sponsor_profile_class_name, type: String, default: "::EmployerProfile"
 
       field :has_active_broker_relationship, type: Boolean, default: false
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
 
-      validates_presence_of   :legal_name, :has_active_broker_relationship
-      validates_presence_of :sic_code, if: :sic_code_exists_for_employer?
+      validates_presence_of   :legal_name, :sic_code, :has_active_broker_relationship
       validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
       validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
 
@@ -64,26 +57,17 @@ module SponsoredBenefits
 
       scope :draft_proposals,     -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
 
-      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)},
-                                                                      {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
+      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, 
+                                                                      {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
 
 
       def employer_profile
-        ::EmployerProfile.find(sponsor_profile_id) || ::BenefitSponsors::Organizations::Profile.find(sponsor_profile_id)
+        ::EmployerProfile.find(sponsor_profile_id)
       end
 
       def broker_agency_profile
-        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::Profile.find(owner_profile_id)
-      end
-
-      def general_agency_profile
-        self.try(:employer_profile).try(:active_general_agency_account)
-      end
-
-      def active_employer_benefit_sponsorship
-        bs = employer_profile.active_benefit_sponsorship
-        bs if (bs && bs.is_eligible?)
+        ::BrokerAgencyProfile.find(owner_profile_id)
       end
 
       # TODO Move this method to BenefitMarket Model
@@ -114,7 +98,7 @@ module SponsoredBenefits
 
       def calculate_start_on_dates
         if employer_profile.present? && employer_profile.active_plan_year.present?
-          [employer_profile.active_plan_year.end_on.to_date.next_day]
+          [employer_profile.active_plan_year.start_on.next_year]
         else
           SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates
         end
@@ -140,10 +124,6 @@ module SponsoredBenefits
         builder.census_employees.each{|ce| ce.save}
         builder.add_proposal_state(new_proposal_state)
         builder.plan_design_proposal
-      end
-
-      def sic_code_exists_for_employer?
-        Settings.aca.employer_has_sic_field
       end
 
       class << self

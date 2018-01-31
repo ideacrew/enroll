@@ -3,19 +3,24 @@ module SponsoredBenefits
     class PlanDesignProposals::BenefitGroupsController < ApplicationController
 
       def create
-        plan_design_form.for_create(benefit_group_params)
+        update_benefit_group_attributes if benefit_group.persisted?
+
+        benefit_group.title = "Benefit Group Created for: #{plan_design_organization.legal_name} by #{plan_design_organization.broker_agency_profile.legal_name}"
+        benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
+
+        if benefit_group.sole_source?
+          benefit_group.build_relationship_benefits
+          benefit_group.estimate_composite_rates
+        else
+          benefit_group.build_composite_tier_contributions
+        end
+        benefit_group.set_bounding_cost_plans
 
         if plan_design_proposal.save
           render json: { url: new_organizations_plan_design_proposal_plan_review_path(plan_design_proposal) }
         else
           flash[:error] = "Something went wrong"
         end
-      end
-
-      def destroy
-        plan_design_form.for_destroy
-        flash[:success] = "Succesfully removed dental benefits from Quote"
-        redirect_to new_organizations_plan_design_proposal_plan_selection_path(proposal_id: params[:proposal_id])
       end
 
       private
@@ -38,7 +43,7 @@ module SponsoredBenefits
         end
 
         def plan_design_form
-          SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id], kind: kind)
+          SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id])
         end
 
         def update_benefit_group_attributes
@@ -54,14 +59,6 @@ module SponsoredBenefits
                       relationship_benefits_attributes: [:relationship, :premium_pct, :offered],
                       composite_tier_contributions_attributes: [:composite_rating_tier, :employer_contribution_percent, :offered]
           )
-        end
-
-        def kind
-          if params[:benefit_group][:kind] == "dental"
-            "dental"
-          else
-            "health"
-          end
         end
     end
   end

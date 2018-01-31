@@ -2,13 +2,11 @@ require 'rails_helper'
 
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
-    let(:owner_profile_id)  {BSON::ObjectId.from_time(DateTime.now)}
 
     describe "#expire proposals for non Prospect Employer" do
-
-      let(:organization) { create(:sponsored_benefits_plan_design_organization,
+      let!(:organization) { create(:plan_design_organization,
                               sponsor_profile_id: "1234",
-                              owner_profile_id: owner_profile_id,
+                              owner_profile_id: "5678",
                               legal_name: "ABC Company",
                               sic_code: "0345" ) }
 
@@ -40,7 +38,7 @@ module SponsoredBenefits
     end
 
     describe "#expire proposals for Prospect" do
-      let!(:organization) { create(:sponsored_benefits_plan_design_organization,
+      let!(:organization) { create(:plan_design_organization,
                         sponsor_profile_id: nil,
                         owner_profile_id: "5678",
                         legal_name: "ABC Company",
@@ -58,22 +56,22 @@ module SponsoredBenefits
     end
 
 
-    describe "Organization with customer" do
-
+    describe "Organization with customer" do 
+      
       let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month}
-      let(:plan_year) { double(start_on: start_on, end_on: start_on.next_year.prev_day)}
+      let(:plan_year) { double(start_on: start_on)}
       let(:census_employees) { double(non_terminated: [])}
       let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
-
-      let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
-        owner_profile_id: owner_profile_id,
+ 
+      let!(:plan_design_organization) { create(:plan_design_organization, 
+        owner_profile_id: "5678",
         legal_name: "ABC Company",
-        sic_code: "0345" )
+        sic_code: "0345" ) 
       }
 
       let(:calculated_dates) { SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates }
 
-      before do
+      before do 
         allow(plan_design_organization).to receive(:employer_profile).and_return(employer_profile)
       end
 
@@ -135,37 +133,6 @@ module SponsoredBenefits
           end
         end
       end
-
-      describe ".general_agency_profile" do
-        let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
-                                            sponsor_profile_id: nil,
-                                            owner_profile_id: owner_profile_id,
-                                            legal_name: "ABC Company",
-                                            sic_code: "0345" ) }
-        let!(:broker_agency) { double("sponsored_benefits_broker_agency_profile", id: "89769")}
-        let!(:employer_profile_with_ga) { double("::EmployerPorfile")}
-        let!(:employer_profile_with_out_ga) { build("sponsored_benefits_organizations_profile")}
-        let!(:organization) { double("Organization")}
-        let!(:active_general_agency_account) { double("::GeneralAgencyprofileAccount")}
-
-        context "pull active_general_agency_account for organization" do
-          it "should return active_general_agency_account" do
-             allow(plan_design_organization).to receive(:broker_agency_profile).and_return(broker_agency)
-             allow(SponsoredBenefits::Organizations::Organization).to receive(:by_broker_agency_profile).with("89769").and_return([organization])
-             allow(organization).to receive(:employer_profile).and_return(employer_profile)
-             allow(employer_profile).to receive(:active_general_agency_account).and_return active_general_agency_account
-             expect(plan_design_organization.general_agency_profile).to eq active_general_agency_account
-          end
-
-          it "should return nil if no active_general_agency_accounts" do
-            allow(plan_design_organization).to receive(:broker_agency_profile).and_return(broker_agency)
-            allow(SponsoredBenefits::Organizations::Organization).to receive(:by_broker_agency_profile).with("89769").and_return([organization])
-            allow(organization).to receive(:employer_profile).and_return(employer_profile_with_out_ga)
-            expect(plan_design_organization.general_agency_profile).to be_nil
-          end
-        end
-      end
-
     end
   end
 end
