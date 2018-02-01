@@ -4,6 +4,7 @@ module SponsoredBenefits
 
       include ActiveModel::Model
       include ActiveModel::Validations
+      include Config::AcaModelConcern
 
       attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :quote_date, :plan_option_kind, :metal_level_for_elected_plan
       attr_reader :profile
@@ -16,7 +17,8 @@ module SponsoredBenefits
         assign_wrapper_attributes(attrs)
         ensure_proposal
         ensure_profile
-        ensure_sic_zip_county
+        ensure_sic if standard_industrial_classification_enabled?
+        ensure_zip_county
       end
 
       def build_benefit_group
@@ -63,8 +65,11 @@ module SponsoredBenefits
         @proposal = @plan_design_organization.plan_design_proposals.build unless @proposal.present?
       end
 
-      def ensure_sic_zip_county
+      def ensure_sic
         @sic_code = @plan_design_organization.sic_code
+      end
+
+      def ensure_zip_county
         if location = @plan_design_organization.office_locations.first
           @zip_code = location.address.zip
           @county = location.address.county

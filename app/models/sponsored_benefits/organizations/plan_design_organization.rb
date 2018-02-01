@@ -6,6 +6,7 @@ module SponsoredBenefits
       include Mongoid::Timestamps
       include Concerns::OrganizationConcern
       include Concerns::AcaRatingAreaConfigConcern
+      include Config::AcaModelConcern
 
       belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'
 
@@ -33,7 +34,9 @@ module SponsoredBenefits
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
 
-      validates_presence_of   :legal_name, :sic_code, :has_active_broker_relationship
+      validates_presence_of   :legal_name, :has_active_broker_relationship
+      validates :sic_code, presence: true, if: :standard_industrial_classification_enabled?
+
       validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
       validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
 
@@ -59,8 +62,6 @@ module SponsoredBenefits
 
       scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, 
                                                                       {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
-
-
 
       def employer_profile
         ::EmployerProfile.find(sponsor_profile_id)

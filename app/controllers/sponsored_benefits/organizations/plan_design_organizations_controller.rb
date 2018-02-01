@@ -90,7 +90,10 @@ module SponsoredBenefits
         @organization = SponsoredBenefits::Forms::PlanDesignOrganizationSignup.new(params)
         @organization.valid?
       end
-      get_sic_codes
+
+      if standard_industrial_classification_enabled?
+        get_sic_codes
+      end
     end
 
     def find_broker_agency_profile
