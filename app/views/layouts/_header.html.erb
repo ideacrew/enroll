@@ -43,7 +43,7 @@
                 </span>
                 <span> | </span>
                 <span>
-                  <%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %>
+                  <%= link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text" %>
                 </span>
                 <br/>
                 <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
@@ -65,7 +65,7 @@
     // check time until logout
     function check_time_until_logout(){
       $.ajax({
-        url: '<%= check_time_until_logout_path(:format => :js) %>',
+        url: '<%= main_app.check_time_until_logout_path(:format => :js) %>',
 	dataType: "script",
         method: 'GET',
         success: function(response){

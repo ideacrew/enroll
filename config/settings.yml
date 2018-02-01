@@ -111,6 +111,7 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+    standard_industrial_classification: false
 
 paper_notice: 'paper-notices'
 checkbook_services: 

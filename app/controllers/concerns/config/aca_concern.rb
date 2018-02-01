@@ -28,4 +28,8 @@ module Config::AcaConcern
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
     end
   end
+
+  def standard_industrial_classification_enabled?
+    @@standard_industrial_classification_enabled ||= Settings.aca.shop_market.standard_industrial_classification
+  end
 end

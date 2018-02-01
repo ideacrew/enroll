@@ -138,4 +138,7 @@ module Config::AcaHelper
    Settings.site.broker_claim_quoting_enabled
   end
 
+  def standard_industrial_classification_enabled?
+    @@standard_industrial_classification_enabled ||= Settings.aca.shop_market.standard_industrial_classification
+  end
 end
