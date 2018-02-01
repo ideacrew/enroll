@@ -41,6 +41,7 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
       employer_email: employer_profile.staff_roles.first.work_email_or_best,
 
     })
+    notice.broker_email = broker_agency_profile.primary_broker_role.email_address
     notice.broker_agency = broker_agency_profile.legal_name.titleize
     address = broker_agency_profile.organization.primary_mailing_address.present? ? broker_agency_profile.organization.primary_mailing_address : broker_agency_profile.organization.primary_office_location.address
     append_address(address)
