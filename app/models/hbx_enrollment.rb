@@ -146,6 +146,8 @@ class HbxEnrollment
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
   scope :my_enrolled_plans,   ->{ where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
+  scope :by_created_datetime_range,  ->(start_at, end_at){ where(:created_at => { "$gte" => start_at, "$lte" => end_at} )}
+  scope :by_submitted_datetime_range,  ->(start_at, end_at){ where(:submitted_at => { "$gte" => start_at, "$lte" => end_at} )}
   scope :current_year,        ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :by_hbx_id,            ->(hbx_id) { where(hbx_id: hbx_id) }
@@ -664,6 +666,22 @@ class HbxEnrollment
       nil
     end
   end
+
+  def mid_year_plan_change_notice
+    if self.census_employee.present?
+      begin
+        if (self.enrollment_kind != "open_enrollment" || self.census_employee.new_hire_enrollment_period.present?)
+          if self.benefit_group.is_congress
+            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
+          else
+            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_non_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
+          end
+        end  
+      rescue Exception => e
+        Rails.logger.error {"Unable to send employee mid year plan change notice to census_employee - #{census_employee.id} due to #{e.backtrace}"}
+      end
+    end  
+  end  
 
   def <=>(other)
     other_members = other.hbx_enrollment_members # - other.terminated_members
@@ -1259,6 +1277,14 @@ class HbxEnrollment
                   to: :coverage_canceled
     end
 
+    event :cancel_for_non_payment, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
+                         :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
+                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
+                         :coverage_enrolled, :renewing_waived, :inactive],
+                  to: :coverage_canceled
+    end
+
     event :terminate_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
@@ -1267,6 +1293,14 @@ class HbxEnrollment
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
+    event :terminate_for_non_payment, :after => :record_transition do
+      transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
+                         :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
+                         :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
+                         :enrolled_contingent, :unverified],
+                  to: :coverage_terminated, after: :propogate_terminate
+    end
+    
     event :invalidate_enrollment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_canceled, :coverage_terminated],
                   to: :void,
@@ -1368,7 +1402,16 @@ class HbxEnrollment
       return special_enrollment_period.qualifying_life_event_kind.reason
     end
     return "open_enrollment" if !is_shop?
+    if is_shop? && is_cobra_status?
+      if cobra_eligibility_date == effective_on
+        return "employer_sponsored_cobra"
+      end
+    end
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
+  end
+
+  def cobra_eligibility_date
+    employee_role.census_employee.cobra_begin_date
   end
 
   def check_for_renewal_event_kind
@@ -1390,6 +1433,7 @@ class HbxEnrollment
       return special_enrollment_period.qle_on
     end
     return nil if !is_shop?
+    return self.employee_role.census_employee.cobra_begin_date if is_shop? && is_cobra_status?
     new_hire_enrollment_for_shop? ? benefit_group_assignment.census_employee.hired_on : nil
   end
 
@@ -1399,6 +1443,7 @@ class HbxEnrollment
       return true
     end
     return false unless is_shop?
+    return true if is_shop? && is_cobra_status?
     new_hire_enrollment_for_shop?
   end
 
@@ -1419,7 +1464,7 @@ class HbxEnrollment
 
   def set_submitted_at
     if submitted_at.blank?
-      write_attribute(:submitted_at, TimeKeeper.date_of_record)
+      write_attribute(:submitted_at, Time.now)
     end
   end
 
