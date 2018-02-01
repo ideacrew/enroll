@@ -205,6 +205,19 @@ And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
 
+And(/^I click on shop for plans button on home page$/) do
+  find(:xpath, "//*[@id='shop-for-plans-widget']/div/div/div[2]/button").click
+end
+
+Then(/^I should not see not under open enrollment text$/) do
+  expect(page).not_to have_content 'You are not under open enrollment period.'
+end
+
+Then(/^I should see banner with text you qualify for sep$/) do
+  expect(page).to have_content 'You qualify for a Special Enrollment Period (SEP)'
+  expect(page).not_to have_content 'You are not under open enrollment period.'
+end
+
 And(/I click on sign in existing account$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
   find('.interaction-click-control-sign-in-existing-account').click
