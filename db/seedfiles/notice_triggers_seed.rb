@@ -147,7 +147,28 @@ shop_notice_triggers = [
   #     }
   #   ]
   # },
-  {
+  # {
+  #   hbx_id: 'DRG006',
+  #   title: 'Plan Offerings Finalized',
+  #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
+  #   resource_name: 'employer',
+  #   event_name: 'planyear_renewal_3a',
+  #   notice_triggers: [
+  #     {
+  #       name: 'PlanYear Renewal',
+  #       notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
+  #       notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
+  #       mpi_indicator: 'MPI_DRG006',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
   #   hbx_id: 'DRG007',
   #   title: 'Plan Offerings Finalized',
   #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
@@ -273,7 +294,6 @@ shop_notice_triggers = [
             }
         ]
     },
-
     {
         hbx_id: 'SHOP_M003',
         title: 'Employer Denial Notice',
