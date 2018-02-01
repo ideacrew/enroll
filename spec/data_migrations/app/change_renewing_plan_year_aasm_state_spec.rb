@@ -43,10 +43,6 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     before(:each) do
       active_household.hbx_enrollments =[enrollment]
       active_household.save!
-
-
-      # ENV['plan_year_start_on'] ="#{plan_year.start_on}"
-      # ENV['fein'] = organization.fein
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
     end
