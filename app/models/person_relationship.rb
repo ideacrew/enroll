@@ -112,6 +112,12 @@ class PersonRelationship
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
   validate :check_predecessor_and_successor
 
+  after_save :notify_updated
+
+  def notify_updated
+    person.notify_updated
+  end
+
   def check_predecessor_and_successor
     errors.add(:successor, "can't be the same as predecessor") if successor_id == predecessor_id
   end
@@ -128,6 +134,12 @@ class PersonRelationship
 
   def successor
     family.family_member.find(successor_id)
+  end
+
+
+  def parent
+    raise "undefined parent class: Person" unless person?
+    self.person
   end
 
   def relative=(new_person)
