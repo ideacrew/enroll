@@ -15,4 +15,4 @@ require File.join(Rails.root, "app", "data_migrations", "change_enrollment_detai
 namespace :migrations do
   desc "changing attributes on enrollment"
   ChangeEnrollmentDetails.define_task :change_enrollment_details => :environment
-end 
+end
