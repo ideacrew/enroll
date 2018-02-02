@@ -401,6 +401,8 @@ var PersonValidations = (function(window, undefined) {
       } else {
         $(".alert.alert-alert").remove();
       }
+    } else {
+      $(".alert.alert-alert").remove();
     }
   }
 
