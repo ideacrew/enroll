@@ -1,9 +1,6 @@
 require 'securerandom'
 
 module TransportProfiles
-  class EndpointNotFoundError < StandardError; end
-  class AmbiguousEndpointError < StandardError; end
-
   class Steps::RouteTo < Steps::Step
 
     def initialize(endpoint_key, file_name, gateway, destination_file_name: nil, source_credentials: nil)
@@ -11,21 +8,43 @@ module TransportProfiles
       @endpoint_key = endpoint_key
       @file_name = file_name
       @target_file_name = destination_file_name
-      @source_credentials = source_credentials
+      @source_credentials = resolve_source_credentials(source_credentials)
     end
 
-    def execute
-      endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(@endpoint_key)
-      raise ::TransportProfiles::EndpointKeyNotFoundError unless endpoints.size > 0
+    def resolve_source_credentials(source_credentials)
+      return source_credentials unless source_credentials.kind_of?(Symbol)
+      endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(source_credentials)
+      raise ::TransportProfiles::EndpointNotFoundError unless endpoints.size > 0
       raise ::TransportProfiles::AmbiguousEndpointError, "More than one matching endpoint found" if endpoints.size > 1
-      file_uri = @file_name.respond_to?(:scheme) ? @file_name : URI.parse(@file_name)
+      endpoints.first
+    end
+
+    def resolve_message_sources(process_context)
+      found_name = @file_name.kind_of?(Symbol) ? process_context.get(@file_name) : @file_name
+      if found_name.kind_of?(Array)
+        found_name.map do |fn|
+          fn.respond_to?(:scheme) ? fn : URI.parse(fn)
+        end
+      else
+        found_name.respond_to?(:scheme) ? [found_name] : [URI.parse(found_name)]
+      end
+    end
+
+    def execute(process_context)
+      endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(@endpoint_key)
+      raise ::TransportProfiles::EndpointNotFoundError unless endpoints.size > 0
+      raise ::TransportProfiles::AmbiguousEndpointError, "More than one matching endpoint found" if endpoints.size > 1
+      source_uris = resolve_message_sources(process_context)
 
       endpoint = endpoints.first
-      uri = complete_uri_for(endpoint, file_uri)
 
-      message = ::TransportGateway::Message.new(from: file_uri, to: uri, destination_credentials: endpoint, source_credentials: @source_credentials)
+      source_uris.each do |file_uri|
+        uri = complete_uri_for(endpoint, file_uri)
 
-      @gateway.send_message(message)
+        message = ::TransportGateway::Message.new(from: file_uri, to: uri, destination_credentials: endpoint, source_credentials: @source_credentials)
+
+        @gateway.send_message(message)
+      end
     end
 
     def complete_uri_for(endpoint, file_uri)

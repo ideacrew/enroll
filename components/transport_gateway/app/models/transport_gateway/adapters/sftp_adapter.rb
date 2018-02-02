@@ -9,6 +9,37 @@ module TransportGateway
     attr_accessor :user
     attr_accessor :credential_options
 
+    def list_entries(resource_query)
+      if resource_query.from.blank?
+        log(:error, "transport_gateway.sftp_adapter") { "query endpoint not provided" }
+        raise ArgumentError.new "query endpoint not provided"
+      end
+
+      target_uri = resource_query.from
+
+      resolve_from_credentials(resource_query)
+      if @user.blank? || @credential_options.blank?
+        log(:error, "transport_gateway.sftp_adapter") { "source server credentials not found" }
+        raise ArgumentError.new("source server username:password not provided")
+      end
+
+      begin
+        result_list = []
+        Net::SFTP.start(target_uri.host, @user, default_options.merge(credential_options)) do |sftp|
+          sftp.dir.foreach(target_uri.path) do |entry|
+            if entry.file?
+              full_uri = URI.join(target_uri, entry.name)
+              result_list << TransportGateway::ResourceEntry.new(entry.name, full_uri, entry.attributes.size, entry.attributes.mtime)
+            end
+          end
+        end
+        result_list
+      rescue Exception => e
+        log(:error, "transport_gateway.sftp_adapter") { e }
+        raise e
+      end
+    end
+
     def receive_message(message)
       if message.from.blank?
         log(:error, "transport_gateway.sftp_adapter") { "source file not provided" }
@@ -24,6 +55,7 @@ module TransportGateway
       end
       
       source_stream = Tempfile.new('tgw_sftp_adapter_dl')
+      source_stream.binmode
 
       begin
         Net::SFTP.start(target_uri.host, @user, default_options.merge(credential_options)) do |sftp|
