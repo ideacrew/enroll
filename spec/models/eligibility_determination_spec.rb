@@ -7,6 +7,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let!(:plan)                         { FactoryGirl.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
   let(:family)                        { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:hbx_profile)                  {FactoryGirl.create(:hbx_profile,:open_enrollment_coverage_period)}
   let(:household)                     { family.active_household }
   let(:application)                   { FactoryGirl.create(:application, family: family) }
   let(:tax_household)                 { FactoryGirl.create(:tax_household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil, household: household, application_id: application.id) }

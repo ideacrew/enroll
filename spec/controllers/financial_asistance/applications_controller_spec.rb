@@ -33,12 +33,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     let(:spouse) {FactoryGirl.create(:family_member, family: family).person}
     let(:child) {FactoryGirl.create(:family_member, family: family).person}
     let(:unrelated_member) {FactoryGirl.create(:family_member, family: family).person}
-
+    let!(:hbx_profile) {FactoryGirl.create(:hbx_profile,:open_enrollment_coverage_period)}
+    let!(:plan) { FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, hios_id: "86052DC0400001-01") }
     let(:application) { FactoryGirl.create :application, family: family, aasm_state: 'determined' }
 
     before(:each) do
       sign_in user
       allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+      allow(application).to receive(:benchmark_plan).and_return plan
       spouse.add_relationship(primary_member, "spouse", family.id)
       primary_member.add_relationship(spouse, "spouse", family.id)
       child.add_relationship(primary_member, "child", family.id)
@@ -103,6 +105,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
   let!(:plan) { FactoryGirl.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
+  let!(:hbx_profile) {FactoryGirl.create(:hbx_profile,:open_enrollment_coverage_period)}
   let!(:application) { FactoryGirl.create(:application,family: family, aasm_state: "draft",effective_date:TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryGirl.create(:applicant, application: application, is_claimed_as_tax_dependent:false, is_self_attested_blind:false, has_daily_living_help:false,need_help_paying_bills:false, family_member_id: family.primary_applicant.id) }
   let!(:application2) { FactoryGirl.create(:application,family: family, aasm_state: "draft",effective_date:TimeKeeper.date_of_record) }
@@ -112,6 +115,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
 
   before do
     sign_in(user)
+    #allow(application).to receive(:active_applicants).and_return [applicant]
+    allow(application).to receive(:benchmark_plan).and_return plan
   end
 
   context "GET Index" do
@@ -151,6 +156,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
 
   context "POST step" do
     before do
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:benchmark_plan).and_return plan
       controller.instance_variable_set(:@modal, application)
     end
 

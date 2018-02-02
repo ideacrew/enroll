@@ -6,6 +6,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
   let!(:plan) { FactoryGirl.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
+  let!(:hbx_profile) {FactoryGirl.create(:hbx_profile,:open_enrollment_coverage_period)}
   let!(:application) { FactoryGirl.create(:application,family: family, aasm_state: "draft",effective_date:TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryGirl.create(:applicant, application: application, is_claimed_as_tax_dependent:false, is_self_attested_blind:false, has_daily_living_help:false,need_help_paying_bills:false, family_member_id: family.primary_applicant.id) }
   let(:financial_assistance_applicant_valid){
