@@ -256,9 +256,9 @@ class Insured::FamiliesController < FamiliesController
     employee_role = @person.active_employee_roles.first
     if employee_role.present? && employee_role.census_employee.present?
       begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: @qle_end_on, qle_on: @qle_date} )
+        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
       rescue Exception => e
-        log("#{e.message}; person_id: #{@person.id}")
+        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
       end
     end
   end
