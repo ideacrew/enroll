@@ -67,17 +67,16 @@ Feature: Consumer RIDP verification process
     Then the CONTINUE button is functionally DISABLED
     And visibly DISABLED
 
-  Scenario: Allowing admin to continue on the ridp doc upload page
+  Scenario: Not Allowing admin to continue on the ridp doc upload page until ID is verified
     Given that the consumer has “Disagreed” to AUTH & CONSENT
     And the consumer is on the DOCUMENT UPLOAD page
     Then Individual logs out
     When an HBX admin exists
     When the Admin clicks “Continue” on the doc upload page
-    Then the Admin is able to complete the application for the consumer
+    Then the Admin is unable to complete the application for the consumer until ID is verified
 
   Scenario: Identity is verified by admin
     Given that the consumer has “Disagreed” to AUTH & CONSENT
-
     And the consumer is on the DOCUMENT UPLOAD page
     And an uploaded identity verification in REVIEW status is present
     And an uploaded application in REVIEW status is present
@@ -88,8 +87,8 @@ Feature: Consumer RIDP verification process
     And Individual resumes enrollment
     And I click on sign in existing account
     And I signed in
-    Then the CONTINUE button is functionally DISABLED
-    And visibly DISABLED
+    Then the CONTINUE button is functionally ENABLED
+    And visibly ENABLED
 
   Scenario: Both Identity and Application are verified by admin
     Given that the consumer has “Disagreed” to AUTH & CONSENT
@@ -152,6 +151,40 @@ Feature: Consumer RIDP verification process
     When an HBX admin exists
     And an uploaded Identity verification in VERIFIED status is present on failed experian screen
     And an uploaded application in VERIFIED status is present on failed experian screen
+    And HBX admin logs out
+    And Individual resumes enrollment
+    And I click on sign in existing account
+    And I signed in
+    Then the CONTINUE button is functionally ENABLED
+    And visibly ENABLED
+
+  Scenario: New insured user chooses I Agree on Auth and Consent Page and uploaded application document
+    Given that the consumer has navigated to the AUTH & CONSENT page
+    When the consumer selects “I Agree”
+    And that the consumer has answered the Experian Identity Proofing questions
+    When  Experian is unable to verify Identity for the consumer
+    And  an Experian Error screen appears for the consumer
+    And an uploaded application in REVIEW status is present
+    Then Individual logs out
+    When an HBX admin exists
+    And an uploaded application in VERIFIED status is present on failed experian screen
+    And HBX admin logs out
+    And Individual resumes enrollment
+    And I click on sign in existing account
+    And I signed in
+    Then the CONTINUE button is functionally DISABLED
+    And visibly DISABLED
+
+  Scenario: New insured user chooses I Agree on Auth and Consent Page and uploaded Identity document
+    Given that the consumer has navigated to the AUTH & CONSENT page
+    When the consumer selects “I Agree”
+    And that the consumer has answered the Experian Identity Proofing questions
+    When  Experian is unable to verify Identity for the consumer
+    And  an Experian Error screen appears for the consumer
+    And an uploaded identity verification in REVIEW status is present
+    Then Individual logs out
+    When an HBX admin exists
+    And an uploaded Identity verification in VERIFIED status is present on failed experian screen
     And HBX admin logs out
     And Individual resumes enrollment
     And I click on sign in existing account
