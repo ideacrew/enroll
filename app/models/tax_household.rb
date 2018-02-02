@@ -71,10 +71,10 @@ class TaxHousehold
     # 15% to each child
 
     # Benchmark Plan: use SLCSP premium rates to determine ratios
-    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    @benefit_sponsorship ||= HbxProfile.current_hbx.benefit_sponsorship
     #current_benefit_coverage_period = benefit_sponsorship.current_benefit_period
     #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
-    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
+    benefit_coverage_period = @benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
 
     # Look up premiums for each aptc_member
