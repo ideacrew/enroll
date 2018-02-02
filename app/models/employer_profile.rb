@@ -794,7 +794,7 @@ class EmployerProfile
         end
 
         if Settings.aca.shop_market.transmit_scheduled_employers
-          if new_date.day == Settings.aca.shop_market.employer_transmission_day_of_month
+          if (new_date.prev_day.mday + 1) == Settings.aca.shop_market.employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
         end
