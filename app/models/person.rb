@@ -253,7 +253,6 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
-  
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
   end
@@ -286,16 +285,6 @@ class Person
 
   def notify_updated
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
-  end
-
-  def need_to_notify?
-    changed_fields = changed_attributes.keys
-    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
-    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
-    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
-    changed_fields = changed_fields.flatten.compact.uniq
-    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
-    notify_fields.present?
   end
 
   def is_aqhp?
@@ -617,7 +606,7 @@ class Person
     return false
   end
 
-  class << self    
+  class << self
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]
     end
