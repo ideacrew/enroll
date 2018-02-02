@@ -305,24 +305,6 @@ class HbxEnrollment
       # end
 
       HbxEnrollment.terminate_scheduled_enrollments
-
-      #FIXME Families with duplicate renewals
-      families_with_effective_renewals_as_of(new_date).each do |family|
-        family.enrollments.renewing.each do |hbx_enrollment|
-          if hbx_enrollment.effective_on <= new_date
-            if census_employee = hbx_enrollment.census_employee
-              if census_employee.renewal_benefit_group_assignment.try(:may_select_coverage?)
-                census_employee.renewal_benefit_group_assignment.select_coverage!
-              end
-            end
-            hbx_enrollment.begin_coverage!
-          end
-        end
-      end
-    end
-
-    def families_with_effective_renewals_as_of(new_date)
-      Family.by_enrollment_shop_market.by_enrollment_renewing.where({ :"households.hbx_enrollments.effective_on".lte => new_date }).limit(10)
     end
 
     def update_individual_eligibilities_for(consumer_role)
