@@ -8,12 +8,15 @@ module SponsoredBenefits
 
       has_and_belongs_to_many :benefit_market_service_periods, class_name: "SponsoredBenefits::BenefitMarketservicePeriod"
 
-      field :issuer_profile_id, type: BSON::ObjectId
-      field :benefit_product_kind, type: Symbol
-      field :benefit_market_service_period_id, type: BSON::ObjectId
+      field :issuer_profile_id,                 type: BSON::ObjectId
+      field :benefit_market_service_period_id,  type: BSON::ObjectId
+      field :benefit_product_kind,              type: Symbol
 
-      field :purchase_period          # => jan 1 - dec 31, 2018
+      field :purchase_period,                   type: Range           # => jan 1 - dec 31, 2018
+      field :hios_id,                           type: String
 
+
+      embeds_many :rating_areas,          class_name: "SponsoredBenefits::BenefitProducts::RatingArea"
       embeds_many :benefit_product_rates, class_name: "SponsoredBenefits::BenefitProducts::BenefitProductRate"
 
       validates_presence_of :issuer_profile_id, :benefit_product_kind, :purchase_period
@@ -21,7 +24,8 @@ module SponsoredBenefits
         inclusion: { in: BENEFIT_PRODUCT_KINDS, message: "%{value} is not a valid benefit market" }
 
       index(issuer_profile_id: 1)
-      index(:"purchase_period.max" =>  1, :"purchase_period.min" => 1)
+      index(benefit_product_kind: 1)
+      index(:"purchase_period.max" =>  1, :"purchase_period.min" => 1, :"hios_id" => 1, )
 
 
       scope :by_issuer_profile,   ->(issuer_profile){where(:"issuer_profile._id" => issuer_profile._id)}
@@ -63,6 +67,7 @@ module SponsoredBenefits
 
       field :product_purchase_period, type: Range
       has_many :rate_tables
+
 
     end
   end
