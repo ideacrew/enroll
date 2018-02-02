@@ -198,7 +198,7 @@ aca:
 
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
-    employer_transmission_day_of_month: 29
+    employer_transmission_day_of_month: 26
 
   use_simple_employer_calculation_model: false
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
