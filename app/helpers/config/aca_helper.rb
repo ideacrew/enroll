@@ -90,6 +90,20 @@ module Config::AcaHelper
     fetch_format
   end
 
+  # CCA Requested a specific format of file while generating reports
+  #
+  # @param [Hash] file_format will hold key value pair of date,time and day
+  # @param [String] task_name will hold the name of task for instance 'employers'
+  #
+  # @return [String] absolute path location to writing a CSV
+  def extract_and_concat_file_path(file_format, task_name)
+    date_extract = file_format.fetch('date_extract')
+    fetch_day = file_format.fetch('fetch_day')
+    time_extract = file_format.fetch('time_extract')
+
+    File.expand_path("#{Rails.root}/CCA_#{ENV["RAILS_ENV"]}_#{task_name}_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
+  end
+
   def enabled_metal_level_years
     @enabled_metal_level_years ||= Settings.aca.plan_option_years.metal_level_carriers_available
   end

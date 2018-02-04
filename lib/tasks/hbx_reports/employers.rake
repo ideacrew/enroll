@@ -48,12 +48,8 @@ namespace :reports do
                   else
                     # For MA stakeholders requested a specific file format
                     file_format = fetch_CCA_required_file_format
-
-                    date_extract = file_format.fetch('date_extract')
-                    fetch_day = file_format.fetch('fetch_day')
-                    time_extract = file_format.fetch('time_extract')
-
-                    File.expand_path("#{Rails.root}/CCA_#{ENV["RAILS_ENV"]}_employers_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
+                    # once after fetch extract those params and return file_path
+                    extract_and_concat_file_path(file_format, 'employers')
                   end
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
