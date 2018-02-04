@@ -4,6 +4,8 @@ namespace :employers do
   desc "Export employers to csv."
   # Usage rake employers:export
   task :export => [:environment] do
+    include Config::AcaHelper
+
     orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
     time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")

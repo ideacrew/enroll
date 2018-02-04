@@ -65,6 +65,7 @@ describe TerminatedHbxEnrollments do
 
     before :each do
      time_str = time_now.utc.strftime("%Y%m%d_%H%M%S")
+     allow(subject).to receive(:individual_market_is_enabled?).and_return(true)
      @file = File.expand_path("#{Rails.root}/public/edi_enrollment_termination_report_#{time_str}.csv")
      allow(Time).to receive(:now).and_return(time_now)
      allow(Publishers::Legacy::EdiEnrollmentTerminationReportPublisher).to receive(:new).and_return(publisher)

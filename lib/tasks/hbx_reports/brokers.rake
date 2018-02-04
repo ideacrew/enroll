@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Brokers"
     task :brokers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
       brokers = Person.exists(broker_role: true).broker_role_having_agency

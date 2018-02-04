@@ -6,6 +6,7 @@ require 'csv'
  
      desc "List of all new people registered in enroll"
      task :total_new_people_list => :environment do
+       include Config::AcaHelper
 
       end_date = TimeKeeper.date_of_record + 1.day
  

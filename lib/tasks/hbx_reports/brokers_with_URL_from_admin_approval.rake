@@ -5,6 +5,8 @@ namespace :reports do
   namespace :shop do
     desc "All Brokers have had a claim URL sent to them upon Admin Approval"
     task :brokers_with_URL_from_admin_approval => :environment do
+      include Config::AcaHelper
+
       invitations=Invitation.where(role:"broker_role").all
       field_names  = %w(
           Broker_Agency_Legal_Name
