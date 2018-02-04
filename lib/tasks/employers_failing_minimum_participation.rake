@@ -12,7 +12,19 @@ namespace :reports do
         :aasm_state.in => valid_states}})
 
       time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/public/employers_failing_minimum_participation_#{time_stamp}.csv")
+      file_name = if individual_market_is_enabled?
+                    File.expand_path("#{Rails.root}/public/employers_failing_minimum_participation_#{time_stamp}.csv")
+                  else
+                    # For MA stakeholders requested a specific file format
+                    file_format = fetch_CCA_required_file_format
+
+                    date_extract = file_format.fetch('date_extract')
+                    fetch_day = file_format.fetch('fetch_day')
+                    time_extract = file_format.fetch('time_extract')
+
+                    File.expand_path("#{Rails.root}/CCA_#{ENV["RAILS_ENV"]}_employers_failing_minimum_participation_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
+                  end
+
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 
       CSV.open(file_name, "w") do |csv|

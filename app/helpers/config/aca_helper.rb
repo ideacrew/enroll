@@ -74,6 +74,22 @@ module Config::AcaHelper
     response
   end
 
+  # Allows us to use time, date and day inside application
+  # @return [Hash] fetch_format assigns options for key-value pair
+  # @date_extract opts [Array<Integer>] for instance ['YYYY', 'MM', 'DD']
+  # @fetch_day opts [Array<String>] for instance ['Friday']
+  # @time_extract opts [Array<String>] for instance ['HH', 'MM', 'SS']
+  #
+  # Note: Time values will be extracted based on UTC time format
+  def fetch_CCA_required_file_format
+    fetch_format = Hash.new
+    fetch_format['date_extract'] = TimeKeeper.date_of_record.try(:strftime, '%y-%m-%d').split('-')
+    fetch_format['fetch_day'] = TimeKeeper.date_of_record.try(:strftime, '%A')
+    fetch_format['time_extract'] = TimeKeeper.datetime_of_record.try(:strftime, '%H:%M:%S').split(':')
+
+    fetch_format
+  end
+
   def enabled_metal_level_years
     @enabled_metal_level_years ||= Settings.aca.plan_option_years.metal_level_carriers_available
   end

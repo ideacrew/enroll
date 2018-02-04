@@ -18,7 +18,19 @@ namespace :reports do
       processed_count = 0
 
       time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/public/brokers_list_with_URL_from_admin_approval_#{time_stamp}.csv")
+      file_name = if individual_market_is_enabled?
+                    File.expand_path("#{Rails.root}/public/brokers_list_with_URL_from_admin_approval_#{time_stamp}.csv")
+                  else
+                    # For MA stakeholders requested a specific file format
+                    file_format = fetch_CCA_required_file_format
+
+                    date_extract = file_format.fetch('date_extract')
+                    fetch_day = file_format.fetch('fetch_day')
+                    time_extract = file_format.fetch('time_extract')
+
+                    File.expand_path("#{Rails.root}/CCA_#{ENV["RAILS_ENV"]}_brokers_list_with_URL_from_admin_approval_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
+                  end
+
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         invitations.each do |invitation|
@@ -39,8 +51,10 @@ namespace :reports do
           end
         end
       end
+
       pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
       pubber.publish URI.join("file://", file_name)
+
       puts "#{processed_count} Brokers to output file: #{file_name}"
     end
   end
