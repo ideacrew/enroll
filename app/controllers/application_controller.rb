@@ -7,23 +7,27 @@ class ApplicationController < ActionController::Base
   def format_js?
    request.format.js?
   end
+  
+  def format_json?
+    request.format.json?
+  end
 
   # force_ssl
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
+  # protect_from_forgery with: :null_session, if: Proc.new {|c| c.request.format.json? }
 
   ## Devise filters
   before_filter :require_login, unless: :authentication_not_required?
-  before_filter :authenticate_user_from_token!
-  before_filter :authenticate_me!
+  before_filter :authenticate_user_from_token!, :unless => :format_json?
+  before_filter :authenticate_me!, :unless => :format_json?
 
   # for i18L
   before_action :set_locale
 
   # for current_user
-  before_action :set_current_user
+  before_action :set_current_user, :unless => :format_json?
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 

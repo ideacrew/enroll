@@ -60,6 +60,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
+gem 'jwt'
+gem 'rack-cors'
 
 #######################################################
 # Removed gems

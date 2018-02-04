@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   require 'resque/server' 
 #  mount Resque::Server, at: '/jobs'
-  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
+  devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :api_registrations => "users/api_registration" }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
@@ -422,6 +422,13 @@ Rails.application.routes.draw do
 
   namespace :api, :defaults => {:format => 'xml'} do
     namespace :v1 do
+      resources :test
+      resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
+        get :search, on: :collection
+        get :privacy, on: :collection
+        post :match, on: :collection
+        post :build, on: :collectio
+      end
       resources :slcsp, :only => []  do
         collection do
           post :plan

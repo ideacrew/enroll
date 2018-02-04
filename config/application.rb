@@ -46,6 +46,13 @@ module Enroll
         SessionTaggedLogger.extract_session_id_from_request(req)
       }
     ]
+    
+    Rails.application.config.middleware.insert_before 0, "Rack::Cors" do
+      allow do
+        origins '*'
+        resource '*', :headers => :any, :methods => [:get, :post, :options, :put, :delete], :expose => ['Link', 'Total']
+      end
+    end
 
     unless Rails.env.test?
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")

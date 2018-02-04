@@ -4,8 +4,13 @@ class Users::SessionsController < Devise::SessionsController
     set_flash_message(:notice, :signed_in) if is_flashing_format?
     sign_in(resource_name, resource)
     yield resource if block_given?
-    location = after_sign_in_path_for(resource)
-    flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
-    respond_with resource, location: location
+    if format_json?
+      token = AuthToken.issue_token({ user_id: resource.id })
+      render json: { token: token }
+    else
+      location = after_sign_in_path_for(resource)
+      flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
+      respond_with resource, location: location
+    end
   end
 end
