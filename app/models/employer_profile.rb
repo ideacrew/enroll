@@ -190,6 +190,10 @@ class EmployerProfile
     end
   end
 
+  def employer_broker_fired
+    trigger_notices('employer_broker_fired')
+  end
+
   alias_method :broker_agency_profile=, :hire_broker_agency
 
   def broker_agency_profile
@@ -1173,7 +1177,11 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+    end
   end
 
   def rating_area

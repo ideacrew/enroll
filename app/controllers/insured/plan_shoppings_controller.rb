@@ -178,6 +178,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_renewal_coverage
       notify_employer_when_employee_terminate_coverage(hbx_enrollment)
       notify_employee_confirming_coverage_termination(hbx_enrollment)
+      # hbx_enrollment.notify_employee_confirming_coverage_termination mirror notice
       redirect_to family_account_path
     else
       redirect_to :back

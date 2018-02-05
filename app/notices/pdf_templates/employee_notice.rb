@@ -13,6 +13,7 @@ module PdfTemplates
     attribute :census_employee, PdfTemplates::CensusEmployee
     attribute :employer_name, String
     attribute :employer_full_name, String
+    attribute :primary_email, String
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan

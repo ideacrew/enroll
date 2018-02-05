@@ -942,6 +942,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  # {
+  #   hbx_id: 'SHOP21',
+  #   title: 'Monthly Invoice Available Notice',
+  #   description: 'When groups invoice is available in their account, this notice is sent to them.',
+  #   resource_name: 'employer',
+  #   event_name: 'employer_invoice_available',
+  #   notice_triggers: [
+  #       {
+  #         name: 'Employer monthly invoice available in the account',
+  #         notice_template: 'notices/shop_employer_notices/employer_invoice_available_notice',
+  #         notice_builder: 'ShopEmployerNotices::EmployerInvoiceAvailable',
+  #         mpi_indicator: 'SHOP_D021',
+  #         notice_trigger_element_group: {
+  #             market_places: ['shop'],
+  #             primary_recipients: ["employer"],
+  #             primary_recipient_delivery_method: ["secure_message"],
+  #             secondary_recipients: []
+  #         }
+  #       }
+  #   ]
+  # },
   {
     hbx_id: 'SHOP26',
     title: 'First Reminder to publish Application',
@@ -1465,6 +1486,27 @@ shop_notice_triggers = [
   #       notice_trigger_element_group: {
   #         market_places: ['shop'],
   #         primary_recipients: ["employee"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
+  #   hbx_id: 'SHOP_D049',
+  #   title: 'Confirmation - Broker Hired',
+  #   description: 'Confirmation of Broker Hired Sent to Employer',
+  #   resource_name: 'employer',
+  #   event_name: 'broker_hired_confirmation_notice',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Boker Hired Confirmation',
+  #       notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
+  #       notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
+  #       mpi_indicator: 'SHOP_D049',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
   #         primary_recipient_delivery_method: ["secure_message"],
   #         secondary_recipients: []
   #       }

@@ -154,8 +154,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:hbx_enrollment) { HbxEnrollment.new(plan: factory_plan, employee_role: factory_employee_role, effective_on: 1.month.ago.to_date, benefit_group: factory_benefit_group, kind: "employer_sponsored") }
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:plan) { double("Plan") }
-    let(:benefit_group) { double("BenefitGroup
-", is_congress: false) }
+    let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
@@ -352,6 +351,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:census_employee).and_return(double)
       allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
       allow(subject).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
+      # allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end
