@@ -14,7 +14,7 @@ module VerificationHelper
     end
   end
 
-def ridp_type_status(type, person)
+  def ridp_type_status(type, person)
     consumer = person.consumer_role
     case type
       when 'Identity'

@@ -131,10 +131,8 @@ When(/^the Admin clicks “Continue” on the doc upload page$/) do
   family_member.trigger("click")
 end
 
-Then(/^the Admin is able to complete the application for the consumer$/) do
-  find('.interaction-click-control-continue').click
-  expect(page).to have_content('Add Member')
-  screenshot("dependents")
+Then(/^the Admin is unable to complete the application for the consumer until ID is verified$/) do
+  find('.interaction-click-control-continue')['disabled'].should == "disabled"
 end
 
 
