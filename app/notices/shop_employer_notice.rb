@@ -85,12 +85,12 @@ class ShopEmployerNotice < Notice
 
   def send_generic_notice_alert_to_broker_and_ga
     if employer_profile.broker_agency_profile.present?
-      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name.titleize
       broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
       # UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
     end
     if employer_profile.general_agency_profile.present?
-      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
+      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name.titleize
       ga_staff_email = employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
       # UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, employer_profile.legal_name.titleize).deliver_now
     end
@@ -103,7 +103,7 @@ class ShopEmployerNotice < Notice
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
     notice.broker = PdfTemplates::Broker.new({
-      primary_fullname: person.full_name,
+      primary_fullname: person.full_name.titleize,
       organization: broker.legal_name,
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
