@@ -2,6 +2,8 @@ module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
+    include ApplicationHelper
+    
     before_action :load_plan_design_organization, except: [:destroy, :publish, :claim, :show]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
     before_action :published_plans_are_view_only, only: [:edit]
