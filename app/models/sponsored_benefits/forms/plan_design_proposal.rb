@@ -128,7 +128,10 @@ module SponsoredBenefits
         if @proposal.persisted?
           @proposal.assign_attributes(title: @title)
         else
-          profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({sic_code: @sic_code})
+          profile = SponsoredBenefits::Organizations.const_get("AcaShop#{aca_state_abbreviation.titleize}EmployerProfile").new
+          if standard_industrial_classification_enabled?
+            profile.sic_code = @sic_code
+          end
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
         end
 
