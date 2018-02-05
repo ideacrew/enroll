@@ -83,7 +83,7 @@ module Config::AcaHelper
   # Note: Time values will be extracted based on UTC time format
   def fetch_CCA_required_file_format
     fetch_format = Hash.new
-    fetch_format['date_extract'] = TimeKeeper.date_of_record.try(:strftime, '%y-%m-%d').split('-')
+    fetch_format['date_extract'] = TimeKeeper.date_of_record.try(:strftime, '%Y-%m-%d').split('-')
     fetch_format['fetch_day'] = TimeKeeper.date_of_record.try(:strftime, '%A')
     fetch_format['time_extract'] = TimeKeeper.datetime_of_record.try(:strftime, '%H:%M:%S').split(':')
 
@@ -101,7 +101,7 @@ module Config::AcaHelper
     fetch_day = file_format.fetch('fetch_day')
     time_extract = file_format.fetch('time_extract')
 
-    File.expand_path("#{Rails.root}/CCA_#{ENV["RAILS_ENV"]}_#{task_name}_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
+    File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name}_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
   end
 
   def enabled_metal_level_years
