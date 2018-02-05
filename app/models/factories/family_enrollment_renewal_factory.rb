@@ -22,6 +22,7 @@ module Factories
         if employer_offering_coverage_kind?
           generate_renewals
         end
+        trigger_notice_dental(enrollment_id: find_active_coverage.hbx_id.to_s) { "dental_carriers_exiting_shop_notice_to_ee" } if kind == 'dental' && find_active_coverage.present? && has_metlife_or_delta_plan?(find_active_coverage)
       end
 
       family
@@ -46,7 +47,6 @@ module Factories
                 renew_enrollment(enrollment: active_enrollment)
                 trigger_notice { "employee_open_enrollment_auto_renewal" }
               else
-                trigger_notice_dental(enrollment_id: active_enrollment.hbx_id.to_s) { "dental_carriers_exiting_shop_notice_to_ee" } if has_metlife_or_delta_plan?(active_enrollment)
                 trigger_notice { "employee_open_enrollment_no_auto_renewal" }
               end
             end
@@ -61,7 +61,7 @@ module Factories
 
     def has_metlife_or_delta_plan?(active_enr)
       carrier_name = active_enr.plan.carrier_profile.legal_name.downcase
-      coverage_kind == 'dental' && (active_enr.benefit_group.plan_year.start_on < Date.new(2019,1,1)) && carrier_name && (["metlife", "delta dental"].include?(carrier_name))
+      (active_enr.benefit_group.plan_year.start_on < Date.new(2019,1,1)) && carrier_name && (["metlife", "delta dental"].include?(carrier_name))
     end
 
     def find_active_coverage
