@@ -98,6 +98,7 @@ aca:
 
       minimum_length:
         days: 5
+        adv_days: 5
       maximum_length:
         months: 2
 
