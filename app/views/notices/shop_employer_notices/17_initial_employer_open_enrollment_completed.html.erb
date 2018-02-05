@@ -26,7 +26,7 @@
   content: "Your first month’s premium payment must be received by 5:00 p.m. on #{notice.plan_year.binder_payment_due_date}, or your group’s coverage will be delayed. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Make a Secure Online Payment"} %>
+  content: "<strong>Make a Secure Online Payment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "#{Settings.site.short_name} offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online."}%>
@@ -78,5 +78,5 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "This notice is being provided in accordance with 45 CFR 715€."} %>
+ content: "This notice is being provided in accordance with 45 CFR 715(e)."} %>
  
