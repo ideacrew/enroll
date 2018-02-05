@@ -612,6 +612,8 @@ module ApplicationHelper
   end
 
   def eligibility_criteria(employer)
+    return unless employer.respond_to?(:show_plan_year)
+
     if employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
