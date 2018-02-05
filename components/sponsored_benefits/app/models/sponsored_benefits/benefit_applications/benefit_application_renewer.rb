@@ -23,7 +23,8 @@ module SponsoredBenefits
 
       private
 
-      def renew_application
+      def renewal_application
+
       end
 
     end
