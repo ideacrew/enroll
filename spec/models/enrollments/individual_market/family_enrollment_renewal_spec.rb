@@ -2,8 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
 
-  let(:current_benefit_coverage_period) { OpenStruct.new(start_on: Date.new(2017,1,1), end_on: Date.new(2017,12,31)) }
-  let(:renewal_benefit_coverage_period) { OpenStruct.new(start_on: Date.new(2018,1,1), end_on: Date.new(2018,12,31)) }
+  let(:current_date) { Date.new(calender_year, 11, 1) }
+
+  let(:current_benefit_coverage_period) { OpenStruct.new(start_on: current_date.beginning_of_year, end_on: current_date.end_of_year) }
+  let(:renewal_benefit_coverage_period) { OpenStruct.new(start_on: current_date.next_year.beginning_of_year, end_on: current_date.next_year.end_of_year) }
 
   let(:aptc_values) {{}}
   let(:assisted) { nil }
@@ -31,10 +33,10 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     FactoryGirl.create(:family_member, person: child, family: family)
   }
 
-  let(:primary_dob){ TimeKeeper.date_of_record.next_month - 57.years }
-  let(:spouse_dob) { TimeKeeper.date_of_record.next_month - 55.years }
-  let(:child1_dob) { TimeKeeper.date_of_record.next_month - 26.years }
-  let(:child2_dob) { TimeKeeper.date_of_record.next_month - 20.years }
+  let(:primary_dob){ current_date.next_month - 57.years }
+  let(:spouse_dob) { current_date.next_month - 55.years }
+  let(:child1_dob) { current_date.next_month - 26.years }
+  let(:child2_dob) { current_date.next_month - 20.years }
 
   let!(:enrollment) {
     FactoryGirl.create(:hbx_enrollment, :with_enrollment_members,
@@ -64,7 +66,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
   }
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 11, 1))
+    TimeKeeper.set_date_of_record_unprotected!(current_date)
   end
 
   describe ".clone_enrollment_members" do
@@ -76,6 +78,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
 
     context "When a child is aged off" do
       it "should not include child" do
+
         applicant_ids = subject.clone_enrollment_members.collect{|m| m.applicant_id}
 
         expect(applicant_ids).to include(family.primary_applicant.id)
@@ -112,7 +115,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     end
 
     context "when all the covered housedhold eligible for renewal" do
-      let(:child1_dob) { TimeKeeper.date_of_record.next_month - 24.years }
+      let(:child1_dob) { current_date.next_month - 24.years }
 
 
       it "should generate passive renewal in auto_renewing state" do
@@ -133,7 +136,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
       let(:enrollment_members) { [child1, child2] }
 
       context "When one of the covered individuals aged off(30 years)" do
-        let(:child1_dob) { TimeKeeper.date_of_record.next_month - 30.years }
+        let(:child1_dob) { current_date.next_month - 30.years }
 
         it "should return catastrophic aged off plan" do
           expect(subject.renewal_plan).to eq cat_age_off_plan.id
@@ -141,7 +144,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
       end
 
       context "When all the covered individuals under 30" do
-        let(:child1_dob) { TimeKeeper.date_of_record.next_month - 25.years }
+        let(:child1_dob) { current_date.next_month - 25.years }
 
         it "should return renewal plan" do
           expect(subject.renewal_plan).to eq renewal_plan.id
