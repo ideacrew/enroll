@@ -13,15 +13,7 @@ namespace :reports do
         :open_enrollment_end_on => {"$gte" => window_date},
         :aasm_state.in => valid_states}})
 
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = if individual_market_is_enabled?
-                    File.expand_path("#{Rails.root}/public/employers_failing_minimum_participation_#{time_stamp}.csv")
-                  else
-                    # For MA stakeholders requested a specific file format
-                    file_format = fetch_CCA_required_file_format
-                    # once after fetch extract those params and return file_path
-                    extract_and_concat_file_path(file_format, 'employers_failing_minimum_participation')
-                  end
+      file_name = fetch_file_format('employers_failing_minimum_participation')
 
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 

@@ -17,15 +17,7 @@ namespace :reports do
 end
 
 def build_csv_report(file_name, organizations)
-  time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-  file_path = if individual_market_is_enabled?
-                File.expand_path("#{Rails.root}/public/#{file_name}_#{time_stamp}.csv")
-              else
-                # For MA stakeholders requested a specific file format
-                file_format = fetch_CCA_required_file_format
-                # once after fetch extract those params and return file_path
-                extract_and_concat_file_path(file_format, file_name)
-              end
+  file_path = fetch_file_format(file_name)
 
   CSV.open(file_path, "w", force_quotes: true) do |csv|
     csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID"]

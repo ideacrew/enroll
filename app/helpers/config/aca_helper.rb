@@ -104,6 +104,18 @@ module Config::AcaHelper
     File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name}_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
   end
 
+  def fetch_file_format(task_name)
+    time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
+    if individual_market_is_enabled?
+      File.expand_path("#{Rails.root}/public/#{task_name}_#{time_stamp}.csv")
+    else
+      # For MA stakeholders requested a specific file format
+      file_format = fetch_CCA_required_file_format
+      # once after fetch extract those params and return file_path
+      extract_and_concat_file_path(file_format, task_name)
+    end
+  end
+
   def enabled_metal_level_years
     @enabled_metal_level_years ||= Settings.aca.plan_option_years.metal_level_carriers_available
   end

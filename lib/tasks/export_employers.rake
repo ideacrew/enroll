@@ -8,15 +8,7 @@ namespace :employers do
 
     orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
-    time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-    file_name = if individual_market_is_enabled?
-                  File.expand_path("#{Rails.root}/public/employer_export_#{time_stamp}.csv")
-                else
-                  # For MA stakeholders requested a specific file format
-                  file_format = fetch_CCA_required_file_format
-                  # once after fetch extract those params and return file_path
-                  extract_and_concat_file_path(file_format, 'employer_export')
-                end
+    file_name = fetch_file_format('employer_export')
 
     def get_primary_office_location(organization)
       organization.office_locations.detect do |office_location|

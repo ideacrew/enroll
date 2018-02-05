@@ -5,15 +5,7 @@ namespace :shop do
 
     roles = Person.where(:employer_staff_roles.exists => true).map(&:employer_staff_roles).flatten
     pending = roles.select{|role| role.aasm_state == 'is_applicant'}
-    time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-    file_name = if individual_market_is_enabled?
-                  File.expand_path("#{Rails.root}/public/er_poc_pending_app_report_#{time_stamp}.csv")
-                else
-                  # For MA stakeholders requested a specific file format
-                  file_format = fetch_CCA_required_file_format
-                  # once after fetch extract those params and return file_path
-                  extract_and_concat_file_path(file_format, 'er_poc_pending_app_report')
-                end
+    file_name = fetch_file_format('er_poc_pending_app_report')
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << ['ER POC Applicant Name','ER POC Email Address','ER Legal Name','ER FEIN','ER POC Application Date Time']

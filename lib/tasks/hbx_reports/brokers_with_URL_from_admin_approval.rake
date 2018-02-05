@@ -19,15 +19,7 @@ namespace :reports do
         )
       processed_count = 0
 
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = if individual_market_is_enabled?
-                    File.expand_path("#{Rails.root}/public/brokers_list_with_URL_from_admin_approval_#{time_stamp}.csv")
-                  else
-                    # For MA stakeholders requested a specific file format
-                    file_format = fetch_CCA_required_file_format
-                    # once after fetch extract those params and return file_path
-                    extract_and_concat_file_path(file_format, 'brokers_list_with_URL_from_admin_approval')
-                  end
+      file_name = fetch_file_format('brokers_list_with_URL_from_admin_approval')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
