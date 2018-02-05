@@ -145,11 +145,13 @@ RSpec.describe Admin::Aptc, :type => :model do
       end
 
       it "should return array with next year added as it is under_open_enrollment" do
+        tax_household10.update_attributes!(effective_starting_on: past_date )
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
         expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year, past_date.year + 1 ]
       end
 
       it "should return array without next year added as it is not under_open_enrollment" do
+        tax_household10.update_attributes!(effective_starting_on: past_date )
         allow(HbxProfile).to receive(:current_hbx).and_return(false)
         expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year]
       end
