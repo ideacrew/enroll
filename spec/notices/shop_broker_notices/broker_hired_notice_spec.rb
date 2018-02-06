@@ -66,6 +66,9 @@ RSpec.describe ShopBrokerNotices::BrokerHiredNotice do
     it "returns employer last name" do
       expect(@broker_notice.notice.employer.employer_last_name).to eq employer_profile.staff_roles.first.last_name
     end
+    it "should return broker email" do
+      expect(@broker_notice.notice.broker_email).to eq broker_agency_profile.primary_broker_role.person.work_email_or_best
+    end
   end
 
   describe "Rendering broker_hired template" do
