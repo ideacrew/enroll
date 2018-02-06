@@ -23,11 +23,15 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
                             :mpi_indicator => 'MPI_SHOP36',
                             :title => "Special Enrollment Period Approval"})
                           }
+  let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
+  let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 15)}
+  let(:title) { "had a baby"}
 
   let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
+      :options => {:qle_on => qle_on, :end_on => end_on, :title => title},
       :template => application_event.notice_template
   }}
 
@@ -66,8 +70,6 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
   end
 
   describe "append data" do
-    let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
-    let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 15)}
     let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
     let(:sep1) {family.special_enrollment_periods.new}
     let(:sep2) {family.special_enrollment_periods.new}
@@ -79,7 +81,7 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
       @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
       sep1.qle_on = qle_on
       sep1.end_on = end_on
-      sep1.title = "had a baby"
+      sep1.title = title
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       @employee_notice.append_data
       @employee_notice.build
@@ -91,7 +93,7 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
       @employee_notice.append_data
       expect(@employee_notice.notice.sep.qle_on).to eq qle_on
       expect(@employee_notice.notice.sep.end_on).to eq end_on
-      expect(@employee_notice.notice.sep.title).to eq "had a baby"
+      expect(@employee_notice.notice.sep.title).to eq title
     end
 
     it "should render ee_sep_request_accepted_notice" do

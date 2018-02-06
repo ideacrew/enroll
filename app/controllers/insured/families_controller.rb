@@ -149,6 +149,7 @@ class Insured::FamiliesController < FamiliesController
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
+      @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
@@ -284,7 +285,11 @@ class Insured::FamiliesController < FamiliesController
   def ee_sep_request_accepted_notice
     employee_role = @person.active_employee_roles.first
     if employee_role.present? && employee_role.census_employee.present?
-      employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice")
+      begin
+        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
+      rescue Exception => e
+        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
+      end
     end
   end
 
