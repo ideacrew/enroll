@@ -485,7 +485,7 @@ function enableSave(form){
   form.find('.interaction-click-control-save').removeClass('disabled');
 }
 
-$(':input[required]').on('change', function(){
+$(':input[required]').on('keyup change', function(){
   var form = $(this).closest('form');
   if (validateForm(form)){
     enableSave(form)
