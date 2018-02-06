@@ -31,8 +31,4 @@ class ResidentRolePolicy < ApplicationPolicy
   def ridp_bypass?
     begin_resident_enrollment?
   end
-  def can_access_resident_application_sub_tab?
-    return @user.person.hbx_staff_role.permission.can_access_resident_application_sub_tab if (@user.person && @user.person.hbx_staff_role)
-    return false
-  end
 end
