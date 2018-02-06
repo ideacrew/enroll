@@ -21,7 +21,6 @@ When(/^hbx admin uploads application document and verifies application$/) do
   find('.v-type-confirm-button').click
 
   expect(page).to have_content('Application successfully verified.')
-  find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^Hbx admin visits household info page$/) do

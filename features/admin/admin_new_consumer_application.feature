@@ -14,8 +14,6 @@ Background: Hbx Admin navigates into the new consumer application with paper app
   Scenario: Hbx Admin uploads and verifies application document
     Given Hbx Admin is on ridp document upload page
     When hbx admin uploads application document and verifies application
-    Then Hbx admin visits household info page
-    And Admin continues to families home page
     And Hbx Admin logs out
     When Individual visits the Insured portal outside of open enrollment
     Then Individual creates a new HBX account
