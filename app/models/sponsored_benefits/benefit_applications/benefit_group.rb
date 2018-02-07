@@ -1,6 +1,7 @@
 module SponsoredBenefits
   module BenefitApplications
     class BenefitGroup < ::BenefitGroup
+      include Config::AcaModelConcern
       embedded_in :benefit_application
       delegate :effective_period, to: :benefit_application
       delegate :sic_code, to: :benefit_application
@@ -18,12 +19,20 @@ module SponsoredBenefits
       end
 
       def plan_year
-        OpenStruct.new(
+        args = {
           :start_on => effective_period.begin,
-          :sic_code => sic_code,
-          :rating_area => rating_area,
           :estimate_group_size? => true
-        )
+        }
+
+        if standard_industrial_classification_enabled?
+          args.merge!({:sic_code => sic_code})
+        end
+        
+        if market_rating_areas.any?
+          args.merge!({:rating_area => rating_area})
+        end
+
+        OpenStruct.new(args)
       end
 
       def employee_costs_for_reference_plan
@@ -58,6 +67,9 @@ module SponsoredBenefits
         @highest_cost_plan ||= ::Plan.find(highest_cost_plan_id)
       end
 
+      def sole_source?
+        offer_sole_source?
+      end
     end
   end
 end
