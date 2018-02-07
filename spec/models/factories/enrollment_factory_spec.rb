@@ -18,6 +18,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     )
   }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+    
   let!(:census_employee) {
     FactoryGirl.create(:census_employee,
       hired_on: hired_on,
