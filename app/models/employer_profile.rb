@@ -167,27 +167,15 @@ class EmployerProfile
   end
 
   def employer_broker_fired
-    begin
-      trigger_notices('employer_broker_fired')
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
-    end
+    trigger_notices('employer_broker_fired')
   end
 
   def broker_agency_fired_confirmation
-    begin
-      trigger_notices("broker_agency_fired_confirmation")
-    rescue Exception => e
-      puts "Unable to deliver broker agency fired confirmation notice to #{active_broker_agency_account.legal_name} due to #{e}" unless Rails.env.test?
-    end
+    trigger_notices("broker_agency_fired_confirmation")
   end
 
   def broker_fired_confirmation_to_broker
-    begin
-      trigger_notices('broker_fired_confirmation_to_broker')
-    rescue Exception => e
-      puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
-    end
+    trigger_notices('broker_fired_confirmation_to_broker')
   end
 
   def employer_broker_fired
@@ -813,29 +801,17 @@ class EmployerProfile
         start_on_1 = (new_date+1.month).beginning_of_month
         if (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
           initial_employers_reminder_to_publish(start_on_1).each do|organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
-            rescue Exception => e
-              Rails.logger.error { "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-            end
+            organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
           end
         elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
           initial_employers_reminder_to_publish(start_on_1).each do |organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
-            rescue Exception => e
-              Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-            end
+            organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
           end
         else
           plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
           if (new_date + 2.days == plan_year_due_date)
             initial_employers_reminder_to_publish(start_on_1).each do |organization|
-              begin
-                organization.employee_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
-              rescue Exception => e
-                Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-              end
+              organization.employee_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
             end
           end
         end
@@ -1180,7 +1156,7 @@ class EmployerProfile
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
     rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+      Rails.logger.error { "Unable to deliver #{event.humanize} notice #{self.legal_name} due to #{e}" }
     end
   end
 

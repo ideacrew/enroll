@@ -1306,13 +1306,13 @@ class PlanYear
 
   def initial_employer_open_enrollment_begins
     return true if (benefit_groups.any?{|bg| bg.is_congress?})
-      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
+    self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
   end
 
   def initial_employer_denial_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-        self.employer_profile.trigger_notices("initial_employer_denial")
+      self.employer_profile.trigger_notices("initial_employer_denial")
     end
   end
 
@@ -1322,7 +1322,7 @@ class PlanYear
       bg.finalize_composite_rates
     end
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-      self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
   end
 
   def renewal_successful
@@ -1336,7 +1336,7 @@ class PlanYear
 
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+    self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
   end
 
   def renewal_employer_open_enrollment_completed
