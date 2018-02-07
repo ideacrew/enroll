@@ -17,12 +17,15 @@ module SponsoredBenefits
       include Mongoid::Timestamps
       # include Concerns::Observable
 
-      ENROLLMENT_FREQUENCY_KINDS = [ :annual, :rolling_month ]
-
       embedded_in :benefit_sponsorable, polymorphic: true
 
       # Obtain this value from site settings
-      field :benefit_market, type: Symbol
+      field :benefit_market_kind, type: Symbol
+
+      field :contact_method, type: String, default: "Paper and Electronic communications"
+
+      # This sponsorship's workflow status
+      field :aasm_state, type: String, default: :applicant
 
       ## Example sponsor enrollment periods
       # DC Individual Market Initial & Renewal:  Jan 1 - Dec 31
@@ -36,11 +39,10 @@ module SponsoredBenefits
       field :initial_enrollment_period, type: Range
       field :annual_enrollment_period_begin_month, type: Integer
       field :enrollment_frequency, type: Symbol, default: :rolling_month
-      field :contact_method, type: String, default: "Paper and Electronic communications"
 
-      embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      has_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :benefit_market, :contact_method
+      validates_presence_of :benefit_market_kind, :contact_method
 
       validates :enrollment_frequency,
         inclusion: { in: ENROLLMENT_FREQUENCY_KINDS, message: "%{value} is not a valid enrollment frequency kind" },

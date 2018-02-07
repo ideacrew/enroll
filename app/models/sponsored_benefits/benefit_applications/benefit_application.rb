@@ -4,41 +4,23 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
-
-      delegate :sic_code, to: :benefit_sponsorship
-      delegate :rating_area, to: :benefit_sponsorship
-      delegate :census_employees, to: :benefit_sponsorship
-      delegate :plan_design_organization, to: :benefit_sponsorship
-      
-     ### Deprecate -- use effective_period attribute
-      # field :start_on, type: Date
-      # field :end_on, type: Date
 
       # The date range when this application is active
       field :effective_period,        type: Range
 
-      ### Deprecate -- use open_enrollment_period attribute
-      # field :open_enrollment_start_on, type: Date
-      # field :open_enrollment_end_on, type: Date
-
       # The date range when members may enroll in benefit products
       field :open_enrollment_period,  type: Range
+
+      # This application's workflow status
+      field :aasm_state, type: String
 
       # Populate when enrollment is terminated prior to open_enrollment_period.end
       # field :terminated_early_on, type: Date
 
-      # field :sponsorable_id, type: String
-      # field :rosterable_id, type: String
-      # field :broker_id, type: String
-      # field :kind, type: :symbol
-
-      # has_one :rosterable, as: :rosterable
-
-      embeds_many :benefit_groups, class_name: "SponsoredBenefits::BenefitApplications::BenefitGroup", cascade_callbacks: true
-
-      # embeds_many :benefit_packages, as: :benefit_packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
-      # accepts_nested_attributes_for :benefit_packages
+      belongs_to  :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      belongs_to  :benefit_market,      class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+      embeds_many :benefit_packages,    class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
+      accepts_nested_attributes_for :benefit_packages
 
       # ## Override with specific benefit package subclasses
       #   embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
@@ -223,15 +205,6 @@ module SponsoredBenefits
         end
 
 
-        def open_enrollment_period_by_effective_date(effective_date)
-          earliest_begin_date = (effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
-
-          prior_month = effective_date - 1.month
-
-          begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
-          end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
-          begin_on..end_on
-        end
 
 
         def find(id)
