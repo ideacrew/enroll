@@ -3,13 +3,13 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :renewal_application_created,
-      :initial_application_submitted,
+      :initial_employer_application_approval,
       :renewal_application_submitted,
       :renewal_application_autosubmitted,
       :renewal_enrollment_confirmation,
       :ineligible_initial_application_submitted,
       :ineligible_renewal_application_submitted,
-      :open_enrollment_began,
+      # :open_enrollment_began, #not being used
       :application_denied,
       :renewal_application_denied
     ]
@@ -38,7 +38,7 @@ module ModelEvents
         end
 
         if is_transition_matching?(to: [:published, :enrolling], from: :draft, event: :publish)
-          is_initial_application_submitted = true
+          is_initial_employer_application_approval = true
         end
 
         if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)
@@ -53,9 +53,10 @@ module ModelEvents
           is_renewal_application_autosubmitted = true
         end
 
-        if enrolling? || renewing_enrolling?
-          is_open_enrollment_began = true
-        end
+        # Not being used any wherer as of now
+        # if enrolling? || renewing_enrolling?
+        #   is_open_enrollment_began = true
+        # end
 
         if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
           is_application_denied = true
