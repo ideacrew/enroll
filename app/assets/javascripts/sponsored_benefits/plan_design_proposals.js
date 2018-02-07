@@ -353,9 +353,9 @@ function checkContributionLevels(contributions) {
 
   values_to_check.forEach(function(contribution){
     if(contribution.relationship == 'employee' || contribution.relationship == 'employee_only') {
-      contributions_are_valid.push((contribution.premium_pct >= minimum_employee_contribution));
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_employee_contribution)));
     } else if (contribution.relationship == 'family'){
-      contributions_are_valid.push((contribution.premium_pct >= minimum_family_contribution));
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_family_contribution)));
     }
   });
   return contributions_are_valid.every(function(val) {
