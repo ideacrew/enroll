@@ -12,8 +12,12 @@ require 'auth_token'
   def create
     if format_json?
       @user = User.new(user_params)
-      token = AuthToken.issue_token({ user_id: resource.id }) if @user.save
-      render json: { token: token }
+      if @user.save
+        token = AuthToken.issue_token({ user_id: resource.id })
+        render json: { token: token }
+      else
+        render json: { status: 401, errors: "An account with this username or email already exists." }
+      end
     else
       build_resource(sign_up_params)
       #   Check for curam user email, if present then restrict the user.

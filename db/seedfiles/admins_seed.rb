@@ -28,7 +28,7 @@ hbx_profile = organization.build_hbx_profile(
     us_state_abbreviation: aca_state_abbreviation,
     benefit_sponsorship: BenefitSponsorship.new(
         geographic_rating_areas: [geographic_rating_area],
-        service_markets: Settings.aca.market_kinds,
+        service_markets: Settings.site.aca_market_kinds,
         benefit_coverage_periods: [
             BenefitCoveragePeriod.new(
                 start_on: Date.new(2015, 1, 1),

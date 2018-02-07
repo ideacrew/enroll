@@ -9,7 +9,7 @@ bk1 = BrokerRole.find_by_npn("2068981")
 bk0 = BrokerRole.find_by_npn("1682443")
 
 supported_state_abbreviation = Settings.aca.state_abbreviation
-supported_market_type = Settings.aca.market_kinds.count == 2 ? 'both' : Settings.aca.market_kinds.first
+supported_market_type = Settings.site.aca_market_kinds.count == 2 ? 'both' : Settings.site.aca_market_kinds.first
 
 office0 = OfficeLocation.new(address: {kind: "work", address_1: "101 Main St", city: "Washington", state: supported_state_abbreviation, zip: "20001"}, phone: {kind: "work", area_code: "202", number: "555-1212"})
 org0 = Organization.new(legal_name: "ACME Agency", fein: "034267010", office_locations: [office0], dba: "Acme")

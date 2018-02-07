@@ -423,11 +423,21 @@ Rails.application.routes.draw do
   namespace :api, :defaults => {:format => 'xml'} do
     namespace :v1 do
       resources :test
+      namespace :broker_agencies do
+        resources :broker_roles, only: [:create] do
+          collection do
+            get :new_broker
+            get :new_staff_member
+            get :new_broker_agency
+            get :search_broker_agency
+          end
+        end
+      end
       resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
         get :search, on: :collection
         get :privacy, on: :collection
         post :match, on: :collection
-        post :build, on: :collectio
+        post :build, on: :collection
       end
       resources :slcsp, :only => []  do
         collection do
