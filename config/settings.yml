@@ -27,10 +27,27 @@ contact_center:
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
+plan_option_titles:
+  sole_source: 'One Plan'
+  metal_level: 'One Level'
+  single_carrier: 'One Carrier'
+  single_plan: 'Single Plan'
+
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   hbx_abbreviation: "DC Health Benefit Exchange"
+  market_kinds: ["shop", "individual"]
+  nationwide_markets: false
+  general_agency_enabled: false
+  dental_market_enabled: true
+  # dental_plan_years_available: [""]
+  # minimum_primary_contribution_percentage: 50
+  # minimum_family_contribution_percentage: 30
+  plan_options_available: ["single_carrier", "metal_level", "single_plan"]
+  ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+  reference_carriers_for_metal_level: ["bronze", "silver", "gold", "dental"]
+
 #
   qle:
     with_in_sixty_days: 60
@@ -109,10 +126,15 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    use_simple_employer_calculation_model: true
+    offerings_constrained_to_service_areas: false
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+    enforce_employer_attestation: false
     standard_industrial_classification: false
+    carrier_filters_enabled: false
+    rating_areas: []
 
 paper_notice: 'paper-notices'
 checkbook_services: 

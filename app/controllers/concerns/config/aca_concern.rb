@@ -18,6 +18,10 @@ module Config::AcaConcern
     end
   end
 
+  def use_simple_employer_calculation_model?
+    (Settings.aca.shop_market.use_simple_employer_calculation_model.to_s.downcase == "true")
+  end
+
   def general_agency_is_enabled?
      Settings.aca.general_agency_enabled
   end
@@ -30,6 +34,6 @@ module Config::AcaConcern
   end
 
   def standard_industrial_classification_enabled?
-    @@standard_industrial_classification_enabled ||= Settings.aca.shop_market.standard_industrial_classification
+    Settings.aca.shop_market.standard_industrial_classification
   end
 end

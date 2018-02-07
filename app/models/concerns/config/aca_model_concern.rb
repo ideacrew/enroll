@@ -19,6 +19,8 @@ module Config::AcaModelConcern
     delegate :non_owner_participation_count_minimum, to: :class
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
     delegate :standard_industrial_classification_enabled?, to: :class
+    delegate :offer_sole_source?, to: :class
+    delegate :carrier_filters_enabled?, to: :class
   end
 
   class_methods do
@@ -55,15 +57,15 @@ module Config::AcaModelConcern
     end
 
     def use_simple_employer_calculation_model?
-      @@use_simple_employer_calculation_model ||= (Settings.aca.use_simple_employer_calculation_model.to_s.downcase == "true")
+      @@use_simple_employer_calculation_model ||= (Settings.aca.shop_market.use_simple_employer_calculation_model.to_s.downcase == "true")
     end
 
     def market_rating_areas
-      @@market_rating_areas ||= Settings.aca.rating_areas
+      @@market_rating_areas ||= Settings.aca.shop_market.rating_areas
     end
 
     def multiple_market_rating_areas?
-      @@multiple_market_rating_areas ||= Settings.aca.rating_areas.many?
+      @@multiple_market_rating_areas ||= Settings.aca.shop_market.rating_areas.many?
     end
 
     def constrain_service_areas?
@@ -88,6 +90,14 @@ module Config::AcaModelConcern
 
     def standard_industrial_classification_enabled?
       @@standard_industrial_classification_enabled ||= Settings.aca.shop_market.standard_industrial_classification
+    end
+
+    def offer_sole_source?
+      @@offer_sole_source ||= Settings.aca.plan_options_available.include?("sole_source")
+    end
+
+    def carrier_filters_enabled?
+      @@carrier_filters_enabled ||= Settings.aca.shop_market.carrier_filters_enabled
     end
   end
 end
