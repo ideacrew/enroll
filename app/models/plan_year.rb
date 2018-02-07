@@ -933,8 +933,8 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
-      transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => [:initial_employer_approval_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster, :record_sic_and_rating_area]
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => [:zero_employees_on_roster, :record_sic_and_rating_area]
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
@@ -1259,11 +1259,7 @@ class PlanYear
   def zero_employees_on_roster
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
-      begin
         self.employer_profile.trigger_notices("zero_employees_on_roster")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
     end
   end
 
@@ -1275,15 +1271,6 @@ class PlanYear
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
-    end
-  end
-
-  def initial_employer_approval_notice
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
-    begin
-      self.employer_profile.trigger_notices("initial_employer_approval")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
@@ -1316,17 +1303,16 @@ class PlanYear
           Rails.logger.error { "Unable to deliver employee employer renewal denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
         end
       end
-    end
+
+  def initial_employer_open_enrollment_begins
+    return true if (benefit_groups.any?{|bg| bg.is_congress?})
+      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
   end
 
   def initial_employer_denial_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-      begin
         self.employer_profile.trigger_notices("initial_employer_denial")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
     end
   end
 
@@ -1336,11 +1322,7 @@ class PlanYear
       bg.finalize_composite_rates
     end
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    begin
       self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
   end
 
   def renewal_successful
@@ -1354,11 +1336,7 @@ class PlanYear
 
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
-    begin
       self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
   end
 
   def renewal_employer_open_enrollment_completed
