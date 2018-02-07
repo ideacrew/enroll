@@ -18,7 +18,7 @@ module TransportProfiles
       })
       entries = @gateway.list_entries(query)
       matching_entries = if !@transform_blk.nil?
-                           @transform_blk.call(entries)
+                           @transform_blk.call(entries, process_context)
                          else
                            entries
                          end
