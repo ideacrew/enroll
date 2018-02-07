@@ -1,1 +1,1 @@
-::Acapi::AmqpEventWorker.run!
+::Acapi::AmqpEventWorker.run
