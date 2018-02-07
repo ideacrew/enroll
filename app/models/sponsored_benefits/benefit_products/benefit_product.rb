@@ -6,14 +6,14 @@ module SponsoredBenefits
 
       BENEFIT_PRODUCT_KINDS = [:health, :dental]
 
-      has_and_belongs_to_many :benefit_market_service_periods, class_name: "SponsoredBenefits::BenefitMarketservicePeriod"
+      has_and_belongs_to_many :benefit_service_periods, class_name: "SponsoredBenefits::BenefitMarketservicePeriod"
 
-      field :issuer_profile_id,                 type: BSON::ObjectId
-      field :benefit_market_service_period_id,  type: BSON::ObjectId
-      field :benefit_product_kind,              type: Symbol
+      field :issuer_profile_id,         type: BSON::ObjectId
+      field :benefit_service_period_id, type: BSON::ObjectId
+      field :benefit_product_kind,      type: Symbol
 
-      field :purchase_period,                   type: Range           # => jan 1 - dec 31, 2018
-      field :hios_id,                           type: String
+      field :purchase_period,           type: Range           # => jan 1 - dec 31, 2018
+      field :hios_id,                   type: String
 
 
       embeds_many :rating_areas,          class_name: "SponsoredBenefits::BenefitProducts::RatingArea"
