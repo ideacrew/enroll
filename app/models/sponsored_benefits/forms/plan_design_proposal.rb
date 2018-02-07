@@ -105,11 +105,15 @@ module SponsoredBenefits
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
         benefit_group = application.benefit_groups.first || construct_new_benefit_group
-        if benefit_group.relationship_benefits.empty?
-          benefit_group.build_relationship_benefits
-        end
-        if benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
+
+        if use_simple_employer_calculation_model?
+          if benefit_group.relationship_benefits.empty?
+            benefit_group.build_relationship_benefits
+          end
+        else
+          if benefit_group.composite_tier_contributions.empty?
+            benefit_group.build_composite_tier_contributions
+          end
         end
       end
 
@@ -117,8 +121,11 @@ module SponsoredBenefits
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
         benefit_group = application.benefit_groups.build
-        benefit_group.build_relationship_benefits
-        benefit_group.build_composite_tier_contributions
+        if use_simple_employer_calculation_model?
+          benefit_group.build_relationship_benefits
+        else
+          benefit_group.build_composite_tier_contributions
+        end
         benefit_group
       end
 

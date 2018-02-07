@@ -19,8 +19,10 @@
       </div>
     </div>
     <div class="col-xs-12 benefits-fields">
+      <% if f.object.sole_source? %>
       <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb|  %>
         <%= render "shared/composite_tier_contribution_fields", f: rb %>
+      <% end %>
       <% end %>
     </div>
   </div>
