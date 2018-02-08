@@ -15,7 +15,7 @@ module Services
       def generate_url
         return @url if is_congress
         begin
-         puts construct_body.to_json
+          puts construct_body.to_json
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
                 :headers => { 'Content-Type' => 'application/json' } )
@@ -67,7 +67,7 @@ module Services
 
       def build_family
         family = [{'dob': census_employee.dob.strftime("%Y-%d-%m") ,'relationship': 'self'}]
-        census_employee.try(:census_dependents).each do |dependent|
+        census_employee.census_dependents.each do |dependent|
           next if dependent == "nephew_or_niece"
           family << {'dob': dependent.dob.strftime("%Y-%d-%m") ,'relationship': dependent.employee_relationship}
         end
