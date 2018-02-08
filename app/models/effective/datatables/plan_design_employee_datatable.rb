@@ -17,7 +17,7 @@ module Effective
         }, :sortable => false, :filter => false
 
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row|
-          row.dob
+          row.dob.strftime("%m/%d/%Y")
         }, :sortable => false, :filter => false
 
         table_column :hired_on, :proc => Proc.new { |row|
