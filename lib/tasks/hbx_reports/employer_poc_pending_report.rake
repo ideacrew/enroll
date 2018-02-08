@@ -5,7 +5,7 @@ namespace :shop do
 
     roles = Person.where(:employer_staff_roles.exists => true).map(&:employer_staff_roles).flatten
     pending = roles.select{|role| role.aasm_state == 'is_applicant'}
-    file_name = fetch_file_format('er_poc_pending_app_report')
+    file_name = fetch_file_format('er_poc_pending_app_report', 'ERPOCPENDINGAPP')
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << ['ER POC Applicant Name','ER POC Email Address','ER Legal Name','ER FEIN','ER POC Application Date Time']

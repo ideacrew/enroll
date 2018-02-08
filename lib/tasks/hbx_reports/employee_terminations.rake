@@ -14,7 +14,7 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = fetch_file_format('employee_terminations')
+      file_name = fetch_file_format('employee_terminations', 'EMPLOYEETERMINATIONS')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names

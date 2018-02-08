@@ -13,7 +13,7 @@ namespace :reports do
         :open_enrollment_end_on => {"$gte" => window_date},
         :aasm_state.in => valid_states}})
 
-      file_name = fetch_file_format('employers_failing_minimum_participation')
+      file_name = fetch_file_format('employers_failing_minimum_participation', 'EMPLOYERSFAILINGMINIMUMPARTICIPATION')
 
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 

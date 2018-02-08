@@ -29,7 +29,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
 
         processed_count = 0
 
-        file_name = fetch_file_format('edi_enrollment_termination_report')
+        file_name = fetch_file_format('edi_enrollment_termination_report', 'EDIENROLLMENTTERMINATION')
 
         CSV.open(file_name, "w", force_quotes: true) do |csv|
           csv << field_names

@@ -8,7 +8,7 @@ namespace :employers do
 
     orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
-    file_name = fetch_file_format('employer_export')
+    file_name = fetch_file_format('employer_export','EMPLOYEREXPORT')
 
     def get_primary_office_location(organization)
       organization.office_locations.detect do |office_location|

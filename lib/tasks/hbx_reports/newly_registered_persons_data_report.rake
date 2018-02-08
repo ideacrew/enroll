@@ -40,7 +40,7 @@ require 'csv'
            Ethnicity
          )
        count = 0
-       file_name = fetch_file_format('new_registered_persons_data_report')
+       file_name = fetch_file_format('new_registered_persons_data_report', 'NEWREGISTEREDPERSONSDATA')
  
       CSV.open(file_name, "w", force_quotes: true) do |csv|
          csv << field_names

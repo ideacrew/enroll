@@ -19,7 +19,7 @@ namespace :reports do
         )
       processed_count = 0
 
-      file_name = fetch_file_format('brokers_list_with_URL_from_admin_approval')
+      file_name = fetch_file_format('brokers_list_with_URL_from_admin_approval', 'BROKERSLISTWITHURLFROMADMINAPPROVAL')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
