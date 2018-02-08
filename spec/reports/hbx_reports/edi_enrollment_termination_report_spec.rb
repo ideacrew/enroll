@@ -70,7 +70,7 @@ describe TerminatedHbxEnrollments do
     before :each do
       allow(TimeKeeper).to receive(:date_of_record).and_return(date)
       allow(TimeKeeper).to receive(:datetime_of_record).and_return(fixed_time)
-     @file = File.expand_path("#{Rails.root}/public/CCA_test_edi_enrollment_termination_report_2018_01_01_Monday_10_00_00.csv")
+     @file = File.expand_path("#{Rails.root}/public/CCA_test_edi_enrollment_termination_report_2018_01_01_10_00_00.csv")
      allow(Time).to receive(:now).and_return(time_now)
      allow(Publishers::Legacy::EdiEnrollmentTerminationReportPublisher).to receive(:new).and_return(publisher)
      allow(publisher).to receive(:publish).with(URI.join("file://", @file))

@@ -74,45 +74,14 @@ module Config::AcaHelper
     response
   end
 
-  # Allows us to use time, date and day inside application
-  # @return [Hash] fetch_format assigns options for key-value pair
-  # @date_extract opts [Array<Integer>] for instance ['YYYY', 'MM', 'DD']
-  # @fetch_day opts [Array<String>] for instance ['Friday']
-  # @time_extract opts [Array<String>] for instance ['HH', 'MM', 'SS']
-  #
-  # Note: Time values will be extracted based on UTC time format
-  def fetch_CCA_required_file_format
-    fetch_format = Hash.new
-    fetch_format['date_extract'] = TimeKeeper.date_of_record.try(:strftime, '%Y-%m-%d').split('-')
-    fetch_format['fetch_day'] = TimeKeeper.date_of_record.try(:strftime, '%A')
-    fetch_format['time_extract'] = TimeKeeper.datetime_of_record.try(:strftime, '%H:%M:%S').split(':')
-
-    fetch_format
-  end
-
-  # CCA Requested a specific format of file while generating reports
-  #
-  # @param [Hash] file_format will hold key value pair of date,time and day
-  # @param [String] task_name will hold the name of task for instance 'employers'
-  #
-  # @return [String] absolute path location to writing a CSV
-  def extract_and_concat_file_path(file_format, task_name)
-    date_extract = file_format.fetch('date_extract')
-    fetch_day = file_format.fetch('fetch_day')
-    time_extract = file_format.fetch('time_extract')
-
-    File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name}_#{date_extract[0]}_#{date_extract[1]}_#{date_extract[2]}_#{fetch_day}_#{time_extract[0]}_#{time_extract[1]}_#{time_extract[2]}.csv")
-  end
-
   def fetch_file_format(task_name)
-    time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
     if individual_market_is_enabled?
+      time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
       File.expand_path("#{Rails.root}/public/#{task_name}_#{time_stamp}.csv")
     else
       # For MA stakeholders requested a specific file format
-      file_format = fetch_CCA_required_file_format
-      # once after fetch extract those params and return file_path
-      extract_and_concat_file_path(file_format, task_name)
+      time_extract = TimeKeeper.datetime_of_record.try(:strftime, '%Y_%m_%d_%H_%M_%S')
+      File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name}_#{time_extract}.csv")
     end
   end
 
