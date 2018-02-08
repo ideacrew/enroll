@@ -267,6 +267,28 @@ And(/I should see the individual home page/) do
   # click_link "My #{Settings.site.short_name}"
 end
 
+When(/^I can click on Shop for Plans link$/) do
+  find(".interaction-click-control-shop-for-plans").click
+end
+
+Then(/^I should land on Coverage household page$/) do
+  expect(page).to have_content 'Choose Coverage for your Household'
+end
+
+And(/^I click on shop for plans button on home page$/) do
+  find(:xpath, "//*[@id='shop-for-plans-widget']/div/div/div[2]/button").click
+end
+
+Then(/^I should not see not under open enrollment text$/) do
+  expect(page).not_to have_content 'You are not under open enrollment period.'
+  expect(page).to have_content 'Open enrollment is over, but you still may be able to enroll now if you qualify for a Special Enrollment Period.'
+end
+
+Then(/^I should see banner with text you qualify for sep$/) do
+  expect(page).to have_content 'You qualify for a Special Enrollment Period (SEP)'
+  expect(page).not_to have_content 'You are not under open enrollment period.'
+end
+
 Then(/^Individual edits a dependents address$/) do
   click_link 'Add Member'
 end
