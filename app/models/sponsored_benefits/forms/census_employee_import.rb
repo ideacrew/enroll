@@ -323,10 +323,10 @@ module SponsoredBenefits
         cell.blank? ? nil : sanitize_value(cell)
       end
 
-      def parse_date(cell, filed_name="date")
+      def parse_date(cell, field_name="date")
         return nil if cell.blank?
-        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, "#{filed_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
-        return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, "#{filed_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
+        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, "#{field_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
+        return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, "#{field_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
         # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
         cell.blank? ? nil : cell
