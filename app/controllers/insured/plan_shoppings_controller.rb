@@ -169,7 +169,7 @@ class Insured::PlanShoppingsController < ApplicationController
         employee_role.employer_profile.active_plan_year.benefit_groups.any?{|bg| bg.is_congress} 
       end rescue nil
       # @census_employee=@hbx_enrollment.employee_role.census_employee.employer_profile.plan_years.first.benefit_groups.first.is_congress?
-      @dc_checkbook_url = is_congress_employee.present?  ? Settings.checkbook_services.congress_url : ::CheckbookServices::PlanComparision.new(@hbx_enrollment.employee_role.census_employee).generate_url
+      @dc_checkbook_url = is_congress_employee.present?  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment.employee_role.census_employee).generate_url
     end
     #@dc_congress_checkbook_url = CheckbookServices::PlanComparision.new(@hbx_enrollment.employee_role.census_employee).generate_congress_url
     @carriers = @carrier_names_map.values
