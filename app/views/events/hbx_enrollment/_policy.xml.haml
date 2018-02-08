@@ -22,6 +22,8 @@
         %total_employer_responsible_amount=(hbx_enrollment.total_employer_contribution).round(2)
         - if hbx_enrollment.composite_rated?
           %composite_rating_tier_name= "urn:openhbx:terms:v1:composite_rating_tier##{hbx_enrollment.composite_rating_tier}"
+        - if hbx_enrollment.is_cobra_status?
+          %cobra_eligibility_date= simple_date_for(hbx_enrollment.cobra_eligibility_date)
     - else
       %individual_market
         %is_carrier_to_bill true
