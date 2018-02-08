@@ -62,6 +62,9 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
     it "should return assignment end date" do
       expect(@broker_notice.notice.termination_date).to eq broker_agency_account.end_on
     end
+    it "should return broker email" do
+      expect(@broker_notice.notice.broker_email).to eq broker_agency_profile.primary_broker_role.person.work_email_or_best
+    end
   end
 
   describe "Render template & Generate PDF" do

@@ -11,7 +11,7 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
     args[:recipient] = broker_agency_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new
-    args[:to] = broker_agency_profile.primary_broker_role.email_address
+    args[:to] = broker_agency_profile.primary_broker_role.person.work_email_or_best
     args[:name] = broker_agency_profile.primary_broker_role.person.full_name
     args[:recipient_document_store] = broker_agency_profile
     self.header = "notices/shared/shop_header.html.erb"
@@ -38,9 +38,9 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
       employer_first_name: employer_profile.staff_roles.first.first_name,
       employer_phone: employer_profile.staff_roles.first.work_phone_or_best,
       employer_last_name: employer_profile.staff_roles.first.last_name,
-      employer_email: employer_profile.staff_roles.first.work_email_or_best,
-
+      employer_email: employer_profile.staff_roles.first.work_email_or_best
     })
+    notice.broker_email = broker_agency_profile.primary_broker_role.person.work_email_or_best
     notice.broker_agency = broker_agency_profile.legal_name.titleize
     address = broker_agency_profile.organization.primary_mailing_address.present? ? broker_agency_profile.organization.primary_mailing_address : broker_agency_profile.organization.primary_office_location.address
     append_address(address)

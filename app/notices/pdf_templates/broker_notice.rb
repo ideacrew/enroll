@@ -19,6 +19,7 @@ module PdfTemplates
     attribute :last_name, String
     attribute :termination_date, Date
     attribute :first_name, String
+    attribute :broker_email, String
     attribute :last_name, String
     attribute :hbx_id, String
     attribute :employer_first_name, String
