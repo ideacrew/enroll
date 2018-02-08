@@ -1,8 +1,8 @@
 <div class="container-fluid">
   <h2><%= l10n("quote_employer_cost_comparison_results")%></h2>
 
-  <p><%= l10n("your_results_are_based_on_your_quote")%> <strong><%= @q.quote_name %></strong> <%= l10n("effective_on")%> <strong><%= @q.start_on %></strong></p>
-  <p> <%= l10n("here_are_the_costs_for_benefit_group")%> <strong><%= @q.title %></strong> </p>
+  <p><%= l10n("your_results_are_based_on_your_quote")%> <strong><%= @qbg.quote_name %></strong> <%= l10n("effective_on")%> <strong><%= @qbg.start_on %></strong></p>
+  <p> <%= l10n("here_are_the_costs_for_benefit_group")%> <strong><%= @qbg.title %></strong> </p>
   <p><%= l10n("employer_percentage_contributions")%>:</p>
   <ul>
     <% @qbg.quote_relationship_benefits.each do |qrb|
@@ -25,8 +25,8 @@
     <tr>
       <td class="quote_detail_results_header" ><%= l10n("plan")%></td>
       <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("lowest_reference_highest")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("lowest_reference_highest")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
     </tr>
     <% i = 0 %>
    <% @quote_results.each do |k,v| %>

@@ -1,10 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe "welcome/index.html.erb", :type => :view do
+RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  do
+  let(:user) { FactoryGirl.create(:user, oim_id: "test@enroll.com") }
 
   describe "a signed in user" do
-    let(:user) { FactoryGirl.create(:user, oim_id: "test@enroll.com") }
-
     before :each do
       sign_in user
     end
@@ -17,9 +16,6 @@ RSpec.describe "welcome/index.html.erb", :type => :view do
   end
 
   describe "not signed in user" do
-    # before :each do
-    #   sign_in user
-    # end
     context "with general agency enabled" do
       before :each do
         Settings.aca.general_agency_enabled = true
@@ -31,7 +27,6 @@ RSpec.describe "welcome/index.html.erb", :type => :view do
         expect(rendered).to match /General Agency Registration/
       end
     end
-
 
     context "with general agency disabled" do
       before :each do
