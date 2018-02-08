@@ -381,6 +381,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
         get :assign_history
+        get  :commission_statements
       end
       member do
         if Settings.aca.general_agency_enabled
