@@ -189,7 +189,7 @@ class Household
 
             if tax_household.eligibility_determinations.build(
               benchmark_plan_id: benchmark_plan_id,
-              max_aptc: verified_eligibility_determination.maximum_aptc,
+              max_aptc: verified_eligibility_determination.maximum_aptc.to_f > 0.00 ? verified_eligibility_determination.maximum_aptc : 0.00,
               csr_percent_as_integer: verified_eligibility_determination.csr_percent,
               determined_at: verified_eligibility_determination.determination_date,
               determined_on: verified_eligibility_determination.determination_date,
