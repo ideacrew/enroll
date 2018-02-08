@@ -158,7 +158,7 @@ class FinancialAssistance::Applicant
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
-  validate :presence_of_attr_step_1, on: :step_1
+  validate :presence_of_attr_step_1, on: [:step_1, :submission]
 
   validate :presence_of_attr_other_qns, on: :other_qns
   validate :driver_question_responses, on: :submission
