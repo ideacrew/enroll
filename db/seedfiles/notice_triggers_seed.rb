@@ -354,8 +354,8 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP14',
-    title: 'Open Enrollment Completed',
+    hbx_id: 'SHOP17',
+    title: 'Group Open Enrollment Successfully Completed',
     description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
     resource_name: 'employer',
     event_name: 'initial_employer_open_enrollment_completed',
