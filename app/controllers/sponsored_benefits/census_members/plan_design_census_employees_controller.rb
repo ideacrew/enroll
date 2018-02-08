@@ -72,10 +72,14 @@ module SponsoredBenefits
       @census_employee_import = SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: params.require(:file), proposal: @plan_design_proposal})
 
       respond_to do |format|
-        if @census_employee_import.save
-          format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
-        else
-          format.html { redirect_to :back, :flash => { :error => "Roster upload failed."} }
+        begin
+          if @census_employee_import.save
+            format.html { redirect_to :back, :flash => { :success => "Roster uploaded successfully."} }
+          else
+            format.html { redirect_to :back, :flash => { :error => "Roster upload failed."} }
+          end
+        rescue Exception => e
+          format.html { redirect_to :back, :flash => { :error => e.to_s} }
         end
       end
     end
