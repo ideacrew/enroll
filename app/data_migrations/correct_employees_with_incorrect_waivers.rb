@@ -21,7 +21,6 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
           active_coverage = enrollments.detect{|e|
             ['coverage_selected', 'coverage_enrolled', 'coverage_expired'].include?(e.aasm_state.to_s)
           }
-
           if waiver.present? && active_coverage.present?
             next if waiver.created_at.blank? || active_coverage.created_at.blank?
             active_submitted_at = active_coverage.submitted_at || active_coverage.created_at

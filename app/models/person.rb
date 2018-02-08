@@ -5,6 +5,7 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Mongoid::Attributes::Dynamic
   include SponsoredBenefits::Concerns::Ssn
   include SponsoredBenefits::Concerns::Dob
 
@@ -240,7 +241,7 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
-  
+
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
   end
@@ -652,7 +653,7 @@ class Person
       if first_name.present? && last_name.present? && dob_query.present?
         first_exp = /^#{first_name}$/i
         last_exp = /^#{last_name}$/i
-        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
+        matches.concat Person.active.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
       end
       matches.uniq
     end
