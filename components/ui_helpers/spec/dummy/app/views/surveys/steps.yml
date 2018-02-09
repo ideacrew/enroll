@@ -804,7 +804,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
+                  text: Will this person be claimed as a tax dependent for 2017? *
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
@@ -860,7 +860,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
+                  text: Will this person be claimed as a tax dependent for 2017? *
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
