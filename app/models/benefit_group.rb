@@ -435,6 +435,8 @@ class BenefitGroup
     case plan_option_kind
     when "single_plan"
       Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
+    when "sole_source"
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
     when "single_carrier"
       Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
     when "metal_level"
