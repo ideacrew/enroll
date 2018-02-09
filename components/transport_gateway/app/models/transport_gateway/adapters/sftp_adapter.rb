@@ -28,7 +28,7 @@ module TransportGateway
         Net::SFTP.start(target_uri.host, @user, default_options.merge(credential_options)) do |sftp|
           sftp.dir.foreach(target_uri.path) do |entry|
             if entry.file?
-              full_uri = URI.join(target_uri, entry.name)
+              full_uri = URI.join(target_uri, URI::Escape.encode(entry.name))
               result_list << TransportGateway::ResourceEntry.new(entry.name, full_uri, entry.attributes.size, entry.attributes.mtime)
             end
           end
