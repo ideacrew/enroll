@@ -52,7 +52,17 @@ class Insured::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
-    census_employees = actual_user.person.present? ? CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a : []
+
+    census_employees = if actual_user && actual_user.person.present?
+                         CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a
+                       else
+                         if params[:census_employee_id] && match = CensusEmployee.where("census_employee_id" => params[:census_employee_id]).first
+                           CensusEmployee.matchable(match.person.ssn, match.person.dob).to_a
+                         else
+                           []
+                         end
+                       end
+
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
     if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
