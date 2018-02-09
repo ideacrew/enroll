@@ -43,10 +43,9 @@ module Services
         },
         "family": build_family,
         "contribution": employer_contributions,
-        "reference_plan": census_employee.employer_profile.plan_years.first.benefit_groups.first.reference_plan.hios_id,
+        "reference_plan": census_employee.employer_profile.show_plan_year.benefit_groups.first.reference_plan.hios_id,
         "filterOption":"carrier",
         "filterValue": carrier_name
-        #"plans_available": census_employee.active_benefit_group.plan_year.benefit_groups.flat_map(&:elected_plans).map(&:hios_base_id)
       }
       end
 
