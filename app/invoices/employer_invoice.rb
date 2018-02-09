@@ -80,7 +80,9 @@ class EmployerInvoice
   # should trigger on conversion employers who has PlanYear::PUBLISHED
   def send_first_invoice_available_notice
     if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting_with_renewal_state? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
+      plan_year = @organization.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: @organization.employer_profile, event_object: plan_year, notice_event: "initial_employer_invoice_available") if plan_year.present?
     end
   end
 
