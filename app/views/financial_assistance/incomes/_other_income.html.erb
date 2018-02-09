@@ -2,7 +2,11 @@
   <div class="focus_effect_module other-income-show">
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">AMOUNT *</label>
+        <% if show_net_amount_for(other_income) %>
+          <label class="static_label label-floatlabel">NET AMOUNT *</label>
+        <% else %>
+          <label class="static_label label-floatlabel">AMOUNT *</label>
+        <% end %>
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= number_to_currency(other_income.amount) %></span>
       </div>
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
