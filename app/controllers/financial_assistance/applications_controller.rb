@@ -50,6 +50,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
+          dummy_data_5_year_bar(@application)
           if @application.publish(payload)
             #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
@@ -196,6 +197,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
         applicant.update_attributes!(:assisted_income_validation => "outstanding", :assisted_mec_validation => "outstanding", aasm_state: "verification_outstanding")
         applicant.assisted_verifications.each { |verification| verification.update_attributes!(status: "outstanding", verification_failed: true) }
       end
+    end
+  end
+
+  def dummy_data_5_year_bar(application)
+    if application.primary_applicant.present? && ["bar5"].include? application.primary_applicant.last_name.downcase
+      application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
     end
   end
 
