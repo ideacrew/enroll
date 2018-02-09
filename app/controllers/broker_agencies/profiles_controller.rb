@@ -183,7 +183,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def commission_statements
-    @id = params.require(:id)
+    @statements = ['2018', 2017]
+    permitted = params.permit(:id)
+    @id = permitted[:id]
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
     elsif current_user.has_hbx_staff_role?
@@ -194,8 +196,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
 
     respond_to do |format|
-      format.js { render 'broker_agencies/profiles/commission_statements' }
-      #format.html
+      format.js
     end
   end
 
