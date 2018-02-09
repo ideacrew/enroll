@@ -1,4 +1,9 @@
 module TransportProfiles
+  # Base class for all process workflows.
+  # 
+  # Workflows are implemented by subclassing this and defining an initialize method which invokes super and adds steps.
+  #
+  # If you would like to start by examining a complicted case, check out {TransportProfiles::Processes::Legacy::TransferPaymentProcessorReports}.
   class Processes::Process
 
     attr_reader :descriptions, :gateway, :steps
