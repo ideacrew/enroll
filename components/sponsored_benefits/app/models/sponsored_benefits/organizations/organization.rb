@@ -4,6 +4,15 @@ module SponsoredBenefits
     class Organization
       include Concerns::OrganizationConcern
 
+      # Organizations may be stored in a tree, with a parent "agency" associated with one or 
+      # more "divisions".  Defining one side of the association will automatically populate
+      # the other.  For example:
+      # org_a.divisions << org_b  # org_b.agency => org_a
+      # org_x.agency = org_y      # org_y.divisions => [org_x]
+      belongs_to :agency,  class_name: "SponsoredBenefits::Organizations::Organization",
+        inverse_of: :divisions
+      has_many :divisions, class_name: "SponsoredBenefits::Organizations::Organization",
+        inverse_of: :agency
 
       embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
       embeds_one :carrier_profile, cascade_callbacks: true, validate: true
