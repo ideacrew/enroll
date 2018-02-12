@@ -48,9 +48,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params[:commit] == "Submit Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+          dummy_data_5_year_bar(@application)
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
-          dummy_data_5_year_bar(@application)
           if @application.publish(payload)
             #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
