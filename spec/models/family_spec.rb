@@ -1618,3 +1618,23 @@ describe Family, "#take_initial_application_snapshot" do
     end
   end
 end
+
+describe "active dependents" do
+  let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person3) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryGirl.create(:household, family: family) }
+  let!(:family_member1) { FactoryGirl.create(:family_member, family: family,person: person2) }
+  let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: person3) }
+
+  it 'should return 2 active dependents when all the family member are active' do
+    allow(family_member2).to receive(:is_active).and_return(true)
+    expect(family.active_dependents.count).to eq 2
+  end
+
+  it 'should return 1 active dependent when one of the family member is inactive' do
+    allow(family_member2).to receive(:is_active).and_return(false)
+    expect(family.active_dependents.count).to eq 1
+  end
+end
