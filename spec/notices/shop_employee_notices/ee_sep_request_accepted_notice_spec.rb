@@ -24,14 +24,14 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
                             :title => "Special Enrollment Period Approval"})
                           }
   let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
-  let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 15)}
+  let(:end_on) {qle_on+30.days}
   let(:title) { "had a baby"}
 
   let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
-      :options => {:qle_on => qle_on, :end_on => end_on, :title => title},
+      :options => {:qle_on => qle_on.to_s, :end_on => end_on.to_s, :title => title},
       :template => application_event.notice_template
   }}
 
