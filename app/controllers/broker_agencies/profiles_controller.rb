@@ -11,6 +11,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
   before_action :redirect_unless_general_agency_is_enabled?, only: [:assign, :update_assign]
+  before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
   layout 'single_column'
 
@@ -194,10 +195,25 @@ class BrokerAgencies::ProfilesController < ApplicationController
       redirect_to new_broker_agencies_profile_path
       return
     end
-
+    collect_and_sort_commission_statments
     respond_to do |format|
       format.js
     end
+  end
+
+  def show_commission_statement
+    options={}
+    options[:filename] = @commission_statement.title
+    options[:type] = 'application/pdf'
+    options[:disposition] = 'inline'
+    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+  end
+
+  def download_commission_statement
+    options={}
+    options[:content_type] = @commission_statement.type
+    options[:filename] = @commission_statement.title
+    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
   end
 
   def employers
@@ -440,6 +456,19 @@ class BrokerAgencies::ProfilesController < ApplicationController
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
       location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
+  end
+
+  def check_and_download_commission_statement
+      @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+      authorize @broker_agency_profile, :access_to_broker_agency_profile?
+      @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
+  end
+
+  def collect_and_sort_commission_statments(sort_order='ASC')
+    #@statements = @broker_agency_profile.organization.try(:documents)
+    #TODO create helper and set setting
+    #@statement_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
+    #sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse! unless @documents
   end
 
   def find_hbx_profile

@@ -394,6 +394,8 @@ Rails.application.routes.draw do
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
+        get :download_commission_statement
+        get :show_commission_statement
       end
 
       resources :applicants
