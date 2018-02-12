@@ -6,6 +6,7 @@ module TransportProfiles
     def initialize(transport_process)
       @process = transport_process
       @context_values = Hash.new
+      @resource_cleanup_list = []
     end
 
     # Place a value into the context for use later on in the process.
@@ -31,6 +32,20 @@ module TransportProfiles
         @context_values[key.to_sym] = yield @context_values[key.to_sym]
       else
         @context_values[key.to_sym] = yield initial_value
+      end
+    end
+
+    # Mark a resource to be removed on process completion.
+    # @api private
+    def remember_to_clean_up(file_or_directory)
+      @resource_cleanup_list << file_or_directory
+    end
+
+    # Clean up the removable resources
+    # @api private
+    def execute_cleanup
+      @resource_cleanup_list.each do |file_or_dir|
+        FileUtils.rm_rf(file_or_dir)
       end
     end
   end
