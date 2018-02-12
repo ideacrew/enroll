@@ -201,7 +201,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def dummy_data_5_year_bar(application)
-    if application.primary_applicant.present? && ["bar5"].include? application.primary_applicant.last_name.downcase
+    if application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
       application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
     end
   end
