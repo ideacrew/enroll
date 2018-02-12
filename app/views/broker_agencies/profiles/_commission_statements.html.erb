@@ -12,7 +12,7 @@
             <th>View</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="commissions">
           <% @statements.each do |statement| %>
             <tr data-toggle="collapse" data-target="#collapse2" id="<%= statement %>" class="statement_years">
               <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> <%= statement %></td>
