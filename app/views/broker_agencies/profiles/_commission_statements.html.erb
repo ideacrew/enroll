@@ -24,10 +24,10 @@
               <% if invoices_2.empty? %>
                 <tr class="invoices <%= statement %>">
                   <td></td>
-                  <td>You have no commission statements for this year</td>
-                  <td></td>
+                  <td>1/10/2017</td>
+                  <td>Dec 2017 </td>
                   <td><%= link_to "<i class='fa fa-cloud-download' aria-hidden='false' title='Download' data-toggle='tooltip'></i>".html_safe, download_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => "wejrowjeroewjd"), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
-                  <td><%= link_to "<i class='glyphicon glyphicon-open-file' aria-hidden='true' data-toggle='tooltip'></i>".html_safe,  download_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => "wejrowjeroewjd"), :target => "_blank" %></td>
+                  <td><%= link_to "<i class='fa fa-file-pdf-o' aria-hidden='true' data-toggle='tooltip'></i>".html_safe,  download_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => "wejrowjeroewjd"), :target => "_blank" %></td>
                 </tr>
               <% else %>
 

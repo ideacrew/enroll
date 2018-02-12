@@ -184,7 +184,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def commission_statements
-    @statements = ['2018', 2017]
+    @statements = ['2018']
     permitted = params.permit(:id)
     @id = permitted[:id]
     if current_user.has_broker_role?
