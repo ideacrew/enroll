@@ -8,5 +8,12 @@ module TransportProfiles
       add_step(TransportProfiles::Steps::RouteTo.new(:shop_legacy_report_client_destination, report_file_name, gateway))
       add_step(TransportProfiles::Steps::DeleteFile.new(report_file_name, gateway))
     end
+
+    def self.used_endpoints
+      [
+        :shop_legacy_report_archive,
+        :shop_legacy_report_client_destination
+      ]
+    end
   end
 end

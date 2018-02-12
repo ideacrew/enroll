@@ -18,6 +18,14 @@ module TransportGateway
       @adapters
     end
 
+    def list_entries(resource_query)
+      logger.info("transport_gateway") { "Started resource query:\n#{resource_query.log_inspect}" }
+      adapter = adapter_from(resource_query)
+      adapter.assign_providers(self, credential_provider)
+      adapter.add_observer(LoggingObserver.new(logger))
+      adapter.list_entries(resource_query)
+    end
+
     def receive_message(message)
       logger.info("transport_gateway") { "Started receive of message:\n#{message.log_inspect}" }
       adapter = adapter_from(message)
