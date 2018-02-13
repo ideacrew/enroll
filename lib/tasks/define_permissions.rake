@@ -56,10 +56,6 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
 end
 
-namespace :permissions do
-  desc 'hbx admin can view resident application link tab'
-  DefinePermissions.define_task :hbx_admin_can_access_resident_application_sub_tab => :environment
-end
 
 
 #rake permissions:initial_hbx
@@ -71,5 +67,4 @@ end
 #rake permissions:hbx_admin_can_access_new_consumer_application_sub_tab
 #rake permissions:hbx_admin_can_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_can_access_outstanding_verification_sub_tab
-#rake permissions:hbx_admin_can_access_resident_application_sub_tab
 
