@@ -824,7 +824,7 @@ class PlanYear
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
-    state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
+    state :canceled, :after_enter => :notify_employer_py_cancellation # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
@@ -1002,6 +1002,10 @@ class PlanYear
   def accept_application
     adjust_open_enrollment_date
     transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
+  end
+
+  def notify_employer_py_cancellation
+    notify("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: self.employer_profile.hbx_id, event_name: "benefit_coverage_renewal_carrier_dropped"})
   end
 
   def decline_application
