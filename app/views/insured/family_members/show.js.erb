@@ -21,12 +21,18 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
     $("#btn-continue").attr('href', '<%= @missing_relation_url %>' );
   <% end %>
 }
-<% if @created %>
+
+<% if !@family.applications.present? && @created %>
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
+
+<% if @family.application_in_progress.present? &&  (['create', 'update', 'destroy'].include? controller.action_name)  %>
+$('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+<% end %>
+
 $("#dependent_buttons").removeClass('hidden');
 
-<% if @family.application_in_progress.present? %>
+<% if @family.application_in_progress.present? && request.env['HTTP_REFERER'].include?('financial_assistance')  %>
   $(".container > .row > .col-md-10 > .col-md-3").html("<%= escape_javascript(render partial: 'financial_assistance/shared/right_nav', 
       locals: { previous_url: financial_assistance_applications_path,
                 next_url:  @family.application_in_progress.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : find_next_application_path(@family.application_in_progress),
