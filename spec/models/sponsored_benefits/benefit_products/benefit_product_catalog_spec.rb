@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module SponsoredBenefits
-  RSpec.describe BenefitPackages::BenefitPackage, type: :model do
+  RSpec.describe BenefitProducts::BenefitProductCatalog, type: :model do
     pending "add some examples to (or delete) #{__FILE__}"
   end
 end

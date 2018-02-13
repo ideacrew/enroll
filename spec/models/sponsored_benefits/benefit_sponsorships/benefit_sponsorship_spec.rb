@@ -4,8 +4,8 @@ module SponsoredBenefits
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
 
     let(:benefit_market)                        { :aca_shop_cca }
-    let(:enrollment_frequency)                  { :rolling_month }
-    let(:contact_method)                        { "Paper and Electronic communications" }
+    let(:contact_method)                        { :paper_and_electronic }
+
     let(:initial_enrollment_period)             { Date.new(2018,5,1)..Date.new(2019,4,30) }
     let(:open_enrollment_period)                { Date.new(2018,4,1)..Date.new(2019,4,10) }
     let(:annual_enrollment_period_begin_month)  { initial_enrollment_period.min.month }

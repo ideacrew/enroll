@@ -1,6 +1,6 @@
 module SponsoredBenefits
   module BenefitMarkets
-    class BenefitApplicationScope
+    class BenefitMarketCatalog
 
       attr_reader :effective_period, :benefit_market, 
                   :open_enrollment_period, :open_enrollment_period_minimum, 
@@ -52,8 +52,6 @@ module SponsoredBenefits
 
       def benefit_products
       end
-
-
     end
   end
 end

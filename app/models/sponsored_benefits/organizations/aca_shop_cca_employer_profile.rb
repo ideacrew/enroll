@@ -3,9 +3,16 @@ module SponsoredBenefits
     class AcaShopCcaEmployerProfile < Profile
       include Concerns::AcaRatingAreaConfigConcern
       
-      field  :sic_code, type: String
+      field       :sic_code, type: String
+      
+      # TODO move this to CCA non-BQT concern 
       embeds_one  :employer_attestation
+
+      # TODO move this to BQT concern 
       embedded_in :plan_design_proposal, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
+
+      # TODO use SIC code validation
+      validates_presence_of :sic_code
 
       after_initialize :initialize_benefit_sponsorship
 

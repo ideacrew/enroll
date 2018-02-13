@@ -4,32 +4,47 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      SERVICE_MARKET_KINDS    = [:aca_shop, :aca_individual]
+      MARKET_KINDS            = [:aca_shop, :aca_individual, :medicaid, :medicare]
       PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
-      field :title,               type: String, default: "" # => DC Health Link SHOP Market
-      field :service_market_kind, type: Symbol  # => :aca_shop
-      field :site_id,             type: Symbol  # For example, :dc, :cca
+      field :site_id,     type: Symbol  # For example, :dc, :cca
+      field :market_kind, type: Symbol  # => :aca_shop
+      field :title,       type: String, default: "" # => DC Health Link SHOP Market
+      field :description, type: String, default: ""
 
-      has_many    :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
-      embeds_many :benefit_market_service_periods, class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarketServicePeriod"
+      embeds_many :benefit_market_service_periods,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarketServicePeriod", 
+        cascade_callbacks: true, 
+        validate: true
 
-      validates_presence_of :site_id, :effective_period
+      has_many    :benefit_applications,            class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+
+      validates_presence_of :site_id
       
-      validates :service_market_kind,
-        inclusion: { in: SERVICE_MARKET_KINDS, message: "%{value} is not a valid service market" }
+      validates :market_kind,
+        inclusion: { in: SponsoredBenefits::MARKET_KINDS, message: "%{value} is not a valid market kind" },
+        allow_nil:    false
 
-      index({ "benefit_market_service_period._id" => 1 })
-      index({ "benefit_market_service_period.effective_period.begin" => 1, 
-              "benefit_market_service_period.effective_period.end" => 1 },
-            { name: "benefit_market_service_period_effective_period" })
+      index({ "site_id" => 1, "market_kind"  => 1 })
+      index({ "benefit_market_service_periods._id" => 1 })
+      index({ "benefit_market_service_periods.application_period.min" => 1, 
+              "benefit_market_service_periods.application_period.max" => 1 },
+            { name: "benefit_market_service_periods_application_period" })
 
-      # Return list of unique product kinds 
-      scope :benefit_product_kinds,                   ->{}
-      scope :benefit_product_kinds_by_effective_date, ->(effective_date = Timekeeper.DateOfRecord) {}
-      scope :service_areas,   ->{}
-      scope :benefit_applications,   ->{  }
 
+      scope :find_by_benefit_sponsorship, ->(benefit_sponsorship) { where(:"benefit_sponsorship.site_id" => site_id, :"benefit_sponsorship.market_kind" => market_kind) }
+      scope :contains_date,               ->(effective_date)      { where(:"benefit_market_service_periods.application_period.min".gte => effective_date,
+                                                                          :"benefit_market_service_periods.application_period.max".lte => effective_date)
+                                                                    }
+
+
+
+      def benefit_market_service_period_for(effective_date)
+        SponsoredBenefits::BenefitMarkets::BenefitMarketCatalog.new(effective_date, self)
+      end
+
+      def benefit_market_catalog_for(effective_date)
+        SponsoredBenefits::BenefitMarkets::BenefitMarketCatalog.new(effective_date, self)
+      end
 
       def benefit_enrollment_scopes_by_date(date)
         effective_dates = effective_dates_for(date)
@@ -84,17 +99,9 @@ module SponsoredBenefits
         bp.benefit_products_by_kind if bp.present?
       end
 
-
-    ## GIC
-    # Open Enrollment
-    #   Annual
-    # Life Insurance
-    #   
-    # Medicare
-    #   Special Enrollment - monthly
-    #   Age 65
-    #   Rate updates - every 6 months
-
+      def renew_service_period
+        @effective_period  = effective_date..(effective_date + 1.year - 1.day)
+      end
 
       private 
 

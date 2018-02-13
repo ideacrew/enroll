@@ -9,46 +9,42 @@ module SponsoredBenefits
       field :effective_period,        type: Range
 
       # The date range when members may enroll in benefit products
+      # Stored locally to enable sponsor-level exceptions
       field :open_enrollment_period,  type: Range
+
+      # The date on which this application was canceled or terminated
+      field :terminated_on,           type: Date
 
       # This application's workflow status
       field :aasm_state, type: String
 
-      # Populate when enrollment is terminated prior to open_enrollment_period.end
-      # field :terminated_early_on, type: Date
-
+      # field :benefit_sponsorship_id, type: BSON::ObjectId
       belongs_to  :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
       belongs_to  :benefit_market,      class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
-      embeds_many :benefit_packages,    class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
-      accepts_nested_attributes_for :benefit_packages
 
-      # ## Override with specific benefit package subclasses
-      #   embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
-      #   accepts_nested_attributes_for :benefit_packages
-      # ##
+      embeds_many :benefit_packages,    class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage", 
+        cascade_callbacks: true, 
+        validate: true
 
-      validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
+      validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
       # validate :validate_application_dates
 
       validate :open_enrollment_date_checks
 
-      #
-      # Are these correct? I don't think you can move an embedded object just by changing an id?
-      #
-      # def benefit_sponsor=(new_sponsor)
-      #   self.sponsorable_id = new_sponsor.id
-      # end
-      #
-      # BrokerAgencyProfile embeds this entire chain - this can't be the way we adjust it
-      #
-      # def broker=(new_broker)
-      #   self.broker_id = new_broker.id
-      # end
+      index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
+      index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
+
+      scope :by_effective_date,       ->(effective_date)    { where(:"effective_period.min" => effective_date) }
+      scope :by_effective_date_range, ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
 
 
       ## Stub for BQT
       def estimate_group_size?
         true
+      end
+
+      def effective_date
+        effective_period.begin unless effective_period.blank?
       end
 
       def effective_period=(new_effective_period)
@@ -61,31 +57,15 @@ module SponsoredBenefits
         write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
       end
 
-      def start_on
-        effective_period.begin
-      end
-
-      def end_on
-        effective_period.end
-      end
-
-      def open_enrollment_begin_on
-        open_enrollment_period.begin
-      end
-
-      def open_enrollment_end_on
-        open_enrollment_period.end
-      end
-
       def open_enrollment_completed?
         open_enrollment_period.blank? ? false : (::TimeKeeper.date_of_record > open_enrollment_period.end)
       end
 
-      # Application meets criteria necessary for sponsored group to shop for benefits
+      # Application meets criteria necessary for sponsored members to shop for benefits
       def is_open_enrollment_eligible?
       end
 
-      # Application meets criteria necessary for sponsored group to effectuate selected benefits
+      # Application meets criteria necessary for sponsored members to effectuate selected benefits
       def is_coverage_effective_eligible?
       end
 
