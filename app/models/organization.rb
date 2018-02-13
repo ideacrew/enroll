@@ -392,6 +392,28 @@ class Organization
     end
   end
 
+
+  def self.upload_commission_statement(file_path,file_name)
+    statement_date = invoice_date(file_path) rescue nil
+    org = by_invoice_filename(file_path) rescue nil
+    if statement_date && org && !commission_statement_exist?(statement_date,org)
+      doc_uri = Aws::S3Storage.save(file_path, "commission_statements", file_name)
+      if doc_uri
+        document = Document.new
+        document.identifier = doc_uri
+        document.date = statement_date
+        document.format = 'application/pdf'
+        document.subject = 'commission_statement'
+        document.title = File.basename(file_path)
+        org.documents << document
+        logger.debug "associated file #{file_path} with the Organization"
+        return document
+      end
+    else
+      logger.warn("Unable to associate commission statement #{file_path}")
+    end
+  end
+
   def self.upload_invoice_to_print_vendor(file_path,file_name)
     org = by_invoice_filename(file_path) rescue nil
     if org.employer_profile.is_converting?
@@ -405,6 +427,8 @@ class Organization
   end
 
   # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Also using this when uploading broker commision statements where the file_path
+  # string is a file_name with format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
   # Returns Organization
   def self.by_invoice_filename(file_path)
     hbx_id= File.basename(file_path).split("_")[0]
@@ -412,6 +436,8 @@ class Organization
   end
 
   # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Also using this when uploading broker commision statements where the file_path
+  # string is a file_name with format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
   # Returns Date
   def self.invoice_date(file_path)
     date_string= File.basename(file_path).split("_")[1]
@@ -421,6 +447,12 @@ class Organization
   def self.invoice_exist?(invoice_date,org)
     docs =org.documents.where("date" => invoice_date)
     matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
+    return true if matching_documents.count > 0
+  end
+
+  def self.commission_statement_exist?(statement_date,org)
+    docs =org.documents.where("date" => statement_date)
+    matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
     return true if matching_documents.count > 0
   end
 
