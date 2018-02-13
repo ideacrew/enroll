@@ -127,11 +127,11 @@ group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'capybara-screenshot'
+  gem 'cucumber', '2.3.3'
+  gem 'cucumber-rails', '1.4.3', :require => false
   gem 'database_cleaner', '1.5.3'
   gem 'fakeredis', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec', '3.0.0'
-  gem 'cucumber', '2.3.3'
-  gem 'cucumber-rails', '1.4.3', :require => false
   gem 'poltergeist'
   gem 'rspec-instafail'
   gem 'ruby-progressbar', '1.6.0'
