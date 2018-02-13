@@ -184,7 +184,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def commission_statements
-    @statements = ['2018']
     permitted = params.permit(:id)
     @id = permitted[:id]
     if current_user.has_broker_role?
@@ -194,6 +193,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
     else
       redirect_to new_broker_agencies_profile_path
       return
+    end
+    documents = @broker_agency_profile.organization.documents
+    if documents
+      @statements = get_commission_statements(documents)
     end
     collect_and_sort_commission_statments
     respond_to do |format|
@@ -464,11 +467,20 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
   end
 
+  def get_commission_statements(documents)
+    commission_statements = []
+    documents.each do |document|
+      # grab only documents that are commission statements by checking the bucket in which they are placed
+      if document.identifier.include?("commission-statements")
+        commission_statements << document
+      end
+    end
+    commission_statements
+  end
+
   def collect_and_sort_commission_statments(sort_order='ASC')
-    #@statements = @broker_agency_profile.organization.try(:documents)
-    #TODO create helper and set setting
-    #@statement_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
-    #sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse! unless @documents
+    @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
+    sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse! 
   end
 
   def find_hbx_profile

@@ -406,7 +406,7 @@ class Organization
         document.subject = 'commission_statement'
         document.title = File.basename(file_path)
         org.documents << document
-        logger.debug "associated file #{file_path} with the Organization"
+        logger.debug "associated commission statement #{file_path} with the Organization"
         return document
       end
     else
