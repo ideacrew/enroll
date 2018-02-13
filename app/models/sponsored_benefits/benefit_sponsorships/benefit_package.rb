@@ -1,9 +1,8 @@
 module SponsoredBenefits
-  module BenefitPackages
+  module BenefitSponsorships
     class BenefitPackage
       include Mongoid::Document
       include Mongoid::Timestamps
-
 
       embedded_in :benefit_application, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
@@ -19,6 +18,7 @@ module SponsoredBenefits
       field :benefit_rating_kind,     type: Symbol  # e.g. :list_bill, :composite
 
       embeds_many :benefit_products
+
 
     end
   end
