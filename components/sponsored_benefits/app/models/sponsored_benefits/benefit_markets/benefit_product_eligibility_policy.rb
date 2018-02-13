@@ -13,6 +13,7 @@ module SponsoredBenefits
       # access frozen plans if member enrolled in last year's mapped plan == true
       # must purchase health to purchase dental
       # must purchase life to purchase health
+      # age-off 26, 65
 
       ## congress member level
       # 'newly designated' special rules (bypass probation period)

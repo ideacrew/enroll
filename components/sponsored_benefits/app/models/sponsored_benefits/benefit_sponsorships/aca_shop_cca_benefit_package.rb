@@ -1,5 +1,5 @@
 module SponsoredBenefits
-  module BenefitPackages
+  module BenefitSponsorships
     class AcaShopCcaBenefitPackage < BenefitPackage
 
 
