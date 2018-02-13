@@ -59,7 +59,7 @@ gem 'symmetric-encryption', '~> 3.6.0'
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1'
 
-gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: '1.0.0'
+gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
 
@@ -183,7 +183,7 @@ end
 group :production do
   # Use Unicorn as the app server
   gem 'unicorn', '~> 4.8.3'
-  gem 'eye'
+  gem 'eye', '0.8.0'
 
   # New Relic gem
   gem 'newrelic_rpm'
