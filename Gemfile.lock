@@ -745,7 +745,7 @@ DEPENDENCIES
   devise (>= 3.5.4)
   effective_datatables!
   email_spec (= 2.0.0)
-  eye
+  eye (= 0.8.0)
   factory_girl_rails (= 4.6.0)
   fakeredis
   font-awesome-rails (= 4.5.0.1)

@@ -183,7 +183,7 @@ end
 group :production do
   # Use Unicorn as the app server
   gem 'unicorn', '~> 4.8.3'
-  gem 'eye'
+  gem 'eye', '0.8.0'
 
   # New Relic gem
   gem 'newrelic_rpm'
