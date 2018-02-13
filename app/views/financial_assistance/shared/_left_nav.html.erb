@@ -102,7 +102,7 @@
       </li>
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover">
-        <% if @application.is_draft? %>
+        <% if @application.present? && @application.is_draft?  %>
           <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
         <% else %>
           <a href="javascript:void(0);" class="cna">Household Info</a>
