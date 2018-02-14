@@ -55,7 +55,7 @@
 - unless applicant.pregnancy_end_on.blank?
   %pregnancy_end_on= simple_date_for(applicant.pregnancy_end_on)
 %is_subject_to_five_year_bar= applicant.is_subject_to_five_year_bar
-- if applicant.is_five_year_bar_met.present?
+- if !applicant.is_five_year_bar_met.nil?
   %is_five_year_bar_met= applicant.is_five_year_bar_met
 - if applicant.is_forty_quarters.present?
   %is_forty_quarters= applicant.is_forty_quarters
