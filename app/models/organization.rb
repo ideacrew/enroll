@@ -397,13 +397,13 @@ class Organization
     statement_date = commission_statement_date(file_path) rescue nil
     org = by_commission_statement_filename(file_path) rescue nil
     if statement_date && org && !commission_statement_exist?(statement_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, "commission_statements", file_name)
+      doc_uri = Aws::S3Storage.save(file_path, "commission-statements", file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri
         document.date = statement_date
         document.format = 'application/pdf'
-        document.subject = 'commission_statement'
+        document.subject = 'commission-statement'
         document.title = File.basename(file_path)
         org.documents << document
         logger.debug "associated commission statement #{file_path} with the Organization"
