@@ -13,17 +13,19 @@ RSpec.describe Insured::PlanFilterHelper, :type => :helper do
     end
   end
 
-  context "shows estimate of your cost " do 
-    it "should return link for cost estimate checkbook link" do
+  context ".estimate_your_costs" do 
+    it "should return link for congressional employee" do
       @market_kind="shop"
-      @dc_checkbook_url="https://dc.checkbookhealth.org/congress/dc/2017/"
+      @dc_checkbook_url=Settings.checkbook_services.congress_url
       @coverage_kind="health"
-      expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"https://dc.checkbookhealth.org/congress/dc/2017/\">Estimate Your Costs</a>"
+      expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"https://dc.checkbookhealth.org/congress/dc/2018/\">Estimate Your Costs</a>"
     end
 
-    it "should not return link for cost estimate checkbook link" do
+    it "should return link for non-congressional employee" do
       @market_kind="shop"
-      expect(estimate_your_costs).not_to eq "<a target=\"_blank\" href=\"https://dc.health.org/dcshop/\">Estimate your costs</a>"
+      @coverage_kind = "health"
+      @dc_checkbook_url="fake_url"
+      expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"fake_url\">Estimate Your Costs</a>"
     end
   end
 end

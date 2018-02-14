@@ -166,14 +166,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop'
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-
-      # @person.employee_roles.detect do |employee_role| 
-      #   employee_role.employer_profile.active_plan_year.benefit_groups.any?{|bg| bg.is_congress} 
-      # end rescue nil
-      # @census_employee=@hbx_enrollment.employee_role.census_employee.employer_profile.plan_years.first.benefit_groups.first.is_congress?
-      @dc_checkbook_url = is_congress_employee.present?  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment.employee_role.census_employee).generate_url
+      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     end
-    #@dc_congress_checkbook_url = CheckbookServices::PlanComparision.new(@hbx_enrollment.employee_role.census_employee).generate_congress_url
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)

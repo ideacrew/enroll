@@ -3,11 +3,15 @@ require 'nokogiri'
 module Services
   module CheckbookServices
     class PlanComparision
-      attr_accessor :census_employee,:is_congress
+
+      attr_accessor :hbx_enrollment,:is_congress
+
       BASE_URL =  Settings.checkbook_services.base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
-      def initialize(census_employee,is_congress=false)
-        @census_employee= census_employee
+
+      def initialize(hbx_enrollment, is_congress=false)
+        @hbx_enrollment = hbx_enrollment
+        @census_employee = @hbx_enrollment.employee_role.census_employee
         @is_congress = is_congress
         is_congress ? @url = CONGRESS_URL : @url = BASE_URL+"/shop/dc/api/"
       end
@@ -26,7 +30,7 @@ module Services
             raise "Unable to generate url"
           end
         rescue Exception => e
-          Rails.logger.error { e }
+          Rails.logger.error { "Unable to generate url for #{@census_employee.full_name} due to #{e.backtrace}" }
         end
       end
 
@@ -35,23 +39,23 @@ module Services
       {
         "remote_access_key": Settings.checkbook_services.remote_access_key,
         "reference_id": Settings.checkbook_services.reference_id,
-        "employer_effective_date": census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"),
-        "employee_coverage_date": census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"), #census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.first.effective_on,
+        "employer_effective_date": @census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"),
+        "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%d-%m"),
         "employer": {
           "state": 11,
           "county": 001
         },
         "family": build_family,
         "contribution": employer_contributions,
-        "reference_plan": census_employee.employer_profile.show_plan_year.benefit_groups.first.reference_plan.hios_id,
-        "filterOption":"carrier",
-        "filterValue": carrier_name
+        "reference_plan": reference_plan.hios_id,
+        "filterOption": reference_plan.plan_option_kind,
+        "filterValue": reference_plan.metal_level
       }
       end
 
       def employer_contributions
         premium_benefit_contributions = {}
-        census_employee.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits.each do |relationship_benefit|
+        @hbx_enrollment.benefit_group.relationship_benefits.each do |relationship_benefit|
           next if ["child_26_and_over","nephew_or_niece","grandchild","child_26_and_over_with_disability"].include? relationship_benefit.relationship
           relationship=  relationship_benefit.relationship == "child_under_26" ? "child" : relationship_benefit.relationship
           premium_benefit_contributions[relationship] = relationship_benefit.premium_pct.to_i
@@ -59,14 +63,13 @@ module Services
         premium_benefit_contributions
       end
 
-     def carrier_name
-      elected_plans= census_employee.active_benefit_group.plan_year.benefit_groups.flat_map(&:elected_plans) 
-      elected_plans.first.carrier_profile.legal_name.gsub(" ","") if elected_plans
-     end
+      def reference_plan
+        @hbx_enrollment.benefit_group.reference_plan
+      end
 
       def build_family
-        family = [{'dob': census_employee.dob.strftime("%Y-%d-%m") ,'relationship': 'self'}]
-        census_employee.census_dependents.each do |dependent|
+        family = [{'dob': @census_employee.dob.strftime("%Y-%d-%m") ,'relationship': 'self'}]
+        @census_employee.census_dependents.each do |dependent|
           next if dependent == "nephew_or_niece"
           family << {'dob': dependent.dob.strftime("%Y-%d-%m") ,'relationship': dependent.employee_relationship}
         end
