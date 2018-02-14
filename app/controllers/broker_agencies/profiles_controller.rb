@@ -198,7 +198,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if documents
       @statements = get_commission_statements(documents)
     end
-    collect_and_sort_commission_statments
+    collect_and_sort_commission_statements
     respond_to do |format|
       format.js
     end
@@ -480,7 +480,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def collect_and_sort_commission_statments(sort_order='ASC')
     @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
-    sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse! 
+    sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse!
   end
 
   def find_hbx_profile

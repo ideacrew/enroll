@@ -394,8 +394,8 @@ class Organization
 
 
   def self.upload_commission_statement(file_path,file_name)
-    statement_date = invoice_date(file_path) rescue nil
-    org = by_invoice_filename(file_path) rescue nil
+    statement_date = commission_statement_date(file_path) rescue nil
+    org = by_commission_statement_filename(file_path) rescue nil
     if statement_date && org && !commission_statement_exist?(statement_date,org)
       doc_uri = Aws::S3Storage.save(file_path, "commission_statements", file_name)
       if doc_uri
@@ -436,8 +436,6 @@ class Organization
   end
 
   # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
-  # Also using this when uploading broker commision statements where the file_path
-  # string is a file_name with format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
   # Returns Date
   def self.invoice_date(file_path)
     date_string= File.basename(file_path).split("_")[1]
@@ -454,6 +452,22 @@ class Organization
     docs =org.documents.where("date" => statement_date)
     matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
     return true if matching_documents.count > 0
+  end
+
+  # Expects file_path string with file_name format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
+  # Returns date
+  # added to decouple functionality from similar method with invoice flow
+  def self.commission_statement_date(file_path)
+    date_string = File.basename(file_path).split("_")[1]
+    Date.strptime(date_string, "%m%d%Y")
+  end
+
+  # Expects file_path string with file_name format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
+  # Returns Organization
+  # added to decouple functionality from similar method with invoice flow
+  def self.by_commission_statement_filename(file_path)
+    hbx_id = File.basename(file_path).split("_")[0]
+    Organization.where(hbx_id: hbx_id).first
   end
 
   def office_location_kinds
