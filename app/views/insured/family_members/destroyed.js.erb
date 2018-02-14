@@ -5,7 +5,7 @@ $("#dependent_buttons").removeClass('hidden');
 <% end %>
 
 <% if @family.application_in_progress.present? &&  (['destroy'].include? controller.action_name)  %>
-$('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+  $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
 <% end %>
 
 <% if @family.application_in_progress.present? && request.env['HTTP_REFERER'].include?('financial_assistance')  %>
