@@ -213,6 +213,9 @@ class PlanYear
     if start_on.blank?
       return(false)
     end
+    if self == employer_profile.latest_plan_year && canceled? && binder_paid? && past_transmission_threshold?
+      return true
+    end
     if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
       return false
     end

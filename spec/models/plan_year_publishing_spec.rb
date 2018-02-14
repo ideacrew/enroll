@@ -38,6 +38,35 @@ describe PlanYear, "that is:
     end
 
   end
+
+  describe "employer cancelled plan year" do
+
+    subject do
+      PlanYear.new({
+                       :aasm_state => "canceled",
+                       :open_enrollment_end_on => Date.new(2017, 6, 15),
+                       :start_on => Date.new(2017, 7, 1),
+                       :employer_profile => employer_profile
+                   })
+    end
+
+    context "and has reached the 15th" do
+      let(:current_date) { Date.new(2017, 6, 15) }
+
+      it "is NOT eligible for export" do
+        expect(subject.eligible_for_export?).to be_falsey
+      end
+    end
+
+
+    context "and has reached the 16th" do
+      let(:current_date) { Date.new(2017, 6, 16) }
+
+      it "is eligible for export" do
+        expect(subject.eligible_for_export?).to be_truthy
+      end
+    end
+  end
 end
 
 describe PlanYear, "that is:
