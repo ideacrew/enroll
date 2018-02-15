@@ -728,16 +728,7 @@ class PlanYear
       # July 1 => Aug 1
       start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
       end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days).beginning_of_month
-
-      first_date = Date.new(2018, 02, 16)
-      last_date = Date.new(2018, 02, 21)
-      range = (first_date..last_date)
-      if(range.include?(TimeKeeper.date_of_record))
-        dates = end_on.beginning_of_month
-      end
-      
       dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
-      return dates
     end
 
     def calculate_start_on_options
