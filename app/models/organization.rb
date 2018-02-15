@@ -462,12 +462,12 @@ class Organization
     Date.strptime(date_string, "%m%d%Y")
   end
 
-  # Expects file_path string with file_name format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
-  # Returns Organization
-  # added to decouple functionality from similar method with invoice flow
+  # Expects file_path string with file_name format /npm_nfpinternalid_mmddyyyy_commission_NUM-NUM_R.pdf
+  # returns organization associated with broker_profile_id
   def self.by_commission_statement_filename(file_path)
-    hbx_id = File.basename(file_path).split("_")[0]
-    Organization.where(hbx_id: hbx_id).first
+    npn = File.basename(file_path).split("_")[0]
+    broker_profile_id = BrokerRole.find_by_npn(npn).broker_agency_profile_id
+    BrokerAgencyProfile.get_organization_from_broker_profile_id(broker_profile_id)
   end
 
   def office_location_kinds
