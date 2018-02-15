@@ -448,7 +448,7 @@ class CensusEmployee < CensusMember
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role?
       else
-        construct_employee_role_for_match_person
+        construct_employee_role_for_match_person if has_benefit_group_assignment?
       end
     end
   end
