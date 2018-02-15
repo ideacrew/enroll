@@ -31,17 +31,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   let(:valid_params){
     {
-      employer_profile: employer_profile,
-      first_name: first_name,
-      middle_name: middle_name,
-      last_name: last_name,
-      name_sfx: name_sfx,
-      ssn: ssn,
-      dob: dob,
-      gender: gender,
-      hired_on: hired_on,
-      is_business_owner: is_business_owner,
-      address: address
+        employer_profile: employer_profile,
+        first_name: first_name,
+        middle_name: middle_name,
+        last_name: last_name,
+        name_sfx: name_sfx,
+        ssn: ssn,
+        dob: dob,
+        gender: gender,
+        hired_on: hired_on,
+        is_business_owner: is_business_owner,
+        address: address
     }
   }
 
@@ -314,13 +314,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                         context "and employee is terminated and reported by employer on timely basis" do
                           let(:earliest_retro_coverage_termination_date)    { (TimeKeeper.date_of_record.advance(
-                                                                                  Settings.
-                                                                                  aca.
-                                                                                  shop_market.
-                                                                                  retroactive_coverage_termination_maximum.
-                                                                                  to_hash)
-                                                                                ).end_of_month
-                                                                              }
+                              Settings.
+                                  aca.
+                                  shop_market.
+                                  retroactive_coverage_termination_maximum.
+                                  to_hash)
+                          ).end_of_month
+                          }
                           let(:earliest_valid_employment_termination_date)  { earliest_retro_coverage_termination_date.beginning_of_month }
                           let(:invalid_employment_termination_date) { earliest_valid_employment_termination_date - 1.day }
                           let(:invalid_coverage_termination_date)   { invalid_employment_termination_date.end_of_month }
@@ -352,10 +352,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                           end
 
                           context "and the termination date is in the future" do
-                              before { initial_census_employee.terminate_employment!(TimeKeeper.date_of_record + 10.days) }
-                              it "is in termination pending state" do
-                                expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
-                              end
+                            before { initial_census_employee.terminate_employment!(TimeKeeper.date_of_record + 10.days) }
+                            it "is in termination pending state" do
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
+                            end
                           end
 
                           context ".terminate_future_scheduled_census_employees" do
@@ -459,12 +459,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:er2_terminated_employee_count)  { 1 }
 
       let(:employee_count)                 {
-                                              er1_active_employee_count +
-                                              er1_terminated_employee_count +
-                                              er1_rehired_employee_count +
-                                              er2_active_employee_count +
-                                              er2_terminated_employee_count
-                                           }
+        er1_active_employee_count +
+            er1_terminated_employee_count +
+            er1_rehired_employee_count +
+            er2_active_employee_count +
+            er2_terminated_employee_count
+      }
 
       let(:terminated_today_employee_count)       { 2 }
       let(:terminated_last_month_employee_count)  { 1 }
@@ -478,25 +478,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:employer_profile_2)             { FactoryGirl.create(:employer_profile) }
 
       let(:er1_active_employees)      { FactoryGirl.create_list(:census_employee, er1_active_employee_count,
-                                                                 employer_profile: employer_profile_1
-                                                                )
-                                                              }
+                                                                employer_profile: employer_profile_1
+      )
+      }
       let(:er1_terminated_employees)  { FactoryGirl.create_list(:census_employee, er1_terminated_employee_count,
-                                                                 employer_profile: employer_profile_1
-                                                                )
-                                                              }
+                                                                employer_profile: employer_profile_1
+      )
+      }
       let(:er1_rehired_employees)     { FactoryGirl.create_list(:census_employee, er1_rehired_employee_count,
-                                                                 employer_profile: employer_profile_1
-                                                            )
-                                                          }
+                                                                employer_profile: employer_profile_1
+      )
+      }
       let(:er2_active_employees)      { FactoryGirl.create_list(:census_employee, er2_active_employee_count,
-                                                                 employer_profile: employer_profile_2
-                                                                )
-                                                              }
+                                                                employer_profile: employer_profile_2
+      )
+      }
       let(:er2_terminated_employees)  { FactoryGirl.create_list(:census_employee, er2_terminated_employee_count,
-                                                                 employer_profile: employer_profile_2
-                                                                )
-                                                              }
+                                                                employer_profile: employer_profile_2
+      )
+      }
 
       before do
         er1_active_employees.each do |ee|
@@ -559,26 +559,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "a census employee is added in the database" do
       let!(:existing_census_employee)     { CensusEmployee.create(
-                                              first_name: "Paxton",
-                                              last_name: "Thomas",
-                                              ssn: "551345151",
-                                              dob: "2014-04-01".to_date,
-                                              gender: "male",
-                                              employer_profile: employer_profile,
-                                              hired_on: "2014-08-12".to_date
-                                            )}
+          first_name: "Paxton",
+          last_name: "Thomas",
+          ssn: "551345151",
+          dob: "2014-04-01".to_date,
+          gender: "male",
+          employer_profile: employer_profile,
+          hired_on: "2014-08-12".to_date
+      )}
       let!(:person)                       { Person.create(
-                                              first_name: existing_census_employee.first_name,
-                                              last_name: existing_census_employee.last_name,
-                                              ssn: existing_census_employee.ssn,
-                                              dob: existing_census_employee.dob,
-                                              gender: existing_census_employee.gender
-                                            )}
+          first_name: existing_census_employee.first_name,
+          last_name: existing_census_employee.last_name,
+          ssn: existing_census_employee.ssn,
+          dob: existing_census_employee.dob,
+          gender: existing_census_employee.gender
+      )}
       let!(:employee_role)                { EmployeeRole.create(
-                                              person: person,
-                                              hired_on: existing_census_employee.hired_on,
-                                              employer_profile: existing_census_employee.employer_profile,
-                                            )}
+          person: person,
+          hired_on: existing_census_employee.hired_on,
+          employer_profile: existing_census_employee.employer_profile,
+      )}
 
       it "existing record should be findable" do
         expect(CensusEmployee.find(existing_census_employee.id)).to be_truthy
@@ -767,10 +767,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       @household = mikes_family.households.first
       @coverage_household = @household.coverage_households.first
       @enrollment = @household.create_hbx_enrollment_from(
-        employee_role: mikes_employee_role,
-        coverage_household: @coverage_household,
-        benefit_group: mikes_benefit_group,
-        benefit_group_assignment: @mikes_benefit_group_assignments
+          employee_role: mikes_employee_role,
+          coverage_household: @coverage_household,
+          benefit_group: mikes_benefit_group,
+          benefit_group_assignment: @mikes_benefit_group_assignments
       )
       @enrollment.save
     end
@@ -1523,61 +1523,61 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     }
 
     let!(:auto_renewing_health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-      household: census_employee.employee_role.person.primary_family.active_household,
-      coverage_kind: "health",
-      kind: "employer_sponsored",
-      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
-      employee_role_id: census_employee.employee_role.id,
-      benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
-      aasm_state: "auto_renewing"
-      )
+                                                                  household: census_employee.employee_role.person.primary_family.active_household,
+                                                                  coverage_kind: "health",
+                                                                  kind: "employer_sponsored",
+                                                                  benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
+                                                                  employee_role_id: census_employee.employee_role.id,
+                                                                  benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+                                                                  aasm_state: "auto_renewing"
+    )
     }
 
     let!(:auto_renewing_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-      household: census_employee.employee_role.person.primary_family.active_household,
-      coverage_kind: "dental",
-      kind: "employer_sponsored",
-      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
-      employee_role_id: census_employee.employee_role.id,
-      benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
-      aasm_state: "auto_renewing"
-      )
+                                                                  household: census_employee.employee_role.person.primary_family.active_household,
+                                                                  coverage_kind: "dental",
+                                                                  kind: "employer_sponsored",
+                                                                  benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
+                                                                  employee_role_id: census_employee.employee_role.id,
+                                                                  benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+                                                                  aasm_state: "auto_renewing"
+    )
     }
 
     let(:enrollment)   { FactoryGirl.create(:hbx_enrollment,
-      household: census_employee.employee_role.person.primary_family.active_household,
-      coverage_kind: "health",
-      kind: "employer_sponsored",
-      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
-      employee_role_id: census_employee.employee_role.id,
-      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-      aasm_state: "coverage_selected"
-      )
+                                            household: census_employee.employee_role.person.primary_family.active_household,
+                                            coverage_kind: "health",
+                                            kind: "employer_sponsored",
+                                            benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
+                                            employee_role_id: census_employee.employee_role.id,
+                                            benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                            aasm_state: "coverage_selected"
+    )
     }
 
 
     shared_examples_for "enrollments for display" do |state, status, result|
 
       let!(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-        household: census_employee.employee_role.person.primary_family.active_household,
-        coverage_kind: "health",
-        kind: "employer_sponsored",
-        benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
-        employee_role_id: census_employee.employee_role.id,
-        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-        aasm_state: state
-        )
+                                                      household: census_employee.employee_role.person.primary_family.active_household,
+                                                      coverage_kind: "health",
+                                                      kind: "employer_sponsored",
+                                                      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
+                                                      employee_role_id: census_employee.employee_role.id,
+                                                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                                      aasm_state: state
+      )
       }
 
       let!(:dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-        household: census_employee.employee_role.person.primary_family.active_household,
-        coverage_kind: "dental",
-        kind: "employer_sponsored",
-        benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
-        employee_role_id: census_employee.employee_role.id,
-        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-        aasm_state: state
-        )
+                                                      household: census_employee.employee_role.person.primary_family.active_household,
+                                                      coverage_kind: "dental",
+                                                      kind: "employer_sponsored",
+                                                      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
+                                                      employee_role_id: census_employee.employee_role.id,
+                                                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                                      aasm_state: state
+      )
       }
 
       it "should #{status}return #{state} health enrollment" do
@@ -1789,6 +1789,50 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(result).to eq expected_result
       end
 
+    end
+  end
+
+  describe '.employee_dependent_age_off_termination' do
+    let!(:employer_profile){ create :employer_profile, aasm_state: "enrolled"}
+    let!(:employee_role) {FactoryGirl.create(:employee_role, person: family.primary_applicant.person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
+    let!(:date) {TimeKeeper.date_of_record - 10.days}
+    let!(:other_child_person1) { FactoryGirl.create(:person)  }
+    let!(:other_child_person2) { FactoryGirl.create(:person)  }
+    let!(:family) {
+      family = FactoryGirl.build(:family, :with_primary_family_member)
+      primary_person = family.family_members.where(is_primary_applicant: true).first.person
+      primary_person.person_relationships << PersonRelationship.new(relative_id: other_child_person1.id, kind: "child")
+      primary_person.person_relationships << PersonRelationship.new(relative_id: other_child_person2.id, kind: "child")
+      primary_person.save
+      other_child_person1.dob = Date.new(date.year, 8, date.beginning_of_month.day) - 26.years
+      other_child_person2.dob = Date.new(date.year, 8, date.beginning_of_month.day) - 26.years
+      other_child_person1.save
+      other_child_person2.save
+      family.save
+      family
+    }
+    let!(:family_member1) { FactoryGirl.create(:family_member, family: family, person: other_child_person1)  }
+    let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: other_child_person2)  }
+    let!(:enrollment) do
+      hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", employee_role_id: employee_role.id)
+      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: date, coverage_start_on: date)
+      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: false).first.id, is_subscriber: false, eligibility_date: date, coverage_start_on: date)
+      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: false).last.id, is_subscriber: false, eligibility_date: date, coverage_start_on: date)
+      hbx.save
+      hbx
+    end
+
+    before do
+      allow(family.active_household).to receive(:hbx_enrollments).and_return [enrollment]
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(family.primary_applicant.person).to receive(:active_employee_roles).and_return [employee_role]
+    end
+
+    it "trigger when dependent's age is 26" do
+      expect(enrollment.any_dependent_members_age_above_26?).to eq true
+      expect(CensusEmployee).to receive(:employee_dependent_age_off_termination).with(date.beginning_of_month)
+      expect{CensusEmployee.employee_dependent_age_off_termination(date.beginning_of_month)}.not_to raise_error
     end
   end
 end

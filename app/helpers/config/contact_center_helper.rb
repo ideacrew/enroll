@@ -31,6 +31,10 @@ module Config::ContactCenterHelper
     Settings.contact_center.phone_number
   end
 
+  def contact_center_ivl_phone_number
+    Settings.contact_center.ivl_phone_number
+  end
+
   def contact_center_fax_number
     Settings.contact_center.fax
   end

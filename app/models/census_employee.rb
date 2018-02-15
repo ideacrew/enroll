@@ -42,12 +42,12 @@ class CensusEmployee < CensusMember
   field :cobra_begin_date, type: Date
 
   embeds_many :census_dependents,
-    cascade_callbacks: true,
-    validate: true
+              cascade_callbacks: true,
+              validate: true
 
   embeds_many :benefit_group_assignments,
-    cascade_callbacks: true,
-    validate: true
+              cascade_callbacks: true,
+              validate: true
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -62,7 +62,7 @@ class CensusEmployee < CensusMember
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
   validates :expected_selection,
-    inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
+            inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
@@ -103,12 +103,12 @@ class CensusEmployee < CensusMember
   # scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
 
   scope :covered,    ->{ where(:"benefit_group_assignments" => {
-    :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
-    })}
+                                   :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
+                               })}
 
   scope :waived,    ->{ where(:"benefit_group_assignments" => {
-    :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
-    })}
+                                  :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
+                              })}
 
   scope :enrolled, -> { any_of([covered.selector, waived.selector]) }
 
@@ -134,9 +134,9 @@ class CensusEmployee < CensusMember
   }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
-   unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
-   unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
+    linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
+    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
+    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
 
   def initialize(*args)
@@ -304,12 +304,12 @@ class CensusEmployee < CensusMember
 
     employment_based_date = employment_termination_date.end_of_month
     submitted_based_date  = TimeKeeper.date_of_record.
-                              advance(Settings.
-                                          aca.
-                                          shop_market.
-                                          retroactive_coverage_termination_maximum
-                                          .to_hash
-                                        ).end_of_month
+        advance(Settings.
+                    aca.
+                    shop_market.
+                    retroactive_coverage_termination_maximum
+                    .to_hash
+        ).end_of_month
 
     # if current_user.has_hbx_staff_role?
     # end
@@ -364,7 +364,7 @@ class CensusEmployee < CensusMember
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
     return false if person.blank? || (person.present? &&
-                                      person.has_active_employee_role_for_census_employee?(self))
+        person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
   end
@@ -427,27 +427,27 @@ class CensusEmployee < CensusMember
 
     def enrolled_count(benefit_group)
 
-        return 0 unless benefit_group
+      return 0 unless benefit_group
 
-        cnt = CensusEmployee.collection.aggregate([
-        {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
-        {"$unwind" => "$benefit_group_assignments"},
-        {"$match" => {"aasm_state" => { "$in" =>  EMPLOYMENT_ACTIVE_STATES  } }},
-        {"$match" => {"benefit_group_assignments.aasm_state" => { "$in" => ["coverage_selected"]} }},
-        #{"$match" => {"benefit_group_assignments.is_active" => true}},
-        {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
-        {"$group" => {
-            "_id" =>  { "bgid" => "$benefit_group_assignments.benefit_group_id",
-                        #"state" => "$aasm_state",
-                        #{}"active" => "$benefit_group_assignments.is_active",
-                        #{}"bgstate" => "$benefit_group_assignments.aasm_state"
-                      },
-                      "count" => { "$sum" => 1 }
-                    }
-              },
-        #{"$match" => {"count" => {"$gte" => 1}}}
-      ],
-      :allow_disk_use => true)
+      cnt = CensusEmployee.collection.aggregate([
+                                                    {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
+                                                    {"$unwind" => "$benefit_group_assignments"},
+                                                    {"$match" => {"aasm_state" => { "$in" =>  EMPLOYMENT_ACTIVE_STATES  } }},
+                                                    {"$match" => {"benefit_group_assignments.aasm_state" => { "$in" => ["coverage_selected"]} }},
+                                                    #{"$match" => {"benefit_group_assignments.is_active" => true}},
+                                                    {"$match" => {"benefit_group_assignments.benefit_group_id" => benefit_group.id  }},
+                                                    {"$group" => {
+                                                        "_id" =>  { "bgid" => "$benefit_group_assignments.benefit_group_id",
+                                                                    #"state" => "$aasm_state",
+                                                                    #{}"active" => "$benefit_group_assignments.is_active",
+                                                                    #{}"bgstate" => "$benefit_group_assignments.aasm_state"
+                                                        },
+                                                        "count" => { "$sum" => 1 }
+                                                    }
+                                                    },
+                                                #{"$match" => {"count" => {"$gte" => 1}}}
+                                                ],
+                                                :allow_disk_use => true)
 
 
       if cnt.count >= 1
@@ -458,6 +458,7 @@ class CensusEmployee < CensusMember
     end
 
     def advance_day(new_date)
+      CensusEmployee.employee_dependent_age_off_termination(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
@@ -483,6 +484,40 @@ class CensusEmployee < CensusMember
           census_employee.terminate_employment(census_employee.employment_terminated_on)
         rescue Exception => e
           (Rails.logger.error { "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" }) unless Rails.env.test?
+        end
+      end
+    end
+
+    def employee_dependent_age_off_termination(new_date)
+      if new_date.mday == 1
+        Person.all_employee_roles.each do |person|
+          begin
+            if person.person_relationships.present?
+              relations = person.person_relationships.select{|relation| relation.kind == 'child'}
+              aged_off_dependents = []
+              relations.select do |relation|
+                id = relation.relative_id.to_s
+                dep =  Person.where(_id: id).first
+                if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && dep.age_on(TimeKeeper.date_of_record.end_of_month) < 27
+                  aged_off_dependents << dep
+                  next if aged_off_dependents.empty?
+                  employee_roles = person.active_employee_roles
+                  employee_roles.each do |employee_role|
+                    enrollments = person.primary_family.active_household.hbx_enrollments.where(employee_role_id: employee_role.id).enrolled
+                    enrollments.each do |en|
+                      covered_members = (en.hbx_enrollment_members.map{|member| member.person} && aged_off_dependents)
+                      if covered_members.any?{|cm| new_date.month ==  cm.dob.month}
+                        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "employee_dependent_age_off_termination")
+                        break
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          rescue Exception => e
+            puts "#{person.full_name}, #{person.hbx_id} #{e.message}"
+          end
         end
       end
     end
@@ -547,15 +582,15 @@ class CensusEmployee < CensusMember
       if employer_profiles.size > 0
         employer_profile_ids = employer_profiles.map(&:_id)
         query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
-                                    where(
-                                      :employment_terminated_on.gte => date_range.first,
-                                      :employment_terminated_on.lte => date_range.last
-                                    )
+            where(
+                :employment_terminated_on.gte => date_range.first,
+                :employment_terminated_on.lte => date_range.last
+            )
       else
         query = unscoped.terminated.where(
-                                    :employment_terminated_on.gte => date_range.first,
-                                    :employment_terminated_on.lte => date_range.last
-                                  )
+            :employment_terminated_on.gte => date_range.first,
+            :employment_terminated_on.lte => date_range.last
+        )
       end
       query.to_a
     end
@@ -656,10 +691,10 @@ class CensusEmployee < CensusMember
     fname_exp = Regexp.compile(Regexp.escape(f_name), true)
     lname_exp = Regexp.compile(Regexp.escape(l_name), true)
     self.where({
-      first_name: fname_exp,
-      last_name: lname_exp,
-      dob: dob
-    }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
+                   first_name: fname_exp,
+                   last_name: lname_exp,
+                   dob: dob
+               }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
   end
 
   def self.to_csv
@@ -705,6 +740,20 @@ class CensusEmployee < CensusMember
             census_member.ssn,
             census_member.dob.strftime("%m/%d/%Y"),
             census_member.gender
+          ] 
+
+        data = [
+            "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
+            census_employee.dob,
+            census_employee.hired_on,
+            census_employee.aasm_state.humanize.downcase,
+            census_employee.renewal_benefit_group_assignment.try(:benefit_group).try(:title)
+        ]
+
+        if active_assignment = census_employee.active_benefit_group_assignment
+          data += [
+              active_assignment.benefit_group.title,
+              "dental: #{ d = active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'dental'}.try(:aasm_state).try(:humanize).try(:downcase)} health: #{ active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'health'}.try(:aasm_state).try(:humanize).try(:downcase)}"
           ]
 
           if census_member.is_a?(CensusEmployee)
@@ -753,8 +802,8 @@ class CensusEmployee < CensusMember
     return false unless coverage_terminated_on <= cobra_begin_date
 
     (hired_on <= cobra_begin_date) &&
-      (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
-      cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
+        (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
+        cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 
   def has_employee_role_linked?
@@ -767,8 +816,8 @@ class CensusEmployee < CensusMember
   # 3.census_employee is pending
   def is_disabled_cobra_action?
     employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
-      (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
-      employee_termination_pending?
+        (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
+        employee_termination_pending?
   end
 
   def has_cobra_hbx_enrollment?
@@ -828,8 +877,8 @@ class CensusEmployee < CensusMember
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state
+        from_state: aasm.from_state,
+        to_state: aasm.to_state
     )
   end
 
@@ -866,7 +915,7 @@ class CensusEmployee < CensusMember
   def no_duplicate_census_dependent_ssns
     dependents_ssn = census_dependents.map(&:ssn).select(&:present?)
     if dependents_ssn.uniq.length != dependents_ssn.length ||
-       dependents_ssn.any?{|dep_ssn| dep_ssn==self.ssn}
+        dependents_ssn.any?{|dep_ssn| dep_ssn==self.ssn}
       errors.add(:base, "SSN's must be unique for each dependent and subscriber")
     end
   end
