@@ -2507,8 +2507,8 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
 
   let(:benefit_group) { FactoryGirl.create(:benefit_group)}
   let(:benefit_group1) { FactoryGirl.create(:benefit_group)}
-  let(:active_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
-  let(:renewal_plan_year)  { FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
+  let!(:active_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
+  let!(:renewal_plan_year)  { FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
   let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,renewal_plan_year]) }
   let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}
@@ -2545,6 +2545,12 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
         expect(enrollment.aasm_state).to eq "coverage_canceled"
       end
     end
+
+    context '.update_end_date' do
+      it "should update the initial plan year end date" do
+        expect(active_plan_year.end_on).to eq active_plan_year.start_on
+      end
+    end
   end
 
   context 'when renewal plan year is canceled' do
@@ -2574,6 +2580,12 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
 
       it "should deactivate renewing benefit group assignment" do
         expect(renewal_benefit_group_assignment.is_active).to be_falsey
+      end
+    end
+
+    context '.update_end_date' do
+      it "should update the renewal plan year end date" do
+        expect(renewal_plan_year.end_on).to eq renewal_plan_year.start_on
       end
     end
 

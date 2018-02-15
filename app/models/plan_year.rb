@@ -109,6 +109,11 @@ class PlanYear
     end
   end
 
+  #Updating end_on with start_on for XML purposes only.
+  def update_end_date
+    self.update_attributes!(:end_on => self.start_on)
+  end
+
   def benefit_group_ids
     self.benefit_groups.map(&:id).uniq
   end
@@ -878,7 +883,7 @@ class PlanYear
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
-    state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
+    state :canceled, :after_enter => :update_end_date             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
     state :termination_pending
@@ -888,7 +893,7 @@ class PlanYear
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
-    state :renewing_canceled
+    state :renewing_canceled, :after_enter => :update_end_date
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
@@ -1363,7 +1368,7 @@ class PlanYear
                  "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
-    if !['canceled', 'suspended', 'terminated', 'termination_pending'].include?(aasm_state)
+    if !['canceled', 'suspended', 'terminated', 'termination_pending', 'renewing_canceled'].include?(aasm_state)
 
       #groups terminated for non-payment get 31 more days of coverage from their paid through date
       if end_on != end_on.end_of_month
