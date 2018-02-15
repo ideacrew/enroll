@@ -1,6 +1,6 @@
 namespace :nfp do
   desc "Upload commission statements to S3 and associate with broker"
-  task agency_statements_upload: :environment do
+  task commission_statements_upload: :environment do
     invoice_folder = "commission_statements"
     current_month_folder = TimeKeeper.date_of_record.strftime("%b-%Y")
     absolute_folder_path = File.expand_path("#{invoice_folder}/#{current_month_folder}")
