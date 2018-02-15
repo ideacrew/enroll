@@ -17,9 +17,9 @@
     = render :partial => "events/addresses/employer_address", :object => benefit.employer_address, as: :address
   - unless benefit.employer_phone.blank?
     = render :partial => "events/phones/employer_phone", :object => benefit.employer_phone, as: :phone
-  - if benefit.is_esi_waiting_period.present?
+  - unless benefit.is_esi_waiting_period.nil?
     %is_esi_waiting_period= benefit.is_esi_waiting_period
-  - if benefit.is_esi_mec_met.present?
+  - unless benefit.is_esi_mec_met.nil?
     %is_esi_mec_met= benefit.is_esi_mec_met
   - if benefit.esi_covered.present?
     %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
