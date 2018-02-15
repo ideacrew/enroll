@@ -545,8 +545,8 @@ module ApplicationHelper
   end
 
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
-    if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
-      terminated_enrollment = hbx_enrollment.census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.coverage_kind == 'health' && h.aasm_state == 'coverage_termination_pending'}
+    if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? 
+      terminated_enrollment = hbx_enrollment.census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.coverage_kind == hbx_enrollment.coverage_kind && h.aasm_state == 'coverage_termination_pending'}
       return if terminated_enrollment.blank?
       
       if hbx_enrollment.coverage_kind == "health"
