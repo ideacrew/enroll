@@ -57,7 +57,7 @@ module SponsoredBenefits
 
       def prepopulate_attributes
         @title = @proposal.title
-        @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.begin.strftime("%Y-%m-%d")
+        @effective_date = @profile.benefit_sponsorships.first.benefit_applications.first.effective_date.strftime("%Y-%m-%d")
         @quote_date = @proposal.updated_at.strftime("%m/%d/%Y")
       end
 
@@ -78,7 +78,7 @@ module SponsoredBenefits
 
       def ensure_profile
         if @profile.blank?
-          @profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new
+          @profile = SponsoredBenefits::Organizations.const_get("AcaShop#{aca_state_abbreviation.titleize}EmployerProfile").new
           sponsorship = @profile.benefit_sponsorships.first
           sponsorship.benefit_applications.build
         end
@@ -141,15 +141,8 @@ module SponsoredBenefits
           end
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
         end
-
         sponsorship = @proposal.profile.benefit_sponsorships.first
-        sponsorship.assign_attributes({initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
-        if sponsorship.present?
-          enrollment_dates = BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date)
-          benefit_application = (sponsorship.benefit_applications.first || sponsorship.benefit_applications.build)
-          benefit_application.effective_period= enrollment_dates[:effective_period]
-          benefit_application.open_enrollment_period= enrollment_dates[:open_enrollment_period]
-        end
+        sponsorship.assign_attributes({initial_enrollment_period: initial_enrollment_period})
 
         @proposal.save!
       end

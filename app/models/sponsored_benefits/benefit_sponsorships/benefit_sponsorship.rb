@@ -21,11 +21,12 @@ module SponsoredBenefits
 
       # This sponsorship's workflow status
       field :aasm_state,      type: String, default: :applicant
+      field :site_id,         type: String
 
       belongs_to  :benefit_market,        class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :benefit_market, :contact_method
+      validates_presence_of :benefit_market
 
       delegate :plan_design_organization, to: :benefit_sponsorable
 

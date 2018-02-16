@@ -29,7 +29,7 @@ module SponsoredBenefits
       @organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
 
       if @organization.is_prospect?
-        get_sic_codes
+        load_sic_codes_if_enabled
       else
         flash[:error] = "Editing of Client employer records not allowed"
         redirect_to employers_organizations_broker_agency_profile_path(@organization.broker_agency_profile)
@@ -91,9 +91,7 @@ module SponsoredBenefits
         @organization.valid?
       end
 
-      if standard_industrial_classification_enabled?
-        get_sic_codes
-      end
+      load_sic_codes_if_enabled
     end
 
     def find_broker_agency_profile
@@ -116,6 +114,12 @@ module SponsoredBenefits
       end
 
       org_params
+    end
+
+    def load_sic_codes_if_enabled
+      if standard_industrial_classification_enabled?
+        get_sic_codes
+      end
     end
 
     def get_sic_codes

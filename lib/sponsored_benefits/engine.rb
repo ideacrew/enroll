@@ -10,5 +10,9 @@ module SponsoredBenefits
       g.assets false
       g.helper false
     end
+
+    config.to_prepare do
+      SponsoredBenefits::ApplicationController.helper Rails.application.helpers
+    end
   end
 end
