@@ -1649,25 +1649,25 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "calculate_start_on_options" do
 
     it "should return one option if start date is before settings day of month offset" do
-      next_start = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
+      next_start = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month.next_month
       dates = [next_start].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days + 5.days)
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
+
     it "should return one option but for the next month if after offset and enrollment monthly deadline" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
+      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month.next_month
       dates = [date1]
       (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 2).times do
         dates << dates.last.next_month
       end
       dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days + 5.days)
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
     it "should return three options" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month
+      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
       dates = [date1]
       (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 2).times do
         dates << dates.last.next_month
@@ -1675,7 +1675,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
       TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
-      expect(PlanYear.calculate_start_on_options).to eq dates
+      expect(PlanYear.calculate_start_on_options).to eq []
     end
   end
 
