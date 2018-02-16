@@ -17,6 +17,7 @@ module Services
       end
 
       def generate_url
+        return nil if slug!
         return @url if is_congress
         begin
           puts construct_body.to_json
@@ -35,6 +36,10 @@ module Services
       end
 
       private
+      def slug!
+        Rails.env.test?
+      end
+
       def construct_body
       {
         "remote_access_key": Settings.checkbook_services.remote_access_key,
