@@ -122,7 +122,7 @@ class EmployerInvoice
       Rails.root.join('tmp',current_month)
     end
   end
- 
+
   def invoice_absolute_file_path
     "#{invoice_folder_path}/#{invoice_file_name}"
   end

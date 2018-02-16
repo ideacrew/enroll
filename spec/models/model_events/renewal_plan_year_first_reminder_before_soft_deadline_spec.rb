@@ -10,7 +10,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:date_mock_object) { double("Date", day: 8)}
 
   describe "ModelEvent" do
-    after(:each) do
+    around(:each) do
       DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
     end
     context "when renewal employer 2 days prior to soft dead line" do

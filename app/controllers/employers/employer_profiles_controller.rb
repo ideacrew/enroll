@@ -2,7 +2,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   include Config::AcaConcern
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -30,11 +30,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -288,6 +286,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
   end
 
+
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
+    redirect_to action: :show, :tab => :employees
+  end
+
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
@@ -510,7 +515,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name, :sic_code, :contact_method],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name, :sic_code],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

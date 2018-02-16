@@ -1,5 +1,5 @@
-Dir.glob('db/seedfiles/translations/*').each do |file|
-  require_relative 'translations/' + File.basename(file,File.extname(file))
+Dir.glob('db/seedfiles/translations/en/*').each do |file|
+  require_relative 'translations/en/' + File.basename(file,File.extname(file))
 end
 
 puts "*"*80
@@ -9,7 +9,6 @@ MAIN_TRANSLATIONS = {
   "en.shared.my_portal_links.my_insured_portal" => "My Insured Portal",
   "en.shared.my_portal_links.my_broker_agency_portal" => "My Broker Agency Portal",
   "en.shared.my_portal_links.my_employer_portal" => "My Employer Portal"
-
 }
 translations = [
   BOOTSTRAP_EXAMPLE_TRANSLATIONS,
@@ -26,7 +25,7 @@ translations = [
 ].reduce({}, :merge)
 
 puts "TRANSLATIONS"
-p translations
+p translations unless Rails.env.test?
 
 translations.keys.each do |k|
   Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{translations[k]}\"")
