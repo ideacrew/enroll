@@ -17,6 +17,7 @@ module Services
       end
 
       def generate_url
+        return nil if slug!
         return @url if is_congress
         begin
           puts construct_body.to_json
@@ -35,6 +36,10 @@ module Services
       end
 
       private
+      def slug!
+        Rails.env.test?
+      end
+
       def construct_body
       {
         "remote_access_key": Settings.checkbook_services.remote_access_key,
@@ -48,9 +53,21 @@ module Services
         "family": build_family,
         "contribution": employer_contributions,
         "reference_plan": reference_plan.hios_id,
-        "filterOption": reference_plan.plan_option_kind,
-        "filterValue": reference_plan.metal_level
+        "filterOption": filter_option,
+        "filterValue": reference_plan.carrier_profile.legal_name
       }
+      end
+
+
+      def filter_option
+        case @hbx_enrollment.benefit_group.plan_option_kind
+        when "single_plan"
+          "Plan"
+        when "single_carrier"
+          "Carrier"
+        when "metal_level"
+          "Metal"
+        end
       end
 
       def employer_contributions
