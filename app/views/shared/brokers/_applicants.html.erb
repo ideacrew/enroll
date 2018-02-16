@@ -23,7 +23,7 @@
     </thead>
     <tbody>
       <% if @broker_applicants.any? %>
-      <%= render partial: "shared/brokers/applicant_row", :collection => @broker_applicants, :as => :applicant %>
+        <%= render partial: "shared/brokers/applicant_row", :collection => @broker_applicants.to_a, :as => :applicant %>
       <% else %>
       <tr><td>No Applicants found.</td></tr>
       <% end %>
