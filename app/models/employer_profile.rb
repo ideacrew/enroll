@@ -9,6 +9,8 @@ class EmployerProfile
   include StateTransitionPublisher
   include ScheduledEventService
   include Config::AcaModelConcern
+  include Concerns::Observable
+  include ModelEvents::EmployerProfile
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -1080,6 +1082,7 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+        org.employer_profile.trigger_model_event(:initial_employee_plan_selection_confirmation)
       end
     end
   end
