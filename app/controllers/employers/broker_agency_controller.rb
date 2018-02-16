@@ -15,7 +15,7 @@ class Employers::BrokerAgencyController < ApplicationController
         page_no = cur_page_no(@page_alphabets.first)
         @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
       else
-        @organizations = @orgs.to_a.first(10)
+        @organizations = @orgs.limit(10).to_a
       end
       @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
     else
