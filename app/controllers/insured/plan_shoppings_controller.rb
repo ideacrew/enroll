@@ -164,6 +164,10 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
+    if params[:market_kind] == 'shop'
+      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
+      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+    end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
