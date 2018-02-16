@@ -29,6 +29,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
   describe "ModelEvent" do
     before :each do
      allow(employer).to receive(:is_primary_office_local?).and_return(false)
+     allow(model_instance).to receive(:open_enrollment_date_errors).and_return(nil)
     end
 
     context "when In eligible renewal application created" do
