@@ -51,14 +51,16 @@
           </label>
         </div>
       </li>
-      <li>
-        <div class="checkbox">
-          <label>
-            <input id="plan-metal-level-catastrophic" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-catastrophic" type="checkbox" data-plan-metal-level-filter="catastrophic">
-            <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_catastrophic_title_info') %>"><%= l10n("catastrophic") %></span></label>
-          </label>
-        </div>
-      </li>
+      <% if @market_kind == "individual" %>
+        <li>
+          <div class="checkbox">
+            <label>
+              <input id="plan-metal-level-catastrophic" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-catastrophic" type="checkbox" data-plan-metal-level-filter="catastrophic">
+              <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_catastrophic_title_info') %>"><%= l10n("catastrophic") %></span></label>
+            </label>
+          </div>
+        </li>
+      <% end %>
           <!--<li>
             <div class="checkbox">
               <label>

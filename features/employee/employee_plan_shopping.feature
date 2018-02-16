@@ -64,4 +64,17 @@ Feature: Employees can purchase coverage from both active and renewing plan year
       Then Employee should see their current plan
       Then Employee should see the correct employee contribution on plan tile
 
-      
+  Scenario: Employee should not see the Catastrophic option in the metal level filter when shopping a plan
+    Given Congressional Employer for Soren White exists with active and renewing enrolling plan year
+    And Employee has past hired on date
+    And Soren White already matched and logged into employee portal
+    When Employee click the "Had a baby" in qle carousel
+    And Employee select a past qle date
+    Then Employee should see confirmation and clicks continue
+    Then Employee should see family members page and clicks continue
+    Then Employee should see the group selection page
+    When Employee clicks continue on the group selection page
+    Then Employee should see the list of plans
+    Then I should not see the Catastrophic metal level
+
+
