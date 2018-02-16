@@ -2,13 +2,13 @@ module SponsoredBenefits
   module Organizations
     class AcaShopCcaEmployerProfile < Profile
       include Concerns::AcaRatingAreaConfigConcern
-      
+
       field       :sic_code, type: String
-      
-      # TODO move this to CCA non-BQT concern 
+
+      # TODO move this to CCA non-BQT concern
       embeds_one  :employer_attestation
 
-      # TODO move this to BQT concern 
+      # TODO move this to BQT concern
       embedded_in :plan_design_proposal, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
 
       # TODO use SIC code validation
@@ -51,7 +51,7 @@ module SponsoredBenefits
     private
 
       def initialize_benefit_sponsorship
-        benefit_sponsorships.build(benefit_market: :aca_shop_cca, enrollment_frequency: :rolling_month) if benefit_sponsorships.blank?
+        benefit_sponsorships.build(benefit_market: :aca_shop_cca) if benefit_sponsorships.blank?
       end
     end
   end
