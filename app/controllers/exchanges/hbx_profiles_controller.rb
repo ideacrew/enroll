@@ -60,11 +60,12 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def generate_invoice
 
-    @organizations= Organization.where(:id.in => params[:ids]).all
+    @organizations = Organization.where(:id.in => params[:ids]).all
 
     @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+      # @employer_invoice = EmployerInvoice.new(org)
+      # @employer_invoice.save_and_notify_with_clean_up
+      org.employer_profile.trigger_model_event(:generate_initial_employer_invoice)
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."

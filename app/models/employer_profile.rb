@@ -9,6 +9,8 @@ class EmployerProfile
   include StateTransitionPublisher
   include ScheduledEventService
   include Config::AcaModelConcern
+  include Concerns::Observable
+  include ModelEvents::EmployerProfile
 
   embedded_in :organization
   attr_accessor :broker_role_id
