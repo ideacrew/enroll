@@ -11,8 +11,8 @@
           %p If you are able to resolve the issue with Experian, select CONTINUE APPLICATION.
           %p= link_to(t('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn btn-primary  btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))
           = render partial: 'insured/interactive_identity_verifications/options_to_verify_identity'
-        .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-          Help me sign up
+        .btn.btn-default.hidden{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+          =l10n("help_me_sign_up")
         %br
           = render partial: 'insured/plan_shoppings/help_with_plan'
         .outstanding-ridp-documents
