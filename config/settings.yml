@@ -171,7 +171,7 @@ aca:
           days: 5
       quiet_period:
         month_offset: -1
-        mday: 28
+        mday: 25
 
     benefit_period:
       length_minimum:
