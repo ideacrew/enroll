@@ -12,26 +12,27 @@ module SponsoredBenefits
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
       field :description, type: String, default: ""
 
-      embeds_many :benefit_market_service_periods,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarketServicePeriod", 
-        cascade_callbacks: true, 
+      embeds_many :benefit_market_service_periods,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarketServicePeriod",
+        cascade_callbacks: true,
         validate: true
 
       has_many    :benefit_applications,            class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
       validates_presence_of :site_id
-      
+
       validates :market_kind,
         inclusion: { in: SponsoredBenefits::MARKET_KINDS, message: "%{value} is not a valid market kind" },
         allow_nil:    false
 
       index({ "site_id" => 1, "market_kind"  => 1 })
       index({ "benefit_market_service_periods._id" => 1 })
-      index({ "benefit_market_service_periods.application_period.min" => 1, 
+      index({ "benefit_market_service_periods.application_period.min" => 1,
               "benefit_market_service_periods.application_period.max" => 1 },
             { name: "benefit_market_service_periods_application_period" })
 
 
-      scope :find_by_benefit_sponsorship, ->(benefit_sponsorship) { where(:"benefit_sponsorship.site_id" => site_id, :"benefit_sponsorship.market_kind" => market_kind) }
+      # THIS SCOPE MADE NO SENSE TO ME --- A scope is a class level method you can't combine that with instance level attributes (e.g site_id, market_kind)
+      scope :find_by_benefit_sponsorship, ->(site_id, market_kind) { where(site_id: site_id, market_kind: market_kind) }
       scope :contains_date,               ->(effective_date)      { where(:"benefit_market_service_periods.application_period.min".gte => effective_date,
                                                                           :"benefit_market_service_periods.application_period.max".lte => effective_date)
                                                                     }
@@ -103,7 +104,7 @@ module SponsoredBenefits
         @effective_period  = effective_date..(effective_date + 1.year - 1.day)
       end
 
-      private 
+      private
 
       def open_enrollment_maximum_length
         Settings.aca.shop_market.open_enrollment.maximum_length.months.months
