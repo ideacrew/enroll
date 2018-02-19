@@ -4,6 +4,7 @@ module SponsoredBenefits
     class Organization
       include Concerns::OrganizationConcern
 
+      # Association that enables organizational hierarchies.
       # Organizations may be stored in a tree, with a parent "agency" associated with one or 
       # more "divisions".  Defining one side of the association will automatically populate
       # the other.  For example:
@@ -13,6 +14,19 @@ module SponsoredBenefits
         inverse_of: :divisions
       has_many :divisions, class_name: "SponsoredBenefits::Organizations::Organization",
         inverse_of: :agency
+
+      # PlanDesignOrganization (an Organization subclass) association that enables an organization 
+      # or its agent to model options and costs for different benefit scenarios.
+      # Example 1: a Broker may prepare one or more designs and quotes for an employer.  Under this 
+      # scenario, the Broker (plan_design_agent) is owner of an instance of the employer's organization 
+      # (plan_design_sponsor) that may be used for modeling purposes.
+      # Example 2: an Employer may prepare one or more plan designs for future coverage.  Under this 
+      # scenario, the Employer is both the plan_design_agent and plan_design_sponsor
+      has_and_belongs_to_many :plan_design_agents,    class_name: "SponsoredBenefits::Organizations::Organization",
+        inverse_of: :plan_design_sponsors
+      has_and_belongs_to_many :plan_design_sponsors,  class_name: "SponsoredBenefits::Organizations::Organization",
+        inverse_of: :plan_design_agents
+
 
       embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
       embeds_one :carrier_profile, cascade_callbacks: true, validate: true
