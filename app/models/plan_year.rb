@@ -47,6 +47,9 @@ class PlanYear
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
 
+  # Indicates plan year transmitted to external source(carriers)
+  field :announced_externally, type: Boolean, default: false
+
   embeds_many :benefit_groups, cascade_callbacks: true
   embeds_many :workflow_state_transitions, as: :transitional
 
