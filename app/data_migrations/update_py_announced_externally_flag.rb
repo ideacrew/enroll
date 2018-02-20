@@ -14,6 +14,7 @@ class UpdatePyAnnouncedExternallyFlag < MongoidMigrationTask
       org.employer_profile.plan_years.published_or_renewing_published.each do |py|
         if py.active? || (((py.enrolled? && py.binder_paid?) || py.renewing_enrolled?) && py.past_transmission_threshold? && py.open_enrollment_completed?)
         py.update_attributes(announced_externally: true)
+        puts "updated plan year announced_externally to true" unless Rails.env.test?
         end
       end
     end
