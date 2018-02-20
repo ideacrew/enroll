@@ -1,6 +1,7 @@
 module DocumentsVerificationStatus
   def verification_type_status(type, member, admin=false)
     consumer = member.consumer_role
+    return "not enrolled" unless Person.person_has_an_active_enrollment?(member)
     if (consumer.vlp_authority == "curam" && consumer.fully_verified?)
       admin ? "curam" : "External source"
     else

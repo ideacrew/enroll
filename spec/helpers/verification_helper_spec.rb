@@ -21,12 +21,13 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe "#verification_type_status" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     let(:types) { ["DC Residency", "Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
-    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin, dob|
+    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin, dob, enrolled|
       before do
         uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
         person.consumer_role.revert!(verification_attr) unless current_state
         person.consumer_role.tribal_id = "444444444" if verification_type == "American Indian Status"
         person.dob = dob || Date.new(1991,11,10)
+        allow(Person).to receive(:person_has_an_active_enrollment?).and_return(true)
         if curam
           person.consumer_role.import!(verification_attr) if current_state == "valid"
           person.consumer_role.vlp_authority = "curam"
@@ -69,6 +70,10 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Citizenship", true, "verified", false, false, Date.new(2005,11,10)
     end
 
+    context "not enrolled" do
+
+    end
+
     context "admin role" do
       it_behaves_like "verification type status", "valid", "Immigration status", true, "curam", "curam", "admin"
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
@@ -78,6 +83,9 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#verification_type_class" do
+    before do
+      allow(Person).to receive(:person_has_an_active_enrollment?).and_return(true)
+    end
     context "verification type status verified" do
       it "returns success SSN verified" do
         person.consumer_role.ssn_validation = "valid"
@@ -291,6 +299,9 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#show_v_type" do
+    before do
+      allow(Person).to receive(:person_has_an_active_enrollment?).and_return(true)
+    end
     context "SSN" do
       it "returns in review if documents for ssn uploaded" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
@@ -304,7 +315,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
       it "returns processing if consumer has pending state" do
-        allow_any_instance_of(ConsumerRole).to receive(:ssa_pending?).and_return true
+        allow(person.consumer_role).to receive(:ssa_pending?).and_return true
         expect(helper.show_v_type('Social Security Number', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
@@ -323,7 +334,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
       it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:citizenship_immigration_processing?).and_return true
+        allow(person.consumer_role).to receive(:citizenship_immigration_processing?).and_return true
         person.consumer_role.vlp_documents = []
         expect(helper.show_v_type('Citizenship', person).gsub('&nbsp;', '')).to eq("Processing")
       end
@@ -343,7 +354,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Outstanding")
       end
       it "returns processing if consumer has pending state and no response from hub less than 24hours" do
-        allow_any_instance_of(ConsumerRole).to receive(:citizenship_immigration_processing?).and_return true
+        allow(person.consumer_role).to receive(:citizenship_immigration_processing?).and_return true
         person.consumer_role.vlp_documents = []
         expect(helper.show_v_type('Immigration status', person).gsub('&nbsp;', '')).to eq("Processing")
       end
@@ -356,7 +367,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Review")
       end
       it 'returns verified if residency is valid' do
-        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return true
+        allow(person.consumer_role).to receive(:residency_verified?).and_return true
         person.consumer_role.local_residency_validation = 'valid'
         expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Verified")
       end

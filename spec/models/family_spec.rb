@@ -1380,7 +1380,9 @@ describe "min_verification_due_date", dbclean: :after_each do
 end
 
 describe "#all_persons_vlp_documents_status" do
-
+  before do
+    allow(Person).to receive(:person_has_an_active_enrollment?).and_return(true)
+  end
   context "vlp documents status for single family member" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -1460,6 +1462,9 @@ describe "#all_persons_vlp_documents_status" do
 end
 
 describe "#document_due_date", dbclean: :after_each do
+  before do
+    allow(Person).to receive(:person_has_an_active_enrollment?).and_return(true)
+  end
   context "when special verifications exists" do
     let(:special_verification) { FactoryGirl.create(:special_verification, type: "admin")}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
@@ -1502,6 +1507,10 @@ end
 describe Family, '#is_document_not_verified' do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+
+  before do
+    allow(Person).to receive(:person_has_an_active_enrollment?).and_return(true)
+  end
 
   it "return true when document is not verified" do
     expect(family.is_document_not_verified("Citizenship", family.primary_family_member.person)).to eq true

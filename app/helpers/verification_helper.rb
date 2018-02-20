@@ -30,6 +30,8 @@ module VerificationHelper
         "success"
       when "processing"
         "info"
+      when "not enrolled"
+        "default"
     end
   end
 
@@ -139,7 +141,7 @@ module VerificationHelper
   end
 
   def show_v_type(v_type, person, admin = false)
-    verification_type_status(v_type, person, admin).capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+    verification_type_status(v_type, person, admin).capitalize.center(12).html_safe
   end
 
   # returns vlp_documents array for verification type
