@@ -42,13 +42,14 @@ describe PlanYear, "that is:
   describe "employer with cancelled plan year" do
 
     subject do
-      PlanYear.new({
+    FactoryGirl.build(:plan_year,
                        :aasm_state => "canceled",
                        :open_enrollment_end_on => Date.new(2017, 6, 15),
                        :start_on => Date.new(2017, 7, 1),
                        :employer_profile => employer_profile,
                        :announced_externally =>true
-                   })
+    )
+
     end
 
     context "and has reached the 15th" do
