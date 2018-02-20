@@ -9,7 +9,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   let(:start_on)                  { Date.new(2015,10,1).beginning_of_year }
   let(:end_on)                    { Date.new(2015,10,1).end_of_year }
   let(:open_enrollment_start_on)  { Date.new(2015,10,1).beginning_of_year - 2.months }
-  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
+  let(:open_enrollment_end_on)    { Date.new(2015,10,1).beginning_of_year.end_of_month }
 
   let(:valid_params){
       {
@@ -133,80 +133,51 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
         end
 
         context "and termination effective on date is requested" do
-          let(:fifty_days_before_start_on)        { start_on - 50.days }
-          let(:thirty_five_days_before_start_on)  { start_on - 35.days }
-          let(:twenty_days_before_start_on)       { start_on - 20.days }
-          let(:ten_days_before_start_on)          { start_on - 10.days }
 
+          # No termination if coverage not yet started
           let(:five_days_after_start_on)          { start_on + 5.days }
           let(:twenty_days_after_start_on)        { start_on + 20.days }
 
           context "and termination is during open enrollment" do
 
-            it "termination date should be start_on date" do
-              expect(benefit_coverage_period.termination_effective_on_for(fifty_days_before_start_on)).to eq start_on
-            end
-
-            it "termination date should be start_on date" do
-              expect(benefit_coverage_period.termination_effective_on_for(thirty_five_days_before_start_on)).to eq start_on
-            end
-
-            context "and termination is before monthly enrollment due date" do
-              it "termination date should be start_on date" do
-                expect(benefit_coverage_period.termination_effective_on_for(twenty_days_before_start_on)).to eq start_on
-              end
-            end
-
-            context "and termination is after monthly enrollment deadline" do
-              it "termination date should be last day of month following start_on date" do
-                expect(benefit_coverage_period.termination_effective_on_for(ten_days_before_start_on)).to eq start_on.end_of_month
-              end
-            end
-
             context "and termination is after start_on date" do
               context "and before monthly enrollment deadline" do
                 it "termination date should be last day of month following start_on date" do
-                  expect(benefit_coverage_period.termination_effective_on_for(five_days_after_start_on)).to eq start_on.end_of_month
+                  expect(benefit_coverage_period.termination_effective_on_for(five_days_after_start_on)).to eq five_days_after_start_on
                 end
               end
 
               context "and after monthly enrollment deadline" do
                 it "termination date should be last day of next month following start_on date" do
-                  expect(benefit_coverage_period.termination_effective_on_for(twenty_days_after_start_on)).to eq start_on.next_month.end_of_month
+                  expect(benefit_coverage_period.termination_effective_on_for(twenty_days_after_start_on)).to eq twenty_days_after_start_on
                 end
               end
             end
           end
-          #  let(:open_enrollment_end_on)    { Date.new(2015,10,1).end_of_year + 2.months }
-          # context "and termination is outside open enrollment" do
-          #   let(:offset_period)                 { 40 }
-          #   let(:after_open_enrollment_end_on)  { open_enrollment_end_on + offset_period.days }
-          #   let(:earliest_termination_date)     { after_open_enrollment_end_on + HbxProfile::IndividualEnrollmentTerminationMinimum }
 
+          context "and termination is outside open enrollment" do
+            let(:compare_date)                  { (benefit_coverage_period.start_on + 3.months).beginning_of_month }
 
-          #     it "termination date should be the waiting period plus the minimum enrollment termination notice period" do
-          #       expect(benefit_coverage_period.termination_effective_on_for(after_open_enrollment_end_on)).to eq(earliest_termination_date)
-          #     end
-          # end
-
-            context "and termination is outside open enrollment" do
-                let(:todays_date) { TimeKeeper.date_of_record }
-                let(:lessThanTerminationMinimum)    { todays_date + 8.days }
-                let(:equalToTerminationMinimum)     { todays_date + HbxProfile::IndividualEnrollmentTerminationMinimum }
-                let(:greaterThanTermnationMinimum)  { todays_date + 23.days }
-
-                it "termination date should be set to (today + TerminationMinumum days) if selected date is less than (today + TerminationMinumum days)" do
-                  expect(benefit_coverage_period.termination_effective_on_for(lessThanTerminationMinimum)).to eq(equalToTerminationMinimum)
-                end
-
-                it "termination date should be set to the date selected if selected date is equal to (today + TerminationMinumum days)" do
-                  expect(benefit_coverage_period.termination_effective_on_for(equalToTerminationMinimum)).to eq(equalToTerminationMinimum)
-                end
-
-                it "termination date should be set to the date selected if selected date is greater than (today + TerminationMinumum days)" do
-                  expect(benefit_coverage_period.termination_effective_on_for(greaterThanTermnationMinimum)).to eq(greaterThanTermnationMinimum)
-                end
+            before :each do
+              TimeKeeper.set_date_of_record_unprotected!(compare_date)
             end
+
+            it "termination date should be set to today if selected date is today " do
+              expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record)).to eq(TimeKeeper.date_of_record)
+            end
+
+            it "termination date should be set to the date selected if selected date is greater than today" do
+              expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record+7.day)).to eq(TimeKeeper.date_of_record+7.day)
+            end
+
+            context "and the effective date would " do               
+
+              it "termination date should be set to end_on date" do
+                expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record.next_year)).to eq benefit_coverage_period.end_on
+              end
+
+            end
+          end
 
         end
       end

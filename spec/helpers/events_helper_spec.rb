@@ -67,7 +67,7 @@ describe EventsHelper, "given an address_kind" do
   end
 
   describe "is_new_conversion_employer?" do
-    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
+    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active", is_conversion: true) }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
     let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
 
@@ -127,186 +127,6 @@ describe EventsHelper, "given an address_kind" do
     end
   end
 
-  describe "employer_plan_years" do
-    let(:active_plan_year){ FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.at_beginning_of_month, aasm_state: "active") }
-    let(:renewing_plan_year){ FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.at_beginning_of_month.next_month,aasm_state: "renewing_enrolling") }
-    let(:employer_profile2){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
-
-    let(:employer_profile1){ FactoryGirl.create(:employer_profile, plan_years: [active_plan_year]) }
-
-    context "initial employer" do
-
-      context "day is after 15th of this month" do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
-        end
-
-        it "should return active plan year" do
-          employer_profile1.active_plan_year.start_on=TimeKeeper.date_of_record.at_beginning_of_month.next_month
-          employer_profile1.save
-          expect(subject.employer_plan_years(employer_profile1)).to eq [active_plan_year]
-        end
-      end
-
-      context "day is on or before 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)
-        end
-
-        it "should not return plan years" do
-          employer_profile1.active_plan_year.start_on=TimeKeeper.date_of_record.at_beginning_of_month.next_month
-          employer_profile1.save
-          expect(subject.employer_plan_years(employer_profile1)).to eq nil
-        end
-      end
-    end
-
-    context "renewal employer" do
-
-      context "day is after 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
-        end
-
-        it "should returna active and renewal plan year" do
-          expect(subject.employer_plan_years(employer_profile2)).to eq [renewing_plan_year,active_plan_year]
-        end
-      end
-
-      context "day is on or before 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)
-        end
-
-        it "should return active plan year" do
-          expect(subject.employer_plan_years(employer_profile2)).to eq [active_plan_year]
-        end
-      end
-    end
-
-    context "conversion employer with no external plan year" do
-
-      before do
-        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
-      end
-
-      context "day is after 15th of this month" do
-
-        it "should return active plan year" do
-          employer_profile1.profile_source='conversion'
-          employer_profile1.registered_on=TimeKeeper.date_of_record-1.year
-          employer_profile1.save
-          expect(subject.employer_plan_years(employer_profile1)).to eq [active_plan_year]
-        end
-      end
-
-      context "day is on or before 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)
-        end
-
-        it "should not return plan years" do
-          employer_profile1.profile_source='conversion'
-          employer_profile1.registered_on=TimeKeeper.date_of_record-1.year
-          employer_profile1.active_plan_year.start_on=TimeKeeper.date_of_record+1.month
-          employer_profile1.save
-          expect(subject.employer_plan_years(employer_profile1)).to eq nil
-        end
-      end
-    end
-
-    context "new conversion employer" do
-
-      context "day is after 15th of this month" do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
-        end
-
-        it "should return active and renewal plan year" do
-          employer_profile2.profile_source='conversion'
-          employer_profile2.save
-          expect(subject.employer_plan_years(employer_profile2)).to eq [renewing_plan_year,active_plan_year]
-        end
-      end
-
-      context "day is on or before 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)
-        end
-
-        it "should not return plan years" do
-          employer_profile2.profile_source='conversion'
-          employer_profile2.save
-          expect(subject.employer_plan_years(employer_profile2)).to eq nil
-        end
-      end
-    end
-
-    context "conversion employer renewing" do
-
-      context "day is after 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 20.days)
-        end
-
-        it "should return active and renewal plan year" do
-          employer_profile2.profile_source='conversion'
-          employer_profile2.registered_on=TimeKeeper.date_of_record-1.year
-          employer_profile2.save
-          expect(subject.employer_plan_years(employer_profile2)).to eq [renewing_plan_year,active_plan_year]
-        end
-      end
-
-      context "day is on or before 15th of this month" do
-
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)
-        end
-
-        it "should return active_plan_year" do
-          employer_profile2.profile_source='conversion'
-          employer_profile2.registered_on=TimeKeeper.date_of_record-1.year
-          employer_profile2.save
-          expect(subject.employer_plan_years(employer_profile2)).to eq [active_plan_year]
-        end
-      end
-    end
-
-  end
-
-  describe "employer_has_office_location?" do
-
-    let(:phone) { FactoryGirl.build(:phone) }
-    let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
-    let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
-
-    context "office address & phone valid" do
-
-      it "should return true" do
-        allow(subject).to receive(:is_office_location_address_valid?).with(office_location).and_return true
-        allow(subject).to receive(:is_office_location_phone_valid?).with(office_location).and_return true
-        expect(subject.employer_has_office_location?(office_location)).to eq true
-      end
-
-    end
-
-    context "office address & phone not valid" do
-
-      it "should return false " do
-        allow(subject).to receive(:is_office_location_address_valid?).with(office_location).and_return true
-        allow(subject).to receive(:is_office_location_phone_valid?).with(office_location).and_return false
-        expect(subject.employer_has_office_location?(office_location)).to eq false
-      end
-    end
-
-  end
-
   describe "is_office_location_address_valid?" do
 
     let(:phone) { FactoryGirl.build(:phone) }
@@ -351,6 +171,32 @@ describe EventsHelper, "given an address_kind" do
       it "should return false " do
         expect(subject.is_office_location_phone_valid?(office_location1)).to eq false
       end
+    end
+  end
+
+end
+
+describe EventsHelper, "transforming a qualifying event kind for external xml" do
+
+  RESULT_PAIR = {
+    "relocate" => "location_change",
+    "eligibility_change_immigration_status" => "citizen_status_change",
+    "lost_hardship_exemption" => "eligibility_change_assistance",
+    "eligibility_change_income" => "eligibility_change_assistance",
+    "court_order" => "medical_coverage_order",
+    "domestic_partnership" => "entering_domestic_partnership",
+    "new_eligibility_member" => "drop_family_member_due_to_new_eligibility",
+    "new_eligibility_family" => "drop_family_member_due_to_new_eligibility",
+    "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
+    "divorce" => "divorce"
+  }
+
+  subject { EventsHelperSlug.new }
+
+  RESULT_PAIR.each_pair do |k,v|
+    it "maps \"#{k}\" to \"#{v}\"" do
+      eligibility_event = instance_double(HbxEnrollment, :eligibility_event_kind => k)
+      expect(subject.xml_eligibility_event_uri(eligibility_event)).to eq "urn:dc0:terms:v1:qualifying_life_event##{v}"
     end
   end
 

@@ -6,10 +6,14 @@ class LawfulPresenceDetermination
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Mongoid::Attributes::Dynamic
+  include Mongoid::History::Trackable
 
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
   embeds_many :vlp_responses, class_name:"EventResponse"
+  embeds_many :ssa_requests, class_name:"EventRequest"
+  embeds_many :vlp_requests, class_name:"EventRequest"
 
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
@@ -18,6 +22,16 @@ class LawfulPresenceDetermination
   field :citizenship_result, type: String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
+
+  track_history   :on => [:vlp_verified_at,
+                          :vlp_authority,
+                          :citizen_status,
+                          :citizenship_result,
+                          :aasm_state],
+                  :scope => :consumer_role,
+                  :track_create  => false,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => false     # track document destruction, default is false
 
   aasm do
     state :verification_pending, initial: true
@@ -60,13 +74,17 @@ class LawfulPresenceDetermination
     notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
   end
 
+  def assign_citizen_status(new_status)
+    update_attributes(citizen_status: new_status)
+  end
+
   private
   def record_approval_information(*args)
     approval_information = args.first
     self.update_attributes!(vlp_verified_at: approval_information.determined_at,
                             vlp_authority: approval_information.vlp_authority)
-    if approval_information.citizen_status
-      self.citizenship_result = approval_information.citizen_status
+    if approval_information.citizenship_result
+      self.citizenship_result = approval_information.citizenship_result
     else
       self.ivl_role.is_native? ? self.citizenship_result = "us_citizen" : self.citizenship_result = "non_native_citizen"
     end
@@ -92,6 +110,7 @@ class LawfulPresenceDetermination
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
+      event: aasm.current_event,
       transition_at: Time.now
     )
   end

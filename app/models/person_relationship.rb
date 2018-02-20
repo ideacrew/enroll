@@ -45,6 +45,19 @@ class PersonRelationship
     "ward"
   ]
 
+  Relationships_UI = [
+    "spouse",
+    "domestic_partner",
+    "child",
+    "parent",
+    "sibling",
+    "unrelated",
+    "aunt_or_uncle",
+    "nephew_or_niece",
+    "grandchild",
+    "grandparent"
+  ]
+
   InverseMap = {
     "child" => "parent",
     "parent" => "child",
@@ -90,6 +103,12 @@ class PersonRelationship
             allow_blank: false,
             allow_nil:   false,
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
+
+  after_save :notify_updated
+
+  def notify_updated
+    person.notify_updated
+  end
 
   def parent
     raise "undefined parent class: Person" unless person?
