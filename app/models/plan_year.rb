@@ -47,6 +47,9 @@ class PlanYear
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
 
+  # Indicates plan year transmitted to external source(carriers)
+  field :announced_externally, type: Boolean, default: false
+
   embeds_many :benefit_groups, cascade_callbacks: true
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -213,7 +216,7 @@ class PlanYear
     if start_on.blank?
       return(false)
     end
-    if self == employer_profile.latest_plan_year && canceled? && binder_paid? && past_transmission_threshold?
+    if announced_externally? && canceled? && binder_paid? && past_transmission_threshold?
       return true
     end
     if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
