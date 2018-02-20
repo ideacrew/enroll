@@ -18,7 +18,7 @@ module BrokerAgencies::ProfilesHelper
   end
 
   def commission_statement_coverage_period(date)
-    "#{date.next_month.beginning_of_month.strftime('%b %Y')}" rescue nil
+    "#{date.prev_month.beginning_of_month.strftime('%b %Y')}" rescue nil
   end
-  
+
 end
