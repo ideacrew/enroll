@@ -17,6 +17,9 @@ class PlanYear
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
+  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
+  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -1011,7 +1014,9 @@ class PlanYear
   end
 
   def notify_employer_py_cancellation
-    notify("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: self.employer_profile.hbx_id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+    if announced_externally?
+      notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
+    end
   end
 
   def decline_application

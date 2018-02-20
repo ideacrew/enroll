@@ -2478,7 +2478,7 @@ end
 
 describe "notify_employer_py_cancellation" do
   context "notify employer plan year cancellation " do
-    let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active')}
+    let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active',announced_externally:true)}
     let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
 
     it "should notify event" do
