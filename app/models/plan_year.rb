@@ -195,6 +195,10 @@ class PlanYear
     end.compact
   end
 
+  def update_announced_externally
+    self.update_attribute(:announced_externally, true)
+  end
+
   def open_enrollment_completed?
     return false if open_enrollment_end_on.blank?
     (TimeKeeper.date_of_record > open_enrollment_end_on)

@@ -831,7 +831,10 @@ class EmployerProfile
       }).each do |org|
 
       employer_profile = org.employer_profile
-      employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
+      if employer_profile.is_renewal_transmission_eligible?
+        employer_profile.transmit_renewal_eligible_event
+        renewing_plan_year.update_announced_externally
+      end
       employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop? 
     end
 
@@ -840,6 +843,7 @@ class EmployerProfile
       }, :"employer_profile.aasm_state".in => ['binder_paid']).each do |org|
 
       org.employer_profile.transmit_initial_eligible_event
+      published_plan_year.update_announced_externally
     end
   end
 
