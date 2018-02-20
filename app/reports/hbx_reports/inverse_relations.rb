@@ -16,47 +16,44 @@ class InverseRelations < MongoidMigrationTask
 		)
 
 		count = 0
-		file_name = "#{Rails.root}/public/inverse_relations.csv"
+		file_name = "#{Rails.root}/inverse_relations.csv"
 		CSV.open(file_name, "w", force_quotes: true) do |csv|
 			csv << field_names
-			families = Family.all
+			families = Family.all_eligible_for_assistance
 
       families.each do |family|
 				begin
-          primary = family.primary_family_member.person
-					
+          primary = family.primary_applicant.person
           family.family_members.each do |member|
-            
             inverse = false
             dependent_relation = member.relationship
             dependent = member.person
+
             if ["child", "grandchild", "stepchild", "ward"].include?(dependent_relation) && dependent.dob < primary.dob
               inverse = true
             elsif ["parent", "grandparent", "stepparent", "guardian"].include?(dependent_relation) && dependent.dob > primary.dob
               inverse = true
             end
             
-              if inverse
-                csv << [
-                  primary.first_name,
-                  primary.last_name,
-                  primary.hbx_id,
-                  primary.dob,
-                  dependent.first_name,
-                  dependent.last_name,
-                  dependent.hbx_id,
-                  dependent.dob,
-                  dependent_relation
-                ]
-              end
+            if inverse
+              csv << [
+                primary.first_name,
+                primary.last_name,
+                primary.hbx_id,
+                primary.dob,
+                dependent.first_name,
+                dependent.last_name,
+                dependent.hbx_id,
+                dependent.dob,
+                dependent_relation
+              ]
             end
-
-          rescue
-						puts "Family record with inverse relation" unless Rails.env.test?
-					end
+          end
+        rescue
+					puts "Bad Family record with primary person's hbx_id: #{primary.hbx_id}" unless Rails.env.test?
 				end
 			end
+      puts "Total count of bad families: #{count}" unless Rails.env.test?
 		end
-	end	
-
-
+	end
+end
