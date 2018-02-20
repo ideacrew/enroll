@@ -47,7 +47,7 @@ describe PlanYear, "that is:
                        :open_enrollment_end_on => Date.new(2017, 6, 15),
                        :start_on => Date.new(2017, 7, 1),
                        :employer_profile => employer_profile,
-                       :announced_externally =>true
+                       :announced_externally =>false
     )
 
     end
@@ -63,6 +63,7 @@ describe PlanYear, "that is:
 
     context "and has reached the 16th" do
       let(:current_date) { Date.new(2017, 6, 16) }
+      let!(:update_plan_year) {subject.update_attributes(announced_externally:true)}
 
       it "is eligible for export" do
         expect(subject.eligible_for_export?).to be_truthy

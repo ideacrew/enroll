@@ -216,7 +216,7 @@ class PlanYear
     if start_on.blank?
       return(false)
     end
-    if announced_externally? && canceled? && binder_paid? && past_transmission_threshold?
+    if canceled? && announced_externally?
       return true
     end
     if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
