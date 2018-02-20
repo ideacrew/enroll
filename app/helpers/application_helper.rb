@@ -661,5 +661,10 @@ module ApplicationHelper
   def previous_year
     TimeKeeper.date_of_record.prev_year.year
   end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
 end
 
