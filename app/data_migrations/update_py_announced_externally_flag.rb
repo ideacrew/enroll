@@ -12,7 +12,7 @@ class UpdatePyAnnouncedExternallyFlag < MongoidMigrationTask
 
     organizations.each do |org|
       org.employer_profile.plan_years.published_or_renewing_published.each do |py|
-        if py.active? || ((py.enrolled? && py.binder_paid?) || py.renewing_enrolled?) && py.past_transmission_threshold? && py.open_enrollment_completed?
+        if py.active? || (((py.enrolled? && py.binder_paid?) || py.renewing_enrolled?) && py.past_transmission_threshold? && py.open_enrollment_completed?)
         py.update_attributes(announced_externally: true)
         end
       end
