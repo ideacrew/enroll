@@ -22,36 +22,38 @@ class InverseRelations < MongoidMigrationTask
 			families = Family.all_eligible_for_assistance
 
       families.each do |family|
-				begin
-          primary = family.primary_applicant.person
-          family.family_members.each do |member|
-            inverse = false
-            dependent_relation = member.relationship
-            dependent = member.person
+        if family.e_case_id.present?
+          begin
+            primary = family.primary_applicant.person
+            family.family_members.each do |member|
+              inverse = false
+              dependent_relation = member.relationship
+              dependent = member.person
 
-            if ["child", "grandchild", "stepchild", "ward"].include?(dependent_relation) && dependent.dob < primary.dob
-              inverse = true
-            elsif ["parent", "grandparent", "stepparent", "guardian"].include?(dependent_relation) && dependent.dob > primary.dob
-              inverse = true
+              if ["child", "grandchild", "stepchild", "ward"].include?(dependent_relation) && dependent.dob < primary.dob
+                inverse = true
+              elsif ["parent", "grandparent", "stepparent", "guardian"].include?(dependent_relation) && dependent.dob > primary.dob
+                inverse = true
+              end
+
+              if inverse
+                csv << [
+                  primary.first_name,
+                  primary.last_name,
+                  primary.hbx_id,
+                  primary.dob,
+                  dependent.first_name,
+                  dependent.last_name,
+                  dependent.hbx_id,
+                  dependent.dob,
+                  dependent_relation
+                ]
+              end
             end
-            
-            if inverse
-              csv << [
-                primary.first_name,
-                primary.last_name,
-                primary.hbx_id,
-                primary.dob,
-                dependent.first_name,
-                dependent.last_name,
-                dependent.hbx_id,
-                dependent.dob,
-                dependent_relation
-              ]
-            end
+          rescue
+            puts "Bad Family record with primary person's hbx_id: #{primary.hbx_id}" unless Rails.env.test?
           end
-        rescue
-					puts "Bad Family record with primary person's hbx_id: #{primary.hbx_id}" unless Rails.env.test?
-				end
+        end
 			end
       puts "Total count of bad families: #{count}" unless Rails.env.test?
 		end

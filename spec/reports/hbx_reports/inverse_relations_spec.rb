@@ -31,6 +31,8 @@ describe InverseRelations do
 
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person)}
   let(:child) { FactoryGirl.create(:family_member, :person => child1, :family => family )}
+  let(:tax_household) { FactoryGirl.create(:tax_household, household: family.households.first)}
+  let!(:eligibility_determination) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household)}
 
   describe "correct data input" do
     it "should have correct data" do
@@ -45,6 +47,7 @@ describe InverseRelations do
       subject.migrate
       @file = "#{Rails.root}/inverse_relations.csv"
     end
+
     it "check the records included in file" do
       file_context = CSV.read(@file)
       expect(file_context.size).to be > 1
