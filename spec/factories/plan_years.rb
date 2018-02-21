@@ -66,7 +66,7 @@ FactoryGirl.define do
     transient do
       renewing false
       with_dental false
-      reference_plan {FactoryGirl.create(:plan, :with_premium_tables)._id}
+      reference_plan {FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables)._id}
       dental_reference_plan nil
     end
 
