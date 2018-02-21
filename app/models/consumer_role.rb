@@ -26,8 +26,8 @@ class ConsumerRole
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
 
   #ridp
-  IDENTITY_VALIDATION_STATES = %w(valid outstanding pending)
-  APPLICATION_VALIDATION_STATES = %w(valid outstanding pending)
+  IDENTITY_VALIDATION_STATES = %w(unverified valid outstanding pending)
+  APPLICATION_VALIDATION_STATES = %w(unverified valid outstanding pending)
 
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
@@ -92,11 +92,11 @@ class ConsumerRole
 
 
   # Identity
-  field :identity_validation, type: String, default: "outstanding"
+  field :identity_validation, type: String, default: "unverified"
   validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => false
 
   # Application
-  field :application_validation, type: String, default: "outstanding"
+  field :application_validation, type: String, default: "unverified"
   validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
 
   #ridp update reason fields
@@ -707,6 +707,14 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  def identity_unverified?
+    self.identity_validation == "unverified"
+  end
+
+  def application_unverified?
+    self.application_validation == "unverified"
+  end
+
   def check_for_critical_changes(person_params, family)
     if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
       redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
@@ -735,6 +743,17 @@ class ConsumerRole
       mark_residency_pending
       start_residency_verification_process
     end
+  end
+
+  def move_identity_documents_to_outstanding
+    if identity_unverified? && application_unverified?
+      update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
+    end
+  end
+
+  def move_identity_documents_to_verified
+    update_attributes(identity_validation: 'valid', application_validation: 'valid',
+                      identity_update_reason: 'Verified by Experian', application_update_reason: 'Verified by Experian')
   end
 
   #class methods

@@ -248,6 +248,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def upload_ridp_document
     set_consumer_bookmark_url
     set_current_person
+    @person.consumer_role.move_identity_documents_to_outstanding
   end
 
   private

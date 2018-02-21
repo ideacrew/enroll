@@ -25,6 +25,7 @@ module Insured
 
     def service_unavailable
       set_consumer_bookmark_url
+      @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"
     end
 
@@ -32,6 +33,7 @@ module Insured
       set_consumer_bookmark_url
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
+      @person.consumer_role.move_identity_documents_to_outstanding
       render "failed_validation"
     end
 
@@ -92,6 +94,7 @@ module Insured
         consumer_user.identity_final_decision_transaction_id = service_response.transaction_id
         consumer_user.identity_verified_date = TimeKeeper.date_of_record
         consumer_user.save!
+        consumer_role.move_identity_documents_to_verified
       end
       redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
     end
