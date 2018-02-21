@@ -23,8 +23,8 @@ class InverseRelations < MongoidMigrationTask
 
       families.each do |family|
         if family.e_case_id.present?
-          primary = family.primary_applicant.person
           begin
+            primary = family.primary_applicant.person
             family.family_members.each do |member|
               inverse = false
               dependent_relation = member.relationship
@@ -51,7 +51,7 @@ class InverseRelations < MongoidMigrationTask
               end
             end
           rescue
-            puts "Bad Family record with primary person's hbx_id: #{primary.hbx_id}" unless Rails.env.test?
+            puts "Bad Family record #{family.id}" unless Rails.env.test?
           end
         end
 			end
