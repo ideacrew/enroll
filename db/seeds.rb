@@ -170,4 +170,9 @@ puts "::: benefit packages seed complete :::"
 puts "*"*80
 system "bundle exec rake permissions:initial_hbx"
 puts "*"*80
+
+puts "*"*80
+system "bundle exec rake seed:translations[db/seedfiles/english_translations_seed.rb]"
+puts "*"*80
+
 puts "End of Seed Data"

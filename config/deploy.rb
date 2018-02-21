@@ -52,6 +52,7 @@ namespace :assets do
       within release_path do
         with rails_env: fetch(:rails_env) do
           execute :rake, "assets:precompile"
+          execute :rake, "seed:translations[db/seedfiles/english_translations_seed.rb]" 
         end
       end
     end
