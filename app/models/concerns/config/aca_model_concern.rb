@@ -18,6 +18,7 @@ module Config::AcaModelConcern
     delegate :employee_participation_ratio_minimum, to: :class
     delegate :non_owner_participation_count_minimum, to: :class
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
+    delegate :enabled_metal_levels, to: :class
   end
 
   class_methods do
@@ -83,6 +84,10 @@ module Config::AcaModelConcern
 
     def non_owner_participation_count_minimum
       @@non_owner_participation_count_minimum ||= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
+    end
+
+    def enabled_metal_levels
+      @@enabled_metal_levels = Settings.aca.reference_carriers_for_metal_level
     end
   end
 end

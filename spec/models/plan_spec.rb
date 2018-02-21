@@ -148,8 +148,8 @@ RSpec.describe Plan, dbclean: :after_each do
       let!(:renewal_health_plan) { create(:plan, coverage_kind: "health", active_year: calender_year + 1) }
       let!(:neighbour_plan) { create(:plan, is_sole_source: true, active_year: calender_year + 1) }
       let(:current_date) { Date.new(calender_year, 4, 10) }
-    
-      before do 
+
+      before do
         TimeKeeper.set_date_of_record_unprotected!(current_date)
       end
 
@@ -163,15 +163,15 @@ RSpec.describe Plan, dbclean: :after_each do
         let(:renewal_plan_status) { true }
 
         let!(:renewal_plan_mappings1) {
-          sole_source_plan.renewal_plan_mappings.create({ 
+          sole_source_plan.renewal_plan_mappings.create({
             start_on: Date.new(calender_year, 1, 1),
             end_on: Date.new(calender_year, 5, 1).end_of_month,
             renewal_plan_id: neighbour_plan.id,
             is_active: renewal_plan_status
           })
         }
-  
-        context "is not active" do 
+
+        context "is not active" do
           let(:renewal_plan_status) { false }
 
           it "should return just regular renewal plan" do
@@ -459,6 +459,7 @@ RSpec.describe Plan, dbclean: :after_each do
     let(:shop_count) { platinum_count + gold_count + shop_silver_count }
     let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
     let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
+    let(:carrier_profile_0_without_bronze_count) { platinum_count + gold_count }
     let(:carrier_profile_1_count) { shop_silver_count + individual_silver_count + catastrophic_count }
     let(:current_year) {TimeKeeper.date_of_record.year}
     let(:next_year) {current_year + 1}
@@ -546,6 +547,11 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       context "with referenced scopes" do
+        let(:enabled_metal_levels) { %w(platinum gold silver bronze) }
+
+        before do
+          allow(Plan).to receive(:enabled_metal_levels).and_return(enabled_metal_levels)
+        end
         it "should return correct counts for each metal scope" do
           expect(Plan.platinum_level.count).to eq platinum_count
           expect(Plan.gold_level.count).to eq gold_count
@@ -562,6 +568,14 @@ RSpec.describe Plan, dbclean: :after_each do
         it "should return correct counts for each carrier_profile scope" do
           expect(Plan.find_by_carrier_profile(carrier_profile_0).count).to eq carrier_profile_0_count
           expect(Plan.find_by_carrier_profile(carrier_profile_1).count).to eq carrier_profile_1_count
+        end
+
+        context "should return correct counts for carriers if metal levels are restricted" do
+          let(:enabled_metal_levels) { %w(platinum gold silver) }
+
+          it "returns a count less bronze plans" do
+            expect(Plan.find_by_carrier_profile(carrier_profile_0).with_enabled_metal_levels.count).to eq carrier_profile_0_without_bronze_count
+          end
         end
 
         it "should return correct counts for chained scopes" do
