@@ -34,6 +34,10 @@ site:
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
+  forms: "https://dchealthlink.com/forms#en"
+  website_url: "www.healthcare.gov"
+  irs_url: "https://www.irs.gov/"
+
   social_media:
     facebook_url: ""
 

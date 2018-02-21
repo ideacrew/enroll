@@ -449,4 +449,19 @@ end
       expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_coverage_termination']
     end
   end
+
+  describe "#previous_year" do
+
+    it "should return past year" do
+      expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
+    end
+
+    it "should not return current year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year)
+    end
+
+    it "should not return next year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
+    end
+  end
 end

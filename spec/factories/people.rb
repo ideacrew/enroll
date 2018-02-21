@@ -21,6 +21,10 @@ FactoryGirl.define do
       #create_list(:employee_role, 1, person: p)
     end
 
+    trait :with_mailing_address do
+      addresses { [FactoryGirl.build(:address, :mailing_kind)]}
+    end
+
     trait :with_ssn do
       sequence(:ssn) { |n| 222222220 + n }
     end
