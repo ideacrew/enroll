@@ -60,6 +60,17 @@ module Observers
             end
         end
 
+        if new_model_event.event_key == :notify_employee_of_initial_employer_ineligibility
+          errors = plan_year.enrollment_errors
+          if(errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
+            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+              if ce.employee_role.present?
+                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_initial_employer_ineligibility")
+              end
+            end
+          end
+        end
+
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
         end
       end
