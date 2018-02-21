@@ -4,22 +4,22 @@ require 'csv'
 class InverseRelations < MongoidMigrationTask
   def migrate
     field_names = %w(
-				 Primary_Member_First_Name
-         Primary_Member_Last_Name
-         Primary_Member_HBX_Id
-         Primary_Member_DOB
-         Dependent_First_Name
-         Dependent_Last_Name
-         Dependent_HBX_Id
-         Dependent_DOB
-         Dependent_Relationship
+      Primary_Member_First_Name
+      Primary_Member_Last_Name
+      Primary_Member_HBX_Id
+      Primary_Member_DOB
+      Dependent_First_Name
+      Dependent_Last_Name
+      Dependent_HBX_Id
+      Dependent_DOB
+      Dependent_Relationship
 		)
 
-		count = 0
-		file_name = "#{Rails.root}/inverse_relations.csv"
-		CSV.open(file_name, "w", force_quotes: true) do |csv|
-			csv << field_names
-			families = Family.all_eligible_for_assistance
+    count = 0
+    file_name = "#{Rails.root}/inverse_relations.csv"
+    CSV.open(file_name, "w", force_quotes: true) do |csv|
+      csv << field_names
+      families = Family.all_eligible_for_assistance
 
       families.each do |family|
         if family.e_case_id.present?

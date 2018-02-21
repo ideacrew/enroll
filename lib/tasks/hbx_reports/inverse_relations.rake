@@ -4,8 +4,8 @@
 require File.join(Rails.root, "app","reports","hbx_reports", "inverse_relations")
 
 namespace :reports do
-	namespace :primary_family_members do
-		desc "List all relations that are inverse"
-		InverseRelations.define_task :inverse_relations =>:environment
-	end
+  namespace :primary_family_members do
+    desc "List all relations that are inverse"
+    InverseRelations.define_task :inverse_relations =>:environment
+  end
 end

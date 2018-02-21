@@ -2,7 +2,8 @@ require "rails_helper"
 require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "inverse_relations")
 
-describe InverseRelations do 
+describe InverseRelations do
+
   let(:given_task_name) { "with_e_case_id" }
   subject { InverseRelations.new(given_task_name, double(:current_scope => nil)) }
 
