@@ -519,6 +519,11 @@ describe Person do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
 
+    it 'ssn present, dob present, first_name, last_name present and person inactive' do
+      @p4.update_attributes(is_active:false)
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
+    end
+
     it 'returns person records only where is_active == true' do
       expect(@p2.is_active).to eq true
       expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
@@ -527,11 +532,6 @@ describe Person do
     it 'should not match person record if is_active == false' do
       expect(@p5.is_active).to eq false
       expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).to be_empty
-    end
-
-    it 'ssn present, dob present, first_name, last_name present and person inactive' do
-      @p4.update_attributes(is_active:false)
-      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
     end
   end
 

@@ -1295,6 +1295,47 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
       end
     end
   end
+
+
+  describe ".transmit_scheduled_employers" do
+
+    context 'when renewal plan year eligible_event triggered' do
+
+      it 'should update renewal plan year announced_externally to true' do
+        renewal_plan_year.reload
+        expect(renewal_plan_year.announced_externally).to be_falsey
+        EmployerProfile.transmit_scheduled_employers(TimeKeeper.date_of_record)
+        renewal_plan_year.reload
+        expect(renewal_plan_year.announced_externally).to be_truthy
+      end
+    end
+
+    context 'when renewal plan year not eligible to trigger' do
+
+      it 'should not update renewal plan year announced_externally' do
+        renewal_plan_year.reload
+        expect(renewal_plan_year.announced_externally).to be_falsey
+        allow_any_instance_of(EmployerProfile).to receive("is_renewal_transmission_eligible?").and_return(false)
+        EmployerProfile.transmit_scheduled_employers(TimeKeeper.date_of_record)
+        renewal_plan_year.reload
+        expect(renewal_plan_year.announced_externally).to be_falsey
+      end
+    end
+
+    context "when initial plan year eligible_event triggered" do
+
+      let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+      let!(:active_plan_year){ FactoryGirl.build(:plan_year,start_on: start_date, aasm_state:'enrolled', benefit_groups:[benefit_group]) }
+      let!(:employer_profile){ FactoryGirl.create(:employer_profile, :aasm_state => "binder_paid", plan_years: [active_plan_year]) }
+
+      it 'should update initial plan year announced_externally to true' do
+        expect(active_plan_year.announced_externally).to be_falsey
+        EmployerProfile.transmit_scheduled_employers(TimeKeeper.date_of_record)
+        active_plan_year.reload
+        expect(active_plan_year.announced_externally).to be_truthy
+      end
+    end
+  end
 end
 
 describe EmployerProfile, "initial employers enrolled plan year state", dbclean: :after_each do
