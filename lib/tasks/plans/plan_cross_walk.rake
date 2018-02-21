@@ -1,5 +1,4 @@
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'plan_cross_walk_list_parser')
-
 namespace :xml do
   desc "Import plan crosswalk"
   task :plan_cross_walk, [:file] => :environment do |task, args|

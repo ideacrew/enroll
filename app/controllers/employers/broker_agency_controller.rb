@@ -52,6 +52,7 @@ class Employers::BrokerAgencyController < ApplicationController
       broker_hired
       broker_hired_confirmation
       broker_agency_hired_confirmation
+      # @employer_profile.trigger_notices("broker_hired_confirmation_notice") #mirror notice
     end
 
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
@@ -100,16 +101,16 @@ class Employers::BrokerAgencyController < ApplicationController
     rescue Exception => e
        puts "Unable to deliver Broker Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
-  end  
+  end
 
   def broker_hired_confirmation
     begin
          ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired_confirmation")
     rescue Exception => e
        puts "Unable to deliver Employer Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
-    end   
+    end
   end
-    
+
   def broker_agency_hired_confirmation
     begin
          ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_agency_hired_confirmation")

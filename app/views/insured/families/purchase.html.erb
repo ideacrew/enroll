@@ -3,9 +3,11 @@
   <div id="confirm_plan" class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
     <h1 class="darkblue"><%= l10n("confirm_your_plan_selection") %></h1>
     <% if @terminate.present? %>
-      <%= l10n("insured.families.purchase.terminate_present_html") %>      
+      <p><%= l10n("insured.families.purchase.click_terminate_plan_button") %></p>
+      <p><%= l10n("insured.families.purchase.remain_in_plan_until_terminate") %></p>
     <% else %>
-      <%= l10n("insured.families.purchase.terminate_not_present_html") %>      
+      <p><%= l10n("insured.families.purchase.current_plan_selection_displayed_below") %></p>
+      <p><%= l10n("insured.families.purchase.not_complete_until_purchase") %></p>
     <% end %>
     <p>
       <% if @enrollment.employer_profile.present? %>
