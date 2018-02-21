@@ -87,7 +87,7 @@ module Config::AcaModelConcern
     end
 
     def enabled_metal_levels
-      @@enabled_metal_levels = Settings.aca.reference_carriers_for_metal_level
+      @@enabled_metal_levels = Settings.aca.enabled_metal_levels_for_single_carrier
     end
   end
 end
