@@ -23,8 +23,8 @@ class InverseRelations < MongoidMigrationTask
 
       families.each do |family|
         if family.e_case_id.present?
+          primary = family.primary_applicant.person
           begin
-            primary = family.primary_applicant.person
             family.family_members.each do |member|
               inverse = false
               dependent_relation = member.relationship
