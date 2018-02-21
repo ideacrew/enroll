@@ -16,4 +16,21 @@ else {
   $('.dropdown.pull-right').removeClass('open');
 }
 
+$( "#datepicker" ).datepicker();
+
+$('input[name=plan_year_radio]').click(function() {
+  $('tr.plan-year-actions').removeClass('hidden')
+  $('#plan-year-btn-group').removeClass('hidden')
+});
+
+$('input[name=term_actions]').click(function() {
+  $('.py-btn-grp').removeClass('disabled')
+});
+
+$('#plan-year-btn-group ul li').each(function() {
+  $(this).click(function() {
+   $('.plan-year-submit').removeClass('disabled')
+  })
+});
+
 applyJQDatePickers();

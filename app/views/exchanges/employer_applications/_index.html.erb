@@ -18,12 +18,13 @@
 
 <div class="container" id="attestation_documents_table">
   <div class = "table-responsive table-override"> 
-  <h4> Applications </h4>
+  <h4> Plan Years </h4>
   <% plan_years = @employer_profile.plan_years.where(:is_conversion => false) %>
   <% if plan_years.present? %>
-    <table class = "table" style="table-layout: fixed;">
+    <table class="table">
       <thead>
         <tr>
+         <th></th>
          <th>Start Date</th>
          <th>End Date</th>
          <th>Open Enrollment Start</th>
@@ -31,12 +32,13 @@
          <th>Created On</th>
          <th>Terminated On</th>
          <th>Status</th>
-         <th>Action Button</th>
+         <th></th>
         </tr>
       </thead>
       <tbody>
         <% plan_years.order('start_on DESC').each do |application| %>
           <tr>
+            <td><%= radio_button_tag 'plan_year_radio', application.id  %></td>
             <td><%= TimeKeeper.format_date(application.start_on) %></td>
             <td><%= TimeKeeper.format_date(application.end_on) %></td>
             <td><%= TimeKeeper.format_date(application.open_enrollment_start_on) %></td>
@@ -44,11 +46,37 @@
             <td><%= TimeKeeper.format_date_time(application.created_at) %></td>
             <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
             <td><%= application.aasm_state.humanize %></td>
-            <td>
-              <%= link_to 'Update', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+            <td colspan="1">
+              <div class="btn-group hidden" id="plan-year-btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle disabled py-btn-grp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Actions <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li><%= link_to 'CANCEL PY', '#'%></li>
+                  <li><%= link_to 'TERMINATE PY', '#'%></li>
+                  <li><%= link_to 'REINSTATE PY', '#'%></li>
+                </ul>
+              </div>
+              
             </td>
           </tr>
           <tr id="collapse_<%= application.id %>">
+          <tr id="<%= application.id %>" class="plan-year-actions hidden">
+            <td colspan="2">
+              <%= radio_button_tag 'term_actions', 'voluntary_term'  %> VOLUNTARY TERMINATION <br />
+              <%= radio_button_tag 'term_actions', 'non_pay_term'  %> NON-PAY TERMINATION
+            </td>
+            <td colspan="2">
+              <input type="text" id="datepicker"> <span class="glyphicon glyphicon-calendar" style="font-size:1.5em" aria-hidden="true"></span>
+            </td>
+            <td colspan="2">
+              <%= check_box_tag 'carrier_xml', 'carrier_xml', true  %> TRANSMIT CARRIER XML? <br />
+              <%= check_box_tag '834_xml', '834_xml', true  %> TRANSMIT CARRIER 834?
+            </td>
+            <td colspan="1">
+              <%= link_to 'Submit', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm plan-year-submit disabled" %>
+            </td>
+          </tr>
           </tr>
         <% end %>
       </tbody>
