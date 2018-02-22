@@ -650,3 +650,44 @@ end
 And(/consumer clicked on "Married" qle/) do
   click_link "Married"
 end
+
+And(/consumer clicked on manage family$/) do
+  find('.interaction-click-control-manage-family').click
+  wait_for_ajax
+end
+
+And(/consumer clicked on personal section$/) do
+  find('.interaction-click-control-personal').click
+  wait_for_ajax
+end
+
+And(/Individual enters incorrect (.*) information for verification types$/) do |item|
+  fill_in "#{item}_consumer_role_vlp_documents_attributes_0_alien_number", :with =>  "1234TestAlienNumber"
+  fill_in "#{item}_consumer_role_vlp_documents_attributes_0_card_number", :with => "2345TestCardNumber"
+  fill_in "#{item}[consumer_role][vlp_documents_attributes][0][expiration_date]", :with => TimeKeeper.date_of_record + 10.days
+end
+
+And(/Individual clicked on (.*) button$/) do |button|
+  if button == "save"
+    find(".btn-primary .fa-user-plus").trigger("click")
+  else
+    find(".btn-primary.mz").trigger("click")
+  end
+end
+
+Then(/Individual should see error messages$/) do
+  expect(page).to have_content "I-551 (Permanent Resident Card): Alien Number has wrong length (should be 9 characters)"
+  expect(page).to have_content "I-551 (Permanent Resident Card): Card Number has wrong length (should be 13 characters)"
+end
+
+And(/Individul should also see the incorrect information they entered$/) do
+  incorrect_alien_number = page.execute_script("$('#person_consumer_role_vlp_documents_attributes_0_alien_number').val()")
+  incorrect_card_number = page.execute_script("$('#person_consumer_role_vlp_documents_attributes_0_card_number').val()")
+  expect(page).to have_content incorrect_alien_number
+  expect(page).to have_content incorrect_card_number
+end
+
+And(/Individual clicked on pencil to edit dependent information$/) do
+  find('.fa-pencil').click
+  wait_for_ajax
+end
