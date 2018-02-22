@@ -8,7 +8,7 @@ class ShopEmployerNotices::EmployerInvoiceAvailable < ShopEmployerNotice
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
-    send_generic_notice_alert_to_broker_and_ga
+    # send_generic_notice_alert_to_broker_and_ga  # turning off emails to brokers/GA
   end
 
   def append_data

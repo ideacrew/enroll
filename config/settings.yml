@@ -128,7 +128,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,01,31) %>
+      end_on: <%= Date.new(2018,02,05) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
