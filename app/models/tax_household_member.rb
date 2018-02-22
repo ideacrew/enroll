@@ -1,23 +1,27 @@
 class TaxHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
+  include BelongsToFamilyMember
 
   embedded_in :tax_household
   embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
-
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_subscriber, type: Boolean, default: false
-
-  include BelongsToFamilyMember
 
   validate :strictly_boolean
 
   def eligibility_determinations
     return nil unless tax_household
     tax_household.eligibility_determinations
+  end
+
+  def update_eligibility_kinds eligibility_kinds
+    return if eligibility_kinds.blank?
+    errors.add(:base, "Cant have true values for insurance_assistance and medicaid_chip eligibility kinds.") if eligibility_kinds['is_ia_eligible'] && eligibility_kinds['is_medicaid_chip_eligible']
+    self.update_attributes eligibility_kinds
   end
 
   def family
