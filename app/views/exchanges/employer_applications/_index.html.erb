@@ -52,9 +52,9 @@
                   Actions <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                  <li><%= link_to 'CANCEL PY', '#'%></li>
-                  <li><%= link_to 'TERMINATE PY', '#'%></li>
-                  <li><%= link_to 'REINSTATE PY', '#'%></li>
+                  <li><%= link_to 'CANCEL PY', exchanges_employer_application_cancel_path(employer_application_id: application.id, employer_id: @employer_profile.id)) %></li>
+                  <li><%= link_to 'TERMINATE PY', exchanges_employer_application_terminate_path(employer_application_id: application.id, employer_id: @employer_profile.id)) %></li>
+                  <li><%= link_to 'REINSTATE PY', exchanges_employer_application_reinstate_path(employer_application_id: application.id, employer_id: @employer_profile.id) %></li>
                 </ul>
               </div>
               
