@@ -113,7 +113,7 @@ module Queries
     def quiet_period_coverage_expression
       {
         "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
-        "households.hbx_enrollments.kind" => "employer_sponsored",
+        "households.hbx_enrollments.kind" => { "$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
         "households.hbx_enrollments.workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
         }
