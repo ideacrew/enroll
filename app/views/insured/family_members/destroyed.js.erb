@@ -1,6 +1,6 @@
 $("#add_member_list_<%= @dependent.id %>").remove();
 $("#dependent_buttons").removeClass('hidden');
-<% if !@family.applications.present? %>
+<% if @family.applications.blank? %>
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
 
