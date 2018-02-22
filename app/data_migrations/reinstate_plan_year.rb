@@ -29,8 +29,10 @@ class ReinstatePlanYear < MongoidMigrationTask
           renewing_plan_year_py_state = renewing_plan_year.aasm_state
           renewing_plan_year.update_attributes!(aasm_state:'renewing_draft')
           renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: renewing_plan_year_py_state,to_state: 'renewing_draft')
-
+          puts "renewal plan year aasm state updated to #{renewing_plan_year.aasm_state}" unless Rails.env.test?
+          return unless ENV['renewing_force_publish'].present? && ENV['renewing_force_publish']
           renewing_plan_year.force_publish! if renewing_plan_year.may_force_publish? # to renewing_enrolling
+          renewing_plan_year.advance_date! if renewing_plan_year.may_advance_date? # to renewing_enrolled
           renewing_plan_year.activate! if renewing_plan_year.may_activate? # to active state
           puts "plan year starting #{renewing_plan_year.start_on} reinstated" unless Rails.env.test?
           update_benefit_group_assignment(renewing_plan_year)
