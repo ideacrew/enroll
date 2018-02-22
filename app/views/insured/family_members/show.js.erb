@@ -22,7 +22,7 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
   <% end %>
 }
 
-<% if !@family.applications.present? && @created %>
+<% if @family.applications.blank? && @created %>
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
 
