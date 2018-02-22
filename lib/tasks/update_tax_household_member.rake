@@ -18,7 +18,7 @@ namespace :task do
         dependent = Person.by_hbx_id(dependent_hbx_id).first rescue nil
 
         if person.present? && dependent.present?
-          return unless person.primary_family
+          if person.primary_family.present?
           primary_family = person.primary_family
           family_member = primary_family.family_members.where(person_id: dependent.id).first
           family_member_id = family_member.id if family_member.present?
@@ -26,6 +26,9 @@ namespace :task do
           latest_active_thh = active_household.latest_active_thh
           latest_active_thh.update_thhm(is_ia_eligible, is_medicaid_chip_eligible, family_member_id) if latest_active_thh.present?
           puts "THHM updated successfully" unless Rails.env.test?
+          else
+            puts "primary_hbx_id do not have primary family" unless Rails.env.test?
+          end
         else
           puts "No Person Record Found for given HBX_IDs, Please check the HBX_IDs" unless Rails.env.test?
         end
