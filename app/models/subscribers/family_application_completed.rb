@@ -41,6 +41,8 @@ module Subscribers
       new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
       verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
       import_home_address(primary_person, verified_new_address)
+      verified_email_addresses = verified_primary_family_member.person.emails
+      import_email_address(primary_person, verified_email_addresses) if verified_email_addresses.present?
       if verified_family.broker_accounts.present?
         newest_broker = verified_family.broker_accounts.max_by{ |broker| broker.start_on}
         newest_broker_agency_account = family.broker_agency_accounts.max_by{ |baa| baa.start_on }
@@ -84,6 +86,20 @@ module Subscribers
       end
       family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
+    end
+
+    def import_email_address(person, verified_email_addresses)
+      verified_email_types = verified_email_addresses.inject([]) do |types, email|
+        types << email.type.split('#').last
+      end
+
+      Email::KINDS.each do |email|
+        if verified_email_types.include?(email) && !person.emails.map(&:kind).include?(email)
+          verified_email = verified_email_addresses.detect { |v_email| v_email if v_email.type.split('#').last == email}
+          person.emails << Email.new({address: verified_email.email_address, kind: verified_email.type.split('#').last})
+          person.save!
+        end
+      end
     end
 
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
