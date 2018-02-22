@@ -149,4 +149,87 @@ RSpec.describe ApplicationController do
       expect(pagination).to eq alphabet_array
     end
   end
+
+  describe 'hbx_staff_and_consumer_role' do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:user) { FactoryGirl.create(:user, :person => person) }
+    let(:role) {FactoryGirl.create(:consumer_role)}
+
+    context 'current user is hbx admin and role is consumer' do
+      before do
+        sign_in(user)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+        subject.instance_variable_set(:@person, person)
+      end
+
+      it 'returns true if role is consumer and current user is admin' do
+        consumer = subject.send(:hbx_staff_and_consumer_role, role)
+        expect(consumer).to eq(true)
+      end
+
+      it 'returns true if person has consumer role and current user is admin' do
+        role = nil
+        consumer = subject.send(:hbx_staff_and_consumer_role, role)
+        expect(consumer).to eq(true)
+      end
+    end
+
+    context 'current user is not hbx_staff member and role is consumer' do
+      before do
+        sign_in(user)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        subject.instance_variable_set(:@person, person)
+      end
+
+      it 'returns false if role is consumer and current user has hbx staff role' do
+        value = subject.send(:hbx_staff_and_consumer_role, role)
+        expect(value).to eq(false)
+      end
+
+      it 'returns false if person has consumer role and current user is not hbx admin' do
+        role = nil
+        value = subject.send(:hbx_staff_and_consumer_role, role)
+        expect(value).to eq(false)
+      end
+    end
+  end
+
+  describe 'hbx_staff_and_consumer_role and person with no user' do
+    let(:current_person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:current_user) { FactoryGirl.create(:user, :person => current_person) }
+    let(:role) {FactoryGirl.create(:consumer_role)}
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+
+    let(:user2) { FactoryGirl.create(:user) }
+
+    context 'current user is hbx admin and role is consumer with no user record' do
+      before do
+        sign_in(current_user)
+        allow(current_user).to receive(:has_hbx_staff_role?).and_return(true)
+        subject.instance_variable_set(:@person, person)
+      end
+
+      it 'returns true if person has consumer role with no user_id and current user is admin' do
+        bookmark_url = "http://localhost:3000/insured/consumer_role/5a2ec91b16676709f7000034/edit"
+        value = subject.send(:save_bookmark, role, bookmark_url)
+        expect(value).to eq(true)
+      end
+
+    end
+
+    context 'current user is hbx admin and role is consumer with user record' do
+      before do
+        sign_in(current_user)
+        allow(current_user).to receive(:has_hbx_staff_role?).and_return(true)
+        subject.instance_variable_set(:@person, person)
+        person.user = user2
+      end
+
+      it 'updates bookmark url if person has consumer role with user_id and current user is admin' do
+        bookmark_url = "http://localhost:3000/insured/consumer_role/5a2ec91b16676709f7000034/edit"
+        value = subject.send(:save_bookmark, role, bookmark_url)
+        expect(value).to eq(true)
+      end
+    end
+  end
 end

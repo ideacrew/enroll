@@ -13,6 +13,10 @@ FactoryGirl.define do
     trait :hbx_staff do
       can_complete_resident_application true
       can_add_sep true
+      can_access_new_consumer_application_sub_tab true
+      can_access_identity_verification_sub_tab true
+      can_access_outstanding_verification_sub_tab true
+      name 'hbx_staff'
     end
 
     trait :hbx_update_ssn do
@@ -29,6 +33,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  true
+      can_access_outstanding_verification_sub_tab true
+      name 'hbx_read_only'
     end
 
     trait :hbx_csr_supervisor do
@@ -41,6 +47,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  false
+      can_access_new_consumer_application_sub_tab true
+      name 'hbx_csr_supervisor'
     end
 
     trait :hbx_csr_tier2 do
@@ -53,6 +61,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs false
+      can_access_new_consumer_application_sub_tab true
+      name 'hbx_csr_tier2'
     end
 
     trait :hbx_csr_tier1 do
@@ -65,6 +75,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  false
+      can_access_new_consumer_application_sub_tab true
+      name 'hbx_csr_tier1'
     end
 
 
@@ -78,6 +90,7 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  false
+      name 'developer'
     end
   end
 end
