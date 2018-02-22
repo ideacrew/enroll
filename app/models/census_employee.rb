@@ -248,7 +248,7 @@ class CensusEmployee < CensusMember
 
   def active_and_renewing_benefit_group_assignments
     result = []
-    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil? 
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
     result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
     result
   end
@@ -454,7 +454,7 @@ class CensusEmployee < CensusMember
     return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
-    self.trigger_notices("employee_eligibility_notice")#sends EE eligibility notice to census employee
+    # self.trigger_notices("employee_eligibility_notice")#sends EE eligibility notice to census employee
     return true
   end
 
