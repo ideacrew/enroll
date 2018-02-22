@@ -19,13 +19,18 @@ else {
 $( "#datepicker" ).datepicker();
 
 $('input[name=plan_year_radio]').click(function() {
-  $('tr.plan-year-actions').removeClass('hidden')
-  $('#plan-year-btn-group').removeClass('hidden')
+  $('.plan-year-actions').addClass('hidden')
+  $('.py-btn-grp').addClass('disabled')
+  if(($(this).attr("status") == "draft")) {
+    $('input[name=plan_year_radio]:checked').closest('tr').next('tr').removeClass('hidden')
+  } else {
+    $('input[name=plan_year_radio]:checked').closest('td').siblings().find('.py-btn-grp').removeClass('disabled')
+  }
 });
 
-$('input[name=term_actions]').click(function() {
-  $('.py-btn-grp').removeClass('disabled')
-});
+// $('input[name=term_actions]').click(function() {
+//   $('.py-btn-grp').removeClass('disabled')
+// });
 
 $('#plan-year-btn-group ul li').each(function() {
   $(this).click(function() {

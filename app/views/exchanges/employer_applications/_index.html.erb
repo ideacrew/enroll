@@ -38,7 +38,7 @@
       <tbody>
         <% plan_years.order('start_on DESC').each do |application| %>
           <tr>
-            <td><%= radio_button_tag 'plan_year_radio', application.id  %></td>
+            <td><%= radio_button_tag 'plan_year_radio', application.id, false, status: application.aasm_state  %></td>
             <td><%= TimeKeeper.format_date(application.start_on) %></td>
             <td><%= TimeKeeper.format_date(application.end_on) %></td>
             <td><%= TimeKeeper.format_date(application.open_enrollment_start_on) %></td>
@@ -47,7 +47,7 @@
             <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
             <td><%= application.aasm_state.humanize %></td>
             <td colspan="1">
-              <div class="btn-group hidden" id="plan-year-btn-group">
+              <div class="btn-group" id="plan-year-btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle disabled py-btn-grp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Actions <span class="caret"></span>
                 </button>
@@ -60,7 +60,6 @@
               
             </td>
           </tr>
-          <tr id="collapse_<%= application.id %>">
           <tr id="<%= application.id %>" class="plan-year-actions hidden">
             <td colspan="2">
               <%= radio_button_tag 'term_actions', 'voluntary_term'  %> VOLUNTARY TERMINATION <br />
@@ -76,7 +75,6 @@
             <td colspan="1">
               <%= link_to 'Submit', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm plan-year-submit disabled" %>
             </td>
-          </tr>
           </tr>
         <% end %>
       </tbody>
