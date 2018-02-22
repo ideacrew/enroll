@@ -746,7 +746,6 @@ class ConsumerRole
   end
 
   def move_identity_documents_to_outstanding
-    binding.pry
     if identity_unverified? && application_unverified?
       update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
     end
