@@ -9,7 +9,7 @@
       <h4>
         <%= find_my_doctor %>
         </br>
-        <% if Settings.checkbook_services.plan_match== "DC"%>
+        <% if plan_match_dc %>
         <%= estimate_your_costs %>
         <% end %>
       </h4>

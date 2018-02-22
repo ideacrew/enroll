@@ -1,4 +1,5 @@
 require 'rails_helper'
+include ApplicationHelper
 
 describe Services::CheckbookServices::PlanComparision do
 
@@ -13,11 +14,13 @@ describe Services::CheckbookServices::PlanComparision do
     let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => "http://checkbook_url"})}
 
     it "should generate non-congressional link" do
-      allow(subject).to receive(:construct_body).and_return({})
-      allow(HTTParty).to receive(:post).with("https://staging.checkbookhealth.org/shop/dc/api/", 
-        {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
-        and_return(result)
-      expect(subject.generate_url).to eq("http://checkbook_url")
+      if plan_match_dc
+        allow(subject).to receive(:construct_body).and_return({})
+        allow(HTTParty).to receive(:post).with("https://staging.checkbookhealth.org/shop/dc/api/", 
+          {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
+          and_return(result)
+        expect(subject.generate_url).to eq("http://checkbook_url")
+      end
     end
   end
 
@@ -25,8 +28,10 @@ describe Services::CheckbookServices::PlanComparision do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
 
     it "should generate congressional url" do
-      allow(subject).to receive(:construct_body).and_return({})
-      expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/2018/")
+     if plan_match_dc
+       allow(subject).to receive(:construct_body).and_return({})
+       expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/2018/")
+      end
     end
   end
 end
