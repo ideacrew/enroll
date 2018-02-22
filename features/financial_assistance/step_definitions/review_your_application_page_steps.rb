@@ -1,8 +1,7 @@
 Given(/^all applicants are in Info Completed state with all types of income$/) do
-
  while find_all(".btn", text: "ADD INCOME & COVERAGE INFO").length > 0 do  
     find_all(".btn", text: "ADD INCOME & COVERAGE INFO")[0].click
-    find("#is_required_to_file_taxes_yes").click
+    find("#is_required_to_file_taxes_no").click
     find("#is_claimed_as_tax_dependent_no").click
     find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
       
@@ -60,19 +59,9 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
   end
 end
 
-def show_page
-  save_page Rails.root.join( 'public', 'capybara.html' )
-  %x(launchy http://localhost:3000/capybara.html)
-end
-
-Then(/^bpry$/) do
-  binding.pry
-end
-
 Then(/^the user is on the Review Your Application page$/) do
   expect(page).to have_content("Review Your Application")
 end
-
 
 Given(/^the pencil icon displays for each instance of (.*)$/) do |deduction|
   find_all(:xpath, '//*[@id="dependents_info_wrapper"]/div[1]/div/table//tr').each{ |tr|
@@ -128,7 +117,7 @@ Then(/^all data should be presented as previously entered$/) do
     expect(find("#has_job_income_true")).to be_checked
     expect(find("#has_self_employment_income_true")).to be_checked
   elsif /step\/1$/.match(current_path)
-    expect(find("#is_required_to_file_taxes_yes")).to be_checked
+    expect(find("#is_required_to_file_taxes_no")).to be_checked
     expect(find("#is_claimed_as_tax_dependent_no")).to be_checked
   elsif /other$/.match(current_path)
     expect(find("#has_other_income_true")).to be_checked

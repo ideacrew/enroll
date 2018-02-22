@@ -1,7 +1,10 @@
 Feature: Conditional Display of Family Relationships link in the left nav of the FAA Household Info page.
 
   Background: Household Info page
-    Given that the user is on FAA Household Info: Family Members page
+    Given a consumer exists
+    And is logged in
+    And a benchmark plan exists
+    And the user will navigate to the FAA Household Info page
 
   Scenario: Relationships link does not display when there is only one household member
     Given the primary member exists
