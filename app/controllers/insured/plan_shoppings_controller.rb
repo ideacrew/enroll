@@ -59,6 +59,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
+    # @enrollment.mid_year_plan_change_notice #mirror notice
 
     # send accepted SEP QLE event notice to enrolled employee
     if @market_kind == "shop" && @enrollment.employee_role_id.present? && @change_plan == "change_by_qle"
@@ -66,6 +67,7 @@ class Insured::PlanShoppingsController < ApplicationController
        @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id }
        sep_qle_request_accept_notice_ee(@employee_role.census_employee.id.to_s, @enrollment)
     end
+
     send_receipt_emails if @person.emails.first
   end
 
@@ -122,6 +124,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       employee_waiver_notice(hbx_enrollment)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
