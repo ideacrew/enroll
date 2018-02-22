@@ -35,6 +35,7 @@ module PdfTemplates
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
     attribute :aasm_state, String
+    attribute :employee_email, String
 
     def shop?
       return true
