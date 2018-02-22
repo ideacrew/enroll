@@ -94,8 +94,8 @@ module Insured
         consumer_user.identity_final_decision_transaction_id = service_response.transaction_id
         consumer_user.identity_verified_date = TimeKeeper.date_of_record
         consumer_user.save!
-        consumer_role.move_identity_documents_to_verified
       end
+      consumer_role.move_identity_documents_to_verified
       redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
     end
 

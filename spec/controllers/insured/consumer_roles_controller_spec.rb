@@ -349,12 +349,38 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
 
+    it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Curam' do
+      person_params["family"]["application_type"] = "Curam"
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+
     it "should redirect to family members path when current user has application type as Mobile" do
       person_params["family"]["application_type"] = "Mobile"
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+
+    it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Mobile' do
+      person_params["family"]["application_type"] = "Mobile"
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_update_reason). to eq 'Verified from Mobile'
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end

@@ -149,6 +149,7 @@ describe Insured::InteractiveIdentityVerificationsController do
           expect(mock_person_user).to receive(:identity_final_decision_transaction_id=).with(mock_transaction_id)
           expect(mock_person_user).to receive(:identity_verified_date=).with(mock_today)
           expect(mock_person_user).to receive(:save!)
+          expect(mock_person.consumer_role).to receive(:move_identity_documents_to_verified).and_return true
           post :create, { "interactive_verification" => verification_params }
           expect(response).to be_redirect
         end
@@ -212,6 +213,7 @@ describe Insured::InteractiveIdentityVerificationsController do
         expect(mock_person_user).to receive(:identity_final_decision_transaction_id=).with(mock_transaction_id)
         expect(mock_person_user).to receive(:identity_verified_date=).with(mock_today)
         expect(mock_person_user).to receive(:save!)
+        expect(mock_person.consumer_role).to receive(:move_identity_documents_to_verified).and_return true
         post :update, { "id" => transaction_id }
         expect(response).to be_redirect
       end
@@ -219,8 +221,8 @@ describe Insured::InteractiveIdentityVerificationsController do
   end
 
   describe "GET #service_unavailable" do
-    let(:mock_person) { double }
-    let(:mock_user) { double(:person => mock_person) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:mock_user) { FactoryGirl.create(:user, :person => person) }
     before :each do
       allow(mock_user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(mock_user)
@@ -234,9 +236,9 @@ describe Insured::InteractiveIdentityVerificationsController do
   end
 
   describe "GET #failed_validation" do
-    let(:mock_person) { double }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:mock_transaction_id) { double }
-    let(:mock_user) { double(:person => mock_person) }
+    let(:mock_user) { FactoryGirl.create(:user, :person => person) }
     before :each do
       allow(mock_user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(mock_user)

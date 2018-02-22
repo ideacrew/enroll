@@ -141,6 +141,29 @@ describe "#find_vlp_document_by_key" do
   end
 end
 
+describe "#move_identity_documents_to_outstanding" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+
+  context "move to outstanding if initial state is unverified" do
+
+    it "successfully updates identity and application to outstanding" do
+      consumer = person.consumer_role
+      consumer.move_identity_documents_to_outstanding
+      expect(consumer.identity_validation). to eq 'outstanding'
+      expect(consumer.application_validation). to eq 'outstanding'
+    end
+
+    it "should not update dentity and application to outstanding" do
+      consumer = person.consumer_role
+      consumer.identity_validation = 'valid'
+      consumer.application_validation = 'valid'
+      consumer.move_identity_documents_to_outstanding
+      expect(consumer.identity_validation). to eq 'valid'
+      expect(consumer.application_validation). to eq 'valid'
+    end
+  end
+end
+
 describe "#find_ridp_document_by_key" do
   let(:person) {Person.new}
   let(:consumer_role) {ConsumerRole.new({person:person})}
