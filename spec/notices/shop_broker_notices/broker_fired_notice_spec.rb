@@ -19,6 +19,7 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
                             :notice_builder => 'ShopBrokerNotices::BrokerFiredNotice',
                             :event_name => 'broker_fired_confirmation_to_broker',
                             :mpi_indicator => 'SHOP_M048',
+                            # :mpi_indicator => 'SHOP_D051)',
                             :title => "You have been removed as a Broker"})
                           }
     let(:valid_parmas) {{
@@ -30,6 +31,7 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
 
   describe "New" do
     before do
+      # allow(employer_profile).to receive_message_chain("broker_agency_accounts.unscoped.last").and_return(broker_agency_account)
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
     end
     context "valid params" do
@@ -51,6 +53,7 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      # allow(employer_profile).to receive_message_chain("broker_agency_accounts.unscoped.last").and_return(broker_agency_account)
       @broker_notice = ShopBrokerNotices::BrokerFiredNotice.new(employer_profile, valid_parmas)
       @broker_notice.build
     end
@@ -61,4 +64,24 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
       expect(@broker_notice.notice.termination_date).to eq broker_agency_account.end_on
     end
   end
+
 end
+
+
+#   describe "Render template & Generate PDF" do
+#     before do
+#       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+#       allow(employer_profile).to receive_message_chain("broker_agency_accounts.unscoped.last").and_return(broker_agency_account)
+#       @broker_notice = ShopBrokerNotices::BrokerFiredNotice.new(employer_profile, valid_parmas)
+#     end
+#     it "should render broker_fired_notice" do
+#       expect(@broker_notice.template).to eq "notices/shop_broker_notices/broker_fired_notice"
+#     end
+#     it "should generate pdf" do
+#       @broker_notice.build
+#       @broker_notice.generate_pdf_notice
+#       file = @broker_notice.generate_pdf_notice
+#       expect(File.exist?(file.path)).to be true
+#     end
+#   end
+# end

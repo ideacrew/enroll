@@ -190,6 +190,10 @@ class EmployerProfile
     end
   end
 
+  def broker_fired_confirmation_to_broker
+    trigger_notices('broker_fired_confirmation_to_broker')
+  end
+
   def employer_broker_fired
     trigger_notices('employer_broker_fired')
   end
@@ -314,8 +318,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present?
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present?
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 

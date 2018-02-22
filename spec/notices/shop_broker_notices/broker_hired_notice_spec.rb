@@ -16,6 +16,10 @@ RSpec.describe ShopBrokerNotice do
                             :notice_builder => 'ShopBrokerNotice',
                             :event_name => 'broker_hired',
                             :mpi_indicator => 'SHOP_MO45',
+                            # :notice_template => 'notices/shop_broker_notices/broker_hired_notice',
+                            # :notice_builder => 'ShopBrokerNotices::BrokerHiredNotice',
+                            # :event_name => 'broker_hired',
+                            # :mpi_indicator => 'SHOP_D048',
                             :title => "You have been Hired as a Broker"})
                           }
     let(:valid_parmas) {{
@@ -61,7 +65,39 @@ RSpec.describe ShopBrokerNotice do
       expect(@broker_notice.notice.employer_first_name).to eq employer_profile.staff_roles.first.first_name
       expect(@broker_notice.notice.employer_last_name).to eq employer_profile.staff_roles.first.last_name
       expect(@broker_notice.notice.broker_agency).to eq employer_profile.broker_agency_profile.legal_name.titleize
+  #     @broker_notice.build
+  #   end
+  #   it "returns broker full name" do
+  #     expect(@broker_notice.notice.primary_fullname).to eq broker_agency_profile.primary_broker_role.person.full_name
+  #   end
+  #   it "returns employer name" do
+  #     expect(@broker_notice.notice.employer_name).to eq employer_profile.legal_name.titleize
+  #   end
+  #   it "returns employer first name" do
+  #     expect(@broker_notice.notice.employer.employer_first_name).to eq employer_profile.staff_roles.first.first_name
+  #   end
+  #   it "returns employer last name" do
+  #     expect(@broker_notice.notice.employer.employer_last_name).to eq employer_profile.staff_roles.first.last_name
+  #   end
+  # end
+
+  # describe "Rendering broker_hired template" do
+  #   before do
+  #     allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+  #     allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+  #     allow(employer_profile).to receive_message_chain("broker_agency_accounts.detect").and_return(broker_agency_account)
+  #     @broker_notice = ShopBrokerNotices::BrokerHiredNotice.new(employer_profile, valid_parmas)
+  #   end
+
+  #   it "should render broker_agency_hired" do
+  #     expect(@broker_notice.template).to eq "notices/shop_broker_notices/broker_hired_notice"
+  #   end
+
+  #   it "should generate pdf" do
+  #     @broker_notice.build
+  #     file = @broker_notice.generate_pdf_notice
+  #     expect(File.exist?(file.path)).to be true
     end
   end
-  
+
 end
