@@ -1,4 +1,5 @@
- <div class="table-border table-responsive">
+<% @broker_applicants = @broker_applicants.entries %>
+<div class="table-border table-responsive">
   <table class="table">
     <thead>
       <tr>
@@ -23,7 +24,7 @@
     </thead>
     <tbody>
       <% if @broker_applicants.any? %>
-        <%= render partial: "shared/brokers/applicant_row", :collection => @broker_applicants.to_a, :as => :applicant %>
+        <%= render partial: "shared/brokers/applicant_row", :collection => @broker_applicants, :as => :applicant %>
       <% else %>
       <tr><td>No Applicants found.</td></tr>
       <% end %>
