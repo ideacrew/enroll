@@ -236,4 +236,39 @@ RSpec.describe TaxHousehold, type: :model do
       expect(tax_household.current_csr_eligibility_kind).to eq eligibility_determination.csr_eligibility_kind
     end
   end
+
+  context "update_thhm" do
+    let!(:person) {FactoryGirl.create(:person, :with_family) }
+    let!(:person_two)  { FactoryGirl.create(:person)}
+    let!(:primary_applicant) {person.primary_family.primary_applicant}
+    let!(:family_member) { FactoryGirl.create(:family_member, family: person.primary_family, person: person_two)}
+    let!(:active_household) { person.primary_family.active_household }
+    let!(:tax_household) { FactoryGirl.create(:tax_household, household: active_household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+
+    before :each do
+      @tax_household_member1 = tax_household.tax_household_members.create!( applicant_id: family_member.id)
+      @tax_household_member2 = tax_household.tax_household_members.create!( applicant_id: primary_applicant.id)
+    end
+
+    it "is_ia_eligible should be equal to 'false' after update_thhm" do
+      expect(@tax_household_member1.is_ia_eligible).to eq false
+    end
+
+    it "is_ia_eligible & is_medicaid_chip_eligible should be equal to 'true & false' after update_thhm for a family member" do
+      active_household.latest_active_thh.update_thhm(true,false,family_member.id)
+      expect(@tax_household_member1.is_ia_eligible).to eq true
+      expect(@tax_household_member1.is_medicaid_chip_eligible).to eq false
+    end
+
+    it "is_ia_eligible & is_medicaid_chip_eligible should be equal to 'false & true' respectively after update_thhm for a primary applicant" do
+      active_household.latest_active_thh.update_thhm(false,true,primary_applicant.id)
+      expect(@tax_household_member1.is_ia_eligible).to eq false
+      expect(@tax_household_member2.is_medicaid_chip_eligible).to eq true
+    end
+
+    it "is_ia_eligible should be equal to previous value after update_thhm with 'nil' for a primary applicant" do
+      active_household.latest_active_thh.update_thhm(nil,true,primary_applicant.id)
+      expect(@tax_household_member1.is_ia_eligible).to eq false
+    end
+  end
 end

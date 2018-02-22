@@ -187,7 +187,13 @@ class TaxHousehold
     end
   end
 
-
+  def update_thhm(is_ia_eligible, is_medicaid_chip_eligible, family_member_id)
+    thhm = tax_household_members.where(applicant_id: family_member_id).first
+    is_ia_eligible = is_ia_eligible.nil? ? thhm.is_ia_eligible : is_ia_eligible
+    is_medicaid_chip_eligible = is_medicaid_chip_eligible.nil? ? thhm.is_medicaid_chip_eligible : is_medicaid_chip_eligible
+    thhm.update_attributes(is_ia_eligible: is_ia_eligible , is_medicaid_chip_eligible: is_medicaid_chip_eligible )
+    thhm.save!
+  end
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
