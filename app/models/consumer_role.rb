@@ -25,8 +25,8 @@ class ConsumerRole
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
 
   #ridp
-  IDENTITY_VALIDATION_STATES = %w(unverified valid outstanding pending)
-  APPLICATION_VALIDATION_STATES = %w(unverified valid outstanding pending)
+  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
+  APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
 
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
@@ -87,11 +87,11 @@ class ConsumerRole
 
 
   # Identity
-  field :identity_validation, type: String, default: "unverified"
+  field :identity_validation, type: String, default: "na"
   validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => false
 
   # Application
-  field :application_validation, type: String, default: "unverified"
+  field :application_validation, type: String, default: "na"
   validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
 
   #ridp update reason fields
@@ -705,11 +705,11 @@ class ConsumerRole
   end
 
   def identity_unverified?
-    self.identity_validation == "unverified"
+    self.identity_validation == "na"
   end
 
   def application_unverified?
-    self.application_validation == "unverified"
+    self.application_validation == "na"
   end
 
   def check_for_critical_changes(person_params, family)
@@ -743,6 +743,7 @@ class ConsumerRole
   end
 
   def move_identity_documents_to_outstanding
+    binding.pry
     if identity_unverified? && application_unverified?
       update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
     end
@@ -751,6 +752,12 @@ class ConsumerRole
   def move_identity_documents_to_verified
     update_attributes(identity_validation: 'valid', application_validation: 'valid',
                       identity_update_reason: 'Verified by Experian', application_update_reason: 'Verified by Experian')
+  end
+
+  def identity_verified_by_curam_or_mobile(app_type)
+    type = app_type == 'Curam' ? 'Curam' : 'Mobile'
+    update_attributes(identity_validation: 'valid', application_validation: 'valid',
+                      identity_update_reason: "Verified from #{type}", application_update_reason: "Verified from #{type}")
   end
 
   #class methods

@@ -8,7 +8,7 @@ describe FixExperianVerifiedPeople, dbclean: :after_each do
 
   it "moves identity and application documents to verified state" do
     person.user = FactoryGirl.create(:user)
-    person.user.update_attributes!("identity_response_code" => "acc")
+    person.user.update_attributes!("identity_final_decision_code" => "acc")
     subject.migrate
     person.reload
     consumer = person.consumer_role
@@ -22,8 +22,8 @@ describe FixExperianVerifiedPeople, dbclean: :after_each do
     subject.migrate
     person.reload
     consumer = person.consumer_role
-    expect(consumer.identity_validation). to eq 'unverified'
-    expect(consumer.application_validation). to eq 'unverified'
+    expect(consumer.identity_validation). to eq 'na'
+    expect(consumer.application_validation). to eq 'na'
     expect(consumer.application_update_reason). to eq nil
   end
 
