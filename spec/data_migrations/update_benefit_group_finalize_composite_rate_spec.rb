@@ -33,7 +33,6 @@ describe UpdateBenefitGroupFinalizeCompositeRate, dbclean: :after_each do
       composite_tier_contribution.reload
       plan_year.reload
       expect(composite_tier_contribution.final_tier_premium).to eq 0.0
-
     end
 
     it "employer with multiple plan year with same py start date,should pick active plan year to calculate final tier premium amount" do
