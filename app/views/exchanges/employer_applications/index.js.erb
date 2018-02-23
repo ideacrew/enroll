@@ -19,7 +19,9 @@ else {
 $( "#datepicker" ).datepicker();
 
 $('input[name=plan_year_radio]').click(function() {
-  $('.plan-year-actions').addClass('hidden')
+  hidePlanYearActions();
+  clearDatePickerValue();
+  hideTerminationRadios();
   $('.py-btn-grp').addClass('disabled')
   if(($(this).attr("status") == "draft")) {
     $('input[name=plan_year_radio]:checked').closest('tr').next('tr').removeClass('hidden')
@@ -34,8 +36,74 @@ $('input[name=plan_year_radio]').click(function() {
 
 $('#plan-year-btn-group ul li').each(function() {
   $(this).click(function() {
-   $('.plan-year-submit').removeClass('disabled')
+    // Do Something
   })
 });
+
+
+function hidePlanYearActions() {
+  $('.plan-year-actions').addClass('hidden');
+}
+
+function showPlanYearActions(id) {
+  $('#'+id).removeClass('hidden');
+}
+
+function disableDatePicker() {
+  $('input#datepicker').prop('disabled', true);
+}
+
+function enableDatePicker() {
+  $('input#datepicker').prop('disabled', false);
+}
+
+function clearDatePickerValue() {
+  $('input#datepicker').val('');
+  enableDatePicker()
+}
+
+function disableSubmitButton() {
+  $('.plan-year-submit').addClass('disabled')
+}
+
+function enableSubmitButton() {
+  $('.plan-year-submit').removeClass('disabled')
+}
+
+function showTerminationRadios() {
+  $('.term_action_radios').removeClass('hidden');
+}
+
+function hideTerminationRadios() {
+  $('.term_action_radios').addClass('hidden');
+}
+
+
+function pyAction(action, id, term_date) {
+  showPlanYearActions(id);
+  if (action == "reinstate") {
+    console.log(term_date)
+    disableDatePicker();
+    $('input#datepicker').val(term_date);
+    hideTerminationRadios();
+    enableSubmitButton()
+  }
+  
+  if (action == 'terminate') {
+    showTerminationRadios();
+    clearDatePickerValue();
+    disableSubmitButton();
+  }
+  
+  if (action == 'cancel') {
+    hideTerminationRadios();
+    clearDatePickerValue();
+    disableSubmitButton();
+  }
+}
+
+function submitPlanActions() {
+  alert("Im Submitted")
+}
 
 applyJQDatePickers();

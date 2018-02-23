@@ -51,10 +51,10 @@
                 <button type="button" class="btn btn-default dropdown-toggle disabled py-btn-grp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Actions <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                  <li><%= link_to 'CANCEL PY', exchanges_employer_application_cancel_path(employer_application_id: application.id, employer_id: @employer_profile.id) %></li>
-                  <li><%= link_to 'TERMINATE PY', exchanges_employer_application_terminate_path(employer_application_id: application.id, employer_id: @employer_profile.id) %></li>
-                  <li><%= link_to 'REINSTATE PY', exchanges_employer_application_reinstate_path(employer_application_id: application.id, employer_id: @employer_profile.id) %></li>
+                <ul class="dropdown-menu dropdown-menu-right" style="margin-left:-30px">
+                    <li onclick="pyAction('cancel','<%= application.id %>', '0')">CANCEL PY</li>
+                    <li onclick="pyAction('terminate','<%= application.id %>','0')">TERMINATE PY</li>
+                    <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= application.terminated_on %>')">REINSTATE PY</li>
                 </ul>
               </div>
               
@@ -62,18 +62,21 @@
           </tr>
           <tr id="<%= application.id %>" class="plan-year-actions hidden">
             <td colspan="2">
-              <%= radio_button_tag 'term_actions', 'voluntary_term'  %> VOLUNTARY TERMINATION <br />
-              <%= radio_button_tag 'term_actions', 'non_pay_term'  %> NON-PAY TERMINATION
+              <div class="term_action_radios hidden">
+                <%= radio_button_tag 'term_actions', 'voluntary_term'  %> VOLUNTARY TERMINATION <br />
+                <%= radio_button_tag 'term_actions', 'non_pay_term'  %> NON-PAY TERMINATION
+              </div>
             </td>
             <td colspan="2">
-              <input type="text" id="datepicker"> <span class="glyphicon glyphicon-calendar" style="font-size:1.5em" aria-hidden="true"></span>
+              <input type="text" id="datepicker" class="form-control" style="width:120px"> <span class="glyphicon glyphicon-calendar" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
               <%= check_box_tag 'carrier_xml', 'carrier_xml', true  %> TRANSMIT CARRIER XML? <br />
               <%= check_box_tag '834_xml', '834_xml', true  %> TRANSMIT CARRIER 834?
             </td>
             <td colspan="1">
-              <%= link_to 'Submit', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm plan-year-submit disabled" %>
+              <%#= link_to 'Submit', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm plan-year-submit" %>
+              <button class="btn btn-primary btn-sm plan-year-submit disabled" onclick="submitPlanActions()">Submit</button>
             </td>
           </tr>
         <% end %>
