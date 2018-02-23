@@ -39,7 +39,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     FactoryGirl.create(:employee_role, employer_profile: employer_profile)
   }
 
-  describe "After performing the link", dbclean: :after_each do
+  describe "After performing the link" do
 
     before(:each) do
       Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
