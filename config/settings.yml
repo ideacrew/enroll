@@ -3,12 +3,14 @@ site:
   subdomain: "mhc"
   domain_name: "hbxshop.org"
   home_url: "https://enroll.mhc.hbxshop.org"
+  home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
   nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   main_web_address_url: "https://www.MAhealthconnector.org"
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
+  invoice_bill_url: "https://ww2.e-billexpress.com/ebpp/maconnector/"
   website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
@@ -23,15 +25,15 @@ site:
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
+  broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
-  main_web_address_text: "MAhealthconnector.org"
-  curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
-
+  terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
+  registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   social_media:
     facebook_url: ""
 
@@ -115,15 +117,12 @@ aca:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
+    verification_due:
+      days: 95
 
     open_enrollment:
-      benefit_year_2016:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
-
-      benefit_year_2017:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
+      start_on: <%= Date.new(2017,11,1) %>
+      end_on: <%= Date.new(2018,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
@@ -149,12 +148,15 @@ aca:
       advertised_deadline_of_month: 10
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 5
+        day_of_month: 21
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
       ineligible_period_after_application_denial:
         days: 90
+      quiet_period:
+        month_offset: 0
+        mday: 8
 
     renewal_application:
       earliest_start_prior_to_effective_on:
@@ -167,6 +169,9 @@ aca:
       open_enrollment:
         minimum_length:
           days: 5
+      quiet_period:
+        month_offset: -1
+        mday: 25
 
     benefit_period:
       length_minimum:
@@ -191,10 +196,14 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    transmit_employers_immediately: false
+    transmit_scheduled_employers: true
+    employer_transmission_day_of_month: 26
+
   use_simple_employer_calculation_model: false
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
   offerings_constrained_to_service_areas: true
-  transmit_employers_immediately: true
+  transmit_employers_immediately: false
   enforce_employer_attestation: true
   rating_areas:
     - R-MA001
@@ -206,10 +215,15 @@ aca:
     - R-MA007
 
 paper_notice: 'paper-notices'
+checkbook_services:
+    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
+    base_url:  "https://dc.checkbookhealth.org"
+    url: "https://dc.checkbookhealth.org/shop/dc/"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."
+  plan_premium_smaller_than_applied: "Applied APTC for any Enrollment cannot be greater than the Plan Premium."
   max_aptc_non_numeric: "Max APTC needs to be a numeric value."
   max_aptc_too_small: "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
   max_aptc_too_big: "Max APTC should be less than 9999.99"

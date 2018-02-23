@@ -1,14 +1,23 @@
 Rails.application.routes.draw do
 
-  mount TransportGateway::Engine, at: "/transport_gateway"
+  mount TransportGateway::Engine,       at: "/transport_gateway"
+  mount TransportProfiles::Engine,      at: "/transport_profiles"
+  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
   mount Notifier::Engine, at: "/notifier"
-  # mount RocketJobMissionControl::Engine => 'rocketjob'
-  mount TransportProfiles::Engine, at: "/transport_profiles"
 
   require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
+  namespace :uis do
+    resources :bootstrap3_examples do
+      collection do
+        get :index
+        get :components
+        get :getting_started
+      end
+    end
+  end
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
@@ -78,6 +87,7 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :family_index_dt
+        get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
         get :employer_poc
@@ -100,7 +110,6 @@ Rails.application.routes.draw do
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
-        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -113,6 +122,7 @@ Rails.application.routes.draw do
         get :show_sep_history
         get :calendar_index
         get :user_account_index
+        get :get_user_info
       end
 
       member do
@@ -181,6 +191,7 @@ Rails.application.routes.draw do
       get 'new'
       member do
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -197,6 +208,7 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -294,6 +306,7 @@ Rails.application.routes.draw do
         post 'download_documents'
         post 'delete_documents'
         post 'upload_document'
+        post 'generate_checkbook_urls'
       end
 
       collection do
@@ -552,11 +565,11 @@ Rails.application.routes.draw do
       get :show_docs
       put :update_verification_type
       get :enrollment_verification
-      put :enrollment_docs_state
       put :extend_due_date
       get :fed_hub_request
       post 'download_documents'
       post 'delete_documents'
+      # post :fed_hub_request
     end
 
     member do

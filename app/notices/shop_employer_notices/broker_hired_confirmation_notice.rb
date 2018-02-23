@@ -11,7 +11,6 @@ class ShopEmployerNotices::BrokerHiredConfirmationNotice < ShopEmployerNotice
   end
 
   def append_data
-  end	
-
+  end
 
 end

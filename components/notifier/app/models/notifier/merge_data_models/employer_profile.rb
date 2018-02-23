@@ -12,6 +12,7 @@ module Notifier
     # attribute :primary_identifier, String
     # attribute :mpi_indicator, String
     attribute :application_date, String
+    attribute :invoice_month, String
     attribute :employer_name, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :broker, MergeDataModels::Broker
@@ -26,6 +27,7 @@ module Notifier
         first_name: 'John',
         last_name: 'Whitmore',
         application_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        invoice_month: TimeKeeper.date_of_record.next_month.strftime('%B'),
         employer_name: 'North America Football Federation'
       })
 

@@ -96,7 +96,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return health enrollment status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)"
         end
       end
 
@@ -106,7 +106,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return dental enrollment status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Dental)"
         end
       end
 
@@ -116,7 +116,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return enrollment status for both health & dental" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)<Br/> Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)<Br/> Enrolled (Dental)"
         end
       end
 
@@ -127,7 +127,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return terminated status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Terminated (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Terminated (Health)"
         end
       end
 
@@ -138,7 +138,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return terminated status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Waived (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Waived (Health)"
         end
       end
     end
@@ -213,6 +213,12 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                                   end_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
                                                   aasm_state: 'published') }
 
+      let(:published_plan_year_with_terminated_on)  { FactoryGirl.build(:plan_year,
+                                                  start_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                                                  end_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
+                                                  terminated_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
+                                                  aasm_state: 'published') }
+
       let(:renewing_plan_year)  { FactoryGirl.build(:plan_year,
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   end_on: TimeKeeper.date_of_record.beginning_of_month + 1.year - 1.day,
@@ -230,6 +236,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       let!(:employer_profile)  { FactoryGirl.create(:employer_profile, 
                                                     plan_years: [expired_plan_year, active_plan_year, draft_plan_year]) }
 
+      let!(:employer_profile_1)  { FactoryGirl.create(:employer_profile)}
+
       before do 
         [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year, published_plan_year].each do |py|
           bg = py.benefit_groups.build({
@@ -244,6 +252,37 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
           bg.save!
         end
         assign(:employer_profile, employer_profile)
+      end
+
+      context "#show_or_hide_claim_quote_button" do
+        it "should return true if plan year is in draft status" do
+          employer_profile_1.update_attributes(plan_years: [draft_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if plan year is in renewing_draft status" do
+          employer_profile_1.update_attributes(plan_years: [renewing_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return false if plan year is in published status" do
+          employer_profile_1.update_attributes(plan_years: [published_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq false
+        end
+
+        it "should return false if plan year is in published status and with future terminated_on" do
+          employer_profile_1.update_attributes(plan_years: [published_plan_year_with_terminated_on])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if employer does not have any plan years" do
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if employer has both published and draft plan years" do
+          employer_profile_1.update_attributes(plan_years: [draft_plan_year, published_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
       end
 
       context "for employer with plan years" do

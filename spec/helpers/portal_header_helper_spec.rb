@@ -17,13 +17,13 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
       let(:employee_role) { FactoryGirl.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/employers/employer_profiles/"+ emp_id.to_s + "\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/employers/employer_profiles/"+ emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
       end
 
         it "should have I'm an Employee link when user has active employee_staff_role" do
 
           allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
-          expect(portal_display_name('')).to eq  "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-individual.png\" alt=\"Icon individual\" /> &nbsp; I'm an Employee</a>"
+          expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/mhc-icon-individual.png\" alt=\"Mhc icon individual\" /> &nbsp; I'm an Employee</a>"
         end
 
       it "should have Welcome prompt when user has no active role" do

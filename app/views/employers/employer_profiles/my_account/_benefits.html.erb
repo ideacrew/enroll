@@ -4,9 +4,18 @@
       <h1>Benefits - Coverage You Offer</h1>
     </div>
     <div class="col-xs-4">
-      <% if @employer_profile.is_new_employer? && !@employer_profile.active_plan_year && site_broker_quoting_enabled? %>
-        <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#claimQuoteModal" }, class: 'btn btn-default btn-block' %>
+      <% if site_broker_claim_quoting_enabled? %>
+        <% if show_or_hide_claim_quote_button(@employer_profile) %>
+          <% claim_warnings, claim_modal_name = claim_quote_warnings(@employer_profile) %>
+
+          <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#{claim_modal_name}" }, class: 'btn btn-default btn-block' %>
+
+          <% if claim_warnings.present? %>
+            <%= render "employers/plan_years/claim_quote_warnings", warnings: claim_warnings %>
+          <% end %>
+        <% end %>
       <% end %>
+
       <%= pundit_span EmployerProfile,:updateable? %>
         <% if @plan_years.present? && @employer_profile.published_plan_year.blank? && !@employer_profile.draft_plan_year.present? %>
         <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-lg", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>

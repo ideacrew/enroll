@@ -45,6 +45,9 @@ class Plan
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables, :sbc_document
 
+  # To filter plan renewal mapping for carrier
+  embeds_many :renewal_plan_mappings
+
   # More Attributes from qhp
   field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
   field :deductible, type: String # Deductible
@@ -63,7 +66,10 @@ class Plan
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
 
-  # offerings
+  #field can be used for filtering
+  field :frozen_plan_year, type: Boolean
+
+  # Fields for checking respective carrier is offering or not
   field :is_horizontal, type: Boolean, default: true
   field :is_vertical, type: Boolean, default: true
   field :is_sole_source, type: Boolean, default: true
@@ -359,9 +365,15 @@ class Plan
     end
   end
 
-  def renewal_plan
+  def renewal_plan(date = nil)
     return @renewal_plan if defined? @renewal_plan
-    @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
+
+    if date.present? && renewal_plan_mappings.by_date(date).present?
+      renewal_mapping = renewal_plan_mappings.by_date(date).first
+      @renewal_plan = renewal_mapping.renewal_plan
+    else
+      @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
+    end
   end
 
   def minimum_age
@@ -423,6 +435,10 @@ class Plan
     (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
   end
 
+  def plan_deductible
+    deductible_integer
+  end
+
   def hsa_plan?
     name = self.name
     regex = name.match("HSA")
@@ -431,6 +447,12 @@ class Plan
     else
       return false
     end
+  end
+
+  def plan_hsa
+    name = self.name
+    regex = name.match("HSA")
+    regex.present? ? 'Yes': 'No'
   end
 
   def renewal_plan_type
@@ -518,6 +540,28 @@ class Plan
       end
     end
 
+    def search_options(plans)
+      options ={
+        'plan_type': [],
+        'plan_hsa': [],
+        'metal_level': [],
+        'plan_deductible': []
+      }
+      options.each do |option, value|
+        collected = plans.collect { |plan|
+          if option == :metal_level
+            MetalLevel.new(plan.send(option))
+          else
+            plan.send(option)
+          end
+        }.uniq.sort
+        unless collected.none?
+          options[option] = collected
+        end
+      end
+      options
+    end
+
     def shop_health_plans year
       $shop_plan_cache = {} unless defined? $shop_plan_cache
       if $shop_plan_cache[year].nil?
@@ -580,4 +624,42 @@ class Plan
       feature_array
     end
   end
+end
+
+class MetalLevel
+  include Comparable
+  attr_reader :name
+  METAL_LEVEL_ORDER = %w(BRONZE SILVER GOLD PLATINUM)
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    @name
+  end
+
+  def <=>(metal_level)
+    metal_level = safe_assign(metal_level)
+    my_level = self.name.upcase
+    compared_level = metal_level.name.upcase
+    METAL_LEVEL_ORDER.index(my_level) <=> METAL_LEVEL_ORDER.index(compared_level)
+  end
+
+  def eql?(metal_level)
+    metal_level = safe_assign(metal_level)
+    METAL_LEVEL_ORDER.index(self.name) ==  METAL_LEVEL_ORDER.index(metal_level.name)
+  end
+
+  def hash
+    @name.hash
+  end
+
+  private
+
+    def safe_assign(metal_level)
+      if metal_level.is_a? String
+        metal_level = MetalLevel.new(metal_level)
+      end
+      metal_level
+    end
 end

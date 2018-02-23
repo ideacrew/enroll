@@ -215,6 +215,10 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
+  def primary_mailing_address
+    office_locations.map(&:address).detect{|add| add.kind == "mailing"}
+  end
+
   def self.search_by_general_agency(search_content)
     Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
   end
@@ -268,7 +272,7 @@ class Organization
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         ## don't enable Tufts for now
-        next carrier_names if org.fein == '800721489'
+        next carrier_names if ["800721489", "042674079"].include?(org.fein)
 
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
@@ -311,7 +315,7 @@ class Organization
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         ## don't enable Tufts for now
-        next carrier_names if org.fein == '800721489'
+        next carrier_names if ["800721489", "042674079"].include?(org.fein)
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
           if filters[:active_year]
@@ -375,7 +379,7 @@ class Organization
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, "invoices",file_name)
+      doc_uri = Aws::S3Storage.save(file_path, "invoices", file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri

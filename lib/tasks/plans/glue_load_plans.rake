@@ -29,6 +29,7 @@ namespace :seed do
         :metal_level => plan.metal_level,
         :coverage_type => plan.coverage_kind,
         :renewal_plan_id => plan.renewal_plan_id,
+        :renewal_plan_hios_id => plan.try(:renewal_plan).try(:hios_id),
         :minimum_age => 0,
         :maximum_age => 120,
         :market_type => plan.market

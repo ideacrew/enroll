@@ -1,0 +1,93 @@
+<html>
+<head>
+  <title><%= Settings.site.short_name %> Confirmation</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+  <meta content="telephone=no" name="format-detection" />
+
+  <style type="text/css">
+
+  @font-face {
+    font-family: 'NimbusTimesRoman';
+    font-style: normal;
+    font-weight: 300;
+    src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
+  }
+
+  body {
+    width:100%!important;
+    -webkit-text-size-adjust:100%;
+    -ms-text-size-adjust:100%;
+    margin:0;
+    padding:0;
+    mso-line-height-rule:exactly
+    font-size:10px;
+    color:rgb(0,0,0);
+    font-family: "NimbusTimesRoman", Times, serif;
+    margin-top: 17px;
+  }
+
+  table td {
+    border-collapse:collapse;
+    font-size:10px;
+    font-family: "NimbusTimesRoman", Times, serif;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  table td {
+    border-collapse: collapse;
+  }
+  </style>
+
+
+<script>
+   // function subst() {
+   //    var vars = {};
+
+   //    // explode the URL query string
+   //    var x = document.location.search.substring(1).split('&');
+
+   //    // loop through each query string segment and get keys/values
+   //    for (var i in x)
+   //    {
+   //       var z = x[i].split('=',2);
+   //       vars[z[0]] = unescape(z[1]);
+   //    }
+
+   //    // an array of all the parameters passed into the footer file
+   //    var x = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+
+   //    // each page will have an element with class 'section' from the body of the footer HTML
+   //    var y = document.getElementsByClassName('footer-section');
+   //    var m = document.getElementsByClassName('mpi-indicator');
+
+   //    for(var j = 0; j < y.length; j++)
+   //    {
+   //       // hide footer on languages page
+   //       if (vars[x[2]] == 1 || vars[x[2]] == 2)
+   //       {
+   //          if (vars[x[2]] == 1){
+   //            m[j].style.display = 'block';
+   //          }
+   //          y[j].style.display = 'none';
+   //       }
+
+   //    }
+
+   // }
+</script>
+</head>
+
+<body onload="subst()">
+  <table class="footer-section" align="center" width="100%" border="0">
+    <tr>
+      <td>____________________________________________________________________________________________________</td>
+    </tr>
+    <tr>
+      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>/TTY: <%= Settings.contact_center.tty %>, or go to www.dchealthlink.com.</td>
+    </tr>
+  </table>
+</body>
+</html>

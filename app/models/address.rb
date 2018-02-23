@@ -97,6 +97,10 @@ class Address
     [address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>').html_safe
   end
 
+  def to_a
+    [kind, address_1, address_2.to_s, city, state, zip]
+  end
+
   # Get the full address formatted as a string
   #
   # @example Get the full address formatted as a string

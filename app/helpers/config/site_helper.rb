@@ -3,7 +3,7 @@ module Config::SiteHelper
   def site_redirect_on_timeout_route
     Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
   end
-  
+
   def site_byline
     Settings.site.byline
   end
@@ -20,12 +20,20 @@ module Config::SiteHelper
     link_to site_website_name, site_website_name
   end
 
+  def site_website_link
+    link_to site_website_name, site_website_name
+  end
+
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
 
   def site_find_expert_url
     site_home_url + "/find-expert"
+  end
+
+  def site_home_business_url
+    Settings.site.home_business_url
   end
 
   def site_home_url
@@ -35,7 +43,11 @@ module Config::SiteHelper
   def site_curam_enabled?
     Settings.site.curam_enabled
   end
-  
+
+  def site_brokers_agreement_path
+    link_to "#{Settings.aca.state_name} #{Settings.site.short_name} Broker Agreement", Settings.site.terms_and_conditions_url
+  end
+
   def site_home_link
     link_to site_home_url, site_home_url
   end
@@ -55,7 +67,7 @@ module Config::SiteHelper
   def site_nondiscrimination_notice_url
     Settings.site.nondiscrimination_notice_url
   end
-    
+
   def site_policies_url
     Settings.site.policies_url
   end
@@ -69,7 +81,11 @@ module Config::SiteHelper
   end
 
   def site_registration_path(resource_name, params)
-    Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+    if Settings.site.registration_path.present? && ENV['AWS_ENV'] == 'prod'
+       Settings.site.registration_path
+    else
+      new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+    end
   end
 
   def site_long_name
@@ -146,5 +162,9 @@ module Config::SiteHelper
 
   def site_document_verification_checklist_url
     Settings.site.document_verification_checklist_url
+  end
+
+  def site_invoice_bill_url
+    Settings.site.invoice_bill_url
   end
 end

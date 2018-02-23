@@ -9,14 +9,14 @@
           <thead>
           <tr>
             <th><%= check_box_tag 'BrokerAgencyProfile-check-all' %></th>
-            <th>FEIN</th>
-            <th>Legal Name</th>
-            <th>EE Count</th>
-            <th>ER State</th>
-            <th>Effective Date</th>
-            <th>Broker</th>
+            <th><%= l10n("fein")%></th>
+            <th><%= l10n("legal_name")%></th>
+            <th><%= l10n("broker_agencies.profiles.ee_count")%></th>
+            <th><%= l10n("broker_agencies.profiles.er_state")%></th>
+            <th><%= l10n("effective_date")%></th>
+            <th><%= l10n("broker")%></th>
             <% if general_agency_enabled? %>
-            <th>General Agency</th>
+              <th><%= l10n("general_agency")%></th>
             <%end%>
           </tr>
           </thead>
@@ -91,11 +91,11 @@
 
       <% if general_agency_enabled? %>
         <div class="col-md-4">
-          <h3>General Agencies</h3>
+          <h3><%= l10n("general_agencies")%></h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
           <%= hidden_field_tag :from_assign, false %>
-          <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-          <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+          <%= submit_tag l10n("assign"), class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+          <%= submit_tag l10n("clear_assignment"), class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
         </div>
         <% end %>
       <% end %>

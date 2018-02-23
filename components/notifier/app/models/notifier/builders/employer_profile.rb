@@ -42,5 +42,10 @@ module Notifier
     def employer_name
       merge_model.employer_name = employer_profile.legal_name
     end
+
+    def invoice_month
+      merge_model.invoice_month = TimeKeeper.date_of_record.next_month.strftime('%B')
+    end
+
   end
 end
