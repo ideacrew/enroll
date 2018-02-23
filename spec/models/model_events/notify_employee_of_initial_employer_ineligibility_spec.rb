@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean => :after_each do
-  let(:model_event)  { "notify_employee_of_initial_employer_ineligibility" }
-  let(:notice_event) { "notify_employee_of_initial_employer_ineligibility" }
+  let(:model_event)  { "application_denied" }
+  let(:notice_event) { "application_denied" }
   let(:employer_profile){ create :employer_profile, aasm_state: "registered"}
   let!(:person) { FactoryGirl.create(:person, :with_family) }
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
@@ -16,7 +16,7 @@ describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean =
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :notify_employee_of_initial_employer_ineligibility, :klass_instance => model_instance, :options => {})
+            expect(model_event).to have_attributes(:event_key => :application_denied, :klass_instance => model_instance, :options => {})
           end
         end
         model_instance.advance_date!
@@ -27,12 +27,12 @@ describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean =
   describe "NoticeTrigger" do
     context "when employer terminated from shop" do
       subject { Observers::NoticeObserver.new }
-      let(:model_event) { ModelEvents::ModelEvent.new(:notify_employee_of_initial_employer_ineligibility, model_instance, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:application_denied, model_instance, {}) }
 
       it "should trigger notice event" do
         allow_any_instance_of(CensusEmployee).to receive(:employee_role).and_return(employee_role)
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_initial_employer_ineligibility"
+          expect(event_name).to eq "acapi.info.events.employee.application_denied"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s

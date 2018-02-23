@@ -10,9 +10,8 @@ module ModelEvents
       :ineligible_initial_application_submitted,
       :ineligible_renewal_application_submitted,
       :open_enrollment_began,
-      #:application_denied,
-      :renewal_application_denied,
-      :notify_employee_of_initial_employer_ineligibility
+      :application_denied,
+      :renewal_application_denied
     ]
 
     DATA_CHANGE_EVENTS = [
@@ -58,17 +57,12 @@ module ModelEvents
           is_open_enrollment_began = true
         end
 
-        # This event is not used in notice_observer as of now
-        # if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
-        #   is_application_denied = true
-        # end
+        if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
+          is_application_denied = true
+        end
 
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
-        end
-
-        if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
-          is_notify_employee_of_initial_employer_ineligibility = true
         end
 
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
