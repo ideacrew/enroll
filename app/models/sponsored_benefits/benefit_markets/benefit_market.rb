@@ -7,7 +7,6 @@ module SponsoredBenefits
       MARKET_KINDS            = [:aca_shop, :aca_individual, :medicaid, :medicare]
       PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
-      field :site_id,     type: Symbol  # For example, :dc, :cca
       field :market_kind, type: Symbol  # => :aca_shop
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
       field :description, type: String, default: ""
@@ -16,28 +15,22 @@ module SponsoredBenefits
         cascade_callbacks: true,
         validate: true
 
-      has_many    :benefit_applications,            class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
-
-      validates_presence_of :site_id
+      belongs_to  :site,                  class_name: "SponsoredBenefits::Site"
+      has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
       validates :market_kind,
         inclusion: { in: SponsoredBenefits::MARKET_KINDS, message: "%{value} is not a valid market kind" },
         allow_nil:    false
 
-      index({ "site_id" => 1, "market_kind"  => 1 })
+      index({ "market_kind"  => 1 })
       index({ "benefit_market_service_periods._id" => 1 })
       index({ "benefit_market_service_periods.application_period.min" => 1,
               "benefit_market_service_periods.application_period.max" => 1 },
             { name: "benefit_market_service_periods_application_period" })
 
-
-      # THIS SCOPE MADE NO SENSE TO ME --- A scope is a class level method you can't combine that with instance level attributes (e.g site_id, market_kind)
-      scope :find_by_benefit_sponsorship, ->(site_id, market_kind) { where(site_id: site_id, market_kind: market_kind) }
       scope :contains_date,               ->(effective_date)      { where(:"benefit_market_service_periods.application_period.min".gte => effective_date,
                                                                           :"benefit_market_service_periods.application_period.max".lte => effective_date)
                                                                     }
-
-
 
       def benefit_market_service_period_for(effective_date)
         SponsoredBenefits::BenefitMarkets::BenefitMarketCatalog.new(effective_date, self)

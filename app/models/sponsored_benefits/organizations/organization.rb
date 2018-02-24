@@ -11,7 +11,7 @@ module SponsoredBenefits
       # org_a.divisions << org_b  # org_b.agency => org_a
       # org_x.agency = org_y      # org_y.divisions => [org_x]
       belongs_to :agency,  class_name: "SponsoredBenefits::Organizations::Organization",
-        inverse_of: :divisions
+        inverse_of: :divisions, counter_cache: true
       has_many :divisions, class_name: "SponsoredBenefits::Organizations::Organization",
         inverse_of: :agency
 
@@ -26,6 +26,23 @@ module SponsoredBenefits
         inverse_of: :plan_design_sponsors
       has_and_belongs_to_many :plan_design_sponsors,  class_name: "SponsoredBenefits::Organizations::Organization",
         inverse_of: :plan_design_agents
+
+      # Organizations with EmployerProfile and HbxProfile belong to a Site
+      belongs_to :site, class_name: "SponsoredBenefits::Site",
+        inverse_of: :owner_organization
+
+      # Use the Document model for managing any/all documents associated with Organization
+      embeds_many :documents, class_name: "SponsoredBenefits::Documents::Document" do
+        def find_by_subject(subject)
+          where(subject: subject)
+        end
+        def find_by_identifier(identifier)
+          where(identifier: identifier)
+        end
+        def find_by_date_range(date_range)
+          #TODO Implement
+        end
+      end
 
 
       embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
