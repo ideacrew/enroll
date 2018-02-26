@@ -1074,7 +1074,7 @@ describe Person, :dbclean => :after_each do
     end
     context 'ridp verification types for person' do
       it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
-      it_behaves_like 'collecting ridp verification types for person', [], 0, false
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, false
     end
   end
 
