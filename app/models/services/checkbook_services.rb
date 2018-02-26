@@ -39,8 +39,8 @@ module Services
       {
         "remote_access_key": Settings.checkbook_services.remote_access_key,
         "reference_id": Settings.checkbook_services.reference_id,
-        "employer_effective_date": @census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%d-%m"),
-        "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%d-%m"),
+        "employer_effective_date": @census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%m-%d"),
+        "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
         "employer": {
           "state": 11,
           "county": 001
@@ -80,10 +80,10 @@ module Services
       end
 
       def build_family
-        family = [{'dob': @census_employee.dob.strftime("%Y-%d-%m") ,'relationship': 'self'}]
+        family = [{'dob': @census_employee.dob.strftime("%Y-%m-%d") ,'relationship': 'self'}]
         @census_employee.census_dependents.each do |dependent|
           next if dependent == "nephew_or_niece"
-          family << {'dob': dependent.dob.strftime("%Y-%d-%m") ,'relationship': dependent.employee_relationship}
+          family << {'dob': dependent.dob.strftime("%Y-%m-%d") ,'relationship': dependent.employee_relationship}
         end
         family
       end
