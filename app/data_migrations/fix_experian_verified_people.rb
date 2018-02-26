@@ -14,7 +14,7 @@ class FixExperianVerifiedPeople < MongoidMigrationTask
   end
 
   def get_people
-    user_ids = User.where("identity_response_code"=> User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE).map(&:_id)
+    user_ids = User.where("identity_final_decision_code"=> User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE).map(&:_id)
     Person.where(:user_id.in => user_ids)
   end
 
