@@ -1285,11 +1285,11 @@ class EmployerProfile
     end
   end
 
-  def welcome_employer_profile
+  def trigger_shop_notices(event)
     begin
-      trigger_model_event(:welcome_notice_to_employer)
+      trigger_model_event(event.to_sym)
     rescue Exception => e
-     puts "Unable to deliver Employer Notice to #{employer_profile.legal_name} due to #{e}" unless Rails.env.test?
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
     end
   end
 

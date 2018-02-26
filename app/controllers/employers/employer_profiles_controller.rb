@@ -208,7 +208,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
-          @organization.employer_profile.welcome_employer_profile if @organization.employer_profile.present?
+          @organization.employer_profile.trigger_shop_notices("welcome_notice_to_employer") if @organization.employer_profile.present?
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
