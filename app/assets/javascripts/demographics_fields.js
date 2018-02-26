@@ -242,44 +242,90 @@ var PersonValidations = (function(window, undefined) {
 
   function validationForVlpDocuments(e) {
     if ($('#vlp_documents_container').is(':visible')) {
+      var doc_errors = []
+
+      if ($("#immigration_doc_type").is(":visible")) {
+        var doc_type = $("#immigration_doc_type").val();
+      } else {
+        var doc_type = $("#naturalization_doc_type").val();
+      };
+
       $('.vlp_doc_area input.doc_fields').each(function() {
         if ($(this).attr('placeholder') == 'Citizenship Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
           } else {
-
+            alphaNumericCheck($(this), [6, 12], 'Citizenship Number');
           }
         }
+
         if ($(this).attr('placeholder') == 'Alien Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
-          } else {}
+          } else {
+            integerCheck($(this), 9, 'Alien Number');
+          }
         }
         if ($(this).attr('placeholder') == 'Card Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
-          } else {}
+          } else {
+            integerCheck($(this), 13, 'Card Number');
+          }
         }
+
         if ($(this).attr('placeholder') == 'Naturalization Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
-          } else {}
-        }
-        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
-
-        } else {
-          if ($(this).attr('placeholder') == 'Passport Number') {
-            if ($(this).val().length < 1) {
-              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
-
-            } else {}
+          } else {
+            alphaNumericCheck($(this), [6, 12], 'Naturalization Number');
           }
         }
+
+        if ($(this).attr('placeholder') == 'SEVIS ID') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+
+          } else {
+            integerCheck($(this), 10, 'SEVIS ID');
+          }
+        }
+
+        if ($(this).attr('placeholder') == 'Passport Number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+
+          } else {
+            alphaNumericCheck($(this), [6, 12], 'Passport Number');
+          }
+        }
+
+        if ($(this).attr('placeholder') == 'I 94 Number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+
+          } else {
+            integerCheck($(this), 11, 'I 94 Number');
+          }
+        }
+
+        if ($(this).attr('placeholder') == 'Visa number') {
+          if ($(this).val().length < 1) {
+            alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+            PersonValidations.restoreRequiredAttributes(e);
+
+          } else {
+            alphaNumericCheck($(this), [8, 8], 'Visa Number');
+          }
+        }
+
         if ($(this).attr('placeholder') == 'I-766 Expiration Date') {
           if ($(this).val().length != 10) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
@@ -294,32 +340,69 @@ var PersonValidations = (function(window, undefined) {
 //
 //          } else {}
 //        }
-        if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
-
-        } else {
-          if ($(this).attr('placeholder') == 'I 94 Number') {
-            if ($(this).val().length < 1) {
-              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
-
-            } else {}
-          }
-        }
-
-        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
-          if ($(this).attr('placeholder') == 'SEVIS ID') {
-            if ($(this).val().length < 1) {
-              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
-
-            } else {}
-          }
-        } else {
-
-        }
-
 
       });
+
+      function integerCheck(elem, digit, placeholder) {
+        var number = elem.val()
+        var alien_number = new RegExp('^\\d{'+digit+'\}$');
+        if(!(alien_number.test(number))) {
+          if (!(number.length == digit)) {
+            doc_errors.push(doc_type + ": " + placeholder + " has wrong length (should be " + digit +" characters)")
+          } else {
+            doc_errors.push(doc_type + ": " + placeholder + " should be in requested format (Only integers)")
+          }
+        }
+      }
+
+      function alphaNumericCheck(element, limits, placeholder) {
+        var number = element.val()
+        var min = limits[0]
+        var max = limits[1]
+        var naturalization_number = new RegExp('^[a-z0-9]{'+min+'\,'+max+'\}$');
+        if(!(naturalization_number.test(number))) {
+          if (!(number.length >= min && number.length <= max)) {
+            if (min == max) {
+              doc_errors.push(doc_type + ": " + placeholder + " has wrong length (should be " + min +" characters)")
+            } else {
+              doc_errors.push(doc_type + ": " + placeholder + " has wrong length (minimum " + min + " and maximum " + max + " characters)")
+            }
+          } else {
+            doc_errors.push(doc_type + ": " + placeholder + " should be in requested format (should NOT contain any special characters)")
+          }
+        }
+      };
+
+      if(doc_errors.length) {
+        $('html,body').animate({scrollTop: 0});
+        $(".alert.alert-alert").remove();
+
+        var error_str = "<h4> The following requires your attention:</h4>"
+        var ul = '<p><ul>';
+
+        for (i in doc_errors){
+          ul+='<li>' + doc_errors[i] + '</li>';
+        }
+        ul+='</ul>';
+
+        error_str += ul
+
+        if($(".my-account-page").length) {
+          $(".my-account-page").prepend("<div class='alert alert-alert'>" + error_str);
+        } else {
+          if ($("#personal_info").length) {
+            $("#personal_info").prepend("<div class='alert alert-alert'>" + error_str);
+          } else {
+            $(".house").prepend("<div class='alert alert-alert'>" + error_str);
+          };
+        };
+        e.preventDefault();
+        e.stopPropagation();
+      } else {
+        $(".alert.alert-alert").remove();
+      }
+    } else {
+      $(".alert.alert-alert").remove();
     }
   }
 
@@ -341,7 +424,7 @@ $(document).ready(function() {
   applyListeners();
   validationForIndianTribeMember();
 
-  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
+  $('html').on('submit', 'form.edit_person, form.new_dependent, form.edit_dependent', function(e) {
     PersonValidations.validationForUsCitizenOrUsNational(e);
     PersonValidations.validationForNaturalizedCitizen(e);
     PersonValidations.validationForEligibleImmigrationStatuses(e);

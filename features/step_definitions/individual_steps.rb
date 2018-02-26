@@ -528,6 +528,39 @@ Then(/^\w+ enters demographic information$/) do
   fill_in 'person[emails_attributes][0][address]', with: "user#{rand(1000)}@example.com"
 end
 
+Then(/^Individual should see demographic questions$/) do
+  expect(page).to have_content(/Are you a US Citizen or US National?/i)
+  expect(page).to have_content(/Are you currently incarcerated?/i)
+end
+
+And(/^Individual click on no for us citizen$/) do
+  find(:xpath, '//*[@id="consumer_fields"]/div[1]/div[3]/div/label/span').click
+end
+
+Then(/Individual should see immigration question$/) do
+  expect(page).to have_content(/Do you have eligible immigration status?/i)
+end
+
+And(/^Individual click on yes for immigration status$/) do
+  find(:xpath, '//*[@id="immigration_status_container"]/div[2]/div/label/span').click
+end
+
+And(/^Individual selected I-551 document type$/) do
+  find(:xpath, '//*[@id="immigration_doc_type_select"]/div/div[2]/p').click
+  find(:xpath, '//*[@id="immigration_doc_type_select"]/div/div[3]/div/ul/li[3]').click
+end
+
+Then(/^Individual should see input boxes for alien number, card number, expiration date$/) do
+  wait_for_ajax
+  expect(page).to have_xpath('//*[@id="person_consumer_role_vlp_documents_attributes_0_alien_number"]')
+  expect(page).to have_xpath('//*[@id="person_consumer_role_vlp_documents_attributes_0_card_number"]')
+  expect(page).to have_xpath('//*[@id="doc_date_field"]')
+end
+
+And(/^Individual should not see text instructions on page$/) do
+  expect(page).not_to have_content(/When entering an Alien Number, only include the numbers/i)
+end
+
 And(/^\w+ is an Employee$/) do
   wait_and_confirm_text /Employer/i
 end
@@ -628,4 +661,45 @@ end
 
 And(/consumer clicked on "Married" qle/) do
   click_link "Married"
+end
+
+And(/consumer clicked on manage family$/) do
+  find('.interaction-click-control-manage-family').click
+  wait_for_ajax
+end
+
+And(/consumer clicked on personal section$/) do
+  find('.interaction-click-control-personal').click
+  wait_for_ajax
+end
+
+And(/Individual enters incorrect (.*) information for verification types$/) do |item|
+  fill_in "#{item}_consumer_role_vlp_documents_attributes_0_alien_number", :with =>  "1234TestAlienNumber"
+  fill_in "#{item}_consumer_role_vlp_documents_attributes_0_card_number", :with => "2345TestCardNumber"
+  fill_in "#{item}[consumer_role][vlp_documents_attributes][0][expiration_date]", :with => TimeKeeper.date_of_record + 10.days
+end
+
+And(/Individual clicked on (.*) button$/) do |button|
+  if button == "save"
+    find(".btn-primary .fa-user-plus").trigger("click")
+  else
+    find(".btn-primary.mz").trigger("click")
+  end
+end
+
+Then(/Individual should see error messages$/) do
+  expect(page).to have_content "I-551 (Permanent Resident Card): Alien Number has wrong length (should be 9 characters)"
+  expect(page).to have_content "I-551 (Permanent Resident Card): Card Number has wrong length (should be 13 characters)"
+end
+
+And(/Individul should also see the incorrect information they entered$/) do
+  incorrect_alien_number = page.execute_script("$('#person_consumer_role_vlp_documents_attributes_0_alien_number').val()")
+  incorrect_card_number = page.execute_script("$('#person_consumer_role_vlp_documents_attributes_0_card_number').val()")
+  expect(page).to have_content incorrect_alien_number
+  expect(page).to have_content incorrect_card_number
+end
+
+And(/Individual clicked on pencil to edit dependent information$/) do
+  find('.fa-pencil').click
+  wait_for_ajax
 end
