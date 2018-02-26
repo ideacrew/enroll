@@ -202,6 +202,11 @@ class BrokerAgencyProfile
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
     end
+
+    def get_organization_from_broker_profile_id(id)
+      organizations = Organization.where("broker_agency_profile._id" => id).to_a
+      organizations.size > 0 ? organizations.first : nil
+    end
   end
 
   aasm do #no_direct_assignment: true do

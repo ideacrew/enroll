@@ -385,6 +385,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
         get :assign_history
+        get  :commission_statements
       end
       member do
         if Settings.aca.general_agency_enabled
@@ -397,6 +398,8 @@ Rails.application.routes.draw do
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
+        get :download_commission_statement
+        get :show_commission_statement
       end
 
       resources :applicants
