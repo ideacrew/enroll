@@ -37,7 +37,7 @@ FactoryGirl.define do
           family.relate_new_member(dependent.person, "child")
         end
       end
-   end
+    end
   end
 end
 
