@@ -7,6 +7,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
+    set_admin_bookmark_url
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @effective_on_date = params[:effective_on_date] || params[:change_plan_date]
