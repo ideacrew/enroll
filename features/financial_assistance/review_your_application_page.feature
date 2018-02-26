@@ -1,7 +1,10 @@
 Feature: Review your application page functionality
 
   Background: Review your application page
-    Given that the user is on FAA Household Info: Family Members page
+    Given a consumer exists
+    And is logged in
+    And a benchmark plan exists
+    And the user will navigate to the FAA Household Info page
     And all applicants are in Info Completed state with all types of income
     And the user clicks CONTINUE
     Then the user is on the Review Your Application page
