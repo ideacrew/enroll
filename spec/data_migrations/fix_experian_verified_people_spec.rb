@@ -14,7 +14,7 @@ describe FixExperianVerifiedPeople, dbclean: :after_each do
     consumer = person.consumer_role
     expect(consumer.identity_validation). to eq 'valid'
     expect(consumer.application_validation). to eq 'valid'
-    expect(consumer.application_update_reason). to eq 'Verified by Experian'
+    expect(consumer.application_update_reason). to eq 'Verified from Experian'
   end
 
   it "should not move identity and application documents to verified state" do
