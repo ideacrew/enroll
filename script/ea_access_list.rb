@@ -37,12 +37,12 @@
             else
               csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), 'Active']
             end
-          elsif user.assister_role?
+          elsif person.assister_role?
             csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "assister", user.created_at, user.last_sign_in_at ]
-          elsif user.csr_role?
+          elsif person.csr_role?
             csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "csr", user.created_at, user.last_sign_in_at ]
-          elsif user.consumer_role?
-            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "consumer", user.created_at, user.last_sign_in_at ] 
+          elsif person.consumer_role?
+            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "consumer", user.created_at, user.last_sign_in_at ]
           end
         rescue Exception => e
           puts "Errors #{e} #{e.backtrace}"
