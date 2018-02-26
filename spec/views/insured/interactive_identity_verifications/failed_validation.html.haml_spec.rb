@@ -13,6 +13,7 @@ describe "insured/interactive_identity_verifications/failed_validation" do
     allow(person).to receive(:consumer_role).and_return consumer_role
     sign_in current_user
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+    allow(view).to receive(:ridp_redirection_link).with(person).and_return nil
   end
   it "should show a message about the user failing validation and providing contact info" do
     render :template => "insured/interactive_identity_verifications/failed_validation.html.haml"

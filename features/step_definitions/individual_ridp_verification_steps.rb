@@ -197,3 +197,35 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
 end
+
+Then(/^HBX admin should see the dependents form$/) do
+  expect(page).to have_content('Add Member')
+  screenshot("dependents")
+end
+
+And(/^HBX admin click on continue button on household info form$/) do
+  find(:xpath, "//*[@id='btn-continue']").click
+end
+
+And(/^HBX admin clicks continue after approving Identity document$/) do
+  find(:xpath, "//*[@id='btn-continue']").click
+end
+
+When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
+  expect(page).to have_content 'None of the situations listed above apply'
+  find('#no_qle_checkbox').click
+  expect(page).to have_content 'To enroll before open enrollment'
+end
+
+And(/^HBX admin click on back to my account button$/) do
+  expect(page).to have_content "To enroll before open enrollment, you must qualify for a special enrollment period"
+  find('.interaction-click-control-back-to-my-account').click
+end
+
+Then(/^HBX admin should land on home page$/) do
+  expect(page).to have_content 'My DC Health Link'
+end
+
+And(/^I click on Continue button$/) do
+  find(:xpath, "//*[@id='btn-continue']").click
+end

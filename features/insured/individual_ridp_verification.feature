@@ -192,4 +192,27 @@ Feature: Consumer RIDP verification process
     Then the CONTINUE button is functionally ENABLED
     And visibly ENABLED
 
-
+  Scenario: New insured user chooses I Agree on Auth and Consent Page and uploaded Identity document and admin already purchased a plan
+    Given that the consumer has navigated to the AUTH & CONSENT page
+    When the consumer selects “I Agree”
+    And that the consumer has answered the Experian Identity Proofing questions
+    When  Experian is unable to verify Identity for the consumer
+    And  an Experian Error screen appears for the consumer
+    And an uploaded identity verification in REVIEW status is present
+    Then Individual logs out
+    When an HBX admin exists
+    And an uploaded Identity verification in VERIFIED status is present on failed experian screen
+    And HBX admin clicks continue after approving Identity document
+    And HBX admin click on continue button on household info form
+    When HBX admin click on none of the situations listed above apply checkbox
+    And HBX admin click on back to my account button
+    Then HBX admin should land on home page
+    And HBX admin logs out
+    And Individual resumes enrollment
+    And I click on sign in existing account
+    And I signed in
+    Then the CONTINUE button is functionally ENABLED
+    And visibly ENABLED
+    And I click on Continue button
+    Then I should land on home page
+    

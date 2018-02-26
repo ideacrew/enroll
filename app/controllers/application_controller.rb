@@ -305,6 +305,16 @@ class ApplicationController < ActionController::Base
       url.match('/service_unavailable')
     end
 
+    # Used for certain RIDP cases when we need to track Admins and the Consumers bookmark separatelty.
+    # There are cases based on the completeness of Verification types as to where the Consumer vs Admin lands on logging in.
+
+    def set_admin_bookmark_url
+      set_current_person
+      bookmark_url = request.original_url
+      role = current_user.has_hbx_staff_role?
+      @person.consumer_role.update_attributes(:admin_bookmark_url => bookmark_url) if role != nil && !prior_ridp_bookmark_urls(bookmark_url) && @person.has_consumer_role?
+    end
+
     def hbx_staff_and_consumer_role(role)
       hbx_staff = current_user.has_hbx_staff_role?
       if role.present?
