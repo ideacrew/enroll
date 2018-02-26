@@ -1,5 +1,9 @@
 module SponsoredBenefits
-  class Locations::ServiceArea
-    include Mongoid::Document
+  class Locations
+    class ServiceArea
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+    end
   end
 end

@@ -14,7 +14,7 @@ module SponsoredBenefits
       embeds_one :benefit_market_configuration
       embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter"
 
-      embeds_many :benefit_market_service_periods,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarketServicePeriod",
+      embeds_many :benefit_market_catalogs,  class_name: "SponsoredBenefits::BenefitProducts::BenefitMarketCatalog",
         cascade_callbacks: true,
         validate: true
 
@@ -26,13 +26,13 @@ module SponsoredBenefits
         allow_nil:    false
 
       index({ "market_kind"  => 1 })
-      index({ "benefit_market_service_periods._id" => 1 })
-      index({ "benefit_market_service_periods.application_period.min" => 1,
-              "benefit_market_service_periods.application_period.max" => 1 },
-            { name: "benefit_market_service_periods_application_period" })
+      index({ "benefit_market_catalogs._id" => 1 })
+      index({ "benefit_market_catalogs.application_period.min" => 1,
+              "benefit_market_catalogs.application_period.max" => 1 },
+            { name: "benefit_market_catalogs_application_period" })
 
-      scope :contains_date,               ->(effective_date)      { where(:"benefit_market_service_periods.application_period.min".gte => effective_date,
-                                                                          :"benefit_market_service_periods.application_period.max".lte => effective_date)
+      scope :contains_effective_date, ->(effective_date)      { where(:"benefit_market_catalogs.application_period.min".gte => effective_date,
+                                                                      :"benefit_market_catalogs.application_period.max".lte => effective_date)
                                                                     }
 
       def benefit_market_service_period_for(effective_date)
@@ -65,7 +65,7 @@ module SponsoredBenefits
       end
 
       def benefit_market_service_period_by_effective_date(effective_date)
-        benefit_market_service_periods.select { |service_period| service_period.effective_period.contains?(effective_date) }
+        benefit_market_catalogs.select { |service_period| service_period.effective_period.contains?(effective_date) }
       end
 
 
