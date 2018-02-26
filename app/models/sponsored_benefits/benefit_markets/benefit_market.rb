@@ -11,6 +11,9 @@ module SponsoredBenefits
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
       field :description, type: String, default: ""
 
+      embeds_one :benefit_market_configuration
+      embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter"
+
       embeds_many :benefit_market_service_periods,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarketServicePeriod",
         cascade_callbacks: true,
         validate: true
