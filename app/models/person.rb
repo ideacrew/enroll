@@ -394,8 +394,8 @@ class Person
 # collect all ridp_verification_types user in case of unsuccessful ridp
   def ridp_verification_types
     ridp_verification_types = []
-    ridp_verification_types << 'Identity' if consumer_role && consumer_role.is_applying_coverage == true && !consumer_role.person.completed_identity_verification?
-    ridp_verification_types << 'Application' if consumer_role && consumer_role.is_applying_coverage == true && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Identity' if consumer_role  && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Application' if consumer_role && !consumer_role.person.completed_identity_verification?
     ridp_verification_types
   end
 
