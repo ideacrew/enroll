@@ -55,10 +55,6 @@ And(/^the user fills out the required employer information$/) do
   fill_in 'financial_assistance_income[employer_address][zip]', with: "22046"
 end
 
-Then(/^the save button should be enabled$/) do
-  find('.interaction-click-control-save').visible?
-end
-
 And(/^the user saves the employer information$/) do
   find('.interaction-click-control-save').click
 end
