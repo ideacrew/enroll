@@ -751,13 +751,16 @@ class ConsumerRole
     end
   end
 
-  def move_identity_documents_to_verified
-    update_attributes(identity_validation: 'valid', application_validation: 'valid',
-                      identity_update_reason: 'Verified by Experian', application_update_reason: 'Verified by Experian')
-  end
 
-  def identity_verified_by_curam_or_mobile(app_type)
-    type = app_type == 'Curam' ? 'Curam' : 'Mobile'
+  def move_identity_documents_to_verified(app_type=nil)
+    case app_type
+      when 'Curam'
+        type = 'Curam'
+      when 'Mobile'
+        type = 'Mobile'
+      else
+        type = 'Experian'
+    end
     update_attributes(identity_validation: 'valid', application_validation: 'valid',
                       identity_update_reason: "Verified from #{type}", application_update_reason: "Verified from #{type}")
   end

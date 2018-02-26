@@ -213,6 +213,7 @@ class Insured::ConsumerRolesController < ApplicationController
         if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
           redirect_to upload_ridp_document_insured_consumer_role_index_path
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
           redirect_to  @consumer_role.admin_bookmark_url.present? ?  @consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
