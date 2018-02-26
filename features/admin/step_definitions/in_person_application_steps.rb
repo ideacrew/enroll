@@ -2,7 +2,7 @@ When(/^the Admin selects the In Person application option$/) do
 	find(:xpath, "//select[@name='person[family][application_type]']/option[@value='In Person']")
 end
 
-When(/^the Admin clicks CONTINUE without uploading and verifying an Identity$/) do
+When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
 	find('#upload_identity').click
   find('#select_upload_identity').click
   within '#select_upload_identity' do
