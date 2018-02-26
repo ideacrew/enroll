@@ -1,2 +1,4 @@
 #!/bin/bash
-rails r -e production script/ea_access_list.rb 
+
+RAILS_ENV=production bundle exec rails r script/ea_access_list.rb
+
