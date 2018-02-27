@@ -41,15 +41,15 @@ describe 'ModelEvents::InitialEmployerFirstRemainderToPublishPlanYear', dbclean:
 
     let(:data_elements) {
       [
-          "employer_profile.notice_date",
-          "employer_profile.employer_name",
-          "employer_profile.plan_year.current_py_start_date",
-          "employer_profile.plan_year.initial_py_publish_advertise_deadline",
-          "employer_profile.broker.primary_fullname",
-          "employer_profile.broker.organization",
-          "employer_profile.broker.phone",
-          "employer_profile.broker.email",
-          "employer_profile.broker_present?"
+        "employer_profile.notice_date",
+        "employer_profile.employer_name",
+        "employer_profile.plan_year.current_py_start_date",
+        "employer_profile.plan_year.initial_py_publish_advertise_deadline",
+        "employer_profile.broker.primary_fullname",
+        "employer_profile.broker.organization",
+        "employer_profile.broker.phone",
+        "employer_profile.broker.email",
+        "employer_profile.broker_present?"
       ]
     }
     let(:merge_model) { subject.construct_notice_object }

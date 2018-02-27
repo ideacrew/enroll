@@ -96,8 +96,9 @@ module Observers
         if model_event.event_key == :renewal_plan_year_publish_dead_line
           trigger_on_queried_records("renewal_plan_year_publish_dead_line")
         end
+
         if model_event.event_key == :initial_employer_first_reminder_to_publish_plan_year
-            trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
+          trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
         end
 
         if model_event.event_key == :initial_employer_second_reminder_to_publish_plan_year
@@ -135,8 +136,8 @@ module Observers
     def trigger_initial_employer_publish_remainder(event_name)
       start_on_1 = (TimeKeeper.date_of_record+1.month).beginning_of_month
       initial_employers_reminder_to_publish(start_on_1).each do|organization|
-          plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
-          trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
+        plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
+        trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
       end
     end
   end

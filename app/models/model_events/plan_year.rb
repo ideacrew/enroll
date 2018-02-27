@@ -105,12 +105,13 @@ module ModelEvents
           is_renewal_plan_year_publish_dead_line = true
         end
 
-        if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2
+        # remainder notices for initial application with unpublished plan year
+        if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline of month i.e., 8th of the month
           is_initial_employer_first_reminder_to_publish_plan_year = true
-          elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1
-            is_initial_employer_second_reminder_to_publish_plan_year = true
-          elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2
-            is_initial_employer_final_reminder_to_publish_plan_year = true
+        elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1 # 1 day prior to advertised deadline of month i.e., 9th of the month
+          is_initial_employer_second_reminder_to_publish_plan_year = true
+        elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
+          is_initial_employer_final_reminder_to_publish_plan_year = true
         end
 
         DATA_CHANGE_EVENTS.each do |event|

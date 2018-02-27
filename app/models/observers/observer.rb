@@ -34,8 +34,8 @@ module Observers
     def initial_employers_reminder_to_publish(new_date)
       Organization.where(:"employer_profile.plan_years" =>
                               {:$elemMatch => {
-                                  :start_on => new_date,
-                                  :aasm_state => "draft"
+                                :start_on => new_date,
+                                :aasm_state => "draft"
                               }
                               })
     end
