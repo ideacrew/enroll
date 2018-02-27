@@ -255,7 +255,7 @@ class Household
 
     th.save!
 
-    family.dependents.each do |fm|
+    family.active_dependents.each do |fm|
       ath = latest_active_thh
       ath.tax_household_members.build(
           family_member: fm,
