@@ -11,7 +11,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
   let!(:date_mock_object) { double("Date", day: 18)}
 
   before do
-  	employer.renewing_plan_year.update_attributes(open_enrollment_end_on: TimeKeeper.date_of_record+2.days)
+    employer.renewing_plan_year.update_attributes(open_enrollment_end_on: TimeKeeper.date_of_record+2.days)
   end
 
   describe "ModelEvent" do
@@ -21,7 +21,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
     end
     context "organizations for low enrollment" do
       it "should trigger model event" do
-      	expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end
@@ -90,14 +90,14 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
       it "should return merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end
-      
-      it "should return notice date" do  
+
+      it "should return notice date" do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
-      end  
+      end
 
       it "should return employer name" do
          expect(merge_model.employer_name).to eq employer.legal_name
-      end   
+      end
 
       it "should return renewing plan year open enrollment end date" do
          expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
@@ -105,11 +105,11 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
 
       it "should return false when there is no broker linked to employer" do
         expect(merge_model.broker_present?).to be_falsey
-      end  
-      
+      end
+
       it "should return renewing plan year start on date" do
-      	expect(merge_model.plan_year.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-      end  
+        expect(merge_model.plan_year.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
+      end
     end
   end
 end
