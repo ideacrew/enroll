@@ -4,36 +4,35 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      MARKET_KINDS            = [:aca_shop, :aca_individual, :medicaid, :medicare]
       PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
-      field :market_kind, type: Symbol  # => :aca_shop
+      field :kind,        type: Symbol  # => :aca_shop
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
       field :description, type: String, default: ""
 
       embeds_one :benefit_market_configuration
       embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter"
 
-      embeds_many :benefit_market_catalogs,  class_name: "SponsoredBenefits::BenefitProducts::BenefitMarketCatalog",
+      embeds_many :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog",
         cascade_callbacks: true,
         validate: true
 
       belongs_to  :site,                  class_name: "SponsoredBenefits::Site"
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
-      validates :market_kind,
-        inclusion: { in: SponsoredBenefits::MARKET_KINDS, message: "%{value} is not a valid market kind" },
+      validates :kind,
+        inclusion: { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
         allow_nil:    false
 
-      index({ "market_kind"  => 1 })
-      index({ "benefit_market_catalogs._id" => 1 })
-      index({ "benefit_market_catalogs.application_period.min" => 1,
-              "benefit_market_catalogs.application_period.max" => 1 },
-            { name: "benefit_market_catalogs_application_period" })
+      index({ "kind"  => 1 })
+      index({ "benefit_catalogs._id" => 1 })
+      index({ "benefit_catalogs.application_period.min" => 1,
+              "benefit_catalogs.application_period.max" => 1 },
+            { name: "benefit_catalogs_application_period" })
 
-      scope :contains_effective_date, ->(effective_date)      { where(:"benefit_market_catalogs.application_period.min".gte => effective_date,
-                                                                      :"benefit_market_catalogs.application_period.max".lte => effective_date)
-                                                                    }
+      scope :contains_date,   ->(date){ where(:"benefit_catalogs.application_period.min".gte => date,
+                                              :"benefit_catalogs.application_period.max".lte => date)
+                                            }
 
       def benefit_market_service_period_for(effective_date)
         SponsoredBenefits::BenefitMarkets::BenefitMarketCatalog.new(effective_date, self)
@@ -65,7 +64,7 @@ module SponsoredBenefits
       end
 
       def benefit_market_service_period_by_effective_date(effective_date)
-        benefit_market_catalogs.select { |service_period| service_period.effective_period.contains?(effective_date) }
+        benefit_catalogs.select { |service_period| service_period.effective_period.contains?(effective_date) }
       end
 
 
