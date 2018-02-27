@@ -2486,6 +2486,7 @@ describe PlanYear, '.update_announced_externally' do
       expect(plan_year.announced_externally).to eq true
     end
   end
+end
 
 describe "notify_employer_py_cancellation" do
   context "notify employer plan year cancellation " do
