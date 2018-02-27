@@ -1350,6 +1350,20 @@ describe EmployerProfile, "initial employers enrolled plan year state", dbclean:
   end
 end
 
+describe EmployerProfile, "update_status_to_binder_paid", dbclean: :after_each do
+  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
+  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+  let!(:organization){ employer_profile.organization }
+  it "should return employers" do
+    allow(Organization).to receive(:find).and_return(organization)
+    allow(organization).to receive(:employer_profile).and_return(employer_profile)
+    allow(employer_profile).to receive(:trigger_model_event).and_return(true)
+    expect(employer_profile).to receive(:trigger_model_event)
+    EmployerProfile.update_status_to_binder_paid([employer_profile.organization.id])
+    expect(employer_profile.aasm_state).to eq 'binder_paid'
+  end
+end
+
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
