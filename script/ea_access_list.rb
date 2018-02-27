@@ -33,9 +33,9 @@
             end
           elsif person.hbx_staff_role?
             if user.oim_id.match(/.*disable/i).present?
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), user.updated_at.strftime("%m/%d/%Y")]
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), user.updated_at.strftime("%m/%d/%Y")]
             else
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), 'Active']
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), 'Active']
             end
           elsif person.assister_role?
             csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "assister", user.created_at, user.last_sign_in_at, user.last_portal_visited ]
