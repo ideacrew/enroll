@@ -2,6 +2,7 @@ class TaxHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include BelongsToFamilyMember
+  include ApplicationHelper
 
   embedded_in :tax_household
   embeds_many :financial_statements
@@ -20,8 +21,12 @@ class TaxHouseholdMember
 
   def update_eligibility_kinds eligibility_kinds
     return if eligibility_kinds.blank?
-    errors.add(:base, "Cant have true values for insurance_assistance and medicaid_chip eligibility kinds.") if eligibility_kinds['is_ia_eligible'] && eligibility_kinds['is_medicaid_chip_eligible']
-    self.update_attributes eligibility_kinds
+    if !(convert_to_bool(eligibility_kinds['is_ia_eligible']) && convert_to_bool(eligibility_kinds['is_medicaid_chip_eligible']))
+      self.update_attributes eligibility_kinds
+      return true
+    else
+      return false
+    end
   end
 
   def family
