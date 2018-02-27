@@ -6,7 +6,8 @@ require 'config'
 
 module SponsoredBenefits
 
-  MARKET_KINDS            = [:aca_shop, :aca_individual, :medicaid, :medicare]
+  BENEFIT_MARKET_KINDS    = [:aca_shop, :aca_individual, :medicaid, :medicare]
+  PRODUCT_KINDS           = [:health, :dental, :medicaid, :medicare]
   PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
   class << self
