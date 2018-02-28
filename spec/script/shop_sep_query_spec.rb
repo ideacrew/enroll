@@ -44,7 +44,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       context 'enrollment submitted with in quiet period' do
         let(:submitted_at) { plan_year.enrollment_quiet_period.max - 3.hours }
 
-        it 'should publish enrollment' do
+        it 'should not publish enrollment' do
           expect(can_publish_enrollment?(enrollment, submitted_at)).to be_falsey
         end
       end
@@ -52,7 +52,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       context 'enrollment submitted during open enrollment' do
         let(:submitted_at) { plan_year.open_enrollment_end_on.prev_day }
 
-        it 'should publish enrollment' do
+        it 'should not publish enrollment' do
           expect(can_publish_enrollment?(enrollment, submitted_at)).to be_falsey
         end
       end
@@ -76,7 +76,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       context 'enrollment effective date is more than 2 months in the past' do
         let(:enrollment_effective_on) { TimeKeeper.date_of_record - 3.months }
 
-        it 'should publish enrollment' do
+        it 'should not publish enrollment' do
           expect(can_publish_enrollment?(enrollment, submitted_at)).to be_falsey
         end
       end
@@ -130,7 +130,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       context 'enrollment submitted with in quiet period' do
         let(:submitted_at) { plan_year.enrollment_quiet_period.max - 3.hours }
 
-        it 'should publish enrollment' do
+        it 'should not publish enrollment' do
           expect(can_publish_enrollment?(enrollment, submitted_at)).to be_falsey
         end
       end
@@ -138,7 +138,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       context 'enrollment submitted during open enrollment' do
         let(:submitted_at) { plan_year.open_enrollment_end_on.prev_day }
 
-        it 'should publish enrollment' do
+        it 'should not publish enrollment' do
           expect(can_publish_enrollment?(enrollment, submitted_at)).to be_falsey
         end
       end
@@ -162,7 +162,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
       context 'enrollment effective date is more than 2 months in the past' do
         let(:enrollment_effective_on) { TimeKeeper.date_of_record - 3.months }
 
-        it 'should publish enrollment' do
+        it 'should not publish enrollment' do
           expect(can_publish_enrollment?(enrollment, submitted_at)).to be_falsey
         end
       end
