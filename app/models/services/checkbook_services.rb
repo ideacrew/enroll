@@ -84,7 +84,7 @@ module Services
         # @census_employee.census_dependents.each do |dependent|
           @hbx_enrollment.hbx_enrollment_members.each do |dependent|
           next if dependent.primary_relationship == "nephew_or_niece"
-          family << {'dob': dependent.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship == "child_under_26" ? "child" : dependent.primary_relationship}
+          family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship}
         end
         family
       end
