@@ -8,7 +8,7 @@ describe 'ModelEvents::InitialEmployerFirstRemainderToPublishPlanYear', dbclean:
   let!(:employer){ create :employer_profile}
   let!(:model_instance) { build(:plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'draft') }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
-  let!(:date_mock_object) { double("Date", day: 8)}
+  let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 )}
 
   describe "ModelEvent" do
     context "when initial employer 2 days prior to soft dead line" do
