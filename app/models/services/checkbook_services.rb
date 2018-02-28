@@ -80,7 +80,8 @@ module Services
       end
 
       def build_family
-        family = [{'dob': @census_employee.dob.strftime("%Y-%m-%d") ,'relationship': 'self'}]
+        family = []
+        # family = [{'dob': @census_employee.dob.strftime("%Y-%m-%d") ,'relationship': 'self'}]
         # @census_employee.census_dependents.each do |dependent|
           @hbx_enrollment.hbx_enrollment_members.each do |dependent|
           next if dependent.primary_relationship == "nephew_or_niece"
