@@ -9,7 +9,7 @@
   processed_count = 0
 
   CSV.open(file_name, "w", force_quotes: true) do |csv|
-    csv << ["User Id", "User's Name", "OIM ID", "Email" ,"Role", "User Record Created Date", "Last Login Date", "Last Portal Visited", "Role Start on(ER-EE/ER-BA/HBX Staff)", "Role Termination Date(ER-EE/ER-BA/HBX Staff)"]
+    csv << ["User Id", "User's Name", "OIM ID", "Email" ,"Role", "User Record Created Date", "Last Login Date", "Last Portal Visited", "Role Start on(ER-EE/ER-BA/HBX Staff)", "Role Termination Date(ER-EE/ER-BA/HBX Staff)", "User Deactivation Date"]
     while offset < user_count
       User.offset(offset).limit(batch_size).each do |user|
         if processed_count % 1000 == 0
@@ -32,11 +32,12 @@
               csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "employee", user.created_at, user.last_sign_in_at, user.last_portal_visited, ce.hired_on, ce.employment_terminated_on]
             end
           elsif person.hbx_staff_role?
-            if user.oim_id.match(/.*disable/i).present?
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), user.updated_at.strftime("%m/%d/%Y")]
+            if user.oim_id.match(/.*disable/i).present? || user.oim_id.match(/.*do[-_]not[-_]/i).present? || user.oim_id.match(/.*access[-_]denied/i).present?
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), '', user.updated_at.strftime("%m/%d/%Y")]
             else
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), 'Active']
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), '', 'Active']
             end
+          # This is grabbing people with no employer or hbx staff roles
           elsif person.assister_role?
             csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "assister", user.created_at, user.last_sign_in_at, user.last_portal_visited ]
           elsif person.csr_role?
