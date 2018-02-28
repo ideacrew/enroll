@@ -1082,8 +1082,16 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        org.employer_profile.trigger_model_event(:initial_employee_plan_selection_confirmation)
+        org.employer_profile.trigger_shop_notices("initial_employee_plan_selection_confirmation")
       end
+    end
+  end
+
+  def trigger_shop_notices(event)
+    begin
+      trigger_model_event(event.to_sym)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event.humanize} notice to #{self.legal_name} due to #{e}" }
     end
   end
 
