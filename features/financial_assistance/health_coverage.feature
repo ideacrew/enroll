@@ -1,12 +1,12 @@
-Feature: Start a new Financial Assistance Application and answers questions on Other Questions page
+Feature: Start a new Financial Assistance Application and answers questions on health coverage page
 
-  Background: User logs in and visits applicant's other questions page
+  Background: User logs in and visits applicant's health coverage page
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
     And the user will navigate to the FAA Household Info page
     When they click ADD INCOME & COVERAGE INFO for an applicant
-    Then they should be taken to the applicant's Tax Info page
+    Then they should be taken to the applicant's Tax Info page (health coverage)
     And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
 
   Scenario: User answers no to currently having health coverage
