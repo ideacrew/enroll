@@ -25,8 +25,8 @@ class ConsumerRole
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
 
   #ridp
-  IDENTITY_VALIDATION_STATES = %w(valid outstanding pending)
-  APPLICATION_VALIDATION_STATES = %w(valid outstanding pending)
+  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
+  APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
 
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
@@ -87,11 +87,11 @@ class ConsumerRole
 
 
   # Identity
-  field :identity_validation, type: String, default: "outstanding"
+  field :identity_validation, type: String, default: "na"
   validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => false
 
   # Application
-  field :application_validation, type: String, default: "outstanding"
+  field :application_validation, type: String, default: "na"
   validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
 
   #ridp update reason fields
@@ -708,6 +708,14 @@ class ConsumerRole
     person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
   end
 
+  def identity_unverified?
+    self.identity_validation == "na"
+  end
+
+  def application_unverified?
+    self.application_validation == "na"
+  end
+
   def check_for_critical_changes(family, opts)
     redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person) && opts[:info_changed]
     trigger_residency! if can_trigger_residency?(family, opts)
@@ -733,6 +741,26 @@ class ConsumerRole
       mark_residency_pending
       start_residency_verification_process
     end
+  end
+
+  def move_identity_documents_to_outstanding
+    if identity_unverified? && application_unverified?
+      update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
+    end
+  end
+
+
+  def move_identity_documents_to_verified(app_type=nil)
+    case app_type
+      when 'Curam'
+        type = 'Curam'
+      when 'Mobile'
+        type = 'Mobile'
+      else
+        type = 'Experian'
+    end
+    update_attributes(identity_validation: 'valid', application_validation: 'valid',
+                      identity_update_reason: "Verified from #{type}", application_update_reason: "Verified from #{type}")
   end
 
   #class methods
