@@ -183,6 +183,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
+          employer_account_creation_notice if @organization.employer_profile.present?
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -293,6 +294,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def employer_account_creation_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
+    end
+  end
 
   private
 
@@ -423,7 +431,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

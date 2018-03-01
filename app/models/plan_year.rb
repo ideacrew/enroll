@@ -11,7 +11,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -192,10 +192,43 @@ class PlanYear
     end.compact
   end
 
+  def open_enrollment_completed?
+    return false if open_enrollment_end_on.blank?
+    (TimeKeeper.date_of_record > open_enrollment_end_on)
+  end
+
+  def binder_paid?
+    employer_profile.binder_paid?
+  end
+
+  def past_transmission_threshold?
+    return false if start_on.blank?
+    t_threshold_date = (start_on - 1.month).beginning_of_month + 14.days
+    (TimeKeeper.date_of_record > t_threshold_date)
+  end
+
   def eligible_for_export?
     return false if self.aasm_state.blank?
-    return false if self.is_conversion
-    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+    return false if is_conversion?
+    if start_on.blank?
+      return(false)
+    end
+    if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+      return false
+    end
+    if (TimeKeeper.date_of_record < start_on)
+      if enrolled?
+        if open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+          return true
+        end
+      elsif renewing_enrolled?
+        if open_enrollment_completed? && past_transmission_threshold?
+          return true
+        end
+      end
+      return false
+    end
+    true
   end
 
   def overlapping_published_plan_years
@@ -289,14 +322,14 @@ class PlanYear
   end
 
   def carriers_offered
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.carriers_offered
     end.uniq
   end
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.dental_carriers_offered
     end.uniq
   end
@@ -512,7 +545,7 @@ class PlanYear
   end
 
   def calc_active_health_assignments_for(employee_pool)
-    benefit_group_ids = self.benefit_groups.map(&:id)
+    benefit_group_ids = self.benefit_groups.pluck(:_id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
         bg_assignment = nil
         bg_assignment = ce.active_benefit_group_assignment if benefit_group_ids.include?(ce.active_benefit_group_assignment.try(:benefit_group_id))
@@ -786,7 +819,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -828,7 +861,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -918,7 +951,7 @@ class PlanYear
                             :enrolled, :enrolling, :active, :application_ineligible,
                             :renewing_application_ineligible, :published_invalid,
                             :eligibility_review, :published, :publish_pending
-                          ], to: :draft
+                          ], to: :draft, :after => [:cancel_enrollments]
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -929,7 +962,7 @@ class PlanYear
     # Admin ability to reset renewing plan year application
     event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling,
-        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft
+        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft, :after => [:cancel_enrollments]
     end
 
     event :cancel_renewal, :after => :record_transition do
@@ -941,6 +974,11 @@ class PlanYear
     end
   end
 
+  def cancel_enrollments
+    self.hbx_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+  end
 
   def trigger_passive_renewals
     open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
@@ -975,7 +1013,9 @@ class PlanYear
   end
 
   def deny_enrollment
-    employer_profile.enrollment_denied!
+    if employer_profile.may_enrollment_denied?
+      employer_profile.enrollment_denied!
+    end
   end
 
   def is_eligible_to_match_census_employees?
@@ -1053,48 +1093,75 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     if event_name == "publish"
-      self.employer_profile.trigger_notices("planyear_renewal_3a")
+      begin
+        self.employer_profile.trigger_notices("planyear_renewal_3a")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer renewal publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     elsif event_name == "force_publish"
-      self.employer_profile.trigger_notices("planyear_renewal_3b")
+      begin
+        self.employer_profile.trigger_notices("planyear_renewal_3b")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer renewal force publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
   def zero_employees_on_roster
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
-      self.employer_profile.trigger_notices("zero_employees_on_roster")
+      begin
+        self.employer_profile.trigger_notices("zero_employees_on_roster")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
   def notify_employee_of_initial_employer_ineligibility
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.census_employees.non_terminated.each do |ce|
-      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
   def initial_employer_approval_notice
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
-    self.employer_profile.trigger_notices("initial_employer_approval")
+    begin
+      self.employer_profile.trigger_notices("initial_employer_approval")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
-  end
-
-  def initial_employer_open_enrollment_begins
-    return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
+    begin
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def renewal_group_notice
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
     if self.employer_profile.is_converting?
-      self.employer_profile.trigger_notices("conversion_group_renewal")
+      begin
+        self.employer_profile.trigger_notices("conversion_group_renewal")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer conversion group renewal notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     else
-      self.employer_profile.trigger_notices("group_renewal_5")
+      begin
+        self.employer_profile.trigger_notices("group_renewal_5")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer group_renewal_5 notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
@@ -1103,7 +1170,11 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if application_eligibility_warnings.include?(:primary_office_location)
       self.employer_profile.census_employees.non_terminated.each do |ce|
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+        begin
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver employee employer renewal denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+        end
       end
     end
   end
@@ -1111,14 +1182,22 @@ class PlanYear
   def initial_employer_denial_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-      self.employer_profile.trigger_notices("initial_employer_denial")
+      begin
+        self.employer_profile.trigger_notices("initial_employer_denial")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer initial denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
   def initial_employer_open_enrollment_completed
     #also check if minimum participation and non owner conditions are met by ER.
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+    begin
+      self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer open enrollment completed notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def renewal_employer_open_enrollment_completed
@@ -1128,12 +1207,20 @@ class PlanYear
 
   def renewal_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
-    self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
+    begin
+      self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
   end
 
   def employer_renewal_eligibility_denial_notice
     if application_eligibility_warnings.include?(:primary_office_location)
-      ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
+      begin
+        ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer renewal eligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
     end
   end
 
@@ -1207,7 +1294,7 @@ class PlanYear
 
     if (start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
       errors.add(:start_on, "may not start application before " \
-        "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
+                 "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
     if !['canceled', 'suspended', 'terminated'].include?(aasm_state)

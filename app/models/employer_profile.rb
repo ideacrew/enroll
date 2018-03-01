@@ -40,6 +40,7 @@ class EmployerProfile
 
 
   field :profile_source, type: String, default: "self_serve"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
   field :xml_transmitted_timestamp, type: DateTime
 
@@ -146,7 +147,17 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
+    broker_fired_confirmation_to_broker
+  end
+
+  def broker_fired_confirmation_to_broker
+      trigger_notices('broker_fired_confirmation_to_broker')   
+  end
+
+  def employer_broker_fired
+    trigger_notices('employer_broker_fired')
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -269,8 +280,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present? 
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -634,19 +645,6 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        organizations_for_low_enrollment_notice(new_date).each do |organization|
-          begin
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-            #exclude congressional employees
-            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
-            end
-          rescue Exception => e
-            puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
-          end
-        end
-
         # Reminder notices to renewing employers to publish thier plan years.
         start_on = new_date.next_month.beginning_of_month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
@@ -654,7 +652,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              Rails.logger.error { "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-6
@@ -662,7 +660,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_second_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              Rails.logger.error { "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-2
@@ -670,7 +668,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_final_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              Rails.logger.error { "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         end
@@ -680,19 +678,23 @@ class EmployerProfile
 
         organizations_for_plan_year_begin(new_date).each do |organization|
           begin
+            puts "START START FOR #{organization.legal_name} - #{Time.now}"
             employer_enroll_factory.employer_profile = organization.employer_profile
             employer_enroll_factory.begin
+            puts "PROCESSED START FOR #{organization.legal_name} - #{Time.now}"
           rescue Exception => e
-            puts "Error found for employer - #{organization.legal_name} during plan year begin"
+            Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year begin" }
           end
         end
 
         organizations_for_plan_year_end(new_date).each do |organization|
           begin
+            puts "START END FOR #{organization.legal_name} - #{Time.now}"
             employer_enroll_factory.employer_profile = organization.employer_profile
             employer_enroll_factory.end
+            puts "PROCESSED END FOR #{organization.legal_name} - #{Time.now}"
           rescue Exception => e
-            puts "Error found for employer - #{organization.legal_name} during plan year end"
+            Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year end" }
           end
         end
 
@@ -703,10 +705,28 @@ class EmployerProfile
           end
         end
 
+        organizations_for_low_enrollment_notice(new_date).each do |organization|
+          begin
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+            #exclude congressional employees
+            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
+            end
+          rescue Exception => e
+            Rails.logger.error { "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}" }
+          end
+        end
+
         if Settings.aca.shop_market.transmit_scheduled_employers
           if new_date.day == Settings.aca.shop_market.employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
+        end
+
+        if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
+          effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
+          notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
 
         #Initial employer reminder notices to publish plan year.
@@ -717,7 +737,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              Rails.logger.error { "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
         elsif new_date+1.day == start_on.last_month
@@ -725,7 +745,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
         else
@@ -735,7 +755,7 @@ class EmployerProfile
               begin
                 organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
               rescue Exception => e
-                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+                Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
               end
             end
           end
@@ -1050,7 +1070,11 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+    end
   end
 
 private

@@ -77,6 +77,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       sign_in(current_user)
     end
 
+    context "during non-open enrollment period" do
+      before :each do
+        allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        @employee_role = employee_role
+        allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      end
+
+      it "should not have the text 'You are not under open enrollment period.'" do
+        render "insured/families/shop_for_plans_widget"
+        expect(rendered).not_to have_content "You are not under open enrollment period."
+      end
+    end
+
     it "should have the updated description with link to 'enroll today' text" do
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_content 'coverage will begin'
@@ -113,5 +126,21 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
   end
 
+  context "dual role person with IVL sep" do
+    let(:qle) { double("QualifyingLifeEventKind", title: "", market_kind: "Individual")}
+    let(:sep) { double("SpecialEnrollmentPeriod", qualifying_life_event_kind: qle)}
+    before :each do
+      assign :person, person
+      assign :family, family
+      sign_in(current_user)
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(family).to receive(:latest_active_sep).and_return sep
+      render "insured/families/shop_for_plans_widget"
+    end
 
+    it "should have SEP eligible text in pop up window" do
+      expect(rendered).to have_content "You qualify for a Special Enrollment Period (SEP) because you"
+    end
+  end
 end
