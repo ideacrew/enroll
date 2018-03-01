@@ -2654,7 +2654,7 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
   end
 end
 
-describe HbxEnrollment, '.ee_select_plan_during_oe', type: :model, dbclean: :after_all do
+describe HbxEnrollment, '.ee_select_plan_during_oe', type: :model, dbclean: :after_each do
 
   let!(:employer_profile) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
@@ -2756,19 +2756,22 @@ describe HbxEnrollment, '.ee_select_plan_during_oe', type: :model, dbclean: :aft
       FactoryGirl.create(:hbx_enrollment,
                          household: family.active_household,
                          coverage_kind: "health",
-                         effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
-                         enrollment_kind: "open_enrollment",
+                         effective_on: start_on.next_day,
+                         enrollment_kind: "special_enrollment",
                          kind: "employer_sponsored",
                          submitted_at: TimeKeeper.date_of_record,
                          benefit_group_id: current_benefit_group.id,
                          employee_role_id: person.active_employee_roles.first.id,
+                         special_enrollment_period_id: sep.id,
                          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
                          plan_id: plan.id,
                          aasm_state: 'shopping'
                          )
     }
+    let!(:sep) { FactoryGirl.create(:special_enrollment_period, family: family, effective_on: start_on.next_day, qle_on: start_on.next_day)}
+
     before do
-      TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_on.next_day)
+      TimeKeeper.set_date_of_record_unprotected!(start_on.next_day)
     end
 
     after do

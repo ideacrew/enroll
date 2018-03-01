@@ -1647,35 +1647,44 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context "calculate_start_on_options" do
+    number_of_months_available = Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
+    initial_application_rules = Settings.aca.shop_market.initial_application
+    let(:start_day_offset) { 0.days }
+    let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:dates) {
+      dates = []
+      number_of_months_available.times do
+        next_date = dates.last || initial_signup_date
+        dates << next_date.next_month.beginning_of_month
+      end
+      dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+    }
 
-    it "should return one option if start date is before settings day of month offset" do
-      next_start = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month.next_month
-      dates = [next_start].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days + 5.days)
+    before do
+      allow(PlanYear).to receive(:enrollment_shopping_start_day_offset).and_return(start_day_offset)
+      TimeKeeper.set_date_of_record_unprotected!(initial_signup_date + PlanYear.enrollment_shopping_start_day_offset)
+    end
+
+    it "should return #{number_of_months_available} options" do
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
-    it "should return one option but for the next month if after offset and enrollment monthly deadline" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month.next_month
-      dates = [date1]
-      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 2).times do
-        dates << dates.last.next_month
+    context "after the publish deadline" do
+      let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month + initial_application_rules.publish_due_day_of_month.days }
+
+      it "should return #{number_of_months_available - 1} option(s) if current date is after the publish deadline" do
+        dates.shift
+        expect(PlanYear.calculate_start_on_options).to eq dates
       end
-      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days + 5.days)
-      expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
-    it "should return three options" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
-      dates = [date1]
-      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 2).times do
-        dates << dates.last.next_month
-      end
-      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+    context "with a enrollment start day offset" do
+      let(:start_day_offset) { 10.days }
+      let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month + 1.day }
 
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
-      expect(PlanYear.calculate_start_on_options).to eq []
+      it "should return #{number_of_months_available - 1} option(s) if date is after the offset" do
+        expect(PlanYear.calculate_start_on_options).to eq dates
+      end
     end
   end
 
