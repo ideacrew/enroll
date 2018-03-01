@@ -356,7 +356,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def messages
     @sent_box = true
-    @provider = current_user.person
+    actual_person = Person.find(params[:broker_agency_profile_id])
+    @provider = actual_user.present? ? current_user.person : actual_person
   end
 
   def agency_messages
