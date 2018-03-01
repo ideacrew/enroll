@@ -49,7 +49,10 @@ class Employers::BrokerAgencyController < ApplicationController
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
-      broker_hired
+
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: broker_agency_profile.primary_broker_role.person, event_object: @employer_profile, notice_event: "broker_hired_notice_to_broker")
+
       broker_hired_confirmation
       broker_agency_hired_confirmation
       # @employer_profile.trigger_notices("broker_hired_confirmation_notice") #mirror notice
@@ -92,14 +95,6 @@ class Employers::BrokerAgencyController < ApplicationController
           redirect_to employers_employer_profile_path(@employer_profile)
         end
       }
-    end
-  end
-
-  def broker_hired
-    begin
-         ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
-    rescue Exception => e
-       puts "Unable to deliver Broker Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
   end
 
