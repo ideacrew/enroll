@@ -13,7 +13,7 @@ module SponsoredBenefits
       field :binder_due_dom, as: :binder_payment_due_day_of_month, type: Integer
 
 
-      field :binder_due_dom, as: :open_enrollment_max, type: Integer
+      field :oe_max_months, as: :open_enrollment_months_max, type: Integer
 
 
       def employee_participation_ratio_min=()
