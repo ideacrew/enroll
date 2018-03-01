@@ -1,5 +1,9 @@
 module SponsoredBenefits
-  class BenefitMarkets::AcaIndividualConfiguration
-    include Mongoid::Document
+  module BenefitMarkets
+    class AcaIndividualConfiguration
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+    end
   end
 end

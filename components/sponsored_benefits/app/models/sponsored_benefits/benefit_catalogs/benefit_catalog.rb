@@ -10,17 +10,6 @@ module SponsoredBenefits
       #   :annual_with_midyear_initial - may start mid-year and renew at subsequent annual effective date month
       APPLICATION_INTERVAL_KINDS = [:monthly, :annual, :annual_with_midyear_initial]
 
-      belongs_to  :benefit_market, class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
-
-      attr_reader :service_area, :benefit_products,
-                  :effective_period, :benefit_market, 
-                  :open_enrollment_period, :open_enrollment_period_minimum, 
-                  :binder_payment_due_on,
-                  :probation_period_kinds,
-                  :benefit_products,
-                  :sponsor_eligibility_policy
-
-
       # Frequency at which sponsors may submit an initial or renewal application
       # Example application interval kinds:
       #   DC Individual Market, Congress:
@@ -47,11 +36,11 @@ module SponsoredBenefits
       field :title,                       type: String, default: ""
       field :description,                 type: String, default: ""
 
-      embeds_one  :sponsor_eligibility_policy,          class_name: "SponsoredBenefits::BenefitMarkets::SponsorEligibilityPolicy"
-      embeds_one  :benefit_product_eligibility_policy,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitProductEligibilityPolicy"
-      embeds_many :benefit_categories,                  class_name: "SponsoredBenefits::BenefitProducts::BenefitCategory"
+      belongs_to  :benefit_market,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+      belongs_to  :service_area,    class_name: "SponsoredBenefits::Locations::ServiceArea"
 
-      belongs_to :service_area,                         class_name: "SponsoredBenefits::Locations::ServiceArea"
+      embeds_one  :sponsor_eligibility_policy,  class_name: "SponsoredBenefits::BenefitMarkets::SponsorEligibilityPolicy"
+      embeds_one  :member_eligibility_policy,   class_name: "SponsoredBenefits::BenefitMarkets::MemberEligibilityPolicy"
 
       validates_presence_of :application_interval_kind, :application_period, :probation_period_kinds
 
@@ -63,21 +52,40 @@ module SponsoredBenefits
       #   inclusion:    { in: SponsoredBenefits::PROBATION_PERIOD_KINDS, message: "%{value} is not a valid probation period kind" },
       #   allow_nil:    false
 
-
-      def effective_period
-        @effective_period  = effective_date..(effective_date + 1.year - 1.day)
+      def products
+        return @products if defined?(@products)
+        @products = SponsoredBenefits::BenefitCatalogs::Product.find_by_benefit_catalog(self)
       end
 
+      def application_period_cover?(compare_date)
+        application_period.cover?(compare_date)
+      end
 
-      def open_enrollment_period
-        earliest_begin_date = effective_date - @benefit_market.open_enrollment_maximum_length
+      def effective_period_for(effective_date)
+        effective_date = effective_date.beginning_of_month
+        return unless application_period_cover?(effective_date)
 
+        case application_interval_kind
+        when :monthly
+          effective_date..(effective_date + 1.year - 1.day)
+        when :annual_with_midyear_initial
+          effective_date..(effective_date + 1.year - 1.day)
+        when :annual 
+          application_period
+        end
+      end
+
+      def open_enrollment_period_for(effective_date)
+        effective_date = effective_date.beginning_of_month
+        return unless application_period_cover?(effective_date)
+
+        earliest_begin_date = effective_date - benefit_market.open_enrollment_maximum_length
         prior_month = effective_date - 1.month
 
         begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
         end_on   = Date.new(prior_month.year, prior_month.month, @benefit_market.open_enrollment_end_on_day_of_month)
 
-        @open_enrollment_period = begin_on..end_on
+        begin_on..end_on
       end
 
 
@@ -92,10 +100,6 @@ module SponsoredBenefits
         open_enrollment_end_on_day - minimum_length
       end
 
-      def products
-        return @products if defined?(@products)
-        @products = SponsoredBenefits::BenefitCatalogs::Product.find_by_benefit_catalog(self)
-      end
 
 
 
