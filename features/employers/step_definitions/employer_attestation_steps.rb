@@ -58,13 +58,13 @@ end
 
 Then (/^Admin should see Employer with (.*) status$/) do |state|
   wait_for_ajax
-  expect(find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[15]')).to have_content state
+  expect(find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[12]')).to have_content state
 end
 
 When (/^Admin clicks attestation action$/) do
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[16]/div').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[13]/div').click
   wait_for_ajax
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[16]/div/ul/li[3]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[13]/div/ul/li[3]/a').click
 end
 
 Then (/^Admin should see attestation document$/)do
