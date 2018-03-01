@@ -16,23 +16,15 @@ else {
   $('.dropdown.pull-right').removeClass('open');
 }
 
-$( "#datepicker" ).datepicker();
-
 $('input[name=plan_year_radio]').click(function() {
   hidePlanYearActions();
   clearDatePickerValue();
   hideTerminationRadios();
-  $('.py-btn-grp').addClass('disabled')
-  if(($(this).attr("status") == "draft")) {
-    $('input[name=plan_year_radio]:checked').closest('tr').next('tr').removeClass('hidden')
-  } else {
-    $('input[name=plan_year_radio]:checked').closest('td').siblings().find('.py-btn-grp').removeClass('disabled')
-  }
+  $('.py-btn-grp').addClass('disabled');
+  var pyStatus = $(this).attr("status");
+  populateDropDown(pyStatus);
+  $('input[name=plan_year_radio]:checked').closest('td').siblings().find('.py-btn-grp').removeClass('disabled')
 });
-
-// $('input[name=term_actions]').click(function() {
-//   $('.py-btn-grp').removeClass('disabled')
-// });
 
 $('#plan-year-btn-group ul li').each(function() {
   $(this).click(function() {
@@ -40,6 +32,23 @@ $('#plan-year-btn-group ul li').each(function() {
   })
 });
 
+function populateDropDown(status) {
+  if (status == "draft") {
+    $('li.cancel-py').removeClass('blocking');
+    $('li.terminate-py').addClass('blocking');
+    $('li.reinstate-py').addClass('blocking');
+  }
+  else if (status == "terminated"){
+    $('li.cancel-py').addClass('blocking');
+    $('li.terminate-py').addClass('blocking');
+    $('li.reinstate-py').removeClass('blocking');
+  }
+  else if (status == "reinstated"){
+    $('li.cancel-py').addClass('blocking');
+    $('li.terminate-py').addClass('blocking');
+    $('li.reinstate-py').removeClass('blocking');
+  }
+}
 
 function hidePlanYearActions() {
   $('.plan-year-actions').addClass('hidden');
@@ -51,6 +60,10 @@ function showPlanYearActions(id) {
 
 function disableDatePicker() {
   $('input#datepicker').prop('disabled', true);
+}
+
+function initDatePicker() {
+  $('input.date').datepicker().removeClass('hasDatepicker');
 }
 
 function enableDatePicker() {
@@ -78,13 +91,41 @@ function hideTerminationRadios() {
   $('.term_action_radios').addClass('hidden');
 }
 
+function terminateValidations() {
+  if ($('input[name=term_actions]:checked').length) {
+    return true;
+  } else
+  return false;
+}
+
+function dateValidations() {
+  if ($('input.date').val().length != 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function addDatePicker() {
+  $('tr.plan-year-actions').each(function() {
+    $('input.date').attr('id','datepicker');
+  })
+}
+
+function validTerminatePy() {
+  if (dateValidations()) {
+    console.log(terminateValidations())
+    enableSubmitButton()
+  } else {
+    console.log("Im Invalid")
+  }
+}
 
 function pyAction(action, id, term_date) {
   showPlanYearActions(id);
   if (action == "reinstate") {
-    console.log(term_date)
     disableDatePicker();
-    $('input#datepicker').val(term_date);
+    $('input#datepicker').val(<%= Date.today %>);
     hideTerminationRadios();
     enableSubmitButton()
   }
@@ -103,7 +144,26 @@ function pyAction(action, id, term_date) {
 }
 
 function submitPlanActions() {
-  alert("Im Submitted")
+  /*
+  $.ajax({
+      type: "POST",
+      data:{
+
+      },
+      success: function() {
+        setTimeout(function() {
+
+        },400);
+      },
+      url: ""
+    });
+  */    
 }
 
+$('#attestation_documents_table').mousemove(function() {
+  initDatePicker();
+  validTerminatePy()
+})
+
 applyJQDatePickers();
+
