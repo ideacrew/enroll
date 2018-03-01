@@ -72,7 +72,7 @@ class TaxHouseholdMember
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
-    coverage_start_on = Forms::TimeKeeper.new.date_of_record
+    coverage_start_on = TimeKeeper.date_of_record
     return unless coverage_start_on.present?
     age = coverage_start_on.year - dob.year
 

@@ -28,19 +28,19 @@ RSpec.describe TaxHouseholdMember, type: :model do
 
   context "age_on_effective_date" do
     it "should return current age for coverage start on month is equal to dob month" do
-      age = Forms::TimeKeeper.new.date_of_record.year-person.dob.year
+      age = TimeKeeper.date_of_record.year-person.dob.year
       expect(tax_household_member1.age_on_effective_date).to eq age
     end
 
     it "should return age-1 for coverage start on month is less than dob month" do
       tax_household_member1.person.update_attributes(dob: Date.new(1999, TimeKeeper.date_of_record.month, TimeKeeper.date_of_record.day+1))
-      age = Forms::TimeKeeper.new.date_of_record.year-person.dob.year
+      age = TimeKeeper.date_of_record.year-person.dob.year
       expect(tax_household_member1.age_on_effective_date).to eq age-1
     end
 
     it "should return age-1 for coverage start on day is less to dob day" do
       tax_household_member1.person.update_attributes(dob: Date.new(1999, TimeKeeper.date_of_record.month+1, TimeKeeper.date_of_record.day))
-      age = Forms::TimeKeeper.new.date_of_record.year-person.dob.year
+      age = TimeKeeper.date_of_record.year-person.dob.year
       expect(tax_household_member1.age_on_effective_date).to eq age-1
     end
   end
