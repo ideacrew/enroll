@@ -21,11 +21,11 @@ class TaxHouseholdMember
 
   def update_eligibility_kinds eligibility_kinds
     return if eligibility_kinds.blank?
-    if !(convert_to_bool(eligibility_kinds['is_ia_eligible']) && convert_to_bool(eligibility_kinds['is_medicaid_chip_eligible']))
+    if convert_to_bool(eligibility_kinds['is_ia_eligible']) && convert_to_bool(eligibility_kinds['is_medicaid_chip_eligible'])
+      return false
+    else
       self.update_attributes eligibility_kinds
       return true
-    else
-      return false
     end
   end
 
