@@ -96,7 +96,7 @@
                   - gutter: 8
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "Would you like to have an application to register to vote mailed to you?"
+                    text: "Would you like to register to vote in DC or update your current registration? (a form will be mailed to you)"
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
@@ -120,7 +120,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to register to vote at this time.<br>
+                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to have requested a voter registration form at this time.<br>
                     You may file a complaint if you believe that someone has interfered with: <br><br>
                     * Your right to register or not register to vote <br>
                     * Your right to privacy in deciding whether or not to register to vote <br>
