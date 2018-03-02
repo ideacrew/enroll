@@ -191,7 +191,8 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should not update verification attributes without verification reason" do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: "MEC",
-                                          verification_reason: ""}
+                                          verification_reason: "",
+                                          family_member_id: family.primary_applicant.id }
         applicant.reload
         expect(applicant.assisted_income_reason).to eq nil
       end
@@ -200,7 +201,8 @@ RSpec.describe DocumentsController, :type => :controller do
         it "should update verification attributes for #{reason} type" do
           post :update_verification_type, { person_id: person.id,
                                             verification_type: "MEC",
-                                            verification_reason: reason}
+                                            verification_reason: reason,
+                                            family_member_id: family.primary_applicant.id }
           applicant.reload
           expect(applicant.assisted_mec_reason).to eq (reason)
         end
