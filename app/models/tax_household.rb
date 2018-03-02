@@ -39,6 +39,10 @@ class TaxHousehold
     # eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
+  def group_by_year
+    effective_starting_on.year
+  end
+
   def current_csr_eligibility_kind
     preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_eligibility_kind : "csr_100"
     # eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
@@ -70,10 +74,10 @@ class TaxHousehold
     # 15% to each child
 
     # Benchmark Plan: use SLCSP premium rates to determine ratios
-    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    @benefit_sponsorship ||= HbxProfile.current_hbx.benefit_sponsorship
     #current_benefit_coverage_period = benefit_sponsorship.current_benefit_period
     #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
-    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
+    benefit_coverage_period = @benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
