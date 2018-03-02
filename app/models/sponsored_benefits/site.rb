@@ -34,10 +34,10 @@ module SponsoredBenefits
     field :faqs_url,    type: String
 
     # The starting calendar year for reserving web site content copyright (year site became active)
-    field :copyright_period_start,  type: String, default: proc("#{Timekeeper.date_of_record.year}")
+    field :copyright_period_start,  type: String, default: ->{ ::TimeKeeper.date_of_record.year }
 
     # File name for the site's logo
-    field :logo_file_name,  type: String, default: proc(site_id.to_s + "_logo.png")
+    field :logo_file_name,  type: String # convention: site_id + "_logo.png"
 
     # TODO Deprecate logo file name and store as binary in database to support multitenancy
     field :logo,        type: BSON::Binary
@@ -46,28 +46,28 @@ module SponsoredBenefits
     # TODO -- come up with scheme to manage/store these attributes and provide defaults
     field :colors,  type: Array
 
-    has_one   :owner_organization,  class_name: "SponsoredBenefits::Organizations:Organization"
-    has_many  :benefit_markets,     class_name: "SponsoredBenefits::BenefitMarkets:BenefitMarket"
+    has_one   :owner_organization,  class_name: "SponsoredBenefits::Organizations::Organization"
+    has_many  :benefit_markets,     class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
-    has_many  :employer_profiles do
+    has_many  :organizations, as: :employer_profiles do
       SponsoredBenefits::Organizations::Organization.has_employer_profile
     end
 
-    has_many  :broker_agencies do
+    has_many  :organizations, as: :broker_agency_profiles do
       SponsoredBenefits::Organizations::Organization.has_broker_agency_profile
     end
 
-    has_many  :issuer_profiles do
+    has_many  :organizations, as: :issuer_profiles do
       SponsoredBenefits::Organizations::Organization.has_issuer_profile
     end
 
-    has_many  :general_agencies do
+    has_many  :organizations, as: :general_agencies do
       SponsoredBenefits::Organizations::Organization.has_general_agency_profile
     end
 
     # has_many :families,         class_name: "::Family"
 
-    validates_presence_of :site_id
+    validates_presence_of :site_id, :owner_organization
 
     scope :find_by_site_id, ->(site_id) { where(site_id: site_id) }
 
