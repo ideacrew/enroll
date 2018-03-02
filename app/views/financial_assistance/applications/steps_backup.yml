@@ -32,7 +32,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
+                  text: Will this person be claimed as a tax dependent for 2017? *
                 - gutter: 1
                   type: label_radio
                   name: row2

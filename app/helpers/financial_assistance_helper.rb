@@ -224,4 +224,8 @@ module FinancialAssistanceHelper
       value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
     end
   end
+
+  def show_net_amount_for(other_income)
+    other_income.kind == "capital_gains" || other_income.kind == "farming_and_fishing"
+  end
 end

@@ -55,7 +55,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for <application-applicable-year-placeholder>? *
+                  text: Will this person be claimed as a tax dependent for <application-applicable-year-placeholder>? *
                 - gutter: 2
                   type: label_radio
                   name: row2
