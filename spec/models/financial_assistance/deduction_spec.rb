@@ -229,15 +229,15 @@ RSpec.describe FinancialAssistance::Deduction, type: :model do
 
     context "if step_1 and submission end on date occur before start on date" do
       it "end on date can't occur before start on date on step_1" do
-        deduction.start_on = Date.today
-        deduction.end_on = Date.yesterday
+        deduction.start_on = TimeKeeper.date_of_record
+        deduction.end_on = TimeKeeper.date_of_record - 10.days
         deduction.valid?(:step_1)
         expect(deduction.errors["end_on"]).to include(" End On date can't occur before Start On Date")
       end
 
       it "end on date can't occur before start on date on submission" do
-      	deduction.start_on = Date.today
-        deduction.end_on = Date.yesterday
+        deduction.start_on = TimeKeeper.date_of_record
+        deduction.end_on = TimeKeeper.date_of_record - 10.days
         deduction.valid?(:submission)
         expect(deduction.errors["end_on"]).to include(" End On date can't occur before Start On Date")
       end
