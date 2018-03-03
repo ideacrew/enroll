@@ -1,5 +1,6 @@
 module DocumentsVerificationStatus
   def verification_type_status(type, member, admin=false)
+    applicant_in_context = @f_member.applicant_for_verification if @f_member
     consumer = member.consumer_role
     if (consumer.vlp_authority == "curam" && consumer.fully_verified?)
       admin ? "curam" : "External source"
@@ -32,6 +33,26 @@ module DocumentsVerificationStatus
             "processing"
           else
             "outstanding"
+          end
+        when 'Income'
+          if applicant_in_context.present?
+            if applicant_in_context.assisted_income_verified?
+              "verified"
+            elsif applicant_in_context.has_faa_docs_for_type?(type)
+              "in review"
+            else
+              "outstanding"
+            end
+          end
+        when 'MEC'
+          if applicant_in_context.present?
+            if applicant_in_context.assisted_mec_verified?
+              "verified"
+            elsif applicant_in_context.has_faa_docs_for_type?(type)
+              "in review"
+            else
+              "outstanding"
+            end
           end
         else
           if consumer.lawful_presence_verified?

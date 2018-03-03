@@ -21,7 +21,7 @@ module VerificationHelper
       when "review"
         "warning"
       when "outstanding"
-          "danger"
+        "danger"
       when "curam"
         "default"
       when "attested"
