@@ -241,7 +241,9 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       driver_qns = FinancialAssistance::Applicant::DRIVER_QUESTION_ATTRIBUTES
 
       before(:each) do
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_required_to_file_taxes).and_return(true)
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_claimed_as_tax_dependent).and_return(false)
+        allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_joint_tax_filing).and_return(false)
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_pregnant).and_return(false)
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:is_self_attested_blind).and_return(false)
         allow_any_instance_of(FinancialAssistance::Applicant).to receive(:has_daily_living_help).and_return(false)
