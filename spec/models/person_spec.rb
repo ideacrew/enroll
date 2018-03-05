@@ -744,7 +744,7 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "does not allow two people with the same user ID to be saved" do
+  describe "does not allow two people with the same user ID to be saved", dbclean: :around_each do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
         def drop_user_id_index_in_db

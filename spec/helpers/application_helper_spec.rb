@@ -494,4 +494,53 @@ end
   #     expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
   #   end
   # end
+
+  describe "convert_to_bool" do
+    let(:val1) {true }
+    let(:val2) {false }
+    let(:val3) {"true" }
+    let(:val4) {"false" }
+    let(:val5) {0 }
+    let(:val6) {1 }
+    let(:val7) {"0" }
+    let(:val8) {"1" }
+    let(:val9) {"khsdbfkjs" }
+
+
+    it "should be true when true is passed" do
+      expect(helper.convert_to_bool(val1)).to eq true
+    end
+
+    it "should be false when false is passed" do
+      expect(helper.convert_to_bool(val2)).to eq false
+    end
+
+    it "should be true when string 'true' is passed" do
+      expect(helper.convert_to_bool(val3)).to eq true
+    end
+
+    it "should be false when string 'false' is passed" do
+      expect(helper.convert_to_bool(val4)).to eq false
+    end
+
+    it "should be false when int 0 is passed" do
+      expect(helper.convert_to_bool(val5)).to eq false
+    end
+
+    it "should be true when int 1 is passed" do
+      expect(helper.convert_to_bool(val6)).to eq true
+    end
+
+    it "should be false when string '0' is passed" do
+      expect(helper.convert_to_bool(val7)).to eq false
+    end
+
+    it "should be true when string '1' is passed" do
+      expect(helper.convert_to_bool(val8)).to eq true
+    end
+
+    it "should raise error when non boolean values are passed" do
+      expect{helper.convert_to_bool(val9)}.to raise_error
+    end
+  end
 end
