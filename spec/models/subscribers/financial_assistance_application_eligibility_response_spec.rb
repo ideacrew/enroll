@@ -47,13 +47,14 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "with a valid application and return status" do
-        let(:message) { { "body" => "", "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
-        let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
-        let(:person) { FactoryGirl.create(:person) }
-        let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+
+        let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
+        let!(:person) { FactoryGirl.create(:person,:with_family) }
+        # let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}",submitted_at: "2018-01-31 21:08:37 UTC", family: person.primary_family, aasm_state: "submitted")
         }
+        let!(:message) { { "body" => "", "assistance_application_id" => application.hbx_id, "return_status" => 203 } }
 
         it "logs the failed to validate the XML against FAA XSD error" do
           expect(subject).to receive(:log) do |arg1, arg2|
@@ -66,12 +67,12 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "without person, with body, a valid application and return status" do
-        let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
+        let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 203 } }
 
         it "logs the failed to find primary person in xml error" do
           expect(subject).to receive(:log) do |arg1, arg2|
@@ -84,13 +85,13 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "without primary person family, with primary person, body, a valid application and return status" do
-        let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
+        let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 203 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let(:primary_person) { FactoryGirl.create(:person) }
         let(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs failed to find primary family for users person in xml error" do
@@ -126,12 +127,12 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "with primary person, family, body, a valid application, return status and not connected to application to tax household" do
-        let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
+        let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 203 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
         let(:tax_household) { FactoryGirl.create(:tax_household, application: application) }
 
@@ -147,12 +148,12 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "with primary person, family, body, a valid application, return status and Failed to update tax household" do
-        let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
+        let!(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 203 } }
         let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let!(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs Failure to update tax household" do
@@ -169,13 +170,13 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
     end
 
     context "with a valid application primary person and family" do
-      let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
+      let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 203 } }
       let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
 
       let(:person) { FactoryGirl.create(:person) }
       let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
       let!(:application) {
-        FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+        FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
       }
       let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
 
@@ -215,12 +216,12 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "with a valid application and return status" do
-        let(:message) { { "body" => "", "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+        let(:message) { { "body" => "", "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs the failed to validate the XML against FAA XSD error" do
@@ -234,11 +235,11 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "without person, with body, a valid application and return status" do
-        let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+        let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs the failed to find primary person in xml error" do
@@ -252,13 +253,13 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "without primary person family, with primary person, body, a valid application and return status" do
-        let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+        let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let(:primary_person) { FactoryGirl.create(:person) }
         let(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs failed to find primary family for users person in xml error" do
@@ -293,37 +294,13 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
         end
       end
 
-      context "with primary person, family, body, a valid application, return status and failed to create Eligibility Determination" do
-        let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
-        let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
-        let!(:person) { FactoryGirl.create(:person) }
-        let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-        let!(:household) { family.households.first }
-        let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
-        }
-        let!(:tax_household) { FactoryGirl.create(:tax_household, household: household, application_id: application.id) }
-
-        it "logs failed to find Tax Households in our DB with the ids in xml error" do
-          message["body"].sub! '<n1:csr_percent>0</n1:csr_percent>', '<n1:csr_percent>892</n1:csr_percent>'
-          tax_household.update_attributes(hbx_assigned_id: "206117")
-          allow(Person).to receive(:where).and_return([person])
-          expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to eq message["body"]
-            expect(arg2[:error_message]).to match(/Failed to create Eligibility Determinations/)
-            expect(arg2[:severity]).to eq("critical")
-          end
-          subject.call(nil, nil, nil, nil, message)
-        end
-      end
-
       context "with primary person, family, body, a valid application, return status and not connected to application to tax household" do
-        let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+        let!(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
         let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let!(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs failed to find Tax Households in our DB with the ids in xml error" do
@@ -338,7 +315,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "with primary person, family, body, a valid application, return status, connected to application and Failed to find dependent" do
-        let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+        let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
         let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let(:primary_person) { FactoryGirl.create(:person) }
         let!(:primary_person_family)  { FactoryGirl.create(:family, :with_primary_family_member, person: primary_person) }
@@ -346,7 +323,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:household) { family.households.first }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs failed to find application for person in xml error" do
@@ -365,12 +342,12 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
       end
 
       context "with primary person, family, body, a valid application, return status and Failed to update tax household" do
-        let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+        let!(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
         let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
         let!(:person) { FactoryGirl.create(:person) }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
-          FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
 
         it "logs Failure to update tax household" do
@@ -387,13 +364,13 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
     end
 
     context "with a valid application primary person and family" do
-      let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+      let(:message) { { "body" => xml, "assistance_application_id" => application.hbx_id, "return_status" => 200 } }
       let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
 
       let(:person) { FactoryGirl.create(:person) }
       let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
       let!(:application) {
-        FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+        FactoryGirl.create(:application, hbx_id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
       }
       let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
 
