@@ -263,6 +263,7 @@ class Household
     tax_households.tax_household_with_year(year)
   end
 
+  # TODO: Refactor this. This will not work in the contect of FAA and multiple THHs.
   def end_multiple_thh(options = {})
     all_active_thh = tax_households.active_tax_household
     all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
@@ -301,7 +302,7 @@ class Household
     )
 
     deter = th.eligibility_determinations.build(
-        source: "Admin_Script",
+        source: "Admin",
         benchmark_plan_id: slcsp,
         max_aptc: max_aptc.to_f,
         csr_percent_as_integer: csr.to_i,

@@ -215,6 +215,6 @@ class TaxHousehold
   end
 
   def set_effective_starting_on
-    write_attributes(effective_starting_on: TimeKeeper.date_of_record)
+    write_attributes(effective_starting_on: TimeKeeper.date_of_record) if effective_starting_on.blank?
   end
 end
