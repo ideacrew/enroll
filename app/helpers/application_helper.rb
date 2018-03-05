@@ -661,5 +661,11 @@ module ApplicationHelper
   def previous_year
     TimeKeeper.date_of_record.prev_year.year
   end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise ArgumentError.new("invalid value for Boolean: \"#{val}\"")
+  end
 end
 
