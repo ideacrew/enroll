@@ -403,7 +403,8 @@ class FinancialAssistance::Applicant
     self.valid?(:submission) &&
       self.incomes.all? { |income| income.valid? :submission } &&
       self.benefits.all? { |benefit| benefit.valid? :submission } &&
-      self.deductions.all? { |deduction| deduction.valid? :submission }
+      self.deductions.all? { |deduction| deduction.valid? :submission } &&
+      self.other_questions_complete?
   end
 
   def clean_conditional_params(model_params)
@@ -416,7 +417,8 @@ class FinancialAssistance::Applicant
 
   def other_questions_complete?
     !has_daily_living_help.nil? &&
-      !need_help_paying_bills.nil?
+      !need_help_paying_bills.nil? &&
+      !is_former_foster_care.nil? if self.age_of_the_applicant.between?(18,26)
   end
 
   def tax_info_complete?
