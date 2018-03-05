@@ -9,8 +9,6 @@ class EmployerProfile
   include StateTransitionPublisher
   include ScheduledEventService
   include Config::AcaModelConcern
-  # include Concerns::Observable
-  # include ModelEvents::EmployerProfile
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -1284,14 +1282,6 @@ class EmployerProfile
       end
     end
   end
-
-  # def trigger_shop_notices(event)
-  #   begin
-  #     trigger_model_event(event.to_sym)
-  #   rescue Exception => e
-  #     Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
-  #   end
-  # end
 
   private
 
