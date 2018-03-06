@@ -96,8 +96,8 @@ def can_publish_enrollment?(enrollment, transition_at)
   end
 end
 
-puts purchase_ids.length
-puts term_ids.length
+puts purchase_ids.length unless Rails.env.test?
+puts term_ids.length unless Rails.env.test?
 
 purchase_families = Family.where("households.hbx_enrollments.hbx_id" => {"$in" => purchase_ids})
 
