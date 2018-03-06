@@ -5,8 +5,9 @@ describe ::Importers::ConversionEmployeeSet do
   let(:employee_record) { instance_double("::Importers::ConversionEmployeeCreate", :save => record_save_result, :errors => record_errors, :warnings => record_warnings) }
   let(:record_errors) { { } }
   let(:record_warnings) { { } }
+  let(:dependencies) {double}
 
-  subject { ::Importers::ConversionEmployeeSet.new(file_name, out_stream, Date.new(2015,3,1)) }
+  subject { ::Importers::ConversionEmployeeSet.new(file_name, out_stream, Date.new(2015,3,1), 8) }
   before :each do
     allow(::Importers::ConversionEmployeeAction).to receive(:new).with(employee_data).and_return(employee_record)
     subject.import!

@@ -1,11 +1,12 @@
-def import_employee(in_file)
+def import_employee(in_file, dependencies)
     config = YAML.load_file("#{Rails.root}/conversions.yml")
 #  begin
+
     result_file = File.open(File.join(Rails.root, "conversion_employee_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
     if Settings.site.key == :mhc
-      importer = Importers::Mhc::ConversionEmployeeSet.new(in_file, result_file, config["conversions"]["employee_date"])
+      importer = Importers::Mhc::ConversionEmployeeSet.new(in_file, result_file, config["conversions"]["employee_date"],dependencies)
     else
-      importer = Importers::ConversionEmployeeSet.new(in_file, result_file, config["conversions"]["employee_date"])
+      importer = Importers::ConversionEmployeeSet.new(in_file, result_file, config["conversions"]["employee_date"], dependencies)
     end
     importer.import!
     result_file.close
@@ -17,5 +18,6 @@ end
 dir_glob = File.join(Rails.root, "conversion_employees", "*.{xlsx,csv}")
 Dir.glob(dir_glob).sort.each do |file|
   puts "PROCESSING: #{file}"
-  import_employee(file)
+  number_of_dependencies =  ARGV[0].to_i
+  import_employee(file, number_of_dependencies)
 end
