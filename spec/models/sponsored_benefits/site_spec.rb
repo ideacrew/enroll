@@ -4,18 +4,18 @@ module SponsoredBenefits
   RSpec.describe Site, type: :model, dbclean: :after_each do
     let(:subject) { Site.new }
 
-    let(:site_id)     { "usa" }
+    let(:site_key)    { "acme" }
     let(:long_name)   { "ACME Widget's Benefit Website" }
     let(:short_name)  { "Benefit Website" }
     let(:domain_name) { "hbxshop.org" }
 
     let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
-    let(:owner_organization)  { SponsoredBenefits::Organizations::GeneralOrganization.new(legal_name: "ACME Widgets", fein: "012345678") }
+    let(:owner_organization)  { SponsoredBenefits::Organizations::GeneralOrganization.create!(legal_name: "ACME Widgets", fein: "012345678", entity_kind: :s_corporation ) }
     let(:employer_profile)    { SponsoredBenefits::Organizations::AcaShopDcEmployerProfile.new(organization: owner_organization, office_locations: [office_location]) }
 
     let(:params) do
       {
-        site_id: site_id,
+        site_key: site_key,
         owner_organization: owner_organization,
         long_name: long_name,
         short_name: short_name,
@@ -32,8 +32,8 @@ module SponsoredBenefits
       end
     end
 
-    context "with no site_id" do
-      subject { described_class.new(params.except(:site_id)) }
+    context "with no site_key" do
+      subject { described_class.new(params.except(:site_key)) }
 
       it "should not be valid" do
         subject.validate
