@@ -5,7 +5,7 @@ module Notifier
 
     attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model
 
-   	def initialize
+    def initialize
       data_object = Notifier::MergeDataModels::BrokerAgencyProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       @merge_model = data_object
@@ -33,11 +33,11 @@ module Notifier
     end
 
     def first_name
-      merge_model.first_name = broker.first_name
+      merge_model.first_name = broker_agency_profile.primary_broker_role.person.first_name
     end
 
     def last_name
-      merge_model.last_name = broker.last_name
+      merge_model.last_name = broker_agency_profile.primary_broker_role.person.last_name
     end
 
     def employer
