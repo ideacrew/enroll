@@ -2,7 +2,33 @@
 module SponsoredBenefits
   module Organizations
     class Organization
-      include Concerns::OrganizationConcern
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      ENTITY_KINDS =[
+        :tax_exempt_organization,
+        :c_corporation,
+        :s_corporation,
+        :partnership,
+        :limited_liability_corporation,
+        :limited_liability_partnership,
+        :household_employer,
+        :governmental_employer,
+        :foreign_embassy_or_consulate,
+        :health_insurance_exchange
+      ]
+
+      field :hbx_id, type: String
+
+      # Registered legal name
+      field :legal_name, type: String
+
+      # Doing Business As (alternate name)
+      field :dba, type: String
+
+      # Business structure or entity type 
+      field :entity_kind, type: Symbol
+
 
       # Association that enables organizational hierarchies.
       # Organizations may be stored in a tree, with a parent "agency" associated with one or 
@@ -31,6 +57,22 @@ module SponsoredBenefits
       belongs_to :site, class_name: "SponsoredBenefits::Site",
         inverse_of: :owner_organization
 
+      belongs_to :site, class_name: "SponsoredBenefits::Site",
+        inverse_of: :employer_profiles
+      
+      belongs_to :site, class_name: "SponsoredBenefits::Site",
+        inverse_of: :broker_agency_profiles
+      
+      belongs_to :site, class_name: "SponsoredBenefits::Site",
+        inverse_of: :issuer_profiles
+      
+      belongs_to :site, class_name: "SponsoredBenefits::Site",
+        inverse_of: :general_agencies
+      
+
+      embeds_many :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation", cascade_callbacks: true, validate: true
+
+
       # Use the Document model for managing any/all documents associated with Organization
       embeds_many :documents, class_name: "SponsoredBenefits::Documents::Document" do
         def find_by_subject(subject)
@@ -52,15 +94,14 @@ module SponsoredBenefits
       accepts_nested_attributes_for :broker_agency_profile, :carrier_profile, :hbx_profile
       # accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 #
-      validates_presence_of :legal_name, :office_locations
+      validates_presence_of :legal_name
 
-      # validates :fein,
-      #   presence: false,
-      #   length: { is: 9, message: "%{value} is not a valid FEIN" },
-      #   numericality: true,
-      #   uniqueness: true
+      before_save :generate_hbx_id
 
-      validate :office_location_kinds
+      index({ legal_name: 1 })
+      index({ dba: 1 },   { sparse: true })
+      index({ fein: 1 },  { unique: true, sparse: true })
+      index({ is_active: 1 })
 
 
       # CarrierProfile child model indexes
@@ -404,6 +445,14 @@ module SponsoredBenefits
           brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
         end
       end
+
+      private
+
+      def generate_hbx_id
+        write_attribute(:hbx_id, SponsoredBenefits::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
+      end
+
+
     end
   end
 end

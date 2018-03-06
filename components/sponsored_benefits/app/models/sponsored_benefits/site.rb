@@ -3,14 +3,14 @@ module SponsoredBenefits
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    SITE_ID_MAX_LENGTH = 6
+    SITE_KEY_MAX_LENGTH = 6
 
-    attr_reader :subdomain, :site_id
+    # attr_reader :subdomain, :site_key
 
     ## General settings for site
 
     # Unique, short identifier for this site
-    field :site_id,     type: Symbol  # For example, :dc, :cca
+    field :site_key,    type: Symbol  # For example, :dc, :cca
 
     # Web site owner's formal agency or business name. Appear in formal locations, such as copyright attribution
     field :long_name,   type: String
@@ -37,7 +37,7 @@ module SponsoredBenefits
     field :copyright_period_start,  type: String, default: ->{ ::TimeKeeper.date_of_record.year }
 
     # File name for the site's logo
-    field :logo_file_name,  type: String # convention: site_id + "_logo.png"
+    field :logo_file_name,  type: String # convention: site_key + "_logo.png"
 
     # TODO Deprecate logo file name and store as binary in database to support multitenancy
     field :logo,        type: BSON::Binary
@@ -67,34 +67,30 @@ module SponsoredBenefits
 
     # has_many :families,         class_name: "::Family"
 
-    validates_presence_of :site_id, :owner_organization
+    validates_presence_of :site_key, :owner_organization
 
-    scope :find_by_site_id, ->(site_id) { where(site_id: site_id) }
+    scope :find_by_site_key, ->(site_key) { where(site_key: site_key) }
 
-    index({ site_id:  1 }, { unique: true })
+    index({ site_key:  1 }, { unique: true })
 
     def subdomain
-      site_id.to_s unless site_id.blank?
+      site_key.to_s unless site_key.blank?
     end
 
     # Using a passed string, prepare and set a site identifier that meets validation requirements
-    def site_id=(new_site_id)
-      valid_id = scrub_site_id(new_site_id)
-
-      if valid_id.present?
-        write_attribute(:site_id, valid_id.to_sym)
-      else
-        site_id
-      end
+    def site_key=(new_site_key)
+      valid_id = scrub_site_key(new_site_key)
+      write_attribute(:site_key, valid_id.to_sym) if valid_id.present?
+      site_key
     end
 
     private
 
-    # Valid IDs are less than or equal to SITE_ID_MAX_LENGTH characters, composed of letters and numbers only 
+    # Valid IDs are less than or equal to SITE_KEY_MAX_LENGTH characters, composed of letters and numbers only 
     # (no special characters), all lower case, and may not begin with a number    
-    def scrub_site_id(new_site_id)
-      return nil if new_site_id.numeric? || new_site_id.blank?
-      strip_leading_numbers(new_site_id).parameterize.gsub(/[-_]/,'').slice(0, SITE_ID_MAX_LENGTH)
+    def scrub_site_key(site_key)
+      raise InvalidArgumentError, "numeric site_key not allowed" if site_key.numeric? || site_key.blank?
+      strip_leading_numbers(site_key.to_s).parameterize.gsub(/[-_]/,'').slice(0, SITE_KEY_MAX_LENGTH).to_sym
     end
 
     def strip_leading_numbers(input_string)
