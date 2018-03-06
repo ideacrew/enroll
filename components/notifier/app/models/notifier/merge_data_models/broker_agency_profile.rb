@@ -1,5 +1,5 @@
 module Notifier
-  class MergeDataModels::BrokerProfile
+  class MergeDataModels::BrokerAgencyProfile
 
     include Virtus.model
     include ActiveModel::Model
@@ -17,7 +17,7 @@ module Notifier
     attribute :employer_poc_lastname, String
 
     def self.stubbed_object
-      notice = Notifier::MergeDataModels::BrokerProfile.new({
+      notice = Notifier::MergeDataModels::BrokerAgencyProfile.new({
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         first_name: 'John',
         last_name: 'Whitmore',
