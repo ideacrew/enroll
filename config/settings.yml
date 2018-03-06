@@ -1,14 +1,14 @@
 site:
-  short_name: "DC Health Link"
-  byline: "DC's Online Health Insurance Marketplace"
+  short_name: "NV Health Link"
+  byline: "NV's Online Health Insurance Marketplace"
   long_name: ""
   copyright_period_start: "2013"
-  header_message: "Welcome to the District's Health Insurance Marketplace"
+  header_message: "Welcome to Nevada Health Link"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
   home_forms_url: "https://dchealthlink.com/forms"
-  forms_name: "DCHealthLink.com/forms"
-  website_name: "www.DCHealthLink.com"
+  forms_name: "nevadahealthlink.com/forms"
+  website_name: "nevadahealthlink.com"
   forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
@@ -19,18 +19,18 @@ site:
   aca_market_kinds: ["individual", "shop"]
 
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "NV Health Link's Customer Care Center"
+  alt_name: "NV Health Link Customer Service"
   phone_number: "1-855-532-5465"
-  tty_number: "1-855-532-5465"
+  tty_number: "855-7NVLINK"
   tty: "771"
-  alt_phone_number: "1-855-532-LINK"
+  alt_phone_number: "855-7NVLINK"
   email_address: "info@dchealthlink.com"
 
 aca:
-  state_name: "District of Columbia"
-  state_abbreviation: "DC"
-  hbx_abbreviation: "DC Health Benefit Exchange"
+  state_name: "Nevada"
+  state_abbreviation: "NV"
+  hbx_abbreviation: "NV Health Link"
   market_kinds: ["individual", "shop"]
 #
   qle:
@@ -114,7 +114,7 @@ aca:
     employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
-checkbook_services: 
+checkbook_services:
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
     base_url:  "https://dc.checkbookhealth.org"
     url: "https://dc.checkbookhealth.org/shop/dc/"
