@@ -5,8 +5,8 @@ site:
   copyright_period_start: "2013"
   header_message: "Welcome to Nevada Health Link"
   logo_file_name: "logo.png"
-  home_url: "https://www.dchealthlink.com/"
-  home_forms_url: "https://dchealthlink.com/forms"
+  home_url: "https://www.nevadahealthlink.com/"
+  home_forms_url: "https://nevadahealthlink.com/forms"
   forms_name: "nevadahealthlink.com/forms"
   website_name: "nevadahealthlink.com"
   forms: "https://dchealthlink.com/forms#en"
@@ -25,7 +25,7 @@ contact_center:
   tty_number: "855-7NVLINK"
   tty: "771"
   alt_phone_number: "855-7NVLINK"
-  email_address: "info@dchealthlink.com"
+  email_address: "info@nevadahealthlink.com"
 
 aca:
   state_name: "Nevada"
