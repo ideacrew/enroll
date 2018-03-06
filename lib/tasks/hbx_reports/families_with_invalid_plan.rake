@@ -18,10 +18,10 @@ namespace :reports do
       ENROLLMENT_APPLICANT_LAST_NAME
       ENROLLMENT_APPLICANT_HBX_ID
       ENROLLMENT_APPLICANT_STATE
-      ENROLLMENT_APPLICANT_MAILING ADDRESS
+      ENROLLMENT_APPLICANT_MAILING_ADDRESS
       ENROLLMENT_EMPLOYER_NAME
       ENROLLMENT_EMPLOYER_PLAN_YEAR_START_ON
-      ER FEIN
+      ER_FEIN
     )
     invalid_plan_ids = ENV["invalid_plan_ids"].split(",").inject([]) { |invalid_plan_ids, id| invalid_plan_ids << BSON::ObjectId.from_string(id) }
 
