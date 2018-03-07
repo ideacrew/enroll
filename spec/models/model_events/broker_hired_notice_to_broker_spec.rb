@@ -4,23 +4,27 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
   let(:model_event)  { "broker_hired_notice_to_broker" }
   let(:notice_event) { "broker_hired_notice_to_broker" }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
-  let!(:broker_agency_profile) { create :broker_agency_profile }
   let!(:broker_agency_account) { create :broker_agency_account,is_active: true, broker_agency_profile: broker_agency_profile }
-  let!(:broker) { create :broker, broker_agency_profile: broker_agency_profile  }
-  let!(:person){ create :person }
+  let(:organization) { FactoryGirl.create(:organization) }
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
   let!(:model_instance) { create(:employer_profile,legal_name:"ffff",broker_agency_accounts:[broker_agency_account])}
   let(:person){ create :person}
+
+
+  before do
+    broker_agency_profile.primary_broker_role.update_attributes!(:broker_agency_profile_id => broker_agency_profile.id)
+  end
  
   describe "NoticeTrigger" do
     context "when ER successfully hires a broker" do
       subject { Observers::Observer.new }
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.person.broker_hired_notice_to_broker"
+          expect(event_name).to eq "acapi.info.events.broker_role.broker_hired_notice_to_broker"
           expect(payload[:event_object_kind]).to eq 'EmployerProfile'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.trigger_notice(recipient: person, event_object: model_instance, notice_event: "broker_hired_notice_to_broker")
+        subject.trigger_notice(recipient: broker_agency_profile.primary_broker_role, event_object: model_instance, notice_event: "broker_hired_notice_to_broker")
       end
     end
   end
@@ -48,11 +52,11 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
+    let(:broker_person) { broker_agency_profile.primary_broker_role.person }
 
     before do
-      allow(subject).to receive(:resource).and_return(person)
+      allow(subject).to receive(:resource).and_return(broker_agency_profile.primary_broker_role)
       allow(subject).to receive(:payload).and_return(payload)
-      allow(person).to receive_message_chain('broker_role.broker_agency_profile').and_return(broker_agency_profile)
       allow(Person).to receive(:staff_for_employer).with(model_instance).and_return([person])
     end
 
@@ -68,24 +72,29 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
       expect(merge_model.employer_name).to eq model_instance.legal_name
     end
 
-    it "should return broker first and last name " do
-      expect(merge_model.first_name).to eq person.first_name
-      expect(merge_model.last_name).to eq person.last_name
+    it "should return broker first name " do
+      expect(merge_model.first_name).to eq broker_person.first_name
+    end
+
+    it "should return broker last name " do
+      expect(merge_model.last_name).to eq broker_person.last_name
     end
 
     it "should return broker assignment date" do
       expect(merge_model.assignment_date).to eq broker_agency_account.start_on
     end
 
-    it "should return employer poc name" do
+    it "should return employer poc first name" do
       expect(merge_model.employer_poc_firstname).to eq model_instance.staff_roles.first.first_name
+    end
+
+    it "should return employer poc last name" do
       expect(merge_model.employer_poc_lastname).to eq model_instance.staff_roles.first.last_name
     end
 
     it "should return broker agency name " do
-      expect(merge_model.borker_agency_name).to eq person.broker_role.broker_agency_profile.legal_name
+      expect(merge_model.borker_agency_name).to eq broker_agency_profile.legal_name
     end
-
 
   end
 end

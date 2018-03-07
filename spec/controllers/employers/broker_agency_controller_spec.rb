@@ -77,7 +77,7 @@ RSpec.describe Employers::BrokerAgencyController do
 
     context 'post create' do
 
-      let!(:params) { {recipient: @broker_role2.person, event_object: @employer_profile, notice_event: "broker_hired_notice_to_broker"} }
+      let!(:params) { {recipient: @broker_role2, event_object: @employer_profile, notice_event: "broker_hired_notice_to_broker"} }
 
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))

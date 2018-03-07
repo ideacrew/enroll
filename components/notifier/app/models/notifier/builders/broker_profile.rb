@@ -3,7 +3,7 @@ module Notifier
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker, :merge_model
+    attr_accessor :payload, :broker_role, :merge_model
 
    def initialize
       data_object = Notifier::MergeDataModels::BrokerProfile.new
@@ -12,11 +12,11 @@ module Notifier
     end
 
     def resource=(resource)
-      @broker = resource
+      @broker_role = resource
     end
 
     def append_contact_details
-      bap = broker.broker_role.broker_agency_profile
+      bap = broker_role.broker_agency_profile
       office_address = bap.organization.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
@@ -34,11 +34,11 @@ module Notifier
     end
 
     def first_name
-      merge_model.first_name = broker.first_name
+      merge_model.first_name = broker_role.person.first_name
     end
 
     def last_name
-      merge_model.last_name = broker.last_name
+      merge_model.last_name = broker_role.person.last_name
     end
 
     def employer
@@ -64,7 +64,7 @@ module Notifier
     end
 
     def borker_agency_name
-      merge_model.borker_agency_name = broker.broker_role.broker_agency_profile.legal_name
+      merge_model.borker_agency_name = broker_role.broker_agency_profile.legal_name
     end
   end
 end

@@ -51,7 +51,7 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.save!(validate: false)
 
       observer = Observers::Observer.new
-      observer.trigger_notice(recipient: broker_agency_profile.primary_broker_role.person, event_object: @employer_profile, notice_event: "broker_hired_notice_to_broker")
+      observer.trigger_notice(recipient: broker_agency_profile.primary_broker_role, event_object: @employer_profile, notice_event: "broker_hired_notice_to_broker")
 
       broker_hired_confirmation
       broker_agency_hired_confirmation
