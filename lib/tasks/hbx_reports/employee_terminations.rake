@@ -42,7 +42,6 @@ namespace :reports do
                 '="' + eval(field_name) + '"'
               end
             end
-
             processed_count += 1
           end
         end
