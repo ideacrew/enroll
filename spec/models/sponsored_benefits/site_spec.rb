@@ -77,8 +77,55 @@ module SponsoredBenefits
       end
     end
 
+    context "site keys must be valid" do
+      let(:site) { FactoryGirl.build(:sponsored_benefits_site, :with_owner_exempt_organization, site_key: site_key) }
 
-    context "exercising organization associations" do
+      context "with keys longer than max length" do
+        let(:max_key_length)  { 6 }
+        let(:long_key)        { :excessive_key_lengths_are_invalid }
+
+        it "it should truncate to max length" do
+          site.site_key = long_key
+          expect(site.site_key).to eq long_key.slice(0, max_key_length).to_sym
+        end
+      end
+
+      context "with keys of string type" do
+        let(:string_key) { "mykey" }
+
+        it "should transform to a symbol" do
+          site.site_key = string_key
+          expect(site.site_key).to eq string_key.to_sym
+        end
+
+      end
+
+      context "with keys that start with numbers" do
+        let(:numeric_key) { "12days" }
+
+        it "should strip the leading numbers" do
+          site.site_key = numeric_key
+          expect(site.site_key).to eq "days".to_sym
+        end
+      end
+
+      context "with keys with special characters" do
+        let(:funky_key) { "m-yK&e*(y#" }
+
+        it "should strip the leading numbers" do
+          site.site_key = funky_key
+          expect(site.site_key).to eq "mykey".to_sym
+        end
+      end
+
+      context "with duplicate keys" do
+        let(:site_key)  { :mykey }
+
+        it "should reject duplicate key" 
+      end
+    end
+
+    context "organization associations must be valid" do
 
       let(:owner_legal_name)    { "Hannah Barbara, LLC" }
       let(:loony_legal_name)    { "Loony Tunes, LLC" }
