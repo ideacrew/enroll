@@ -29,7 +29,7 @@ contact_center:
 
 aca:
   state_name: "Nevada"
-  state_abbreviation: "NV"
+  state_abbreviation: "DC"
   hbx_abbreviation: "NV Health Link"
   market_kinds: ["individual", "shop"]
 #

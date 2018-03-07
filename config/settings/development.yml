@@ -9,7 +9,7 @@ site:
 
 aca:
   state_name: "Nevada"
-  state_abbreviation: "NV"
+  state_abbreviation: "DC"
   ivl:
     enrollment_due_day_of_month: 15
   shop:
