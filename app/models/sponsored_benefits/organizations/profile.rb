@@ -9,7 +9,7 @@ module SponsoredBenefits
       PROFILE_SOURCE_KINDS = [:broker_quote]
 
       embedded_in :organization,          class_name: "SponsoredBenefits::Organizations::Organization"
-      embedded_in :plan_design_proposal,  class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
+      # embedded_in :plan_design_proposal,  class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
 
       field :contact_method,  type: Symbol, default: :paper_and_electronic
       field :profile_source, type: String, default: :broker_quote
