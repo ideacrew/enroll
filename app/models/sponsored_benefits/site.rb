@@ -46,32 +46,51 @@ module SponsoredBenefits
     # TODO -- come up with scheme to manage/store these attributes and provide defaults
     field :colors,  type: Array
 
-    has_one   :owner_organization,  class_name: "SponsoredBenefits::Organizations::Organization"
-    has_many  :benefit_markets,     class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
-    has_many  :organizations, as: :employer_profiles do
-      SponsoredBenefits::Organizations::Organization.has_employer_profile
-    end
+    # Associations between sites and organizations
+    has_one   :owner_organization, inverse_of: :site_owner,
+              class_name: "SponsoredBenefits::Organizations::ExemptOrganization"
 
-    has_many  :organizations, as: :broker_agency_profiles do
-      SponsoredBenefits::Organizations::Organization.has_broker_agency_profile
-    end
+    has_many  :site_organizations, inverse_of: :site,
+              class_name: "SponsoredBenefits::Organizations::Organization"
+    
 
-    has_many  :organizations, as: :issuer_profiles do
-      SponsoredBenefits::Organizations::Organization.has_issuer_profile
-    end
+    has_many  :benefit_markets,
+              class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
-    has_many  :organizations, as: :general_agencies do
-      SponsoredBenefits::Organizations::Organization.has_general_agency_profile
-    end
+
+    accepts_nested_attributes_for :owner_organization
+
+
+      # def employer_profiles
+      #   where(:"profiles._type" => "SponsoredBenefits::Organizations::AcaShopDcEmployerProfile")
+      # end
+      # def broker_agency_profiles
+      #   where(has_broker_agency_profile)
+      # end
+    # end
+
+    # has_many  :organizations, as: :broker_agency_profiles,  class_name: "SponsoredBenefits::Organizations::Organization" do
+    #   SponsoredBenefits::Organizations::Organization.has_broker_agency_profile
+    # end
+
+    # has_many  :organizations, as: :issuer_profiles do
+    #   SponsoredBenefits::Organizations::Organization.has_issuer_profile
+    # end
+
+    # has_many  :organizations, as: :general_agencies do
+    #   SponsoredBenefits::Organizations::Organization.has_general_agency_profile
+    # end
 
     # has_many :families,         class_name: "::Family"
 
     validates_presence_of :site_key, :owner_organization
 
     scope :find_by_site_key, ->(site_key) { where(site_key: site_key) }
+    # scope :aca_shop_dc_employer_profiles, -> { where(:"aca_shop_dc_employer_profiles.0" => true) }
 
     index({ site_key:  1 }, { unique: true })
+
 
     def subdomain
       site_key.to_s unless site_key.blank?
