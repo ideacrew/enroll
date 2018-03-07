@@ -1,6 +1,7 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlansController < ApplicationController
+      include SponsoredBenefits::Organizations::PlanDesignHelpers
 
       def index
         offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)
@@ -24,15 +25,7 @@ module SponsoredBenefits
       end
 
       private
-        helper_method :selected_carrier_level, :plan_design_organization, :carrier_profile, :carriers_cache
-
-        def selected_carrier_level
-          @selected_carrier_level ||= params[:selected_carrier_level]
-        end
-
-        def plan_design_organization
-          @plan_design_organization ||= PlanDesignOrganization.find(params[:plan_design_organization_id])
-        end
+        helper_method :carrier_profile, :carriers_cache
 
         def carrier_profile
           @carrier_profile ||= ::CarrierProfile.find(params[:carrier_id])

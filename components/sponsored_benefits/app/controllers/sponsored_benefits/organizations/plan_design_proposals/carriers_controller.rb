@@ -1,6 +1,7 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::CarriersController < ApplicationController
+      include SponsoredBenefits::Organizations::PlanDesignHelpers
 
       def index
         @carrier_names = ::Organization.load_carriers(
@@ -11,15 +12,7 @@ module SponsoredBenefits
       end
 
       private
-        helper_method :selected_carrier_level, :plan_design_organization, :active_year
-
-        def selected_carrier_level
-          @selected_carrier_level ||= params[:selected_carrier_level]
-        end
-
-        def plan_design_organization
-          @plan_design_organization ||= PlanDesignOrganization.find(params[:plan_design_organization_id])
-        end
+        helper_method :active_year
 
         def active_year
           params[:active_year]

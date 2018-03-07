@@ -1,6 +1,7 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::ProposalCopiesController < ApplicationController
+      include SponsoredBenefits::Organizations::PlanDesignHelpers
 
       def create
         new_plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({ organization: plan_design_organization }.merge(plan_design_form.to_h))
@@ -25,8 +26,6 @@ module SponsoredBenefits
       end
 
       private
-      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal
-
       def assign_roster_employees(sponsorship:, roster:)
         roster.each do |employee|
           census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new.tap do |ce|
@@ -75,18 +74,6 @@ module SponsoredBenefits
 
         new_bg.estimate_composite_rates
         new_application.benefit_sponsorship.benefit_sponsorable.save!
-      end
-
-      def plan_design_proposal
-        @plan_design_proposal ||= SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id])
-      end
-
-      def plan_design_organization
-        @plan_design_organization ||= plan_design_proposal.plan_design_organization
-      end
-
-      def plan_design_form
-        SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id])
       end
     end
   end
