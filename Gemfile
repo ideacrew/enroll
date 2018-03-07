@@ -86,6 +86,7 @@ end
 group :development do
   gem 'parallel_tests'
   gem 'web-console', '2.3.0'
+  gem 'overcommit'
 end
 
 group :development, :test do
