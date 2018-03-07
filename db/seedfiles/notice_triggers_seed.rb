@@ -1112,27 +1112,6 @@ shop_notice_triggers = [
             }
         ]
     },
-    {
-        hbx_id: 'SHOP47',
-        title: 'You have been removed as a Broker',
-        description: "When a broker is fired, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-        resource_name: 'broker_role',
-        event_name: 'broker_agency_fired_confirmation',
-        notice_triggers: [
-           {
-              name: 'Broker Agency Fired',
-              notice_template: 'notices/shop_broker_agency_notices/broker_agency_fired_notice',
-              notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyFiredNotice',
-              mpi_indicator: 'SHOP_M047',
-              notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["broker"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-        ]
-    },
 
     {
         hbx_id: 'SHOP56',

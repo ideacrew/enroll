@@ -163,7 +163,8 @@ class EmployerProfile
     employer_broker_fired
     notify_broker_terminated
     broker_fired_confirmation_to_broker
-    broker_agency_fired_confirmation
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: broker_agency_profile, event_object: @employer_profile, notice_event: "broker_agency_fired_confirmation")
   end
 
   def employer_broker_fired
@@ -171,14 +172,6 @@ class EmployerProfile
       trigger_notices('employer_broker_fired')
     rescue Exception => e
       Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
-    end
-  end
-
-  def broker_agency_fired_confirmation
-    begin
-      trigger_notices("broker_agency_fired_confirmation")
-    rescue Exception => e
-      puts "Unable to deliver broker agency fired confirmation notice to #{active_broker_agency_account.legal_name} due to #{e}" unless Rails.env.test?
     end
   end
 
