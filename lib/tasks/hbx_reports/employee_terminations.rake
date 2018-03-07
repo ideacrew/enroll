@@ -6,7 +6,7 @@ namespace :reports do
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
 
-      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2015,10,1)))
+      census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2017,10,1)))
 
       field_names  = %w(
           employee_name employee_hbx_id employer_legal_name employer_hbx_id date_of_hire date_added_to_roster employment_status date_of_termination date_terminated_on_roster
