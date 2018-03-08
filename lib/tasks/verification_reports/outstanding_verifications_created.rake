@@ -32,7 +32,7 @@ namespace :reports do
 
     def due_date_for_type(person, type, transition)
       if person.consumer_role.special_verifications.any?
-        sv = person.consumer_role.special_verifications.select{|sv| sv.verification_type == type }.select{|svp| svp.created_at < transition.transtition_at}
+        sv = person.consumer_role.special_verifications.select{|sv| sv.verification_type == type }.select{|svp| svp.created_at < transition.transition_at}
         sv.any? ? sv.due_date : transition.transition_at + 95.days
       else
         transition.transition_at + 95.days
@@ -59,7 +59,15 @@ namespace :reports do
     end
 
     def workflow_transitions(person)
-      person.consumer_role.workflow_state_transitions.where(:event => "reject!", :transition_at=>{'$gte'=>start_date, '$lte' => end_date})
+      person.consumer_role.workflow_state_transitions.where(:event =>
+                                                                {"$in" => [
+                                                                    "reject!",
+                                                                    "ssn_invalid!",
+                                                                    "ssn_valid_citizenship_invalid!",
+                                                                    "fail_dhs!",
+                                                                    "fail_residency!"]},
+                                                            :transition_at =>
+                                                                {'$gte'=>start_date, '$lte' => end_date})
     end
 
     file_name = "#{Rails.root}/public/outstanding_types_created_#{date.gsub(" ", "").split(",").join("_")}.csv"
@@ -69,30 +77,31 @@ namespace :reports do
       csv << field_names
 
       people.each do |person|
-        workflow_transitions(person).to_a.each do |transition|
+        workflow_transitions(person).each do |transition|
           case transition.event
             when "ssn_invalid!"
-              type = "Social Security Number"
+              types = person.verification_types - ['DC Residency', 'American Indian Status']
             when "ssn_valid_citizenship_invalid!"
-              type = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian Status']).first
+              types = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian Status'])
             when "fail_dhs!"
-              type = "Immigration status"
+              types = ["Immigration status"]
             when "fail_residency!"
-              type = "DC Residency"
+              types = ["DC Residency"]
             when "reject!"
-              type = get_rejected_type(person)
+              types = [get_rejected_type(person)]
           end
 
-
-          csv << [
-              subscriber_id(person),
-              person.hbx_id,
-              person.first_name,
-              person.last_name,
-              type,
-              "outstanding",
-              due_date_for_type(person, type, transition).to_date
-          ]
+          types.each do |type|
+            csv << [
+                subscriber_id(person),
+                person.hbx_id,
+                person.first_name,
+                person.last_name,
+                type,
+                "outstanding",
+                due_date_for_type(person, type, transition).to_date
+            ]
+          end
         end
       end
       puts "*********** DONE ******************"
