@@ -9,7 +9,7 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      resource.is_a?(EmployeeRole) ? resource.person : resource
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
     end
 
     def construct_notice_object
@@ -174,7 +174,7 @@ module Notifier
 
     def create_recipient_document(doc_uri)
       receiver = resource
-      receiver = resource.person if resource.is_a?(EmployeeRole)
+      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
 
       notice = receiver.documents.build({
         title: notice_filename, 
@@ -193,7 +193,7 @@ module Notifier
 
     def create_secure_inbox_message(notice)
       receiver = resource
-      receiver = resource.person if resource.is_a?(EmployeeRole)
+      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
 
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
