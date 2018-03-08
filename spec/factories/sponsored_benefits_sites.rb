@@ -8,6 +8,7 @@ FactoryGirl.define do
     transient do
       legal_name "My Exchange Site"
       fein "012345678"
+      kind :aca_shop
     end
 
     trait :with_owner_general_organization do
@@ -22,6 +23,11 @@ FactoryGirl.define do
       end
     end
 
-
+    trait :with_benefit_market do
+      after :build do |site, evaluator|
+        site.benefit_markets << build(:sponsored_benefits_benefit_markets_benefit_market, kind: evaluator.kind)
+      end
+    end
+    
   end
 end
