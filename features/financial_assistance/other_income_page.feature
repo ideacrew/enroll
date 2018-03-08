@@ -8,7 +8,6 @@ Feature: Other income page
     When they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
     And the user clicks Other Income section on the left navigation
-    And applicant should see and confirm modal dialog box
     And the user will navigate to the Other Income page for the corresponding applicant
 
   Scenario: User answers no to having other income

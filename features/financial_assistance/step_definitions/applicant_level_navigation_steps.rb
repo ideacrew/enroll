@@ -11,11 +11,6 @@ When(/^the user clicks ADD\/EDIT INCOME & COVERAGE INFO button for a given house
   click_link 'ADD INCOME & COVERAGE INFO'
 end
 
-When(/^applicant should see and confirm modal dialog box$/) do
-  expect(page).to have_content('You Have Unsaved Changes')
-  click_button "LEAVE WITHOUT SAVING"
-end
-
 Then(/^the user will navigate to the Tax Info page for the corresponding applicant\.$/) do
 	expect(page).to have_content('Household Info: Family Members')
 	screenshot_and_post_to_slack('tax_info_page_left_nav_screenshot', channel: 'new_faa_team')
