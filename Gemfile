@@ -54,10 +54,10 @@ gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
 gem 'slim-rails'
-gem 'sprockets' , '~> 2.12.3'
+gem 'sprockets', '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
-gem 'turbolinks','2.5.3'
+gem 'turbolinks', '2.5.3'
 gem 'uglifier', '>= 1.3.0'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
@@ -87,6 +87,7 @@ group :development do
   gem 'parallel_tests'
   gem 'web-console', '2.3.0'
   gem 'overcommit'
+  gem 'rubocop', require: false
 end
 
 group :development, :test do
@@ -130,4 +131,3 @@ group :production do
   gem 'newrelic_rpm'
   gem 'unicorn', '~> 4.8.3'
 end
-
