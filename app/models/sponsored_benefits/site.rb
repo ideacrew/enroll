@@ -47,40 +47,20 @@ module SponsoredBenefits
     field :colors,  type: Array
 
 
-    # Associations between sites and organizations
+    # Organization responsible for administering this site
     has_one   :owner_organization, inverse_of: :site_owner,
               class_name: "SponsoredBenefits::Organizations::ExemptOrganization"
 
+    # Set of organizations who offer, broker and sponsor benefits on this site
     has_many  :site_organizations, inverse_of: :site,
               class_name: "SponsoredBenefits::Organizations::Organization"
     
-
+    # Curated collections of benefits intended for specific sponsor and member groups
     has_many  :benefit_markets,
               class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
 
     accepts_nested_attributes_for :owner_organization
-
-
-      # def employer_profiles
-      #   where(:"profiles._type" => "SponsoredBenefits::Organizations::AcaShopDcEmployerProfile")
-      # end
-      # def broker_agency_profiles
-      #   where(has_broker_agency_profile)
-      # end
-    # end
-
-    # has_many  :organizations, as: :broker_agency_profiles,  class_name: "SponsoredBenefits::Organizations::Organization" do
-    #   SponsoredBenefits::Organizations::Organization.has_broker_agency_profile
-    # end
-
-    # has_many  :organizations, as: :issuer_profiles do
-    #   SponsoredBenefits::Organizations::Organization.has_issuer_profile
-    # end
-
-    # has_many  :organizations, as: :general_agencies do
-    #   SponsoredBenefits::Organizations::Organization.has_general_agency_profile
-    # end
 
     # has_many :families,         class_name: "::Family"
 

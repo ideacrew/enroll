@@ -13,7 +13,7 @@ module SponsoredBenefits
       belongs_to  :site,                  class_name: "SponsoredBenefits::Site"
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
 
-      embeds_one :configuration 
+      embeds_one :configuration_set
       embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter"
 
       embeds_many :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog",
@@ -30,10 +30,11 @@ module SponsoredBenefits
               "benefit_catalogs.application_period.max" => 1 },
             { name: "benefit_catalogs_application_period" })
 
+      after_initialize :initialize_configuration_set
 
       def kind=(new_kind)
-        initialize_configuration(new_kind)
         write_attribute(:kind, new_kind)
+        initialize_configuration_set
       end
 
       def benefit_catalog_for(date)
@@ -83,13 +84,27 @@ module SponsoredBenefits
 
       private
 
-      def initialize_configuration(benefit_market_kind)
-        klass_name = "#{new_kind.to_s}_configuration".camelcase
-        klass = klass_name.constantize
-        self.configuration = klass.new
+      def initialize_configuration_set
+        return if kind.blank? || configuration_set.present?
+
+        klass = configuration_class_name.constantize
+        configuration_set = klass.new
       end
 
+      # Configuration setting model is automatically associated based on "kind" attribute value
+      def configuration_class_name
+        return unless kind.present?
 
+        config_klass = "#{kind.to_s}_configuration".camelcase
+        namespace_for(self.class) + "::#{config_klass}"
+      end
+
+      # Isolate the namespace portion of the passed class
+      def namespace_for(klass)
+        klass_name = klass.to_s.split("::")
+        klass_name.slice!(-1) || []
+        klass_name.join("::")
+      end
 
     end
   end
