@@ -70,6 +70,11 @@ class ConsumerRole
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
+
+  # This is utilized to store the url where Admin last visited. Used to build logic as to where the consumer
+  # should land next after completing RIDP or Identify Verifications.
+  field :admin_bookmark_url, type: String, default: nil
+
   field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
 
