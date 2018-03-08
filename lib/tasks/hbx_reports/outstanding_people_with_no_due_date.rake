@@ -16,24 +16,19 @@ namespace :reports do
         csv << %w[HBX_ID First_Name Last_Name Due_Date DC_Residency Citizenship Social_Security_Number American_Indian/Alaskan_Native Immigration_Status]
         families.each do |family|
           primary_family_member = family.primary_family_member
-          if family.enrolled_policy(primary_family_member).present? # checking whether the family_member is present on enrollment or not
-            person = primary_family_member.person
-            #notice_present = person.inbox.messages.where(subject: 'Your Health or Dental Plan Enrollment and Payment Deadline').present? || person.inbox.messages.where(subject: 'Review Your Insurance Plan Enrollment and Pay Your Bill Now').present?
-            #unless notice_present
-              min_verification_due_date = family.min_verification_due_date.present? ? family.min_verification_due_date : (TimeKeeper.date_of_record+ 95.days).strftime('%Y-%m-%d')
-              outstanding_doc_types(family, primary_family_member)
-              csv << [person.hbx_id,
-                      person.first_name,
-                      person.last_name,
-                      min_verification_due_date,
-                      @residency_doc_type,
-                      @citizenship_doc_type,
-                      @ssn_doc_type,
-                      @ami_doc_type,
-                      @immigration_doc_type]
-              count += 1
-            #end
-          end
+          person = primary_family_member.person
+          min_verification_due_date = family.min_verification_due_date.present? ? family.min_verification_due_date : (TimeKeeper.date_of_record+ 95.days).strftime('%Y-%m-%d')
+          outstanding_doc_types(family, primary_family_member)
+          csv << [person.hbx_id,
+                  person.first_name,
+                  person.last_name,
+                  min_verification_due_date,
+                  @residency_doc_type,
+                  @citizenship_doc_type,
+                  @ssn_doc_type,
+                  @ami_doc_type,
+                  @immigration_doc_type]
+          count += 1
         end
           puts "File path: %s. Total count of families with outstanding no due date: #{count}"
       end
