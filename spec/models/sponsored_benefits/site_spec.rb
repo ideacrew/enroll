@@ -71,7 +71,7 @@ module SponsoredBenefits
           before { valid_site.save }
 
           it "should be findable by site_key" do
-            expect(SponsoredBenefits::Site.find_by_site_key(site_key).size).to eq 1
+            expect(SponsoredBenefits::Site.by_site_key(site_key).size).to eq 1
           end
         end
       end
@@ -154,10 +154,29 @@ module SponsoredBenefits
         expect(site.benefit_markets.first).to eq benefit_market
       end
 
-      it "and site should be valid" do
+      it "site should be valid" do
         site.validate
         expect(site).to be_valid
       end
+
+      context "benefit_market should be findable by kind" do
+        let(:shop_kind)           { :aca_shop }
+        let(:individual_kind)     { :aca_individual }
+        let!(:shop_site)          { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: shop_kind) }
+        let!(:individual_site)    { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: individual_kind) }
+
+        let(:found_sites)         { Site.by_benefit_market_kind(shop_kind) }
+
+        it "should be find the shop site and only the shop" do
+          expect(found_sites.size).to eq 1
+          expect(found_sites.first).to eq shop_site
+        end
+
+        it "should have the queried benefit_market_kind" do
+          expect(found_sites.first.benefit_markets.first.kind).to eq shop_kind
+        end
+      end
+
     end
 
   end
