@@ -23,7 +23,7 @@ module SponsoredBenefits
       }
     end
 
-    context "creating and persisting and instance" do
+    context "ability to create, validate and persist instances of this class" do
       context "with no arguments" do
         subject { described_class.new }
 
@@ -144,9 +144,21 @@ module SponsoredBenefits
       it "should have correct number of employer_profiles" do
         expect((site.site_organizations.employer_profiles).size).to eq 2
       end
-
     end
 
+    context "benefit_market associations must be valid" do
+      let(:site)                { FactoryGirl.build(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [benefit_market]) }
+      let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
+
+      it "assigned benefit market should be associated with site" do
+        expect(site.benefit_markets.first).to eq benefit_market
+      end
+
+      it "and site should be valid" do
+        site.validate
+        expect(site).to be_valid
+      end
+    end
 
   end
 end
