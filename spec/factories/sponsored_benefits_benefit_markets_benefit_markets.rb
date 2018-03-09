@@ -6,7 +6,7 @@ FactoryGirl.define do
 
     trait :with_site do
       after :build do |benefit_market, evaluator|
-        build(:sponsored_benefits_site, :with_owner_general_organization, benefit_market: benefit_market)
+        build(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [benefit_market])
       end
     end
 

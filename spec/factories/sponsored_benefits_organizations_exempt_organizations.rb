@@ -4,13 +4,16 @@ FactoryGirl.define do
     dba "ACME Widgets Co."
     entity_kind :s_corporation
 
-    # site do
-    #   build(:sponsored_benefits_site)
-    # end
-
     office_locations do
       [ build(:sponsored_benefits_office_location, :primary) ]
     end
     
+    trait :with_site do
+      before :build do |organization, evaluator|
+        build(:sponsored_benefits_site, owner_organization: organization, site_organizations: [organization])
+      end
+    end
+
+
   end
 end
