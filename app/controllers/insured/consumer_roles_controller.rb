@@ -213,7 +213,7 @@ class Insured::ConsumerRolesController < ApplicationController
           redirect_to upload_ridp_document_insured_consumer_role_index_path
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
+          redirect_to  @consumer_role.admin_bookmark_url.present? ?  @consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
         end
@@ -237,8 +237,8 @@ class Insured::ConsumerRolesController < ApplicationController
   def ridp_agreement
     set_current_person
     consumer = @person.consumer_role
-    if @person.completed_identity_verification? || (consumer.identity_verified? ) || @person.primary_family.has_curam_or_mobile_application_type?
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    if @person.completed_identity_verification? || consumer.identity_verified?
+      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
     end

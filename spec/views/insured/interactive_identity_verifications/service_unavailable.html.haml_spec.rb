@@ -11,6 +11,7 @@ describe "insured/interactive_identity_verifications/service_unavailable" do
     allow(person).to receive(:consumer_role).and_return consumer_role
     sign_in current_user
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+    allow(view).to receive(:ridp_redirection_link).with(person).and_return nil
   end
   it "should show a message about the service being down and asking the user to try back later" do
     render :template => "insured/interactive_identity_verifications/service_unavailable.html.haml"
