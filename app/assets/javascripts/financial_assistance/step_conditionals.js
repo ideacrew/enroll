@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+  $(document).on('click', 'a[href]:not(.disabled).interaction-click-control-other-questions', function(e) {
     if($('#unsavedOtherQuestionsWarning').length == 1) {
       e.preventDefault();
       var self = this;
@@ -15,7 +15,7 @@ $(document).ready(function() {
     return true;
   });
 
-  $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+  $(document).on('click', 'a[href]:not(.disabled).interaction-click-control-tax-info', function(e) {
     if($('#unsavedTaxInfoQuestionsWarning').length == 1) {
       e.preventDefault();
       var self = this;

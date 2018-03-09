@@ -18,29 +18,24 @@ Feature: This gives the user access to application level navigation for applican
   Scenario: Navigate from Tax Info to Job Income Info page
     Given that the user is on the Tax Info page for a given applicant
     When the user clicks Job Income section on the left navigation
-    And applicant should see and confirm modal dialog box
     Then the user will navigate to the Job Income page for the corresponding applicant
 
   Scenario:  Navigate from Tax Info to Other Income page
     Given that the user is on the Tax Info page for a given applicant
     When the user clicks Other Income section on the left navigation
-    And applicant should see and confirm modal dialog box
     Then the user will navigate to the Other Income page for the corresponding applicant.
 
   Scenario: Navigate from Tax Info to Income Adustments page
     Given that the user is on the Tax Info page for a given applicant
     When the user clicks Income Adjustments section on the left navigation
-    And applicant should see and confirm modal dialog box
     Then the user will navigate to the Income Adjustments page for the corresponding applicant
 
   Scenario: Navigate from Tax Info to Health Coverage page
     Given that the user is on the Tax Info page for a given applicant
     When the user clicks Health Coverage section on the left navigation
-    And applicant should see and confirm modal dialog box
     Then the user will navigate to the Health Coverage page for the corresponding applicant
 
   Scenario: Navigate from Tax Info to Other Questions page
     Given that the user is on the Tax Info page for a given applicant
     When the user clicks Other Questions section on the left navigation
-    And applicant should see and confirm modal dialog box
     Then the user will navigate to the Other Questions page for the corresponding applicant
