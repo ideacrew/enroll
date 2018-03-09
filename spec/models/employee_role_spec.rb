@@ -47,7 +47,7 @@ end
 
 describe ".coverage_effective_on" do
 
-  context 'when both active and renewal benefit groups present' do 
+  context 'when both active and renewal benefit groups present' do
 
     let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
 
@@ -91,7 +91,7 @@ describe ".coverage_effective_on" do
 
       it 'should calculate effective date based on active benefit group' do
         expect(employee_role.coverage_effective_on).to eq hired_on
-      end 
+      end
     end
   end
 end
@@ -618,19 +618,6 @@ describe EmployeeRole, dbclean: :after_each do
       end
     end
   end
-
-  context "hired_on date field" do
-    let(:different_hired_date) { employee_role.hired_on + 2.days }
-
-    it 'should use census employee record data' do
-      expect(employee_role.hired_on).to eq census_employee.hired_on
-      employee_role.hired_on = different_hired_date
-      employee_role.save
-      employee_role.reload
-      expect(employee_role.hired_on).to eq census_employee.hired_on
-      expect(Date.parse(employee_role.read_attribute(:hired_on).strftime('%Y/%m/%d'))).to eq different_hired_date
-    end
-  end
 end
 
 describe "#benefit_group", dbclean: :after_each do
@@ -678,7 +665,7 @@ describe "#benefit_group", dbclean: :after_each do
 
     before do
       census_employee.benefit_group_assignments.each do |bga|
-        bga.delete 
+        bga.delete
       end
       active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
       expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
