@@ -147,7 +147,8 @@ class Insured::FamiliesController < FamiliesController
     end
 
     if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
-      sep_request_denial_notice
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: @person.active_employee_roles.first, event_object: @qle, notice_event: "sep_request_denial_notice")
     end
   end
 
@@ -232,15 +233,6 @@ class Insured::FamiliesController < FamiliesController
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
-    end
-  end
-
-  def sep_request_denial_notice
-    # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice", qle_reported_date: @qle_date.to_s, qle_id: @qle.id.to_s)
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.hbx_id}")
     end
   end
 

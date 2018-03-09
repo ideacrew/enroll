@@ -12,6 +12,7 @@ module Notifier
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.qle = Notifier::MergeDataModels::QualifyingLifeEventKind.new
       @merge_model = data_object
     end
 
@@ -98,6 +99,36 @@ module Notifier
 
     def employer_profile
       employee_role.employer_profile
+    end
+
+    def qle
+      return @qle if defined? @qle
+      if payload['event_object_kind'].constantize == QualifyingLifeEventKind
+        @qle = QualifyingLifeEventKind.find(payload['event_object_id'])
+      end
+    end
+
+    def qle_title
+      return if qle.blank?
+      merge_model.qle.title = qle.title
+    end
+
+    def qle_start_on
+      return if qle.blank?
+      merge_model.qle.start_on = qle.start_on
+    end
+
+    def qle_end_on
+      return if qle.blank?
+      merge_model.qle.end_on = qle.end_on
+    end
+
+    def qle_event_on
+      merge_model.qle.event_on = qle.event_on
+    end
+
+    def qle_reported_on
+      merge_model.qle.reported_on = qle.reported_on
     end
   end
 end
