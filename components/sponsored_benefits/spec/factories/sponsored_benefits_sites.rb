@@ -4,6 +4,7 @@ FactoryGirl.define do
     long_name   "ACME Widget's Benefit Website"
     short_name  "Benefit Website"
     domain_name "hbxshop.org"
+    benefit_markets []
 
     transient do
       legal_name "My Exchange Site"
@@ -28,6 +29,6 @@ FactoryGirl.define do
         site.benefit_markets << build(:sponsored_benefits_benefit_markets_benefit_market, kind: evaluator.kind)
       end
     end
-    
+
   end
 end
