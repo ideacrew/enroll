@@ -32,8 +32,8 @@ namespace :reports do
 
     def due_date_for_type(person, type, transition)
       if person.consumer_role.special_verifications.any?
-        sv = person.consumer_role.special_verifications.select{|sv| sv.verification_type == type }.select{|svp| svp.created_at < transition.transition_at}
-        sv.any? ? sv.due_date : transition.transition_at + 95.days
+        sv = person.consumer_role.special_verifications.order_by(:created_at => 'desc').select{|sv| sv.verification_type == type }.select{|svp| svp.created_at < end_date}.first
+        sv.present? ? sv.due_date : transition.transition_at + 95.days
       else
         transition.transition_at + 95.days
       end
