@@ -37,7 +37,9 @@ module SponsoredBenefits
       field :description,                 type: String, default: ""
 
       belongs_to  :benefit_market,  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
-      belongs_to  :service_area,    class_name: "SponsoredBenefits::Locations::ServiceArea"
+
+      # Entire geography covered by under this catalog
+      has_and_belongs_to_many  :service_areas,  class_name: "SponsoredBenefits::Locations::ServiceArea"
 
       embeds_one  :sponsor_eligibility_policy,  class_name: "SponsoredBenefits::BenefitMarkets::SponsorEligibilityPolicy"
       embeds_one  :member_eligibility_policy,   class_name: "SponsoredBenefits::BenefitMarkets::MemberEligibilityPolicy"
@@ -52,6 +54,11 @@ module SponsoredBenefits
       #   inclusion:    { in: SponsoredBenefits::PROBATION_PERIOD_KINDS, message: "%{value} is not a valid probation period kind" },
       #   allow_nil:    false
 
+      scope :by_application_date,     ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
+
+      index({ "application_period.min" => 1, "application_period.max" => 1 })
+
+
       def products
         return @products if defined?(@products)
         @products = SponsoredBenefits::BenefitCatalogs::Product.find_by_benefit_catalog(self)
@@ -61,7 +68,7 @@ module SponsoredBenefits
         application_period.cover?(compare_date)
       end
 
-      def effective_period_for(effective_date)
+      def effective_period_on(effective_date)
         effective_date = effective_date.beginning_of_month
         return unless application_period_cover?(effective_date)
 
@@ -75,7 +82,7 @@ module SponsoredBenefits
         end
       end
 
-      def open_enrollment_period_for(effective_date)
+      def open_enrollment_period_on(effective_date)
         effective_date = effective_date.beginning_of_month
         return unless application_period_cover?(effective_date)
 

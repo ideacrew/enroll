@@ -12,34 +12,35 @@ module SponsoredBenefits
 
       belongs_to  :site,                  class_name: "SponsoredBenefits::Site"
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      has_many    :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      embeds_one :configuration_set
-      embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter"
+      embeds_one :configuration_setting
+      embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter",
+                                          autobuild: true
 
-      embeds_many :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog",
-        cascade_callbacks: true,
-        validate: true
 
       validates :kind,
         inclusion: { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
         allow_nil:    false
 
-      index({ "kind"  => 1 })
-      index({ "benefit_catalogs._id" => 1 })
-      index({ "benefit_catalogs.application_period.min" => 1,
-              "benefit_catalogs.application_period.max" => 1 },
-            { name: "benefit_catalogs_application_period" })
+      index({ kind:  1 })
 
-      after_initialize :initialize_configuration_set
+      after_initialize :initialize_configuration_setting
 
       def kind=(new_kind)
         write_attribute(:kind, new_kind)
-        initialize_configuration_set
+        initialize_configuration_setting
       end
 
-      def benefit_catalog_for(date)
+      # Catalogs with benefit products currently available for purchase
+      def active_benefit_catalogs
+        return @active_benefit_catalogs if defined? @active_benefit_catalogs
+        @active_benefit_catalogs = application_benefit_catalogs_on(TimeKeeper.date_of_record)
+      end
+
+      def application_benefit_catalogs_on(date)
         benefit_catalogs.select { |catalog| catalog.application_period_cover?(date)}
-      end      
+      end
 
       # Calculate available effective dates periods using passed date
       def effective_periods_for(base_date = ::Timekeeper.date_of_record)
@@ -84,11 +85,11 @@ module SponsoredBenefits
 
       private
 
-      def initialize_configuration_set
-        return if kind.blank? || configuration_set.present?
+      def initialize_configuration_setting
+        return if kind.blank? || configuration_setting.present?
 
         klass = configuration_class_name.constantize
-        configuration_set = klass.new
+        configuration_setting = klass.new
       end
 
       # Configuration setting model is automatically associated based on "kind" attribute value

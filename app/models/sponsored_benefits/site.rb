@@ -56,8 +56,8 @@ module SponsoredBenefits
               class_name: "SponsoredBenefits::Organizations::Organization"
     
     # Curated collections of benefits intended for specific sponsor and member groups
-    embeds_many :benefit_markets,
-                class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+    has_many :benefit_markets,
+             class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
 
     accepts_nested_attributes_for :owner_organization
@@ -66,12 +66,9 @@ module SponsoredBenefits
 
     validates_presence_of :site_key, :owner_organization
 
-    scope :by_site_key,             ->(site_key) { where(site_key: site_key) }
-    scope :by_benefit_market_kind,  ->(benefit_market_kind) { where("benefit_markets.kind": benefit_market_kind) }
+    scope :by_site_key,   ->(site_key) { where(site_key: site_key) }
 
     index({ site_key:  1 }, { unique: true })
-    index({ site_key:  1, "benefit_markets.kind": 1 })
-
 
     def subdomain
       site_key.to_s unless site_key.blank?
@@ -84,6 +81,9 @@ module SponsoredBenefits
       site_key
     end
 
+    def benefit_market_for(kind)
+      benefit_markets.select { |market| market.kind == kind }
+    end
 
     private
 

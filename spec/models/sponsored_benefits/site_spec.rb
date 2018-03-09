@@ -162,18 +162,25 @@ module SponsoredBenefits
       context "benefit_market should be findable by kind" do
         let(:shop_kind)           { :aca_shop }
         let(:individual_kind)     { :aca_individual }
-        let!(:shop_site)          { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: shop_kind) }
-        let!(:individual_site)    { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: individual_kind) }
 
-        let(:found_sites)         { Site.by_benefit_market_kind(shop_kind) }
+        let(:shop_benefit_market_1) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
+        let(:shop_benefit_market_2) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
+        let(:ivl_benefit_market_1)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
+        let(:ivl_benefit_market_2)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
 
-        it "should be find the shop site and only the shop" do
-          expect(found_sites.size).to eq 1
-          expect(found_sites.first).to eq shop_site
-        end
+        let(:shop_only_site)     { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [shop_benefit_market_1]) }
+        let(:ivl_only_site)      { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [ivl_benefit_market_1]) }
+        let(:shop_and_ivl_site)  { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [ivl_benefit_market_2, shop_benefit_market_2]) }
 
-        it "should have the queried benefit_market_kind" do
-          expect(found_sites.first.benefit_markets.first.kind).to eq shop_kind
+        it "should find the right benefit_markets using benefit_market_for" do
+          expect(shop_only_site.benefit_market_for(shop_kind).count).to eq 1
+          expect(shop_only_site.benefit_market_for(individual_kind).count).to eq 0
+
+          expect(ivl_only_site.benefit_market_for(shop_kind).count).to eq 0
+          expect(shop_and_ivl_site.benefit_market_for(shop_kind).count).to eq 1
+
+          expect(ivl_only_site.benefit_market_for(individual_kind).count).to eq 1
+          expect(shop_and_ivl_site.benefit_market_for(individual_kind).count).to eq 1
         end
       end
 
