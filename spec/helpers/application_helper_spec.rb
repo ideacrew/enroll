@@ -88,11 +88,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
-    context ">100 census employees" do
-      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+    context ">200 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 201, employer_profile: employer_profile) }
+      context "greater than 200 employees " do
+        context "active employees count greater than 200" do
+          it "does not display if active census employees > 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+          end
+        end
 
-      it "does not display" do
-        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+        context "active employees count greater than 200" do
+
+          before do
+            employees.take(5).each do |census_employee|
+              census_employee.terminate_employee_role!
+            end
+          end
+
+          it "should display progress bar if active census employees < 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
+          end
+        end
       end
     end
 

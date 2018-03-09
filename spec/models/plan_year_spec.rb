@@ -1011,11 +1011,26 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     expect(workflow_plan_year_with_benefit_group.additional_required_participants_count).to eq (required_employee_count - 3)
                   end
 
-                  context "greater than 100 employees " do
-                    let(:employee_count)    { 101 }
+                  context "greater than 200 employees " do
+                    let(:employee_count)    { 201 }
+                    before do
+                      allow(workflow_plan_year_with_benefit_group).to receive_message_chain(:enrolled_by_bga, :count).and_return 25
+                    end
+                    context "active employees count greater than 200" do
+                      it "should return 0" do
+                        expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
+                      end
+                    end
 
-                    it "return 0" do
-                      expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
+                    context "active employees count less than 200" do
+                      before do
+                        workflow_plan_year_with_benefit_group.employer_profile.census_employees.limit(5).each do |census_employee|
+                          census_employee.terminate_employee_role!
+                        end
+                      end
+                      it "return enrolled count" do
+                        expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 25
+                      end
                     end
                   end
 
