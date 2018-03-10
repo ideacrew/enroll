@@ -1,5 +1,14 @@
 require 'csv'
-# RAILS_ENV=production bundle exec rake reports:outstanding_types_created date = "Month,year"  (example: "January, 2018")
+
+# Both reports outlined in 21119 and 21123 will utilize the same rake task.
+# For 21123 we will have an additional switch to remove Duplicates.
+
+# 21119 - Include Duplicates (Report Filename: all_outstanding_types_created_[Month]_[Year].csv)
+# # RAILS_ENV=production bundle exec rake reports:outstanding_types_created date=Month,Year (example: January,2018)
+
+# 21123 - Remove Duplicates (Report Filename: current_outstanding_types_created_[Month]_[Year].csv)
+# # RAILS_ENV=production bundle exec rake reports:outstanding_types_created date=Month,Year remove_dup=true
+
 namespace :reports do
   desc "Outstanding verifications created monthly report"
   task :outstanding_types_created => :environment do
@@ -44,6 +53,10 @@ namespace :reports do
       record.verification_type if record
     end
 
+    def remove_dup_override?
+      ENV["remove_dup"].present? && ENV["remove_dup"] == "true"
+    end
+
     def people
       Person.where(:"consumer_role.workflow_state_transitions".elem_match => {
           "$and" => [
@@ -70,12 +83,11 @@ namespace :reports do
                                                                 {'$gte'=>start_date, '$lte' => end_date})
     end
 
-    file_name = "#{Rails.root}/public/outstanding_types_created_#{date.gsub(" ", "").split(",").join("_")}.csv"
-
+    report_prefix = remove_dup_override? ? "current" : "all"
+    file_name = "#{Rails.root}/#{report_prefix}_outstanding_types_created_#{date.gsub(" ", "").split(",").join("_")}.csv"
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
-
       people.each do |person|
         workflow_transitions(person).each do |transition|
           case transition.event
@@ -90,6 +102,9 @@ namespace :reports do
             when "reject!"
               types = [get_rejected_type(person)]
           end
+
+          # Remove duplpicates and keep only 1 occurance of the same verification type.
+          types.uniq! if remove_dup_override?
 
           types.each do |type|
             csv << [
