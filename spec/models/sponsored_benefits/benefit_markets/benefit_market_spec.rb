@@ -25,7 +25,7 @@ module SponsoredBenefits
         end
       end
 
-      context "with no kind" do
+      context "with no kind attribute" do
         subject { described_class.new(params.except(:kind)) }
 
         it "should not be valid" do
@@ -34,15 +34,26 @@ module SponsoredBenefits
         end
       end
 
-      context "with kind argument" do
-        let(:shop_kind) { :aca_shop }
-        let(:shop_config_klass_name) { :aca_shop }
+      context "with invalid kind attribute" do
+        let(:invalid_kind)  { :corner_market }
+        subject { described_class.new(kind: invalid_kind) }
 
-        let!(:benefit_market) { SponsoredBenefits::BenefitMarkets::BenefitMarket.new(kind: shop_kind) }
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors[:kind].first).to match(/is not a valid market kind/)
+        end
+      end
 
-        it "should set a kind-appropropriate configuration set" do
-          expect(benefit_market.kind).to eq shop_kind
-          expect(benefit_market.configuration_setting).to eq "lll"
+      context "with valid kind attribute" do
+        subject { described_class.new(kind: valid_kind) }
+        let(:valid_kind)        { :aca_shop }
+        let(:valid_class_name)  { "SponsoredBenefits::BenefitMarkets::AcaShopConfiguration" }
+
+        it "should set a kind-appropropriate configuration setting" do
+          expect(subject.configuration_setting.class.to_s).to eq valid_class_name
+          # expect(SponsoredBenefits::BenefitMarkets::BenefitMarket.new(kind: shop_kind).configuration_setting.class).to eq configuration_setting_class
+          # expect(benefit_market.configuration_setting.class).to eq configuration_setting_class
         end
       end
 
