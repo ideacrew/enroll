@@ -19,8 +19,10 @@ module SponsoredBenefits
       field :aasm_state, type: String
 
       # field :benefit_sponsorship_id, type: BSON::ObjectId
-      belongs_to  :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
-      belongs_to  :benefit_market,      class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+      belongs_to  :benefit_sponsorship, 
+                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      belongs_to  :benefit_market, counter_cache: true,
+                  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
       embeds_many :benefit_packages,    class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage", 
         cascade_callbacks: true, 
