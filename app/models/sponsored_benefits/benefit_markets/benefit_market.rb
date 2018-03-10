@@ -6,6 +6,8 @@ module SponsoredBenefits
 
       PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
+      attr_reader :configuration_setting, :contact_center_profile
+
       field :kind,        type: Symbol  # => :aca_shop
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
       field :description, type: String, default: ""
@@ -14,20 +16,26 @@ module SponsoredBenefits
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       has_many    :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      embeds_one :configuration_setting
-      embeds_one :contact_center_profile, class_name: "SponsoredBenefits::Organizations::ContactCenter",
+      embeds_one :configuration_setting,  class_name: "SponsoredBenefits::BenefitMarkets::AcaIndividualConfiguration",
                                           autobuild: true
+      # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
+      #                                     autobuild: true
 
+      validates_presence_of :configuration_setting #, :contact_center_setting
 
       validates :kind,
-        inclusion: { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
-        allow_nil:    false
+        inclusion:  { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
+        allow_nil:  false
 
       index({ kind:  1 })
 
+      # Mongoid initializes associations after setting attributes. It's necessary to autobuild the 
+      # configuration file and subsequently change following initialization, if necessary
       after_initialize :initialize_configuration_setting
 
       def kind=(new_kind)
+        return unless SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(new_kind)
+        @kind = new_kind
         write_attribute(:kind, new_kind)
         initialize_configuration_setting
       end
@@ -83,20 +91,26 @@ module SponsoredBenefits
         Settings.aca.shop_market.open_enrollment.minimum_length.days
       end
 
+
+      def reset_configuration_setting
+        return unless kind.present?
+
+        klass_name = configuration_class_name
+        self.configuration_setting = klass_name.constantize.new
+      end
+
       private
 
       def initialize_configuration_setting
-        return if kind.blank? || configuration_setting.present?
+        klass_name = configuration_class_name
+        reset_configuration_setting if self.has_configuration_setting? && (klass_name != configuration_setting.class.to_s)
 
-        klass = configuration_class_name.constantize
-        configuration_setting = klass.new
+        configuration_setting
       end
 
       # Configuration setting model is automatically associated based on "kind" attribute value
       def configuration_class_name
-        return unless kind.present?
-
-        config_klass = "#{kind.to_s}_configuration".camelcase
+        config_klass = "#{@kind.to_s}_configuration".camelcase
         namespace_for(self.class) + "::#{config_klass}"
       end
 

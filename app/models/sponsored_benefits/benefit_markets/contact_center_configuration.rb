@@ -1,8 +1,10 @@
 module SponsoredBenefits
-  module Organizations
-    class ContactCenter
+  module BenefitMarkets
+    class ContactCenterConfiguration
       include Mongoid::Document
       include Mongoid::Timestamps
+
+      embedded_in :benefit_market, class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
       field :name,      type: String
       field :alt_name,  type: String
@@ -15,7 +17,7 @@ module SponsoredBenefits
 
       # Addresses for customer communications/notice return address
       embeds_many :addresses, class_name: "::Address"
-
+      
     end
   end
 end

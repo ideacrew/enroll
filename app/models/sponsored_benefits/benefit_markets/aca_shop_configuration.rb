@@ -4,6 +4,8 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      embedded_in :benefit_market, class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+
       field :ee_ct_max,           as: :employee_count_max, type: Integer, default: 50
       field :ee_ratio_min,        as: :employee_participation_ratio_min, type: Float, default: 0.666
       field :ee_non_owner_ct_min, as: :employee_non_owner_count_min, type: Integer, default: 1

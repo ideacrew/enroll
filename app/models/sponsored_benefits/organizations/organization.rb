@@ -58,7 +58,7 @@ module SponsoredBenefits
       belongs_to  :site_owner, inverse_of: :owner_organization,
                   class_name: "SponsoredBenefits::Site"
 
-      belongs_to  :site, inverse_of: :site_organizations,
+      belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
                   class_name: "SponsoredBenefits::Site"
 
       embeds_many :profiles, 
