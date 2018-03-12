@@ -57,7 +57,7 @@
             end
           # People who only have a consumer role
           elsif person.consumer_role?
-            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "consumer", user.created_at, person.consumer_role.created_at, '', user.last_portal_visited, user.last_sign_in_at ]
+            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "consumer", user.created_at, '', '', user.last_portal_visited, user.last_sign_in_at ]
           end
         rescue Exception => e
           puts "Errors #{e} #{e.backtrace}"
