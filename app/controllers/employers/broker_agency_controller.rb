@@ -1,7 +1,7 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
   before_action :find_employer
-  before_action :find_borker_agency, :except => [:index, :active_broker]
+  before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
 
   def index
@@ -154,7 +154,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])
   end
 
-  def find_borker_agency
+  def find_broker_agency
     id = params[:id] || params[:broker_agency_id]
     @broker_agency_profile = BrokerAgencyProfile.find(id)
   end

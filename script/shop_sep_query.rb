@@ -87,7 +87,7 @@ end
 def can_publish_enrollment?(enrollment, transition_at)
   plan_year = enrollment.benefit_group.plan_year
   if enrollment.employer_profile.aasm_state == "enrolled" || is_valid_plan_year?(plan_year)
-    return false if plan_year.enrollment_quiet_period.cover?(transition_at) # don't transmit quiet period enrollment
+    return false if transition_at.in_time_zone("UTC") <= plan_year.enrollment_quiet_period.max # don't transmit enrollments until quiet period ended
     return true  if term_states.include?(enrollment.aasm_state) # new hire enrollment check not needed for terminated enrollments
     return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months))
     return true
@@ -96,8 +96,8 @@ def can_publish_enrollment?(enrollment, transition_at)
   end
 end
 
-puts purchase_ids.length
-puts term_ids.length
+puts purchase_ids.length unless Rails.env.test?
+puts term_ids.length unless Rails.env.test?
 
 purchase_families = Family.where("households.hbx_enrollments.hbx_id" => {"$in" => purchase_ids})
 
