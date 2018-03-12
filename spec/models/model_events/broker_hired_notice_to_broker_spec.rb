@@ -38,7 +38,7 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
           "broker_profile.first_name",
           "broker_profile.last_name",
           "broker_profile.assignment_date",
-          "broker_profile.borker_agency_name",
+          "broker_profile.broker_agency_name",
           "broker_profile.employer_poc_firstname",
           "broker_profile.employer_poc_lastname"
       ]
@@ -93,7 +93,7 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
     end
 
     it "should return broker agency name " do
-      expect(merge_model.borker_agency_name).to eq broker_agency_profile.legal_name
+      expect(merge_model.broker_agency_name).to eq broker_agency_profile.legal_name
     end
 
   end

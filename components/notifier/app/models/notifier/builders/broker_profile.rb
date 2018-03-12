@@ -63,8 +63,8 @@ module Notifier
       merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
     end
 
-    def borker_agency_name
-      merge_model.borker_agency_name = broker_role.broker_agency_profile.legal_name
+    def broker_agency_name
+      merge_model.broker_agency_name = broker_role.broker_agency_profile.legal_name
     end
   end
 end
