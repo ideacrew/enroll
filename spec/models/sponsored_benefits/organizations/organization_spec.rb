@@ -3,6 +3,35 @@ require 'rails_helper'
 module SponsoredBenefits
   RSpec.describe Organizations::Organization, type: :model do
 
+    context "an Organization is hierarchical with a top level agency and child divisions" do
+      let(:agency_name)             { "Multinational Conglomerate, Ltd" }
+      let(:business_division_name)  { "Business Ops" }
+      let(:it_division_name)        { "Information Technology Ops" }
+      let(:it_devops_division_name) { "DevOps" }
+      let(:agency)                  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: agency_name) }
+      let(:it_division)             { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: it_division_name) }
+
+      before do
+        agency.divisions.build(legal_name: business_division_name) 
+        agency.divisions << it_division
+        it_division.divisions.build(legal_name: it_devops_division_name)
+      end
+
+      it "the top level Agency should have two divisions" do
+        expect(agency.divisions.size).to eq 2
+      end
+
+      it "IT division should have one division" do
+        expect(it_division.divisions.first.legal_name).to eq it_devops_division_name
+      end
+
+      it "the IT devops division should have two agency parents" do
+        expect(it_division.divisions.first.agency.legal_name).to eq it_division_name
+        expect(it_division.divisions.first.agency.agency.legal_name).to eq agency_name
+        expect(it_division.divisions.first.agency.agency.agency).to be_nil
+      end
+    end
+
 
     context "a broker gains access to an employer's information for plan_design" do
       let(:employer_name)         { "Classy Cupcakes, Corp" }
