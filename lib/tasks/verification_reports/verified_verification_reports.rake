@@ -61,16 +61,16 @@ namespace :reports do
       csv << field_names
 
       admin_action.each do |person|
-        verified_history_elements_with_date_range(person).each do |v|
+        verified_history_elements_with_date_range(person).each do |verified_person|
         
                 csv << [  subscriber_id(person),
                           person.hbx_id,
                           person.first_name,
                           person.last_name,  
                           'yes',
-                          v.verification_type,
-                          v.created_at,
-                          v.update_reason
+                          verified_person.verification_type,
+                          verified_person.created_at,
+                          verified_person.update_reason
                         ]
          end  
 
