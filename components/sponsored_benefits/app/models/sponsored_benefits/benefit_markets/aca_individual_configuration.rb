@@ -2,8 +2,7 @@ module SponsoredBenefits
   module BenefitMarkets
     class AcaIndividualConfiguration < Configuration
 
-      field :foo, type: String
-
+      embedded_in :configurable, polymorphic: true
     end
   end
 end
