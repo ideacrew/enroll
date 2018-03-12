@@ -1,5 +1,7 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
+  include ApplicationHelper
+
   before_action :find_employer
   before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
@@ -51,8 +53,7 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.save!(validate: false)
       broker_hired
       broker_hired_confirmation
-      observer = Observers::Observer.new
-      observer.trigger_notice(recipient: broker_agency_profile, event_object: @employer_profile, notice_event: "broker_agency_hired_confirmation")
+      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
       # @employer_profile.trigger_notices("broker_hired_confirmation_notice") #mirror notice
     end
 
