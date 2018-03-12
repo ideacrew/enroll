@@ -39,7 +39,7 @@ module SponsoredBenefits
       belongs_to  :agency, inverse_of: :divisions, counter_cache: true,
                   class_name: "SponsoredBenefits::Organizations::Organization"
        
-      has_many    :divisions, inverse_of: :agency,
+      has_many    :divisions, inverse_of: :agency, autosave: true,
                   class_name: "SponsoredBenefits::Organizations::Organization"
         
 
@@ -52,10 +52,10 @@ module SponsoredBenefits
       # Employer (plan_design_subject) that may be used for modeling purposes.
       # Example 2: an Employer may prepare one or more plan designs for future coverage.  
       # Under this scenario, the Employer is both the plan_design_author and the plan_design_subject
-      has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, validate: true,
+      has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, autosave: true,
                               class_name: "SponsoredBenefits::Organizations::Organization"
         
-      has_and_belongs_to_many :plan_design_subjects, inverse_of: :plan_design_authors, validate: true,
+      has_and_belongs_to_many :plan_design_subjects, inverse_of: :plan_design_authors, autosave: true,
                               class_name: "SponsoredBenefits::Organizations::Organization"
  
       has_many    :plan_design_organizations, inverse_of: :plan_design_organization,
