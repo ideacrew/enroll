@@ -16,8 +16,7 @@ module SponsoredBenefits
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       has_many    :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      embeds_one :configuration_setting,  class_name: "SponsoredBenefits::BenefitMarkets::AcaIndividualConfiguration",
-                                          autobuild: true
+      embeds_one :configuration_setting,  as: :configurable, autobuild: true
       # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
       #                                     autobuild: true
 
@@ -29,7 +28,7 @@ module SponsoredBenefits
 
       index({ kind:  1 })
 
-      # Mongoid initializes associations after setting attributes. It's necessary to autobuild the 
+      # Mongoid initializes associations after setting attributes. It's necessary to autobuild the
       # configuration file and subsequently change following initialization, if necessary
       after_initialize :initialize_configuration_setting
 
