@@ -42,7 +42,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def show
     set_flash_by_announcement
     session[:person_id] = nil
-     @provider = current_user.person
+     @provider = @broker_agency_profile.primary_broker_role.person
      @staff_role = current_user.has_broker_agency_staff_role?
      @id=params[:id]
   end
@@ -356,8 +356,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def messages
     @sent_box = true
-    actual_person = Person.find(params[:broker_agency_profile_id])
-    @provider = actual_user.present? ? current_user.person : actual_person
+    @provider = Person.find(params["id"])
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:profile_id])
   end
 
   def agency_messages
