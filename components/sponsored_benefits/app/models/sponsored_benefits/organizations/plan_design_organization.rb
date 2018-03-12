@@ -1,75 +1,37 @@
 # Broker-owned model to manage attributes of the prospective of existing employer
 module SponsoredBenefits
   module Organizations
-    class PlanDesignOrganization
-      include Mongoid::Document
-      include Mongoid::Timestamps
-      include Concerns::OrganizationConcern
-      include Concerns::AcaRatingAreaConfigConcern
-      include Config::AcaModelConcern
+    class PlanDesignOrganization < Organization
 
-      belongs_to :broker_agency_profile, class_name: "SponsoredBenefits::Organizations::BrokerAgencyProfile", inverse_of: 'plan_design_organization'
 
-      # Registered legal name
-      field :legal_name, type: String
+      belongs_to  :plan_design_organization, inverse_of: :plan_design_organizations, counter_cache: true,
+                  class_name: "SponsoredBenefits::Organizations::Organization"
 
-      # Doing Business As (alternate name)
-      field :dba, type: String
-
-      # Federal Employer ID Number
-      field :fein, type: String
-
-      # Standard Industrial Classification Code that indicates company's business type
-      field :sic_code, type: String
-
-      # Plan design owner profile type & ID
-      field :owner_profile_id,    type: BSON::ObjectId
-      field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
-
-      # Plan design sponsor profile type & ID
-      field :sponsor_profile_id,         type: BSON::ObjectId
-      field :sponsor_profile_class_name, type: String, default: "::EmployerProfile"
-
-      field :has_active_broker_relationship, type: Boolean, default: false
+      belongs_to  :subject_organization, inverse_of: :plan_design_subject_organizations,
+                  class_name: "SponsoredBenefits::Organizations::Organization"
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
 
-      validates_presence_of   :legal_name, :has_active_broker_relationship
-      validates :sic_code, presence: true, if: :standard_industrial_classification_enabled?
+      
+      validates_presence_of :subject_organization
 
-      validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
-      validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
-
-
-      index({"owner_profile_id" => 1})
-      index({"sponsor_profile_id" => 1})
-      index({"has_active_broker_relationship" => 1})
+      index({"subject_organization._id" => 1})
       index({"plan_design_proposals._id" => 1})
       index({"plan_design_proposals.aasm_state" => 1, "plan_design_proposals.claim_code" => 1})
 
+      scope :by_subject_organization,  ->(subject_organization){ where(:"subject_organization_id" => BSON::ObjectId.from_string(subject_organization)) }
 
-      # TODO These scopes must use both the Profile Class and ID.  Change to pass in profile instance
-      scope :find_by_owner,       -> (owner_id) { where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id)) }
-      scope :find_by_sponsor,     -> (sponsor_id) { where(:"sponsor_profile_id" => BSON::ObjectId.from_string(sponsor_id)) }
+      # scope :find_by_proposal,     ->(proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
 
-      scope :find_by_proposal,    -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
-
-      scope :active_sponsors,     -> { where(:has_active_broker_relationship => true) }
-      scope :inactive_sponsors,   -> { where(:has_active_broker_relationship => false) }
-      scope :prospect_sponsors,   -> { where(:sponsor_profile_id => nil) }
+      # scope :active_sponsors,     -> { where(:has_active_broker_relationship => true) }
+      # scope :inactive_sponsors,   -> { where(:has_active_broker_relationship => false) }
+      # scope :prospect_sponsors,   -> { where(:sponsor_profile_id => nil) }
 
       scope :draft_proposals,     -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
 
       scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, 
                                                                       {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
-      def employer_profile
-        ::EmployerProfile.find(sponsor_profile_id)
-      end
-
-      def broker_agency_profile
-        ::BrokerAgencyProfile.find(owner_profile_id)
-      end
 
       # TODO Move this method to BenefitMarket Model
       def service_areas_available_on(date)
