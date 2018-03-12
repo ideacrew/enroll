@@ -4,8 +4,7 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :benefit_market, class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
-
+      embedded_in :configurable, polymorphic: true
     end
   end
 end
