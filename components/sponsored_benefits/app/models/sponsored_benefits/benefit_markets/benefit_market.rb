@@ -16,7 +16,7 @@ module SponsoredBenefits
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       has_many    :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      embeds_one :configuration_setting,  as: :configurable, autobuild: true
+      embeds_one :configuration_setting,  as: :configurable
       # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
       #                                     autobuild: true
 
