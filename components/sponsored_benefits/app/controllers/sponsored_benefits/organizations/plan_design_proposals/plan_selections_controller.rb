@@ -1,7 +1,7 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanSelectionsController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
 
       before_action :published_plans_are_view_only
 

@@ -1,7 +1,8 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::BenefitGroupsController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
+      include SponsoredBenefits::Organizations::BenefitGroupAccessors
 
       def create
         update_benefit_group_attributes if benefit_group.persisted?

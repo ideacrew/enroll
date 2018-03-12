@@ -1,7 +1,8 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::ContributionsController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
+      include SponsoredBenefits::Organizations::BenefitGroupAccessors
 
       def index
         @plan = ::Plan.find(benefit_group.reference_plan_id)

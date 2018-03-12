@@ -1,7 +1,9 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanComparisonsController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
+      include SponsoredBenefits::Organizations::BenefitGroupAccessors
+      include SponsoredBenefits::Organizations::BenefitPresentationHelpers
 
       def new
         @sort_by = params[:sort_by].rstrip

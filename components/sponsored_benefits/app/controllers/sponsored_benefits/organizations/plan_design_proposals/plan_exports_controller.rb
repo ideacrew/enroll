@@ -1,7 +1,9 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanExportsController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
+      include SponsoredBenefits::Organizations::BenefitGroupAccessors
+      include SponsoredBenefits::Organizations::BenefitPresentationHelpers
 
       def new
         @plan_design_organization = plan_design_organization

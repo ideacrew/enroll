@@ -1,7 +1,8 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlansController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
+      include SponsoredBenefits::Organizations::BenefitPresentationHelpers
 
       def index
         offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)

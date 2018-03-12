@@ -1,7 +1,7 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::ProposalCopiesController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
 
       def create
         new_plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({ organization: plan_design_organization }.merge(plan_design_form.to_h))

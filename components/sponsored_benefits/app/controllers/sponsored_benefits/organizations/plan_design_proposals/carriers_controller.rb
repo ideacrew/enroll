@@ -1,7 +1,8 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::CarriersController < ApplicationController
-      include SponsoredBenefits::Organizations::PlanDesignHelpers
+      include SponsoredBenefits::Organizations::PlanDesigners
+      include SponsoredBenefits::Organizations::BenefitPresentationHelpers
 
       def index
         @carrier_names = ::Organization.load_carriers(
