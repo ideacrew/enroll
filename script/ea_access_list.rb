@@ -9,7 +9,7 @@
   processed_count = 0
 
   CSV.open(file_name, "w", force_quotes: true) do |csv|
-    csv << ["User Id", "User's Name", "OIM ID", "Email" ,"Role", "User Record Created Date", "Last Login Date", "Last Portal Visited", "Role Start on(ER-EE/ER-BA/HBX Staff)", "Role Termination Date(ER-EE/ER-BA/HBX Staff)", "User Deactivation Date"]
+    csv << ["User Id", "User's Name", "OIM ID", "Email" ,"Role", "User Record Created Date", "Role Start on(ER-EE/ER-BA)", "Role Termination Date(ER-EE/ER-BA)", "Last Portal Visited", "Last Login Date", "Internal User Deactivation Date"]
     while offset < user_count
       User.offset(offset).limit(batch_size).each do |user|
         if processed_count % 1000 == 0
@@ -18,32 +18,46 @@
         begin
           person = user.person
           if person.nil?
-            csv << ["No person record found", "No person record", user.oim_id, user.email,'', user.created_at, user.last_sign_in_at, user.last_portal_visited]
+            csv << ["No person record found", "No person record", user.oim_id, user.email,'', user.created_at, '', '', user.last_portal_visited, user.last_sign_in_at]
           elsif person.has_active_employer_staff_role?
             employer_profile_id = person.employer_staff_roles.first.employer_profile_id
             employer_profile = EmployerProfile.find(employer_profile_id)
             employer_profile.broker_agency_accounts.unscoped.all.each do |baa|
               #next if baa.nil? || baa.broker_agency_profile.nil? || baa.broker_agency_profile.market_kind == "individual"
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "employer staff", user.created_at, user.last_sign_in_at, user.last_portal_visited, baa.try(:start_on), baa.try(:end_on)]
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "employer staff", user.created_at,  baa.try(:start_on), baa.try(:end_on), user.last_portal_visited, user.last_sign_in_at]
             end
           elsif person.employee_roles?
             person.employee_roles.each do |emp|
               ce = emp.census_employee
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "employee", user.created_at, user.last_sign_in_at, user.last_portal_visited, ce.hired_on, ce.employment_terminated_on]
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "employee", user.created_at, ce.hired_on, ce.employment_terminated_on, user.last_portal_visited, user.last_sign_in_at]
             end
           elsif person.hbx_staff_role?
             if user.oim_id.match(/.*disable/i).present? || user.oim_id.match(/.*do[-_]not[-_]/i).present? || user.oim_id.match(/.*access[-_]denied/i).present?
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), '', user.updated_at.strftime("%m/%d/%Y")]
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), '', user.last_portal_visited, user.last_sign_in_at.strftime("%m/%d/%Y"), user.updated_at.strftime("%m/%d/%Y")]
             else
-              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.last_sign_in_at.strftime("%m/%d/%Y"), user.last_portal_visited, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), '', 'Active']
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, user.person.hbx_staff_role.permission.name, user.created_at, user.person.hbx_staff_role.created_at.strftime("%m/%d/%Y"), '', user.last_portal_visited, user.last_sign_in_at.strftime("%m/%d/%Y"), 'Active']
             end
           # This is grabbing people with no employer or hbx staff roles
+          # Need to determine whether they have a consumer role as well or not
           elsif person.assister_role?
-            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "assister", user.created_at, user.last_sign_in_at, user.last_portal_visited ]
+            if person.consumer_role?
+              # use consumer_role creation date
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "assister/consumer", user.created_at, person.consumer_role.created_at, '', user.last_portal_visited, user.last_sign_in_at ]
+            else
+              # use user creation date
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "assister", user.created_at, person.assister_role.created_at, '', user.last_portal_visited, user.last_sign_in_at ]
+            end
           elsif person.csr_role?
-            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "csr", user.created_at, user.last_sign_in_at, user.last_portal_visited ]
+            if person.consumer_role?
+              # use consumer_role creation date
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "csr/consumer", user.created_at, person.consumer_role.created_at, '', user.last_portal_visited, user.last_sign_in_at]
+            else
+              # use user creation date
+              csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "csr", user.created_at, person.csr_role.created_at, '', user.last_portal_visited, user.last_sign_in_at ]
+            end
+          # People who only have a consumer role
           elsif person.consumer_role?
-            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "consumer", user.created_at, user.last_sign_in_at, user.last_portal_visited ]
+            csv << [user.person.hbx_id, user.person.full_name, user.oim_id, user.email, "consumer", user.created_at, person.consumer_role.created_at, '', user.last_portal_visited, user.last_sign_in_at ]
           end
         rescue Exception => e
           puts "Errors #{e} #{e.backtrace}"
