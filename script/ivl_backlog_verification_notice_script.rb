@@ -61,13 +61,6 @@ unless event_kind.present?
   puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
 end
 
-#need to exlude this list from UQHP_FEL data set.
-
-# @excluded_list = []
-# CSV.foreach("UQHP_FEL_EXLUDE_LIST_nov_14.csv",:headers =>true).each do |d|
-#   @excluded_list << d["Subscriber"]
-# end
-
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
