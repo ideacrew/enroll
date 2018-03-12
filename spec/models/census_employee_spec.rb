@@ -1804,4 +1804,29 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     end
   end
+
+  describe "#has_no_hbx_enrollments?" do
+    let(:census_employee) { FactoryGirl.create :census_employee_with_active_assignment}
+
+    it "should return true if no employee role linked" do
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
+    end
+
+    it "should return true if employee role present & no enrollment present" do
+      allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
+    end
+
+    it "should return true if employee role present & no active enrollment present" do
+      allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return double("HbxEnrollment", aasm_state: "coverage_canceled")
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
+    end
+
+    it "should return false if employee role present & active enrollment present" do
+      allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return double("HbxEnrollment", aasm_state: "coverage_selected")
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq false
+    end
+  end
 end
