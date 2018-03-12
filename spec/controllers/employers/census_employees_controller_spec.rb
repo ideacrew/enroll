@@ -386,6 +386,8 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET terminate" do
+    let!(:notice_trigger_params) { {recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_termination_notice"} }
+
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user
@@ -408,6 +410,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
     context "with termination date" do
       it "should terminate census employee" do
+        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(notice_trigger_params).and_return(true)
         xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
         expect(response).to have_http_status(:success)
         expect(assigns[:fa]).to eq true
