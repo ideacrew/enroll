@@ -1,9 +1,14 @@
 require 'csv'
 # RAILS_ENV=production bundle exec rake reports:verified_verification_report date="Month,year"  (example: "January, 2018")
 namespace :reports do
-  desc "Outstanding verifications created monthly report"
+  desc "Verified verifications created monthly report"
   task :verified_verification_report => :environment do
-    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFIED VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON)
+    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON)
+
+    CITIZEN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid!", "ssn_valid", "pass_dhs!", "pass_dhs", "pass_residency!", "pass_residency"]
+
+    ALL_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid_citizenship_invalid", "ssn_valid_citizenship_invalid!",
+                                "ssn_valid!", "ssn_valid", "pass_dhs!", "pass_dhs", "pass_residency!", "pass_residency"]
 
     def date
       begin
@@ -13,11 +18,11 @@ namespace :reports do
       end
     end
 
-    def subscriber_id(person)
-      if person.primary_family
-        person.hbx_id
+    def subscriber_id
+      if @person.primary_family
+        @person.hbx_id
       else
-        person.families.map(&:primary_family_member).map(&:hbx_id).join(',')
+        @person.families.map(&:primary_family_member).map(&:hbx_id).join(',')
       end
 
     end
@@ -30,27 +35,38 @@ namespace :reports do
       Date.parse(date).next_month
     end
 
-    def verified_history_elements_with_date_range person
-      person.consumer_role.verification_type_history_elements.
+    def verified_history_elements_with_date_range
+
+      @person.consumer_role.verification_type_history_elements.
       where(created_at:{
-        :$gte => start_date,
-        :$lte => end_date
-       }).where(action: "verify")
+        :"$gte" => start_date,
+        :"$lt" => end_date},
+        :"$or" => [
+          {:"action" => "verify"},
+          {:"modifier" => "external Hub"}
+        ]
+      )
     
     end
   
-    def admin_action
-      people_with_consumer_role = Person.where({ :"consumer_role" => {"$exists" => true}})
+    def people_with_consumer_roles
+      Person.where({ :"consumer_role" => {"$exists" => true}})
     end
 
-    def hub_response person
-      events = ["ssn_valid_citizenship_valid!", "ssn_valid", "pass_dhs!", "pass_residency!"]
-      person.consumer_role.workflow_state_transitions.
-        where(created_at: {
-        :$gte => start_date,
-        :$lte => end_date
-         }).where({:event => {"$in" => events}})
+    def hub_response_wfst
+      hub_response_on = @history_element.created_at.to_date
+      v_type = @history_element.type
+      @person.consumer_role.workflow_state_transitions.where(:"created_at" => {
+        :"$gt" => hub_response_on - 1.day,
+        :"$lt" => hub_response_on + 1.day
+        }, 
+        :"event".in => (v_type == "Citizenship" ? CITIZEN_VALID_EVENTS : ALL_VALID_EVENTS)
+      ).first
+    end
 
+    def is_not_eligible_transaction?
+      return false if @history_element.modifier != "external hub"
+      hub_response_wfst.blank?
     end
 
 
@@ -60,43 +76,24 @@ namespace :reports do
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
 
-      admin_action.each do |person|
-        verified_history_elements_with_date_range(person).each do |verified_person|
+      people_with_consumer_roles.each do |person|
+        @person = person
+        verified_history_elements_with_date_range.each do |history_element|
+          @history_element = history_element
+
+          next if is_not_eligible_transaction?
         
-                csv << [  subscriber_id(person),
-                          person.hbx_id,
-                          person.first_name,
-                          person.last_name,  
-                          'yes',
-                          verified_person.verification_type,
-                          verified_person.created_at,
-                          verified_person.update_reason
-                        ]
-         end  
-
-         hub_response(person).each do |hub|        
-          case hub.event
-            when "ssn_valid_citizenship_valid!"
-              type = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian status']).first
-            when "ssn_valid!"
-              type = person.verification_types - ['DC Residency', 'American Indian status']  
-            when "pass_dhs!"
-              type = "Immigration status"
-            when "pass_residency!"
-              type = "DC Residency"    
-          end
-
-          csv << [
-              subscriber_id(person),
-              person.hbx_id,
-              person.first_name,
-              person.last_name,
-              'yes',
-              type,
-              hub.created_at,
-              "Hub Response"
-          ]
-         end     
+          csv << [  subscriber_id,
+                    person.hbx_id,
+                    person.first_name,
+                    person.last_name,  
+                    person.consumer_role.verification_type_status(history_element.verification_type,person),
+                    history_element.verification_type,
+                    history_element.created_at,
+                    history_element.update_reason
+                  ]
+        end  
+  
       end
       
       puts "*********** DONE ******************"
