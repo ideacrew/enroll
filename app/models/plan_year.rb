@@ -564,7 +564,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    if self.employer_profile.census_employees.count < 100
+    if self.employer_profile.census_employees.active.count < 200
       #enrolled.count
       enrolled_by_bga.count
     else
