@@ -36,24 +36,35 @@ module SponsoredBenefits
       # the other.  For example:
       # org_a.divisions << org_b  # org_b.agency => org_a
       # org_x.agency = org_y      # org_y.divisions => [org_x]
-      belongs_to :agency,  class_name: "SponsoredBenefits::Organizations::Organization",
-        inverse_of: :divisions, counter_cache: true
-      has_many :divisions, class_name: "SponsoredBenefits::Organizations::Organization",
-        inverse_of: :agency
+      belongs_to  :agency, inverse_of: :divisions, counter_cache: true,
+                  class_name: "SponsoredBenefits::Organizations::Organization"
+       
+      has_many    :divisions, inverse_of: :agency,
+                  class_name: "SponsoredBenefits::Organizations::Organization"
+        
 
-      # PlanDesignOrganization (an Organization subclass) association that enables an organization 
-      # or its agent to model options and costs for different benefit scenarios.
-      # Example 1: a Broker may prepare one or more designs and quotes for an employer.  Under this 
-      # scenario, the Broker (plan_design_agent) is owner of an instance of the employer's organization 
-      # (plan_design_sponsor) that may be used for modeling purposes.
-      # Example 2: an Employer may prepare one or more plan designs for future coverage.  Under this 
-      # scenario, the Employer is both the plan_design_agent and plan_design_sponsor
-      has_and_belongs_to_many :plan_design_agents,    class_name: "SponsoredBenefits::Organizations::Organization",
-        inverse_of: :plan_design_sponsors
-      has_and_belongs_to_many :plan_design_sponsors,  class_name: "SponsoredBenefits::Organizations::Organization",
-        inverse_of: :plan_design_agents
+      # PlanDesignOrganization (an Organization subclass) association enables an organization 
+      # or its agent to model options and costs for different benefit scenarios.  This is managed through
+      # two association types: HABTM to track access/permissions and OTM to track instances of plan_designs.
+      # Example 1: a Broker agent may prepare one or more designs/quotes for an Employer.  
+      # Under this scenario, the Broker's access is defined through plan_design_authors and reciprocal 
+      # plan_design_subjects associations, and the broker owns a plan_design_organization instance for the 
+      # Employer (plan_design_subject) that may be used for modeling purposes.
+      # Example 2: an Employer may prepare one or more plan designs for future coverage.  
+      # Under this scenario, the Employer is both the plan_design_author and the plan_design_subject
+      has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, validate: true,
+                              class_name: "SponsoredBenefits::Organizations::Organization"
+        
+      has_and_belongs_to_many :plan_design_subjects, inverse_of: :plan_design_authors, validate: true,
+                              class_name: "SponsoredBenefits::Organizations::Organization"
+ 
+      has_many    :plan_design_organizations, inverse_of: :plan_design_organization,
+                  class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
+      has_many    :plan_design_subject_organizations, inverse_of: :subject_organization,
+                  class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
 
+        
       # Organizations with EmployerProfile and HbxProfile belong to a Site
       belongs_to  :site_owner, inverse_of: :owner_organization,
                   class_name: "SponsoredBenefits::Site"
@@ -87,6 +98,8 @@ module SponsoredBenefits
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
       scope :employer_profiles,       ->{ where(:"profiles._type" => /.*EmployerProfile$/) }
       scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
+
+
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
