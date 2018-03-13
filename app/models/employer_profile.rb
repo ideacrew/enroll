@@ -9,6 +9,7 @@ class EmployerProfile
   include StateTransitionPublisher
   include ScheduledEventService
   include Config::AcaModelConcern
+  include ApplicationHelper
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -162,7 +163,7 @@ class EmployerProfile
     active_broker_agency_account.save!
     employer_broker_fired
     notify_broker_terminated
-    broker_fired_confirmation_to_broker
+    trigger_notice_observer(active_broker_agency_account.broker_agency_profile.primary_broker_role, self, "broker_fired_confirmation_to_broker")
     broker_agency_fired_confirmation
   end
 
@@ -179,14 +180,6 @@ class EmployerProfile
       trigger_notices("broker_agency_fired_confirmation")
     rescue Exception => e
       puts "Unable to deliver broker agency fired confirmation notice to #{active_broker_agency_account.legal_name} due to #{e}" unless Rails.env.test?
-    end
-  end
-
-  def broker_fired_confirmation_to_broker
-    begin
-      trigger_notices('broker_fired_confirmation_to_broker')
-    rescue Exception => e
-      puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
     end
   end
 

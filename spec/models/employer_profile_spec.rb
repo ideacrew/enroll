@@ -499,8 +499,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
     let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", legal_name: 'broker agency organization 7')}
+    let(:broker_agency_profile7)  {FactoryGirl.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
+    let(:broker_role7) { FactoryGirl.create(:broker_role) }
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
@@ -538,6 +539,17 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
+    end
+
+    it 'should trigger broker fired notice to broker' do
+      employer = organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111');
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      employer = Organization.find(employer.organization.id).employer_profile
+      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice)
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
     end
 
     it 'shows an employer selected a broker for the first time' do
