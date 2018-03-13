@@ -12,12 +12,12 @@ class Employers::BrokerAgencyController < ApplicationController
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
       if params[:page].present?
-        page_no = cur_page_no(@page_alphabets.first)
-        @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+        @page_alphabet = cur_page_no(@page_alphabets.first)
+        @organizations = @orgs.where("legal_name" => /^#{@page_alphabet}/i)
       else
         @organizations = @orgs.limit(10).to_a
       end
-      @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
+      @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1)
     else
       results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
       if results.first.is_a?(Person)
