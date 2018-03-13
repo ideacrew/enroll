@@ -81,14 +81,8 @@ namespace :reports do
                                                             "fail_residency!"]},
                                                     :transition_at =>
                                                         {'$gte'=>start_date, '$lte' => end_date})
-      if remove_dup_override?
-        filtered_transitions = []
-        transitions.order_by(:created_at => 'desc').each do |transition|
-          filtered_transitions << transition if filtered_transitions.map(&:event).exclude? transition.event
-        end
-      end
 
-      filtered_transitions || transitions
+      remove_dup_override? ? transitions.order_by(:created_at => 'desc').uniq{|e| e.event} : transitions
     end
 
     report_prefix = remove_dup_override? ? "current" : "all"
