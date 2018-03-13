@@ -68,28 +68,28 @@ class ConsumerRole
   field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
 
-  field :ssn_validation, type: String, default: "pending"
-  validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
+  field :ssn_validation, type: String, default: "pending" #move to verification type
+  validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false #move to verification type
 
-  field :native_validation, type: String, default: nil
-  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
+  field :native_validation, type: String, default: nil #move to verification type
+  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false #move to verification type
 
   # DC residency
   field :is_state_resident, type: Boolean, default: nil
-  field :residency_determined_at, type: DateTime
-  field :local_residency_validation, type: String, default: nil
-  validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
+  field :residency_determined_at, type: DateTime #move to verification type
+  field :local_residency_validation, type: String, default: nil #move to verification type
+  validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true #move to verification type
 
-  field :ssn_update_reason, type: String
-  field :lawful_presence_update_reason, type: Hash
-  field :native_update_reason, type: String
-  field :residency_update_reason, type: String
+  field :ssn_update_reason, type: String #move to verification type
+  field :lawful_presence_update_reason, type: Hash #move to verification type
+  field :native_update_reason, type: String #move to verification type
+  field :residency_update_reason, type: String #move to verification type
 
   #rejection flags for verification types
-  field :ssn_rejected, type: Boolean, default: false
-  field :native_rejected, type: Boolean, default: false
-  field :lawful_presence_rejected, type: Boolean, default: false
-  field :residency_rejected, type: Boolean, default: false
+  field :ssn_rejected, type: Boolean, default: false #move to verification type
+  field :native_rejected, type: Boolean, default: false #move to verification type
+  field :lawful_presence_rejected, type: Boolean, default: false #move to verification type
+  field :residency_rejected, type: Boolean, default: false #move to verification type
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -105,14 +105,13 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable do
+  embeds_many :vlp_documents, as: :documentable do #move to verification type
     def uploaded
       @target.select{|document| document.identifier }
     end
   end
   embeds_many :workflow_state_transitions, as: :transitional
-  embeds_many :special_verifications, cascade_callbacks: true, validate: true
-  embeds_many :verification_type_history_elements
+  embeds_many :special_verifications, cascade_callbacks: true, validate: true #move to verification type
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
