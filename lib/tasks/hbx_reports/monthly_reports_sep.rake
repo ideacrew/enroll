@@ -1,12 +1,28 @@
 require 'csv'
-# RAILS_ENV=production bundle exec rake reports:monthly_reports_sep
+# RAILS_ENV=production bundle exec rake reports:monthly_reports_sep date=Month,Year
 namespace :reports do
  desc "Monthly sep enrollments report"
  task :monthly_reports_sep => :environment do
 
+  def date
+    begin
+      ENV["date"].strip
+    rescue
+      puts 'Provide report month.'
+    end
+  end
+
+  def start_date
+    Date.parse(date)
+  end
+
+  def end_date
+    Date.parse(date).next_month
+  end
+
+
     file_name = "#{Rails.root}/monthly_sep_enrollments_report_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
     puts "Created file and trying to import the data #{file_name}" 
-    date_range = ((TimeKeeper.date_of_record - 1.month).beginning_of_month..(TimeKeeper.date_of_record - 1.month).end_of_month)
 
     families = Family.where({:"households.hbx_enrollments" => {"$elemMatch" => {
       "aasm_state" => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES },
@@ -31,10 +47,11 @@ namespace :reports do
       ]
 
       families.each do |family|
-        hbx_enrollments = family.active_household.hbx_enrollments.special_enrollments
+        binding.pry
+        hbx_enrollments = family.active_household.hbx_enrollments.where(:created_at=>{'$gte'=>start_date, '$lte' => end_date}).special_enrollments
+        # handling nil class exception
         if hbx_enrollments
           hbx_enrollments.each do |hbx_enroll|
-            next unless date_range.cover?(hbx_enroll.special_enrollment_period.created_at.to_date)
             hbx_enroll.hbx_enrollment_members.each do |hbx_member|
               person = hbx_member.person
               if hbx_enroll.special_enrollment_period
