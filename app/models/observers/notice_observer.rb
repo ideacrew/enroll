@@ -37,6 +37,10 @@ module Observers
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
         end
 
+        if new_model_event.event_key == :group_advance_termination_confirmation
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+        end
+
         if new_model_event.event_key == :ineligible_renewal_application_submitted
 
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)

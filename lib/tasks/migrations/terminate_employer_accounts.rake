@@ -59,7 +59,6 @@ namespace :migrations do
             end
           end
           if generate_termination_notice
-            send_notice_to_employer(organization)
             send_notice_to_employees(organization)
           end
         end
@@ -127,15 +126,6 @@ namespace :migrations do
     end
   end
 
-  def send_notice_to_employer(org)
-    puts "group_advance_termination_confirmation:Notification generated for employer"
-    begin
-      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver Notices to #{org.employer_profile.legal_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
-    end
-  end
-
   def send_notice_to_employees(org)
     puts "Notification generated for employee"
     org.employer_profile.census_employees.active.each do |ce|
@@ -144,15 +134,6 @@ namespace :migrations do
       rescue Exception => e
         (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
       end
-    end
-  end
-
-  def send_termination_notice_to_employer(org)
-    begin
-      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
-      puts "Termination notice sent to #{org.legal_name}" unless Rails.env.test?
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver termination notice to #{org.legal_name} due to #{e}" }) unless Rails.env.test?
     end
   end
 end

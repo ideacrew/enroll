@@ -11,7 +11,8 @@ module ModelEvents
       :ineligible_renewal_application_submitted,
       :open_enrollment_began,
       :application_denied,
-      :renewal_application_denied
+      :renewal_application_denied,
+      :group_advance_termination_confirmation
     ]
 
     DATA_CHANGE_EVENTS = [
@@ -63,6 +64,10 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
+        end
+        
+        if is_transition_matching?(to: :terminated, from: [:active, :suspended, :termination_pending], event: :terminate)
+          is_group_advance_termination_confirmation = true
         end
 
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
