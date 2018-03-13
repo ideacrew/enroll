@@ -77,23 +77,26 @@ namespace :reports do
       csv << field_names
 
       people_with_consumer_roles.each do |person|
-        @person = person
-        verified_history_elements_with_date_range.each do |history_element|
-          @history_element = history_element
+        begin
+          @person = person
+          verified_history_elements_with_date_range.each do |history_element|
+            @history_element = history_element
 
-          next if is_not_eligible_transaction?
-        
-          csv << [  subscriber_id,
-                    person.hbx_id,
-                    person.first_name,
-                    person.last_name,  
-                    person.consumer_role.verification_type_status(history_element.verification_type,person),
-                    history_element.verification_type,
-                    history_element.created_at,
-                    history_element.update_reason
-                  ]
-        end  
-  
+            next if is_not_eligible_transaction?
+          
+            csv << [  subscriber_id,
+                      person.hbx_id,
+                      person.first_name,
+                      person.last_name,  
+                      person.consumer_role.verification_type_status(history_element.verification_type,person),
+                      history_element.verification_type,
+                      history_element.created_at,
+                      history_element.update_reason
+                    ]
+          end
+        rescue => e
+         puts "Invalid Person with HBX_ID: #{person.hbx_id}"
+        end 
       end
       
       puts "*********** DONE ******************"
