@@ -1,5 +1,5 @@
 require 'csv'
-# RAILS_ENV=production bundle exec rake reports:monthly_reports_sep date=Month,Year
+# RAILS_ENV=production bundle exec rake reports:monthly_reports_sep date="Month,Year"
 namespace :reports do
  desc "Monthly sep enrollments report"
  task :monthly_reports_sep => :environment do
@@ -47,7 +47,6 @@ namespace :reports do
       ]
 
       families.each do |family|
-        binding.pry
         hbx_enrollments = family.active_household.hbx_enrollments.where(:created_at=>{'$gte'=>start_date, '$lte' => end_date}).special_enrollments
         # handling nil class exception
         if hbx_enrollments
