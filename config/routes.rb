@@ -254,6 +254,7 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      post :update_application_type
       get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection

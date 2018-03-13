@@ -326,6 +326,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def ridp_redirection
+    return false if current_user.has_hbx_staff_role?
     consumer = @person.consumer_role
     not_verified = ((@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified?) ? false : true
     @person.user && not_verified
