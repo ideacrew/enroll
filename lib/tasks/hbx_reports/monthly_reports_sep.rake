@@ -47,7 +47,7 @@ namespace :reports do
       ]
 
       families.each do |family|
-        hbx_enrollments = family.active_household.hbx_enrollments.where(:created_at=>{'$gte'=>start_date, '$lte' => end_date}).special_enrollments
+        hbx_enrollments = family.active_household.hbx_enrollments.where(:created_at => { "$gte" => start_date, "$lte" => end_date }).special_enrollments
         # handling nil class exception
         if hbx_enrollments
           hbx_enrollments.each do |hbx_enroll|
@@ -57,19 +57,21 @@ namespace :reports do
                 sep_qle = hbx_enroll.special_enrollment_period
                 plan = hbx_enroll.plan
                 enrollees = hbx_enroll.hbx_enrollment_members.count
-                csv << [ hbx_enroll.subscriber.person.hbx_id, 
-                  hbx_enroll.hbx_id,
-                  hbx_enroll.subscriber.person.first_name,
-                  hbx_enroll.subscriber.person.last_name,
-                  sep_qle.title,
-                  sep_qle.effective_on,
-                  person.first_name,
-                  person.last_name,
-                  plan.coverage_kind,
-                  plan.name,
-                  plan.hios_id,
-                  enrollees
-                ]
+                if plan 
+                  csv << [ hbx_enroll.subscriber.person.hbx_id, 
+                    hbx_enroll.hbx_id,
+                    hbx_enroll.subscriber.person.first_name,
+                    hbx_enroll.subscriber.person.last_name,
+                    sep_qle.title,
+                    sep_qle.effective_on,
+                    person.first_name,
+                    person.last_name,
+                    plan.coverage_kind,
+                    plan.name,
+                    plan.hios_id,
+                    enrollees
+                  ]
+                end
               end
             end
           end
