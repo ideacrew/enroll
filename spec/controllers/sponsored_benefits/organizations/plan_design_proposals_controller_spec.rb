@@ -18,7 +18,7 @@ module SponsoredBenefits
     let!(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }
     let(:broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
 
-    let(:sponsorship) { build(:plan_design_benefit_sponsorship,
+    let(:sponsorship) { build(:sponsored_benefits_benefit_sponsorship,
                         benefit_market: :aca_shop_cca,
                         initial_enrollment_period: initial_enrollment_period,
                         annual_enrollment_period_begin_month: beginning_of_next_month.month,
