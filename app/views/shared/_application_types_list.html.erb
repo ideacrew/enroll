@@ -6,7 +6,6 @@
             <span> <b> Application Type :</b></span>
           </div>
         </div>
-
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
           <%= f.fields_for :family do |f| %>
               <% if @person.primary_family.e_case_id.present? && !(@person.primary_family.e_case_id.include? "curam_landing") %>
@@ -16,8 +15,6 @@
               <% else %>
                   <%= f.select(:application_type, options_for_select(["Phone", "Paper"], selected: @person.primary_family.application_type ), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
               <% end %>
-
-
         </div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd top-buffer">
           <%= f.submit 'Confirm', class: 'btn btn-primary', style: "margin-top: -7px" %>
