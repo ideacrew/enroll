@@ -66,24 +66,28 @@ module SponsoredBenefits
 
         
       # Organizations with EmployerProfile and HbxProfile belong to a Site
-      belongs_to  :site_owner, inverse_of: :owner_organization,
-                  class_name: "SponsoredBenefits::Site"
-
       belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
                   class_name: "SponsoredBenefits::Site"
 
-      embeds_many :profiles, 
-                  class_name: "SponsoredBenefits::Organizations::Profile"
+      belongs_to  :site_owner, inverse_of: :owner_organization,
+                  class_name: "SponsoredBenefits::Site"
 
       embeds_many :office_locations, 
                   class_name: "SponsoredBenefits::Organizations::OfficeLocation", 
                   cascade_callbacks: true, validate: true
 
+      embeds_many :profiles, 
+                  class_name: "SponsoredBenefits::Organizations::Profile"
+
+      # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
+      has_many    :benefit_sponsorships, counter_cache: true,
+                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+
 
       # Use the Document model for managing any/all documents associated with Organization
       has_many :documents, class_name: "SponsoredBenefits::Documents::Document"
 
-      validates_presence_of :legal_name, :site
+      validates_presence_of :legal_name, :site, :profiles
 
       before_save :generate_hbx_id
 
@@ -91,23 +95,32 @@ module SponsoredBenefits
       index({ dba: 1 },   { sparse: true })
       index({ fein: 1 },  { unique: true, sparse: true })
       index({ :"profiles._type" => 1 }, { sparse: true })
+      index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
 
+      scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
       scope :employer_profiles,       ->{ where(:"profiles._type" => /.*EmployerProfile$/) }
       scope :broker_agency_profiles,  ->{ where(:"profiles._type" => /.*BrokerAgencyProfile$/) }
       scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
-      scope :employer_profiles,       ->{ where(:"profiles._type" => /.*EmployerProfile$/) }
-      scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
-
-
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
 
       # Strip non-numeric characters
       def fein=(new_fein)
-        write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
+        numeric_fein = new_fein.to_s.gsub(/\D/, '')
+        write_attribute(:fein, numeric_fein)
+        @fein = numeric_fein
       end
+
+      def sponsor_benefits_for(profile, benefit_market)
+        if profile.benefit_sponsorship_eligible?
+          benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
+        else
+          raise SponsoredBenefits::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
+        end 
+      end
+
 
       class << self
         def default_search_order

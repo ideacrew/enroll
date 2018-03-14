@@ -3,9 +3,10 @@
 # open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
 # cycles.  Scenarios where enollments are conducted on a rolling monthly basis are also supported.
 
-# OrganzationProfiles will typically embed many BenefitSponsorships.  A new BenefitSponsorship is in order when
-# a significant change occurs, such as the following supported scenarios:
-# - Benefit Sponsor (employer) terminates and later returns after some elapsed period
+# Organzations may embed many BenefitSponsorships.  Significant changes result in new BenefitSponsorship,
+# such as the following supported scenarios:
+# - Benefit Sponsor (employer) voluntarily terminates and later returns after some elapsed period
+# - Benefit Sponsor is involuntarily terminated (such as for non-payment) and later becomes eligible
 # - Existing Benefit Sponsor changes effective date
 
 # Referencing a new BenefitSponsorship helps ensure integrity on subclassed and associated data models and
@@ -17,35 +18,52 @@ module SponsoredBenefits
       include Mongoid::Timestamps
       # include Concerns::Observable
 
-      embedded_in :benefit_sponsorable, polymorphic: true
+      belongs_to  :organization,
+                  class_name: "SponsoredBenefits::Organizations::Organization"
 
       # This sponsorship's workflow status
-      field :aasm_state,      type: String, default: :applicant
-      field :site_id,         type: String
+      field :site_id,                 type: String
+      field :initial_effective_date,  type: Date
+      field :sponsorship_profile_id,  type: BSON::ObjectId
 
-      belongs_to  :benefit_market,        class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
-      has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      field :contact_method_kind,     type: Symbol
+      field :aasm_state,              type: String, default: :applicant
 
-      validates_presence_of :benefit_market
 
-      delegate :plan_design_organization, to: :benefit_sponsorable
+      belongs_to  :rating_area,
+                  class_name: "SponsoredBenefits::Locations::RatingArea"
 
-      # Prevent changes to immutable fields. Instantiate a new model instead
-      # before_validation {
-      #     if persisted?
-      #       false if  (self.initial_enrollment_period.changed? && self.initial_enrollment_period_was.present?) ||
-      #                 (annual_enrollment_period_begin_month.changed? && annual_enrollment_period_begin_month.present?)
-      #     end
-      #   }
+      has_many    :service_areas,
+                  class_name: "SponsoredBenefits::Locations::ServiceArea"
+
+      belongs_to  :benefit_market, counter_cache: true,
+                  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+
+      has_many    :benefit_applications,
+                  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+
+      validates_presence_of :benefit_market, :sponsorship_profile_id
 
       after_create :build_nested_models
+
+# TODO move this to concern
+      def sic_code
+        sponsorship_profile.sic_code
+      end
+###
+      def sponsorship_profile=(sponsorship_profile)
+        write_attribute(:sponsorship_profile_id, sponsorship_profile._id)
+        @sponsorship_profile = sponsorship_profile
+      end
+
+      def sponsorship_profile
+        return @sponsorship_profile if defined?(@sponsorship_profile)
+        @sponsorship_profile = organization.sponsorship_profiles.detect { |sponsorship_profile| sponsorship_profile._id == self.sponsorship_profile_id }
+      end
 
       def census_employees
         SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
       end
-
-
-
 
       def initial_enrollment_period=(new_initial_enrollment_period)
         initial_enrollment_range = SponsoredBenefits.tidy_date_range(new_initial_enrollment_period, :initial_enrollment_period)

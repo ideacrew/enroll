@@ -34,10 +34,10 @@ module SponsoredBenefits
 
 
     context "a broker gains access to an employer's information for plan_design" do
-      let(:employer_name)         { "Classy Cupcakes, Corp" }
-      let(:broker_name)           { "Busy Brokers, Inc" }
-      let!(:employer_organization) { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: employer_name) }
-      let!(:broker_organization)   { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: broker_name) }
+      let(:employer_name)           { "Classy Cupcakes, Corp" }
+      let(:broker_name)             { "Busy Brokers, Inc" }
+      let!(:employer_organization)  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: employer_name) }
+      let!(:broker_organization)    { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: broker_name) }
 
       before { broker_organization.plan_design_subjects << employer_organization }
 

@@ -10,6 +10,8 @@ module SponsoredBenefits
   PRODUCT_KINDS           = [:health, :dental, :medicaid, :medicare]
   PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
+  CONTACT_METHOD_KINDS    = [:paper_and_electronic, :paper_only]
+
   class << self
     attr_writer :configuration
   end

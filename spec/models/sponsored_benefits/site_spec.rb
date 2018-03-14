@@ -2,16 +2,18 @@ require 'rails_helper'
 
 module SponsoredBenefits
   RSpec.describe Site, type: :model, dbclean: :around_each do
-    let(:site) { Site.new }
+    # let(:site) { Site.new }
 
-    let(:site_key)            { :acme }
-    let(:owner_legal_name)    { "ACME Widgets" }
+    let(:site_key)            { :usa }
     let(:long_name)           { "ACME Widget's Benefit Website" }
     let(:short_name)          { "Benefit Website" }
     let(:domain_name)         { "hbxshop.org" }
 
+    let(:owner_legal_name)    { "ACME Widgets" }
+    let(:owner_organization)  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, profiles: [profile]) }
     let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
-    let(:owner_organization)  { FactoryGirl.build(:sponsored_benefits_organizations_exempt_organization, legal_name: owner_legal_name, site: site, site_owner: site) }
+    let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
+
 
     let(:params) do
       {
@@ -24,35 +26,38 @@ module SponsoredBenefits
     end
 
     context "ability to create, validate and persist instances of this class" do
+
       context "with no arguments" do
-        subject { described_class.new }
+        let(:site)  { Site.new }
 
         it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
+          site.validate
+          expect(site).to_not be_valid
         end
       end
 
       context "with no site_key" do
-        subject { described_class.new(params.except(:site_key)) }
+        let(:site)  { Site.new(params.except(:site_key)) }
 
         it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
+          site.validate
+          expect(site).to_not be_valid
         end
       end
 
       context "with no owner_organization" do
-        subject { described_class.new(params.except(:owner_organization)) }
+        let(:site)   { Site.new(params.except(:owner_organization)) }
 
         it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
+          site.validate
+          expect(site).to_not be_valid
         end
       end
 
       context "with all required arguments" do
-        let(:valid_site) { described_class.new(params) }
+        let(:valid_site) { Site.new(params) }
+
+        before { valid_site.owner_organization = owner_organization; valid_site.site_organizations << owner_organization }
 
         it "should be valid" do
           valid_site.validate
@@ -78,7 +83,7 @@ module SponsoredBenefits
     end
 
     context "site keys must be valid" do
-      let(:site) { FactoryGirl.build(:sponsored_benefits_site, :with_owner_exempt_organization, site_key: site_key) }
+      let(:site) { FactoryGirl.build(:sponsored_benefits_site) }
 
       context "with keys longer than max length" do
         let(:max_key_length)  { 6 }
@@ -129,11 +134,15 @@ module SponsoredBenefits
 
       let(:owner_legal_name)    { "Hannah Barbara, LLC" }
       let(:loony_legal_name)    { "Loony Tunes, LLC" }
-      let(:acme_legal_name)     { "iTunes, Inc" }
+      let(:itune_legal_name)    { "iTunes, Inc" }
 
-      let(:site)                { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization) }
-      let!(:loony_organization) { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: loony_legal_name, site: site) }
-      let!(:acme_organization)  { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: acme_legal_name, site: site) }
+      let!(:site)                { FactoryGirl.create(:sponsored_benefits_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
+      let(:owner_organization)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
+      let!(:loony_organization) { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
+      let!(:acme_organization)  { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
+
+      let(:employer_profile)    { FactoryGirl.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) }
+      let(:hbx_profile)         { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
 
 
       # this will include the owner_organization in the count
@@ -142,45 +151,57 @@ module SponsoredBenefits
       end
 
       it "should have correct number of employer_profiles" do
+# binding.pry
         expect((site.site_organizations.employer_profiles).size).to eq 2
       end
-    end
 
-    context "benefit_market associations must be valid" do
-      let(:site)                { FactoryGirl.build(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [benefit_market]) }
-      let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
+      context "and benefit_market associations must be valid" do
+        let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
+        let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
 
-      it "assigned benefit market should be associated with site" do
-        expect(site.benefit_markets.first).to eq benefit_market
-      end
+        # before { loony_organization.profiles << [ profile ] }
+        before { site.benefit_markets << benefit_market }
 
-      it "site should be valid" do
-        site.validate
-        expect(site).to be_valid
-      end
+        it "assigned benefit market should be associated with site" do
+          expect(site.benefit_markets.first).to eq benefit_market
+        end
 
-      context "benefit_market should be findable by kind" do
-        let(:shop_kind)           { :aca_shop }
-        let(:individual_kind)     { :aca_individual }
+        it "site should be valid" do
+          expect(site).to be_valid
+        end
 
-        let(:shop_benefit_market_1) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
-        let(:shop_benefit_market_2) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
-        let(:ivl_benefit_market_1)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
-        let(:ivl_benefit_market_2)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
+        context "benefit_market should be findable by kind" do
+          let(:shop_kind)             { :aca_shop }
+          let(:individual_kind)       { :aca_individual }
+          let(:legal_name_1)          { "3M, Corp" }
+          let(:legal_name_2)          { "M&M, Corp" }
+          let(:legal_name_3)          { "R&D, Corp" }
 
-        let(:shop_only_site)     { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [shop_benefit_market_1]) }
-        let(:ivl_only_site)      { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [ivl_benefit_market_1]) }
-        let(:shop_and_ivl_site)  { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, benefit_markets: [ivl_benefit_market_2, shop_benefit_market_2]) }
+          let(:shop_benefit_market_1) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
+          let(:shop_benefit_market_2) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
+          let(:ivl_benefit_market_1)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
+          let(:ivl_benefit_market_2)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
 
-        it "should find the right benefit_markets using benefit_market_for" do
-          expect(shop_only_site.benefit_market_for(shop_kind).count).to eq 1
-          expect(shop_only_site.benefit_market_for(individual_kind).count).to eq 0
+          let(:owner_organization_1)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
+          let(:owner_organization_2)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }
+          let(:owner_organization_3)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_3, profiles: [employer_profile]) }
 
-          expect(ivl_only_site.benefit_market_for(shop_kind).count).to eq 0
-          expect(shop_and_ivl_site.benefit_market_for(shop_kind).count).to eq 1
+          let(:shop_only_site)        { FactoryGirl.build(:sponsored_benefits_site, :owner_organization => owner_organization_1, site_organizations: [ owner_organization_1 ], benefit_markets: [shop_benefit_market_1]) }
+          let(:ivl_only_site)         { FactoryGirl.build(:sponsored_benefits_site, :owner_organization => owner_organization_2, site_organizations: [ owner_organization_2 ], benefit_markets: [ivl_benefit_market_1]) }
+          let(:shop_and_ivl_site)     { FactoryGirl.build(:sponsored_benefits_site, :owner_organization => owner_organization_3, site_organizations: [ owner_organization_3 ], benefit_markets: [ivl_benefit_market_2, shop_benefit_market_2]) }
 
-          expect(ivl_only_site.benefit_market_for(individual_kind).count).to eq 1
-          expect(shop_and_ivl_site.benefit_market_for(individual_kind).count).to eq 1
+
+          it "should find the right benefit_markets using benefit_market_for" do
+            # binding.pry
+            expect(shop_only_site.benefit_market_for(shop_kind).count).to eq 1
+            expect(shop_only_site.benefit_market_for(individual_kind).count).to eq 0
+
+            expect(ivl_only_site.benefit_market_for(shop_kind).count).to eq 0
+            expect(shop_and_ivl_site.benefit_market_for(shop_kind).count).to eq 1
+
+            expect(ivl_only_site.benefit_market_for(individual_kind).count).to eq 1
+            expect(shop_and_ivl_site.benefit_market_for(individual_kind).count).to eq 1
+          end
         end
       end
 
