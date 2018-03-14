@@ -21,11 +21,6 @@ module Observers
           end
         end
 
-        #multiple notices are being triggered in this case. 1.OE beings 2.Zero employees on roster. Using same event for both
-        if new_model_event.event_key == :open_enrollment_began
-          trigger_zero_employees_on_roster_notice(plan_year)
-        end
-
         if new_model_event.event_key == :zero_employees_on_roster
           trigger_zero_employees_on_roster_notice(plan_year)
         end
