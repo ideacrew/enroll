@@ -72,15 +72,17 @@ namespace :reports do
     end
 
     def workflow_transitions(person)
-      person.consumer_role.workflow_state_transitions.where(:event =>
-                                                                {"$in" => [
-                                                                    "reject!",
-                                                                    "ssn_invalid!",
-                                                                    "ssn_valid_citizenship_invalid!",
-                                                                    "fail_dhs!",
-                                                                    "fail_residency!"]},
-                                                            :transition_at =>
-                                                                {'$gte'=>start_date, '$lte' => end_date})
+      transitions = person.consumer_role.workflow_state_transitions.where(:event =>
+                                                        {"$in" => [
+                                                            "reject!",
+                                                            "ssn_invalid!",
+                                                            "ssn_valid_citizenship_invalid!",
+                                                            "fail_dhs!",
+                                                            "fail_residency!"]},
+                                                    :transition_at =>
+                                                        {'$gte'=>start_date, '$lte' => end_date})
+
+      remove_dup_override? ? transitions.order_by(:created_at => 'desc').uniq{|e| e.event} : transitions
     end
 
     report_prefix = remove_dup_override? ? "current" : "all"
@@ -102,9 +104,6 @@ namespace :reports do
             when "reject!"
               types = [get_rejected_type(person)]
           end
-
-          # Remove duplpicates and keep only 1 occurance of the same verification type.
-          types.uniq! if remove_dup_override?
 
           types.each do |type|
             csv << [
