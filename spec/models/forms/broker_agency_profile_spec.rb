@@ -118,7 +118,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     end
 
     it 'should raise an error' do
-      expect(subject.errors.to_hash[:base]).to include("fein is already in use.")
+      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")    
     end
   end
 
@@ -270,6 +270,29 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
       expect(subject.person.emails).not_to be_empty
       expect(subject.person.emails[0].kind).to eq('work')
       expect(subject.person.emails[0].address).to eq(attributes[:email])
+    end
+  end
+
+  context "person already exists" do
+    let(:attributes) { {
+      first_name: "test1",
+      last_name: "test1",
+      dob: "1985-11-11"
+      } }
+
+    let(:person) { FactoryGirl.create(:person)}
+    let(:organization) { FactoryGirl.create(:organization)}
+
+    before do
+      person.update_attributes(other_attributes)
+      subject.instance_variable_set("@office_locations", organization.office_locations)
+      subject.match_or_create_person # I need to trigger this twice in "SPEC" to see failure.
+    end
+
+    it "should not throw any error" do #19754
+      subject.match_or_create_person
+      person.reload
+      expect(person.update_attributes(middle_name: "test")).to eq true
     end
   end
 end

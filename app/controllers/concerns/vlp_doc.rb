@@ -13,6 +13,7 @@ module VlpDoc
 
   def update_vlp_documents(consumer_role, source='person', dependent=nil)
     return true if consumer_role.blank?
+    return true if params[source][:is_applying_coverage] == "false"
 
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
@@ -24,8 +25,8 @@ module VlpDoc
     end
 
     if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
-      if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
-        params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
+        if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
+          params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
       elsif params[:person].present? && params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
         params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], "%m/%d/%Y")
       end
@@ -46,9 +47,10 @@ module VlpDoc
   end
 
   def get_vlp_doc_subject_by_consumer_role(consumer_role)
-    return nil if consumer_role.blank?
-    if [::ConsumerRole::NATURALIZED_CITIZEN_STATUS, ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS].include? consumer_role.try(:person).try(:citizen_status)
-      consumer_role.try(:vlp_documents).try(:last).try(:subject)
-    end
+    return nil if consumer_role.blank? || consumer_role.vlp_documents.empty?
+    naturalized_citizen_docs = ["Certificate of Citizenship", "Naturalization Certificate"]
+    docs_for_status = consumer_role.citizen_status == "naturalized_citizen" ? naturalized_citizen_docs : VlpDocument::VLP_DOCUMENT_KINDS
+    docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject=>{"$in" => docs_for_status})
+    docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
   end
 end
