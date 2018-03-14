@@ -255,7 +255,6 @@ class Insured::ConsumerRolesController < ApplicationController
     set_current_person
     application_type = params[:consumer_role][:family][:application_type]
     @person.primary_family.update_attributes(application_type: application_type)
-
     if @person.primary_family.has_curam_or_mobile_application_type?
       @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
