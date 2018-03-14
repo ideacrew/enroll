@@ -41,13 +41,8 @@ module SponsoredBenefits
       end
 
       # Catalogs with benefit products currently available for purchase
-      def active_benefit_catalogs
-        return @active_benefit_catalogs if defined? @active_benefit_catalogs
-        @active_benefit_catalogs = application_benefit_catalogs_on(TimeKeeper.date_of_record)
-      end
-
-      def application_benefit_catalogs_on(date)
-        benefit_catalogs.select { |catalog| catalog.application_period_cover?(date)}
+      def benefit_catalog_active_on(date = TimeKeeper.date_of_record)
+        benefit_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
       end
 
       # Calculate available effective dates periods using passed date

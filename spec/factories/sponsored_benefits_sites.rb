@@ -4,23 +4,20 @@ FactoryGirl.define do
     long_name   "ACME Widget's Benefit Website"
     short_name  "Benefit Website"
     domain_name "hbxshop.org"
-    benefit_markets []
-
-    transient do
-      legal_name "My Exchange Site"
-      fein "012345678"
-      kind :aca_shop
-    end
 
     trait :with_owner_general_organization do
+      association :owner_organization, factory: :sponsored_benefits_organizations_general_organization
+      
       after :build do |site, evaluator|
-        build(:sponsored_benefits_organizations_general_organization, site_owner: site, site: site, legal_name: evaluator.legal_name, fein: evaluator.fein)
+        site.site_organizations << site.owner_organization
       end
     end
 
     trait :with_owner_exempt_organization do
+      association :owner_organization, factory: :sponsored_benefits_organizations_exempt_organization
+      
       after :build do |site, evaluator|
-        build(:sponsored_benefits_organizations_exempt_organization, site_owner: site, site: site, legal_name: evaluator.legal_name)
+        site.site_organizations << site.owner_organization
       end
     end
 
