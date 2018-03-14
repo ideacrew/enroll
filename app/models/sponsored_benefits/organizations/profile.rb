@@ -5,43 +5,44 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      CONTACT_METHOD_KINDS = [:paper_and_electronic, :paper_only]
       PROFILE_SOURCE_KINDS = [:broker_quote]
 
-      embedded_in :organization,          class_name: "SponsoredBenefits::Organizations::Organization"
-      # embedded_in :plan_design_proposal,  class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"
+      embedded_in :organization,      class_name: "SponsoredBenefits::Organizations::Organization"
 
-      field :contact_method,  type: Symbol, default: :paper_and_electronic
-      field :profile_source, type: String, default: :broker_quote
+      field :contact_method,          type: Symbol, default: :paper_and_electronic
 
       # Terminated twice for non-payment?
-      field :eligible_for_benefit_sponsorship, type: Boolean
+      field :benefit_sponsorship_eligible,  type: Boolean, default: false
+      field :benefit_sponsorship_id,        type: BSON::ObjectId
 
       # Share common attributes across all Profile kinds
-      delegate :hbx_id, to: :organization, allow_nil: true
-      delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
-      delegate :dba, :dba=, to: :organization, allow_nil: true
-      delegate :fein, :fein=, to: :organization, allow_nil: true
-      delegate :is_active, :is_active=, to: :organization, allow_nil: false
+      delegate :hbx_id,                   to: :organization, allow_nil: false
+      delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
+      delegate :dba, :dba=,               to: :organization, allow_nil: true
+      delegate :fein, :fein=,             to: :organization, allow_nil: true
       delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+      embeds_many :office_locations, 
+                  class_name:"SponsoredBenefits::Organizations::OfficeLocation"
 
-      # Only one benefit_sponsorship may be active.  Enable many to support changes and history tracking
-      embeds_many :benefit_sponsorships, as: :benefit_sponsorable, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
-      embeds_many :office_locations, class_name:"SponsoredBenefits::Organizations::OfficeLocation"
+      alias_method :benefit_sponsorship_eligible?, :benefit_sponsorship_eligible
 
-      def plan_design_organization
-        plan_design_proposal.plan_design_organization if plan_design_proposal.present?
+      # @abstract profile subclass is expected to implement #initialize_profile
+      # @!method initialize_profile
+      #    Initialize settings for the abstract profile
+      after_initialize :initialize_profile
+
+
+      def benefit_sponsorship
+        return @benefit_sponsorship if defined?(@benefit_sponsorship)
+        @benefit_sponsorship = organization.benefit_sponsorships.detect { |benefit_sponsorship| benefit_sponsorship._id == self.benefit_sponsorship_id }
       end
 
-      def effective_date
-        benefit_sponsorships.first.initial_enrollment_period.begin
+      def benefit_sponsorship=(benefit_sponsorship)
+        write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
+        @benefit_sponsorship = benefit_sponsorship
       end
 
-      def benefit_application
-        bs = benefit_sponsorships.first
-        bs.benefit_applications.first
-      end
     end
   end
 end
