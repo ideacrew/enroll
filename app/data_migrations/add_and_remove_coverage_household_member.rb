@@ -12,8 +12,26 @@ class AddAndRemoveCoverageHouseholdMember < MongoidMigrationTask
 
     @active_household = primary_person.first.primary_family.active_household
 
-
-    family_members = [family_member_ids].split(",").flatten.collect {|id| FamilyMember.find(id)}
+    begin
+      family_member_ids = [family_member_ids].split(",").flatten
+      family_members = family_member_ids.collect {|id| FamilyMember.find(id)}
+    rescue
+      if ENV["invalid_family_members"] == "true"
+        @active_household.coverage_households.each do |c_household|
+          invalid_chms = c_household.coverage_household_members.where(:"family_member_id".in => family_member_ids)
+          until c_household.coverage_household_members.where(:"family_member_id".in => family_member_ids).blank?
+            invalid_chms.each do |chm|
+              chm.destroy!
+            end
+          end
+        end
+        @active_household.save!
+        puts "Destroyed invalid coverage household member records" unless Rails.env.test?
+      else
+        puts "There's no point to have coverage household member records without family member. Pass 'invalid_family_members' args as true to destroy!!"
+        return
+      end
+    end
 
     if action == "add_chm"
       family_members.each {|family_member| add_coverage_household_member(family_member)}

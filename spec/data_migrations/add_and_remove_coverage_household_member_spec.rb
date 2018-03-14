@@ -60,4 +60,24 @@ describe AddAndRemoveCoverageHouseholdMember, dbclean: :after_each do
       expect(family.active_household.coverage_households.map(&:coverage_household_members).flatten.size).to eq 2
     end
   end
+
+  context "remove coverage household member for an invalid family member", dbclean: :after_each do
+
+    before :each do
+      allow(ENV).to receive(:[]).with('invalid_family_members').and_return "true"
+      allow(ENV).to receive(:[]).with('family_member_ids').and_return "random_id"
+      allow(ENV).to receive(:[]).with('action').and_return nil
+    end
+
+    it "should remove coverage household member record" do
+      expect(family.active_household.coverage_households.map(&:coverage_household_members).flatten.size).to eq 3
+      family.active_household.coverage_households.map(&:coverage_household_members).flatten.each do |chm|
+        next if chm.is_subscriber
+        chm.update_attribute(:family_member_id, "random_id")
+      end
+      subject.migrate
+      family.active_household.reload
+      expect(family.active_household.coverage_households.map(&:coverage_household_members).flatten.size).to eq 1
+    end
+  end
 end
