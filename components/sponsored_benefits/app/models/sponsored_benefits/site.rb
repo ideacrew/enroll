@@ -82,7 +82,7 @@ module SponsoredBenefits
     end
 
     def benefit_market_for(kind)
-      benefit_markets.select { |market| market.kind == kind }
+      benefit_markets.detect { |market| market.kind == kind }
     end
 
     private
