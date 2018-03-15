@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean => :after_each do
   let(:model_event)  { "application_denied" }
-  let(:notice_event) { "application_denied" }
+  let(:notice_event) { "group_ineligibility_notice_to_employee" }
   let(:employer_profile){ create :employer_profile, aasm_state: "registered"}
   let!(:person) { FactoryGirl.create(:person, :with_family) }
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
@@ -28,11 +28,13 @@ describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean =
     context "when employer terminated from shop" do
       subject { Observers::NoticeObserver.new }
       let(:model_event) { ModelEvents::ModelEvent.new(:application_denied, model_instance, {}) }
+      let(:errors) { {non_business_owner_enrollment_count: "at least 2/3 non-owner employee must enroll"} }
 
       it "should trigger notice event" do
+        allow(model_instance).to receive(:enrollment_errors).and_return(errors)
         allow_any_instance_of(CensusEmployee).to receive(:employee_role).and_return(employee_role)
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.application_denied"
+          expect(event_name).to eq "acapi.info.events.employee.group_ineligibility_notice_to_employee"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s

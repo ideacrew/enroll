@@ -65,7 +65,7 @@ module Observers
           if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               if ce.employee_role.present?
-                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "application_denied")
+                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
               end
             end
           end
