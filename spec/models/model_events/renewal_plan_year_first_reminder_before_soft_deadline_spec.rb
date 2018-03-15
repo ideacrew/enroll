@@ -15,7 +15,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
       DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
     end
     context "when renewal employer 2 days prior to soft dead line" do
-      it "should trigger model event" do
+      it "should trigger model event", :dbclean => :around_each do
         expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
