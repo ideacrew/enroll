@@ -5,7 +5,7 @@ describe 'ModelEvents::ZeroEmployeesOnRoster', dbclean: :around_each  do
   let(:model_event)  { "zero_employees_on_roster" }
   let(:notice_event) { "zero_employees_on_roster_notice" }
   let!(:employer){ FactoryGirl.create :employer_profile}
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month}
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.months}
   let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'draft', open_enrollment_start_on: TimeKeeper.date_of_record.next_day) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance, title: "Benefits #{model_instance.start_on.year}") }
 
