@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
+describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', :dbclean => :after_each do
 
   let(:model_event) { "renewal_plan_year_first_reminder_before_soft_dead_line" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
@@ -9,7 +9,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: 8)}
 
-  describe "ModelEvent", :dbclean => :after_each do
+  describe "ModelEvent" do
     context "when renewal employer 2 days prior to soft dead line" do
       it "should trigger model event" do
         expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
