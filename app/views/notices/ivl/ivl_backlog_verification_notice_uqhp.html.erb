@@ -22,10 +22,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "You enrolled in or renewed a plan through DC Health Link for #{notice.coverage_year}. We're writing to let you know that you must submit documents if you want to keep your insurance. "} %>
+    content: "You enrolled in or renewed a plan through #{Settings.site.short_name} for #{notice.coverage_year}. We're writing to let you know that you must submit documents if you want to keep your insurance. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "DC Health Link is required by federal law to be sure that people who enroll in health insurance through our system are eligible.  ", top_margin: '10px'} %>
+    content: "#{Settings.site.short_name} is required by federal law to be sure that people who enroll in health insurance through our system are eligible.  ", top_margin: '10px'} %>
 
 <% if notice.documents_needed %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {

@@ -120,10 +120,8 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_identifier = recipient.hbx_id
-    notice.coverage_year = TimeKeeper.date_of_record.next_year.year
+    notice.coverage_year = TimeKeeper.date_of_record.year
     notice.current_year = TimeKeeper.date_of_record.year
-    notice.ivl_open_enrollment_start_on = Settings.aca.individual_market.open_enrollment.start_on
-    notice.ivl_open_enrollment_end_on = Settings.aca.individual_market.open_enrollment.end_on
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.primary_firstname = recipient.first_name.titleize
   end
