@@ -47,7 +47,8 @@ namespace :reports do
       ]
 
       families.each do |family|
-        hbx_enrollments = family.active_household.hbx_enrollments.where(:created_at => { "$gte" => start_date, "$lte" => end_date }).special_enrollments
+        binding.pry
+        hbx_enrollments = family.active_household.hbx_enrollments.where(:aasm_state.in => ["ENROLLED_STATUSES", "TERMINATED_STATUSES"]).where(:created_at => { "$gte" => start_date, "$lte" => end_date }).special_enrollments
         # handling nil class exception
         if hbx_enrollments
           hbx_enrollments.each do |hbx_enroll|
