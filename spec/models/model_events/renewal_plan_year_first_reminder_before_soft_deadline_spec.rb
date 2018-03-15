@@ -9,13 +9,9 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: 8)}
 
-  describe "ModelEvent" do
-    around(:each) do |example|
-      example.run
-      DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
-    end
+  describe "ModelEvent", :dbclean => :after_each do
     context "when renewal employer 2 days prior to soft dead line" do
-      it "should trigger model event", :dbclean => :around_each do
+      it "should trigger model event" do
         expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
