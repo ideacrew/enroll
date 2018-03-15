@@ -38,7 +38,6 @@ module SponsoredBenefits
 
       def kind=(new_kind)
         return unless SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(new_kind)
-        @kind = new_kind
         write_attribute(:kind, new_kind)
         initialize_configuration_setting
       end
@@ -90,25 +89,22 @@ module SponsoredBenefits
       end
 
 
-      def reset_configuration_setting
-        return unless kind.present?
-
-        klass_name = configuration_class_name
-        self.configuration_setting = klass_name.constantize.new
-      end
-
       private
 
       def initialize_configuration_setting
+        return unless kind.present?
+
         klass_name = configuration_class_name
-        reset_configuration_setting if self.has_configuration_setting? && (klass_name != configuration_setting.class.to_s)
+        if self.has_configuration_setting? && (klass_name != configuration_setting.class.to_s)
+          configuration_setting = klass_name.constantize.new
+        end
 
         configuration_setting
       end
 
       # Configuration setting model is automatically associated based on "kind" attribute value
       def configuration_class_name
-        config_klass = "#{@kind.to_s}_configuration".camelcase
+        config_klass = "#{kind.to_s}_configuration".camelcase
         namespace_for(self.class) + "::#{config_klass}"
       end
 
