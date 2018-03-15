@@ -1,3 +1,6 @@
+# BenefitMarket is a marketplace where BenefitSponsors choose benefit products to offer to their members.  Market behaviors and products 
+# are governed by law, along with rules and policies of the market owner.  ACA Individual market and ACA SHOP market are two example market kinds.
+# BenefitMarket owners publish and refresh benefit products on a periodic basis using BenefitCatalogs
 module SponsoredBenefits
   module BenefitMarkets
     class BenefitMarket
