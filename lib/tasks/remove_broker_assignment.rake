@@ -7,8 +7,8 @@ namespace :migrations do
     Broker_agency_legal_name
     Status
     )
-    file_name = "#{Rails.root}/IVL Broker Assignments TO BE REMOVED 20160105 Output.csv"
-    CSV.foreach("#{Rails.root}/IVL Broker Assignments TO BE REMOVED 20160105.csv", headers: true) do |row|
+    file_name = "#{Rails.root}/ivl_broker_assignments_to_be_removed_20160105_output.csv"
+    CSV.foreach("#{Rails.root}/ivl_broker_assignments_to_be_removed_20160105.csv", headers: true) do |row|
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         if !Person.by_ssn(row['SSN']).present?
