@@ -16,19 +16,30 @@ FactoryGirl.define do
     end
 
     # association :profiles, factory: :sponsored_benefits_organizations_aca_shop_dc_employer_profile
-    profiles { [ build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) ] }
+    # profiles { [ build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) ] }
 
     trait :with_site do
-      before :build do |organization, evaluator|
+      after :build do |organization, evaluator|
         build(:sponsored_benefits_site, owner_organization: organization, site_organizations: [organization])
       end
     end
   
     trait :with_aca_shop_dc_employer_profile do
-      before :build do |organization, evaluator|
-        organization.profiles.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile)
+      after :build do |organization, evaluator|
+        organization.profiles << build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile)
       end
     end
 
+    trait :with_aca_shop_cca_employer_profile do
+      after :build do |organization, evaluator|
+        organization.profiles << build(:sponsored_benefits_organizations_aca_shop_cca_employer_profile)
+      end
+    end
+
+    trait :with_hbx_profile do
+      after :build do |organization, evaluator|
+        organization.profiles << build(:sponsored_benefits_organizations_hbx_profile)
+      end
+    end
   end
 end

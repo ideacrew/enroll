@@ -232,11 +232,11 @@ GEM
     equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.7.0)
-    eye (0.10.0)
-      celluloid (~> 0.17.3)
+    eye (0.8)
+      celluloid (~> 0.17.2)
       celluloid-io (~> 0.17.0)
-      kostya-sigar (~> 2.0.0)
-      state_machines
+      sigar (~> 0.7.3)
+      state_machine
       thor
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
@@ -302,7 +302,6 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kgio (2.11.2)
-    kostya-sigar (2.0.0)
     language_list (1.1.0)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -548,6 +547,7 @@ GEM
     sexp_processor (4.10.0)
     shoulda-matchers (3.1.1)
       activesupport (>= 4.0.0)
+    sigar (0.7.3)
     simple_form (3.5.0)
       actionpack (> 4, < 5.2)
       activemodel (> 4, < 5.2)
@@ -576,7 +576,7 @@ GEM
     sshkit (1.15.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    state_machines (0.5.0)
+    state_machine (1.2.0)
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
@@ -654,7 +654,7 @@ DEPENDENCIES
   devise (~> 3.4.1)
   effective_datatables!
   email_spec (= 2.0.0)
-  eye
+  eye (= 0.8.0)
   factory_girl_rails (= 4.6.0)
   fakeredis
   font-awesome-rails (= 4.5.0.1)
