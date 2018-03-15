@@ -438,7 +438,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
-    return if plan_year.employer_profile.census_employees.count > 100
+    return if plan_year.employer_profile.census_employees.active.count > 200
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -660,6 +660,12 @@ module ApplicationHelper
 
   def previous_year
     TimeKeeper.date_of_record.prev_year.year
+  end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise ArgumentError.new("invalid value for Boolean: \"#{val}\"")
   end
 end
 
