@@ -5,7 +5,7 @@ module SponsoredBenefits
 
       # DC Individual
       # age-off 26, 65
-      # catestrophic plans - enrollment group must be < 35
+      # catestrophic plans - enrollment group must be < 30
       ## See existing rules
 
       # DC SHOP 
