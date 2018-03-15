@@ -39,7 +39,7 @@ module Services
       {
         "remote_access_key": Settings.checkbook_services.remote_access_key,
         "reference_id": Settings.checkbook_services.reference_id,
-        "employer_effective_date": @census_employee.active_benefit_group.plan_year.start_on.strftime("%Y-%m-%d"),
+        "employer_effective_date": employer_effective_date,
         "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
         "employer": {
           "state": 11,
@@ -51,6 +51,11 @@ module Services
         "filterOption": filter_option,
         "filterValue": reference_plan.carrier_profile.legal_name
       }
+      end
+
+      def employer_effective_date
+        benefit_group_assignment = @census_employee.renewal_benefit_group_assignment || @census_employee.active_benefit_group_assignment
+        benefit_group_assignment.benefit_group.plan_year.start_on.strftime("%Y-%m-%d")
       end
 
 
