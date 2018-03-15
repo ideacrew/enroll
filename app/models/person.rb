@@ -122,6 +122,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
+  embeds_many :verification_types, as: :verifiable
 
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
@@ -151,6 +152,7 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
+  before_save :ensure_verification_types
 
   #after_save :generate_family_search
   after_create :create_inbox
@@ -426,17 +428,34 @@ class Person
   end
 
   # collect all verification types user can have based on information he provided
-  def verification_types
-    verification_types = []
-    verification_types << 'DC Residency'
-    verification_types << 'Social Security Number' if ssn
-    verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
+  def ensure_verification_types
+    live_types = []
+    live_types << 'DC Residency'
+    live_types << 'Social Security Number' if ssn
+    live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
-      verification_types << 'Citizenship'
+      live_types << 'Citizenship'
     else
-      verification_types << 'Immigration status'
+      live_types << 'Immigration status'
     end
-    verification_types
+    deactivate_types(verification_types.active.map(&:type_name) - live_types) if (verification_types.active.map(&:type_name) - live_types).any?
+    (live_types - verification_types.active.map(&:type_name)).each do |new_type|
+      add_new_verification_type(new_type)
+    end
+  end
+
+  def deactivate_types(types)
+    types.each do |type|
+      verification_type_by_name(type).update_attributes(:inactive => true) unless verification_type_by_name(type).inactive
+    end
+  end
+
+  def add_new_verification_type(new_type)
+    verification_types << VerificationType.new(:type_name => new_type)
+  end
+
+  def verification_type_by_name(type)
+    verification_types.find_by(:type_name => type)
   end
 
   def relatives
