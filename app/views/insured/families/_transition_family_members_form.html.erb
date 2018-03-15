@@ -1,0 +1,50 @@
+<script type="text/javascript">
+  jQuery('[id^="cancel_hbx_"]').click(function($) {
+    if (this.checked) {
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', false);
+    }
+    else {
+      jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('disabled', true);
+      //jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('checked', false);
+    }
+  });
+</script>
+
+<td colspan="90%">
+  <%= form_tag transition_family_members_update_insured_families_path, :method => :post, remote: true do %>
+    <h3 class='title'>Transition Family Members</h3>
+    <br />
+    <table  class="table table-striped">
+      <tr>
+        <th>Name</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>HBX ID</th>
+        <th>Transition User?</th>
+        <th>New Market</th>
+        <th>Effective Date</th>
+      </tr>
+      <% @family_members.each do |family_member| %>
+      <tr>
+        <% person = family_member.person %>
+        <td><%= person.full_name %></td>
+        <td><%= number_to_obscured_ssn(person.ssn) %></td>
+        <td><%= person.dob %></td>
+        <td><%= person.hbx_id %></td>
+        <td><%= check_box_tag "transition_user_#{person.id}", person.id %></td>
+        <td><%= select_tag "transition_user_#{person.id}", options_for_select(@non_shop_market_kinds, "1") %></td>
+        <td><%= text_field_tag "effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "form-control date-field date-picker"%></td>
+      </tr>
+      <% end %>
+      <tr><td colspan = "7"><br /></td></tr>
+      <tr>
+        <td colspan = "7">
+          <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+          <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+          <%= hidden_field_tag :family, params[:family] %>
+          <%= submit_tag "Submit", class: 'btn btn-primary' %>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+</td>
