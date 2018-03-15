@@ -33,6 +33,7 @@ describe 'ModelEvents::BrokerAgencyFiredConfirmation', dbclean: :around_each  do
           "broker_agency_profile.first_name",
           "broker_agency_profile.last_name",
           "broker_agency_profile.assignment_date",
+          "broker_agency_profile.termination_date",
           "broker_agency_profile.broker_agency_name",
           "broker_agency_profile.employer_poc_firstname",
           "broker_agency_profile.employer_poc_lastname"
@@ -59,7 +60,7 @@ describe 'ModelEvents::BrokerAgencyFiredConfirmation', dbclean: :around_each  do
     end
 
     it "should return notice date" do
-      expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      expect(merge_model.notice_date).to eq TimeKeeper.date_of_record
     end
 
     it "should return employer name" do
@@ -73,6 +74,10 @@ describe 'ModelEvents::BrokerAgencyFiredConfirmation', dbclean: :around_each  do
 
     it "should return broker assignment date" do
       expect(merge_model.assignment_date).to eq broker_agency_account.start_on
+    end
+
+    it "should return broker termination date" do
+      expect(merge_model.termination_date).to eq broker_agency_account.end_on
     end
 
     it "should return employer poc name" do

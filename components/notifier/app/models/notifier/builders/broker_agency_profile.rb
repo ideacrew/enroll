@@ -1,9 +1,7 @@
 module Notifier
   class Builders::BrokerAgencyProfile
-    include Notifier::Builders::PlanYear
-    include Notifier::Builders::Broker
 
-    attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model
+    attr_accessor :payload, :broker_agency_profile, :merge_model
 
     def initialize
       data_object = Notifier::MergeDataModels::BrokerAgencyProfile.new
@@ -29,7 +27,7 @@ module Notifier
     end
 
     def notice_date
-      merge_model.notice_date = format_date(TimeKeeper.date_of_record)
+      merge_model.notice_date = TimeKeeper.date_of_record
     end
 
     def first_name
@@ -38,6 +36,10 @@ module Notifier
 
     def last_name
       merge_model.last_name = broker_agency_profile.primary_broker_role.person.last_name
+    end
+
+    def last_broker_agency_account
+      employer.broker_agency_accounts.unscoped.reject{ |account| account.is_active? }.last
     end
 
     def employer
@@ -60,6 +62,10 @@ module Notifier
 
     def assignment_date
       merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
+    end
+
+    def termination_date
+      merge_model.termination_date = last_broker_agency_account.end_on if last_broker_agency_account
     end
 
     def broker_agency_name
