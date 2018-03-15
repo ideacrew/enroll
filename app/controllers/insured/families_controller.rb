@@ -263,6 +263,29 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def transition_family_members
+    @row_id = params[:family_actions_id]
+    @family_members = @family.family_members
+    @non_shop_market_kinds = Person::NON_SHOP_ROLES
+    respond_to do |format|
+      format.js { render "insured/families/transition_family_members" }
+    end
+  end
+
+  def transition_family_members_update
+    @row_id = params[:family_actions_id]
+
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.transition_family_members
+
+    respond_to do |format|
+      format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
+    end
+  end
+
   private
 
   def updateable?

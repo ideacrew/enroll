@@ -51,6 +51,10 @@ module Forms
       terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
     end
 
+    def transition_family_members
+      # Handle transitions here
+    end
+
     private
 
     def handle_edi_transmissions(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
