@@ -21,12 +21,9 @@ module SponsoredBenefits
       # field :benefit_sponsorship_id, type: BSON::ObjectId
       belongs_to  :benefit_sponsorship, 
                   class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
-      belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
-      embeds_many :benefit_packages,    class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage", 
-        cascade_callbacks: true, 
-        validate: true
+      embeds_many :benefit_packages, counter_cache: true,
+                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage"
 
       validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
       # validate :validate_application_dates
