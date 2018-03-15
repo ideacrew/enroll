@@ -1,27 +1,30 @@
 require 'rails_helper'
 
 module SponsoredBenefits
-  RSpec.describe Site, type: :model, dbclean: :around_each do
-    # let(:site) { Site.new }
+  RSpec.describe Site, type: :model, dbclean: :after_each do
 
     let(:site_key)            { :usa }
     let(:long_name)           { "ACME Widget's Benefit Website" }
     let(:short_name)          { "Benefit Website" }
     let(:domain_name)         { "hbxshop.org" }
+    let(:benefit_market_kind) { :aca_shop }
 
     let(:owner_legal_name)    { "ACME Widgets" }
     let(:owner_organization)  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, profiles: [profile]) }
     let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
     let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
 
+    let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+
 
     let(:params) do
       {
         site_key: site_key,
-        owner_organization: owner_organization,
         long_name: long_name,
         short_name: short_name,
         domain_name: domain_name,
+        owner_organization: owner_organization,
+        benefit_markets: [benefit_market],
       }
     end
 
@@ -50,6 +53,20 @@ module SponsoredBenefits
         it "should not be valid" do
           site.validate
           expect(site).to_not be_valid
+        end
+      end
+
+      context "with two benefit markets of the same kind" do
+        let(:same_benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+
+        let(:site) { Site.new(params) }
+
+        before { site.benefit_markets << same_benefit_market }
+
+        it "should not be valid" do
+          site.validate
+          expect(site).to_not be_valid
+          expect(site.errors[:benefit_markets].first).to match(/cannot be more than one/)
         end
       end
 
@@ -157,7 +174,6 @@ module SponsoredBenefits
         let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
         let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
 
-        # before { loony_organization.profiles << [ profile ] }
         before { site.benefit_markets << benefit_market }
 
         it "assigned benefit market should be associated with site" do
@@ -190,17 +206,18 @@ module SponsoredBenefits
 
 
           it "should find the right benefit_markets using benefit_market_for" do
-            # binding.pry
-            expect(shop_only_site.benefit_market_for(shop_kind).count).to eq 1
-            expect(shop_only_site.benefit_market_for(individual_kind).count).to eq 0
+            expect(shop_only_site.benefit_market_for(shop_kind)).to eq shop_benefit_market_1
+            expect(shop_only_site.benefit_market_for(individual_kind)).to be_nil
 
-            expect(ivl_only_site.benefit_market_for(shop_kind).count).to eq 0
-            expect(shop_and_ivl_site.benefit_market_for(shop_kind).count).to eq 1
+            expect(ivl_only_site.benefit_market_for(shop_kind)).to be_nil
+            expect(shop_and_ivl_site.benefit_market_for(shop_kind)).to eq shop_benefit_market_2
 
-            expect(ivl_only_site.benefit_market_for(individual_kind).count).to eq 1
-            expect(shop_and_ivl_site.benefit_market_for(individual_kind).count).to eq 1
+            expect(ivl_only_site.benefit_market_for(individual_kind)).to eq ivl_benefit_market_1
+            expect(shop_and_ivl_site.benefit_market_for(individual_kind)).to eq ivl_benefit_market_2
           end
         end
+
+
       end
 
     end

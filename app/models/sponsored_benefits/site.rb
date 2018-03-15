@@ -65,6 +65,8 @@ module SponsoredBenefits
     # has_many :families,         class_name: "::Family"
 
     validates_presence_of :site_key, :owner_organization
+    validate :association_limits
+
 
     scope :by_site_key,   ->(site_key) { where(site_key: site_key) }
 
@@ -99,6 +101,15 @@ module SponsoredBenefits
         input_string = input_string.slice!(1, input_string.length - 1)
       end
       input_string
+    end
+
+    def association_limits
+      SponsoredBenefits::BENEFIT_MARKET_KINDS.each do |market_kind|
+        market_count = benefit_markets.select { |market| market.kind == market_kind }
+        if market_count.size > 1
+          errors.add(:benefit_markets, "cannot be more than one #{market_kind}")
+        end
+      end
     end
 
 
