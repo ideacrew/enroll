@@ -113,12 +113,21 @@ module SponsoredBenefits
         @fein = numeric_fein
       end
 
-      def sponsor_benefits_for(profile, benefit_market)
-        if profile.benefit_sponsorship_eligible?
-          benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
+      def sponsor_benefits_for(sponsorship_profile)
+        if sponsorship_profile.benefit_sponsorship_eligible?
+
+          if sponsorship_profile._type == "SponsoredBenefits::Organizations::HbxProfile"
+            benefit_market = site.benefit_market_for(:aca_individual)
+          else
+            benefit_market = site.benefit_market_for(:aca_shop)
+          end
+
+          new_sponsorship = benefit_sponsorships.build(sponsorship_profile: sponsorship_profile, benefit_market: benefit_market)
         else
           raise SponsoredBenefits::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
-        end 
+        end
+
+        new_sponsorship
       end
 
 

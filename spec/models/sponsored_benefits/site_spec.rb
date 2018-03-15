@@ -26,7 +26,6 @@ module SponsoredBenefits
     end
 
     context "ability to create, validate and persist instances of this class" do
-
       context "with no arguments" do
         let(:site)  { Site.new }
 
@@ -136,7 +135,7 @@ module SponsoredBenefits
       let(:loony_legal_name)    { "Loony Tunes, LLC" }
       let(:itune_legal_name)    { "iTunes, Inc" }
 
-      let!(:site)                { FactoryGirl.create(:sponsored_benefits_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
+      let!(:site)               { FactoryGirl.create(:sponsored_benefits_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
       let(:owner_organization)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
       let!(:loony_organization) { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
       let!(:acme_organization)  { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
@@ -151,7 +150,6 @@ module SponsoredBenefits
       end
 
       it "should have correct number of employer_profiles" do
-# binding.pry
         expect((site.site_organizations.employer_profiles).size).to eq 2
       end
 
