@@ -48,6 +48,8 @@ class Person
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
   VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
+  NON_SHOP_ROLES = ['Individual','Coverall']
+
   field :hbx_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
