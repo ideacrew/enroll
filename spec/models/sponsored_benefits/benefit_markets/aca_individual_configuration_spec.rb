@@ -3,7 +3,7 @@ require 'rails_helper'
 module SponsoredBenefits
   RSpec.describe BenefitMarkets::AcaIndividualConfiguration, type: :model, dbclean: :around_each do
 
-  	 let(:aca_individual_configuration) { AcaIndividualConfiguration.new }
+    let(:aca_individual_configuration) { AcaIndividualConfiguration.new }
 
     let(:mm_enr_due_on)       { 15 }
     let(:vr_os_window)    	  { 0 }
@@ -22,24 +22,20 @@ module SponsoredBenefits
     end
 
     context "with all required arguments" do
-        let(:valid_aca_individual_configuration) { described_class.new(params) }
+      let(:valid_aca_individual_configuration) { described_class.new(params) }
 
-        it "should be valid" do
-          valid_aca_individual_configuration.validate
-          expect(valid_aca_individual_configuration).to be_valid
-        end
+      it "should be valid" do
+        valid_aca_individual_configuration.validate
+        expect(valid_aca_individual_configuration).to be_valid
+      end
 
-        it "all provided attributes should be set" do
-          expect(valid_aca_individual_configuration.mm_enr_due_on).to eq mm_enr_due_on
-          expect(valid_aca_individual_configuration.vr_os_window).to eq vr_os_window
-          expect(valid_aca_individual_configuration.vr_due).to eq vr_due
-          expect(valid_aca_individual_configuration.open_enrl_start_on).to eq open_enrl_start_on
-          expect(valid_aca_individual_configuration.open_enrl_end_on).to eq open_enrl_end_on
-        end
-    end 
-	end
+      it "all provided attributes should be set" do
+        expect(valid_aca_individual_configuration.mm_enr_due_on).to eq mm_enr_due_on
+        expect(valid_aca_individual_configuration.vr_os_window).to eq vr_os_window
+        expect(valid_aca_individual_configuration.vr_due).to eq vr_due
+        expect(valid_aca_individual_configuration.open_enrl_start_on).to eq open_enrl_start_on
+        expect(valid_aca_individual_configuration.open_enrl_end_on).to eq open_enrl_end_on
+      end
+    end
+  end
 end
-
-
-
-
