@@ -9,7 +9,7 @@ module SponsoredBenefits
 
       PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
-      attr_reader :market_configuration, :contact_center_profile
+      attr_reader :contact_center_profile
 
       field :kind,        type: Symbol #, default: :aca_individual  # => :aca_shop
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
@@ -19,12 +19,12 @@ module SponsoredBenefits
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       has_many    :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      has_one  :configuration, as: :market_configuration,   class_name: "SponsoredBenefits::BenefitMarkets::Configuration" 
+      embeds_one  :configuration, class_name: "SponsoredBenefits::BenefitMarkets::Configuration" 
 
       # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
       #                                     autobuild: true
 
-      validates_presence_of :market_configuration #, :contact_center_setting
+      validates_presence_of :configuration #, :contact_center_setting
 
       validates :kind,
         inclusion:  { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
@@ -94,23 +94,22 @@ module SponsoredBenefits
         return unless kind.present? && SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(kind)
 
         # if kind == :aca_individual
-        #   market_configuration = aca_individual_configuration
+        #   configuration = aca_individual_configuration
         # else
-        #   market_configuration = aca_shop_configuration
+        #   configuration = aca_shop_configuration
         # end
-
+ 
         klass_name = configuration_class_name
-        market_configuration = klass_name.constantize.new
-        market_configuration
+        self.configuration = klass_name.constantize.new
       end
-
-      private
 
       # Configuration setting model is automatically associated based on "kind" attribute value
       def configuration_class_name
         config_klass = "#{kind.to_s}_configuration".camelcase
         namespace_for(self.class) + "::#{config_klass}"
       end
+
+      private
 
       # Isolate the namespace portion of the passed class
       def namespace_for(klass)
