@@ -1647,35 +1647,44 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context "calculate_start_on_options" do
+    number_of_months_available = Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
+    initial_application_rules = Settings.aca.shop_market.initial_application
+    let(:start_day_offset) { 0.days }
+    let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:dates) {
+      dates = []
+      number_of_months_available.times do
+        next_date = dates.last || initial_signup_date
+        dates << next_date.next_month.beginning_of_month
+      end
+      dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+    }
 
-    it "should return one option if start date is before settings day of month offset" do
-      next_start = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month.next_month
-      dates = [next_start].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days + 5.days)
+    before do
+      allow(PlanYear).to receive(:enrollment_shopping_start_day_offset).and_return(start_day_offset)
+      TimeKeeper.set_date_of_record_unprotected!(initial_signup_date + PlanYear.enrollment_shopping_start_day_offset)
+    end
+
+    it "should return #{number_of_months_available} options" do
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
-    it "should return one option but for the next month if after offset and enrollment monthly deadline" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month.next_month
-      dates = [date1]
-      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 2).times do
-        dates << dates.last.next_month
+    context "after the publish deadline" do
+      let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month + initial_application_rules.publish_due_day_of_month.days }
+
+      it "should return #{number_of_months_available - 1} option(s) if current date is after the publish deadline" do
+        dates.shift
+        expect(PlanYear.calculate_start_on_options).to eq dates
       end
-      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days + 5.days)
-      expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
-    it "should return three options" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
-      dates = [date1]
-      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 2).times do
-        dates << dates.last.next_month
-      end
-      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+    context "with a enrollment start day offset" do
+      let(:start_day_offset) { 10.days }
+      let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month + 1.day }
 
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
-      expect(PlanYear.calculate_start_on_options).to eq []
+      it "should return #{number_of_months_available - 1} option(s) if date is after the offset" do
+        expect(PlanYear.calculate_start_on_options).to eq dates
+      end
     end
   end
 
@@ -2591,7 +2600,7 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
     let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: aasm_state, start_on: start_on) }
     let(:plan_year) { employer_profile.plan_years.where(aasm_state: aasm_state)[0]}
     let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
-    let(:quiet_period_end) { 
+    let(:quiet_period_end) {
       quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months)
       TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.initial_application.quiet_period.mday))
     }
@@ -2609,7 +2618,7 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
     context 'when plan year active' do
       let(:aasm_state) { 'active' }
 
-      it 'should return initial employer quiet period' do 
+      it 'should return initial employer quiet period' do
         quiet_period = plan_year.enrollment_quiet_period
         expect(quiet_period.begin).to eq (quiet_period_begin)
         expect(quiet_period.end).to eq (quiet_period_end)
@@ -2617,14 +2626,14 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
     end
   end
 
-  context 'renewing employer profile' do 
+  context 'renewing employer profile' do
     let!(:employer_profile) {
-      create(:employer_with_renewing_planyear, start_on: start_on, 
+      create(:employer_with_renewing_planyear, start_on: start_on,
         renewal_plan_year_state: aasm_state
       )
     }
 
-    let!(:plan_year) { 
+    let!(:plan_year) {
       plan_year = employer_profile.plan_years.where(aasm_state: aasm_state)[0]
       plan_year.workflow_state_transitions.build(from_state: :renewing_draft, to_state: :renewing_enrolling)
       employer_profile.plan_years.detect{|py| py.active?}.update(aasm_state: 'expired')
@@ -2633,7 +2642,7 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
     }
 
     let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
-    let(:quiet_period_end) { 
+    let(:quiet_period_end) {
       quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months)
       TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.renewal_application.quiet_period.mday))
     }
@@ -2641,7 +2650,7 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
     context "when plan year renewing" do
       let(:aasm_state) { 'renewing_enrolling' }
 
-      it 'should return renewing employer quiet period' do 
+      it 'should return renewing employer quiet period' do
         quiet_period = plan_year.enrollment_quiet_period
         expect(quiet_period.begin).to eq (quiet_period_begin)
         expect(quiet_period.end).to eq (quiet_period_end)
