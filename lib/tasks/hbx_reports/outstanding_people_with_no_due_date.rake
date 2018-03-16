@@ -15,6 +15,7 @@ namespace :reports do
       CSV.open(file_name, 'w', force_quotes: true) do |csv|
         csv << %w[HBX_ID First_Name Last_Name Due_Date DC_Residency Citizenship Social_Security_Number American_Indian/Alaskan_Native Immigration_Status]
         families.each do |family|
+          next if family.has_valid_e_case_id?
           primary_family_member = family.primary_family_member
           person = primary_family_member.person
           min_verification_due_date = family.min_verification_due_date.present? ? family.min_verification_due_date : (TimeKeeper.date_of_record+ 95.days).strftime('%Y-%m-%d')
