@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 module SponsoredBenefits
-  RSpec.describe BenefitMarkets::BenefitMarket, type: :model, dbclean: :around_each do
+  RSpec.describe BenefitMarkets::BenefitMarket, type: :model, dbclean: :after_each do
 
-    let(:kind)        { :aca_shop }
-    let(:title)       {  "DC Health Link SHOP Market" }
-    let(:description) {  "Health Insurance Marketplace for District Employers and Employees" }
+    let(:kind)            { :aca_shop }
+    let(:title)           {  "DC Health Link SHOP Market" }
+    let(:description)     {  "Health Insurance Marketplace for District Employers and Employees" }
 
     let(:params) do
       {
@@ -17,48 +17,52 @@ module SponsoredBenefits
 
     context "ability to create, validate and persist instances of this class" do
       context "with no arguments" do
-        subject { described_class.new }
+        let(:benefit_market) { BenefitMarkets::BenefitMarket.new }
 
         it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
+          benefit_market.validate
+          expect(benefit_market).to_not be_valid
         end
       end
 
       context "with no kind attribute" do
-        subject { described_class.new(params.except(:kind)) }
+        let(:benefit_market) { BenefitMarkets::BenefitMarket.new(params.except(:kind)) }
 
         it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
+          benefit_market.validate
+          expect(benefit_market).to_not be_valid
         end
       end
 
       context "with invalid kind attribute" do
-        let(:invalid_kind)  { :corner_market }
-        subject { described_class.new(kind: invalid_kind) }
+        let(:invalid_kind)    { :corner_market }
+        let(:benefit_market)  { BenefitMarkets::BenefitMarket.new(kind: invalid_kind) }
 
         it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-          expect(subject.errors[:kind].first).to match(/is not a valid market kind/)
+          benefit_market.validate
+          expect(benefit_market).to_not be_valid
+          expect(benefit_market.errors[:kind].first).to match(/is not a valid market kind/)
         end
       end
 
       context "with valid kind attribute" do
-        subject { described_class.new(kind: valid_kind) }
         let(:valid_kind)        { :aca_shop }
+        let(:benefit_market)    { BenefitMarkets::BenefitMarket.new(params) }
         let(:valid_class_name)  { "SponsoredBenefits::BenefitMarkets::AcaShopConfiguration" }
 
+        before { benefit_market.kind = valid_kind  }
+
         it "should set a kind-appropropriate configuration setting" do
-          expect(subject.configuration_setting.class.to_s).to eq valid_class_name
+    # binding.pry
+          expect(benefit_market.kind).to eq valid_kind
+          expect(benefit_market.configuration_setting.class.to_s).to eq valid_class_name
           # expect(SponsoredBenefits::BenefitMarkets::BenefitMarket.new(kind: shop_kind).configuration_setting.class).to eq configuration_setting_class
           # expect(benefit_market.configuration_setting.class).to eq configuration_setting_class
         end
       end
 
       context "with all required arguments" do
-        let(:valid_benefit_market)  { described_class.new(params) }
+        let(:valid_benefit_market)  { BenefitMarkets::BenefitMarket.new(params) }
 
         it "all provided attributes should be set" do
           expect(valid_benefit_market.kind).to eq kind
