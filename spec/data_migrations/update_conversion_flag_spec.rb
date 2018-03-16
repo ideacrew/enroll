@@ -14,7 +14,7 @@ describe UpdateConversionFlag, :dbclean => :after_each do
   describe "updating conversion flag of employer" do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile,legal_name:'tyutuyyuyutuytuytyu')}
 
-    it "should update profile source to self_serve and shouldn't approve employer attestation" do
+    it "should update profile source to self_serve and should approve employer attestation" do
       ENV["fein"] = employer_profile.fein
       ENV["profile_source"] = "self_serve"
       subject.migrate
