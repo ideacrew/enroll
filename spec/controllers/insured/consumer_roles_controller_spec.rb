@@ -428,6 +428,27 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
+  context "Post update application type" do
+    let(:person) { FactoryGirl.create(:person, :with_family, :with_consumer_role) }
+    let(:consumer_params) {{"family"=>{"application_type"=>"Phone"}}}
+    before :each do
+      sign_in user
+    end
+
+    before :each do
+      request.env["HTTP_REFERER"] = "http://test.com"
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+    end
+
+    it "should redirect back to the same page" do
+      post :update_application_type, consumer_role_id: person.consumer_role.id, :consumer_role => consumer_params
+      expect(response).to redirect_to :back
+    end
+
+  end
+
   describe "Post match resident role" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:resident_parameters) { { :first_name => "John", :last_name => "Smith1", :dob => "4/4/1972" }}
