@@ -1,10 +1,8 @@
 module SponsoredBenefits
   module BenefitMarkets
-    class AcaIndividualConfiguration
-      include Mongoid::Document
-      include Mongoid::Timestamps
+    class AcaIndividualConfiguration < Configuration
 
-      embedded_in :benefit_market, class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+      field :foo, type: String
 
     end
   end
