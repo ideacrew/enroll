@@ -10,7 +10,7 @@ module SponsoredBenefits
       field :open_enrl_start_on,   as: :open_enrollment_start_on, type: Date, default: Date.new(2017,11,1)
       field :open_enrl_end_on,     as: :open_enrollment_end_on, type: Date, default: Date.new(2017,01,31)
 
-      embeds_one :initial_configuration,  class_name: "SponsoredBenefits::BenefitMarkets::AcaInitialIndividualConfiguration",
+      embeds_one :initial_configuration,  class_name: "SponsoredBenefits::BenefitMarkets::AcaIndividualInitialApplicationConfiguration",
                                           autobuild: true
     end
   end

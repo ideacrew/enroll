@@ -1,6 +1,6 @@
 module SponsoredBenefits
   module BenefitMarkets
-    class AcaInitialIndividualConfiguration
+    class AcaIndividualInitialApplicationConfiguration
       include Mongoid::Document
       include Mongoid::Timestamps
 
