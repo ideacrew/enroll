@@ -15,7 +15,7 @@ describe UpdateEeDot, dbclean: :after_each do
   describe "updating termination date for an Employee" do
 
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, coverage_terminated_on:TimeKeeper.date_of_record,employer_profile: employer_profile)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)
@@ -28,6 +28,12 @@ describe UpdateEeDot, dbclean: :after_each do
       census_employee.reload
       expect(census_employee.employment_terminated_on).to eq (TimeKeeper.date_of_record - 20.days)
     end
+
+     it "should not update coverage termination date" do
+       subject.migrate
+       census_employee.reload
+       expect(census_employee.coverage_terminated_on).to eq (TimeKeeper.date_of_record)
+     end
   end
 
   describe "updating coverage termination date for an Employee" do
