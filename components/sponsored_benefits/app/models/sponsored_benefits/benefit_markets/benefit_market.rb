@@ -1,3 +1,6 @@
+# BenefitMarket is a marketplace where BenefitSponsors choose benefit products to offer to their members.  Market behaviors and products 
+# are governed by law, along with rules and policies of the market owner.  ACA Individual market and ACA SHOP market are two example market kinds.
+# BenefitMarket owners publish and refresh benefit products on a periodic basis using BenefitCatalogs
 module SponsoredBenefits
   module BenefitMarkets
     class BenefitMarket
@@ -6,9 +9,9 @@ module SponsoredBenefits
 
       PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
-      attr_reader :configuration_setting, :contact_center_profile
+      attr_reader :contact_center_profile
 
-      field :kind,        type: Symbol  # => :aca_shop
+      field :kind,        type: Symbol #, default: :aca_individual  # => :aca_shop
       field :title,       type: String, default: "" # => DC Health Link SHOP Market
       field :description, type: String, default: ""
 
@@ -16,12 +19,12 @@ module SponsoredBenefits
       has_many    :benefit_applications,  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
       has_many    :benefit_catalogs,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      embeds_one :configuration_setting,  class_name: "SponsoredBenefits::BenefitMarkets::AcaIndividualConfiguration",
-                                          autobuild: true
+      embeds_one  :configuration, class_name: "SponsoredBenefits::BenefitMarkets::Configuration" 
+
       # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
       #                                     autobuild: true
 
-      validates_presence_of :configuration_setting #, :contact_center_setting
+      validates_presence_of :configuration #, :contact_center_setting
 
       validates :kind,
         inclusion:  { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
@@ -31,13 +34,14 @@ module SponsoredBenefits
 
       # Mongoid initializes associations after setting attributes. It's necessary to autobuild the 
       # configuration file and subsequently change following initialization, if necessary
-      after_initialize :initialize_configuration_setting
+      before_validation :reset_configuration_attributes, if: :kind_changed?
 
       def kind=(new_kind)
         return unless SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(new_kind)
-        @kind = new_kind
-        write_attribute(:kind, new_kind)
-        initialize_configuration_setting
+        # write_attribute(:kind, new_kind)
+        # @kind = new_kind
+        super(new_kind)
+        reset_configuration_attributes
       end
 
       # Catalogs with benefit products currently available for purchase
@@ -86,28 +90,26 @@ module SponsoredBenefits
         Settings.aca.shop_market.open_enrollment.minimum_length.days
       end
 
+      def reset_configuration_attributes
+        return unless kind.present? && SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(kind)
 
-      def reset_configuration_setting
-        return unless kind.present?
-
+        # if kind == :aca_individual
+        #   configuration = aca_individual_configuration
+        # else
+        #   configuration = aca_shop_configuration
+        # end
+ 
         klass_name = configuration_class_name
-        self.configuration_setting = klass_name.constantize.new
-      end
-
-      private
-
-      def initialize_configuration_setting
-        klass_name = configuration_class_name
-        reset_configuration_setting if self.has_configuration_setting? && (klass_name != configuration_setting.class.to_s)
-
-        configuration_setting
+        self.configuration = klass_name.constantize.new
       end
 
       # Configuration setting model is automatically associated based on "kind" attribute value
       def configuration_class_name
-        config_klass = "#{@kind.to_s}_configuration".camelcase
+        config_klass = "#{kind.to_s}_configuration".camelcase
         namespace_for(self.class) + "::#{config_klass}"
       end
+
+      private
 
       # Isolate the namespace portion of the passed class
       def namespace_for(klass)

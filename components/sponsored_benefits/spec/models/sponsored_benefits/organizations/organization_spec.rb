@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module SponsoredBenefits
-  RSpec.describe Organizations::Organization, type: :model do
+  RSpec.describe Organizations::Organization, type: :model, dbclean: :after_each do
 
     context "an Organization is hierarchical with a top level agency and child divisions" do
       let(:agency_name)             { "Multinational Conglomerate, Ltd" }
@@ -69,6 +69,68 @@ module SponsoredBenefits
         end
       end
     end
+
+
+    context "a health exchange sets up a site offering ACA individual and shop benefit markets" do
+      let(:shop_kind)           { :aca_shop }
+      let(:individual_kind)     { :aca_individual }
+      let(:hbx_name)            { "Health Exchange Unlimited, LTD" }
+      let(:hbx_profile)         { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
+      let!(:hbx_site)           { FactoryGirl.create(:sponsored_benefits_site, 
+                                                        owner_organization: hbx_organization, 
+                                                        site_organizations: [ hbx_organization ],
+                                                        benefit_markets: [shop_benefit_market, ivl_benefit_market]
+                                                      ) 
+                                                    }
+      let(:hbx_organization)    { FactoryGirl.build(:sponsored_benefits_organizations_exempt_organization, 
+                                                        legal_name: hbx_name, 
+                                                        profiles: [hbx_profile]
+                                                      )
+                                                    }
+      let(:shop_benefit_market)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, 
+                                                        :with_benefit_catalog,
+                                                        kind: shop_kind
+                                                      ) 
+                                                    }
+
+      let(:ivl_benefit_market)    { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, 
+                                                        :with_benefit_catalog,
+                                                        kind: individual_kind
+                                                      ) 
+                                                    }
+
+      it "a site should exist with an individual and shop market" do
+        expect(hbx_site.benefit_markets.size).to eq 2
+      end
+
+      context "and an employer sponsors benefits" do
+        let(:employer_name)            { "Spacely Sprockets, Inc." }
+        let(:employer_organization)    { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, 
+                                                              legal_name: employer_name, 
+                                                              profiles: [employer_profile],
+                                                              site: hbx_site
+                                                            )
+                                                          }
+        let(:employer_profile)      { FactoryGirl.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) }
+
+        before { employer_organization.sponsor_benefits_for(employer_profile) }
+
+        it "should add a benefit_sponsorship to the organization" do
+          expect(employer_organization.benefit_sponsorships.size).to eq 1
+        end
+
+        it "benefit sponsorship should be associated with the correct profile" do
+          expect(employer_organization.benefit_sponsorships.first.sponsorship_profile).to eq employer_profile
+        end
+
+        it "benefit sponsorship should be associated with the correct benefit market" do
+          expect(employer_organization.benefit_sponsorships.first.benefit_market).to eq shop_benefit_market
+        end
+
+      end
+
+    end
+
 
   end
 end

@@ -22,7 +22,6 @@ module SponsoredBenefits
                   class_name: "SponsoredBenefits::Organizations::Organization"
 
       # This sponsorship's workflow status
-      field :site_id,                 type: String
       field :initial_effective_date,  type: Date
       field :sponsorship_profile_id,  type: BSON::ObjectId
 
