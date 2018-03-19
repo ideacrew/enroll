@@ -147,8 +147,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
-      observer = Observers::Observer.new
-      observer.trigger_notice(recipient: @person.active_employee_roles.first, event_object: @qle, notice_event: "sep_request_denial_notice")
+      trigger_notice_observer(@person.active_employee_roles.first, @qle, "sep_request_denial_notice")
     end
   end
 

@@ -575,7 +575,6 @@ RSpec.describe Insured::FamiliesController do
     end
 
     describe "with invalid params" do
-      let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
 
       it "returns qualified_date as false for invalid future date" do
         xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}
@@ -605,41 +604,28 @@ RSpec.describe Insured::FamiliesController do
         expect(assigns(:future_qualified_date)).to eq(false)
       end
 
-      it "trigger sep_request_denial_notice for unqualified date when qle market kind is shop" do
-        qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop')
-        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
-        expect(controller).to receive(:sep_request_denial_notice)
-        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
-      end
-
-
       it "future_qualified_date should return nil when qle market kind is indiviual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
         expect(response).to have_http_status(:success)
-        expect(controller).not_to receive(:sep_request_denial_notice)
         expect(assigns(:qualified_date)).to eq true
         expect(assigns(:future_qualified_date)).to eq(nil)
-      end
-
-      it "should not trigger sep_request_denial_notice unqualified date  when qle market kind is individual" do
-        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
-        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
-        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
-        expect(controller).not_to receive(:sep_request_denial_notice)
-        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
       end
     end
 
     context "GET check_qle_date" do
-      let(:user) { FactoryGirl.create(:user) }
-      let(:person) { FactoryGirl.build(:person) }
-      let(:family) { FactoryGirl.build(:family) }
+      let!(:user) { FactoryGirl.create(:user) }
+      let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+      let(:employee_role) { person100.employee_roles.first }
+      let!(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+
       before :each do
-        allow(user).to receive(:person).and_return person
-        allow(person).to receive(:primary_family).and_return family
+        allow(user).to receive(:person).and_return person100
+        allow(person100).to receive(:primary_family).and_return family
+        allow(employee_role).to receive(:census_employee).and_return census_employee
       end
 
       context "normal qle event" do
@@ -660,8 +646,13 @@ RSpec.describe Insured::FamiliesController do
       end
 
       context "special qle events which can not have future date" do
+        subject { Observers::Observer.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
         it "should return true" do
-          sign_in user
           date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
           xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
           expect(response).to have_http_status(:success)
@@ -669,15 +660,27 @@ RSpec.describe Insured::FamiliesController do
         end
 
         it "should return false" do
-          sign_in user
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
           xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
 
+        it "should return false and also notify sep request denied" do
+          date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
+          xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+          expect(assigns(:qualified_date)).to eq false
+
+          expect(subject).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employee.sep_request_denial_notice"
+            expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
+            expect(payload[:event_object_id]).to eq qle.id.to_s
+          end
+
+          subject.trigger_notice(recipient: employee_role, event_object:qle, notice_event: "sep_request_denial_notice")
+        end
+
         it "should have effective_on_options" do
-          sign_in user
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
           effective_on_options = [TimeKeeper.date_of_record, TimeKeeper.date_of_record - 10.days]
           allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
