@@ -138,4 +138,8 @@ module Config::AcaHelper
    Settings.site.broker_claim_quoting_enabled
   end
 
+  def aca_broker_routing_information
+    Settings.aca.broker_routing_information
+  end
+
 end
