@@ -47,14 +47,7 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
 
   def check_for_unverified_individuals
     family = recipient.primary_family
-    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
-          (
-          hbx_en.terminated_on.blank? ||
-              hbx_en.terminated_on >= TimeKeeper.date_of_record
-          )
-    end
-    enrollments.reject!{|e| e.coverage_terminated? }
+    enrollments = family.enrollments.where(:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }, :kind => "individual")
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
@@ -71,46 +64,21 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     append_unverified_individuals(outstanding_people)
   end
 
-  def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
-  end
-
-  def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship')
-  end
-
-  def immigration_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Immigration status')
-  end
-
-  def american_indian_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
-  end
-
-  def residency_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('DC Residency')
-  end
-
   def append_unverified_individuals(people)
     people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if immigration_status_outstanding?(person)
-        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if american_indian_status_outstanding?(person)
-        notice.american_indian_unverified  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if residency_outstanding?(person)
-        notice.residency_inconsistency  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+      person.consumer_role.outstanding_verification_types.each do |verification_type|
+        case verification_type
+          when "Social Security Number"
+            notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+          when "Immigration status"
+            notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+          when "Citizenship"
+            notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+          when "American Indian Status"
+            notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+          when "DC Residency"
+            notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        end
       end
     end
   end
@@ -124,51 +92,6 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     notice.current_year = TimeKeeper.date_of_record.year
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.primary_firstname = recipient.first_name.titleize
-  end
-
-
-  def is_dc_resident(person)
-    return false if person.no_dc_address == true && person.no_dc_address_reason.blank?
-    return true if person.no_dc_address == true && person.no_dc_address_reason.present?
-
-    address_to_use = person.addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
-    if person.addresses.present?
-      if person.addresses.select{|address| address.kind == address_to_use && address.state == 'DC'}.present?
-        return true
-      else
-        return false
-      end
-    else
-      return ""
-    end
-  end
-
-  def phone_number(legal_name)
-    case legal_name
-      when "BestLife"
-        "(800) 433-0088"
-      when "CareFirst"
-        "(855) 444-3119"
-      when "Delta Dental"
-        "(800) 471-0236"
-      when "Dominion"
-        "(855) 224-3016"
-      when "Kaiser"
-        "(844) 524-7370"
-    end
-  end
-
-  def citizen_status(status)
-    case status
-      when "us_citizen"
-        "US Citizen"
-      when "LP"
-        "Lawfully Present"
-      when "NC"
-        "US Citizen"
-      else
-        ""
-    end
   end
 
 end
