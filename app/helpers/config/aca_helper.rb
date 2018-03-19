@@ -138,4 +138,8 @@ module Config::AcaHelper
    Settings.site.broker_claim_quoting_enabled
   end
 
+  def aca_address_query_county
+    Settings.aca.address_query_county
+  end
+    
 end

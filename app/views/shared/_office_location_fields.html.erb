@@ -55,7 +55,7 @@
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                  <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP',oninvalid:"checkZip(this);", oninput:"checkZip(this);", data: { 'child-index': "#{f.index.to_s}" } %>
               </div>
-              <% if controller_name == 'employer_profiles' %>
+              <% if controller_name == 'employer_profiles' && aca_address_query_county %>
                 <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd <%= 'primary-office-location' if primary_office_location %>">
                    <% @counties = RatingArea.find_counties_for(zip_code: address.object.try(:zip)) %>
                    <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
