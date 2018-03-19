@@ -15,9 +15,9 @@ class Employers::BrokerAgencyController < ApplicationController
         @page_alphabet = cur_page_no(@page_alphabets.first)
         @organizations = @orgs.where("legal_name" => /^#{@page_alphabet}/i)
       else
-        @organizations = @orgs.limit(10).to_a
+        @organizations = @orgs.limit(12).to_a
       end
-      @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1)
+      @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
     else
       results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
       if results.first.is_a?(Person)

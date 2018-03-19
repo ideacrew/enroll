@@ -39,7 +39,7 @@
 </div>
 <div class="row container">
   <div class="col-md-12" id="paginator">
-    <%= paginate @broker_agency_profiles, :remote => true, :param_name => "organization_page", :params => {:page => @page_alphabet} %>
+    <%= paginate @broker_agency_profiles, :remote => true, :param_name => "organization_page", :params => {:page => @page_alphabet || "A"} %>
   </div>
 </div>
 <% if @page_alphabets.present? %>
