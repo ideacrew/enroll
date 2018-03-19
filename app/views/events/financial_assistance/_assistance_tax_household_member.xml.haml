@@ -4,7 +4,7 @@
       = render :partial => "events/individuals/individual", :object => assistance_tax_household_member.person, as: :individual, :locals=> {family_id: financial_assistance_application.family.id}
       %is_primary_applicant= assistance_tax_household_member.family_member.is_primary_applicant
       %is_consent_applicant= assistance_tax_household_member.family_member.is_consent_applicant
-      %is_coverage_applicant= assistance_tax_household_member.family_member.is_coverage_applicant
+      %is_coverage_applicant= assistance_tax_household_member.family_member.person.consumer_role.is_applying_coverage
       - if assistance_tax_household_member.is_without_assistance.present?
         %is_without_assistance= assistance_tax_household_member.is_without_assistance
       - if assistance_tax_household_member.is_ia_eligible.present?
