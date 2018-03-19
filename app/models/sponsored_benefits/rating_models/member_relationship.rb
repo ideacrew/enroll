@@ -5,20 +5,49 @@ module SponsoredBenefits
       include Mongoid::Timestamps
 
 
-      # ACA_SHOP_PERSONAL_RELATINSHIP_KINDS = [
-      #                                           :employee, 
-      #                                           :spouse, 
-      #                                           :domestic_partner, 
-      #                                           :child_under_26, 
-      #                                           :child_26_and_over
-      #                                         ]
+      ACA_SHOP_RELATIONSHIP_KINDS =       [
+                                            :self, 
+                                            :survivor,
+                                            :spouse, 
+                                            :domestic_partner, 
+                                            :child_under_26, 
+                                            :disabled_children_26_and_over,
+                                            :child_26_and_over,
+                                          ]
 
-      # ACA_INDIVIDUAL_PERSONAL_RELATINSHIP_KINDS = [
-      #                                                 :self, 
-      #                                                 :spouse, 
-      #                                                 :domestic_partner, 
-      #                                                 :child
-      #                                               ]
+      ACA_INDIVIDUAL_RELATIONSHIP_KINDS = [
+                                            :self,
+                                            :survivor,
+                                            :spouse,
+                                            :domestic_partner,
+                                            :child,
+                                            :parent,
+                                            :sibling,
+                                            :ward,
+                                            :guardian,
+                                            :unrelated,
+                                            :other_tax_dependent,
+                                            :aunt_or_uncle,
+                                            :nephew_or_niece,
+                                            :grandchild,
+                                            :grandparent,
+                                          ]
+
+      RELATIONSHIPS_UI =                  [
+                                            :self,
+                                            :survivor, 
+                                            :spouse,
+                                            :domestic_partner,
+                                            :child,
+                                            :parent,
+                                            :sibling,
+                                            :unrelated,
+                                            :aunt_or_uncle,
+                                            :nephew_or_niece,
+                                            :grandchild,
+                                            :grandparent,
+                                          ]
+
 
       embedded_in :rating_tier, class_name: "SponsoredBenefits::RatingModels::RatingTier"
 
@@ -26,13 +55,13 @@ module SponsoredBenefits
       field :ordinal_position,          type: Integer
       field :key,                       type: Symbol
       field :title,                     type: String
-      field :member_relationship_kinds, type: Array, default: []
+      field :member_relationship_map,   type: Array, default: []
 
 
       embeds_one  :sponsor_credit, 
                   class_name: "SponsoredBenefits::RatingModels::SponsorCredit"
 
-      validates_presence_of :ordinal_position, :key, :member_relationship_kinds
+      validates_presence_of :ordinal_position, :key, :member_relationship_map
 
 
 
@@ -53,18 +82,18 @@ module SponsoredBenefits
       end
 
 
-      def relationship_to_tier_map
+      def rating_tier
 
         # MA mapping
-        # employee_only:                        [:employee == 1, :spouse == 0, :dependent == 0, :survivor == 0],
-        # employee_and_spouse_only:             [:employee == 1, :spouse == 1, :dependent == 0, :survivor == 0],
-        # employee_and_one_or_more_dependents:  [:employee == 1, :spouse == 0, :dependent > 0,  :survivor == 0],
-        # family:                               [:employee == 1, :spouse == 1, :dependent > 0,  :survivor == 0],
+        # employee_only:                        :employee == 1, :spouse == 0, :dependent == 0, :survivor == 0
+        # employee_and_spouse_only:             :employee == 1, :spouse == 1, :dependent == 0, :survivor == 0
+        # employee_and_one_or_more_dependents:  :employee == 1, :spouse == 0, :dependent > 0,  :survivor == 0
+        # family:                               :employee == 1, :spouse == 1, :dependent > 0,  :survivor == 0
 
         # Congress mapping
-        # employee_only:                        [:employee == 1, :spouse == 0, :dependent == 0, :survivor == 0],
-        # employee_and_one_dependent:           [:employee == 1, :spouse == 0, :dependent == 1, :survivor == 0],
-        # employee_and_two_or_more_dependents:  [:employee == 1, :spouse == 0, :dependent > 1,  :survivor == 0],
+        # employee_only:                        :employee == 1, :spouse == 0, :dependent == 0, :survivor == 0
+        # employee_and_one_dependent:           :employee == 1, :spouse == 0, :dependent == 1, :survivor == 0
+        # employee_and_two_or_more_dependents:  :employee == 1, :spouse == 0, :dependent > 1,  :survivor == 0
 
       end
 
