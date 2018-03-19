@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 module SponsoredBenefits
-  RSpec.describe BenefitMarkets::AcaInitialIndividualConfiguration, type: :model, dbclean: :around_each do
+  RSpec.describe BenefitMarkets::AcaIndividualInitialApplicationConfiguration, type: :model, dbclean: :around_each do
 
-  	let(:aca_initial_individual_configuration) { AcaInitialIndividualConfiguration.new }
+  	let(:aca_initial_individual_configuration) { AcaIndividualInitialApplicationConfiguration.new }
 
     let(:pub_due_dom)       { 5 }
     let(:erlst_strt_prior_eff_months)    	  { -3 }
