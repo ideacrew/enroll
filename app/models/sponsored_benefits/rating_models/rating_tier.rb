@@ -9,6 +9,7 @@ module SponsoredBenefits
       field :hbx_id,                            type: String
       field :title,                             type: String
       field :description,                       type: String, default: ""
+      field :ordinal_position,                  type: Integer
 
       # Sponsor elects to offer contributions toward this rating tier
       field :is_offered,                        type: Boolean
