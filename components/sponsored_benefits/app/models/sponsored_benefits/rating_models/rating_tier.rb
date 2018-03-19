@@ -4,41 +4,28 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      CREDIT_STRUCTURE_KINDS = [ 
-                                  :percent_with_cap,                  # Congress
-                                  :reference_plan_percent,            # DC SHOP list bill
-                                  :group_composite_percent,           # MA SHOP
-                                  :fixed_dollar_only,                 # DC Individual financial assistance
-                                  :reference_plan_percent_with_cap,  
-                                  :percent_only, 
-                                ]
+      embedded_in :rating_model, class_name: "SponsoredBenefits::RatingModels::RatingModel"
 
-      # Mapped relationships are evaulated in ordered sequence
-      field :ordinal_position,                  type: Integer
-      field :key,                               type: Symbol
+      field :hbx_id,                            type: String
       field :title,                             type: String
       field :description,                       type: String, default: ""
+
+      # Sponsor elects to offer contributions toward this rating tier
       field :is_offered,                        type: Boolean
 
       # Sponsor must offer contributions toward to this rating tier
       field :is_required,                       type: Boolean
 
-      field :sponsor_credit_structure_kind,     type: Symbol
 
-      embeds_one  :credit_structure, as: :sponsor_contribution,
+      embeds_one  :sponsor_credit,
                   class_name: "SponsoredBenefits::RatingModels::CreditStructure"
 
-      embeds_many :member_relationships,
-                  class_name: "SponsoredBenefits::RatingModels::MemberRelationship"
-
-      validates_presence_of :ordinal_position, :is_offered, :is_required, :sponsor_contribution,
-                            :member_relationships
+      embeds_one  :member_relationship_map,
+                  class_name: "SponsoredBenefits::RatingModels::MemberRelationshipMap"
 
 
-      validates :sponsor_credit_structure_kind,
-        inclusion:  { in: CREDIT_STRUCTURE_KINDS, message: "%{value} is not a valid credit structure kind" },
-        allow_nil:  false
-
+      validates_presence_of :hbx_id, :is_offered, :is_required, 
+                            :sponsor_credit, :member_relationship_map
 
       alias_method :is_offered?, :is_offered
       alias_method :is_required?, :is_required
