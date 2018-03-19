@@ -53,19 +53,24 @@ module SponsoredBenefits
 
       # Mapped relationships are evaulated in ordered sequence
       field :ordinal_position,          type: Integer
-      field :key,                       type: Symbol
       field :title,                     type: String
-      field :member_relationship_map,   type: Array, default: []
+      field :description,               type: String, default: ""
 
+
+      embeds_many :member_relationship_maps,
+                  class_name: "SponsoredBenefits::RatingModels:MemberRelationshipMap"
 
       embeds_one  :sponsor_credit, 
                   class_name: "SponsoredBenefits::RatingModels::SponsorCredit"
 
-      validates_presence_of :ordinal_position, :key, :member_relationship_map
+      validates_presence_of :ordinal_position, :member_relationship_maps
 
 
+      # TODO
+      # Build a relationship_map for the given member set
+      def relationship_map_for(enrollment_group)
 
-      def reduce_relationships
+        # Fold enrollment group into relationship_map
 
         # MA relationships
         # :employee,  # => employee
@@ -79,10 +84,13 @@ module SponsoredBenefits
         # :survivor,  # => survivor
         # :dependent, # => spouse, domestic partner, child, child + age < 26, child + is_disabled? 
 
+        relationship_map
       end
 
 
-      def rating_tier
+      # TODO
+      # Return the rating tier that matches the primary member's enrollment group
+      def rating_tier_for(relationship_map)
 
         # MA mapping
         # employee_only:                        :employee == 1, :spouse == 0, :dependent == 0, :survivor == 0
@@ -95,6 +103,7 @@ module SponsoredBenefits
         # employee_and_one_dependent:           :employee == 1, :spouse == 0, :dependent == 1, :survivor == 0
         # employee_and_two_or_more_dependents:  :employee == 1, :spouse == 0, :dependent > 1,  :survivor == 0
 
+        rating_tier
       end
 
 
