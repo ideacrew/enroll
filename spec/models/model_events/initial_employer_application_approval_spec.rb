@@ -10,6 +10,9 @@ describe 'ModelEvents::InitialEmployerApplicationApproval' do
   let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'draft' ) }
 
   describe "ModelEvent" do
+    before do
+      allow(model_instance).to receive(:is_application_unpublishable?).and_return false
+    end
     context "when initial employer's application is approved" do
 
       it "should trigger model event" do
