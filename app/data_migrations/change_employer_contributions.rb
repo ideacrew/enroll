@@ -14,12 +14,11 @@ class ChangeEmployerContributions < MongoidMigrationTask
     end
     if kind == "health"
       rb = organizations.first.employer_profile.plan_years.where(aasm_state: state).first.benefit_groups.first.relationship_benefits.where(:relationship => relationship).first
-      rb.update_attributes(:premium_pct => premium, offered: offered)
     elsif kind == "dental"
       rb = organizations.first.employer_profile.plan_years.where(aasm_state: state).first.benefit_groups.first.dental_relationship_benefits.where(:relationship => relationship).first
-      rb.update_attributes(:premium_pct => premium, offered: offered)
     else
       raise "Please provide accurate coverage kind"
     end
+    rb.update_attributes(:premium_pct => premium, offered: offered)
   end
 end
