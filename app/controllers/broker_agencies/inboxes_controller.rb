@@ -51,8 +51,13 @@ class BrokerAgencies::InboxesController < InboxesController
     if Person.find(params["id"]).id.to_s == id
       @inbox_provider = Person.find(params["id"])
     else
-      @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
-      @inbox_provider = @broker_agency_provider
+      @broker_agency_provider = BrokerAgencyProfile.where(:_id => params["id"]||params['profile_id'])
+      if @broker_agency_provider.present?
+        @inbox_provider = @broker_agency_provider
+      else
+        @inbox_provider = Person.where(:_id => id).first
+      end
+
     end
 
   end
