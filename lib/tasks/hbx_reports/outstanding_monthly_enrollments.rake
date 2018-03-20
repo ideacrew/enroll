@@ -21,7 +21,9 @@ namespace :reports do
                    'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name','Policy in Glue?']
     CSV.open("#{Rails.root}/hbx_report/#{ENV['start_date']}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
-      feins = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on} }).map(&:fein)
+      feins_1 = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on, :aasm_state => 'enrolled'} }, :"employer_profile.aasm_state".in => ['binder_paid']).map(&:fein)
+      feins_2 = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on, :aasm_state => 'renewing_enrolled' }).map(&:fein)
+      feins = (feins_1 + feins_2).uniq
       enrollment_ids = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
       enrollment_ids.each do |id|
         hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
