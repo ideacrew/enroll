@@ -151,7 +151,7 @@ module Config::AcaHelper
   end
 
   def aca_security_questions
-    Settings.aca.aca_security_questions
+    Settings.aca.security_questions
   end
 
 end
