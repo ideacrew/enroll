@@ -10,6 +10,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
     before do
       sign_in user
       allow(BrokerAgencyProfile).to receive(:where).and_return(inbox_provider)
+      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:_id).and_return('xxx')
@@ -30,6 +31,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
       allow(BrokerAgencyProfile).to receive(:where).and_return(inbox_provider)
+      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(inbox_provider).to receive(:inbox).and_return(inbox)
       allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)
@@ -82,6 +84,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(user)
       allow(BrokerAgencyProfile).to receive(:find).and_return(inbox_provider)
+      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(controller).to receive(:find_message)
       controller.instance_variable_set(:@message, message)
       allow(message).to receive(:update_attributes).and_return(true)
