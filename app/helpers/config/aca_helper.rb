@@ -149,4 +149,9 @@ module Config::AcaHelper
   def aca_broker_routing_information
     Settings.aca.broker_routing_information
   end
+
+  def aca_security_questions
+    Settings.aca.aca_security_questions
+  end
+
 end
