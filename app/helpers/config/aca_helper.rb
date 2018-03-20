@@ -138,4 +138,8 @@ module Config::AcaHelper
    Settings.site.broker_claim_quoting_enabled
   end
 
+  def calendar_is_enabled?
+    Settings.aca.calendar_enabled
+  end
+
 end
