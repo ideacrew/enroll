@@ -105,6 +105,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
   describe "GET show on Message with no Profile" do
     let(:message){double(to_a: double("to_array"))}
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"))}
+    let(:id){double(id: "1")}
     before do
       allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
@@ -113,11 +114,11 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
       allow(controller).to receive(:find_message)
       controller.instance_variable_set(:@message, message)
       allow(message).to receive(:update_attributes).and_return(true)
-      allow(person).to receive(:_id).and_return('12345678')
+      allow(Person).to receive(:find).and_return(id)
     end
 
     it "show action" do
-      get :show, id: 1
+      get :show, id: id
       expect(response).to have_http_status(:success)
     end
   end
