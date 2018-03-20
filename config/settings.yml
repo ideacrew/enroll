@@ -145,6 +145,7 @@ aca:
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
+    new_employee_paper_application: false
 
     earliest_enroll_prior_to_effective_on:
       days: -30

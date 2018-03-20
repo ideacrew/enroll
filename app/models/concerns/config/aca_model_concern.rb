@@ -7,6 +7,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_cobra_enrollment_period_in_months, to: :class
     delegate :aca_shop_market_employer_family_contribution_percent_minimum, to: :class
     delegate :aca_shop_market_employer_contribution_percent_minimum, to: :class
+    delegate :aca_shop_market_new_employee_paper_application_is_enabled?, to: :class
     delegate :individual_market_is_enabled?, to: :class
     delegate :general_agency_enabled?, to: :class
     delegate :use_simple_employer_calculation_model?, to: :class
@@ -40,6 +41,10 @@ module Config::AcaModelConcern
 
     def aca_shop_market_employer_family_contribution_percent_minimum
       @@aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
+    end
+
+    def aca_shop_market_new_employee_paper_application_is_enabled?
+      @@aca_shop_market_new_employee_paper_application ||= Settings.aca.shop_market.new_employee_paper_application
     end
 
     def aca_shop_market_employer_contribution_percent_minimum
