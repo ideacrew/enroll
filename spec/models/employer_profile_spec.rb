@@ -499,11 +499,13 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
     let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", legal_name: 'broker agency organization 7')}
+    let(:broker_agency_profile7)  {FactoryGirl.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
+    let(:broker_role7) { FactoryGirl.create(:broker_role) }
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
+    let(:observer) { Observers::Observer.new }
 
     def er3; organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
     def er4; organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
@@ -538,6 +540,23 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
+    end
+
+    it 'should trigger broker_agency_fired_confirmation notice' do
+      employer = organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111')
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      employer = Organization.find(employer.organization.id).employer_profile
+      employer.fire_broker_agency(TimeKeeper.date_of_record)
+      expect(observer).to receive(:notify) do |event_name, payload|
+        expect(event_name).to eq "acapi.info.events.broker_agency_profile.broker_agency_fired_confirmation"
+        expect(payload[:event_object_kind]).to eq 'EmployerProfile'
+        expect(payload[:event_object_id]).to eq employer.id.to_s
+      end
+
+      observer.trigger_notice(recipient: broker_agency_profile7, event_object: employer, notice_event: "broker_agency_fired_confirmation")
+      employer.save
     end
 
     it 'shows an employer selected a broker for the first time' do
