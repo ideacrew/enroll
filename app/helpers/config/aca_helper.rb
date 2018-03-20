@@ -145,4 +145,8 @@ module Config::AcaHelper
   def aca_address_query_county
     Settings.aca.address_query_county
   end
+
+  def aca_broker_routing_information
+    Settings.aca.broker_routing_information
+  end
 end
