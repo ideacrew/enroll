@@ -22,6 +22,7 @@
         <th>HBX ID</th>
         <th>Transition User?</th>
         <th>New Market</th>
+        <th>Reason Code</th>
         <th>Effective Date</th>
       </tr>
       <% @family_members.each do |family_member| %>
@@ -32,8 +33,9 @@
         <td><%= person.dob %></td>
         <td><%= person.hbx_id %></td>
         <td><%= check_box_tag "transition_user_#{person.id}", person.id %></td>
-        <td><%= select_tag "transition_user_#{person.id}", options_for_select(@non_shop_market_kinds, "1") %></td>
-        <td><%= text_field_tag "effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "form-control date-field date-picker"%></td>
+        <td><%= select_tag "transition_market_kind_#{person.id}", options_for_select(IndividualMarketTransition::ROLE_TYPES, "1") %></td>
+        <td><%= select_tag "transition_reason_#{person.id}", options_for_select(IndividualMarketTransition::REASON_CODES, "1") %></td>
+        <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "form-control date-field date-picker"%></td>
       </tr>
       <% end %>
       <tr><td colspan = "7"><br /></td></tr>

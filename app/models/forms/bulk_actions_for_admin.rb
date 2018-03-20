@@ -53,6 +53,24 @@ module Forms
 
     def transition_family_members
       # Handle transitions here
+      params.each do |key, value|
+        if key.to_s[/transition_user_.*/]
+          person = Person.find(value)
+          market_kind = params["transition_market_kind_#{value}"]
+          effective_date = Date.strptime(params["transition_effective_date_#{value}"], "%m/%d/%Y")
+          transition_reason = params["transition_reason_#{value}"]
+          person.individual_market_transitions.build(role_type: market_kind, effective_starting_on: effective_date, reason_code: transition_reason, submitted_at: ::TimeKeeper.datetime_of_record)
+
+          begin
+            person.save!
+            @result[:success] << person
+            # handle endating previous transition(s)
+            # creation of SEP?
+          rescue
+            @result[:failure] << person
+          end
+        end
+      end
     end
 
     private
