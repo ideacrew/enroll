@@ -6,11 +6,12 @@
 # from options (e.g. organization_agency, organization_office_location, organization_dba, organization_entity_kind)
 # => GeneralOrganization if fein.present?
 # => ExemptOrganization if fein.blank?
-# If profile.is_benefit_sponsorship_eligible?
 # => Initialize BenefitSponsorship with BenefitCatalog association
 # Note following rules:
+# => Only works if profile.is_benefit_sponsorship_eligible?
 # => Only one HbxProfile may exist per Site
 # => Only HbxProfile, FehbProfile (Congress), and EmployerProfile and subclasses are eligible for BenefitSponsorship
+
 module SponsoredBenefits
   module Organizations
     class BenefitSponsorFactory
