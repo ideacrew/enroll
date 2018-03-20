@@ -153,4 +153,8 @@ module Config::AcaHelper
   def aca_broker_routing_information
     Settings.aca.broker_routing_information
   end
+
+  def aca_recaptcha_enabled
+    Settings.aca.recaptcha_enabled
+  end
 end
