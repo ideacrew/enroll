@@ -3,8 +3,9 @@ module Notifier
     include Virtus.model
 
     attribute :coverage_start_on, String
-    # attribute :coverage_end_on, Date
+    attribute :coverage_end_on, String
     attribute :plan_name, String
+    attribute :enrolled_count, String
     # attribute :metal_level, String
     # attribute :coverage_kind, String
     # attribute :plan_carrier, String

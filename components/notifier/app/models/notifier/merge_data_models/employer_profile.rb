@@ -20,6 +20,8 @@ module Notifier
     # attribute :plan, MergeDataModels::Plan
     attribute :plan_year, MergeDataModels::PlanYear
     attribute :addresses, Array[MergeDataModels::Address]
+    attribute :employee,  MergeDataModels::EmployeeProfile
+    attribute :enrollment, MergeDataModels::Enrollment
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployerProfile.new({

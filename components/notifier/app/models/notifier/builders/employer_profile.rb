@@ -2,6 +2,7 @@ module Notifier
   class Builders::EmployerProfile
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
+    include Notifier::Builders::HbxEnrollment
 
     attr_accessor :employer_profile, :merge_model, :payload
     
@@ -10,6 +11,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
+      data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       @merge_model = data_object
     end
 

@@ -815,28 +815,6 @@ shop_notice_triggers = [
         ]
     },
 
-    {
-        hbx_id: 'SHOP_M039',
-        title: 'Employee Terminating coverage',
-        description: 'Employee Terminating coverage after QLE',
-        resource_name: 'employer',
-        event_name: 'notify_employer_when_employee_terminate_coverage',
-        notice_triggers: [
-          {
-            name: 'Notice to employer when employee terminates coverage',
-            notice_template: 'notices/employee_terminating_coverage',
-            notice_builder: 'EmployeeTerminatingCoverage',
-            mpi_indicator: 'SHOP_M039',
-            notice_trigger_element_group: {
-              market_places: ['shop'],
-              primary_recipients: ["employer"],
-              primary_recipient_delivery_method: ["secure_message"],
-              secondary_recipients: []
-            }
-          }
-        ]
-    },
-
    {
    hbx_id: 'SHOP46',
    title: 'Broker Hired Confirmation Notice',
