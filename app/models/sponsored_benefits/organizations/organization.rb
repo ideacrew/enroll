@@ -114,7 +114,7 @@ module SponsoredBenefits
       end
 
       def sponsor_benefits_for(sponsorship_profile)
-        if sponsorship_profile.benefit_sponsorship_eligible?
+        if sponsorship_profile.is_benefit_sponsorship_eligible?
 
           if sponsorship_profile._type == "SponsoredBenefits::Organizations::HbxProfile"
             benefit_market = site.benefit_market_for(:aca_individual)

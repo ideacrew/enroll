@@ -15,10 +15,10 @@ module SponsoredBenefits
       private 
 
       def initialize_profile
-        return unless benefit_sponsorship_eligible.blank?
+        return unless is_benefit_sponsorship_eligible.blank?
 
-        write_attribute(:benefit_sponsorship_eligible, false)
-        @benefit_sponsorship_eligible = false
+        write_attribute(:is_benefit_sponsorship_eligible, false)
+        @is_benefit_sponsorship_eligible = false
         self
       end
 
