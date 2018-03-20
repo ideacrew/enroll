@@ -6,3 +6,6 @@ namespace :migrations do
   desc "Update Employer Profile profile source using fein"
   UpdateConversionFlag.define_task :update_conversion_flag => :environment
 end
+
+
+#RAILS_ENV=production bundle exec rake migrations:update_conversion_flag fein="466575778" profile_source="self_serve"

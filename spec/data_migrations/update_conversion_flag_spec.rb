@@ -12,7 +12,7 @@ describe UpdateConversionFlag, :dbclean => :after_each do
   end
 
   describe "updating conversion flag of employer" do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile,legal_name:'tyutuyyuyutuytuytyu')}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
 
     it "should update profile source to self_serve and should approve employer attestation" do
       ENV["fein"] = employer_profile.fein
@@ -32,4 +32,22 @@ describe UpdateConversionFlag, :dbclean => :after_each do
       expect(employer_profile.employer_attestation.aasm_state).to eq "approved"
     end
   end
+
+  describe "employer with denied employer attestation" do
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'denied',employer_profile:employer_profile) }
+
+
+    it "should approve employer attestation" do
+      ENV["fein"] = employer_profile.fein
+      ENV["profile_source"] = "self_serve"
+      expect(employer_attestation.aasm_state).to eq "denied"
+      subject.migrate
+      employer_profile.reload
+      expect(employer_profile.profile_source).to eq "self_serve"
+      expect(employer_profile.employer_attestation.aasm_state).to eq "approved"
+    end
+  end
+
+
 end

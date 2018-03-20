@@ -34,7 +34,7 @@ class EmployerAttestation
     end
 
     event :revert, :after => :record_transition do
-      transitions from: [:submitted], to: :unsubmitted
+      transitions from: [:submitted,:denied,:pending], to: :unsubmitted
     end
   end
 
