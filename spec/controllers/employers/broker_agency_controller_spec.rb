@@ -28,6 +28,12 @@ RSpec.describe Employers::BrokerAgencyController do
 
   describe ".index" do
 
+    it "should render js template" do
+      sign_in(@user)
+      xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name
+      expect(response.content_type).to eq Mime::JS
+    end
+
     context 'with out search string' do
       before(:each) do
         sign_in(@user)

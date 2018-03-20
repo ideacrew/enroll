@@ -12,6 +12,7 @@ site:
   forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
+  exchange_hbx_id: "DC0"
 
   social_media:
     facebook_url: ""
