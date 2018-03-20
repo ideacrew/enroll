@@ -113,6 +113,7 @@ aca:
   calendar_enabled: false
   address_query_county: false
   broker_routing_information: false
+  recaptcha_enabled: false
 
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   reference_carriers_for_metal_level: ["bronze","silver", "gold", "dental"]
@@ -218,6 +219,7 @@ aca:
   transmit_employers_immediately: false
   transmit_scheduled_employers: true
   employer_transmission_day_of_month: 16
+  employer_has_sic_field: false
 
   use_simple_employer_calculation_model: true
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
