@@ -27,8 +27,8 @@
                     glyphicon_class: 'glyphicon-briefcase'
                   }
                   %>
-                  
-    <% if !aca_user_accounts_enabled %>
+
+    <% if aca_user_accounts_enabled %>
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'user-account',
