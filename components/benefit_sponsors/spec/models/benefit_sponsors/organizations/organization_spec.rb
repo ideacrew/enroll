@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module SponsoredBenefits
+module BenefitSponsors
   RSpec.describe Organizations::Organization, type: :model, dbclean: :after_each do
 
     context "an Organization is hierarchical with a top level agency and child divisions" do
@@ -8,8 +8,8 @@ module SponsoredBenefits
       let(:business_division_name)  { "Business Ops" }
       let(:it_division_name)        { "Information Technology Ops" }
       let(:it_devops_division_name) { "DevOps" }
-      let(:agency)                  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: agency_name) }
-      let(:it_division)             { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: it_division_name) }
+      let(:agency)                  { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: agency_name) }
+      let(:it_division)             { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: it_division_name) }
 
       before do
         agency.divisions.build(legal_name: business_division_name) 
@@ -36,8 +36,8 @@ module SponsoredBenefits
     context "a broker gains access to an employer's information for plan_design" do
       let(:employer_name)           { "Classy Cupcakes, Corp" }
       let(:broker_name)             { "Busy Brokers, Inc" }
-      let!(:employer_organization)  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: employer_name) }
-      let!(:broker_organization)    { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: broker_name) }
+      let!(:employer_organization)  { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: employer_name) }
+      let!(:broker_organization)    { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: broker_name) }
 
       before { broker_organization.plan_design_subjects << employer_organization }
 

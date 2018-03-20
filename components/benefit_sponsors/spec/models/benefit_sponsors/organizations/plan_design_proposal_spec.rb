@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-module SponsoredBenefits
+module BenefitSponsors
   RSpec.describe Organizations::PlanDesignProposal, type: :model do
     let(:initial_enrollment_period){ Date.new(2018,5,1)..Date.new(2019,4,30) }
-    let(:profile) { SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new }
+    let(:profile) { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new }
 
     describe "#instance methods" do
-      let(:organization){ SponsoredBenefits::Organizations::PlanDesignOrganization.new }
+      let(:organization){ BenefitSponsors::Organizations::PlanDesignOrganization.new }
       let(:plan_design_proposals){
         [organization.plan_design_proposals.build({title: "new proposal for new client", profile: profile})]
       }

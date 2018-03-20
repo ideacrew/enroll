@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module SponsoredBenefits
+module BenefitSponsors
   RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
 
     describe "#expire proposals for non Prospect Employer" do
@@ -116,7 +116,7 @@ module SponsoredBenefits
         context "active plan year present" do
           it "should return plan design proposal with renewal effective date and status" do
             proposal = plan_design_organization.build_proposal_from_existing_employer_profile
-            expect(proposal).to be_kind_of(SponsoredBenefits::Organizations::PlanDesignProposal)
+            expect(proposal).to be_kind_of(BenefitSponsors::Organizations::PlanDesignProposal)
             expect(proposal.effective_date).to eq start_on.next_year
             expect(proposal.aasm_state).to eq 'renewing_draft'
           end
@@ -127,7 +127,7 @@ module SponsoredBenefits
 
           it "should return plan design proposal with initial effective date and status" do
             proposal = plan_design_organization.build_proposal_from_existing_employer_profile
-            expect(proposal).to be_kind_of(SponsoredBenefits::Organizations::PlanDesignProposal)
+            expect(proposal).to be_kind_of(BenefitSponsors::Organizations::PlanDesignProposal)
             expect(proposal.effective_date).to eq calculated_dates[0]
             expect(proposal.aasm_state).to eq 'draft'
           end

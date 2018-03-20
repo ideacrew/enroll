@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module SponsoredBenefits
+module BenefitSponsors
   RSpec.describe Site, type: :model, dbclean: :after_each do
 
     let(:site_key)            { :usa }
@@ -10,7 +10,7 @@ module SponsoredBenefits
     let(:benefit_market_kind) { :aca_shop }
 
     let(:owner_legal_name)    { "ACME Widgets" }
-    let(:owner_organization)  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, profiles: [profile]) }
+    let(:owner_organization)  { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, profiles: [profile]) }
     let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
     let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
 
@@ -92,7 +92,7 @@ module SponsoredBenefits
           before { valid_site.save }
 
           it "should be findable by site_key" do
-            expect(SponsoredBenefits::Site.by_site_key(site_key).size).to eq 1
+            expect(BenefitSponsors::Site.by_site_key(site_key).size).to eq 1
           end
         end
       end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module SponsoredBenefits
+module BenefitSponsors
   RSpec.describe Organizations::PlanDesignProposalBuilder, type: :model do
     pending "add some examples to (or delete) #{__FILE__}"
   end

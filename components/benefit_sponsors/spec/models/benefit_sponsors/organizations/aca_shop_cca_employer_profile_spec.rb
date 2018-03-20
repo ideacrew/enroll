@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module SponsoredBenefits
+module BenefitSponsors
   RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model, dbclean: :after_each  do
 
     let(:sic_code)        { '1111' }
@@ -23,7 +23,7 @@ module SponsoredBenefits
 
     context "Embedded in a Plan Design Proposal" do
       let(:title)                     { 'New proposal' }
-      let(:cca_employer_profile)      { SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
+      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
 
       let(:plan_design_organization)  { Organizations::PlanDesignOrganization.new(fein: fein, legal_name: legal_name, sic_code: sic_code) }
       let(:plan_design_proposal)      { plan_design_organization.plan_design_proposals.build(title: title, profile: cca_employer_profile) }
