@@ -15,8 +15,10 @@
         </div><br>
 
         <div class="action-group">
+          <% if aca_broker_routing_information %>
           <%= render "broker_agencies/applicants/bank_information", f: f %>
           <p class="bank-name-container"></p>
+          <% end %>
         </div>
 
         <div class="row no-buffer row-form-wrapper no-border">
