@@ -145,4 +145,9 @@ module Config::AcaHelper
   def aca_address_query_county
     Settings.aca.address_query_county
   end
+
+  def aca_recaptcha_enabled
+    Settings.aca.recaptcha_enabled
+  end
+
 end
