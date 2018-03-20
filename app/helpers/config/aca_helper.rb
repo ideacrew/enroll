@@ -23,6 +23,10 @@ module Config::AcaHelper
     @aca_shop_market_valid_employer_attestation_documents_url ||= Settings.aca.shop_market.valid_employer_attestation_documents_url
   end
 
+  def aca_shop_market_new_employee_paper_application_is_enabled?
+    @aca_shop_market_new_employee_paper_application ||= Settings.aca.shop_market.new_employee_paper_application
+  end
+
 
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
