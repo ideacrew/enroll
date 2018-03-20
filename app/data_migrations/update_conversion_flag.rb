@@ -28,7 +28,6 @@ class UpdateConversionFlag < MongoidMigrationTask
   def attestation_doc(employer)
     attestation = employer.employer_attestation.blank?  ? employer.build_employer_attestation : employer.employer_attestation
     attestation.revert! if attestation.may_revert?
-    puts "Reverted attestation to unsubmitted state"
     attestation.submit! if attestation.may_submit?
     attestation.approve! if attestation.may_approve?
     attestation.save
