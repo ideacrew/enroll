@@ -65,9 +65,9 @@ module BenefitMarkets
 
     def open_enrollment_minimum_begin_day_of_month(use_grace_period = false)
       if use_grace_period
-        open_enrollment_end_on_day_of_month - open_enrollment_grace_period_minimum_length_days
+        configuration.open_enrollment_end_on_montly - configuration.open_enrollment_grace_period_length_days_min
       else
-        open_enrollment_end_on_day_of_month - open_enrollment_minimum_length_days
+        configuration.open_enrollment_end_on_montly - configuration.open_enrollment_days_min
       end
     end
 
@@ -77,15 +77,15 @@ module BenefitMarkets
     end
 
     def open_enrollment_end_on_day_of_month
-      Settings.aca.shop_market.open_enrollment.monthly_end_on
+      configuration.open_enrollment_end_on_montly
     end
 
     def open_enrollment_minimum_length_days
-      Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
+      configuration.open_enrollment_adv_days_min
     end
 
     def open_enrollment_grace_period_minimum_length_days
-      Settings.aca.shop_market.open_enrollment.minimum_length.days
+      configuration.open_enrollment_minimum_length_days
     end
 
     def reset_configuration_attributes
