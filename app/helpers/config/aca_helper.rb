@@ -161,4 +161,8 @@ module Config::AcaHelper
   def aca_security_questions
     Settings.aca.security_questions
   end
+
+  def aca_user_accounts_enabled
+    Settings.aca.user_accounts_enabled
+  end
 end

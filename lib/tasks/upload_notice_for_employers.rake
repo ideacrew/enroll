@@ -1,4 +1,5 @@
-# Run the following - bundle exec rake migrations:generate_notices
+# Run the following - bundle exec rake migrations:generate_notices input_file_name=upload_notice_to_employers
+
 
 require 'csv'
 
@@ -6,7 +7,9 @@ namespace :migrations do
   desc "Adding notices to ER accounts"
   task :generate_notices => :environment do
 
-    CSV.foreach("#{Rails.root}/lib/termination_notice_employers.csv") do |notice_info|
+    input_file_name = ENV['input_file_name']
+
+    CSV.foreach("#{Rails.root}/lib/#{input_file_name}.csv") do |notice_info|
       fein, file_path, notice_name = notice_info
       ENV['file_path'] = file_path
       ENV['fein'] = fein
