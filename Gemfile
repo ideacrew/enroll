@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
+gem "benefit_sponsors", path: "components/benefit_sponsors"
 
 gem 'aasm', '~> 4.8.0'
 gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.0.0'
