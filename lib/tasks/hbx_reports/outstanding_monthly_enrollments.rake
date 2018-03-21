@@ -19,7 +19,7 @@ namespace :reports do
 
     field_names = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Enrollment Group ID', 
                    'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name','Policy in Glue?']
-    CSV.open("#{Rails.root}/hbx_report/#{ENV['start_date']}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
+    CSV.open("#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
       feins_1 = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on, :aasm_state => 'enrolled'} }, :"employer_profile.aasm_state".in => ['binder_paid']).map(&:fein)
       feins_2 = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on, :aasm_state => 'renewing_enrolled'}}).map(&:fein)
