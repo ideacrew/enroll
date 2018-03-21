@@ -165,4 +165,8 @@ module Config::AcaHelper
   def aca_user_accounts_enabled
     Settings.aca.user_accounts_enabled
   end
+
+  def employer_attestation_is_enabled?
+    Settings.aca.employer_attestation
+  end
 end
