@@ -811,38 +811,63 @@ class PlanYear
        binder_payment_due_date: binder_payment_due_date}
     end
 
-    def map_binder_payment_due_date_by_start_on(start_on)
-      dates_map = {}
-      {
-        "2017-01-01" => '2016,12,23',
-        "2017-02-01" => '2017,1,23',
-        "2017-03-01" => '2017,2,23',
-        "2017-04-01" => '2017,3,23',
-        "2017-05-01" => '2017,4,24',
-        "2017-06-01" => '2017,5,23',
-        "2017-07-01" => '2017,6,23',
-        "2017-08-01" => '2017,7,24',
-        "2017-09-01" => '2017,8,23',
-        "2017-10-01" => '2017,9,25',
-        "2017-11-01" => '2017,10,23',
-        "2017-12-01" => '2017,11,24',
-        "2018-01-01" => '2017,12,26',
-        "2018-02-01" => '2018,1,23',
-        "2018-03-01" => '2018,2,23',
-        "2018-04-01" => '2018,3,23',
-        "2018-05-01" => '2018,4,23',
-        "2018-06-01" => '2018,5,23',
-        "2018-07-01" => '2018,6,25',
-        "2018-08-01" => '2018,7,23',
-        "2018-09-01" => '2018,8,23',
-        "2018-10-01" => '2018,9,24',
-        "2018-11-01" => '2018,10,23',
-        "2018-12-01" => '2018,11,23',
-        "2019-01-01" => '2018,12,24',
-      }.each_pair do |k, v|
-        dates_map[k] = Date.strptime(v, '%Y,%m,%d')
-      end
+    def nth_wday(n, wday, month, year)
+      t = Time.local year, month, 1
+      first = t.wday
+        if first == wday
+          fwd = 1
+        elsif first < wday
+          fwd = wday - first + 1
+        elsif first > wday
+          fwd = (wday+7) - first + 1
+        end
+        target = fwd + (n-1)*7
+        begin
+          t2 = Time.local year, month, target
+        rescue ArgumentError
+        return nil
+        end
+        if t2.mday == target
+          t2
+        else
+          nil
+        end
+    end
 
+    def schedule_time(time)
+      if time.saturday?
+        return time.prev_month.end_of_month if time.day == 1
+        return time = time - 1.day
+      end
+      if time.sunday?
+        return time.next_month.beginning_of_month if time == time.end_of_month
+        return time = time  + 1.day
+      end
+      return time
+    end
+
+    def last_monday_may(year, month, day)
+      date = Date.new(year, month, day)
+      date - ( date.wday - 1 )
+    end
+
+    def map_binder_payment_due_date_by_start_on(start_on)
+      event_arr = [{event_name: "New Year's Day", event_date: schedule_time(Date.new(Date.today.year, 01, 01))}, {event_name: "Martin birthday", event_date: nth_wday(3, 1, 1, Date.today.year)}, {event_name: "President's Day", event_date: nth_wday(3, 1, 2, Date.today.year)}, {event_name: "Memorial Day", event_date: last_monday_may(Date.today.year, 5, 31)}, {event_name: "Labor day", event_date: nth_wday(1, 1, 9, Date.today.year)}, {event_name: "Columbus Day", event_date: nth_wday(2, 1, 10, Date.today.year)}, {event_name: "Veterans Day", event_date: schedule_time(Date.new(Date.today.year, 11, 11))}, {event_name: "Thanksgiving Day", event_date: nth_wday(4, 4, 11, Date.today.year)}, {event_name: "Christmas Day", event_date: schedule_time(Date.new(Date.today.year, 12, 25))}, {event_name: "Independence Day", event_date: schedule_time(Date.new(Date.today.year, 07, 04))}]
+      event_date_arr = event_arr.map{|hsh| schedule_time(hsh[:event_date])}
+      due_day = Settings.aca.shop_market.binder_payment_due_on
+      dates_map = {}
+      month = start_on.month
+      key = Date.new(TimeKeeper.date_of_record.year, month, 1)
+      year = TimeKeeper.date_of_record.year
+      if (month == 1)
+        month = 12
+        year -=1
+      end
+      to_date = Date.new(year, month, due_day)
+      while (event_date_arr.include?(to_date) or to_date.wday > 5)
+        to_date = to_date+1.day
+      end
+      dates_map[key] = to_date
       dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
     end
 
