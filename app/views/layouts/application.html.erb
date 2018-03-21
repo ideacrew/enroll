@@ -49,7 +49,9 @@
     <%= render 'layouts/header' %>
 
     <div class="content <%= controller_name %> content-bottom">
-      <%= render 'users/security_question_responses/modal' %>
+      <% if aca_security_questions %>
+        <%= render 'users/security_question_responses/modal' %>
+      <% end %>
 
       <%= render_flash %>
       <div class="container">
