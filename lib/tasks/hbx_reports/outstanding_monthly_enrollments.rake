@@ -11,7 +11,7 @@ namespace :reports do
 
   desc "Outstanding Enrollments by Employer"
   task :outstanding_monthly_enrollments => :environment do
-    effective_on = ENV['start_date'].to_date
+    effective_on = Date.strptime(ENV['start_date'],'%m/%d/%Y') 
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
 
