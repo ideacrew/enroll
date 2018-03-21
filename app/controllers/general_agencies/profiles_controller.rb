@@ -23,7 +23,6 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   def update
-    binding.pry
     authorize HbxProfile, :modify_admin_tabs?
     sanitize_agency_profile_params
     params.permit!
