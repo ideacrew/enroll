@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   require 'resque/server' 
 #  mount Resque::Server, at: '/jobs'
-  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
+  mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
   
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
