@@ -114,6 +114,8 @@ aca:
   address_query_county: false
   broker_routing_information: false
   recaptcha_enabled: false
+  security_questions: false
+  user_accounts_enabled: false
 
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   reference_carriers_for_metal_level: ["bronze","silver", "gold", "dental"]
