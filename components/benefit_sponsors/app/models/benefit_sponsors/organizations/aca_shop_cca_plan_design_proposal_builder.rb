@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class AcaShopCcaPlanDesignProposalBuilder < PlanDesignProposalBuilder
+    class AcaShopCcaPlanDesignProposalBuilder < BenefitSponsors::Organizations::PlanDesignProposalBuilder
 
 
 

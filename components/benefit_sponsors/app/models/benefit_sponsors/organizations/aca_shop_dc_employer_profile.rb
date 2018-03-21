@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class AcaShopDcEmployerProfile < Profile
+    class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
 
 
       private

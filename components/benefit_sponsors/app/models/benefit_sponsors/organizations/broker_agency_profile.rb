@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class BrokerAgencyProfile < Profile
+    class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
 
       has_many :plan_design_organizations, class_name: "BenefitSponsors::Organizations::PlanDesignOrganization", inverse_of: :broker_agency_profile
       accepts_nested_attributes_for :plan_design_organizations, class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"

@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class IssuerProfile < Profile
+    class IssuerProfile < BenefitSponsors::Organizations::Profile
       include Mongoid::Document
       include Mongoid::Timestamps
 

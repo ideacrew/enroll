@@ -1,7 +1,7 @@
 # Broker-owned model to manage attributes of the prospective of existing employer
 module BenefitSponsors
   module Organizations
-    class PlanDesignOrganization < Organization
+    class PlanDesignOrganization < BenefitSponsors::Organizations::Organization
 
 
       belongs_to  :plan_design_organization, inverse_of: :plan_design_organizations, counter_cache: true,
