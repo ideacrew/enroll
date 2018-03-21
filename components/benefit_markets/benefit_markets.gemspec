@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = BenefitMarkets::VERSION
   s.authors     = ["Brian Weiner"]
   s.email       = ["brian.weiner@dc.gov"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of BenefitMarkets."
-  s.description = "TODO: Description of BenefitMarkets."
+  s.homepage    = "https://github.com/dchbx/enroll"
+  s.summary     = "BenefitMarkets are how Exchanges define sets of related plans to be made available for shopping"
+  s.description = "For SHOP, IVL, or other market types"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
