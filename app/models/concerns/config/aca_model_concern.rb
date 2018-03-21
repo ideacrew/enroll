@@ -21,6 +21,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
     delegate :enrollment_shopping_start_day_offset, to: :class
     delegate :sic_field_exists_for_employer?, to: :class
+    delegate :employer_attestation_is_enabled?, to: :class
   end
 
   class_methods do
@@ -90,6 +91,10 @@ module Config::AcaModelConcern
 
     def non_owner_participation_count_minimum
       @@non_owner_participation_count_minimum ||= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
+    end
+
+    def employer_attestation_is_enabled?
+      @@employer_attestation ||= Settings.aca.employer_attestation
     end
 
     def enrollment_shopping_start_day_offset
