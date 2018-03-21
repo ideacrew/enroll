@@ -19,9 +19,9 @@ require 'shoulda/matchers'
 require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
-require 'factory_girl_rails'
-FactoryGirl.definition_file_paths = [File.expand_path('../factories', __FILE__)]
-FactoryGirl.find_definitions
+require 'factory_bot_rails'
+FactoryBot.definition_file_paths = [File.expand_path('../factories', __FILE__)]
+FactoryBot.find_definitions
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

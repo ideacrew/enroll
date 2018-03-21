@@ -1,6 +1,9 @@
 module BenefitMarkets
   # AcaShopConfiguration settings
   class AcaShopConfiguration < Configuration
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
     embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::AcaShopInitialApplicationConfiguration",
       autobuild: true
 
@@ -18,7 +21,7 @@ module BenefitMarkets
     field :oe_start_month, as: :open_enrollment_start_on_montly, type: Integer, default: 1
     field :oe_end_month, as: :open_enrollment_end_on_montly, type: Integer, default: 10
     field :oe_min_dys, as: :open_enrollment_days_min, type: Integer, default: 5
-    field :oe_grce_min_dys, as: open_enrollment_grace_period_length_days_min, type: Integer, default: 5
+    field :oe_grce_min_dys, as: :open_enrollment_grace_period_length_days_min, type: Integer, default: 5
     field :oe_min_adv_dys, as: :open_enrollment_adv_days_min, type: Integer, default: 5
     field :oe_max_months, as: :open_enrollment_months_max, type: Integer, default: 2
     field :cobra_epm, as: :cobra_enrollment_period_month, type: Integer, default: 6

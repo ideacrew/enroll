@@ -1,5 +1,7 @@
 module BenefitMarkets
   class AcaIndividualConfiguration < Configuration
+    include Mongoid::Document
+    include Mongoid::Timestamps
     embeds_one :initial_application_configuration,  class_name: "AcaIndividualInitialApplicationConfiguration",
       autobuild: true
 

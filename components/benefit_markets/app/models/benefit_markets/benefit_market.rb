@@ -15,8 +15,10 @@ module BenefitMarkets
     field :description, type: String, default: ""
 
     belongs_to  :site,                  class_name: "SponsoredBenefits::Site"
-    has_many    :benefit_applications,  class_name: "BenefitApplications::BenefitApplication"
-    has_many    :benefit_catalogs,      class_name: "BenefitCatalogs::BenefitCatalog"
+    #TODO: Commenting out until we connect BenefitApplications into engine
+    #has_many    :benefit_applications,  class_name: "BenefitApplications::BenefitApplication"
+    #TODO: Commenting until we add benefit_catalog class
+    #has_many    :benefit_catalogs,      class_name: "BenefitCatalogs::BenefitCatalog"
 
     embeds_one :configuration,  as: :configurable
     # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
@@ -25,7 +27,7 @@ module BenefitMarkets
     validates_presence_of :configuration #, :contact_center_setting
 
     validates :kind,
-      inclusion:  { in: SponsoredBenefits::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
+      inclusion:  { in: BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
       allow_nil:  false
 
     index({ kind:  1 })
@@ -35,7 +37,7 @@ module BenefitMarkets
     before_validation :reset_configuration_attributes, if: :kind_changed?
 
     def kind=(new_kind)
-      return unless SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(new_kind)
+      return unless BenefitMarkets::BENEFIT_MARKET_KINDS.include?(new_kind)
       # write_attribute(:kind, new_kind)
       # @kind = new_kind
       super(new_kind)
@@ -89,7 +91,7 @@ module BenefitMarkets
     end
 
     def reset_configuration_attributes
-      return unless kind.present? && SponsoredBenefits::BENEFIT_MARKET_KINDS.include?(kind)
+      return unless kind.present? && BenefitMarkets::BENEFIT_MARKET_KINDS.include?(kind)
 
       # if kind == :aca_individual
       #   configuration = aca_individual_configuration

@@ -79,8 +79,8 @@ module BenefitMarkets
     # context "benefit_market should be findable by kind" do
     #   let(:shop_kind)           { :aca_shop }
     #   let(:individual_kind)     { :aca_individual }
-    #   let!(:shop_site)          { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: shop_kind) }
-    #   let!(:individual_site)    { FactoryGirl.create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: individual_kind) }
+    #   let!(:shop_site)          { create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: shop_kind) }
+    #   let!(:individual_site)    { create(:sponsored_benefits_site, :with_owner_exempt_organization, :with_benefit_market, kind: individual_kind) }
 
     #   let(:found_sites)         { Site.by_benefit_market_kind(shop_kind) }
 
