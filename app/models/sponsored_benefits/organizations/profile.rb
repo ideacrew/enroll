@@ -12,7 +12,7 @@ module SponsoredBenefits
       field :contact_method,          type: Symbol, default: :paper_and_electronic
 
       # Terminated twice for non-payment?
-      field :benefit_sponsorship_eligible,  type: Boolean, default: false
+      field :is_benefit_sponsorship_eligible,  type: Boolean, default: false
       field :benefit_sponsorship_id,        type: BSON::ObjectId
 
       # Share common attributes across all Profile kinds
@@ -25,7 +25,7 @@ module SponsoredBenefits
       embeds_many :office_locations, 
                   class_name:"SponsoredBenefits::Organizations::OfficeLocation"
 
-      alias_method :benefit_sponsorship_eligible?, :benefit_sponsorship_eligible
+      alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
       # @abstract profile subclass is expected to implement #initialize_profile
       # @!method initialize_profile

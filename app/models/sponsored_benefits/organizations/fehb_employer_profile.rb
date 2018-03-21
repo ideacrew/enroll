@@ -1,9 +1,10 @@
 module SponsoredBenefits
   module Organizations
-    class AcaShopDcEmployerProfile < Profile
+    class FehbEmployerProfile
+    include Mongoid::Document
 
 
-      private
+      private 
 
       def initialize_profile
         return unless is_benefit_sponsorship_eligible.blank?
@@ -12,6 +13,8 @@ module SponsoredBenefits
         @is_benefit_sponsorship_eligible = true
         self
       end
+
+
     end
   end
 end
