@@ -11,7 +11,7 @@
 
 # Referencing a new BenefitSponsorship helps ensure integrity on subclassed and associated data models and
 # enables history tracking as part of the models structure
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitSponsorships
     class BenefitSponsorship
       include Mongoid::Document
@@ -19,7 +19,7 @@ module SponsoredBenefits
       # include Concerns::Observable
 
       belongs_to  :organization,
-                  class_name: "SponsoredBenefits::Organizations::Organization"
+                  class_name: "BenefitSponsors::Organizations::Organization"
 
       # This sponsorship's workflow status
       field :initial_effective_date,  type: Date
@@ -30,16 +30,16 @@ module SponsoredBenefits
 
 
       belongs_to  :rating_area,
-                  class_name: "SponsoredBenefits::Locations::RatingArea"
+                  class_name: "BenefitSponsors::Locations::RatingArea"
 
       has_many    :service_areas,
-                  class_name: "SponsoredBenefits::Locations::ServiceArea"
+                  class_name: "BenefitSponsors::Locations::ServiceArea"
 
       belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+                  class_name: "BenefitMarkets::BenefitMarket"
 
       has_many    :benefit_applications,
-                  class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+                  class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       validates_presence_of :benefit_market, :sponsorship_profile_id
 
