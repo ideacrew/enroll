@@ -148,6 +148,8 @@ class Person
 
   validate :is_ssn_composition_correct?
 
+  validate :is_single_individual_role_active?
+
   validates :gender,
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
@@ -534,11 +536,11 @@ class Person
   end
 
   def has_active_consumer_role?
-    consumer_role.present? and consumer_role.is_active?
+    consumer_role.present? && consumer_role.is_active?
   end
 
   def has_active_resident_role?
-    resident_role.present? and resident_role.is_active?
+    resident_role.present? && resident_role.is_active?
   end
 
   def can_report_shop_qle?
@@ -915,6 +917,14 @@ class Person
     end
 
     true
+  end
+
+  def is_single_individual_role_active?
+    if self.has_active_consumer_role? && self.has_active_resident_role?
+      return false
+    else
+      return true
+    end    
   end
 
   def create_inbox
