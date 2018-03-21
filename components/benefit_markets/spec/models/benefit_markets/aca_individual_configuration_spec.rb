@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-module SponsoredBenefits
-  RSpec.describe BenefitMarkets::AcaIndividualConfiguration, type: :model, dbclean: :around_each do
+module BenefitMarkets
+  RSpec.describe AcaIndividualConfiguration, type: :model, dbclean: :around_each do
 
     let(:aca_individual_configuration) { AcaIndividualConfiguration.new }
 

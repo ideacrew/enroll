@@ -28,6 +28,12 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: components/benefit_markets
+  specs:
+    benefit_markets (0.0.1)
+      rails (~> 4.2.7.1)
+
+PATH
   remote: components/sponsored_benefits
   specs:
     sponsored_benefits (0.0.1)
@@ -636,6 +642,7 @@ DEPENDENCIES
   addressable (= 2.3.8)
   animate-rails (~> 1.0.7)
   aws-sdk (= 2.2.4)
+  benefit_markets!
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
   bson (= 3.2.6)

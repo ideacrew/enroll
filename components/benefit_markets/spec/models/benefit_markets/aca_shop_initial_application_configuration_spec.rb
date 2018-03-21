@@ -1,18 +1,18 @@
 require 'rails_helper'
 
 # AcaShopInitialApplicationConfiguration test cases
-module SponsoredBenefits
-  RSpec.describe BenefitMarkets::AcaShopInitialApplicationConfiguration, type: :model do
+module BenefitMarkets
+  RSpec.describe AcaShopInitialApplicationConfiguration, type: :model do
     let(:pub_due_dom) { 10 }
     let(:quiet_per_end) { 28 }
 
     context "ability to create, validate and persist instances of this class" do
       context "with no arguments" do
         subject { described_class.new }
-        let!(:benefit_market) { SponsoredBenefits::BenefitMarkets::AcaShopConfiguration.new }
+        let!(:configuration) { BenefitMarkets::AcaShopConfiguration.new }
 
         before(:each) do
-          subject.benefit_market = benefit_market
+          subject.configuration = configuration
         end
         it "should be valid" do
           subject.validate
@@ -20,7 +20,7 @@ module SponsoredBenefits
         end
 
         it "should be benefit market" do
-          expect(subject.benefit_market).to be_instance_of(SponsoredBenefits::BenefitMarkets::AcaShopConfiguration)
+          expect(subject.configuration).to be_instance_of(BenefitMarkets::AcaShopConfiguration)
         end
       end
     end

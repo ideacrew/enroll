@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-module SponsoredBenefits
-  RSpec.describe BenefitMarkets::BenefitMarket, type: :model, dbclean: :after_each do
+module BenefitMarkets
+  RSpec.describe BenefitMarket, type: :model, dbclean: :after_each do
 
     let(:kind)            { :aca_shop }
     let(:title)           {  "DC Health Link SHOP Market" }
@@ -48,14 +48,14 @@ module SponsoredBenefits
       context "with valid kind attribute" do
         let(:valid_kind)        { :aca_shop }
         let(:benefit_market)    { BenefitMarkets::BenefitMarket.new(params) }
-        let(:valid_class_name)  { "SponsoredBenefits::BenefitMarkets::AcaShopConfiguration" }
+        let(:valid_class_name)  { "BenefitMarkets::AcaShopConfiguration" }
 
         before { benefit_market.kind = valid_kind  }
 
         it "should set a kind-appropropriate configuration setting" do
           expect(benefit_market.kind).to eq valid_kind
           expect(benefit_market.configuration.class.to_s).to eq valid_class_name
-          # expect(SponsoredBenefits::BenefitMarkets::BenefitMarket.new(kind: shop_kind).configuration_setting.class).to eq configuration_setting_class
+          # expect(BenefitMarkets::BenefitMarket.new(kind: shop_kind).configuration_setting.class).to eq configuration_setting_class
           # expect(benefit_market.configuration_setting.class).to eq configuration_setting_class
         end
       end

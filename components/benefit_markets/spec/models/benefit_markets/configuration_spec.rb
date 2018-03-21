@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-module SponsoredBenefits
-  RSpec.describe BenefitMarkets::Configuration, type: :model do
+module BenefitMarkets
+  RSpec.describe Configuration, type: :model do
     pending "add some examples to (or delete) #{__FILE__}"
   end
 end
