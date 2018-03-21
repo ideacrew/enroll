@@ -7,6 +7,7 @@ module RecaptchaConcern
     private
 
     def check_captcha
+      return unless Settings.aca.recaptcha_enabled
       case self.class.to_s
       when 'Users::RegistrationsController'
         unless verify_recaptcha
