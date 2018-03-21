@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :sponsored_benefits_benefit_markets_benefit_market, class: 'SponsoredBenefits::BenefitMarkets::BenefitMarket' do
+  factory :benefit_markets_benefit_market, class: 'BenefitMarkets::BenefitMarket' do
     kind :aca_shop
     title "DC Health Link SHOP Market"
     description "Health Insurance Marketplace for District Employers and Employees"

@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem "sponsored_benefits", path: "components/sponsored_benefits"
+gem "benefit_markets", path: "components/benefit_markets"
 gem "benefit_sponsors", path: "components/benefit_sponsors"
 
 gem 'aasm', '~> 4.8.0'
