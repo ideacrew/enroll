@@ -2,7 +2,7 @@
 # embassies and other types where FEIN is not assigned/available
 module SponsoredBenefits
   module Organizations
-    class ExemptOrganization < Organization
+    class ExemptOrganization < SponsoredBenefits::Organizations::Organization
 
 
     end
