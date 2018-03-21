@@ -3,6 +3,7 @@ require File.join(Rails.root, "app", "data_migrations", "migrate_verification_ty
 describe MigrateVerificationTypes, dbclean: :after_each do
   let(:given_task_name) { "move_all_verification_types_to_model" }
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:vlp_doc) {FactoryGirl.build(:vlp_document)}
   subject { MigrateVerificationTypes.new(given_task_name, double(:current_scope => nil)) }
 
   shared_examples_for "verification types migrations" do |types_count, ssn, tribal_id, us_citizen, correct_type, wrong_type|
@@ -12,7 +13,7 @@ describe MigrateVerificationTypes, dbclean: :after_each do
       allow(person).to receive(:tribal_id).and_return tribal_id
       allow(person).to receive(:us_citizen).and_return us_citizen
       subject.migrate
-      #person.reload
+      person.reload
     end
     it "assigns correct number of verification types" do
       expect(person.verification_types.active.count).to eq types_count.to_i
@@ -31,11 +32,23 @@ describe MigrateVerificationTypes, dbclean: :after_each do
     end
   end
   describe "dynamic types migration to model" do
-    it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'Citizenship', 'Immigration status'
+    it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'Citizenship', 'Immigration status', "vlp_doc"
     it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'Social Security Number', 'Immigration status'
     it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'DC Residency', 'Immigration status'
     it_behaves_like "verification types migrations", "4", "343555664", "454334556", true, 'American Indian Status', 'Immigration status'
-    it_behaves_like "verification types migrations", "3", "343555664", nil, true, 'Citizenship', 'American Indian Status'
-    it_behaves_like "verification types migrations", "2", nil, nil, true, 'Citizenship', 'Social Security Number'
+    it_behaves_like "verification types migrations", "3", "343555664", nil, true, 'Citizenship', 'American Indian Status', "vlp_doc"
+    it_behaves_like "verification types migrations", "2", nil, nil, true, 'Citizenship', 'Social Security Number', "vlp_doc"
+  end
+
+  describe "vlp documents migration" do
+    before do
+      person.consumer_role.vlp_documents.first.verification_type = "Citizenship"
+      subject.migrate
+      person.reload
+    end
+
+    it "migrate Citizenship document" do
+      expect(person.verification_types.active.where(:type_name => "Citizenship").first.vlp_documents.count).to eq 1
+    end
   end
 end

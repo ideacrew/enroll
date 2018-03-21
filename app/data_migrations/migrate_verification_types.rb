@@ -10,12 +10,9 @@ class MigrateVerificationTypes < MongoidMigrationTask
     people.each do |person|
       begin
         ensure_verification_types(person)
-        # person.verification_types.each do |type|
-        #   assign_verification_type_status(type, person)
-        # end
         puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
       rescue
-        $stderr.puts "Issue migrating person: person #{person.id}, HBX id  #{person.hbx_id}"
+        $stderr.puts "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
       end
     end
   end
@@ -42,10 +39,44 @@ class MigrateVerificationTypes < MongoidMigrationTask
         :validation_status => assign_verification_type_status(type, person),
         :update_reason => type_update_reason(person, type),
         :rejected => type_rejected(person, type),
-        :due_date => due_date_for_type(person, type))
+        :due_date => due_date(person, type),
+        :due_date_type => due_date_type(person, type),
+        :type_history_elements => create_type_history_elements(person, type),
+        :vlp_documents => create_vlp_documents(person, type))
   end
 
-  def due_date_for_type(person, type)
+  def create_vlp_documents(person, type)
+    documents = []
+    person.consumer_role.vlp_documents.where(verification_type: type).each do |elem|
+      documents << Document.new(:title => elem.title,
+                                :creator => elem.creator,
+                                :identifier => elem.identifier,
+                                :created_at => elem.created_at,
+                                :updated_at => elem.updated_at)
+    end
+    documents
+  end
+
+  def create_type_history_elements(person, type)
+    history_element = []
+    person.consumer_role.verification_type_history_elements.where(verification_type: type).each do |elem|
+      history_element << TypeHistoryElement.new(:action => elem.action,
+                                                :created_at => elem.created_at,
+                                                :updated_at => elem.updated_at,
+                                                :modifier => elem.modifier,
+                                                :update_reason => elem.update_reason,
+                                                :event_response_record_id => elem.event_response_record_id,
+                                                :event_request_record_id => elem.event_request_record_id)
+    end
+    history_element
+  end
+
+  def due_date(person, type)
+    sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
+    sv.type if sv.present?
+  end
+
+  def due_date_type(person, type)
     sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
     sv.due_date if sv.present?
   end
