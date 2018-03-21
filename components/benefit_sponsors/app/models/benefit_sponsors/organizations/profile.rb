@@ -1,5 +1,5 @@
 # Attributes, validations and constraints common to all Profile classes embedded in an Organization
-module SponsoredBenefits
+module BenefitSponsors
   module Organizations
     class Profile
       include Mongoid::Document
@@ -7,7 +7,7 @@ module SponsoredBenefits
 
       PROFILE_SOURCE_KINDS = [:broker_quote]
 
-      embedded_in :organization,      class_name: "SponsoredBenefits::Organizations::Organization"
+      embedded_in :organization,      class_name: "BenefitSponsors::Organizations::Organization"
 
       field :contact_method,          type: Symbol, default: :paper_and_electronic
 
@@ -23,7 +23,7 @@ module SponsoredBenefits
       delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
       embeds_many :office_locations, 
-                  class_name:"SponsoredBenefits::Organizations::OfficeLocation"
+                  class_name:"BenefitSponsors::Organizations::OfficeLocation"
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 

@@ -1,7 +1,9 @@
-module SponsoredBenefits
+module BenefitSponsors
   module Organizations
-    class AcaShopDcEmployerProfile < Profile
+    class HbxProfile < Profile
 
+      field :cms_id, type: String
+      field :us_state_abbreviation, type: String
 
       private
 
@@ -12,6 +14,7 @@ module SponsoredBenefits
         @is_benefit_sponsorship_eligible = true
         self
       end
+
     end
   end
 end

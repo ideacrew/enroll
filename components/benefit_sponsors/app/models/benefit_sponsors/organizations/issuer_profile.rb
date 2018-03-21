@@ -1,10 +1,16 @@
-module SponsoredBenefits
+module BenefitSponsors
   module Organizations
-    class ContactCenterProfile
+    class IssuerProfile < Profile
       include Mongoid::Document
       include Mongoid::Timestamps
 
 
+
+      def benefit_products
+      end
+
+      def benefit_products_by_effective_date(effective_date)
+      end
 
       private 
 
@@ -16,6 +22,6 @@ module SponsoredBenefits
         self
       end
 
-    end
+    end 
   end
 end

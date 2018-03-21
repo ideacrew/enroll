@@ -1,5 +1,5 @@
 # Parent model for any business, government agency, or other organized entity
-module SponsoredBenefits
+module BenefitSponsors
   module Organizations
     class Organization
       include Mongoid::Document
@@ -37,10 +37,10 @@ module SponsoredBenefits
       # org_a.divisions << org_b  # org_b.agency => org_a
       # org_x.agency = org_y      # org_y.divisions => [org_x]
       belongs_to  :agency, inverse_of: :divisions, counter_cache: true,
-                  class_name: "SponsoredBenefits::Organizations::Organization"
+                  class_name: "BenefitSponsors::Organizations::Organization"
        
       has_many    :divisions, inverse_of: :agency, autosave: true,
-                  class_name: "SponsoredBenefits::Organizations::Organization"
+                  class_name: "BenefitSponsors::Organizations::Organization"
         
 
       # PlanDesignOrganization (an Organization subclass) association enables an organization 
@@ -53,39 +53,39 @@ module SponsoredBenefits
       # Example 2: an Employer may prepare one or more plan designs for future coverage.  
       # Under this scenario, the Employer is both the plan_design_author and the plan_design_subject
       has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, autosave: true,
-                              class_name: "SponsoredBenefits::Organizations::Organization"
+                              class_name: "BenefitSponsors::Organizations::Organization"
         
       has_and_belongs_to_many :plan_design_subjects, inverse_of: :plan_design_authors, autosave: true,
-                              class_name: "SponsoredBenefits::Organizations::Organization"
+                              class_name: "BenefitSponsors::Organizations::Organization"
  
       has_many    :plan_design_organizations, inverse_of: :plan_design_organization,
-                  class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
+                  class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
 
       has_many    :plan_design_subject_organizations, inverse_of: :subject_organization,
-                  class_name: "SponsoredBenefits::Organizations::PlanDesignOrganization"
+                  class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
 
         
       # Organizations with EmployerProfile and HbxProfile belong to a Site
       belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
-                  class_name: "SponsoredBenefits::Site"
+                  class_name: "BenefitSponsors::Site"
 
       belongs_to  :site_owner, inverse_of: :owner_organization,
-                  class_name: "SponsoredBenefits::Site"
+                  class_name: "BenefitSponsors::Site"
 
       embeds_many :office_locations, 
-                  class_name: "SponsoredBenefits::Organizations::OfficeLocation", 
+                  class_name: "BenefitSponsors::Organizations::OfficeLocation", 
                   cascade_callbacks: true, validate: true
 
       embeds_many :profiles, 
-                  class_name: "SponsoredBenefits::Organizations::Profile"
+                  class_name: "BenefitSponsors::Organizations::Profile"
 
       # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
       has_many    :benefit_sponsorships, counter_cache: true,
-                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+                  class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
 
       # Use the Document model for managing any/all documents associated with Organization
-      has_many :documents, class_name: "SponsoredBenefits::Documents::Document"
+      has_many :documents, class_name: "BenefitSponsors::Documents::Document"
 
       validates_presence_of :legal_name, :site, :profiles
 
@@ -116,7 +116,7 @@ module SponsoredBenefits
       def sponsor_benefits_for(sponsorship_profile)
         if sponsorship_profile.is_benefit_sponsorship_eligible?
 
-          if sponsorship_profile._type == "SponsoredBenefits::Organizations::HbxProfile"
+          if sponsorship_profile._type == "BenefitSponsors::Organizations::HbxProfile"
             benefit_market = site.benefit_market_for(:aca_individual)
           else
             benefit_market = site.benefit_market_for(:aca_shop)
@@ -124,7 +124,7 @@ module SponsoredBenefits
 
           new_sponsorship = benefit_sponsorships.build(sponsorship_profile: sponsorship_profile, benefit_market: benefit_market)
         else
-          raise SponsoredBenefits::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
+          raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end
 
         new_sponsorship
@@ -152,7 +152,7 @@ module SponsoredBenefits
       private
 
       def generate_hbx_id
-        write_attribute(:hbx_id, SponsoredBenefits::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
+        write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
       end
 
 

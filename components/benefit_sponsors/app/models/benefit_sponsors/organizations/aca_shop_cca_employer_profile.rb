@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile < Profile
       include Concerns::AcaRatingAreaConfigConcern
