@@ -31,7 +31,12 @@ PATH
   remote: components/benefit_markets
   specs:
     benefit_markets (0.0.1)
+      aasm (~> 4.8.0)
+      config
+      mongoid (~> 5.0.1)
       rails (~> 4.2.7.1)
+      slim (~> 3.0.8)
+      symmetric-encryption (~> 3.6.0)
 
 PATH
   remote: components/benefit_sponsors

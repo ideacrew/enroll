@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class HbxProfile < Profile
+    class HbxProfile < BenefitSponsors::Organizations::Profile
 
       field :cms_id, type: String
       field :us_state_abbreviation, type: String
