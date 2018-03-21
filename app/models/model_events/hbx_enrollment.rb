@@ -3,7 +3,8 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :application_coverage_selected,
-      :employer_notice_for_employee_coverage_termination
+      :employer_notice_for_employee_coverage_termination,
+      :employee_notice_for_employee_coverage_termination
     ]
 
     def notify_on_save
@@ -18,6 +19,7 @@ module ModelEvents
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, 
                          :renewing_contingent_enrolled, :enrolled_contingent, :unverified], event: :terminate_coverage)
           is_employer_notice_for_employee_coverage_termination = true
+          is_employee_notice_for_employee_coverage_termination = true
         end
       
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers

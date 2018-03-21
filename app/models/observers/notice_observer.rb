@@ -85,6 +85,12 @@ module Observers
             trigger_notice(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
           end
         end
+
+        if new_model_event.event_key == :employee_notice_for_employee_coverage_termination
+          if hbx_enrollment.is_shop?
+            trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+          end
+        end
       end
     end
 

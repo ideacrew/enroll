@@ -14,8 +14,13 @@ module Notifier
     end
 
     def enrollment_coverage_end_on
-    	return if enrollment.blank?
+      return if enrollment.blank?
       merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
+    end
+
+    def enrollment_plan_name
+			return if enrollment.blank?
+      merge_model.enrollment.plan_name = enrollment.plan.name
     end
 
     def enrollment_enrolled_count
@@ -31,6 +36,16 @@ module Notifier
     def enrollment_employer_responsible_amount
       return if enrollment.blank?
       merge_model.enrollment.employer_responsible_amount = number_to_currency(enrollment.total_employer_contribution, precision: 2)
+    end
+
+    def enrollment_employee_first_name
+    	return if enrollment.blank?
+      merge_model.enrollment.employee_first_name = enrollment.census_employee.first_name
+    end
+
+    def enrollment_employee_last_name
+    	return if enrollment.blank?
+      merge_model.enrollment.employee_last_name = enrollment.census_employee.last_name
     end
 
   end
