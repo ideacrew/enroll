@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class FehbEmployerProfile
+    class FehbEmployerProfile < BenefitSponsors::Organizations::Profile
     include Mongoid::Document
 
 
