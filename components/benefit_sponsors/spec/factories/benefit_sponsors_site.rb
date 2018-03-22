@@ -1,4 +1,4 @@
-FactoryBot.define do
+FactoryGirl.define do
   factory :benefit_sponsors_site, class: 'SponsoredBenefits::Site' do
     site_key    :acme
     long_name   "ACME Widget's Benefit Website"
