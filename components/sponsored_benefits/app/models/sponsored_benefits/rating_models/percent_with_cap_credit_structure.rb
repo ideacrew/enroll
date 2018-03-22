@@ -4,12 +4,18 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      field :contribution_percent_minimum,    type: Integer
+      field :contribution_percent,            type: Integer
       field :contribution_cap_amount,         type: Money
+      field :contribution_percent_minimum,    type: Integer
 
       validate :contribution_percent_minimum,
                 numericality: {only_integer: true, inclusion: 0..100},
                 allow_nil: false
+
+
+      def validate_self
+        unless contribution_percent >= contribution_percent_minimum
+      end
 
     end
   end
