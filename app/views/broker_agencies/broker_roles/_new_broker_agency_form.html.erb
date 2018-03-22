@@ -33,7 +33,7 @@
         <div class="row">
           <div class="col-xs-12">
             <% if aca_broker_registration_text %>
-              <h5>By submitting this application to become a certified broker on the Health Connector for Business, I agree to the terms and conditions described in the <%= site_brokers_agreement_path %>.</h5>
+              <h5><%= l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)%></h5>
             <% end %>
           </div>
         </div>
