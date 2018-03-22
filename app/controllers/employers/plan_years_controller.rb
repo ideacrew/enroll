@@ -1,4 +1,5 @@
 class Employers::PlanYearsController < ApplicationController
+  include Config::AcaConcern
   before_action :find_employer
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
@@ -6,10 +7,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
-    if @employer_profile.service_areas.present? && @employer_profile.service_areas.any?
-      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
-    else
+    if @employer_profile.constrain_service_areas? && @employer_profile.service_areas.blank?
       redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => no_products_message(@plan_year) }
+    else
+      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     end
   end
 
