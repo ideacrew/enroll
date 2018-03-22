@@ -19,9 +19,6 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', db
   end
 
   describe "NoticeTrigger" do
-    after(:each) do
-      DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
-    end
     context "when renewal application created" do
       subject { Observers::NoticeObserver.new }
 
