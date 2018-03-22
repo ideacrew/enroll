@@ -12,9 +12,9 @@ module SponsoredBenefits
     let(:owner_legal_name)    { "ACME Widgets" }
     let(:owner_organization)  { SponsoredBenefits::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, profiles: [profile]) }
     let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
-    let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
+    let(:profile)             { FactoryBot.build(:sponsored_benefits_organizations_hbx_profile) }
 
-    let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+    let(:benefit_market)      { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
 
     let(:params) do
@@ -57,7 +57,7 @@ module SponsoredBenefits
       end
 
       context "with two benefit markets of the same kind" do
-        let(:same_benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+        let(:same_benefit_market)      { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
         let(:site) { Site.new(params) }
 
@@ -99,7 +99,7 @@ module SponsoredBenefits
     end
 
     context "site keys must be valid" do
-      let(:site) { FactoryGirl.build(:sponsored_benefits_site) }
+      let(:site) { FactoryBot.build(:sponsored_benefits_site) }
 
       context "with keys longer than max length" do
         let(:max_key_length)  { 6 }
@@ -152,13 +152,13 @@ module SponsoredBenefits
       let(:loony_legal_name)    { "Loony Tunes, LLC" }
       let(:itune_legal_name)    { "iTunes, Inc" }
 
-      let!(:site)               { FactoryGirl.create(:sponsored_benefits_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
-      let(:owner_organization)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
-      let!(:loony_organization) { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
-      let!(:acme_organization)  { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
+      let!(:site)               { FactoryBot.create(:sponsored_benefits_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
+      let(:owner_organization)  { FactoryBot.build(:sponsored_benefits_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
+      let!(:loony_organization) { FactoryBot.create(:sponsored_benefits_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
+      let!(:acme_organization)  { FactoryBot.create(:sponsored_benefits_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
 
-      let(:employer_profile)    { FactoryGirl.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) }
-      let(:hbx_profile)         { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
+      let(:employer_profile)    { FactoryBot.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) }
+      let(:hbx_profile)         { FactoryBot.build(:sponsored_benefits_organizations_hbx_profile) }
 
 
       # this will include the owner_organization in the count
@@ -171,8 +171,8 @@ module SponsoredBenefits
       end
 
       context "and benefit_market associations must be valid" do
-        let(:profile)             { FactoryGirl.build(:sponsored_benefits_organizations_hbx_profile) }
-        let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
+        let(:profile)             { FactoryBot.build(:sponsored_benefits_organizations_hbx_profile) }
+        let(:benefit_market)      { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
 
         before { site.benefit_markets << benefit_market }
 
@@ -191,18 +191,18 @@ module SponsoredBenefits
           let(:legal_name_2)          { "M&M, Corp" }
           let(:legal_name_3)          { "R&D, Corp" }
 
-          let(:shop_benefit_market_1) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
-          let(:shop_benefit_market_2) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
-          let(:ivl_benefit_market_1)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
-          let(:ivl_benefit_market_2)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
+          let(:shop_benefit_market_1) { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
+          let(:shop_benefit_market_2) { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
+          let(:ivl_benefit_market_1)  { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
+          let(:ivl_benefit_market_2)  { FactoryBot.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
 
-          let(:owner_organization_1)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
-          let(:owner_organization_2)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }
-          let(:owner_organization_3)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_3, profiles: [employer_profile]) }
+          let(:owner_organization_1)  { FactoryBot.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
+          let(:owner_organization_2)  { FactoryBot.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }
+          let(:owner_organization_3)  { FactoryBot.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_3, profiles: [employer_profile]) }
 
-          let(:shop_only_site)        { FactoryGirl.build(:sponsored_benefits_site, :owner_organization => owner_organization_1, site_organizations: [ owner_organization_1 ], benefit_markets: [shop_benefit_market_1]) }
-          let(:ivl_only_site)         { FactoryGirl.build(:sponsored_benefits_site, :owner_organization => owner_organization_2, site_organizations: [ owner_organization_2 ], benefit_markets: [ivl_benefit_market_1]) }
-          let(:shop_and_ivl_site)     { FactoryGirl.build(:sponsored_benefits_site, :owner_organization => owner_organization_3, site_organizations: [ owner_organization_3 ], benefit_markets: [ivl_benefit_market_2, shop_benefit_market_2]) }
+          let(:shop_only_site)        { FactoryBot.build(:sponsored_benefits_site, :owner_organization => owner_organization_1, site_organizations: [ owner_organization_1 ], benefit_markets: [shop_benefit_market_1]) }
+          let(:ivl_only_site)         { FactoryBot.build(:sponsored_benefits_site, :owner_organization => owner_organization_2, site_organizations: [ owner_organization_2 ], benefit_markets: [ivl_benefit_market_1]) }
+          let(:shop_and_ivl_site)     { FactoryBot.build(:sponsored_benefits_site, :owner_organization => owner_organization_3, site_organizations: [ owner_organization_3 ], benefit_markets: [ivl_benefit_market_2, shop_benefit_market_2]) }
 
 
           it "should find the right benefit_markets using benefit_market_for" do

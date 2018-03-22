@@ -10,7 +10,7 @@ module SponsoredBenefits
     let(:sponsor_contribution_factor_kind)  { :percentage_of_reference_plan }
     let(:sponsor_contribution_minimum)      { 0.75 }
     let(:sponsor_contribution_maximum)      { 750.0 }
-    let(:member_to_tier_maps)               { [ FactoryGirl.build(:sponsored_benefits_rating_models_member_to_tier_map) ] }
+    let(:member_to_tier_maps)               { [ FactoryBot.build(:sponsored_benefits_rating_models_member_to_tier_map) ] }
 
 
     let(:params) do

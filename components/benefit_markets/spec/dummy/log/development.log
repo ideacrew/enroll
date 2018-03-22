@@ -1,0 +1,229 @@
+MONGODB | Topology type 'unknown' initializing.
+MONGODB | Server localhost:27017 initializing.
+MONGODB | Topology type 'unknown' changed to type 'single'.
+MONGODB | Server description for localhost:27017 changed from 'unknown' to 'standalone'.
+MONGODB | There was a change in the members of the 'single' topology.
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.001325s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000337s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000297s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000296s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026199999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000261s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000285s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000525s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000325s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026500000000000004s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000299s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000277s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000257s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000299s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000468s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000326s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000355s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000322s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000296s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000298s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00027s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026599999999999996s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.0005690000000000001s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000325s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000266s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000264s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00025299999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00025499999999999996s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00025s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026599999999999996s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.0006360000000000001s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000362s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000306s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026900000000000003s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000284s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000306s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000298s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000291s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000595s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000299s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000297s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000269s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00029200000000000005s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000294s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.00048699999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000349s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000344s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00027499999999999996s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000264s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026199999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000265s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000297s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000532s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000316s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000274s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000294s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000258s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000257s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000256s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000457s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000282s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000265s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000291s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000257s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00025299999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000259s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00029600000000000004s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000494s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000295s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000308s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000263s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000382s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000267s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000263s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.00054s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000328s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00029s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000265s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000251s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00028399999999999996s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000271s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.0005530000000000001s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000323s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00025s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000246s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00027s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00026199999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000259s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000471s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000329s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000307s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000265s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00029299999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00027800000000000004s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000263s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000257s
+MONGODB | localhost:27017 | dummy_development.listCollections | STARTED | {"listCollections"=>1, "cursor"=>{}, "filter"=>{"name"=>{"$not"=>/system\.|\$/}}}
+MONGODB | localhost:27017 | dummy_development.listCollections | SUCCEEDED | 0.000418s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsored_applications", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000266s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00028599999999999996s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000283s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_applications_sponsor_census_member_bases", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000301s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_locations_addresses", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.00029299999999999997s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"census_members", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000294s
+MONGODB | localhost:27017 | dummy_development.delete | STARTED | {"delete"=>"sponsored_benefits_organizations_plan_design_organizations", "deletes"=>[{"q"=>{}, "limit"=>0}], "ordered"=>true}
+MONGODB | localhost:27017 | dummy_development.delete | SUCCEEDED | 0.000251s

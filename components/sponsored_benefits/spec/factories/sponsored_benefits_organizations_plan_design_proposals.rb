@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :plan_design_proposal, class: 'SponsoredBenefits::Organizations::PlanDesignProposal' do
     
     trait :with_profile do

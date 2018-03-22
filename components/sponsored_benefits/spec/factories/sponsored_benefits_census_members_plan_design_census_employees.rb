@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :plan_design_census_employee, class: 'SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee' do
 
     first_name "Eddie"
@@ -17,7 +17,7 @@ FactoryGirl.define do
     # association :sponsored_benefits_locations_address, strategy: :build
     # association :sponsored_benefits_email, strategy: :build
     # association :sponsored_benefits_benefit_sponsorships_plan_design_employer_profile, strategy: :build
-    # plan_design_organization            { FactoryGirl.build(:plan_design_organization) }
+    # plan_design_organization            { FactoryBot.build(:plan_design_organization) }
 
     transient do
       create_with_spouse false

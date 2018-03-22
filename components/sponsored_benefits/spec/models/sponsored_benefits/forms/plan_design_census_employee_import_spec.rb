@@ -94,7 +94,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
     end
 
     context "employee exists" do
-      let(:census_employee) { FactoryGirl.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
+      let(:census_employee) { FactoryBot.create(:plan_design_census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), benefit_sponsorship: benefit_sponsorship}) }
 
       before do
         allow(subject).to receive(:find_employee).and_return(census_employee)

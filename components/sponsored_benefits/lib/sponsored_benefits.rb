@@ -26,6 +26,7 @@ module SponsoredBenefits
 
   def self.configure
     yield(configuration)
+    require 'sponsored_benefit_factories'
   end
 
   class Configuration

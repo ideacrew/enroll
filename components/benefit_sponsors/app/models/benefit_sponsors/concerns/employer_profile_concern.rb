@@ -22,7 +22,7 @@ module BenefitSponsors
 
         field :profile_source, type: String, default: "self_serve"
         field :entity_kind, type: String
-        field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+        field :registered_on, type: Date, default: ->{ ::TimeKeeper.date_of_record }
         field :xml_transmitted_timestamp, type: DateTime
 
 
@@ -31,7 +31,7 @@ module BenefitSponsors
           allow_blank: false
 
         validates :profile_source,
-          inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
+          inclusion: { in: PROFILE_SOURCE_KINDS },
           allow_blank: false
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }

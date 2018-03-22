@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :sponsored_benefits_organizations_exempt_organization, class: 'SponsoredBenefits::Organizations::ExemptOrganization' do
     legal_name "ACME Widgets, Inc."
     dba "ACME Widgets Co."
