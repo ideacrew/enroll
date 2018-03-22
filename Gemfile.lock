@@ -28,6 +28,29 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: components/benefit_markets
+  specs:
+    benefit_markets (0.0.1)
+      aasm (~> 4.8.0)
+      config
+      mongoid (~> 5.0.1)
+      rails (~> 4.2.7.1)
+      slim (~> 3.0.8)
+      symmetric-encryption (~> 3.6.0)
+
+PATH
+  remote: components/benefit_sponsors
+  specs:
+    benefit_sponsors (0.0.1)
+      aasm (~> 4.8.0)
+      config
+      mongoid (~> 5.0.1)
+      rails (~> 4.2.7.1)
+      roo (~> 2.1.0)
+      slim (~> 3.0.8)
+      symmetric-encryption (~> 3.6.0)
+
+PATH
   remote: components/sponsored_benefits
   specs:
     sponsored_benefits (0.0.1)
@@ -636,6 +659,8 @@ DEPENDENCIES
   addressable (= 2.3.8)
   animate-rails (~> 1.0.7)
   aws-sdk (= 2.2.4)
+  benefit_markets!
+  benefit_sponsors!
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
   bson (= 3.2.6)
@@ -731,4 +756,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
