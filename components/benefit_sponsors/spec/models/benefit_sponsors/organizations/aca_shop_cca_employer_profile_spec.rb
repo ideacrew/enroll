@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model, dbclean: :after_each  do
+  RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model do
 
     let(:sic_code)        { '1111' }
 

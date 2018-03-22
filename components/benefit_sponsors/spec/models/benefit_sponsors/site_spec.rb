@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Site, type: :model, dbclean: :after_each do
+  RSpec.describe Site, type: :model do
 
     let(:site_key)            { :usa }
     let(:long_name)           { "ACME Widget's Benefit Website" }
@@ -70,7 +70,7 @@ module BenefitSponsors
         end
       end
 
-      context "with all required arguments" do
+      context "with all required arguments", dbclean: :after_each do
         let(:valid_site) { Site.new(params) }
 
         before { valid_site.owner_organization = owner_organization; valid_site.site_organizations << owner_organization }
@@ -146,7 +146,7 @@ module BenefitSponsors
       end
     end
 
-    context "organization associations must be valid" do
+    context "organization associations must be valid", dbclean: :after_each do
 
       let(:owner_legal_name)    { "Hannah Barbara, LLC" }
       let(:loony_legal_name)    { "Loony Tunes, LLC" }

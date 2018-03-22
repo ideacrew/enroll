@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
+  RSpec.describe Organizations::PlanDesignOrganization, type: :model do
 
     describe "#expire proposals for non Prospect Employer" do
       let!(:organization) { create(:plan_design_organization,

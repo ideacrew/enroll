@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe BenefitMarket, type: :model, dbclean: :after_each do
+  RSpec.describe BenefitMarket, type: :model do
 
     let(:kind)            { :aca_shop }
     let(:title)           {  "DC Health Link SHOP Market" }
