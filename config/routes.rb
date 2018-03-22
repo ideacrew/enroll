@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   require 'resque/server' 
-  mount Resque::Server, at: '/jobs'
+#  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -31,12 +31,23 @@ Rails.application.routes.draw do
     end
     resources :agents_inboxes, only: [:show, :destroy]
 
+    resources :residents, only: [:create, :edit, :update] do
+      get :search, on: :collection
+      post :match, on: :collection
+      post :build, on: :collection
+      get :begin_resident_enrollment, on: :collection
+      get :resume_resident_enrollment, on: :collection
+      get :ridp_bypass, on: :collection
+      get :find_sep, on: :collection
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
       collection do
         get :family_index
         get :family_index_dt
+        get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
         get :employer_poc
@@ -58,8 +69,6 @@ Rails.application.routes.draw do
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
-        get :verification_index
-        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -70,6 +79,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :get_user_info
       end
 
       member do
@@ -113,6 +123,9 @@ Rails.application.routes.draw do
     get 'verification_documents/upload', to: 'verification_documents#upload'
     post 'verification_documents/upload', to: 'verification_documents#upload'
     get 'verification_documents/download/:key', to: 'verification_documents#download'
+    get 'paper_applications/upload', to: 'paper_applications#upload'
+    post 'paper_applications/upload', to: 'paper_applications#upload'
+    get 'paper_applications/download/:key', to: 'paper_applications#download'
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -133,8 +146,8 @@ Rails.application.routes.draw do
     resources :families, only: [:show] do
       get 'new'
       member do
-        post 'unblock'
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -144,12 +157,14 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'brokers'
         get 'verification'
+        get 'upload_application'
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -187,8 +202,13 @@ Rails.application.routes.draw do
 
     root 'families#home'
 
-    resources :family_members
-
+    resources :family_members do
+      get :resident_index, on: :collection
+      get :new_resident_dependent, on: :collection
+      get :edit_resident_dependent, on: :member
+      get :show_resident_dependent, on: :member
+    end
+    
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -230,6 +250,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        post 'generate_checkbook_urls'
       end
       collection do
         get 'welcome'
@@ -268,6 +289,8 @@ Rails.application.routes.draw do
         get :delink
         get :terminate
         get :rehire
+        get :cobra
+        get :cobra_reinstate
         get :benefit_group, on: :member
       end
     end
@@ -346,6 +369,8 @@ Rails.application.routes.draw do
           get :download_pdf
           get :dental_plans_data
           get :my_quotes
+          get :employees_list
+          get :employee_type
         end
         member do
           get :upload_employee_roster
@@ -470,9 +495,8 @@ Rails.application.routes.draw do
       get :show_docs
       put :update_verification_type
       get :enrollment_verification
-      put :enrollment_docs_state
       put :extend_due_date
-      get :fed_hub_request
+      post :fed_hub_request
     end
   end
 

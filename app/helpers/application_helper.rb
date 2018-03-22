@@ -1,5 +1,13 @@
 module ApplicationHelper
 
+  def deductible_display(hbx_enrollment, plan)
+    if hbx_enrollment.hbx_enrollment_members.size > 1
+      plan.family_deductible.split("|").last.squish
+    else
+      plan.deductible
+    end
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true
@@ -421,8 +429,8 @@ module ApplicationHelper
 
   def relationship_options(dependent, referer)
     relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
-      BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS - ["self"] :
-      PersonRelationship::Relationships
+      BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
+      PersonRelationship::Relationships_UI
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
   end
 
@@ -430,7 +438,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
-    return if plan_year.employer_profile.census_employees.count > 100
+    return if plan_year.employer_profile.census_employees.active.count > 200
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -457,7 +465,7 @@ module ApplicationHelper
         end
 
         if eligible > 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minumum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
 
@@ -467,6 +475,12 @@ module ApplicationHelper
         end)
       end
     end
+  end
+
+  def is_readonly(object)
+    return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
+    return true if object.try(:linked?)  # cannot edit, employer census roster
+    return !(object.new_record? or object.try(:eligible?)) # employer census roster
   end
 
   def may_update_census_employee?(census_employee)
@@ -488,6 +502,10 @@ module ApplicationHelper
     notice.enrollments.inject([]) do |enrollees, enrollment|
       enrollees += enrollment.enrollees
     end.uniq
+  end
+
+  def show_oop_pdf_link(aasm_state)
+    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
   end
 
   def calculate_age_by_dob(dob)
@@ -515,26 +533,9 @@ module ApplicationHelper
     "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
   end
 
-  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
-    return [] if effective_on_kinds.blank?
-
-    options = []
-    effective_on_kinds.each do |kind|
-      case kind
-      when 'date_of_event'
-        options << ["#{kind.humanize}(#{qle_date.to_s})", kind]
-      when 'fixed_first_of_next_month'
-        options << ["#{kind.humanize}(#{(qle_date.end_of_month + 1.day).to_s})", kind]
-      end
-    end
-
-    options
-  end
-
   def purchase_or_confirm
     'Confirm'
   end
-
 
   def qualify_qle_notice
     content_tag(:span) do
@@ -544,8 +545,18 @@ module ApplicationHelper
     end
   end
 
-  def disable_purchase?(disabled, hbx_enrollment)
-    disabled || !hbx_enrollment.can_select_coverage?
+  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+    begin
+      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
+        ShopNoticesNotifierJob.perform_later(hbx_enrollment.employer_profile.id.to_s, "notify_employer_when_employee_terminate_coverage", hbx_enrollment: hbx_enrollment.hbx_id.to_s)
+      end
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver employee_terminate_coverage_notice of employee #{hbx_enrollment.census_employee.id.to_s} to #{hbx_enrollment.employer_profile.id.to_s}due to #{e}" }) unless Rails.env.test?
+    end
+  end
+
+  def disable_purchase?(disabled, hbx_enrollment, options = {})
+    disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
 
   def get_key_and_bucket(uri)
@@ -609,7 +620,8 @@ module ApplicationHelper
       if text == "Yes"
         "Eligible"
       else
-        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+        "Ineligible"
+        #{}"<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='tooltip' title='#{eligibility_text}'></i>".html_safe
       end
     else
       "Ineligible"
@@ -642,5 +654,18 @@ module ApplicationHelper
     end
   end
 
+  def is_new_paper_application?(current_user, app_type)
+    current_user.has_hbx_staff_role? && app_type == "paper"
+  end
 
+  def previous_year
+    TimeKeeper.date_of_record.prev_year.year
+  end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise ArgumentError.new("invalid value for Boolean: \"#{val}\"")
+  end
 end
+

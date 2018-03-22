@@ -8,7 +8,7 @@ class BenefitSponsorship
   # person/roles can determine which sponsor in a class has a relationship (offer products)
   # which benefit packages should be offered to person/roles
 
-  SERVICE_MARKET_KINDS = %w(shop individual)
+  SERVICE_MARKET_KINDS = %w(shop individual coverall)
 
   field :service_markets, type: Array, default: []
 
@@ -93,6 +93,12 @@ class BenefitSponsorship
         hbx_sponsor.advance_month   if new_date.day == 1
         hbx_sponsor.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
         hbx_sponsor.advance_year    if new_date.day == 1 && new_date.month == 1
+      end
+
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+      if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date && !Rails.env.test?
+        oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
+        oe_begin.process_renewals
       end
 
       # # Find families with events today and trigger their respective workflow states

@@ -30,7 +30,6 @@ module Enroll
     config.i18n.available_locales = [:en, :es]
     config.i18n.default_locale = :en
 
-    config.active_job.queue_adapter = :resque
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.active_record.raise_in_transactional_callbacks = true
     config.assets.enabled = true
@@ -57,8 +56,13 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::LawfulPresence")
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
+      config.acapi.add_async_subscription("Subscribers::IamAccountCreation")
       config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
+      config.acapi.add_async_subscription("Subscribers::ShopBinderEnrollmentsTransmissionAuthorized")
+      config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
+      config.acapi.add_async_subscription("Subscribers::ShopInitialEmployerQuietPeriodEnded")
+      config.acapi.add_async_subscription("Subscribers::PolicyTerminationsSubscriber")
     end
   end
 end

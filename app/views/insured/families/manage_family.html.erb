@@ -3,12 +3,21 @@
 <% end %>
 
 <div class="my-account-page">
-  <h1>Manage Family</h1>
+  <h1><%= l10n("manage_family") %></h1>
 </div>
 
-<div class="content-bottom">
-  <%= render "profile_submenu", :active_subtab => "family-tab" %>
-  <div id="profile-content">
-    <%= render 'family' %>
+<% if @resident %>
+  <div class="content-bottom">
+    <%= render "profile_submenu", :active_subtab => "family-tab" %>
+    <div id="profile-content">
+      <%= render 'insured/families/coverall/family' %>
+    </div>
   </div>
-</div>
+<% else %>
+  <div class="content-bottom">
+    <%= render "profile_submenu", :active_subtab => "family-tab" %>
+    <div id="profile-content">
+      <%= render 'family' %>
+    </div>
+  </div>
+<% end %>
