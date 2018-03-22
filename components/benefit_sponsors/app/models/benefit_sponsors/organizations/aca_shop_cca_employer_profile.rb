@@ -2,6 +2,7 @@ module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile < BenefitSponsors::Organizations::Profile
       include Concerns::AcaRatingAreaConfigConcern
+      include Concerns::EmployerProfileConcern
 
       field :sic_code,        type: String
       field :rating_area_id,  type: BSON::ObjectId

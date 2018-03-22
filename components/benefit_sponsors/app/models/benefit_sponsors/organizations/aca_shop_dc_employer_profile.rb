@@ -2,6 +2,7 @@ module BenefitSponsors
   module Organizations
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
 
+      include Concerns::EmployerProfileConcern
 
       private
 
