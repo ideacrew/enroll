@@ -1,11 +1,11 @@
-module SponsoredBenefits
-  module BenefitSponsorships
+module BenefitSponsors
+  module BenefitPackages
     class BenefitPackage
       include Mongoid::Document
       include Mongoid::Timestamps
     
 
-      embedded_in :benefit_application, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      embedded_in :benefit_application, class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       field :title, type: String, default: ""
       field :description, type: String, default: ""

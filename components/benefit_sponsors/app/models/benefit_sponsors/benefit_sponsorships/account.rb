@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitSponsorships
     class Account
       include Mongoid::Document

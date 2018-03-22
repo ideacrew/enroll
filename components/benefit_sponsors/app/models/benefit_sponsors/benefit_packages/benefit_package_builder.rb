@@ -1,11 +1,11 @@
-module SponsoredBenefits
-  module BenefitSponsorships
+module BenefitSponsors
+  module BenefitPackages
     class BenefitPackageBuilder
 
       attr_reader :benefit_package, :benefit_package_attrs
 
       def initialize
-        @benefit_package = SponsoredBenefits::BenefitSponsorships::BenefitPackage.new
+        @benefit_package = BenefitSponsors::BenefitSponsorships::BenefitPackage.new
       end
 
       def self.build

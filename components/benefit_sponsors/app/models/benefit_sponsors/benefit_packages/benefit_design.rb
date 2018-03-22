@@ -1,10 +1,10 @@
-module SponsoredBenefits
-  module BenefitSponsorships
-    class BenefitOffering
+module BenefitSponsors
+  module BenefitPackages
+    class BenefitDesign
       include Mongoid::Document
       include Mongoid::Timestamps
     
-      embedded_in :benefit_package, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage"
+      embedded_in :benefit_package, class_name: "BenefitSponsors::BenefitSponsorships::BenefitPackage"
 
       PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level sole_source)
 
