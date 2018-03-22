@@ -36,6 +36,9 @@ module SponsoredBenefits
         # Use same strategy as BenefitMarket#kind to associate the appropriate subclass here
       end
 
+      # Return self if rating tier matches the enrollment group composition
+      def match()
+      end
 
     end
   end
