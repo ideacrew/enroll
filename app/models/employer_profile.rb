@@ -190,10 +190,6 @@ class EmployerProfile
     end
   end
 
-  def broker_fired_confirmation_to_broker
-    trigger_notices('broker_fired_confirmation_to_broker')
-  end
-
   def employer_broker_fired
     trigger_notices('employer_broker_fired')
   end
@@ -1184,7 +1180,7 @@ class EmployerProfile
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
     rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+      Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
     end
   end
 
