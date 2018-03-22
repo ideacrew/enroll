@@ -40,7 +40,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, is_homeless: false, is_temporarily_out_of_state: false, has_active_consumer_role?: false, has_active_employee_role?: true) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -436,7 +436,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "with a person with an address" do
-      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "") }
+      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, is_homeless: false, is_temporarily_out_of_state: false) }
 
       it "should be a success" do
         expect(response).to have_http_status(:success)
