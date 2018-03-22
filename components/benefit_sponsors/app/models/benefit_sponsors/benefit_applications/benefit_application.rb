@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitApplications
     class BenefitApplication
       include Mongoid::Document
@@ -39,11 +39,11 @@ module SponsoredBenefits
 
       # field :benefit_sponsorship_id, type: BSON::ObjectId
       belongs_to  :benefit_sponsorship, 
-                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+                  class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
       belongs_to  :benefit_market, counter_cache: true,
                   class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
 
-      embeds_many :benefit_packages,    class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage", 
+      embeds_many :benefit_packages,    class_name: "BenefitSponsors::BenefitPackages:BenefitPackage",
         cascade_callbacks: true, 
         validate: true
 
@@ -69,12 +69,12 @@ module SponsoredBenefits
       end
 
       def effective_period=(new_effective_period)
-        effective_range = SponsoredBenefits.tidy_date_range(new_effective_period, :effective_period)
+        effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
         write_attribute(:effective_period, effective_range) unless effective_range.blank?
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
-        open_enrollment_range = SponsoredBenefits.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
+        open_enrollment_range = BenefitSponsors.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
         write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
       end
 

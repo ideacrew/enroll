@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitApplications
     class BenefitGroup < ::BenefitGroup
       include Config::AcaModelConcern
