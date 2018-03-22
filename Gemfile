@@ -109,8 +109,8 @@ group :development, :test do
   gem 'rspec_junit_formatter', '0.2.3'
   gem 'ruby-progressbar', '1.6.0'
   gem 'spring', '1.6.3'
-  gem 'yard', '~> 0.9.5'
-  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'yard', '~> 0.9.5', require: false
+  gem 'yard-mongoid', '~> 0.1.0', require: false
 end
 
 group :test do
