@@ -105,7 +105,7 @@ module BenefitSponsors
 
       context "and an employer sponsors benefits" do
         let(:employer_name)            { "Spacely Sprockets, Inc." }
-        let(:employer_organization)    { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, 
+        let(:employer_organization)    { FactoryGirl.build(:benefits_organizations_general_organization, 
                                                               legal_name: employer_name, 
                                                               profiles: [employer_profile],
                                                               site: hbx_site

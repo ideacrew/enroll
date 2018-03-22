@@ -14,7 +14,7 @@ module BenefitSponsors
     let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
     let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
 
-    let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+    let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
 
     let(:params) do
@@ -24,7 +24,7 @@ module BenefitSponsors
         short_name: short_name,
         domain_name: domain_name,
         owner_organization: owner_organization,
-        benefit_markets: [benefit_market],
+        benefit_markets: [benefit_market]
       }
     end
 
@@ -57,7 +57,7 @@ module BenefitSponsors
       end
 
       context "with two benefit markets of the same kind" do
-        let(:same_benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+        let(:same_benefit_market)      { FactoryGirl.build(:benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
         let(:site) { Site.new(params) }
 
@@ -172,7 +172,7 @@ module BenefitSponsors
 
       context "and benefit_market associations must be valid" do
         let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
-        let(:benefit_market)      { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, :with_benefit_catalog) }
+        let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, :with_benefit_catalog) }
 
         before { site.benefit_markets << benefit_market }
 
@@ -191,10 +191,10 @@ module BenefitSponsors
           let(:legal_name_2)          { "M&M, Corp" }
           let(:legal_name_3)          { "R&D, Corp" }
 
-          let(:shop_benefit_market_1) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
-          let(:shop_benefit_market_2) { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: shop_kind) } 
-          let(:ivl_benefit_market_1)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
-          let(:ivl_benefit_market_2)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, kind: individual_kind) } 
+          let(:shop_benefit_market_1) { FactoryGirl.build(:benefit_markets_benefit_market, kind: shop_kind) } 
+          let(:shop_benefit_market_2) { FactoryGirl.build(:benefit_markets_benefit_market, kind: shop_kind) } 
+          let(:ivl_benefit_market_1)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) } 
+          let(:ivl_benefit_market_2)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) } 
 
           let(:owner_organization_1)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
           let(:owner_organization_2)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }

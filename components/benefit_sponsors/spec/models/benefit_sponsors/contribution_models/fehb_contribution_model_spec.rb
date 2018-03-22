@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  describe ContributionModels::FehbContributionModel do
+  RSpec.describe ContributionModels::FehbContributionModel do
     describe "given a contribution unit" do
       let(:contribution_unit) do
         ContributionModels::ContributionUnit.new(

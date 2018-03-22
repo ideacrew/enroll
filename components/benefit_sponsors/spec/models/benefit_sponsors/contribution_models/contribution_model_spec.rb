@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  describe ContributionModels::ContributionModel do
+  RSpec.describe ContributionModels::ContributionModel do
     describe "given nothing" do
       it "is invalid" do
         expect(subject.valid?).to be_falsey
