@@ -12,6 +12,7 @@
 # => Only one HbxProfile may exist per Site
 # => Only HbxProfile, FehbProfile (Congress), and EmployerProfile and subclasses are eligible for BenefitSponsorship
 
+
 module BenefitSponsors
   module Organizations
     class BenefitSponsorFactory
@@ -26,9 +27,9 @@ module BenefitSponsors
 
       def init_organization
         class_name = @profile._type
-        org = if class_name.match(/.*EmployerProfile$/) || class_name.match(/.*BrokerAgencyProfile$/)
+        org = if @fein.present?
           GeneralOrganization.new(legal_name: @legal_name, fein: @fein, site: BenefitSponsorFactory.get_site, profiles: [@profile], entity_kind: @entity_kind)
-        elsif @profile._type.match(/.*HbxProfile$/)
+        else
           ExemptOrganization.new(legal_name: @legal_name, site: BenefitSponsorFactory.get_site,  profiles: [@profile], entity_kind: @entity_kind)
         end
         org.save!
