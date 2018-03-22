@@ -73,12 +73,12 @@ class MigrateVerificationTypes < MongoidMigrationTask
 
   def due_date(person, type)
     sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
-    sv.type if sv.present?
+    sv.due_date if sv.present?
   end
 
   def due_date_type(person, type)
     sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
-    sv.due_date if sv.present?
+    sv.type if sv.present?
   end
 
   def type_rejected(person, type)
