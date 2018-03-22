@@ -46,11 +46,19 @@ namespace :reports do
           {:"modifier" => "external Hub"}
         ]
       )
-    
     end
   
-    def people_with_consumer_roles
-      Person.where({ :"consumer_role" => {"$exists" => true}})
+    def verified_people
+      Person.where(:"consumer_role.verification_type_history_elements" => { :"$elemMatch" => {
+        :"created_at" => {
+          :"$gte" => start_date,
+          :"$lt" => end_date
+        },
+        :"$or" => [
+          {:"action" => "verify"},
+          {:"modifier" => "external Hub"}
+        ]  
+      }})
     end
 
     def hub_response_wfst
@@ -76,7 +84,7 @@ namespace :reports do
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
 
-      people_with_consumer_roles.each do |person|
+      verified_people.each do |person|
         begin
           @person = person
           verified_history_elements_with_date_range.each do |history_element|
