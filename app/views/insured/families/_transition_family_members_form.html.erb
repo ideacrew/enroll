@@ -33,14 +33,14 @@
         <td><%= person.dob %></td>
         <td><%= person.hbx_id %></td>
         <td><%= check_box_tag "transition_user_#{person.id}", person.id %></td>
-        <td><%= select_tag "transition_market_kind_#{person.id}", options_for_select(IndividualMarketTransition::ROLE_TYPES, "1") %></td>
+        <td><%= select_tag "transition_market_kind_#{person.id}", options_for_select(IndividualMarketTransition::ROLE_TYPES, selected: "#{person.individual_market_transitions.first.role_type if person.individual_market_transitions.present?}"), prompt: 'no' %></td>
         <td><%= select_tag "transition_reason_#{person.id}", options_for_select(IndividualMarketTransition::REASON_CODES, "1") %></td>
         <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "form-control date-field date-picker"%></td>
       </tr>
       <% end %>
-      <tr><td colspan = "7"><br /></td></tr>
+      <tr><td colspan = "12"><br /></td></tr>
       <tr>
-        <td colspan = "7">
+        <td colspan = "12">
           <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
           <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
           <%= hidden_field_tag :family, params[:family] %>
@@ -49,4 +49,5 @@
       </tr>
     </table>
   <% end %>
+  <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
 </td>
