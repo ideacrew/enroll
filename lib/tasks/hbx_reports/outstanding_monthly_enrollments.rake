@@ -17,14 +17,15 @@ namespace :reports do
 
     glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip)
 
-    field_names = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Enrollment Group ID', 
-                   'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name','Policy in Glue?']
+    field_names = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State', 'Enrollment Group ID', 
+               'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name','Policy in Glue?', 'Quiet Period?']
     CSV.open("#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
-      feins_1 = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on, :aasm_state => 'enrolled'} }, :"employer_profile.aasm_state".in => ['binder_paid']).map(&:fein)
-      feins_2 = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on, :aasm_state => 'renewing_enrolled'}}).map(&:fein)
+      feins = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on} }).map(&:fein)
       feins = (feins_1 + feins_2).uniq
-      enrollment_ids = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+      enrollment_ids_regular = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+      enrollment_ids_quiet_period = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on,["coverage_selected"])
+      enrollment_ids = enrollment_ids_regular + enrollment_ids_quiet_period
       enrollment_ids.each do |id|
         hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
         employer_profile = hbx_enrollment.employer_profile
@@ -34,6 +35,7 @@ namespace :reports do
         plan_year = hbx_enrollment.benefit_group.plan_year
         plan_year_start = plan_year.start_on.to_s
         plan_year_state = plan_year.aasm_state
+        employer_profile_aasm = employer_profile.aasm_state
         eg_id = id
         purchase_time = hbx_enrollment.created_at
         coverage_start = hbx_enrollment.effective_on
@@ -45,7 +47,8 @@ namespace :reports do
           last_name = subscriber.person.last_name
         end
         in_glue = glue_list.include?(id)
-        csv << [employer_id,fein,legal_name,plan_year_start,plan_year_state,eg_id,purchase_time,coverage_start,enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue]
+        quiet_period_boolean = enrollment_ids_quiet_period.include?(id)
+        csv << [employer_id,fein,legal_name,plan_year_start,plan_year_state,employer_profile_aasm,eg_id,purchase_time,coverage_start,enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
       end
     end
   end
