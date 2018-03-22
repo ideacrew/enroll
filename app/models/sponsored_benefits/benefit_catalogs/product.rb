@@ -30,6 +30,7 @@ module SponsoredBenefits
 
       field :hbx_id,              type: Integer
       field :purchase_period,     type: Range  # => jan 1 - dec 31, 2018
+      
       field :benefit_market_kind, type: Symbol
       field :product_kind,        type: Symbol
 
@@ -45,10 +46,15 @@ module SponsoredBenefits
       # field :tags,          type: Array, default: []
 
 
-      embeds_many :rating_areas,        class_name: "SponsoredBenefits::Locations::GeographicRatingArea"
+      belongs_to  :benefit_catalog,
+                  class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
 
-      belongs_to :benefit_catalog,      class_name: "SponsoredBenefits::BenefitCatalogs::BenefitCatalog"
-      belongs_to :issuer_organization,  class_name: "SponsoredBenefits::Organizations::Organization"
+      belongs_to  :issuer_organization,  counter_cache: true,
+                  class_name: "SponsoredBenefits::Organizations::Organization"
+
+      has_many    :rating_areas,
+                  class_name: "SponsoredBenefits::Locations::GeographicRatingArea"
+
 
 
       scope :find_by_benefit_catalog,   ->(benefit_catalog){ where(benefit_catalog_id: BSON::ObjectId.from_string(benefit_catalog._id)) }
