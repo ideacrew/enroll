@@ -26,12 +26,12 @@ module BenefitSponsors
       end
 
       def init_organization
-        class_name = @profile._type
         org = if @fein.present?
           GeneralOrganization.new(legal_name: @legal_name, fein: @fein, site: BenefitSponsorFactory.get_site, profiles: [@profile], entity_kind: @entity_kind)
         else
           ExemptOrganization.new(legal_name: @legal_name, site: BenefitSponsorFactory.get_site,  profiles: [@profile], entity_kind: @entity_kind)
         end
+
         org.save!
       end
 

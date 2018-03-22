@@ -7,6 +7,18 @@ module BenefitSponsors
       include StateMachines::EmployerProfileStateMachine
 
       included do
+        ENTITY_KINDS = [
+          "tax_exempt_organization",
+          "c_corporation",
+          "s_corporation",
+          "partnership",
+          "limited_liability_corporation",
+          "limited_liability_partnership",
+          "household_employer",
+          "governmental_employer",
+          "foreign_embassy_or_consulate"
+        ]
+
         ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
         INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -27,7 +39,7 @@ module BenefitSponsors
 
 
         validates :entity_kind,
-          inclusion: { in: Organizations::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+          inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
           allow_blank: false
 
         validates :profile_source,
