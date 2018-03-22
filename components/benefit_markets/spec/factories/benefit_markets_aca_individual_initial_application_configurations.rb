@@ -1,4 +1,4 @@
-FactoryBot.define do
+FactoryGirl.define do
   factory :benefit_markets_aca_individual_initial_application_configuration, class: 'BenefitMarkets::AcaIndividualInitialApplicationConfiguration' do
 
     mm_enr_due_on   15

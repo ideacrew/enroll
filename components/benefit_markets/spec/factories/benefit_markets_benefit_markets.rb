@@ -1,4 +1,4 @@
-FactoryBot.define do
+FactoryGirl.define do
   factory :benefit_markets_benefit_market, class: 'BenefitMarkets::BenefitMarket' do
     kind :aca_shop
     title "DC Health Link SHOP Market"
