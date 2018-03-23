@@ -93,7 +93,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
     end
 
     it "should render initial_employer_ineligibility_notice" do
-     expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_ineligibility_notice"
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/20_a_initial_employer_ineligibility_notice"
     end
 
     it "should generate pdf" do
