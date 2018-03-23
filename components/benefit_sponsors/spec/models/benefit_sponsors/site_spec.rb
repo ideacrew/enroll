@@ -57,7 +57,7 @@ module BenefitSponsors
       end
 
       context "with two benefit markets of the same kind" do
-        let(:same_benefit_market)      { FactoryGirl.build(:benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+        let(:same_benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
         let(:site) { Site.new(params) }
 
