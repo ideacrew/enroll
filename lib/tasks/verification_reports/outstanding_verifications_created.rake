@@ -92,6 +92,8 @@ namespace :reports do
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
+
+      collect_rows = []
       people.each do |person|
         workflow_transitions(person).each do |transition|
           case transition.event
@@ -108,7 +110,7 @@ namespace :reports do
           end
 
           types.each do |type|
-            csv << [
+            collect_rows << [
                 subscriber_id(person),
                 person.hbx_id,
                 person.first_name,
@@ -119,6 +121,12 @@ namespace :reports do
             ]
           end
         end
+      end
+
+      rows_for_csv = remove_dup_override? ? collect_rows.uniq : collect_rows
+
+      rows_for_csv.each do |row|
+        csv << row
       end
       puts "*********** DONE ******************"
     end
