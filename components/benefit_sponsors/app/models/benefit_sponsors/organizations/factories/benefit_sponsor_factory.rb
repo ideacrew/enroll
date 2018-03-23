@@ -15,30 +15,30 @@
 
 module BenefitSponsors
   module Organizations
-    class BenefitSponsorFactory
+    module Factories
+      class BenefitSponsorFactory < OrganizationProfileFactory
 
-      def initialize(profile, legal_name, fein = nil, options = {})
-
-        @profile = profile
-        @legal_name = legal_name
-        @fein = fein
-        @entity_kind = options[:entity_kind]
-      end
-
-      def init_organization
-        org = if @fein.present?
-          GeneralOrganization.new(legal_name: @legal_name, fein: @fein, site: BenefitSponsorFactory.get_site, profiles: [@profile], entity_kind: @entity_kind)
-        else
-          ExemptOrganization.new(legal_name: @legal_name, site: BenefitSponsorFactory.get_site,  profiles: [@profile], entity_kind: @entity_kind)
+        def initialize(profile, legal_name, fein = nil, options = {})
+          @profile = profile
+          @legal_name = legal_name
+          @fein = fein
+          @entity_kind = options[:entity_kind]
         end
 
-        org.save!
-      end
+        def init_organization
+          org = if @fein.present?
+            GeneralOrganization.new(legal_name: @legal_name, fein: @fein, site: BenefitSponsorFactory.get_site, profiles: [@profile], entity_kind: @entity_kind)
+          else
+            ExemptOrganization.new(legal_name: @legal_name, site: BenefitSponsorFactory.get_site,  profiles: [@profile], entity_kind: @entity_kind)
+          end
 
-      def self.get_site
-        BenefitSponsors::ApplicationController::current_site
-      end
+          org.save!
+        end
 
+        def self.get_site
+          BenefitSponsors::ApplicationController::current_site
+        end
+      end
     end
   end
 end
