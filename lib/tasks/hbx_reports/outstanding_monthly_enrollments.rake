@@ -22,7 +22,6 @@ namespace :reports do
     CSV.open("#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
       feins = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on} }).map(&:fein)
-      feins = (feins_1 + feins_2).uniq
       enrollment_ids_regular = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
       enrollment_ids_quiet_period = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on,["coverage_selected"])
       enrollment_ids = enrollment_ids_regular + enrollment_ids_quiet_period
