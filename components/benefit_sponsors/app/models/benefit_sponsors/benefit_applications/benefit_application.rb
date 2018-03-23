@@ -36,14 +36,13 @@ module BenefitSponsors
       field :enrolled_summary, type: Integer, default: 0
       field :waived_summary, type: Integer, default: 0
 
-
-      # field :benefit_sponsorship_id, type: BSON::ObjectId
+      field :benefit_sponsorship_id, type: BSON::ObjectId
       belongs_to  :benefit_sponsorship, 
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
       belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "SponsoredBenefits::BenefitMarkets::BenefitMarket"
+                  class_name: "BenefitMarkets::BenefitMarket"
 
-      embeds_many :benefit_packages,    class_name: "BenefitSponsors::BenefitPackages:BenefitPackage",
+      embeds_many :benefit_packages,    class_name: "BenefitSponsors::BenefitPackages::BenefitPackage",
         cascade_callbacks: true, 
         validate: true
 
