@@ -4,6 +4,7 @@ Feature: can Transition family memebers
 		Given a Hbx admin with hbx_staff role exists
 		And a Hbx admin logs on to Portal
 		And a consumer exists
+		And the HBX admin visits the Dashboard page
 
 		Scenario: Only Hbx Admin can view Transition family memebers link actions dropdown in families index page
 			When Hbx Admin clicks on Families link
