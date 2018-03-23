@@ -13,8 +13,8 @@ module BenefitSponsors
     let(:required_params) do 
       {
         benefit_market: benefit_market,
-        contact_method: contact_method,
-        enrollment_frequency: enrollment_frequency,
+#        contact_method: contact_method,
+#        enrollment_frequency: enrollment_frequency,
       }
     end
 
