@@ -61,7 +61,7 @@ module BenefitSponsors
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
-        enrollment_frequency: "rolling_month"
+#        enrollment_frequency: "rolling_month"
       )}
 
       let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
@@ -101,7 +101,7 @@ module BenefitSponsors
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
-        enrollment_frequency: "rolling_month"
+#        enrollment_frequency: "rolling_month"
       )}
 
       let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }

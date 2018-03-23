@@ -82,18 +82,18 @@ module BenefitSponsors
                                                         benefit_markets: [shop_benefit_market, ivl_benefit_market]
                                                       ) 
                                                     }
-      let(:hbx_organization)    { FactoryGirl.build(:sponsored_benefits_organizations_exempt_organization, 
+      let(:hbx_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_exempt_organization, 
                                                         legal_name: hbx_name, 
                                                         profiles: [hbx_profile]
                                                       )
                                                     }
-      let(:shop_benefit_market)  { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, 
+      let(:shop_benefit_market)  { FactoryGirl.build(:benefit_markets_benefit_market, 
                                                         :with_benefit_catalog,
                                                         kind: shop_kind
                                                       ) 
                                                     }
 
-      let(:ivl_benefit_market)    { FactoryGirl.build(:sponsored_benefits_benefit_markets_benefit_market, 
+      let(:ivl_benefit_market)    { FactoryGirl.build(:benefit_markets_benefit_market, 
                                                         :with_benefit_catalog,
                                                         kind: individual_kind
                                                       ) 
@@ -111,7 +111,7 @@ module BenefitSponsors
                                                               site: hbx_site
                                                             )
                                                           }
-        let(:employer_profile)      { FactoryGirl.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) }
+        let(:employer_profile)      { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
 
         before { employer_organization.sponsor_benefits_for(employer_profile) }
 

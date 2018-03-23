@@ -61,11 +61,11 @@ module BenefitSponsors
       end
 
       def census_employees
-        SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
+        BenefitSponsors::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
       end
 
       def initial_enrollment_period=(new_initial_enrollment_period)
-        initial_enrollment_range = SponsoredBenefits.tidy_date_range(new_initial_enrollment_period, :initial_enrollment_period)
+        initial_enrollment_range = BenefitSponsors.tidy_date_range(new_initial_enrollment_period, :initial_enrollment_period)
         write_attribute(:initial_enrollment_period, initial_enrollment_range) if initial_enrollment_range.present?
       end
 
@@ -92,7 +92,7 @@ module BenefitSponsors
 
       class << self
         def find(id)
-          organization = SponsoredBenefits::Organizations::PlanDesignOrganization.where("plan_design_proposals.profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          organization = BenefitSponsors::Organizations::PlanDesignOrganization.where("plan_design_proposals.profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
           return if organization.blank?
           proposal = organization.plan_design_proposals.where("profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
           proposal.profile.benefit_sponsorships.detect{|sponsorship| sponsorship.id.to_s == id.to_s}
