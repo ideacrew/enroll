@@ -24,7 +24,6 @@ module BenefitSponsors
     def new_broker_agency
       
       @organization = BenefitSponsors::Forms::BrokerAgencyProfile.new
-      binding.pry
       respond_to do |format|
         format.html { render 'new' }
         format.js
