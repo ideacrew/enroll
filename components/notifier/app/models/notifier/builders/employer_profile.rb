@@ -20,11 +20,8 @@ module Notifier
     end
 
     def append_contact_details
-      if employer_profile.staff_roles.present?
-        merge_model.first_name = employer_profile.staff_roles.first.first_name
-        merge_model.last_name = employer_profile.staff_roles.first.last_name
-      end
-
+      first_name
+      last_name
       office_address = employer_profile.organization.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
@@ -35,6 +32,14 @@ module Notifier
           zip: office_address.zip
           })
       end
+    end
+
+    def first_name
+      merge_model.first_name = employer_profile.staff_roles.first.first_name
+    end
+
+    def last_name
+      merge_model.last_name = employer_profile.staff_roles.first.last_name
     end
 
     def notice_date
