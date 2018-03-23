@@ -104,5 +104,10 @@ module Config::AcaModelConcern
     def sic_field_exists_for_employer?
       @@sic_field_exists_for_employer ||= Settings.aca.employer_has_sic_field
     end
+
+    def validate_county?
+      @@validate_count ||= Settings.aca.validate_county
+    end
+
   end
 end
