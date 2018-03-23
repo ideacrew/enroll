@@ -58,7 +58,7 @@ namespace :reports do
     end
 
     def people
-      Person.where(:"consumer_role.workflow_state_transitions".elem_match => {
+      people = Person.where(:"consumer_role.workflow_state_transitions".elem_match => {
           "$and" => [
               {:event => {"$in" => ["ssn_invalid!",
                                     "ssn_valid_citizenship_invalid!",
@@ -69,6 +69,8 @@ namespace :reports do
               { :transition_at.lte => end_date }
           ]
       })
+
+      remove_dup_override? ? people.where(:"consumer_role.aasm_state" => "verification_outstanding") : people
     end
 
     def workflow_transitions(person)
@@ -90,6 +92,8 @@ namespace :reports do
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
+
+      collect_rows = []
       people.each do |person|
         workflow_transitions(person).each do |transition|
           case transition.event
@@ -106,7 +110,7 @@ namespace :reports do
           end
 
           types.each do |type|
-            csv << [
+            collect_rows << [
                 subscriber_id(person),
                 person.hbx_id,
                 person.first_name,
@@ -117,6 +121,12 @@ namespace :reports do
             ]
           end
         end
+      end
+
+      rows_for_csv = remove_dup_override? ? collect_rows.uniq : collect_rows
+
+      rows_for_csv.each do |row|
+        csv << row
       end
       puts "*********** DONE ******************"
     end
