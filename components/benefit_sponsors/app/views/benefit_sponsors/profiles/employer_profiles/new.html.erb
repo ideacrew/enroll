@@ -1,0 +1,4 @@
+<%= form_for @sponsor, as: :organization, url: {action: "create"} do |f| %>
+  <%= render 'benefit_sponsors/shared/error_messages', :object => @sponsor %>
+  <%= render 'employer_form', f: f %>
+<% end %>

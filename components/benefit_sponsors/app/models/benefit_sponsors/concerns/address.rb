@@ -36,8 +36,8 @@ module BenefitSponsors
       # The name of the country where this address is located
       field :country_name, type: String, default: ""
 
-      validates :zip, presence: true, unless: :plan_design_model?
-      validates :kind, presence: true, unless: :plan_design_model?
+      validates :zip, presence: true
+      validates :kind, presence: true
 
       validates :kind,
         inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },

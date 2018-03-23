@@ -87,7 +87,7 @@ module BenefitSponsors
 
       def ensure_office_locations
         if @office_locations.empty?
-          new_office_location = OfficeLocation.new
+          new_office_location = Locations::OfficeLocation.new
           new_office_location.build_address
           new_office_location.build_phone
           @office_locations = [new_office_location]
@@ -130,7 +130,7 @@ module BenefitSponsors
         @office_locations = []
         attrs.each_pair do |k, att_set|
           att_set.delete('phone_attributes') if att_set["phone_attributes"].present? && att_set["phone_attributes"]["number"].blank?
-          @office_locations << OfficeLocation.new(att_set)
+          @office_locations << Locations::OfficeLocation.new(att_set)
         end
         @office_locations
       end
@@ -148,6 +148,22 @@ module BenefitSponsors
         #Regexp.compile(Regexp.escape(str.to_s))
         clean_string = Regexp.escape(str.strip)
         /^#{clean_string}$/i
+      end
+
+      def first_name
+        @first_name
+      end
+
+      def last_name
+        @last_name
+      end
+
+      def first_name=(val)
+        @first_name = val.blank? ? nil : val.strip
+      end
+
+      def last_name=(val)
+        @last_name = val.blank? ? nil : val.strip
       end
     end
   end

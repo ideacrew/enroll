@@ -17,12 +17,17 @@ module BenefitSponsors
   module Organizations
     module Factories
       class BenefitSponsorFactory < OrganizationProfileFactory
+        attr_accessor :email
+        attr_accessor :area_code
+        attr_accessor :number
+        attr_accessor :extension
 
         def initialize(profile, legal_name, fein = nil, options = {})
           @profile = profile
           @legal_name = legal_name
           @fein = fein
           @entity_kind = options[:entity_kind]
+          super()
         end
 
         def init_organization
