@@ -12,6 +12,7 @@ site:
   forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
+  exchange_hbx_id: "DC0"
 
   social_media:
     facebook_url: ""
@@ -113,7 +114,7 @@ aca:
     employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
-checkbook_services: 
+checkbook_services:
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
     base_url:  "https://dc.checkbookhealth.org"
     url: "https://dc.checkbookhealth.org/shop/dc/"
