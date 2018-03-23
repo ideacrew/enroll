@@ -22,9 +22,11 @@
   <% end %>
 </div>
 
-<div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
-  <%= render "sic_help", sicFieldId: 'organization_employer_profile_attributes_sic_code' %>
-</div>
+<% if display_sic_field_for_employer? %>
+  <div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
+    <%= render "sic_help", sicFieldId: 'organization_employer_profile_attributes_sic_code' %>
+  </div>
+<% end %>
 
 <script>
   $(function(){
