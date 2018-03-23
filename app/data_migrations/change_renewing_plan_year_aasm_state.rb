@@ -7,7 +7,7 @@ class ChangeRenewingPlanYearAasmState< MongoidMigrationTask
       if organization.present?
         return unless ENV['plan_year_start_on'].present?
         plan_year_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
-        aasm_state = ENV['state'].to_s if ENV['state'] = "renewing_enrolled"
+        aasm_state = ENV['state'].to_s if ENV['state'] == "renewing_enrolled"
         plan_year = organization.employer_profile.plan_years.where(:start_on => plan_year_start_on).first
         if plan_year.present?
           plan_year.revert_renewal! if plan_year.may_revert_renewal?
