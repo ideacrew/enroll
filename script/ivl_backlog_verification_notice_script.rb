@@ -82,6 +82,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
+            family: family,
             data: members
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
         )

@@ -3,11 +3,11 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
   attr_accessor :family, :data, :person
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = args[:family].primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= args[:family].primary_applicant.person
+    args[:to] = args[:family].primary_applicant.person.work_email_or_best
     self.person = args[:person]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
