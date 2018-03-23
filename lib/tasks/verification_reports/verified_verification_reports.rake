@@ -36,7 +36,6 @@ namespace :reports do
     end
 
     def verified_history_elements_with_date_range
-
       @person.consumer_role.verification_type_history_elements.
       where(created_at:{
         :"$gte" => start_date,
@@ -78,7 +77,7 @@ namespace :reports do
     end
 
 
-    file_name = "#{Rails.root}/public/verified_verification_report_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
+    file_name = "#{Rails.root}/public/verified_verification_report_#{date.gsub(" ", "").split(",").join("_")}.csv"
 
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
