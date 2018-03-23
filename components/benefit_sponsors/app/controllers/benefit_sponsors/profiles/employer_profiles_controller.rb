@@ -2,7 +2,6 @@ module BenefitSponsors
   class Profiles::EmployerProfilesController < ApplicationController
     before_action :get_site_key
     def new
-      binding.pry
       if @site_key == :dc
         @profile = Organizations::AcaShopDcEmployerProfile.new
       elsif @site_key == :cca
@@ -12,7 +11,6 @@ module BenefitSponsors
     end
 
     def create
-      binding.pry
     end
 
     private
