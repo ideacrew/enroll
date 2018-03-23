@@ -29,16 +29,15 @@ class UpdateConversionFlag < MongoidMigrationTask
     attestation = employer.employer_attestation.blank?  ? employer.build_employer_attestation : employer.employer_attestation
     if attestation.present? && attestation.denied?
       attestation.revert! if attestation.may_revert?
-      document= attestation.employer_attestation_documents.where(aasm_state:"rejected").first
+      document = attestation.employer_attestation_documents.where(:aasm_state.ne =>"accepted").first
       unless document.present?
         puts "Employer attestation document not found" unless Rails.env.test?
-        return 
       else
         document.revert! if document.present? && document.may_revert?
+        document.submit! if document.may_submit?
         document.accept! if document.may_accept?
       end
     end
-
     attestation.submit! if attestation.may_submit?
     attestation.approve! if attestation.may_approve?
     attestation.save
