@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe AcaIndividualInitialApplicationConfiguration, type: :model, dbclean: :around_each do
+  RSpec.describe AcaIndividualInitialApplicationConfiguration, type: :model do
 
   	let(:aca_initial_individual_configuration) { AcaIndividualInitialApplicationConfiguration.new }
 

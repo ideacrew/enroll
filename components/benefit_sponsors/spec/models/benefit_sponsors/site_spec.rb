@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Site, type: :model do
+  RSpec.describe Site, type: :model, dbclean: :after_each do
 
     let(:site_key)            { :usa }
     let(:long_name)           { "ACME Widget's Benefit Website" }
@@ -56,7 +56,7 @@ module BenefitSponsors
         end
       end
 
-      context "with two benefit markets of the same kind" do
+      context "with two benefit markets of the same kind", dbclean: :after_each do
         let(:same_benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
         let(:site) { Site.new(params) }

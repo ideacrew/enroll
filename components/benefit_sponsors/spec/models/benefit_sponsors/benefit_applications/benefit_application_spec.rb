@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitApplications::BenefitApplication, type: :model, dbclean: :around_each do
+  RSpec.describe BenefitApplications::BenefitApplication, type: :model do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
     # let(:date_range) { (Date.today..1.year.from_now) }
@@ -57,47 +57,7 @@ module BenefitSponsors
       end
     end
 
-    context "#to_plan_year" do
-      let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
-      let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(
-        benefit_market: "aca_shop_cca",
-#        enrollment_frequency: "rolling_month"
-      )}
-
-      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
-      let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
-      let(:office_location) { OfficeLocation.new(
-          is_primary: true,
-          address: address,
-          phone: phone
-        )
-      }
-
-      let(:plan_design_organization)  { BenefitSponsors::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
-      let(:plan_design_proposal)      { BenefitSponsors::Organizations::PlanDesignProposal.new(title: "New Proposal") }
-      let(:profile) {BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new}
-
-      before(:each) do
-        plan_design_organization.plan_design_proposals << [plan_design_proposal]
-        plan_design_proposal.profile = profile
-        profile.benefit_sponsorships = [benefit_sponsorship]
-        benefit_sponsorship.benefit_applications = [benefit_application]
-        benefit_application.benefit_groups.build
-        plan_design_organization.save
-      end
-
-      it "should instantiate a plan year object and must have correct values assigned" do
-        plan_year = benefit_application.to_plan_year
-        expect(plan_year.class).to eq PlanYear
-        expect(plan_year.benefit_groups.present?).to eq true
-        expect(plan_year.start_on).to eq benefit_application.effective_period.begin
-        expect(plan_year.end_on).to eq benefit_application.effective_period.end
-        expect(plan_year.open_enrollment_start_on).to eq benefit_application.open_enrollment_period.begin
-        expect(plan_year.open_enrollment_end_on).to eq benefit_application.open_enrollment_period.end
-      end
-    end
-
-    context "#to_plan_year" do
+    context "#to_plan_year", dbclean: :after_each do
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
+  RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
 
     let(:benefit_market)                        { :aca_shop_cca }
     let(:contact_method)                        { :paper_and_electronic }

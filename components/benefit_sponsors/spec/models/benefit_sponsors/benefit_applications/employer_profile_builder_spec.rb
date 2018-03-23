@@ -17,7 +17,7 @@ module BenefitSponsors
       }
     end
 
-    context "add_plan_year" do
+    context "add_plan_year", dbclean: :after_each do
 
       let(:employer_profile)          { EmployerProfile.new }
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
