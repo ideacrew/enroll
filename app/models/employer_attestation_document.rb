@@ -50,7 +50,6 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-    binding.pry
     if submitted? && employer_attestation.editable?
       case params[:status].to_sym
       when :rejected
