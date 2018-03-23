@@ -70,12 +70,14 @@
             <%= l10n("broker_mail")%>
           <% end %>
         </li>
+        <% if aca_broker_routing_information %>
         <li role="presentation" id="commissions-tab" <%= menu_tab_class(active_tab, "commissions-tab") %>>
           <%= link_to(main_app.commission_statements_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
             <span class="hidden-xs">Commissions</span>
             <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
           <% end %>
         </li>
+        <% end %>
 
         <% if current_user.has_hbx_staff_role? %>
         <% else %>

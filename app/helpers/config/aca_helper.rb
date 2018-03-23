@@ -142,8 +142,4 @@ module Config::AcaHelper
     Settings.aca.broker_routing_information
   end
 
-  def aca_broker_registration_text
-    Settings.aca.broker_registration_text
-  end
-
 end
