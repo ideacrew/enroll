@@ -858,17 +858,18 @@ class PlanYear
       dates_map = {}
       month = start_on.month
       key = Date.new(TimeKeeper.date_of_record.year, month, 1)
+      month = month-1
       year = TimeKeeper.date_of_record.year
-      if (month == 1)
+      if (month == 0)
         month = 12
         year -=1
       end
       to_date = Date.new(year, month, due_day)
-      while (event_date_arr.include?(to_date) or to_date.wday > 5)
+      while (event_date_arr.include?(to_date) or to_date.wday == 6 or to_date.wday == 0)
         to_date = to_date+1.day
       end
       dates_map[key] = to_date
-      dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
+      dates_map[start_on]  || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
     end
 
     ## TODO - add holidays
