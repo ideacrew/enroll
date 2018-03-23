@@ -21,7 +21,7 @@ namespace :reports do
   end
 
 
-    file_name = "#{Rails.root}/monthly_sep_enrollments_report_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
+    file_name = "#{Rails.root}/monthly_sep_enrollments_report_#{date.gsub(" ", "").split(",").join("_")}.csv"
     puts "Created file and trying to import the data #{file_name}" 
 
     families = Family.where(:"households.hbx_enrollments" => {"$elemMatch" => {
