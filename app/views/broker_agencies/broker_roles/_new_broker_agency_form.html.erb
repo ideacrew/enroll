@@ -15,8 +15,10 @@
         </div><br>
 
         <div class="action-group">
-          <%= render "broker_agencies/applicants/bank_information", f: f %>
-          <p class="bank-name-container"></p>
+          <% if aca_broker_routing_information %>
+             <%= render "broker_agencies/applicants/bank_information", f: f %>
+             <p class="bank-name-container"></p>
+          <% end %>
         </div>
 
         <div class="row no-buffer row-form-wrapper no-border">
@@ -30,7 +32,9 @@
         </div>
         <div class="row">
           <div class="col-xs-12">
-            <h5>By submitting this application to become a certified broker on the Health Connector for Business, I agree to the terms and conditions described in the <%= site_brokers_agreement_path %>.</h5>
+            <% if aca_broker_routing_information %>
+              <h5><%= l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)%></h5>
+            <% end %>
           </div>
         </div>
       </div>
