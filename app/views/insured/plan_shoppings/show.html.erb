@@ -9,7 +9,7 @@
       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
         <div>
           <h1><%= l10n("choose_plan") %></h1>
-          <p class="twenty switch-header"><%= l10n(".choose_plan_filter_results_header") %><% if check_plan_options_title && @benefit_group.sole_source? %><b>Please note your final cost may change based on the final enrollment of all employees.</b><% end %></p>
+          <p class="twenty switch-header"><%= l10n(".choose_plan_filter_results_header") %><% if display_plan_cost_warning(@benefit_group) %><b>Please note your final cost may change based on the final enrollment of all employees.</b><% end %></p>
           <div class="row no-buffer">
             <%= render "shared/plan_shoppings/more_plan_details" %>
             <p class="pull-right">
