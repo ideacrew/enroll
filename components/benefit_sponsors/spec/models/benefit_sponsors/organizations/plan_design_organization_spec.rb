@@ -1,14 +1,11 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Organizations::PlanDesignOrganization, type: :model do
+  RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :after_each do
 
     describe "#expire proposals for non Prospect Employer" do
       let!(:organization) { create(:plan_design_organization,
-                              sponsor_profile_id: "1234",
-                              owner_profile_id: "5678",
-                              legal_name: "ABC Company",
-                              sic_code: "0345" ) }
+                              legal_name: "ABC Company") }
 
       context "when in an expirable state" do
         before(:each) do
@@ -39,10 +36,7 @@ module BenefitSponsors
 
     describe "#expire proposals for Prospect" do
       let!(:organization) { create(:plan_design_organization,
-                        sponsor_profile_id: nil,
-                        owner_profile_id: "5678",
-                        legal_name: "ABC Company",
-                        sic_code: "0345" ) }
+                        legal_name: "ABC Company") }
 
       context "when in an expirable state" do
         before(:each) do
@@ -61,12 +55,10 @@ module BenefitSponsors
       let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month}
       let(:plan_year) { double(start_on: start_on)}
       let(:census_employees) { double(non_terminated: [])}
-      let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
+      let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees) }
  
       let!(:plan_design_organization) { create(:plan_design_organization, 
-        owner_profile_id: "5678",
-        legal_name: "ABC Company",
-        sic_code: "0345" ) 
+        legal_name: "ABC Company")
       }
 
       let(:calculated_dates) { SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates }

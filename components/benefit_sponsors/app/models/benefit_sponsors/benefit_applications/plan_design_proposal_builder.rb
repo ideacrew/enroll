@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitApplications
     class PlanDesignProposalBuilder
 
@@ -12,7 +12,7 @@ module SponsoredBenefits
       end
 
       def add_plan_design_profile
-        profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({
+        profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new({
           sic_code: @employer_profile.sic_code
           })
 

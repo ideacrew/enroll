@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
+  RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
 
     let(:benefit_market)                        { :aca_shop_cca }
     let(:contact_method)                        { :paper_and_electronic }
@@ -13,15 +13,15 @@ module BenefitSponsors
     let(:required_params) do 
       {
         benefit_market: benefit_market,
-        contact_method: contact_method,
-        enrollment_frequency: enrollment_frequency,
+#        contact_method: contact_method,
+#        enrollment_frequency: enrollment_frequency,
       }
     end
 
     let(:optional_params) do
       {
-        initial_enrollment_period: initial_enrollment_period,
-        annual_enrollment_period_begin_month: annual_enrollment_period_begin_month,
+        initial_enrollment_period: initial_enrollment_period
+#        annual_enrollment_period_begin_month: annual_enrollment_period_begin_month,
       }
     end
 
@@ -40,12 +40,6 @@ module BenefitSponsors
       it "is not valid without a benefit market" do
         subject.benefit_market = nil
         expect(subject).to_not be_valid
-      end
-
-      it "is not valid without a enrollment frequency" do
-        subject.enrollment_frequency = invalid_enrollment_frequency
-        subject.validate
-        expect(subject.errors[:enrollment_frequency].first).to match /weekly is not a valid enrollment frequency kind/
       end
 
       it "is not valid without a contact method" do
@@ -73,6 +67,7 @@ module BenefitSponsors
       end
 
       it "is not valid with an invalid enrollment frequency" do
+        subject.enrollment_frequency = nil
         subject.contact_method = nil
         expect(subject).to_not be_valid
       end

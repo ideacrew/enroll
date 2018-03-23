@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Site, type: :model do
+  RSpec.describe Site, type: :model, dbclean: :after_each do
 
     let(:site_key)            { :usa }
     let(:long_name)           { "ACME Widget's Benefit Website" }
@@ -56,8 +56,8 @@ module BenefitSponsors
         end
       end
 
-      context "with two benefit markets of the same kind" do
-        let(:same_benefit_market)      { FactoryGirl.build(:benefits_benefit_markets_benefit_market, kind: benefit_market_kind) } 
+      context "with two benefit markets of the same kind", dbclean: :after_each do
+        let(:same_benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
         let(:site) { Site.new(params) }
 
@@ -153,11 +153,11 @@ module BenefitSponsors
       let(:itune_legal_name)    { "iTunes, Inc" }
 
       let!(:site)               { FactoryGirl.create(:benefit_sponsors_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
-      let(:owner_organization)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
-      let!(:loony_organization) { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
-      let!(:acme_organization)  { FactoryGirl.create(:sponsored_benefits_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
+      let(:owner_organization)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
+      let!(:loony_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
+      let!(:acme_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
 
-      let(:employer_profile)    { FactoryGirl.build(:sponsored_benefits_organizations_aca_shop_dc_employer_profile) }
+      let(:employer_profile)    { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
       let(:hbx_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
 
 
@@ -196,9 +196,9 @@ module BenefitSponsors
           let(:ivl_benefit_market_1)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) } 
           let(:ivl_benefit_market_2)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) } 
 
-          let(:owner_organization_1)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
-          let(:owner_organization_2)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }
-          let(:owner_organization_3)  { FactoryGirl.build(:sponsored_benefits_organizations_general_organization, legal_name: legal_name_3, profiles: [employer_profile]) }
+          let(:owner_organization_1)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
+          let(:owner_organization_2)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }
+          let(:owner_organization_3)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_3, profiles: [employer_profile]) }
 
           let(:shop_only_site)        { FactoryGirl.build(:benefit_sponsors_site, :owner_organization => owner_organization_1, site_organizations: [ owner_organization_1 ], benefit_markets: [shop_benefit_market_1]) }
           let(:ivl_only_site)         { FactoryGirl.build(:benefit_sponsors_site, :owner_organization => owner_organization_2, site_organizations: [ owner_organization_2 ], benefit_markets: [ivl_benefit_market_1]) }
