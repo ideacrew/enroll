@@ -1,5 +1,5 @@
 # Generate a CCA EnrollApp EmployerProfile and child models from an existing PlanDesign Proposal
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitApplications
     class CcaEmployerProfileBuilder < EmployerProfileBuilder
 

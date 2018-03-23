@@ -1,5 +1,5 @@
 # Base class to generate EnrollApp EmployerProfile and child models from an existing PlanDesign Proposal
-module SponsoredBenefits
+ module BenefitSponsors
   module BenefitApplications
     class EmployerProfileBuilder
 

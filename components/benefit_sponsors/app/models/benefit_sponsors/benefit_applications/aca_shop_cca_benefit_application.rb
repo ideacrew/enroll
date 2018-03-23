@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module BenefitApplications
     class AcaShopCcaBenefitApplication < BenefitApplication
       include Concerns::AcaRatingAreaConfigConcern
