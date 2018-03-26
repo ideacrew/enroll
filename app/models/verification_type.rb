@@ -41,4 +41,8 @@ class VerificationType
   def is_type_outstanding?
     type_unverified? && vlp_documents.empty?
   end
+
+  def add_type_history_element(params)
+    type_history_elements<<TypeHistoryElement.new(params)
+  end
 end
