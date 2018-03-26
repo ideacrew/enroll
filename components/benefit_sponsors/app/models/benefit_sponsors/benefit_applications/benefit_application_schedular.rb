@@ -10,13 +10,7 @@ module BenefitSponsors
         next_month_start      = given_date.end_of_month + 1.day
         following_month_start = next_month_start + 1.month
 
-        if use_grace_period
-          last_day = open_enrollment_minimum_begin_day_of_month(true)
-        else
-          last_day = open_enrollment_minimum_begin_day_of_month
-        end
-
-        if given_day_of_month > last_day
+        if given_day_of_month > open_enrollment_minimum_begin_day_of_month(use_grace_period)
           following_month_start..(following_month_start + 1.year - 1.day)
         else
           next_month_start..(next_month_start + 1.year - 1.day)
@@ -38,6 +32,7 @@ module BenefitSponsors
         effective_date            = effective_date.to_date.beginning_of_month
         effective_period          = effective_date..(effective_date + 1.year - 1.day)
         open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+
         prior_month               = effective_date - 1.month
         binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
 
@@ -83,7 +78,8 @@ module BenefitSponsors
         #   candidate_open_enrollment_end_on
         # end
 
-        open_enrollment_start_on = [(start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months), TimeKeeper.date_of_record].max
+        open_enrollment_period = open_enrollment_period_by_effective_date(start_on)
+
 
         #candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
 
@@ -93,14 +89,19 @@ module BenefitSponsors
         #  candidate_open_enrollment_end_on
         #end
 
-        open_enrollment_end_on = enrollment_timetable_by_effective_date(start_on)[:open_enrollment_latest_end_on]
         binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
         {
-          open_enrollment_start_on: open_enrollment_start_on,
-          open_enrollment_end_on: open_enrollment_end_on,
+          open_enrollment_start_on: open_enrollment_period.begin,
+          open_enrollment_end_on: open_enrollment_period.end,
           binder_payment_due_date: binder_payment_due_date
         }
+      end
+
+      def open_enrollment_period_by_effective_date(start_on)
+        open_enrollment_start_on = [(start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months), TimeKeeper.date_of_record].max
+        open_enrollment_end_on   = ("#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
+        open_enrollment_start_on..open_enrollment_end_on
       end
 
       def map_binder_payment_due_date_by_start_on(start_on)
