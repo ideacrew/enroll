@@ -41,6 +41,24 @@ module BenefitSponsors
         end
       end
 
+      def init_organization
+        # for now we're always doing General Organization
+        class_name = GeneralOrganization || ExemptOrganization 
+
+        class_name.new(
+          :fein => fein,
+          :legal_name => legal_name,
+          :dba => dba,
+          :entity_kind => entity_kind,
+          :office_locations => office_locations,
+          :site => site
+        )
+      end
+
+      def site
+        BenefitSponsors::ApplicationController::current_site
+      end
+
       def match_or_create_person(current_user)
         if !self.person_id.blank?
           self.person = Person.find(self.person_id)
@@ -51,7 +69,7 @@ module BenefitSponsors
           :last_name => last_name,
           :dob => dob
         })
-        if  self.class.to_s == 'Forms::EmployerProfile'
+        if self.class.to_s.include?("BenefitSponsorFactory")
           matched_people = Person.where(
             first_name: regex_for(first_name),
             last_name: regex_for(last_name),
