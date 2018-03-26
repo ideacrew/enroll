@@ -4,31 +4,19 @@ module BenefitSponsors
 
       attr_reader :benefit_application, :application_attrs
       
-      #
-      # def initialize(options)
-      #   # TODO Work out how to get Site in single/multi-tenant scenarios
-      #   @application_class ||= AcaShopDcBenefitApplication
-      #   @benefit_application = @application_class.new(options)
-      # end
-      #
       # AcaShopCcaBenefitApplicationBuilder.build do |builder|
+      #   builder.benefit_sponsorship(benefit_sponsorship)
       #   builder.application_attrs(list_bill_attrs)
       #   builder.build_application       
       # end
-      #
 
       def self.build
         builder = new
         yield(builder)
-        builder.build_application
+        builder.add_effective_period
+        builder.add_open_enrollment_period
+        builder.add_ftp_pte_msp
         builder.benefit_application
-      end
-
-      def build_application
-        add_effective_period
-        add_open_enrollment_period
-        add_ftp_pte_msp
-        add_benefit_packages
       end
 
       def effective_date
@@ -65,7 +53,7 @@ module BenefitSponsors
         @benefit_application.open_enrollment_period = parse_date(@application_attrs[:open_enrollment_start_on])..parse_date(@application_attrs[:open_enrollment_end_on])
       end
 
-      def add_ftp
+      def add_ftp_pte_msp
         @benefit_application.fte_count = application_attrs[:fte_count]
       end
 
@@ -75,15 +63,6 @@ module BenefitSponsors
 
       def add_msp
         @benefit_application.msp_count = application_attrs[:msp_count]
-      end
-
-      def add_benefit_packages
-        @benefit_application.benefit_packages = application_attrs.fetch(:benefit_groups_attributes).inject([]) do |packages, (index, attrs)|
-          packages << SponsoredBenefits::BenefitSponsorships::BenefitPackageBuilder.build do |builder|
-            builder.benefit_sponsorship(@benefit_sponsorship)
-            builder.benefit_package_options(attrs)
-          end
-        end
       end
 
       # def add_benefit_sponsor(new_benefit_sponsor)

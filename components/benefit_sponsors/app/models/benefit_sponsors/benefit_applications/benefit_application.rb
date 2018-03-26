@@ -4,10 +4,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include AASM
-      include SetCurrentUser
-      include Acapi::Notifiers
-# Re-enable once module is defined
-#      include BenefitApplicationAasmCallbacks
+      include BenefitApplicationAasmCallbacks
 
       PUBLISHED = %w(published enrolling enrolled active suspended)
       RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
