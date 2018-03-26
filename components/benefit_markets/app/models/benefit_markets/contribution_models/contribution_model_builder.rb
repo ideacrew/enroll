@@ -4,8 +4,9 @@ module BenefitMarkets
   class ContributionModels::ContributionModelBuilder
     # Produce the contribution unit values specified by the given contribution model
     def build_contribution_unit_values(contribution_model)
+      contribution_value_kls = contribution_model.contribution_value_kind.constantize
       contribution_model.contribution_units.map do |cu|
-        contribution_model.contribution_value_kind.new({
+        contribution_value_kls.new({
           contribution_unit: cu,
           offered: cu.default_offering
         })

@@ -21,6 +21,11 @@ module BenefitMarkets
         subject.valid?
         expect(subject.errors.has_key?(:member_relationships)).to be_truthy
       end
+
+      it "is a contribution value kind" do
+        subject.valid?
+        expect(subject.errors.has_key?(:contribution_value_kind)).to be_truthy
+      end
     end
   end
 end
