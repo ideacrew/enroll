@@ -1,11 +1,11 @@
-module SponsoredBenefits
+module BenefitSponsors
   class CensusMembers::CensusMember
 
     include Mongoid::Document
     include Mongoid::Timestamps
     include Concerns::UnsetableSparseFields
-    include SponsoredBenefits::Concerns::Ssn
-    include SponsoredBenefits::Concerns::Dob
+    include BenefitSponsors::Concerns::Ssn
+    include BenefitSponsors::Concerns::Dob
 
     store_in collection: 'census_members'
 
@@ -27,10 +27,10 @@ module SponsoredBenefits
     field :employee_relationship, type: String
     field :employer_assigned_family_id, type: String
 
-    embeds_one :address, class_name: "SponsoredBenefits::Locations::Address"
+    embeds_one :address, class_name: "BenefitSponsors::Locations::Address"
     accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
 
-    embeds_one :email, class_name: "SponsoredBenefits::Email"
+    embeds_one :email, class_name: "BenefitSponsors::Email"
     accepts_nested_attributes_for :email, allow_destroy: true
 
     validates_presence_of :first_name, :last_name, :dob, :employee_relationship
@@ -39,7 +39,7 @@ module SponsoredBenefits
     validates :gender, allow_blank: true, inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
     def plan_design_model?
-      self.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) || _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+      self.is_a?(BenefitSponsors::CensusMembers::PlanDesignCensusEmployee) || _parent.is_a?(BenefitSponsors::CensusMembers::PlanDesignCensusEmployee)
     end
 
     def full_name
@@ -59,7 +59,7 @@ module SponsoredBenefits
     end
 
     def relationship_string
-      if is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+      if is_a?(BenefitSponsors::CensusMembers::PlanDesignCensusEmployee)
         "employee"
       else
         relationship_mapping[employee_relationship]

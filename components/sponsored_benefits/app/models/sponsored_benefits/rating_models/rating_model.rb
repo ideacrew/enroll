@@ -30,7 +30,7 @@ module SponsoredBenefits
         rating_tiers.match(enrollment_group)
       end
 
-
+=begin
       class benefit_package
         embeds_many :benefit_designs
         embeds_one  :roster
@@ -43,7 +43,7 @@ module SponsoredBenefits
         embeds_one :rating_model
       end
 
-
+=end
 # benefit_sponsor
 
 # BenefitApplication
