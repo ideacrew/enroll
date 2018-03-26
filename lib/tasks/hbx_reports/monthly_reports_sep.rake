@@ -58,7 +58,7 @@ namespace :reports do
               primary_person.first_name,
               primary_person.last_name,
               enrollment.special_enrollment_period.title,
-              enrollment.created_at,
+              enrollment.submitted_at,
               covered_people,
               enrollment.coverage_kind,
               enrollment.plan.name,
