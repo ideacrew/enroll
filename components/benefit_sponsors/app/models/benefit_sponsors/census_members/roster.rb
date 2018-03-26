@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module CensusMembers
     class Roster
       include Enumerable
@@ -20,9 +20,9 @@ module SponsoredBenefits
 
       def member_class_for(member_instance)
         case member_instance.class_name
-        when "SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee", "SponsoredBenefits::CensusMembers::PlanDesignCensusDependent"
+        when "BenefitSponsors::CensusMembers::PlanDesignCensusEmployee", "BenefitSponsors::CensusMembers::PlanDesignCensusDependent"
           @roster_kind  = :plan_design
-          @member_klass = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
+          @member_klass = BenefitSponsors::CensusMembers::PlanDesignCensusEmployee
         when "PlanDesignCensusEmployee", "PlanDesignCensusDependent"
           @roster_kind  = :employer_profile
           @member_klass = ::CensusEmployee
@@ -40,7 +40,7 @@ module SponsoredBenefits
 
       def add_member(new_member)
         
-        census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(serialize_attributes(new_member.attributes))
+        census_employee = BenefitSponsors::CensusMembers::PlanDesignCensusEmployee.new(serialize_attributes(new_member.attributes))
         census_employee.benefit_sponsorship_id = benefit_sponsorship.id
         census_employee.ssn = census_employee.ssn if census_employee.ssn.present?
 
@@ -51,7 +51,7 @@ module SponsoredBenefits
       end
 
       def add_member_dependent(new_census_dependent)
-        census_dependent = SponsoredBenefits::CensusMembers::CensusDependent.new(dependent_attributes(new_census_dependent.attributes))
+        census_dependent = BenefitSponsors::CensusMembers::CensusDependent.new(dependent_attributes(new_census_dependent.attributes))
         census_dependent.ssn= census_dependent.ssn if census_dependent.ssn.present?
         census_dependent
       end

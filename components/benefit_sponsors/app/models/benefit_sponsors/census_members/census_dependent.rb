@@ -1,6 +1,6 @@
-module SponsoredBenefits
+module BenefitSponsors
   module CensusMembers
-    class CensusDependent < SponsoredBenefits::CensusMembers::CensusMember
+    class CensusDependent < BenefitSponsors::CensusMembers::CensusMember
 
       EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse domestic_partner child_under_26  child_26_and_over disabled_child_26_and_over]
 

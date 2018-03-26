@@ -385,7 +385,7 @@ module BenefitSponsors
 
       class << self
         def schedular
-          BenefitApplicationSchedular.new
+          ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         end
        
         def calculate_start_on_options
