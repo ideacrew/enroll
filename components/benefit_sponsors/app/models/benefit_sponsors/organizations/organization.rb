@@ -130,6 +130,14 @@ module BenefitSponsors
         new_sponsorship
       end
 
+      def employer_profile
+        self.profiles.where(_type: /.*EmployerProfile$/).first
+      end
+
+      def is_an_issuer_profile?
+        self.profiles.where(_type: /.*IssuerProfile$/).present?
+      end
+
 
       class << self
         def default_search_order
