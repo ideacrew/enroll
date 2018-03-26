@@ -276,6 +276,14 @@
   "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
   "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)",
   "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
+<% elsif notice.notification_type && notice.notification_type == "ivl_backlog_verification_notice_uqhp" %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility for enrollment in a qualified health plan: 45 CFR §155.305(a)",
+  "Social Security Number requests/use: 45 CFR §155.305(f)(6)",
+  "Verifying eligibility for enrollment in a qualified health plan: 45 CFR §155.315",
+  "Document requests: 45 CFR §155.315(f)(2)(ii)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
 <% else %>
   <%= render partial: 'notices/shared/reference_paragraph', :locals => {
   contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
