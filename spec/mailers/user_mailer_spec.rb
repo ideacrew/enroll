@@ -16,7 +16,7 @@ RSpec.describe UserMailer do
     end
 
     it "should have subject of #{Settings.site.short_name}" do
-      expect(email.subject).to match(/Health Connector/)
+      expect(email.subject).to match(/#{Settings.site.short_name}/)
     end
 
     it "should have one attachment" do
