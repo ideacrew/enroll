@@ -39,16 +39,16 @@ module BenefitSponsors
         open_enrollment_minimum_day     = open_enrollment_minimum_begin_day_of_month
         open_enrollment_period_minimum  = Date.new(prior_month.year, prior_month.month, open_enrollment_minimum_day)..open_enrollment_period.end
 
-        employer_initial_application_earliest_start_on  = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
-        employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
-        employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+        # employer_initial_application_earliest_start_on  = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
+        # employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
+        # employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
 
         {
           effective_date: effective_date,
           effective_period: effective_period,
-          employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
-          employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
-          employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
+          # employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
+          # employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
+          # employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
           open_enrollment_period: open_enrollment_period,
           open_enrollment_period_minimum: open_enrollment_period_minimum,
           binder_payment_due_on: binder_payment_due_on,

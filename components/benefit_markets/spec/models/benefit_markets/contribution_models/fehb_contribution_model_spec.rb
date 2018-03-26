@@ -35,6 +35,7 @@ module BenefitMarkets
 
       let(:contribution_model) do
         ContributionModels::FehbContributionModel.new(
+          :contribution_value_kind => "::BenefitSponsors::ContributionUnitValues::FehbContributionUnitValue",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
           :name => "Federal Heath Benefits"
