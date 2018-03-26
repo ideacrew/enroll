@@ -206,6 +206,7 @@ And(/Individual clicks on add member button/) do
 end
 
 And(/Individual again clicks on add member button/) do
+  wait_for_ajax
   find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
   expect(page).to have_content('Lives with primary subscriber')
 
