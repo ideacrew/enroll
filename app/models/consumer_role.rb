@@ -112,6 +112,7 @@ class ConsumerRole
   end
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true #move to verification type
+  embeds_many :verification_type_history_elements
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
@@ -222,46 +223,12 @@ class ConsumerRole
   #use this method to check what verification types needs to be included to the notices
   def outstanding_verification_types
     self.person.verification_types.find_all do |type|
-      self.is_type_outstanding?(type)
+      type.is_type_outstanding?
     end
   end
 
   def all_types_verified?
-    person.verification_types.all?{ |type| is_type_verified?(type) }
-  end
-
-  #check verification type status
-  def is_type_outstanding?(type)
-    case type
-      when "DC Residency"
-        residency_denied? && !has_docs_for_type?(type) && local_residency_outstanding?
-      when 'Social Security Number'
-        !ssn_verified? && !has_docs_for_type?(type)
-      when 'American Indian Status'
-        !native_verified? && !has_docs_for_type?(type)
-      else
-        !lawful_presence_authorized? && !has_docs_for_type?(type)
-    end
-  end
-
-  def local_residency_outstanding?
-    self.local_residency_validation == 'outstanding'
-  end
-
-  def ssn_verified?
-    ["na", "valid"].include?(self.ssn_validation)
-  end
-
-  def ssn_pending?
-    self.ssn_validation == "pending"
-  end
-
-  def ssn_outstanding?
-    self.ssn_validation == "outstanding"
-  end
-
-  def lawful_presence_verified?
-    self.lawful_presence_determination.verification_successful?
+    person.verification_types.all?{ |type| type.type_verified? }
   end
 
   def is_hbx_enrollment_eligible?
@@ -837,53 +804,29 @@ class ConsumerRole
   end
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
-    case v_type
-      when "DC Residency"
-        update_attributes(:residency_update_reason => update_reason, :residency_rejected => true)
-        mark_residency_denied
-      when "Social Security Number"
-        update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
-      when "American Indian Status"
-        update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
-      else
-        lawful_presence_determination.deny!(verification_attr(authority.first))
-        update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason}, :lawful_presence_rejected => true )
+    v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
+    if  v_type.type_name == "DC Residency"
+      mark_residency_denied
+    elsif ["Citizenship", "Immigration status"].include? v_type.type_name
+      lawful_presence_determination.deny!(verification_attr(authority.first))
     end
     reject!(verification_attr(authority.first))
     "#{v_type} was rejected."
   end
 
   def update_verification_type(v_type, update_reason, *authority)
-    case v_type
-      when "DC Residency"
-        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record, :local_residency_validation => "valid")
-      when "Social Security Number"
-        update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
-      when "American Indian Status"
-        update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
-      else
-        lawful_presence_determination.authorize!(verification_attr(authority.first))
-        update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    v_type.update_attributes(:validation_status => "valid", :update_reason => update_reason)
+    if v_type.type_name == "DC Residency"
+      update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
+    elsif ["Citizenship", "Immigration status"].include? v_type.type_name
+      lawful_presence_determination.authorize!(verification_attr(authority.first))
     end
-    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type} successfully verified."
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type.type_name} successfully verified."
   end
 
   def redetermine_verification!(verification_attr)
     revert!(verification_attr)
     coverage_purchased_no_residency!(verification_attr)
-  end
-
-  def is_type_verified?(type)
-    case type
-      when "DC Residency"
-        residency_verified?
-      when "Social Security Number"
-        ssn_verified?
-      when "American Indian Status"
-        native_verified?
-      else
-        lawful_presence_verified?
-    end
   end
 
   def ensure_validation_states

@@ -129,7 +129,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     due_dates = []
     family.contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.each do |v_type|
-        due_dates << family.document_due_date(family_member, v_type)
+        due_dates << family.document_due_date(v_type)
       end
     end
     due_dates.compact!

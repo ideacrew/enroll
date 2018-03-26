@@ -1,0 +1,3 @@
+class VerificationTypesController < ApplicationController
+
+end

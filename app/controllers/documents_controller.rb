@@ -1,6 +1,7 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
+  before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
   respond_to :html, :js
@@ -32,13 +33,12 @@ class DocumentsController < ApplicationController
   end
 
   def update_verification_type
-    v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
     family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
-      verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
+      verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
       update_documents_status(family_member) if family_member
@@ -194,6 +194,11 @@ class DocumentsController < ApplicationController
 
   def set_person
     @person = Person.find(params[:person_id]) if params[:person_id]
+  end
+
+  def set_verification_type
+    set_person
+    @verification_type = @person.verification_types.active.find(params[:verification_type])
   end
 
   def verification_attr

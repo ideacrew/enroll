@@ -14,8 +14,8 @@ module VerificationHelper
     end
   end
 
-  def verification_type_class(type, member, admin=false)
-    case verification_type_status(type, member, admin)
+  def verification_type_class(status)
+    case status
       when "verified"
         "success"
       when "review"
@@ -52,7 +52,7 @@ module VerificationHelper
 
   def is_not_verified?(family_member, v_type)
     return true if family_member.blank?
-    !family_member.person.consumer_role.is_type_verified?(v_type)
+    !(["na", "valid"].include?(v_type.validation_status))
   end
 
   def can_show_due_date?(person, options ={})
@@ -138,8 +138,9 @@ module VerificationHelper
     ["verified", "rejected"].include?(status)
   end
 
-  def show_v_type(v_type, person, admin = false)
-    verification_type_status(v_type, person, admin).capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+  def show_v_type(status, admin = false)
+    return "Curam".center(12) if status == "curam" && admin
+    status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe if status
   end
 
   # returns vlp_documents array for verification type
@@ -158,7 +159,7 @@ module VerificationHelper
   def build_admin_actions_list(v_type, f_member)
     if f_member.consumer_role.aasm_state == 'unverified'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
-    elsif verification_type_status(v_type, f_member) == 'outstanding'
+    elsif v_type.validation_status == 'outstanding'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS

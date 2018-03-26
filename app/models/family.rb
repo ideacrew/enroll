@@ -983,7 +983,7 @@ class Family
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.each do |v_type|
-        due_dates << document_due_date(family_member, v_type)
+        due_dates << v_type.due_date
       end
     end
     due_dates.compact!
@@ -1004,10 +1004,8 @@ class Family
     enrolled_family_members
   end
 
-  def document_due_date(family_member, v_type)
-    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
-    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    sv.present? ? sv.due_date : nil
+  def document_due_date(v_type)
+    ["verified", "attested"].include? v_type.validation_status ? nil : v_type.due_date
   end
 
   def enrolled_policy(family_member)
@@ -1039,10 +1037,10 @@ class Family
     documents_list = []
     document_status_outstanding = []
     self.active_family_members.each do |member|
-      member.person.verification_types.each do |type|
-      if member.person.consumer_role && is_document_not_verified(type, member.person)
-        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
-        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+      member.person.verification_types.active.each do |type|
+      if member.person.consumer_role && is_document_not_verified(type)
+        documents_list <<  (type.vlp_documents.where(verification_type: type.type_name) && type.validation_status != "outstanding")
+        document_status_outstanding << (type.vlp_documents.where(verification_type: type.type_name) && type.validation_status != "outstanding")
       end
       end
     end
@@ -1064,9 +1062,8 @@ class Family
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
   end
 
-  def is_document_not_verified(type, person)
-    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified" &&
-    verification_type_status(type, person, person.hbx_staff_role?) != "curam"
+  def is_document_not_verified(type)
+    !(["valid", "attested", "verified", "curam"].include? type.validation_status)
   end
 
   def has_valid_e_case_id?
