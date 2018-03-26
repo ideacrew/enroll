@@ -73,7 +73,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Site"
 
       embeds_many :office_locations, 
-                  class_name: "BenefitSponsors::Organizations::OfficeLocation", 
+                  class_name: "BenefitSponsors::Locations::OfficeLocation", 
                   cascade_callbacks: true, validate: true
 
       embeds_many :profiles, 

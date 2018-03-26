@@ -4,6 +4,20 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include AASM
+      include SetCurrentUser
+      include Acapi::Notifiers
+# Re-enable once module is defined
+#      include BenefitApplicationAasmCallbacks
+
+      PUBLISHED = %w(published enrolling enrolled active suspended)
+      RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
+      RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
+
+      INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
+
+      OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
+      INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
+      INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
       # The date range when this application is active
       field :effective_period,        type: Range
@@ -47,24 +61,80 @@ module BenefitSponsors
         validate: true
 
       validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
-      # validate :validate_application_dates
-
-      validate :open_enrollment_date_checks
+      
+      validate :validate_application_dates
+      # validate :open_enrollment_date_checks
 
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
 
       scope :by_effective_date,       ->(effective_date)    { where(:"effective_period.min" => effective_date) }
       scope :by_effective_date_range, ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
+      scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
+      scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
+      scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
+      scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
+      
+      scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
+        where(
+          "$and" => [
+            {:aasm_state.in => PUBLISHED },
+            {"$or" => [
+              { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
+              { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
+            ]
+          }
+        ]
+        )
+      }
 
+      scope :published_plan_years_by_date, ->(date) {
+        where(
+          "$and" => [
+            {:aasm_state.in => PUBLISHED },
+            {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+          ]
+          )
+      }
 
-      ## Stub for BQT
-      def estimate_group_size?
-        true
+      scope :published_and_expired_plan_years_by_date, ->(date) {
+        where(
+          "$and" => [
+            {:aasm_state.in => PUBLISHED + ['expired'] },
+            {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+          ]
+          )
+      }
+
+      after_update :update_employee_benefit_packages
+      # Refactor code into benefit package updater
+      def update_employee_benefit_packages
+        if self.start_on_changed?
+          bg_ids = self.benefit_groups.pluck(:_id)
+          employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+          employees.each do |census_employee|
+            census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+              assignment.update(start_on: self.start_on)
+              assignment.update(end_on: self.end_on) if assignment.end_on.present?
+            end
+          end
+        end
+      end
+
+      def start_on
+        effective_period.begin
+      end
+
+      def end_on
+        effective_period.end
       end
 
       def effective_date
         effective_period.begin unless effective_period.blank?
+      end
+
+      def employer_profile
+        benefit_sponsorship.benefit_sponsorable
       end
 
       def effective_period=(new_effective_period)
@@ -75,6 +145,21 @@ module BenefitSponsors
       def open_enrollment_period=(new_open_enrollment_period)
         open_enrollment_range = BenefitSponsors.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
         write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
+      end
+
+      def eligible_for_export?
+        return false if self.aasm_state.blank?
+        return false if self.is_conversion
+        !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+      end
+
+      def overlapping_published_plan_years
+        employer_profile.plan_years.published_plan_years_within_date_range(start_on, end_on)
+      end
+
+      ## Stub for BQT
+      def estimate_group_size?
+        true
       end
 
       def open_enrollment_completed?
@@ -89,12 +174,18 @@ module BenefitSponsors
       def is_coverage_effective_eligible?
       end
 
-      # def employer_profile
-      #   benefit_sponsorship.benefit_sponsorable
-      # end
-
       def default_benefit_group
         benefit_groups.detect(&:default)
+      end
+
+      def employee_participation_percent
+        return "-" if eligible_to_enroll_count == 0
+        "#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
+      end
+
+      def employee_participation_percent_based_on_summary
+        return "-" if eligible_to_enroll_count == 0
+        "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
       end
 
       def minimum_employer_contribution
@@ -114,26 +205,19 @@ module BenefitSponsors
       end
 
       def to_plan_year
-        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
-        raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
+        BenefitApplicationToPlanYearConverter.new(self).call
+      end
 
-        # CCA-specific attributes (move to subclass)
-        recorded_sic_code               = ""
-        recorded_rating_area            = ""
-
-        copied_benefit_groups = []
-        benefit_groups.each do |benefit_group|
-          benefit_group.attributes.delete("_type")
-          copied_benefit_groups << ::BenefitGroup.new(benefit_group.attributes)
+      def filter_active_enrollments_by_date(date)
+        enrollment_proxies = BenefitApplicationEnrollmentsQuery.new(self).call(Family, date)
+        return [] if (enrollment_proxies.count > 100)
+        enrollment_proxies.map do |ep|
+          OpenStruct.new(ep)
         end
+      end
 
-        ::PlanYear.new(
-          start_on: effective_period.begin,
-          end_on: effective_period.end,
-          open_enrollment_start_on: open_enrollment_period.begin,
-          open_enrollment_end_on: open_enrollment_period.end,
-          benefit_groups: copied_benefit_groups
-        )
+      def hbx_enrollments_by_month(date)
+        BenefitApplicationEnrollmentsMonthlyQuery.new(self).call(date)
       end
 
       aasm do
@@ -300,75 +384,25 @@ module BenefitSponsors
       end
 
       class << self
-        def calculate_start_on_dates
-          start_on = if TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true)
-            TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-          else
-            TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-          end
-
-          end_on = TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
-          dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
+        def schedular
+          BenefitApplicationSchedular.new
         end
-
+       
         def calculate_start_on_options
-          calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+          schedular.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
         end
 
         def enrollment_timetable_by_effective_date(effective_date)
-          effective_date            = effective_date.to_date.beginning_of_month
-          effective_period          = effective_date..(effective_date + 1.year - 1.day)
-          open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
-          prior_month               = effective_date - 1.month
-          binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
-
-          open_enrollment_minimum_day     = open_enrollment_minimum_begin_day_of_month
-          open_enrollment_period_minimum  = Date.new(prior_month.year, prior_month.month, open_enrollment_minimum_day)..open_enrollment_period.end
-
-          {
-              effective_date: effective_date,
-              effective_period: effective_period,
-              open_enrollment_period: open_enrollment_period,
-              open_enrollment_period_minimum: open_enrollment_period_minimum,
-              binder_payment_due_on: binder_payment_due_on,
-            }
+          schedular.enrollment_timetable_by_effective_date(effective_date)
         end
 
-        def open_enrollment_minimum_begin_day_of_month(use_grace_period = false)
-          if use_grace_period
-            minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
-          else
-            minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
-          end
-
-          open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
-          open_enrollment_end_on_day - minimum_length
+        def calculate_open_enrollment_date(start_on)
+          schedular.calculate_open_enrollment_date(start_on)
         end
-
-
-        # TODOs
-        ## handle late rate scenarios where partial or no benefit product plan/rate data exists for effective date
-        ## handle midyear initial enrollments for annual fixed enrollment periods
+  
         def effective_period_by_date(given_date = TimeKeeper.date_of_record, use_grace_period = false)
-          given_day_of_month    = given_date.day
-          next_month_start      = given_date.end_of_month + 1.day
-          following_month_start = next_month_start + 1.month
-
-          if use_grace_period
-            last_day = open_enrollment_minimum_begin_day_of_month(true)
-          else
-            last_day = open_enrollment_minimum_begin_day_of_month
-          end
-
-          if given_day_of_month > last_day
-            following_month_start..(following_month_start + 1.year - 1.day)
-          else
-            next_month_start..(next_month_start + 1.year - 1.day)
-          end
+          schedular.effective_period_by_date(given_date, use_grace_period)
         end
-
-
-
 
         def find(id)
           application = nil
@@ -383,10 +417,110 @@ module BenefitSponsors
         end
       end
 
+      def due_date_for_publish
+        if employer_profile.plan_years.renewing.any?
+          Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
+        else
+          Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
+        end
+      end
 
+      def is_publish_date_valid?
+        event_name = aasm.current_event.to_s.gsub(/!/, '')
+        event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
+      end
 
-      def open_enrollment_date_checks
+      def open_enrollment_date_errors
+        errors = {}
+
+        if is_renewing?
+          minimum_length = Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
+          enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+        else
+          minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
+          enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
+        end
+
+        if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
+          log_message(errors) {{open_enrollment_period: "Open Enrollment period is shorter than minimum (#{minimum_length} days)"}}
+        end
+
+        if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
+          log_message(errors) {{open_enrollment_period: "Open Enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"}}
+        end
+
+        errors
+      end
+
+      # Check plan year for violations of model integrity relative to publishing
+      def application_errors
+        errors = {}
+
+        if open_enrollment_end_on > (open_enrollment_start_on + (Settings.aca.shop_market.open_enrollment.maximum_length.months).months)
+          log_message(errors){{open_enrollment_period: "Open Enrollment period is longer than maximum (#{Settings.aca.shop_market.open_enrollment.maximum_length.months} months)"}}
+        end
+
+        if benefit_groups.any?{|bg| bg.reference_plan_id.blank? }
+          log_message(errors){{benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."}}
+        end
+
+        if benefit_groups.blank?
+          log_message(errors) {{benefit_groups: "You must create at least one benefit group to publish a plan year"}}
+        end
+
+        if employer_profile.census_employees.active.to_set != assigned_census_employees.to_set
+          log_message(errors) {{benefit_groups: "Every employee must be assigned to a benefit group defined for the published plan year"}}
+        end
+
+        if employer_profile.ineligible?
+          log_message(errors) {{employer_profile:  "This employer is ineligible to enroll for coverage at this time"}}
+        end
+
+        if overlapping_published_plan_year?
+          log_message(errors) {{ publish: "You may only have one published plan year at a time" }}
+        end
+
+        if !is_publish_date_valid?
+          log_message(errors) {{publish: "Plan year starting on #{start_on.strftime("%m-%d-%Y")} must be published by #{due_date_for_publish.strftime("%m-%d-%Y")}"}}
+        end
+
+        errors
+      end
+
+      # Check plan year application for regulatory compliance
+      def application_eligibility_warnings
+        warnings = {}
+
+        unless employer_profile.is_primary_office_local?
+          warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
+        end
+
+        # Application is in ineligible state from prior enrollment activity
+        if aasm_state == "application_ineligible" || aasm_state == "renewing_application_ineligible"
+          warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
+        end
+
+        # Maximum company size at time of initial registration on the HBX
+        if !(is_renewing?) && (fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
+          warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
+        end
+
+        # Exclude Jan 1 effective date from certain checks
+        unless effective_date.yday == 1
+          # Employer contribution toward employee premium must meet minimum
+          if benefit_groups.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+            warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
+          end
+        end
+
+        warnings
+      end
+
+      # TODO review this
+      def validate_application_dates
+        return if canceled? || expired? || renewing_canceled?
         return if effective_period.blank? || open_enrollment_period.blank?
+        return if imported_plan_year
 
         if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
           errors.add(:effective_period, "start date must be first day of the month")
@@ -421,9 +555,18 @@ module BenefitSponsors
         #   errors.add(:effective_period, "may not start application before " \
         #              "#{(effective_period.begin + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{effective_period.begin} effective date")
         # end
+
+        if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+          #groups terminated for non-payment get 31 more days of coverage from their paid through date
+          if end_on != end_on.end_of_month
+            errors.add(:end_on, "must be last day of the month")
+          end
+
+          if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
+            errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
+          end
+        end
       end
-
-
     end
   end
 end

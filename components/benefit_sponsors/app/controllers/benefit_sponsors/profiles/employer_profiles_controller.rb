@@ -13,6 +13,17 @@ module BenefitSponsors
     def create
     end
 
+    def update
+      sanitize_office_locations_params
+
+      @general_organization = BenefitSponsors::Organizations::Organization.find(params[:id])
+      @employer_profile = @general_organization.profiles.first
+      @orga_office_locations_dup = @general_organization.office_locations.as_json
+    end
+
+    def sanitize_office_locations_params
+    end
+
     private
 
     def get_site_key

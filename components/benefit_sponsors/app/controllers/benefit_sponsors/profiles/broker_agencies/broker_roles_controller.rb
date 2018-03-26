@@ -1,7 +1,7 @@
 require_dependency "benefit_sponsors/application_controller"
 
 module BenefitSponsors
-  class BrokerAgencies::BrokerRolesController < ApplicationController
+  class Profiles::BrokerAgencies::BrokerRolesController < ApplicationController
     before_action :assign_filter_and_agency_type
 
     def new_broker
@@ -22,7 +22,6 @@ module BenefitSponsors
     end
 
     def new_broker_agency
-      
       @organization = BenefitSponsors::Forms::BrokerAgencyProfile.new
       respond_to do |format|
         format.html { render 'new' }

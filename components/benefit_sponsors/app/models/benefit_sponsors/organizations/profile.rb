@@ -23,7 +23,7 @@ module BenefitSponsors
       delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
       embeds_many :office_locations, 
-                  class_name:"BenefitSponsors::Organizations::OfficeLocation"
+                  class_name:"BenefitSponsors::Locations::OfficeLocation"
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
