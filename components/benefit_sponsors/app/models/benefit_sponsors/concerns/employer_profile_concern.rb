@@ -7,7 +7,7 @@ module BenefitSponsors
       include StateMachines::EmployerProfileStateMachine
 
       included do
-        ENTITY_KINDS = [
+        ENTITY_KINDS ||= [
           "tax_exempt_organization",
           "c_corporation",
           "s_corporation",
@@ -19,15 +19,15 @@ module BenefitSponsors
           "foreign_embassy_or_consulate"
         ]
 
-        ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
-        INACTIVE_STATES = ["suspended", "ineligible"]
+        ACTIVE_STATES   ||= ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+        INACTIVE_STATES ||= ["suspended", "ineligible"]
 
-        PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
+        PROFILE_SOURCE_KINDS  ||= ["self_serve", "conversion"]
 
-        INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
-        INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
+        INVOICE_VIEW_INITIAL  ||= %w(published enrolling enrolled active suspended)
+        INVOICE_VIEW_RENEWING ||= %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
-        ENROLLED_STATE = %w(enrolled suspended)
+        ENROLLED_STATE ||= %w(enrolled suspended)
 
         # Workflow attributes
         field :aasm_state, type: String, default: "applicant"
@@ -43,7 +43,7 @@ module BenefitSponsors
           allow_blank: false
 
         validates :profile_source,
-          inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
+          inclusion: { in: PROFILE_SOURCE_KINDS },
           allow_blank: false
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
