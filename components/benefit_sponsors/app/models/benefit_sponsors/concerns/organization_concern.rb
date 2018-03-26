@@ -31,9 +31,9 @@ module BenefitSponsors
       # User or Person ID who created/updated
       field :updated_by, type: BSON::ObjectId
 
-      embeds_many :office_locations, class_name: "BenefitSponsors::Organizations::OfficeLocation", cascade_callbacks: true, validate: true
+      embeds_many :office_locations, class_name: "BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true, validate: true
 
-      accepts_nested_attributes_for :office_locations, class_name: "BenefitSponsors::Organizations::OfficeLocation"
+      accepts_nested_attributes_for :office_locations, class_name: "BenefitSponsors::Locations::OfficeLocation"
 
       validates_presence_of :legal_name, :office_locations
 
