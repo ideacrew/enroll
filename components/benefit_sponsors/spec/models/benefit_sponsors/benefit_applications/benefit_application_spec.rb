@@ -98,7 +98,7 @@ module BenefitSponsors
     end
 
     context "a BenefitApplication class" do
-      let(:subject)             { BenefitApplications::BenefitApplication }
+      let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
       let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
       let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on -
