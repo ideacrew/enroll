@@ -1,0 +1,53 @@
+<h3>When would you like your coverage to start?</h3>
+<h4> (in the next 90 days) <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers can begin shopping for coverage on <%= Settings.site.short_name %> up to 3 months prior to the desired coverage effective date."></i></h4>
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <% benefit_application_start_dates = BenefitSponsors::BenefitApplications::BenefitApplication.calculate_start_on_options %>
+        <% if f.object.effective_period.min.present? && !benefit_application_start_dates.any?{|set| set[1] == f.object.effective_period.min.try(:to_s, :db) } %>
+          <% benefit_application_start_dates << [f.object.effective_period.min.strftime("%B %Y"), f.object.effective_period.min.try(:to_s, :db)]%>
+        <% end %>
+        <%= f.select(:start_on, options_for_select(benefit_application_start_dates, selected: f.object.effective_period.min.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, { :class => 'plan-year-start-date', :disabled => (@benefit_application.is_renewing? ? true : false) }) %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= datepicker_control(f, :end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-start_on", :required => true, :placeholder => "END ON", readonly: true}) %>
+      </div>
+    </div>
+    <br/>
+    <h3>Select your open enrollment dates</h3> <h4> <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers offering coverage through <%= Settings.site.short_name %> for the first time must have an open enrollment period of no less than 14 days. Employers renewing their <%= Settings.site.short_name %> coverage must have an open enrollment period of at least 30 days."></i></h4>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= datepicker_control(f, :open_enrollment_start_on, {:class => "floatlabel form-control interaction-field-control-plan_year-open_enrollment_start_on", :required => true, :"data-date-min" => @benefit_application.effective_period.min ? (@benefit_application.min - 2.months) : "" , :placeholder => "OPEN ENROLLMENT START DATE"}) %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= datepicker_control(f, :open_enrollment_end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-open_enrollment_end_on", :required => true, :placeholder => "OPEN ENROLLMENT END DATE"}) %>
+      </div>
+    </div>
+
+
+    <h3>Add the total number of employees in your workforce</h3>
+    <div class="row row-form-wrapper no-buffer" style="display: block;">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :fte_count, class: "floatlabel form-control", required: true, placeholder: 'FULL TIME EMPLOYEES' %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :pte_count, class: "floatlabel form-control", required: true, placeholder: 'PART TIME EMPLOYEES' %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :msp_count, class: "floatlabel form-control", required: true, placeholder: 'MEDICARE SECOND PAYERS' %>
+      </div>
+    </div>
+    <br>
+  </div>
+</div>
+
+<br/>
+
+<a href="#" data-href="<%= recommend_dates_employers_employer_profile_plan_years_path %>" id='generate_recommend_dates' class='btn btn-primary' data-loading-text="Loading..." style='display:none;'> generate  recommend dates by start on</a>
+<div class="recommend">
+  <div id="notice"></div>
+  <div id="content">
+
+  </div>
+</div>
