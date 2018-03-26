@@ -5,13 +5,13 @@
     </p>
   </div>
 
-  <%if individual_market_is_enabled? %>
+  <%if employer_attestation_is_enabled? %>
     <div class="left-icon-section section">
       <div class="row">
         <div class="col-md-offset-1 col-md-11">
-          <h3>Important Documents Needed</h3>
+          <h3><%=l10n("employers.employer_profiles.my_account.important_documents_needed")%></h3>
           <p class="twenty">
-            After you complete your application, you will need to submit proof of your eligibility to shop as a small business through the Health Connector. You will need to submit this proof before you are able to shop for a plan. Please review our list of documents that can be used as proof and make sure that you have the right documentation available.
+            <%=l10n("employers.employer_profiles.my_account.eligibility_documents_needed")%>
           </p>
         </div>
       </div>
