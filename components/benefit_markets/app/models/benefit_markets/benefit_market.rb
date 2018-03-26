@@ -14,7 +14,7 @@ module BenefitMarkets
     field :title,       type: String, default: "" # => DC Health Link SHOP Market
     field :description, type: String, default: ""
 
-    belongs_to  :site,                  class_name: "SponsoredBenefits::Site"
+    belongs_to  :site,                  class_name: "BenefitSponsors::Site"
     #TODO: Commenting out until we connect BenefitApplications into engine
     #has_many    :benefit_applications,  class_name: "BenefitApplications::BenefitApplication"
     #TODO: Commenting until we add benefit_catalog class
