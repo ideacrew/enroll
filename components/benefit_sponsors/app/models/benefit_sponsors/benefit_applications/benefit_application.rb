@@ -6,7 +6,8 @@ module BenefitSponsors
       include AASM
       include SetCurrentUser
       include Acapi::Notifiers
-      include BenefitApplicationAasmCallbacks
+# Re-enable once module is defined
+#      include BenefitApplicationAasmCallbacks
 
       PUBLISHED = %w(published enrolling enrolled active suspended)
       RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
