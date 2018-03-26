@@ -14,7 +14,6 @@ module SponsoredBenefits
 
 
       def validate_self
-        unless contribution_percent >= contribution_percent_minimum
       end
 
     end
