@@ -62,7 +62,7 @@ namespace :reports do
 
     def hub_response_wfst
       hub_response_on = @history_element.created_at.to_date
-      v_type = @history_element.type
+      v_type = @history_element.verification_type
       @person.consumer_role.workflow_state_transitions.where(:"created_at" => {
         :"$gt" => hub_response_on - 1.day,
         :"$lt" => hub_response_on + 1.day
