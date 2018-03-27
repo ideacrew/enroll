@@ -6,8 +6,4 @@ BenefitMarkets::Engine.routes.draw do
   resources :benefit_markets, only: [] do
     resource :configuration
   end
-
-  namespace :products do
-    resources :product_packages, :only => [:new, :create, :show]
-  end
 end
