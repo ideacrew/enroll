@@ -134,6 +134,10 @@ module BenefitSponsors
         effective_period.begin unless effective_period.blank?
       end
 
+      def is_renewing?
+        RENEWING.include?(aasm_state)
+      end
+
       def employer_profile
         benefit_sponsorship.benefit_sponsorable
       end

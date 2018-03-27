@@ -12,6 +12,9 @@ module BenefitSponsors
 
       field :probation_period_kind, type: Symbol
 
+      embeds_many :sponsored_benefits,
+                  class_name: "BenefitSponsors::BenefitPackages::SponsoredBenefit"
+
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range
  
@@ -29,11 +32,6 @@ module BenefitSponsors
       def new_hire_effective_on(roster)
         
       end
-      
-
-      embeds_many :sponsored_benefits,
-                  class_name: "BenefitSponsors::BenefitPackages::SponsoredBenefit"
-                  
 
       def build_relationship_benefits
       end
