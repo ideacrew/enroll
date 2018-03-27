@@ -31,7 +31,9 @@ module BenefitSponsors
       end
       
 
-      embeds_many :benefit_offerings
+      embeds_many :sponsored_benefits,
+                  class_name: "BenefitSponsors::BenefitPackages::SponsoredBenefit"
+                  
 
       def build_relationship_benefits
       end
