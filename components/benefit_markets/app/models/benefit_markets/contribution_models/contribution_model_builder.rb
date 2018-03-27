@@ -6,10 +6,9 @@ module BenefitMarkets
     def build_contribution_unit_values(contribution_model)
       contribution_value_kls = contribution_model.contribution_value_kind.constantize
       contribution_model.contribution_units.map do |cu|
-        contribution_value_kls.new({
-          contribution_unit: cu,
-          offered: cu.default_offering
-        })
+        contribution_value_kls.new.tap do |cv|
+          cu.assign_contribution_value_defaults(cv)
+        end
       end
     end
   end

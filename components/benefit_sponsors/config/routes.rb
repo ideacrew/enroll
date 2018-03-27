@@ -10,6 +10,8 @@ BenefitSponsors::Engine.routes.draw do
         end
       end
     end
+
+    resources :employer_profiles
   end
 
   namespace :organizations do

@@ -25,6 +25,9 @@ module BenefitSponsors
       embeds_many :office_locations, 
                   class_name:"BenefitSponsors::Locations::OfficeLocation"
 
+      # embeds_one  :inbox, as: :recipient, cascade_callbacks: true,
+      #             class_name:"BenefitSponsors::Organizations::Inbox"
+
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
       # @abstract profile subclass is expected to implement #initialize_profile
