@@ -22,7 +22,7 @@ module BenefitSponsors
     end
 
     def new_broker_agency
-      @organization = BenefitSponsors::Forms::BrokerAgencyProfile.new
+      @organization = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new
       respond_to do |format|
         format.html { render 'new' }
         format.js
