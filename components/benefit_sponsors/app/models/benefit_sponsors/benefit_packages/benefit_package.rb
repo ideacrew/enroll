@@ -32,7 +32,13 @@ module BenefitSponsors
       
 
       embeds_many :benefit_offerings
-             
+
+      def build_relationship_benefits
+      end
+
+      def build_dental_relationship_benefits
+      end
+
     end
   end
 end

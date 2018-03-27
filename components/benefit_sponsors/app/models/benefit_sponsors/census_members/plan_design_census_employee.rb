@@ -1,6 +1,6 @@
-module SponsoredBenefits
+module BenefitSponsors
   module CensusMembers
-    class PlanDesignCensusEmployee < SponsoredBenefits::CensusMembers::CensusMember
+    class PlanDesignCensusEmployee < BenefitSponsors::CensusMembers::CensusMember
 
       include AASM
       include Sortable
@@ -21,13 +21,13 @@ module SponsoredBenefits
       # field :employer_profile_id, type: BSON::ObjectId
       field :benefit_sponsorship_id, type: BSON::ObjectId
 
-      has_many :census_survivors, class_name: "SponsoredBenefits::CensusMembers::CensusSurvivor"
-      embeds_many :census_dependents, as: :census_dependent, class_name: "SponsoredBenefits::CensusMembers::CensusDependent",
+      has_many :census_survivors, class_name: "BenefitSponsors::CensusMembers::CensusSurvivor"
+      embeds_many :census_dependents, as: :census_dependent, class_name: "BenefitSponsors::CensusMembers::CensusDependent",
                     cascade_callbacks: true,
                     validate: true
       accepts_nested_attributes_for :census_dependents
 
-      embeds_many :benefit_group_assignments, as: :benefit_assignable, class_name: "SponsoredBenefits::CensusMembers::BenefitGroupAssignment",
+      embeds_many :benefit_group_assignments, as: :benefit_assignable, class_name: "BenefitSponsors::CensusMembers::BenefitGroupAssignment",
                     cascade_callbacks: true,
                     validate: true
 
@@ -47,7 +47,7 @@ module SponsoredBenefits
       # scope :by_sponsorship_id,       ->(benefit_sponsorship_id) { where(benefit_sponsorship_id: benefit_sponsorship_id) }
       # scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
 
-      scope :by_ssn,                  ->(ssn) { where(encrypted_ssn: SponsoredBenefits::CensusMembers::CensusMember.encrypt_ssn(ssn)) }
+      scope :by_ssn,                  ->(ssn) { where(encrypted_ssn: BenefitSponsors::CensusMembers::CensusMember.encrypt_ssn(ssn)) }
 
       scope :active,            ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
       scope :terminated,        ->{ any_in(aasm_state: EMPLOYMENT_TERMINATED_STATES) }
@@ -115,7 +115,7 @@ module SponsoredBenefits
       end
 
       def employer_profile=(new_employer_profile)
-        raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile)
+        raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
         self.employer_profile_id = new_employer_profile._id
         @employer_profile = new_employer_profile
       end
@@ -126,14 +126,14 @@ module SponsoredBenefits
       end
 
       def benefit_sponsorship=(benefit_sponsorship)
-        raise ArgumentError.new("expected Benefit Sponsorship") unless benefit_sponsorship.is_a?(SponsoredBenefits::BenefitSponsorships::BenefitSponsorship)
+        raise ArgumentError.new("expected Benefit Sponsorship") unless benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
         self.benefit_sponsorship_id = benefit_sponsorship._id
         @benefit_sponsorship = benefit_sponsorship
       end
 
       def benefit_sponsorship
         return @benefit_sponsorship if defined? @benefit_sponsorship
-        @benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.find(self.benefit_sponsorship_id)
+        @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(self.benefit_sponsorship_id)
       end
 
       def plan_design_proposal
@@ -207,7 +207,7 @@ module SponsoredBenefits
                 census_member.gender
               ]
 
-              if census_member.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
+              if census_member.is_a?(BenefitSponsors::CensusMembers::PlanDesignCensusEmployee)
                 values += [
                   census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
                   census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",

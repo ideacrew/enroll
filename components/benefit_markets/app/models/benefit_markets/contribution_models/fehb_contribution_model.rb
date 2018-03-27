@@ -1,5 +1,4 @@
 module BenefitMarkets
-  class ContributionModels::FehbContributionModel
-    include Mongoid::Document
+  class ContributionModels::FehbContributionModel < ContributionModels::ContributionModel
   end
 end

@@ -73,7 +73,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Site"
 
       embeds_many :office_locations, 
-                  class_name: "BenefitSponsors::Organizations::OfficeLocation", 
+                  class_name: "BenefitSponsors::Locations::OfficeLocation", 
                   cascade_callbacks: true, validate: true
 
       embeds_many :profiles, 
@@ -128,6 +128,14 @@ module BenefitSponsors
         end
 
         new_sponsorship
+      end
+
+      def employer_profile
+        self.profiles.where(_type: /.*EmployerProfile$/).first
+      end
+
+      def is_an_issuer_profile?
+        self.profiles.where(_type: /.*IssuerProfile$/).present?
       end
 
 

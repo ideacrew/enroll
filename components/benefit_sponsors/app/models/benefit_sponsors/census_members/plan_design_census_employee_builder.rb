@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module CensusMembers
     class PlanDesignCensusEmployeeBuilder
 

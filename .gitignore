@@ -61,3 +61,5 @@ plan_xmls.zip
 
 # Ignore .idea
 .idea
+.yardoc
+*.log
