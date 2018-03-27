@@ -1,4 +1,5 @@
 require "rails_helper"
+include BankHolidaysHelper
 
 RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
   context "employer profile dashboard with current plan year" do
