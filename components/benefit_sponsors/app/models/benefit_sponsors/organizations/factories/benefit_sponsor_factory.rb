@@ -54,6 +54,7 @@ module BenefitSponsors
               return false
             end
             update_organization(existing_org) unless claimed
+            @profile = existing_org.employer_profile
           else
             init_benefit_sponsor
           end

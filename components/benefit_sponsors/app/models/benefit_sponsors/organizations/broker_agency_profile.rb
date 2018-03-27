@@ -1,75 +1,93 @@
 module BenefitSponsors
   module Organizations
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
+      include SetCurrentUser
+      include AASM
 
-      has_many :plan_design_organizations, class_name: "BenefitSponsors::Organizations::PlanDesignOrganization", inverse_of: :broker_agency_profile
-      accepts_nested_attributes_for :plan_design_organizations, class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
+      field :entity_kind, type: String
+      field :market_kind, type: String
+      field :corporate_npn, type: String
+      field :primary_broker_role_id, type: BSON::ObjectId
+      field :default_general_agency_profile_id, type: BSON::ObjectId
 
-      # All PlanDesignOrganizations that belong to this BrokerRole/BrokerAgencyProfile
-      def employer_leads
+      field :languages_spoken, type: Array, default: ["en"] # TODO
+      field :working_hours, type: Boolean, default: false
+      field :accept_new_clients, type: Boolean
+
+      field :aasm_state, type: String
+
+      # Web URL - Broker Specific ? - Migrate data
+      field :home_page, type: String
+
+      embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+      embeds_many :documents, as: :documentable
+      accepts_nested_attributes_for :inbox
+
+      has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
+      accepts_nested_attributes_for :broker_agency_contacts, reject_if: :all_blank, allow_destroy: true
+
+      validates_presence_of :market_kind, :entity_kind #, :primary_broker_role_id
+
+      validates :corporate_npn,
+        numericality: {only_integer: true},
+        length: { minimum: 1, maximum: 10 },
+        uniqueness: true,
+        allow_blank: true
+
+      validates :market_kind,
+        inclusion: { in: ::BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid practice area" },
+        allow_blank: false
+
+      validates :entity_kind,
+        inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
+        allow_blank: false
+
+      after_initialize :build_nested_models
+
+      scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
+      scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
+
+
+      def employer_clients
       end
 
+      def family_clients
+      end
+
+      aasm do #no_direct_assignment: true do
+        state :is_applicant, initial: true
+        state :is_approved
+        state :is_rejected
+        state :is_suspended
+        state :is_closed
+
+        event :approve do
+          transitions from: [:is_applicant, :is_suspended], to: :is_approved
+        end
+
+        event :reject do
+          transitions from: :is_applicant, to: :is_rejected
+        end
+
+        event :suspend do
+          transitions from: [:is_applicant, :is_approved], to: :is_suspended
+        end
+
+        event :close do
+          transitions from: [:is_approved, :is_suspended], to: :is_closed
+        end
+      end
       class << self
 
-        def find(id)
-          BenefitSponsors::Organizations::PlanDesignOrganization.find_by_owner(id).first
+        private
+
+        def initialize_profile
+          return unless is_benefit_sponsorship_eligible.blank?
+
+          write_attribute(:is_benefit_sponsorship_eligible, false)
+          @is_benefit_sponsorship_eligible = false
+          self
         end
-
-        def find_or_initialize_broker_profile(broker_agency)
-          org = BenefitSponsors::Organizations::Organization.find_or_initialize_by(fein: broker_agency.fein)
-          unless org.persisted?
-            org.hbx_id = broker_agency.hbx_id
-            org.legal_name = broker_agency.legal_name
-            org.dba = broker_agency.dba
-            org.is_active = broker_agency.is_active
-            org.office_locations = broker_agency.organization.office_locations
-            org.broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new()
-          end
-          org
-        end
-
-        def assign_employer(broker_agency:, employer:, office_locations:)
-          org = find_or_initialize_broker_profile(broker_agency)
-
-          plan_design_organization = BenefitSponsors::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency.id, employer.id)
-
-          if plan_design_organization
-            plan_design_organization.has_active_broker_relationship = true
-            plan_design_organization.office_locations = office_locations
-            plan_design_organization.save!
-          else
-            org.broker_agency_profile.plan_design_organizations.new().tap do |org|
-              org.owner_profile_id = broker_agency._id
-              org.sponsor_profile_id = employer._id
-              org.office_locations = office_locations
-              org.fein = employer.fein
-              org.legal_name = employer.legal_name
-              org.has_active_broker_relationship = true
-              org.sic_code = employer.sic_code
-              org.save!
-            end
-          end
-        end
-
-        def unassign_broker(broker_agency:, employer:)
-          return if broker_agency.nil?
-          plan_design_organization = BenefitSponsors::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency.id, employer.id)
-          return unless plan_design_organization.present?
-          plan_design_organization.has_active_broker_relationship = false
-          plan_design_organization.sic_code ||= employer.sic_code
-          plan_design_organization.save!
-          plan_design_organization.expire_proposals
-        end
-      end
-
-      private
-
-      def initialize_profile
-        return unless is_benefit_sponsorship_eligible.blank?
-
-        write_attribute(:is_benefit_sponsorship_eligible, false)
-        @is_benefit_sponsorship_eligible = false
-        self
       end
     end
   end
