@@ -10,6 +10,8 @@ module Notifier
     # attribute :plan_carrier, String
     attribute :employee_responsible_amount, String
     attribute :employer_responsible_amount, String
+    attribute :employee_first_name, String
+    attribute :employee_last_name, String
 
     def self.stubbed_object
       Notifier::MergeDataModels::Enrollment.new({
