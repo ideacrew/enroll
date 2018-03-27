@@ -79,7 +79,6 @@ module Observers
             end
           end
         end
-
       end
     end
 

@@ -342,24 +342,55 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "GET print_waiver" do
-    let(:enrollment){ double(:HbxEnrollment) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, employee_role_id: employee_role.id, household: family.active_household) }
+    subject { Observers::Observer.new }
 
-    it "should return hbx_enrollment to print waiver" do
+    before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
+      employee_role.update_attributes(census_employee_id: census_employee.id)
       sign_in(user)
+    end
+
+    it "should return hbx_enrollment to print waiver" do
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
+    end
+
+    it "should trigger employee_notice for employee_coverage_termination" do
+      expect(subject).to receive(:notify) do |event_name, payload|
+        expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_coverage_termination"
+        expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+        expect(payload[:event_object_id]).to eq enrollment.id.to_s
+      end
+      subject.trigger_notice(recipient: employee_role, event_object: enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+    end
+
+    it "should trigger employer_notice for employer_coverage_termination" do
+      expect(subject).to receive(:notify) do |event_name, payload|
+        expect(event_name).to eq "acapi.info.events.employer.employer_notice_for_employee_coverage_termination"
+        expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+        expect(payload[:event_object_id]).to eq enrollment.id.to_s
+      end
+      subject.trigger_notice(recipient: enrollment.employer_profile, event_object: enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
     end
   end
 
   context "POST terminate" do
-    let(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected"}) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_selected", employee_role_id: employee_role.id, household: family.active_household) }
+    subject { Observers::Observer.new }
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
       allow(enrollment).to receive(:may_schedule_coverage_termination?).and_return(true)
       allow(enrollment).to receive(:schedule_coverage_termination!).and_return(true)
       allow(person).to receive(:primary_family).and_return(Family.new)
+      employee_role.update_attributes(census_employee_id: census_employee.id)
       sign_in user
     end
 
@@ -380,6 +411,24 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       post :terminate, id: "hbx_id"
       expect(enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
+    end
+
+    it "should trigger employee_notice for employee_coverage_termination" do
+      expect(subject).to receive(:notify) do |event_name, payload|
+        expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_coverage_termination"
+        expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+        expect(payload[:event_object_id]).to eq enrollment.id.to_s
+      end
+      subject.trigger_notice(recipient: employee_role, event_object: enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+    end
+
+    it "should trigger employer_notice for employer_coverage_termination" do
+      expect(subject).to receive(:notify) do |event_name, payload|
+        expect(event_name).to eq "acapi.info.events.employer.employer_notice_for_employee_coverage_termination"
+        expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+        expect(payload[:event_object_id]).to eq enrollment.id.to_s
+      end
+      subject.trigger_notice(recipient: enrollment.employer_profile, event_object: enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
     end
   end
 
