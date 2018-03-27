@@ -72,7 +72,7 @@ namespace :reports do
     end
 
     def is_not_eligible_transaction?
-      return false if @history_element.modifier != "external hub"
+      return false if @history_element.modifier != "external Hub"
       hub_response_wfst.blank?
     end
 
