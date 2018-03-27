@@ -5,6 +5,7 @@ module BenefitSponsors
       include Mongoid::Timestamps
       include AASM
       include BenefitApplicationAasmCallbacks
+      include BenefitSponsors::Concerns::RecordTransition
 
       PUBLISHED = %w(published enrolling enrolled active suspended)
       RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
@@ -56,6 +57,9 @@ module BenefitSponsors
       embeds_many :benefit_packages,    class_name: "BenefitSponsors::BenefitPackages::BenefitPackage",
         cascade_callbacks: true, 
         validate: true
+      
+      embeds_many :workflow_state_transitions, as: :transitional
+
 
       validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
       
@@ -245,16 +249,16 @@ module BenefitSponsors
         state :terminated           # Coverage under this application is terminated
         state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
 
-        event :activate, :after => :record_transition do
+        event :activate do
           transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
         end
 
-        event :expire, :after => :record_transition do
+        event :expire do
           transitions from: [:published, :enrolling, :enrolled, :active],  to: :expired,  :guard  => :can_be_expired?
         end
 
         # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
-        event :advance_date, :after => :record_transition do
+        event :advance_date do
           transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
           transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
           transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
@@ -275,7 +279,7 @@ module BenefitSponsors
         ## Application eligibility determination process
 
         # Submit plan year application
-        event :publish, :after => :record_transition do
+        event :publish do
           transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
           transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
           transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
@@ -288,13 +292,13 @@ module BenefitSponsors
         end
 
         # Returns plan to draft state (or) renewing draft for edit
-        event :withdraw_pending, :after => :record_transition do
+        event :withdraw_pending do
           transitions from: :publish_pending, to: :draft
           transitions from: :renewing_publish_pending, to: :renewing_draft
         end
 
         # Plan as submitted failed eligibility check
-        event :force_publish, :after => :record_transition do
+        event :force_publish do
           transitions from: :publish_pending, to: :published_invalid
 
           transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
@@ -309,45 +313,45 @@ module BenefitSponsors
         end
 
         # Employer requests review of invalid application determination
-        event :request_eligibility_review, :after => :record_transition do
+        event :request_eligibility_review do
           transitions from: :published_invalid, to: :eligibility_review, :guard => :is_within_review_period?
         end
 
         # Upon review, application ineligible status overturned and deemed eligible
-        event :grant_eligibility, :after => :record_transition do
+        event :grant_eligibility do
           transitions from: :eligibility_review, to: :published
         end
 
         # Upon review, submitted application ineligible status verified ineligible
-        event :deny_eligibility, :after => :record_transition do
+        event :deny_eligibility do
           transitions from: :eligibility_review, to: :published_invalid
         end
 
         # Enrollment processed stopped due to missing binder payment
-        event :cancel, :after => :record_transition do
+        event :cancel do
           transitions from: [:draft, :published, :enrolling, :enrolled, :active], to: :canceled
         end
 
         # Coverage disabled due to non-payment
-        event :suspend, :after => :record_transition do
+        event :suspend do
           transitions from: :active, to: :suspended
         end
 
         # Coverage terminated due to non-payment
-        event :terminate, :after => :record_transition do
+        event :terminate do
           transitions from: [:active, :suspended], to: :terminated
         end
 
         # Coverage reinstated
-        event :reinstate_plan_year, :after => :record_transition do
+        event :reinstate_plan_year do
           transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
         end
 
-        event :renew_plan_year, :after => :record_transition do
+        event :renew_plan_year do
           transitions from: :draft, to: :renewing_draft
         end
 
-        event :renew_publish, :after => :record_transition do
+        event :renew_publish do
           transitions from: :renewing_draft, to: :renewing_published
         end
 
@@ -361,21 +365,21 @@ module BenefitSponsors
         end
 
         # Admin ability to accept application and successfully complete enrollment
-        event :enroll, :after => :record_transition do
+        event :enroll do
           transitions from: [:published, :enrolling, :renewing_published], to: :enrolled
         end
 
         # Admin ability to reset renewing plan year application
-        event :revert_renewal, :after => :record_transition do
+        event :revert_renewal do
           transitions from: [:active, :renewing_published, :renewing_enrolling,
             :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft, :after => [:cancel_enrollments]
         end
 
-        event :cancel_renewal, :after => :record_transition do
+        event :cancel_renewal do
           transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled
         end
 
-        event :conversion_expire, :after => :record_transition do
+        event :conversion_expire do
           transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
         end
       end
