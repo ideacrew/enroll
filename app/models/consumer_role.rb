@@ -228,7 +228,27 @@ class ConsumerRole
   end
 
   def all_types_verified?
-    person.verification_types.all?{ |type| type.type_verified? }
+    person.verification_types.active.all?{ |type| type.type_verified? }
+  end
+
+  def local_residency_outstanding?
+    self.local_residency_validation == 'outstanding'
+  end
+
+  def ssn_verified?
+    ["na", "valid"].include?(self.ssn_validation)
+  end
+
+  def ssn_pending?
+    self.ssn_validation == "pending"
+  end
+
+  def ssn_outstanding?
+    self.ssn_validation == "outstanding"
+  end
+
+  def lawful_presence_verified?
+    self.lawful_presence_determination.verification_successful?
   end
 
   def is_hbx_enrollment_eligible?
@@ -789,7 +809,7 @@ class ConsumerRole
   end
 
   def update_all_verification_types(*args)
-    person.verification_types.each do |v_type|
+    person.verification_types.active.each do |v_type|
       update_verification_type(v_type, "fully verified by curam/migration", lawful_presence_determination.try(:vlp_authority))
     end
   end
