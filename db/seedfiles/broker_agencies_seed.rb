@@ -33,7 +33,8 @@ broker_files.each do |file|
     vcard = broker_record.vcard
     address = vcard.broker_address
     loc_address = Address.new(kind: address.parameter.type.text, address_1: address.street, city: address.locality, state: address.region, zip: address.code)
-
+  end
+end
 p0.broker_role.broker_agency_profile_id  = org0.broker_agency_profile.id
 p0.broker_role.save!
 p3.broker_role.broker_agency_profile_id  = org1.broker_agency_profile.id
