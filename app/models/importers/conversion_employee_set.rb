@@ -37,7 +37,7 @@ module Importers
         "SELF (only one option)"
       ]  
       dep_headers = []
-      @dependencies.times do |i|
+      @dependents.times do |i|
         ["SSN", "DOB", "Gender", "Premium", "First Name", "Middle Name", "Last Name", "Email", "Phone", "Address 1", "Address 2", "City", "State", "Zip", "Relationship"].each do |h|
             dep_headers << "Dep#{i+1} #{h}"
         end
@@ -81,7 +81,7 @@ module Importers
         :ignore 
       ]
       dep_rows = []
-      @dependencies.times do |i|
+      @dependents.times do |i|
         ["ssn", "dob", "gender", "name_first", "name_middle", "name_last", "email", "phone", "address_1", "address_2", "city", "state", "zip", "relationship"].each do |r|
           dep_rows << "ignore".to_sym if r == 'name_first'
           dep_rows << "dep_#{i+1}_#{r}".to_sym
@@ -92,12 +92,12 @@ module Importers
 
     include ::Importers::RowSet
 
-    def initialize(file_name, o_stream, default_hire_date, dependencies)
+    def initialize(file_name, o_stream, default_hire_date, dependents)
       @default_hire_date = default_hire_date
       @spreadsheet = Roo::Spreadsheet.open(file_name)
       @out_stream = o_stream
       @out_csv = CSV.new(o_stream)
-      @dependencies = dependencies
+      @dependents = dependents
     end
 
     def create_model(record_attrs)
