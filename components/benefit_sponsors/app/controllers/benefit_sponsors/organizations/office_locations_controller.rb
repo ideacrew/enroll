@@ -16,7 +16,7 @@ module BenefitSponsors
       @child_index = params[:child_index]
       @parent_object = params[:parent_object]
       @slug_owner = SlugLocationOwner.new
-      @office_location = BenefitSponsors::Organizations::OfficeLocation.new
+      @office_location = BenefitSponsors::Locations::OfficeLocation.new
       @office_location.build_address
       @office_location.build_phone
       respond_to do |format|
