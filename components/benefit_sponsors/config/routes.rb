@@ -1,4 +1,6 @@
 BenefitSponsors::Engine.routes.draw do
+  resources :sites
+
   namespace :profiles do
     resources :registrations
 
