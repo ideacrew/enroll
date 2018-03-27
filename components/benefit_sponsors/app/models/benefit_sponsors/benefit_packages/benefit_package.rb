@@ -6,6 +6,7 @@ module BenefitSponsors
     
 
       embedded_in :benefit_application, class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+      embeds_many :sponsored_benefits
 
       field :title, type: String, default: ""
       field :description, type: String, default: ""
@@ -29,9 +30,6 @@ module BenefitSponsors
       def new_hire_effective_on(roster)
         
       end
-      
-
-      embeds_many :benefit_offerings
 
       def build_relationship_benefits
       end
