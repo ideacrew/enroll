@@ -3,7 +3,7 @@ module BenefitSponsors
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
       include SetCurrentUser
       include AASM
-      
+
       field :entity_kind, type: String
       field :market_kind, type: String
       field :corporate_npn, type: String
@@ -16,7 +16,7 @@ module BenefitSponsors
 
       field :aasm_state, type: String
 
-       # Web URL - Broker Specific ? - Migrate data
+      # Web URL - Broker Specific ? - Migrate data
       field :home_page, type: String
 
       embeds_one  :inbox, as: :recipient, cascade_callbacks: true
@@ -35,7 +35,7 @@ module BenefitSponsors
         allow_blank: true
 
       validates :market_kind,
-        inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
+        inclusion: { in: ::BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid practice area" },
         allow_blank: false
 
       validates :entity_kind,
@@ -79,14 +79,15 @@ module BenefitSponsors
       end
       class << self
 
-      private
+        private
 
-      def initialize_profile
-        return unless is_benefit_sponsorship_eligible.blank?
+        def initialize_profile
+          return unless is_benefit_sponsorship_eligible.blank?
 
-        write_attribute(:is_benefit_sponsorship_eligible, false)
-        @is_benefit_sponsorship_eligible = false
-        self
+          write_attribute(:is_benefit_sponsorship_eligible, false)
+          @is_benefit_sponsorship_eligible = false
+          self
+        end
       end
     end
   end
