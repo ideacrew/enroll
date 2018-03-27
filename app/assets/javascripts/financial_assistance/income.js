@@ -381,7 +381,6 @@ $(document).ready(function() {
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
     }
     else {
-      e.preventDefault();
       // prompt to delete all these dedcutions
       $("#destroyAllOtherIncomes").modal();
       $("#destroyAllOtherIncomes .modal-cancel-button").click(function(e) {
