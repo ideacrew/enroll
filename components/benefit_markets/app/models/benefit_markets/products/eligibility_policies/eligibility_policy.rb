@@ -1,5 +1,5 @@
 module BenefitMarkets
-  class SponsoredBenefits::DentalSponsoredBenefit
+  class Products::EligibilityPolicies::EligibilityPolicy
     include Mongoid::Document
   end
 end
