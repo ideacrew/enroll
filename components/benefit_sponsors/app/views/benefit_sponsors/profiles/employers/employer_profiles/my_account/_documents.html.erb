@@ -1,0 +1,34 @@
+<div class="documents-tab">
+  <h1>Documents</h1>
+  <h4 class="starter">
+    The Documents folder is a safe and convenient way for you to view and keep track of important notices and communications you receive from <%= Settings.site.short_name %>. You'll receive an email notification when there are new documents for you to review.
+  </h4>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Document Title</th>
+        <th>Document Type</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <%# unless @employer_profile.has_consumer_role? %>
+        <tr>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td>N/A</td>
+        </tr>
+      <%# else %>
+          <%# @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
+            <tr>
+              <td><%#= doc.title %></td>
+              <td><%#= doc.subject %></td>
+              <td><%#= doc.created_at.try(:to_date) %></td>
+            </tr>
+          <%# end %>
+      <%# end %>
+    </tbody>
+  </table>
+
+</div>
