@@ -54,7 +54,8 @@ module Services
       end
 
       def employer_effective_date
-        benefit_group_assignment = @census_employee.renewal_benefit_group_assignment || @census_employee.active_benefit_group_assignment
+        benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.start_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
+        # benefit_group_assignment = @census_employee.renewal_benefit_group_assignment  || @census_employee.active_benefit_group_assignment
         benefit_group_assignment.benefit_group.plan_year.start_on.strftime("%Y-%m-%d")
       end
 
