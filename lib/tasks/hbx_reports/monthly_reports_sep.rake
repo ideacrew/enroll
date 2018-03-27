@@ -27,7 +27,7 @@ namespace :reports do
     families = Family.where(:"households.hbx_enrollments" => {"$elemMatch" => {
       :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES },
       :enrollment_kind => "special_enrollment",
-      :submitted_at => {:"$gte" => start_date, :"$lt" => end_date},
+      :created_at => {:"$gte" => start_date, :"$lt" => end_date},
       :kind => 'individual'
     }})
 
@@ -47,7 +47,7 @@ namespace :reports do
 
       families.each do |family|
         begin
-          hbx_enrollments = family.active_household.hbx_enrollments.special_enrollments.individual_market.show_enrollments_sans_canceled.where(:"submitted_at" => {:"$gte" => start_date, :"$lt" => end_date})
+          hbx_enrollments = family.active_household.hbx_enrollments.special_enrollments.individual_market.show_enrollments_sans_canceled.where(:"created_at" => {:"$gte" => start_date, :"$lt" => end_date})
           hbx_enrollments.each do |enrollment|
             primary_person = enrollment.family.primary_applicant.person
             covered_people = enrollment.hbx_enrollment_members.map(&:family_member).map(&:person).map(&:full_name)
@@ -58,7 +58,7 @@ namespace :reports do
               primary_person.first_name,
               primary_person.last_name,
               enrollment.special_enrollment_period.title,
-              enrollment.submitted_at,
+              enrollment.created_at,
               covered_people,
               enrollment.coverage_kind,
               enrollment.plan.name,
