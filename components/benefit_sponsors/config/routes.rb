@@ -68,5 +68,4 @@ BenefitSponsors::Engine.routes.draw do
       end
     end
   end
-  resources :sites
 end
