@@ -148,11 +148,8 @@ class Insured::PlanShoppingsController < ApplicationController
     def employee_mid_year_plan_change(person,change_plan)
      begin
       ce = person.active_employee_roles.first.census_employee
-      employee_role_id = ce.id
-      if employee_role_id.present?
-        if change_plan.present? or ce.new_hire_enrollment_period.present?
-          trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer')
-        end
+      if change_plan.present? or ce.new_hire_enrollment_period.present?
+        trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer')
       end
      rescue Exception => e
        log("#{e.message}; person_id: #{person.id}")
