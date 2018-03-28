@@ -22,7 +22,7 @@
           <% end %>
         </li>
         <% if @staff_role %>
-          <% if site_broker_claim_quoting_enabled? %>
+          <% if site_broker_claim_quoting_enabled? && !individual_market_is_enabled? %>
             <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab") %>>
               <%= link_to(broker_agencies_profile_applicants_path(@broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
                 <span class="hidden-xs"><%= l10n("brokers")%></span>
@@ -32,9 +32,11 @@
           <% end %>
           <!-- Hidden due to request in 18558(DC) Re-enabled during code merge-->
           <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
-            <%= link_to(main_app.agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
-              <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
-              <%= l10n("broker_agencies.profiles.agency_mail")%>
+            <% if !individual_market_is_enabled? %>
+              <%= link_to(main_app.agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+                <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
+                <%= l10n("broker_agencies.profiles.agency_mail")%>
+              <% end %>
             <% end %>
           </li>
         <% end %>
@@ -47,11 +49,17 @@
           </li>
         <% end %>
 
-        <% if site_broker_quoting_enabled? %>
+        <% if site_broker_quoting_enabled? && individual_market_is_enabled? %>
           <li role="presentation" id="assign-tab" <%= menu_tab_class(active_tab, "assign-tab") %>>
             <%= link_to(main_app.assign_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
               <span class="hidden-xs">Assign</span>
               <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
+            <% end %>
+          </li>
+          <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
+          <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
+              <span class="hidden-xs">Quoting Tool</span>
+              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Quoting Tool"></span>
             <% end %>
           </li>
         <% end %>
