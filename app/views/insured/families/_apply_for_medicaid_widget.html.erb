@@ -13,16 +13,18 @@
       </div>
     </div>
     <% end %>
-    <div class="panel-body">
-      <div class="row flex">
-      <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-        <strong><%= link_to l10n("insured.families.medicaid_and_tax_credits"), navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %></strong>
+    <% if individual_market_is_enabled? %>
+      <div class="panel-body">
+        <div class="row flex">
+          <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+            <strong><%= l10n('insured.families.apply_for_medicaid_widget')%></strong>
+          </div>
+          <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+            <div class='image-area'></div>
+            <%= link_to l10n("insured.families.medicaid_and_tax_credits"), navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
+          </div>
+        </div>
       </div>
-      <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-        <div class='image-area'></div>
-          <%= link_to l10n("insured.families.apply_for_medicaid_widget"), navigate_to_assistance_saml_index_path, class: "btn btn-default pull-right" %>
-      </div>
-    </div>
-  </div>
+    <% end %>
   </div>
 </div>
