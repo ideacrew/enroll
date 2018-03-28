@@ -1,5 +1,6 @@
 module BenefitMarkets
-  class ContributionModels::CcaCompositeContributionModel
-    include Mongoid::Document
+  module ContributionModels
+    class CcaCompositeContributionModel < ContributionModel
+    end
   end
 end

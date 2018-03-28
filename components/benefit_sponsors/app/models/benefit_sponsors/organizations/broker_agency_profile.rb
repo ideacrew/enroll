@@ -4,8 +4,8 @@ module BenefitSponsors
       include SetCurrentUser
       include AASM
 
-      field :entity_kind, type: String
-      field :market_kind, type: String
+      field :entity_kind, type: Symbol
+      field :market_kind, type: Symbol
       field :corporate_npn, type: String
       field :primary_broker_role_id, type: BSON::ObjectId
       field :default_general_agency_profile_id, type: BSON::ObjectId
@@ -16,7 +16,6 @@ module BenefitSponsors
 
       field :aasm_state, type: String
 
-      # Web URL - Broker Specific ? - Migrate data
       field :home_page, type: String
 
       embeds_one  :inbox, as: :recipient, cascade_callbacks: true
@@ -39,7 +38,7 @@ module BenefitSponsors
         allow_blank: false
 
       validates :entity_kind,
-        inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
+        inclusion: { in: Organizations::Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
         allow_blank: false
 
       after_initialize :build_nested_models
@@ -47,11 +46,36 @@ module BenefitSponsors
       scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
       scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
 
+      # has_one primary_broker_role
+      def primary_broker_role=(new_primary_broker_role = nil)
+        if new_primary_broker_role.present?
+          raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
+          self.primary_broker_role_id = new_primary_broker_role._id
+        else
+          unset("primary_broker_role_id")
+        end
+        @primary_broker_role = new_primary_broker_role
+      end
+
+      def primary_broker_role
+        return @primary_broker_role if defined? @primary_broker_role
+        @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
+      end
 
       def employer_clients
       end
 
       def family_clients
+      end
+
+      ## Class methods
+      class << self
+
+        def find(id)
+          organizations = Organizations::GeneralOrganization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
+          organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+        end
+
       end
 
       aasm do #no_direct_assignment: true do
@@ -77,18 +101,21 @@ module BenefitSponsors
           transitions from: [:is_approved, :is_suspended], to: :is_closed
         end
       end
-      class << self
 
-        private
+      private
 
-        def initialize_profile
-          return unless is_benefit_sponsorship_eligible.blank?
+      def initialize_profile
+        return unless is_benefit_sponsorship_eligible.blank?
 
-          write_attribute(:is_benefit_sponsorship_eligible, false)
-          @is_benefit_sponsorship_eligible = false
-          self
-        end
+        write_attribute(:is_benefit_sponsorship_eligible, false)
+        @is_benefit_sponsorship_eligible = false
+        self
       end
+
+      def build_nested_models
+        build_inbox if inbox.nil?
+      end
+
     end
   end
 end

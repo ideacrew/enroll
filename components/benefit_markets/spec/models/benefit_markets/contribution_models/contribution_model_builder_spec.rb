@@ -3,7 +3,6 @@ require 'rails_helper'
 module BenefitMarkets
   class MockContributionUnitValue
     attr_accessor :contribution_unit
-    attr_accessor :offered
     attr_accessor :contribution_cap
     attr_accessor :contribution_factor
 
@@ -20,7 +19,6 @@ module BenefitMarkets
         ContributionModels::PercentWithCapContributionUnit.new(
           name: "employee_only",
           display_name: "Employee Only",
-          default_offering: true,
           member_relationship_maps: [member_relationship_map],
           default_contribution_factor: 0.75,
           default_contribution_cap: 500.00,
@@ -65,10 +63,6 @@ module BenefitMarkets
 
         it "build the specified kind of contribution unit value" do
           expect(subject.first.kind_of?(::BenefitMarkets::MockContributionUnitValue)).to be_truthy
-        end
-
-        it "properly assigns the offered value" do
-          expect(subject.first.offered).to be_truthy
         end
 
         it "properly assigns the contribution unit" do
