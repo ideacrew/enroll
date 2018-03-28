@@ -230,14 +230,7 @@ aca:
   transmit_employers_immediately: false
   employer_attestation: false
   enforce_employer_attestation: true
-  rating_areas:
-    - R-MA001
-    - R-MA002
-    - R-MA003
-    - R-MA004
-    - R-MA005
-    - R-MA006
-    - R-MA007
+  rating_areas: []
 
 paper_notice: 'paper-notices'
 checkbook_services:
