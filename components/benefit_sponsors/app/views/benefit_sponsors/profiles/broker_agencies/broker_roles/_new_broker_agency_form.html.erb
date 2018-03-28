@@ -1,6 +1,6 @@
 <div id="broker_agency_form" class="container">
-<%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
-<%= render 'benefit_sponsors/shared/error_messages', :object => @organization %>
+<%= form_for @broker_agency, as: :broker_agency, url: {action: "create"} do |f| %>
+<%= render 'benefit_sponsors/shared/error_messages', :object => @broker_agency %>
   <div class="row">
     <%= render "person_info_fields", f: f %><br>
     <div class="row">
