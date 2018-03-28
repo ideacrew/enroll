@@ -11,8 +11,16 @@ module BenefitSponsors
     attr_accessor :broker_applicant_type, :email
     include NpnField
 
+    MARKET_KINDS = %W[individual shop both]
+
+    MARKET_KINDS_OPTIONS = {
+      "Individual & Family Marketplace ONLY" => "individual",
+      "Small Business Marketplace ONLY" => "shop",
+      "Both – Individual & Family AND Small Business Marketplaces" => "both"
+    }
+
     validates :market_kind,
-      inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+      inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
       allow_blank: false
 
     validates :email, :email => true, :allow_blank => false
