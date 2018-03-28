@@ -1,31 +1,31 @@
 <% content_for :navigation do %>
-<%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<%= render :partial => 'primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
 
 <%- if @tab == 'home' %>
-<%= render :partial => 'employers/employer_profiles/my_account/home_tab' %>
+<%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/my_account/home_tab' %>
 <%- elsif @tab == 'profile' %>
-<%= render 'employers/employer_profiles/my_account/profile_tab' %>
+<%= render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/profile_tab' %>
 <%- elsif @tab == 'employees' %>
 
-<%= render :partial => "employers/employer_profiles/my_account/census_employees" %>
+<%= render :partial => "benefit_sponsors/profiles/employers/employer_profiles/my_account/census_employees" %>
 
 <%- elsif @tab == 'benefits' %>
-<%= render partial: "employers/employer_profiles/my_account/benefits" %>
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits" %>
 <%- elsif @tab == 'brokers' %>
-<%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/broker_agency" %>
 <%- elsif @tab == 'inbox' %>
   <h1 class="darkblue no-buffer">Messages</h1>
-<%= render :partial => 'shared/inboxes/messages_list' %>
+<%= render :partial => 'benefit_sponsors/shared/inboxes/messages_list' %>
 <%- elsif @tab == 'documents' %>
 
-<%= render partial: "employers/employer_profiles/my_account/documents" %>
+<%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/documents" %>
 
 <%- elsif @tab == 'billing' %>
-  <%= render partial: "employers/employer_profiles/my_account/billing" %>
+  <%= render partial: "benefit_sponsors/profiles/employers/employer_profiles/my_account/billing" %>
 
 <%- elsif @tab == 'families' %>
-<%= render partial:  "employers/employer_profiles/my_account/families" %>
+<%= render partial:  "benefit_sponsors/profiles/employers/employer_profiles/my_account/families" %>
 <%- end %>
 
 <%- if @tab == 'home' %>

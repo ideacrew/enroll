@@ -15,7 +15,7 @@
           </h3>
         </div>
         <div class="panel-body">
-          <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
+          <%= render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/enrollment_progress_bar' %>
           <div class="information">
             <strong><%=  @current_plan_year.total_enrolled_count %></strong>
             out of
@@ -390,7 +390,7 @@
           </div>
           <!--Dental plan collapsible: end -->
           <% if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1 %>
-          <%= render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
+          <%= render partial: 'benefit_sponsors/shared/custom_dental_offered_plans_modal', locals: { bg: bg } %>
           <% end %>
           <% end %>
         </div>
@@ -400,14 +400,14 @@
         </div> -->
       <% end %>
       <% else %>
-      <%= render partial: 'employers/employer_profiles/my_account/employer_welcome' %>
+      <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/my_account/employer_welcome' %>
       <% end %>
     </div>
   </div>
   <% if !@current_plan_year.present? %>
   <div class="row">
     <div class="col-xs-4">
-      <%= render partial: 'employers/employer_profiles/employer_broker_widget' %>
+      <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/employer_broker_widget' %>
     </div>
   </div>
   <% end %>
