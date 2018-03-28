@@ -71,7 +71,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
     let(:organization_params) do
       {
-        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true,
+        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
         office_locations_attributes: {
           "0"=> {
             "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
@@ -110,6 +110,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.reload
       expect(broker_agency_profile.accept_new_clients).to be_truthy
+      expect(broker_agency_profile.working_hours).to be_truthy
     end
   end
 
