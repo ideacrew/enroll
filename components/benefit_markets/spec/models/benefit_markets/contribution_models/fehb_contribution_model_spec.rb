@@ -10,7 +10,6 @@ module BenefitMarkets
         ContributionModels::ContributionUnit.new(
           name: "employee_only",
           display_name: "Employee Only",
-          default_offering: true,
           member_relationship_maps: [member_relationship_map],
           order: 0
         )

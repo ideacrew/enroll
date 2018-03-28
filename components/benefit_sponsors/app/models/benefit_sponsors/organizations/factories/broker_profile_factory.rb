@@ -9,7 +9,8 @@ module BenefitSponsors
         include Forms::NpnField
 
         attr_accessor :broker_agency_profile
-        attr_accessor :market_kind, :languages_spoken
+        attr_accessor :profile
+        attr_accessor :market_kind, :entity_kind, :languages_spoken
         attr_accessor :working_hours, :accept_new_clients, :home_page
         attr_accessor :broker_applicant_type, :email
 
@@ -25,15 +26,24 @@ module BenefitSponsors
 
         class OrganizationAlreadyMatched < StandardError; end
 
-        def initialize(attrs = {})
-          self.fein = Organization.generate_fein
-          self.is_fake_fein=true
+        def initialize(profile, attrs = {})
+          @profile = profile
           super(attrs)
         end
 
-        def self.model_name
-          ::BrokerAgencyProfile.model_name
+        def initialize_broker_profile
+          organization = init_organization
+          profile.entity_kind = entity_kind.to_sym
+          profile.contact_method = contact_method
+          profile.market_kind = :aca_shop
+          organization.profiles << profile
+          organization.save!
+          organization
         end
+
+        # def self.model_name
+        #   ::BrokerAgencyProfile.model_name
+        # end
 
         def add_broker_role
           person.broker_role = ::BrokerRole.new({
@@ -59,10 +69,12 @@ module BenefitSponsors
           person.save!
           add_broker_role
           organization = create_or_find_organization
+
           self.broker_agency_profile = organization.broker_agency_profile
           self.broker_agency_profile.primary_broker_role = person.broker_role
           self.broker_agency_profile.save!
           person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
+
           UserMailer.broker_application_confirmation(person).deliver_now
           # person.update_attributes({ broker_agency_staff_roles: [::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)]})
           true
@@ -97,8 +109,9 @@ module BenefitSponsors
         end
 
         def create_or_find_organization
-          existing_org = Organization.where(:fein => self.fein)
+          existing_org = GeneralOrganization.where(:fein => self.fein)
           if existing_org.present? && !existing_org.first.broker_agency_profile.present?
+            ### TODO$ Refactor This to use Profile passed in ###
             new_broker_agency_profile = ::BrokerAgencyProfile.new({
                 :entity_kind => entity_kind,
                 :home_page => home_page,
@@ -109,26 +122,14 @@ module BenefitSponsors
             existing_org = existing_org.first
             existing_org.update_attributes!(broker_agency_profile: new_broker_agency_profile)
             existing_org
+            ##########
           else
-            Organization.create!(
-              :fein => fein,
-              :legal_name => legal_name,
-              :dba => dba,
-              :is_fake_fein => is_fake_fein,
-              :broker_agency_profile => ::BrokerAgencyProfile.new({
-                :entity_kind => entity_kind,
-                :home_page => home_page,
-                :market_kind => market_kind,
-                :languages_spoken => languages_spoken,
-                :working_hours => working_hours,
-                :accept_new_clients => accept_new_clients
-              }),
-              :office_locations => office_locations
-            )
+            initialize_broker_profile
           end
         end
 
         def self.find(broker_agency_profile_id)
+          ### TODO$ Change this to BenefitSponsors::Organizations::BrokerAgencyProfile ?
           broker_agency_profile = ::BrokerAgencyProfile.find(broker_agency_profile_id)
           organization = broker_agency_profile.organization
           broker_role = broker_agency_profile.primary_broker_role
@@ -211,8 +212,8 @@ module BenefitSponsors
         end
 
         def check_existing_organization
-          existing_org = Organization.where(:fein => self.fein)
-          if existing_org.present? && existing_org.first.broker_agency_profile.present?
+          existing_org = GeneralOrganization.where(:fein => self.fein).first
+          if existing_org.present? && existing_org.broker_agency_profile.present?
             raise OrganizationAlreadyMatched.new
           end
         end
