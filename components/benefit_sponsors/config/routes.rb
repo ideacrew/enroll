@@ -21,4 +21,18 @@ BenefitSponsors::Engine.routes.draw do
       end
     end
   end
+
+  namespace :profiles do
+    resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
+
+      collection do
+        get :messages
+      end
+      member do
+        get :assign
+      end
+
+    end
+  end
+
 end

@@ -20,6 +20,9 @@ module BenefitSponsors
 
       field :hbx_id, type: String
 
+      # Web URL
+      field :home_page, type: String
+
       # Registered legal name
       field :legal_name, type: String
 
@@ -87,6 +90,8 @@ module BenefitSponsors
       # Use the Document model for managing any/all documents associated with Organization
       has_many :documents, class_name: "BenefitSponsors::Documents::Document"
 
+      accepts_nested_attributes_for :office_locations
+
       validates_presence_of :legal_name, :site, :profiles
 
       before_save :generate_hbx_id
@@ -132,6 +137,10 @@ module BenefitSponsors
 
       def employer_profile
         self.profiles.where(_type: /.*EmployerProfile$/).first
+      end
+
+      def broker_agency_profile
+        self.profiles.where(_type: /.*BrokerAgencyProfile$/).first
       end
 
       def is_an_issuer_profile?

@@ -3,7 +3,7 @@ module BenefitSponsors
     class Employers::EmployerProfilesController < ApplicationController
       before_action :get_site_key
       before_action :initiate_employer_profile, only: [:create]
-      before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
+      before_action :find_employer, only: [:show, :edit, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
 
       def new
@@ -63,16 +63,9 @@ module BenefitSponsors
       end
 
       def edit
-        @general_organization = BenefitSponsors::Organizations::Organization.find(params[:id])
-        @employer_profile = @general_organization.profiles.first
-        @staff = Person.staff_for_employer_including_pending(@employer_profile)
-        @add_staff = params[:add_staff]
-        #TODO
-        # @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
-        # respond_to do |format|
-        #   format.html { render 'benefit_sponsors/profiles/employer_profiles/edit' }
-        #   format.js
-        # end
+        # This & respective views should go to ER staff roles controller TODO
+        # @staff = Person.staff_for_employer_including_pending(@employer_profile)
+        # @add_staff = params[:add_staff]
       end
 
       def update
@@ -145,7 +138,8 @@ module BenefitSponsors
       def find_employer
         id_params = params.permit(:id, :employer_profile_id)
         id = id_params[:id] || id_params[:employer_profile_id]
-        @employer_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(params[:id])).first.employer_profile
+        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
+        @employer_profile = @organization.employer_profile
         render file: 'public/404.html', status: 404 if @employer_profile.blank?
       end
     end

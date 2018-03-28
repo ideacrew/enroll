@@ -5,7 +5,6 @@ module BenefitMarkets
     # These are the type of objects eligible for passing to pricing
     # and contribution models.
     class Roster
-      # Return the dependents of this entry.
       # @yieldparam entry [RosterEntry] an individual roster entry element.
       def each
         raise NotImplementedError.new("This is a documentation only interface.")
