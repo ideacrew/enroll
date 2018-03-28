@@ -13,4 +13,4 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-# gem "sponsored_benefits", path: "../sponsored_benefits"
+gem "benefit_markets", path: "../benefit_markets"

@@ -18,6 +18,11 @@ module BenefitMarkets
       validates_presence_of :display_name, :allow_blank => false
       validates_presence_of :member_relationship_maps, :allow_blank => false
       validates_numericality_of :order, :allow_blank => false
+
+      def assign_contribution_value_defaults(cv)
+        cv.offered = default_offering
+        cv.contribution_unit = self
+      end
     end
   end
 end

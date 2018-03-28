@@ -4,6 +4,8 @@ module BenefitMarkets
   class MockContributionUnitValue
     attr_accessor :contribution_unit
     attr_accessor :offered
+    attr_accessor :contribution_cap
+    attr_accessor :contribution_factor
 
     def initialize(opts = {})
       opts.each_key do |k|
@@ -15,11 +17,13 @@ module BenefitMarkets
   RSpec.describe ContributionModels::ContributionModelBuilder do
     describe "given a contribution model for Fehb" do
       let(:contribution_unit) do
-        ContributionModels::ContributionUnit.new(
+        ContributionModels::PercentWithCapContributionUnit.new(
           name: "employee_only",
           display_name: "Employee Only",
           default_offering: true,
           member_relationship_maps: [member_relationship_map],
+          default_contribution_factor: 0.75,
+          default_contribution_cap: 500.00,
           order: 0
         )
       end

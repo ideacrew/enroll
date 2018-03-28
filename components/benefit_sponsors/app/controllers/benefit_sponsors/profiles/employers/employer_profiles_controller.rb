@@ -73,10 +73,50 @@ module BenefitSponsors
 
         @general_organization = BenefitSponsors::Organizations::Organization.find(params[:id])
         @employer_profile = @general_organization.profiles.first
-        @orga_office_locations_dup = @general_organization.office_locations.as_json
+        @org_office_locations_dup = @general_organization.office_locations.as_json
+        @employer = @employer_profile.match_employer(current_user)
+
+        if (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
+          @general_organization.assign_attributes(employer_profile_params)
+          if @general_organization.valid?
+            @general_organization.save!
+            #TODO
+            # @general_organization.notify_legal_name_or_fein_change
+            # @general_organization.notify_address_change(@org_office_locations_dup, employer_profile_params)
+            flash[:notice] = 'Employer successfully Updated.'
+            redirect_to edit_profiles_employer_profile_path(@general_organization)
+          else
+            org_error_msg = @general_organization.errors.full_messages.join(",").humanize if @general_organization.errors.present?
+            flash[:error] = "Employer information not saved. #{org_error_msg}."
+            redirect_to edit_profiles_employer_profile_path(@general_organization)
+          end
+        else
+          flash[:error] = 'You do not have permissions to update the details'
+          redirect_to edit_profiles_employer_profile_path(@employer_profile)
+        end
       end
 
       def sanitize_office_locations_params
+        params[:organization][:office_locations_attributes].each do |key, location|
+          params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+          location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+          office_locations = params[:organization][:office_locations_attributes]
+          if office_locations && office_locations[key]
+            params[:organization][:office_locations_attributes][key][:is_primary] = (office_locations[key][:address_attributes][:kind] == 'primary')
+          end
+        end
+      end
+
+      def employer_profile_params
+        params.require(:organization).permit(
+            :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
+            :office_locations_attributes => [
+                {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
+                {:phone_attributes => [:kind, :area_code, :number, :extension]},
+                {:email_attributes => [:kind, :address]},
+                :is_primary
+            ]
+        )
       end
 
       private

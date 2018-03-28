@@ -18,6 +18,11 @@ module BenefitMarkets
       validates_presence_of :contribution_value_kind, :allow_blank => false
       validates_presence_of :member_relationships
       validates_presence_of :name, :allow_blank => false
+
+
+      def contribution_unit_values_for()
+        raise NotImplementedError.new("subclass responsibility")
+      end
     end
   end
 end

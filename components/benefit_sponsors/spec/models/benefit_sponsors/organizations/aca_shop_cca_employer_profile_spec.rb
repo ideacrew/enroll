@@ -9,6 +9,7 @@ module BenefitSponsors
     let(:valid_params) do 
       {
         sic_code: sic_code,
+        entity_kind: "s_corporation"
       }
     end
 

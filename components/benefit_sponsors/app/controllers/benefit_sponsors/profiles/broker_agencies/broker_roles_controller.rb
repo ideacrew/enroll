@@ -22,7 +22,7 @@ module BenefitSponsors
     end
 
     def new_broker_agency
-      @organization = BenefitSponsors::Forms::BrokerAgencyProfile.new
+      @organization = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new
       respond_to do |format|
         format.html { render 'new' }
         format.js
@@ -60,7 +60,7 @@ module BenefitSponsors
         @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
         if @broker_candidate.save
           flash[:notice] = notice
-          redirect_to broker_registration_path
+          redirect_to broker_registration_profiles_broker_agencies_broker_roles_path
         else
           @filter = params[:person][:broker_applicant_type]
           render 'new'
@@ -70,7 +70,7 @@ module BenefitSponsors
         @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
         if @organization.save
           flash[:notice] = notice
-          redirect_to broker_registration_path
+          redirect_to broker_registration_profiles_broker_agencies_broker_roles_path
         else
           @agency_type = 'new'
           render "new"
