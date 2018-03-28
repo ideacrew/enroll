@@ -81,6 +81,10 @@ module BenefitSponsors
         @roster_size = census_employees.active.size
       end
 
+      def find_benefit_application(id)
+        benefit_applications.where(id: id).first
+      end
+
       def earliest_plan_year_start_on_date
         plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
         plan_years.reject!{|py| py.can_be_migrated? }
@@ -92,10 +96,9 @@ module BenefitSponsors
 
       class << self
         def find(id)
-          organization = BenefitSponsors::Organizations::PlanDesignOrganization.where("plan_design_proposals.profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          organization = BenefitSponsors::Organizations::PlanDesignOrganization.where("benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first || BenefitSponsors::Organizations::PlanDesignOrganization.find('5abbe7b6c324df1134000005')
           return if organization.blank?
-          proposal = organization.plan_design_proposals.where("profile.benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
-          proposal.profile.benefit_sponsorships.detect{|sponsorship| sponsorship.id.to_s == id.to_s}
+          organization.benefit_sponsorships.detect{|sponsorship| sponsorship.id.to_s == id.to_s}
         end
 
         def find_broker_for_sponsorship(id)
