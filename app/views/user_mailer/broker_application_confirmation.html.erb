@@ -4,7 +4,7 @@ Dear <%= person.full_name.titleize %>,
 <br />
 <div>Welcome! Thank you for submitting your application to become a certified broker on the <%= site_short_name %> for Business. Please allow up to 7-10 business days for the <%= site_short_name %> to review your application.</div>
 <br />
-<div>Once we have verified that you have satisfied all of the requirements to become a certified broker on the Health Connector for Business platform, you will receive an email from <a href="mailto:noreply@healthconnector.org">noreply@healthconnector.org</a> with important information about how to access your broker portal and how your small business clients can assign you as their broker.</div>
+<div>Once we have verified that you have satisfied all of the requirements to become a certified broker on the Health Connector for Business platform, you will receive an email from <a href="mailto:noreply@healthconnector.org"><%= mail_address %></a> with important information about how to access your broker portal and how your small business clients can assign you as their broker.</div>
 <br />
 <div>If you have not satisfied some of the requirements to be an approved broker on the <%= site_short_name %> for Business platform, you will receive an email notification detailing any outstanding requirements that must be satisfied before your application can be approved.</div>
 <br />
@@ -16,6 +16,6 @@ Dear <%= person.full_name.titleize %>,
 	</ul>
 </div>
 <br />
-<div>For any questions about the process for becoming a certified broker on the <%= site_short_name %> for Business platform, please contact <%= contact_center_phone_number %> (TTY: <%= contact_center_tty_number %>) or <a href="https://www.mahealthconnector.org/">MAhealthconnector.org</a></div>
+<div>For any questions about the process for becoming a certified broker on the <%= site_short_name %> for Business platform, please contact <%= contact_center_phone_number %> (TTY: <%= contact_center_tty_number %>) or <a href="https://www.mahealthconnector.org/"><%= mail_address %></a></div>
 </body>
 </html>

@@ -39,6 +39,7 @@ site:
   website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "MA0"
+  mail_address: "noreply@healthconnector.org"
 
   social_media:
     facebook_url: ""

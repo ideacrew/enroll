@@ -159,4 +159,8 @@ module Config::SiteHelper
   def site_invoice_bill_url
     Settings.site.invoice_bill_url
   end
+
+  def mail_address
+    Settings.site.mail_address
+  end
 end
