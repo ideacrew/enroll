@@ -13,6 +13,24 @@ module BenefitSponsors
 
   class << self
     attr_writer :configuration
+
+    def event_listeners
+      @event_listeners ||= Hash.new([])
+    end
+
+    # Add a new event listener for communicating between engines
+    # Listener should be a constant or a string representing a constant,
+    # and that class/module must respond to `.execute`.
+    def add_event_listener(event, listener)
+      event_listeners[event] = event_listeners[event] + [listener.to_s]
+    end
+
+    def publish_event(event, *args)
+      event_listeners[event].map do |listener|
+        Object.const_get(listener).execute(*args)
+      end
+    end
+
   end
 
   def self.configuration
