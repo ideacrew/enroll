@@ -1,5 +1,6 @@
 module BenefitMarkets
-  class ContributionModels::ListBillContributionModel
-    include Mongoid::Document
+  module ContributionModels
+    class ListBillContributionModel < ContributionModel
+    end
   end
 end
