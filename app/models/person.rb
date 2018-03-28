@@ -148,8 +148,6 @@ class Person
 
   validate :is_ssn_composition_correct?
 
-  validate :is_single_individual_role_active?
-
   validates :gender,
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
@@ -216,6 +214,7 @@ class Person
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
+  scope :all_individual_market_transitions,  -> { exists(individual_market_transitions: true) }
 
   #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }
@@ -535,14 +534,6 @@ class Person
     best_phone ? best_phone.full_phone_number : nil
   end
 
-  def has_active_consumer_role?
-    consumer_role.present? && consumer_role.is_active?
-  end
-
-  def has_active_resident_role?
-    resident_role.present? && resident_role.is_active?
-  end
-
   def can_report_shop_qle?
     employee_roles.first.census_employee.qle_30_day_eligible?
   end
@@ -592,6 +583,22 @@ class Person
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
     return false
+  end
+
+  def current_individual_market_transition
+    self.individual_market_transitions.last
+  end
+
+  def active_individual_market_role
+    current_individual_market_transition.role_type
+  end
+
+  def is_consumer_role_active?
+    self.active_individual_market_role == "consumer" ? true : false
+  end
+
+  def is_resident_role_active?
+     self.active_individual_market_role == "resident" ? true : false
   end
 
   class << self
@@ -917,14 +924,6 @@ class Person
     end
 
     true
-  end
-
-  def is_single_individual_role_active?
-    if self.has_active_consumer_role? && self.has_active_resident_role?
-      return false
-    else
-      return true
-    end    
   end
 
   def create_inbox
