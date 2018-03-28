@@ -1,5 +1,4 @@
 require 'rails_helper'
-include BankHolidaysHelper
 
 RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
   let(:employer_profile){ create :employer_profile}

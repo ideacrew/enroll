@@ -1,5 +1,5 @@
 require 'rails_helper'
-include BankHolidaysHelper
+include Config::BankHolidaysHelper
 
 describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :start_on }
