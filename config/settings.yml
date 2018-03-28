@@ -251,6 +251,11 @@ aptc_errors:
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 style:
-  header_color: '#333'
-  nav_color: '#007bc4'
-  footer_color: '#003260'
+  primary_orange: '#333'
+  brand_primary: '#007bc4'
+  primary_color: '#003260'
+
+  primary_notification: '#d41414'
+  primary_panel: '#69A30D'
+  primary_button: '#e72b2d'
+  primary_button_color: '#b7191b'
