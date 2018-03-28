@@ -20,6 +20,9 @@ module BenefitSponsors
 
       field :hbx_id, type: String
 
+      # Web URL
+      field :home_page, type: String
+
       # Registered legal name
       field :legal_name, type: String
 

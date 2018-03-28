@@ -129,13 +129,12 @@ module BenefitSponsors
         end
 
         def self.find(broker_agency_profile_id)
-          ### TODO$ Change this to BenefitSponsors::Organizations::BrokerAgencyProfile ?
-          broker_agency_profile = ::BrokerAgencyProfile.find(broker_agency_profile_id)
-          organization = broker_agency_profile.organization
+          organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => broker_agency_profile_id).first
+          broker_agency_profile = organization.broker_agency_profile
           broker_role = broker_agency_profile.primary_broker_role
           person = broker_role.try(:person)
 
-          record = self.new({
+          record = self.new(broker_agency_profile, {
             id: organization.id,
             legal_name: organization.legal_name,
             dba: organization.dba,
