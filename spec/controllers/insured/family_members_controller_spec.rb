@@ -66,6 +66,8 @@ RSpec.describe Insured::FamilyMembersController do
     # Some times Effective dates vary even for the next day. So creating a new SEP & re-calculating effective on dates
     context "with sep_id in params" do
 
+       subject { Observers::Observer.new }
+
       let(:sep) { FactoryGirl.create :special_enrollment_period, family: test_family }
       let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
 
@@ -79,6 +81,17 @@ RSpec.describe Insured::FamilyMembersController do
       it "should not duplicate sep if using current sep on same day" do
         get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
         expect(assigns(:sep)).to eq sep
+      end
+
+      it "should return false and also notify sep request accepted" do
+           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
+           get :index, :sep_id => sep.id, qle_id: qle.id, date_val: date, format: :js
+           expect(subject).to receive(:notify) do |event_name, payload|
+             expect(event_name).to eq "acapi.info.events.employee.employee_notice_after_sep_accepted"
+             expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
+             expect(payload[:event_object_id]).to eq qle.id.to_s
+           end
+           subject.trigger_notice(recipient: employee_role, event_object: qle, notice_event: "employee_notice_after_sep_accepted", notice_params: sep.id)
       end
 
       context "when using old active sep" do

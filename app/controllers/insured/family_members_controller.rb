@@ -1,5 +1,6 @@
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
+  include ApplicationHelper
 
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
@@ -41,7 +42,9 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
-      special_enrollment_period.save
+      if special_enrollment_period.save
+        trigger_notice_observer(@employee_role, qle, "employee_notice_after_sep_accepted", {:sep_id => special_enrollment_period.id}) if qle.shop?
+      end
       @market_kind = qle.market_kind
     end
 

@@ -4,7 +4,7 @@ module Notifier
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
-    attr_accessor :employee_role, :merge_model, :payload
+    attr_accessor :employee_role, :merge_model, :payload, :sep_id
 
     def initialize
       data_object = Notifier::MergeDataModels::EmployeeProfile.new
@@ -12,6 +12,8 @@ module Notifier
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.qle = Notifier::MergeDataModels::QualifyingLifeEventKind.new
+      data_object.sep = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
       @merge_model = data_object
     end
 
@@ -98,6 +100,51 @@ module Notifier
 
     def employer_profile
       employee_role.employer_profile
+    end
+
+    def qle
+      if payload['event_object_kind'].constantize == QualifyingLifeEventKind
+        @qle ||= QualifyingLifeEventKind.find(payload['event_object_id'])
+      end
+    end
+
+    def sep
+      if payload['event_object_kind'].constantize == QualifyingLifeEventKind
+        @sep ||= employee_role.person.primary_family.current_sep
+      end
+    end
+
+    def sep_title
+      return if sep.blank?
+      merge_model.sep.title = sep.title
+    end
+
+    def sep_end_on
+      return if sep.blank?
+      merge_model.sep.end_on = sep.end_on
+    end
+
+    def qle_title
+      return if qle.blank?
+      merge_model.qle.title = qle.title
+    end
+
+    def qle_start_on
+      return if qle.blank?
+      merge_model.qle.start_on = qle.start_on
+    end
+
+    def qle_end_on
+      return if qle.blank?
+      merge_model.qle.end_on = qle.end_on
+    end
+
+    def qle_event_on
+      merge_model.qle.event_on = qle.event_on
+    end
+
+    def qle_reported_on
+      merge_model.qle.reported_on = qle.updated_at.strftime('%m/%d/%Y')
     end
   end
 end
