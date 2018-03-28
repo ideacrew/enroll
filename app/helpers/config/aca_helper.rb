@@ -166,10 +166,6 @@ module Config::AcaHelper
     Settings.aca.user_accounts_enabled
   end
 
-  def aca_families_outstanding_verifications
-    Settings.aca.families_outstanding_verifications
-  end
-
   def employer_attestation_is_enabled?
     Settings.aca.employer_attestation
   end
