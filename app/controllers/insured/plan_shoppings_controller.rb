@@ -132,8 +132,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    trigger_notice_observer(@hbx_enrollment.census_employee.employee_role, @hbx_enrollment, "employee_notice_for_employee_coverage_termination")
-    trigger_notice_observer(@hbx_enrollment.employer_profile, @hbx_enrollment, "employer_notice_for_employee_coverage_termination")
   end
 
   def employee_waiver_notice(hbx_enrollment)
@@ -177,8 +175,6 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      trigger_notice_observer(hbx_enrollment.census_employee.employee_role, hbx_enrollment, "employee_notice_for_employee_coverage_termination")
-      trigger_notice_observer(hbx_enrollment.employer_profile, hbx_enrollment, "employer_notice_for_employee_coverage_termination")
       redirect_to family_account_path
     else
       redirect_to :back
