@@ -547,9 +547,9 @@ module ApplicationHelper
     end
   end
 
-  def trigger_notice_observer(recipient, event_object, notice_event)
+  def trigger_notice_observer(recipient, event_object, notice_event, notice_params = nil)
     observer = Observers::Observer.new
-    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
+    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
   end
 
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)

@@ -4,7 +4,7 @@ module Notifier
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
-    attr_accessor :employee_role, :merge_model, :payload
+    attr_accessor :employee_role, :merge_model, :payload, :qle_title, :qle_event_on, :qle_reporting_deadline
 
     def initialize
       data_object = Notifier::MergeDataModels::EmployeeProfile.new
@@ -109,8 +109,7 @@ module Notifier
     end
 
     def qle_title
-      return if qle.blank?
-      merge_model.qle.title = qle.title
+      merge_model.qle.title = qle.blank? ? payload[:qle_title] : qle.title
     end
 
     def qle_start_on
@@ -124,11 +123,15 @@ module Notifier
     end
 
     def qle_event_on
-      merge_model.qle.event_on = qle.event_on
+      merge_model.qle.event_on = qle.blank? ? payload[:qle_event_on] : qle.event_on
     end
 
     def qle_reported_on
-      merge_model.qle.reported_on = qle.reported_on
+      merge_model.qle.reported_on = qle.updated_at
+    end
+
+    def qle_reporting_deadline
+      merge_model.qle.reporting_deadline = qle.blank? ? payload[:qle_reporting_deadline] : qle.reporting_deadline
     end
   end
 end

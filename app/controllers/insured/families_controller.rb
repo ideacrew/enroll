@@ -125,21 +125,22 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
+    today = TimeKeeper.date_of_record
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
-    start_date = TimeKeeper.date_of_record - 30.days
-    end_date = TimeKeeper.date_of_record + 30.days
+    start_date = today - 30.days
+    end_date = today + 30.days
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
-      end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+      start_date = today - @qle.post_event_sep_in_days.try(:days)
+      end_date = today + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > today) ? true : false
     end
 
     if @person.resident_role?
@@ -147,7 +148,9 @@ class Insured::FamiliesController < FamiliesController
     end
 
     if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
-      trigger_notice_observer(@person.active_employee_roles.first, @qle, "sep_request_denial_notice")
+      plan_year = @person.active_employee_roles.first.employer_profile.active_plan_year
+      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+      trigger_notice_observer(@person.active_employee_roles.first, plan_year, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline, qle_event_on: @qle_date)
     end
   end
 

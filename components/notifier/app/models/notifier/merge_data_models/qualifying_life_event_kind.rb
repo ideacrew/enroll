@@ -7,6 +7,7 @@ module Notifier
    	attribute :start_on, Date
    	attribute :end_on, Date
    	attribute :reported_on, Date
+    attribute :reporting_deadline, Date
 
     def self.stubbed_object
       Notifier::MergeDataModels::QualifyingLifeEventKind.new({

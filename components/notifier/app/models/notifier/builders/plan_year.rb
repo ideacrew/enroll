@@ -114,6 +114,10 @@ module Notifier
         end
       end
 
+      # if plan_year.blank? && employee_role.present?
+      #   plan_year = employee_role.employer_profile.active_plan_year 
+      # end
+
       plan_year
     end
 

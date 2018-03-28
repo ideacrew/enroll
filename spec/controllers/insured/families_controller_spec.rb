@@ -617,14 +617,18 @@ RSpec.describe Insured::FamiliesController do
 
     context "GET check_qle_date" do
       let!(:user) { FactoryGirl.create(:user) }
-      let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
-      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
-      let(:employee_role) { person100.employee_roles.first }
-      let!(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+      let!(:person1) { FactoryGirl.create(:person) }
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
+      let!(:employer_profile){ FactoryGirl.create(:employer_profile)}
+      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, :aasm_state => 'enrolling') }
+      let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+      let!(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+      let!(:employee_role) {FactoryGirl.create(:employee_role, person: person1, employer_profile: employer_profile)}
+      let!(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment1]) }
 
       before :each do
-        allow(user).to receive(:person).and_return person100
-        allow(person100).to receive(:primary_family).and_return family
+        allow(user).to receive(:person).and_return person1
+        allow(person1).to receive(:primary_family).and_return family
         allow(employee_role).to receive(:census_employee).and_return census_employee
       end
 
@@ -668,16 +672,18 @@ RSpec.describe Insured::FamiliesController do
 
         it "should return false and also notify sep request denied" do
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
-          xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+          xhr :get, :check_qle_date, qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js
           expect(assigns(:qualified_date)).to eq false
 
           expect(subject).to receive(:notify) do |event_name, payload|
-            expect(event_name).to eq "acapi.info.events.employee.sep_request_denial_notice"
-            expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
-            expect(payload[:event_object_id]).to eq qle.id.to_s
+            expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_sep_denial"
+            expect(payload[:event_object_kind]).to eq 'PlanYear'
+            expect(payload[:event_object_id]).to eq plan_year.id.to_s
+            expect(payload[:notice_params][:qle_title]).to eq qle.title
+            expect(payload[:notice_params][:qle_reporting_deadline]).to eq date
+            expect(payload[:notice_params][:qle_event_on]).to eq date
           end
-
-          subject.trigger_notice(recipient: employee_role, event_object:qle, notice_event: "sep_request_denial_notice")
+          subject.trigger_notice(recipient: employee_role, event_object: plan_year, notice_event: "employee_notice_for_sep_denial", notice_params: {qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date})
         end
 
         it "should have effective_on_options" do
