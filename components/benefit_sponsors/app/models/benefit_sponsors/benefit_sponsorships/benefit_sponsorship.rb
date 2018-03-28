@@ -21,6 +21,12 @@ module BenefitSponsors
       belongs_to  :organization,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
+      # Unique Resource Name identifier for benefit market 
+      field :benefit_market_urn,      type: String
+      # belongs_to  :benefit_market, counter_cache: true,
+      #             class_name: "BenefitMarkets::BenefitMarket"
+
+
       # This sponsorship's workflow status
       field :initial_effective_date,  type: Date
       field :sponsorship_profile_id,  type: BSON::ObjectId
@@ -35,17 +41,14 @@ module BenefitSponsors
       has_many    :service_areas,
                   class_name: "BenefitSponsors::Locations::ServiceArea"
 
-      belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "BenefitMarkets::BenefitMarket"
-
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :benefit_market, :sponsorship_profile_id
+      validates_presence_of :benefit_market_urn, :sponsorship_profile_id
 
       after_create :build_nested_models
 
-# TODO move this to concern
+# TODO move this to Profile
       def sic_code
         sponsorship_profile.sic_code
       end
