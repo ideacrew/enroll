@@ -23,7 +23,6 @@ end
 require File.join(File.dirname(__FILE__), "factories", "wrapping_sequence")
 require 'factory_girl_rails'
 require 'ivl_helper'
-require 'bank_holidays_helper'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
