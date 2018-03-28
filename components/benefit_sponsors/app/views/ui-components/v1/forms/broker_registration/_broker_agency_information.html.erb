@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <label for="validationCustomLegalName">Legal Name</label>
+    <%= f.text_field :legal_name, placeholder:'Legal Name', required:'true', id:'validationCustomLegalName', class:'form-control' %>
+  </div>
+  <div class="col-md-6 mb-3">
+    <label for="validationCustomLegalName">DBA</label>
+    <%= f.text_field :dba, placeholder:'DBA', required:'true', id:'validationCustomdba', class:'form-control' %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-3 mb-3">
+    <%= f.select :market_kinds, options_for_select([ "Individual & Family Marketplace ONLY", "Small Business Marketplace ONLY", "Both – Individual & Family AND Small Business Marketplaces"]), {include_blank: true}, {class:'custom-select custom-select-lg mb-3'} %>
+  </div>
+  <div class="col-md-3 mb-3">
+    <%= f.select :languages, options_for_select(["English"]), {include_blank: true}, {class:'custom-select custom-select-lg mb-3'} %>
+  </div>
+  <div class="col-md-3 mb-3 mt-2">
+    <%= f.check_box :working_hours %>
+    <label class="custom-control-label" for="customCheck1">EVENING/WEEKEND HOURS?</label>
+  </div>
+  <div class="col-md-3 mb-3 mt-2">
+    <%= f.check_box :accept_new_clients %>
+    <label class="custom-control-label" for="customCheck2">ACCEPT NEW CLIENTS?</label>
+  </div>
+</div>

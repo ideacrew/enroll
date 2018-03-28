@@ -84,7 +84,7 @@ module BenefitSponsors
       private
 
       def get_site_key
-        @site_key = self.class.superclass.current_site.site_key
+        #@site_key = self.class.superclass.current_site.site_key
       end
 
       def initiate_broker_profile
