@@ -55,7 +55,6 @@ describe 'ModelEvents::EmployerNoticeForEmployeeCoverageTermination', dbclean: :
       allow(subject).to receive(:resource).and_return(employer_profile)
       allow(subject).to receive(:payload).and_return(payload)
       employee_role.update_attributes(census_employee_id: census_employee.id) 
-      # allow(Person).to receive(:staff_for_employer).with(model_instance.employer_profile).and_return([employer_staff])
     end
 
     it "should return merge model" do
