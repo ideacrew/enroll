@@ -12,7 +12,7 @@ module BenefitMarkets
         expect(subject.errors.has_key?(:name)).to be_truthy
       end
 
-      it "is missing contribution models" do
+      it "is missing contribution units" do
         subject.valid?
         expect(subject.errors.has_key?(:contribution_units)).to be_truthy
       end
@@ -22,7 +22,7 @@ module BenefitMarkets
         expect(subject.errors.has_key?(:member_relationships)).to be_truthy
       end
 
-      it "is a contribution value kind" do
+      it "is missing contribution value kind" do
         subject.valid?
         expect(subject.errors.has_key?(:contribution_value_kind)).to be_truthy
       end
