@@ -1,29 +1,20 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe PricingModels::MemberRelationshipMap do
+  RSpec.describe PricingModels::RelationshipPricingUnit do
     describe "given:
 - a name
 - an operator
 - a count
 - a parent pricing_unit
 - a parent pricing_model, with member_relationships
-- a relationship_name that isn't present in the member_relationships
+- a name that isn't present in the member_relationships
 " do
       let(:pricing_unit) do
-        PricingModels::TieredPricingUnit.new(
-          name: "employee_only",
-          display_name: "Employee Only",
-          member_relationship_maps: [member_relationship_map],
+        PricingModels::RelationshipPricingUnit.new(
+          name: "spouse",
+          display_name: "spouse",
           order: 0
-        )
-      end
-
-      let(:member_relationship_map) do
-        PricingModels::MemberRelationshipMap.new(
-          relationship_name: "spouse",
-          operator: :==,
-          count: 1
         )
       end
 
@@ -44,7 +35,7 @@ module BenefitMarkets
         )
       end
 
-      subject { pricing_model; member_relationship_map }
+      subject { pricing_model; pricing_unit }
       it "is invalid" do
         expect(subject.valid?).to be_falsey
       end

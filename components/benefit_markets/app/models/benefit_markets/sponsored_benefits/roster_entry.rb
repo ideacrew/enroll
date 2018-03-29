@@ -4,7 +4,17 @@ module BenefitMarkets
     # which must be satisfied by objects returned by any implementation of
     # Roster's #each method.
     class RosterEntry
-
+      # The member id of the primary.
+      def member_id
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
+      
+      # Relationship to the primary.  Will typically be "self".
+      # @return [Symbol] the relationship
+      def relationship
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
+      
       # Provide the primary's date of birth.
       def dob
         raise NotImplementedError.new("This is a documentation only interface.")

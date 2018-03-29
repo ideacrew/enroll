@@ -10,11 +10,8 @@ module BenefitMarkets
       field :display_name, type: String
       field :order, type: Integer
 
-      embeds_many :member_relationship_maps, class_name: "::BenefitMarkets::PricingModels::MemberRelationshipMap"
-
       validates_presence_of :name, :allow_blank => false
       validates_presence_of :display_name, :allow_blank => false
-      validates_presence_of :member_relationship_maps, :allow_blank => false
       validates_numericality_of :order, :allow_blank => false
     end
   end

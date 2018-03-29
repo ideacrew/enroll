@@ -22,6 +22,12 @@ module BenefitMarkets
       def pricing_calculator
         @pricing_calculator ||= price_calculator_kind.constantize.new
       end
+
+      # Transform an external relationship into the mapped relationship
+      # specified by this pricing model.
+      def map_relationship_for(relationship)
+        member_relatiohships.detect? { |mr| mr.match?(relationship.to_sym) }.relationship_name
+      end
     end
   end
 end
