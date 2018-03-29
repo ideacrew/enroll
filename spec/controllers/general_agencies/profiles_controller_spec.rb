@@ -47,24 +47,8 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     let(:general_agency_profile){ GeneralAgencyProfile.find( person.general_agency_staff_roles.first.general_agency_profile_id) }
     before :each do
       sign_in user
-      #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
       allow(controller).to receive(:sanitize_agency_profile_params).and_return(true)
       allow(controller).to receive(:authorize).and_return(true)
-    end
-
-    it "should success with valid params" do
-      allow(org).to receive(:update_attributes).and_return(true)
-      #post :update, id: general_agency_profile.id, organization: {}
-      #expect(response).to have_http_status(:redirect)
-      #expect(flash[:notice]).to eq "Successfully Update Broker Agency Profile"
-    end
-
-    it "should failed with invalid params" do
-      allow(org).to receive(:update_attributes).and_return(false)
-      #post :update, id: general_agency_profile.id, organization: {}
-      #expect(response).to render_template("edit")
-      #expect(response).to have_http_status(:redirect)
-      #expect(flash[:error]).to eq "Failed to Update Broker Agency Profile"
     end
 
     it "should update person main phone" do
