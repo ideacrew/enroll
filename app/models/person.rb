@@ -534,6 +534,14 @@ class Person
     best_phone ? best_phone.full_phone_number : nil
   end
 
+  def has_active_consumer_role?
+     consumer_role.present? && consumer_role.is_active?
+  end
+
+  def has_active_resident_role?
+    resident_role.present? && resident_role.is_active?
+  end
+
   def can_report_shop_qle?
     employee_roles.first.census_employee.qle_30_day_eligible?
   end

@@ -14,10 +14,12 @@ class IndividualMarketTransition
   # a single individual_market_transition on a person that is not nil, e.g. the active role
   field :effective_ending_on, type: Date, default: nil
   field :reason_code, type: String
-  field :submitted_at, type: DateTime
+  field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
 
-	validates_presence_of :effective_starting_on, :submitted_at
+  # can't validate presence of effective_starting_on since this needs to be created for initial enrollments that may not be
+  # transitions
+	# validates_presence_of :submitted_at
 
   validates :role_type,
             presence: true,
@@ -27,8 +29,8 @@ class IndividualMarketTransition
 
   validates :reason_code,
           presence: true,
-          allow_blank: false,
-          allow_nil:   false,
+          allow_blank: true,
+          allow_nil:   true,
           inclusion: {in: REASON_CODES, message: "%{value} is not a valid transistion reason code"}
 
   before_save :set_submitted_at, :set_submitted_by
