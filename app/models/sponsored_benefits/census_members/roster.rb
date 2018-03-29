@@ -1,56 +1,44 @@
 module SponsoredBenefits
   module CensusMembers
     class Roster
-      include Enumerable
+      include Mongoid::Document
+      include Mongoid::Timestamps
 
-      attr_reader :roster_kind
+      belongs_to :rosterable, polymorphic: true
 
-      ROSTER_KINDS = [:plan_design, :employer_profile]
 
-      def initialize(*members)
-        @roster_kind  = :employer_profile
-        @members      = members
+      field :benefit_sponsorship_id, type: BSON::ObjectId
 
-        member_class_for(@members.first) if @members.size > 0
+      embeds_many :census_members, class_name: "SponsoredBenefits::CensusMembers"
+
+      has_one :benefit_rating_category_map
+
+
+      def benefit_rating_categories
       end
-
-      def each(&block)
-        @members.each { |member| block.call(member) }
-      end
-
-      def member_class_for(member_instance)
-        case member_instance.class_name
-        when "SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee", "SponsoredBenefits::CensusMembers::PlanDesignCensusDependent"
-          @roster_kind  = :plan_design
-          @member_klass = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
-        when "PlanDesignCensusEmployee", "PlanDesignCensusDependent"
-          @roster_kind  = :employer_profile
-          @member_klass = ::CensusEmployee
-        end
-      end
-
-      def add_members_by_benefit_sponsor(benefit_sponsor)
-        @members = benefit_sponsor.census_employees.collect { |member| add_member(member) }
-      end
-
 
       def benefit_rating_category_for(census_employee)
       end
 
 
-      def add_member(new_member)
-        
-        census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(serialize_attributes(new_member.attributes))
+      def add_census_employees_by_employer_profile(employer_profile)
+        @census_employees = employer_profile.census_employees.non_terminated.collect do |census_employee|
+          add_employee(census_employee)
+        end
+      end
+
+      def add_employee(new_census_employee)
+        census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.new(serialize_attributes(new_census_employee.attributes))
         census_employee.benefit_sponsorship_id = benefit_sponsorship.id
         census_employee.ssn = census_employee.ssn if census_employee.ssn.present?
 
         census_employee.census_dependents.each do |dependent|
-          census_employee.census_dependents << add_member_dependent(dependent)
+          census_employee.census_dependents << add_dependent(dependent)
         end
         census_employee
       end
 
-      def add_member_dependent(new_census_dependent)
+      def add_dependent(new_census_dependent)
         census_dependent = SponsoredBenefits::CensusMembers::CensusDependent.new(dependent_attributes(new_census_dependent.attributes))
         census_dependent.ssn= census_dependent.ssn if census_dependent.ssn.present?
         census_dependent
@@ -230,6 +218,7 @@ module SponsoredBenefits
         }, # choice rating
 
       ]
+
     end
   end
 end
