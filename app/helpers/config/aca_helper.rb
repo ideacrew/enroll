@@ -169,7 +169,7 @@ module Config::AcaHelper
   def employer_attestation_is_enabled?
     Settings.aca.employer_attestation
   end
-
+  
   def display_plan_cost_warning(bg)
     return false unless offer_sole_source?
     return false if bg.nil?
