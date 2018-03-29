@@ -9,12 +9,12 @@
               <h4><%= pluralize(@benefit_application.errors.count, "error") %> prohibited this plan year from being saved:</h4>
               <% end %>
               <ul>
-                <% @benefit_application.errors.delete(:benefit_groups) %>
+                <% @benefit_application.errors.delete(:benefit_packages) %>
                 <% @benefit_application.errors.full_messages.each do |msg| %>
                   <li><%= msg %></li>
                 <% end %>
 
-                <% @benefit_application.benefit_groups.each do |bg| %>
+                <% @benefit_application.benefit_packages.each do |bg| %>
                   <% bg.errors.full_messages.each do |msg| %>
                     <li><%= msg %></li>
                   <% end %>
@@ -35,15 +35,15 @@
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
             <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
-            <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
-              <%= render "shared/benefit_group_fields", f: bg, p: @benefit_application %><br>
+            <%= f.fields_for :benefit_packages, errors: {}, fieldset: false do |bg|  %>
+              <%= render "benefit_sponsors/benefit_applications/benefit_applications/shared/benefit_package_field", f: bg, p: @benefit_application %><br>
             <% end %>
             <div class="row no-buffer controls module" style="display: none;">
               <br/>
               <br/>
               <div class="vertically-aligned-row">
                 <div class="text-left">
-                  <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-default xs_full_width abg btn-lg' %>
+                  <%= link_to_add_fields "Add Benefit Group", f, :benefit_packages, 'btn btn-default xs_full_width abg btn-lg' %>
                   <a href="#" class="btn btn-default btn-lg remove_fields">Remove Benefit Group</a>
                 </div>
                 <div class="text-right">
