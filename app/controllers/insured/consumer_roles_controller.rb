@@ -315,9 +315,11 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create_initial_market_transition
-    binding.pry
     transition = IndividualMarketTransition.new
     transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
     User.find(params[:person][:user_id]).person.individual_market_transitions << transition
   end
 
