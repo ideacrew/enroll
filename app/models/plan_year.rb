@@ -8,6 +8,7 @@ class PlanYear
   include Config::AcaModelConcern
   include Concerns::Observable
   include ModelEvents::PlanYear
+  include Config::BankHolidaysHelper
 
   embedded_in :employer_profile
 
@@ -815,38 +816,24 @@ class PlanYear
     end
 
     def map_binder_payment_due_date_by_start_on(start_on)
+      #list of bank holidays.
+      event_arr = [{event_name: "New Year's Day", event_date: schedule_time(Date.new(Date.today.year, 01, 01))}, {event_name: "Martin birthday", event_date: nth_wday(3, 1, 1, Date.today.year)}, {event_name: "President's Day", event_date: nth_wday(3, 1, 2, Date.today.year)}, {event_name: "Memorial Day", event_date: last_monday_may(Date.today.year, 5, 31)}, {event_name: "Labor day", event_date: nth_wday(1, 1, 9, Date.today.year)}, {event_name: "Columbus Day", event_date: nth_wday(2, 1, 10, Date.today.year)}, {event_name: "Veterans Day", event_date: schedule_time(Date.new(Date.today.year, 11, 11))}, {event_name: "Thanksgiving Day", event_date: nth_wday(4, 4, 11, Date.today.year)}, {event_name: "Christmas Day", event_date: schedule_time(Date.new(Date.today.year, 12, 25))}, {event_name: "Independence Day", event_date: schedule_time(Date.new(Date.today.year, 07, 04))}]
+      event_date_arr = event_arr.map{|hsh| schedule_time(hsh[:event_date])}
+      due_day = Settings.aca.shop_market.binder_payment_due_on
       dates_map = {}
-      {
-        "2017-01-01" => '2016,12,23',
-        "2017-02-01" => '2017,1,23',
-        "2017-03-01" => '2017,2,23',
-        "2017-04-01" => '2017,3,23',
-        "2017-05-01" => '2017,4,24',
-        "2017-06-01" => '2017,5,23',
-        "2017-07-01" => '2017,6,23',
-        "2017-08-01" => '2017,7,24',
-        "2017-09-01" => '2017,8,23',
-        "2017-10-01" => '2017,9,25',
-        "2017-11-01" => '2017,10,23',
-        "2017-12-01" => '2017,11,24',
-        "2018-01-01" => '2017,12,26',
-        "2018-02-01" => '2018,1,23',
-        "2018-03-01" => '2018,2,23',
-        "2018-04-01" => '2018,3,23',
-        "2018-05-01" => '2018,4,23',
-        "2018-06-01" => '2018,5,23',
-        "2018-07-01" => '2018,6,25',
-        "2018-08-01" => '2018,7,23',
-        "2018-09-01" => '2018,8,23',
-        "2018-10-01" => '2018,9,24',
-        "2018-11-01" => '2018,10,23',
-        "2018-12-01" => '2018,11,23',
-        "2019-01-01" => '2018,12,24',
-      }.each_pair do |k, v|
-        dates_map[k] = Date.strptime(v, '%Y,%m,%d')
+      month = start_on.month
+      key = Date.new(TimeKeeper.date_of_record.year, month, 1)
+      year = TimeKeeper.date_of_record.year
+      if (month == 0)
+        month = 12
+        year -=1
       end
-
-      dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
+      to_date = Date.new(TimeKeeper.date_of_record.year,binder_pay_month-1 , Settings.aca.shop_market.binder_payment_due_on)
+      while (event_date_arr.include?(to_date) or to_date.wday == 6 or to_date.wday == 0)
+        to_date = to_date+1.day #If to_date is in holidays arr, we are adding +1 day
+      end
+      dates_map[key] = to_date
+      dates_map[start_on]  || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
     end
 
     ## TODO - add holidays
