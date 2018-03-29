@@ -1,9 +1,10 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
-  mount BenefitMarkets::Engine,      at: "/benefit_markets"
-  
+  mount BenefitMarkets::Engine,       at: "/benefit_markets"
+#  mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
+
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -211,7 +212,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
