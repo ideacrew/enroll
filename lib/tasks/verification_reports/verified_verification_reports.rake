@@ -5,11 +5,16 @@ namespace :reports do
   task :verified_verification_report => :environment do
     field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON)
 
-    CITIZEN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid!", "ssn_valid", "pass_dhs!", "pass_dhs", "pass_residency!", "pass_residency"]
+    CITIZEN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid","pass_dhs!", "pass_dhs"]
 
-    ALL_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid_citizenship_invalid", "ssn_valid_citizenship_invalid!",
-                                "ssn_valid!", "ssn_valid", "pass_dhs!", "pass_dhs", "pass_residency!", "pass_residency"]
+    SSN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid_citizenship_invalid", "ssn_valid_citizenship_invalid!",
+                                "ssn_valid!", "ssn_valid"]
+    RESIDENCY_VALID_EVENTS = ["pass_residency!", "pass_residency"]
 
+    IMMIGRATION_VALID_EVENTS = ["pass_dhs!", "pass_dhs"]
+
+    ALL_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid", "ssn_valid_citizenship_invalid", "ssn_valid_citizenship_invalid!",
+                  "pass_dhs!", "pass_dhs"]
     def date
       begin
         ENV["date"].strip         
@@ -67,11 +72,27 @@ namespace :reports do
         :"$gt" => hub_response_on - 1.day,
         :"$lt" => hub_response_on + 1.day
         }, 
-        :"event".in => (v_type == "Citizenship" ? CITIZEN_VALID_EVENTS : ALL_VALID_EVENTS)
+        :"event".in => (verification_valid_event(v_type))
       ).first
     end
 
-    def is_not_eligible_transaction?
+    def verification_valid_event(v_type)
+      case v_type
+        when 'Social Security Number'
+          SSN_VALID_EVENTS
+        when 'DC Residency'
+          RESIDENCY_VALID_EVENTS
+        when 'Immigration status'
+          IMMIGRATION_VALID_EVENTS
+        when 'Citizenship'
+          CITIZEN_VALID_EVENTS
+        else
+          ALL_EVENTS
+      end
+
+    end
+    
+   def is_not_eligible_transaction?
       return false if @history_element.modifier != "external Hub"
       hub_response_wfst.blank?
     end
