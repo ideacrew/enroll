@@ -37,7 +37,7 @@
                   <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
                   <%= l10n("broker_agencies.profiles.agency_mail")%>
                 <% end %>
-          </li>
+            </li>
           <% end %>
         <% end %>
         <% if general_agency_enabled? %>
