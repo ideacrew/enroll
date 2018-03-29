@@ -231,6 +231,7 @@ aca:
   transmit_employers_immediately: false
   employer_attestation: false
   enforce_employer_attestation: true
+  plan_match_tool: true
   rating_areas: []
 
 paper_notice: 'paper-notices'

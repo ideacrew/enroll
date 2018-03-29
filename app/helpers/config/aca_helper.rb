@@ -176,4 +176,8 @@ module Config::AcaHelper
     bg.sole_source?
   end
 
+  def plan_match_tool_is_enabled?
+    Settings.aca.plan_match_tool
+  end
+
 end
