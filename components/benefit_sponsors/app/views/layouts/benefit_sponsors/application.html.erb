@@ -7,8 +7,9 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<%= yield %>
-
+  <%= render partial: './ui-components/v1/navbar/navbar' %>
+  <div class="container">
+    <%= yield %>
+  </div>
 </body>
 </html>

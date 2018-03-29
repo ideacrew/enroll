@@ -411,8 +411,8 @@ module BenefitSponsors
 
         def find(id)
           application = nil
-          Organizations::PlanDesignOrganization.where(:"plan_design_profile.benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
-            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
+          Organizations::PlanDesignOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
+            sponsorships = pdo.try(:benefit_sponsorships) || []
             sponsorships.each do |sponsorship|
               application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
               break if application.present?

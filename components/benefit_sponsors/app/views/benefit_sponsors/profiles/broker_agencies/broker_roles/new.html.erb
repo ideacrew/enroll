@@ -1,15 +1,28 @@
-<div id="broker_registration_panel">
-  <div class="container top-pd">
-    <div class="tab-wrapper">
-      <%= render "primary_nav" %>
-      <div id="broker_signup_container" class="tab-content-pd bottom-pd">
-       <div id="broker_and_staff_form">
-        <% if @filter == 'broker' %>
-        <%= render "broker_signup" %>
-        <% else %>
-        <%= render "existing_broker_agency_form" %>
-        <% end %>
-      </div>
+<div class="broker-registration-container mt-4 pt-4 pl-3 pr-3 pb-3">
+  <h1 class="enroll-lead">Broker Registration</h1>
+  
+  <h5 class="enroll-lead">Personal Information</h5>
+  
+  <%= form_for :object, html: { class: "needs-validation", id:'broker_registration_form' } do |f| %>
+  <%= render partial: './ui-components/v1/forms/broker_registration/personal_information', locals: {f: f} %>
+      
+  <h5 class="enroll-lead mb-2">Broker Agency Information</h5>
+      
+  <h6 class="enroll-lead mb-2">NOTE: If you are not associated with a broker agency, please enter your personal information. Do not enter a General Agency or Third Party Administrator‘s Information.</h6>
+      
+  <%= render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f} %>
+      
+  <h5 class="enroll-lead mb-2">Office Location</h5>
+  
+  <%= render partial: './ui-components/v1/forms/office_locations/office_location', locals: {f: f} %>
+  <div id="office-locations"></div>
+      
+  <div class="row">
+    <div class="col">
+      <button class="float-left btn btn-outline-primary" id="add-broker-location">Add Office Location</button>
+      <%= f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right' %>
     </div>
   </div>
+      
+  <% end %>
 </div>
