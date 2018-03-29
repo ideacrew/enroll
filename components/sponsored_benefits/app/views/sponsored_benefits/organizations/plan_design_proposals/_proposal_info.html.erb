@@ -11,13 +11,10 @@
     <%= f.text_field :quote_date, class: "floatlabel form-control", disabled: true, placeholder: 'Quote Date' %>
   </div>
 
-  <% if standard_industrial_classification_enabled? %>
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
     <%= f.text_field :sic_code, class: "floatlabel form-control", disabled: true, placeholder: 'SIC' %>
   </div>
-  <% end %>
 
-  <% if constrain_service_areas? %> 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
     <%= f.text_field :zip_code, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'ZIP Code' %>
   </div>
@@ -25,8 +22,6 @@
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
     <%= f.text_field :county, class: "floatlabel form-control", required: true, disabled: true, placeholder: 'County' %>
   </div>
-  <% end %>
- 
 </div>
 
 <script>
