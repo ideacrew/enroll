@@ -9,7 +9,8 @@ module BenefitSponsors
     let(:valid_params) do 
       {
         sic_code: sic_code,
-        entity_kind: "s_corporation"
+        entity_kind: "s_corporation",
+        rating_area_id: "23211212"
       }
     end
 

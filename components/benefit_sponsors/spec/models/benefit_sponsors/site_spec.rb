@@ -172,7 +172,8 @@ module BenefitSponsors
 
       context "and benefit_market associations must be valid" do
         let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
-        let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, :with_benefit_catalog) }
+        # let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, :with_benefit_catalog) }
+        let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market) } #TODO enable benefit catalog when its implemented under benefit_market engine
 
         before { site.benefit_markets << benefit_market }
 
