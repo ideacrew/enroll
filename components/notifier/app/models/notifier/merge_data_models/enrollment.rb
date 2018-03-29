@@ -7,7 +7,7 @@ module Notifier
     attribute :plan_name, String
     attribute :enrolled_count, String
     # attribute :metal_level, String
-    # attribute :coverage_kind, String
+    attribute :coverage_kind, String
     # attribute :plan_carrier, String
     attribute :employee_responsible_amount, String
     attribute :employer_responsible_amount, String

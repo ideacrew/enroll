@@ -28,6 +28,11 @@ module Notifier
     	merge_model.enrollment.enrolled_count = enrollment.humanized_dependent_summary
     end
 
+    def enrollment_coverage_kind
+      return if enrollment.blank?
+      merge_model.enrollment.coverage_kind = enrollment.coverage_kind
+    end
+
     def enrollment_employee_responsible_amount
       return if enrollment.blank?
       merge_model.enrollment.employee_responsible_amount = number_to_currency(enrollment.total_employee_cost, precision: 2)

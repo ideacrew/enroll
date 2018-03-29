@@ -35,7 +35,8 @@ describe 'ModelEvents::EmployeeNoticeForEmployeeCoverageTermination', dbclean: :
           "employee_profile.last_name",
           "employee_profile.employer_name",
           "employee_profile.enrollment.coverage_end_on",
-          "employee_profile.enrollment.enrolled_count"
+          "employee_profile.enrollment.enrolled_count",
+          "employee_profile.enrollment.coverage_kind"
       ]
     }
 
@@ -76,6 +77,10 @@ describe 'ModelEvents::EmployeeNoticeForEmployeeCoverageTermination', dbclean: :
 
     it "should return enrollment terminated_on date" do
       expect(merge_model.enrollment.coverage_end_on).to eq model_instance.terminated_on
+    end
+
+    it "should return enrollment coverage_kind" do
+      expect(merge_model.enrollment.coverage_kind).to eq model_instance.coverage_kind
     end
 
     it "should return enrollment covered dependents" do
