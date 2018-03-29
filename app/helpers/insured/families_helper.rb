@@ -241,4 +241,30 @@ module Insured::FamiliesHelper
     end
     return first_checked, second_checked
   end
+
+  def current_market_kind(person)
+    if person.is_consumer_role_active? || person.is_resident_role_active?
+      person.active_individual_market_role
+    else
+      "No Consumer/CoverAll Market"
+    end
+  end
+
+  def new_market_kind(person)
+    if person.is_consumer_role_active?
+      "resident"
+    elsif person.is_resident_role_active?
+      "consumer"
+    else
+      " - "
+    end
+  end
+
+  def transition_reason(person)
+    if person.is_consumer_role_active?
+      { 'Not eligible for marketplace coverage due to citizenship or immigration status' => 'not_eligible_for_marketplace_coverage_due_to_citizenship_or_immigration_status'}
+    elsif person.is_resident_role_active?
+      { 'Provided documents proving eligibility' => 'provided_documents_proving_eligibility'}
+    end
+  end
 end

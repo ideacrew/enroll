@@ -59,8 +59,12 @@ module Forms
           market_kind = params["transition_market_kind_#{value}"]
           effective_date = Date.strptime(params["transition_effective_date_#{value}"], "%m/%d/%Y")
           transition_reason = params["transition_reason_#{value}"]
-          person.individual_market_transitions.build(role_type: market_kind, effective_starting_on: effective_date, reason_code: transition_reason, submitted_at: ::TimeKeeper.datetime_of_record)
 
+          current_active_role = person.individual_market_transitions.all.last
+          # need to update current transition instance end date to new transition start date less 1 day
+          current_active_role.update_attributes!(effective_ending_on: effective_date - 1.days)
+
+          person.individual_market_transitions.build(role_type: market_kind, effective_starting_on: effective_date, reason_code: transition_reason, submitted_at: ::TimeKeeper.datetime_of_record)
           begin
             person.save!
             @result[:success] << person
