@@ -170,6 +170,14 @@ module Config::AcaHelper
     Settings.aca.employer_attestation
   end
 
+  def payment_pdf_helper
+    if Settings.site.payment_pdf_url.match("http")
+      Settings.site.payment_pdf_url
+    else
+      asset_path(Settings.site.payment_pdf_url)
+    end
+  end
+
   def display_plan_cost_warning(bg)
     return false unless offer_sole_source?
     return false if bg.nil?
