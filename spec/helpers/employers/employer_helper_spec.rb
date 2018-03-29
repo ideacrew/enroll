@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Employers::EmployerHelper, :type => :helper do
+RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each do
   describe "#enrollment_state" do
 
     let(:benefit_group)    { plan_year.benefit_groups.first }
@@ -9,11 +9,11 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       bg = FactoryGirl.create(:benefit_group, plan_year: py)
       PlanYear.find(py.id)
     end
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
     let(:benefit_group_assignment) { double }
-    let(:person) {double}
-    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person, :with_ssn) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:dental_plan) { FactoryGirl.create(:plan, coverage_kind: "dental", dental_level: "high" ) }
     let(:health_plan) { FactoryGirl.create(:plan, coverage_kind: "health") }
     let(:dental_enrollment)   { FactoryGirl.create( :hbx_enrollment,
@@ -122,6 +122,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
       context 'when coverage terminated' do
         before do
+          employee_role.update_attributes!(census_employee_id: census_employee.id)
           health_enrollment.terminate_coverage!
           allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
         end
