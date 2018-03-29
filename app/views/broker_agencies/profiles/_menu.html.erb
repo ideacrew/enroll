@@ -31,14 +31,14 @@
             </li>
           <% end %>
           <!-- Hidden due to request in 18558(DC) Re-enabled during code merge-->
-          <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
-            <% if !individual_market_is_enabled? %>
-              <%= link_to(main_app.agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
-                <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
-                <%= l10n("broker_agencies.profiles.agency_mail")%>
-              <% end %>
-            <% end %>
+          <% if !individual_market_is_enabled %>
+            <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
+                <%= link_to(main_app.agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+                  <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
+                  <%= l10n("broker_agencies.profiles.agency_mail")%>
+                <% end %>
           </li>
+          <% end %>
         <% end %>
         <% if general_agency_enabled? %>
           <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
@@ -48,7 +48,6 @@
             <% end %>
           </li>
         <% end %>
-
         <% if site_broker_quoting_enabled? && individual_market_is_enabled? %>
           <li role="presentation" id="assign-tab" <%= menu_tab_class(active_tab, "assign-tab") %>>
             <%= link_to(main_app.assign_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
@@ -87,7 +86,6 @@
             <% end %>
           </li>
         <% end %>
-
         <% if current_user.has_hbx_staff_role? %>
         <% else %>
           <% if individual_market_is_enabled? %>
