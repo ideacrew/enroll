@@ -6,7 +6,7 @@ class IndividualMarketTransition
   embedded_in :person
 
   ROLE_TYPES   = %W(consumer resident)
-  REASON_CODES = %W(not_eligible_for_marketplace_coverage_due_to_citizenship_or_immigration_status provided_documents_proving_eligibility)
+  REASON_CODES = %W(reason1 reason2 generating_consumer_role generating_resident_role)
 
   field :role_type, type: String
   field :effective_starting_on, type: Date
@@ -17,9 +17,8 @@ class IndividualMarketTransition
   field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
 
-  # can't validate presence of effective_starting_on since this needs to be created for initial enrollments that may not be
-  # transitions
-	# validates_presence_of :submitted_at
+
+	validates_presence_of :submitted_at
 
   validates :role_type,
             presence: true,
@@ -29,8 +28,8 @@ class IndividualMarketTransition
 
   validates :reason_code,
           presence: true,
-          allow_blank: true,
-          allow_nil:   true,
+          allow_blank: false,
+          allow_nil:   false,
           inclusion: {in: REASON_CODES, message: "%{value} is not a valid transistion reason code"}
 
   before_save :set_submitted_at, :set_submitted_by
