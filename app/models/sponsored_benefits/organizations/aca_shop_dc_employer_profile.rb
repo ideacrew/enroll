@@ -2,16 +2,11 @@ module SponsoredBenefits
   module Organizations
     class AcaShopDcEmployerProfile < Profile
 
+      field :profile_source, type: String, default: "broker_quote"
+      field :contact_method, type: String, default: "Only Electronic communications"
 
-      private
+      embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
 
-      def initialize_profile
-        return unless is_benefit_sponsorship_eligible.blank?
-
-        write_attribute(:is_benefit_sponsorship_eligible, true)
-        @is_benefit_sponsorship_eligible = true
-        self
-      end
     end
   end
 end

@@ -5,17 +5,9 @@ module SponsoredBenefits
       attr_reader :benefit_application
 
       def initialize(options)
-
-        # TODO Work out how to get Site in single/multi-tenant scenarios
-        # @benefit_market = 
-
-        # benefit_sponsor, effective_date
-
         @application_class ||= AcaShopDcBenefitApplication
         @benefit_application = @application_class.new(options)
       end
-
-
 
       def add_benefit_sponsor(new_benefit_sponsor)
         @benefit_application.benefit_sponsor = new_benefit_sponsor

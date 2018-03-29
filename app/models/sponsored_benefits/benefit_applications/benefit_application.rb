@@ -4,46 +4,69 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      embedded_in :benefit_sponsorship, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+
+      delegate :sic_code, to: :benefit_sponsorship
+      delegate :rating_area, to: :benefit_sponsorship
+      delegate :census_employees, to: :benefit_sponsorship
+      delegate :plan_design_organization, to: :benefit_sponsorship
+      
+     ### Deprecate -- use effective_period attribute
+      # field :start_on, type: Date
+      # field :end_on, type: Date
 
       # The date range when this application is active
       field :effective_period,        type: Range
 
+      ### Deprecate -- use open_enrollment_period attribute
+      # field :open_enrollment_start_on, type: Date
+      # field :open_enrollment_end_on, type: Date
+
       # The date range when members may enroll in benefit products
-      # Stored locally to enable sponsor-level exceptions
       field :open_enrollment_period,  type: Range
 
-      # The date on which this application was canceled or terminated
-      field :terminated_on,           type: Date
+      # Populate when enrollment is terminated prior to open_enrollment_period.end
+      # field :terminated_early_on, type: Date
 
-      # This application's workflow status
-      field :aasm_state, type: String
+      # field :sponsorable_id, type: String
+      # field :rosterable_id, type: String
+      # field :broker_id, type: String
+      # field :kind, type: :symbol
 
-      # field :benefit_sponsorship_id, type: BSON::ObjectId
-      belongs_to  :benefit_sponsorship, 
-                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+      # has_one :rosterable, as: :rosterable
 
-      embeds_many :benefit_packages, counter_cache: true,
-                  class_name: "SponsoredBenefits::BenefitSponsorships::BenefitPackage"
+      embeds_many :benefit_groups, class_name: "SponsoredBenefits::BenefitApplications::BenefitGroup", cascade_callbacks: true
 
-      validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
+      # embeds_many :benefit_packages, as: :benefit_packageable, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage"
+      # accepts_nested_attributes_for :benefit_packages
+
+      # ## Override with specific benefit package subclasses
+      #   embeds_many :benefit_packages, class_name: "SponsoredBenefits::BenefitPackages::BenefitPackage", cascade_callbacks: true
+      #   accepts_nested_attributes_for :benefit_packages
+      # ##
+
+      validates_presence_of :effective_period, :open_enrollment_period, :message => "is missing"
       # validate :validate_application_dates
 
       validate :open_enrollment_date_checks
 
-      index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
-      index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
-
-      scope :by_effective_date,       ->(effective_date)    { where(:"effective_period.min" => effective_date) }
-      scope :by_effective_date_range, ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
+      #
+      # Are these correct? I don't think you can move an embedded object just by changing an id?
+      #
+      # def benefit_sponsor=(new_sponsor)
+      #   self.sponsorable_id = new_sponsor.id
+      # end
+      #
+      # BrokerAgencyProfile embeds this entire chain - this can't be the way we adjust it
+      #
+      # def broker=(new_broker)
+      #   self.broker_id = new_broker.id
+      # end
 
 
       ## Stub for BQT
       def estimate_group_size?
         true
-      end
-
-      def effective_date
-        effective_period.begin unless effective_period.blank?
       end
 
       def effective_period=(new_effective_period)
@@ -56,15 +79,31 @@ module SponsoredBenefits
         write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
       end
 
+      def start_on
+        effective_period.begin
+      end
+
+      def end_on
+        effective_period.end
+      end
+
+      def open_enrollment_begin_on
+        open_enrollment_period.begin
+      end
+
+      def open_enrollment_end_on
+        open_enrollment_period.end
+      end
+
       def open_enrollment_completed?
         open_enrollment_period.blank? ? false : (::TimeKeeper.date_of_record > open_enrollment_period.end)
       end
 
-      # Application meets criteria necessary for sponsored members to shop for benefits
+      # Application meets criteria necessary for sponsored group to shop for benefits
       def is_open_enrollment_eligible?
       end
 
-      # Application meets criteria necessary for sponsored members to effectuate selected benefits
+      # Application meets criteria necessary for sponsored group to effectuate selected benefits
       def is_coverage_effective_eligible?
       end
 
@@ -184,6 +223,14 @@ module SponsoredBenefits
         end
 
 
+        def open_enrollment_period_by_effective_date(effective_date)
+          earliest_begin_date = effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+          prior_month = effective_date - 1.month
+
+          begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
+          end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
+          begin_on..end_on
+        end
 
 
         def find(id)
@@ -225,7 +272,7 @@ module SponsoredBenefits
         end
 
         if open_enrollment_period.begin < (effective_period.begin - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
-          errors.add(:open_enrollment_period, "can't occur earlier than 60 days before start date")
+          errors.add(:open_enrollment_period.begin, "can't occur earlier than 60 days before start date")
         end
 
         if open_enrollment_period.end > (open_enrollment_period.begin + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)

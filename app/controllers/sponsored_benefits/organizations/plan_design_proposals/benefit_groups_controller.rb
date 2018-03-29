@@ -1,6 +1,7 @@
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::BenefitGroupsController < ApplicationController
+
       def create
         update_benefit_group_attributes if benefit_group.persisted?
 
@@ -11,10 +12,8 @@ module SponsoredBenefits
           benefit_group.build_relationship_benefits
           benefit_group.estimate_composite_rates
         else
-          # TODO - Handle when composite tier models merged
-          # benefit_group.build_composite_tier_contributions
+          benefit_group.build_composite_tier_contributions
         end
-
         benefit_group.set_bounding_cost_plans
 
         if plan_design_proposal.save
@@ -48,12 +47,8 @@ module SponsoredBenefits
         end
 
         def update_benefit_group_attributes
-          if benefit_group.sole_source?
-            benefit_group.composite_tier_contributions.destroy_all
-          else
-            benefit_group.relationship_benefits.destroy_all
-          end
-
+          benefit_group.composite_tier_contributions.destroy_all
+          benefit_group.relationship_benefits.destroy_all
           benefit_group.update_attributes(benefit_group_params)
         end
 

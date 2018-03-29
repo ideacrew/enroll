@@ -14,12 +14,17 @@ module SponsoredBenefits
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
 
+  # field :recorded_sic_code, type: String
+  # field :recorded_rating_area, type: String
+
+
     let(:params) do
       {
         effective_period: effective_period,
         open_enrollment_period: open_enrollment_period,
       }
     end
+
 
     context "with no arguments" do
       subject { described_class.new }
