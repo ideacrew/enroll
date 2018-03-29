@@ -22,6 +22,7 @@ module Config::AcaModelConcern
     delegate :enrollment_shopping_start_day_offset, to: :class
     delegate :sic_field_exists_for_employer?, to: :class
     delegate :employer_attestation_is_enabled?, to: :class
+    delegate :plan_match_tool_is_enabled?, to: :class
   end
 
   class_methods do
@@ -96,6 +97,11 @@ module Config::AcaModelConcern
     def employer_attestation_is_enabled?
       @@employer_attestation ||= Settings.aca.employer_attestation
     end
+
+    def plan_match_tool_is_enabled?
+      @@plan_match_tool ||= Settings.aca.plan_match_tool
+    end
+
 
     def enrollment_shopping_start_day_offset
       @@enrollment_shopping_start_day_offset ||= Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days

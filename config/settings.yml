@@ -226,6 +226,7 @@ aca:
   transmit_employers_immediately: false
   employer_attestation: true
   enforce_employer_attestation: true
+  plan_match_tool: false
   rating_areas:
     - R-MA001
     - R-MA002
