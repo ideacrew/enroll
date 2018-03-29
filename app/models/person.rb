@@ -601,6 +601,10 @@ class Person
     current_individual_market_transition.role_type
   end
 
+  def has_consumer_or_resident_role?
+    is_consumer_role_active? || is_resident_role_active?
+  end
+
   def is_consumer_role_active?
     self.active_individual_market_role == "consumer" ? true : false
   end
