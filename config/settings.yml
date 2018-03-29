@@ -119,7 +119,7 @@ aca:
   user_accounts_enabled: false
 
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-  reference_carriers_for_metal_level: ["bronze","silver", "gold", "dental"]
+  reference_carriers_for_metal_level: ["bronze", "silver", "gold", "platinum", dental"]
     ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
 
   plan_option_years:
