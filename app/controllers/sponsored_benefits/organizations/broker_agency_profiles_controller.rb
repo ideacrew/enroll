@@ -9,6 +9,8 @@ module SponsoredBenefits
 
     def employers
       @datatable = ::Effective::Datatables::BrokerAgencyEmployerDatatable.new(profile_id: @broker_agency_profile._id)
+      @broker_role = current_user.person.broker_role || nil
+      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
     end
 
   private
