@@ -74,15 +74,21 @@ namespace :reports do
     end
 
     def workflow_transitions(person)
-      transitions = person.consumer_role.workflow_state_transitions.where(:event =>
+      transitions1 = person.consumer_role.workflow_state_transitions.where(:event =>
                                                         {"$in" => [
                                                             "reject!",
                                                             "ssn_invalid!",
-                                                            "ssn_valid_citizenship_invalid!",
-                                                            "fail_dhs!",
                                                             "fail_residency!"]},
                                                     :transition_at =>
-                                                        {'$gte'=>start_date, '$lte' => end_date})
+                                                        {'$gte'=>start_date, '$lte' => end_date}).to_a
+
+      transitions2 = person.consumer_role.workflow_state_transitions.where(:event =>
+                                                                               {"$in" => [
+                                                                                   "ssn_valid_citizenship_invalid!",
+                                                                                   "fail_dhs!"]},
+                                                                           :transition_at =>
+                                                                               {'$gte'=>start_date, '$lte' => end_date}).to_a
+      transitions = transitions1 + transitions2.uniq{|t| t.created_at.to_date}
 
       remove_dup_override? ? transitions.order_by(:created_at => 'desc').uniq{|e| e.event} : transitions
     end
@@ -102,7 +108,7 @@ namespace :reports do
             when "ssn_valid_citizenship_invalid!"
               types = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian Status'])
             when "fail_dhs!"
-              types = ["Immigration status"]
+              types = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian Status'])
             when "fail_residency!"
               types = ["DC Residency"]
             when "reject!"
@@ -123,7 +129,7 @@ namespace :reports do
         end
       end
 
-      rows_for_csv = remove_dup_override? ? collect_rows.uniq : collect_rows
+      rows_for_csv = remove_dup_override? ? collect_rows.uniq{|row| row.type } : collect_rows
 
       rows_for_csv.each do |row|
         csv << row
