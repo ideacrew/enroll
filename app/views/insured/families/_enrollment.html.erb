@@ -179,11 +179,7 @@
         <i class="fa fa-phone fa-2x pull-right"></i>
         <span><%= l10n(".plan_contact_info") %></span>
       </a>
-      <% if aca_carrier_contact_info %>
-        <%= render partial: "shared/carrier_contact_information_dc", locals: { plan: plan } unless plan.carrier_profile.blank? %>
-      <% else %>
-        <%= render partial: "shared/carrier_contact_information_ma", locals: { plan: plan } unless plan.carrier_profile.blank? %>
-      <% end %>
+        <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
     </div>
     <% if !read_only == true %>
       <div class="col-lg-3">

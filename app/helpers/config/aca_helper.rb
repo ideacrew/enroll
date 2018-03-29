@@ -170,10 +170,6 @@ module Config::AcaHelper
     Settings.aca.employer_attestation
   end
   
-  def aca_carrier_contact_info
-    Settings.aca.carrier_contact_info
-  end
-
   def display_plan_cost_warning(bg)
     return false unless offer_sole_source?
     return false if bg.nil?
