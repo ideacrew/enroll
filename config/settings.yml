@@ -40,6 +40,7 @@ site:
   website_url: "www.healthcare.gov"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
+  mail_address: "noreply@dchealthlink.com"
   forms_name: "DCHealthLink.com/forms"
 
   social_media:
