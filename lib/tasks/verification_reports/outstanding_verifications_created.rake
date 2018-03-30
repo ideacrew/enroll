@@ -90,7 +90,7 @@ namespace :reports do
                                                                                {'$gte'=>start_date, '$lte' => end_date}).to_a
       transitions = transitions1 + transitions2.uniq{|t| t.created_at.to_date}
 
-      remove_dup_override? ? transitions.order_by(:created_at => 'desc').uniq{|e| e.event} : transitions
+      remove_dup_override? ? transitions.sort_by!{|t| t.created_at}.reverse.uniq{|e| e.event} : transitions
     end
 
     report_prefix = remove_dup_override? ? "current" : "all"
