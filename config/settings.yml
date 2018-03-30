@@ -45,8 +45,6 @@ site:
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
-
 contact_center:
   name: "Health Connector's Customer Care Center"
   alt_name: "Health Connector Customer Service"
