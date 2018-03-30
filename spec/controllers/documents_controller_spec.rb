@@ -7,9 +7,15 @@ RSpec.describe DocumentsController, :type => :controller do
   let(:document) {FactoryGirl.build(:vlp_document)}
   let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
   let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment) }
+  let(:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number') }
+  let(:dc_type) { FactoryGirl.build(:verification_type, type_name: 'DC Residency') }
+  let(:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship') }
+  let(:immigration_type) { FactoryGirl.build(:verification_type, type_name: 'Immigration status') }
+  let(:native_type) { FactoryGirl.build(:verification_type, type_name: "American Indian Status") }
 
   before :each do
     sign_in user
+    person.verification_types = [ssn_type, dc_type, citizenship_type, native_type, immigration_type]
   end
 
   describe "destroy" do
@@ -76,7 +82,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citozenship' do
-        post :fed_hub_request, verification_type: 'Social Security Number',person_id: person.id, id: document.id
+        post :fed_hub_request, verification_type: ssn_type.id, person_id: person.id, id: document.id
         expect(response).to redirect_to :back
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
@@ -84,7 +90,7 @@ RSpec.describe DocumentsController, :type => :controller do
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-        post :fed_hub_request, verification_type: 'DC Residency',person_id: person.id, id: document.id
+        post :fed_hub_request, verification_type: dc_type.id, person_id: person.id, id: document.id
         expect(response).to redirect_to :back
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
@@ -94,7 +100,7 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      put :extend_due_date, family_member_id: family.primary_applicant.id, verification_type: "Citizenship"
+      put :extend_due_date, family_member_id: family.primary_applicant.id, person_id: person.id, verification_type: citizenship_type.id
     end
 
     it "should redirect to back" do
@@ -106,52 +112,48 @@ RSpec.describe DocumentsController, :type => :controller do
       request.env["HTTP_REFERER"] = "http://test.com"
     end
 
-    shared_examples_for "update verification type" do |type, reason, admin_action, updated_attr, result|
-      it "updates #{updated_attr} for #{type} to #{result} with #{admin_action} admin action" do
+    shared_examples_for "update verification type" do |type, reason, admin_action, attribute, result|
+      it "updates #{attribute} for #{type} to #{result} with #{admin_action} admin action" do
         post :update_verification_type, { person_id: person.id,
-                                          verification_type: type,
+                                          verification_type: send(type).id,
                                           verification_reason: reason,
                                           admin_action: admin_action}
         person.reload
-        if updated_attr == "lawful_presence_update_reason"
-          expect(person.consumer_role.lawful_presence_update_reason["v_type"]).to eq(type)
-          expect(person.consumer_role.lawful_presence_update_reason["update_reason"]).to eq(result)
-        else
-          expect(person.consumer_role.send(updated_attr)).to eq(result)
+        if attribute == "validation"
+          expect(person.verification_types.find(send(type).id).validation_status).to eq(result)
+        elsif attribute == "update_reason"
+          expect(person.verification_types.find(send(type).id).update_reason).to eq(result)
         end
       end
     end
 
     context "Social Security Number verification type" do
-      it_behaves_like "update verification type", "Social Security Number", "E-Verified in Curam", "verify", "ssn_validation", "valid"
-      it_behaves_like "update verification type", "Social Security Number", "E-Verified in Curam", "verify", "ssn_update_reason", "E-Verified in Curam"
+      it_behaves_like "update verification type", "ssn_type", "E-Verified in Curam", "verify", "validation", "valid"
+      it_behaves_like "update verification type", "ssn_type", "E-Verified in Curam", "verify", "update_reason", "E-Verified in Curam"
     end
 
     context "American Indian Status verification type" do
       before do
         person.update_attributes(:tribal_id => "444444444")
       end
-      it_behaves_like "update verification type", "American Indian Status", "Document in EnrollApp", "verify", "native_validation", "valid"
-      it_behaves_like "update verification type", "American Indian Status", "Document in EnrollApp", "verify", "native_update_reason", "Document in EnrollApp"
+      it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "validation", "valid"
+      it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "update_reason", "Document in EnrollApp"
     end
 
     context "Citizenship verification type" do
-      it_behaves_like "update verification type", "Citizenship", "Document in EnrollApp", "verify", "lawful_presence_update_reason", "Document in EnrollApp"
+      it_behaves_like "update verification type", "citizenship_type", "Document in EnrollApp", "verify", "update_reason", "Document in EnrollApp"
     end
 
     context "Immigration verification type" do
-      it_behaves_like "update verification type", "Immigration", "SAVE system", "verify", "lawful_presence_update_reason", "SAVE system"
+      it_behaves_like "update verification type", "immigration_type", "SAVE system", "verify", "update_reason", "SAVE system"
     end
 
     it 'updates verification type if verification reason is expired' do
-      initial_value = person.consumer_role.lawful_presence_update_reason
-      params = { person_id: person.id, verification_type: 'Citizenship', verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
+      params = { person_id: person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
       put :update_verification_type, params
       person.reload
-      updated_value = person.consumer_role.lawful_presence_update_reason
 
-      expect(person.consumer_role.lawful_presence_update_reason).to eq({"v_type"=>"Citizenship", "update_reason"=>"Expired"})
-      expect(initial_value).to_not eq(updated_value)
+      expect(person.verification_types.where(:type_name => citizenship_type.type_name).first.update_reason).to eq("Expired")
     end
 
     context "redirection" do
@@ -164,7 +166,7 @@ RSpec.describe DocumentsController, :type => :controller do
     context "verification reason inputs" do
       it "should not update verification attributes without verification reason" do
         post :update_verification_type, { person_id: person.id,
-                                          verification_type: "Citizenship",
+                                          verification_type: citizenship_type.id,
                                           verification_reason: "",
                                           admin_action: "verify"}
         person.reload
@@ -172,7 +174,7 @@ RSpec.describe DocumentsController, :type => :controller do
       end
 
       VlpDocument::VERIFICATION_REASONS.each do |reason|
-        it_behaves_like "update verification type", "Citizenship", reason, "verify", "lawful_presence_update_reason", reason
+        it_behaves_like "update verification type", "citizenship_type", reason, "verify", "lawful_presence_update_reason", reason
       end
     end
   end

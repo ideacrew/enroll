@@ -75,14 +75,14 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    if params[:verification_type] == 'DC Residency'
+    if @verification_type.type_name == 'DC Residency'
       @person.consumer_role.invoke_residency_verification!
     else
       @person.consumer_role.redetermine_verification!(verification_attr)
     end
     respond_to do |format|
       format.html {
-        hub =  params[:verification_type] == 'DC Residency' ? 'Local Residency' : 'FedHub'
+        hub =  @verification_type.type_name == 'DC Residency' ? 'Local Residency' : 'FedHub'
         flash[:success] = "Request was sent to #{hub}."
         redirect_to :back
       }
@@ -103,7 +103,7 @@ class DocumentsController < ApplicationController
 
   def extend_due_date
     @family_member = FamilyMember.find(params[:family_member_id])
-    v_type = params[:verification_type]
+    v_type = @verification_type.type_name
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
       add_type_history_element
@@ -152,15 +152,13 @@ class DocumentsController < ApplicationController
 
   def add_type_history_element
     actor = current_user ? current_user.email : "external source or script"
-    verification_type = params[:verification_type]
     action = params[:admin_action] || params[:action]
     action = "Delete #{params[:doc_title]}" if action == "destroy"
     reason = params[:verification_reason]
-    if @person
-      @person.consumer_role.add_type_history_element(verification_type: verification_type,
-                                                     action: action.split('_').join(' '),
-                                                     modifier: actor,
-                                                     update_reason: reason)
+    if @verification_type
+      @verification_type.add_type_history_element(action: action.split('_').join(' '),
+                                                  modifier: actor,
+                                                  update_reason: reason)
     end
   end
 
@@ -198,7 +196,7 @@ class DocumentsController < ApplicationController
 
   def set_verification_type
     set_person
-    @verification_type = @person.verification_types.active.find(params[:verification_type])
+    @verification_type = @person.verification_types.active.find(params[:verification_type]) if params[:verification_type]
   end
 
   def verification_attr
