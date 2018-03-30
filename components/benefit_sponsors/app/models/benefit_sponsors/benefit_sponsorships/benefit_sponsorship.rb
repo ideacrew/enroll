@@ -23,8 +23,8 @@ module BenefitSponsors
 
       # Unique Resource Name identifier for benefit market 
       field :benefit_market_urn,      type: String
-      # belongs_to  :benefit_market, counter_cache: true,
-      #             class_name: "BenefitMarkets::BenefitMarket"
+      belongs_to  :benefit_market, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitMarket"
 
 
       # This sponsorship's workflow status
@@ -44,7 +44,7 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :benefit_market_urn, :sponsorship_profile_id
+      validates_presence_of :benefit_market, :sponsorship_profile_id
 
       after_create :build_nested_models
 
