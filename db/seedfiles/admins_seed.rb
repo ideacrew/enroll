@@ -45,6 +45,20 @@ hbx_profile = organization.build_hbx_profile(
                 open_enrollment_start_on: Date.new(2015, 11, 1),
                 open_enrollment_end_on:   Date.new(2016, 1, 31),
                 service_market: "individual"
+              ),
+              BenefitCoveragePeriod.new(
+                    start_on: Date.new(2017, 1, 1),
+                    end_on:   Date.new(2017, 12, 31),
+                    open_enrollment_start_on: Date.new(2016, 11, 1),
+                    open_enrollment_end_on:   Date.new(2017, 1, 31),
+                    service_market: "individual"
+                  ),
+              BenefitCoveragePeriod.new(
+                      start_on: Date.new(2018, 1, 1),
+                      end_on:   Date.new(2018, 12, 31),
+                      open_enrollment_start_on: Date.new(2017, 11, 1),
+                      open_enrollment_end_on:   Date.new(2018, 1, 31),
+                      service_market: "individual"
               )
           ]
       )
