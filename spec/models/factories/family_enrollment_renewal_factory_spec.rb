@@ -108,7 +108,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
                 factory.census_employee = current_employee.census_employee.reload
                 factory.employer = renewing_employer.reload
                 factory.renewing_plan_year = renewing_employer.renewing_plan_year.reload
-                expect(factory).to receive(:trigger_notice_dental) if coverage_kind == 'dental'
+                # expect(factory).to receive(:trigger_notice_dental) if coverage_kind == 'dental'
                 factory.renew
               end
             end
