@@ -34,7 +34,7 @@ class PlanSelection
 
     qle = hbx_enrollment.is_special_enrollment?
     if qle
-      sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id 
+      sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id
       : hbx_enrollment.family.earliest_effective_ivl_sep.id
 
       hbx_enrollment.special_enrollment_period_id = sep_id
@@ -42,6 +42,7 @@ class PlanSelection
     if enrollment_members_verification_status(market_kind)
       hbx_enrollment.move_to_contingent!
     else
+      hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
       hbx_enrollment.select_coverage!(qle: qle)
     end
   end
@@ -115,7 +116,7 @@ class PlanSelection
   end
 
   def existing_enrollment_for_covered_individuals
-    previous_active_coverages.detect{|en| 
+    previous_active_coverages.detect{|en|
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? && en.id != hbx_enrollment.id
     }
   end
@@ -132,8 +133,8 @@ class PlanSelection
       :kind => hbx_enrollment.kind,
       :coverage_kind => hbx_enrollment.coverage_kind,
       :effective_on.gte => coverage_year_start,
-      }).or( 
-        {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}, 
+      }).or(
+        {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES},
         {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
       ).order("effective_on DESC")
   end
