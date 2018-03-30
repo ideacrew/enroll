@@ -232,7 +232,11 @@ def employer_poc
     else
       @employer_actions = true
       @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
-      @organization = Organization.find(@element_to_replace_id.split("_").last)
+      @organization = if params.key?(:employers_action_id)
+        EmployerProfile.find(@element_to_replace_id.split("_").last).organization
+      else
+        Organization.find(@element_to_replace_id.split("_").last)
+      end
     end
   end
 
