@@ -118,6 +118,10 @@ module Config::AcaHelper
     Settings.plan_option_titles.single_carrier
   end
 
+  def fetch_invoices_addendum
+    Settings.invoices.addendum
+  end
+
   def carrier_special_plan_identifier_namespace
     @carrier_special_plan_identifier_namespace ||= Settings.aca.carrier_special_plan_identifier_namespace
   end

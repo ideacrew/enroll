@@ -98,6 +98,9 @@ notices:
     state: "MA"
     zip:
 
+invoices:
+  addendum: 'ma_non_discrimination_and_language_tags.pdf'
+
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
