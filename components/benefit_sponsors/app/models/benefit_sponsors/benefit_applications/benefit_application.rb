@@ -21,9 +21,12 @@ module BenefitSponsors
       # Unique Resource Name identifier for benefit catalog
       field :benefit_catalog_urn,      type: String
 
-      ## Deprecated
-      # belongs_to  :benefit_market, counter_cache: true,
-      #             class_name: "BenefitSponsors::BenefitMarket"
+      belongs_to  :benefit_catalog, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitCatalog"
+
+      ## TODO Deprecate -- BenefitMarket is associated with BenefitSponsorship
+      belongs_to  :benefit_market, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitMarket"
 
       # The date range when this application is active
       field :effective_period,        type: Range
@@ -50,7 +53,7 @@ module BenefitSponsors
       
       embeds_many :workflow_state_transitions, as: :transitional
 
-      validates_presence_of :benefit_catalog_urn, :effective_period, :open_enrollment_period
+      validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
       
       validate :validate_application_dates
       # validate :open_enrollment_date_checks
@@ -514,7 +517,7 @@ module BenefitSponsors
       def validate_application_dates
         return if canceled? || expired? || renewing_canceled?
         return if effective_period.blank? || open_enrollment_period.blank?
-        return if imported_plan_year
+        # return if imported_plan_year
 
         if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
           errors.add(:effective_period, "start date must be first day of the month")
