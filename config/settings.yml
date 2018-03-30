@@ -46,8 +46,6 @@ site:
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["individual", "shop"]  # deprecated.  use aca:market_kinds
-
 contact_center:
   name: "DC Health Link's Customer Care Center"
   alt_name: "DC Health Link Customer Service"
