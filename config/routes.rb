@@ -87,6 +87,7 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :family_index_dt
+        get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
         get :employer_poc
@@ -109,7 +110,6 @@ Rails.application.routes.draw do
         get :binder_index_datatable
         post :binder_paid
         get :verification_index
-        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -122,6 +122,7 @@ Rails.application.routes.draw do
         get :show_sep_history
         get :calendar_index
         get :user_account_index
+        get :get_user_info
       end
 
       member do
@@ -190,6 +191,7 @@ Rails.application.routes.draw do
       get 'new'
       member do
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -206,6 +208,7 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -303,6 +306,7 @@ Rails.application.routes.draw do
         post 'download_documents'
         post 'delete_documents'
         post 'upload_document'
+        post 'generate_checkbook_urls'
       end
 
       collection do
@@ -381,6 +385,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
         get :assign_history
+        get  :commission_statements
       end
       member do
         if Settings.aca.general_agency_enabled
@@ -393,6 +398,8 @@ Rails.application.routes.draw do
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
+        get :download_commission_statement
+        get :show_commission_statement
       end
 
       resources :applicants
@@ -561,11 +568,11 @@ Rails.application.routes.draw do
       get :show_docs
       put :update_verification_type
       get :enrollment_verification
-      put :enrollment_docs_state
       put :extend_due_date
       get :fed_hub_request
       post 'download_documents'
       post 'delete_documents'
+      # post :fed_hub_request
     end
 
     member do

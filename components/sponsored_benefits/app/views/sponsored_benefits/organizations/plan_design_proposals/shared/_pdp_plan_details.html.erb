@@ -1,3 +1,5 @@
+<% plan_export_default_class ||= "plan-not-saved" %>
+
 <div class="col-md-8">
   <table class="table table-striped">
     <tbody>
@@ -27,7 +29,7 @@
       </tr> -->
       <tr>
         <th>Summary of Benefits and Coverage (SBC)</th>
-        <td><a>View SBC</a></td>
+        <td><%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %></td>
       </tr>
     </tbody>
   </table>
@@ -36,7 +38,7 @@
   <h2 class="text-center employer-cost-text">Estimated Maximum Monthly Employer Cost</h2>
   <h2 class="employer-monthly-cost text-center"></h2>
   <div class="text-center">
-    <a class="btn btn-default plan-not-saved" id="downloadReferencePlanDetailsButton" onmouseenter="setSBC('<%= sponsored_benefits.new_organizations_plan_design_proposal_plan_export_path(@plan_design_proposal) %>')">Download PDF</a>
+    <a class="btn btn-default <%= plan_export_default_class %>" id="downloadReferencePlanDetailsButton" onmouseenter="setSBC('<%= sponsored_benefits.new_organizations_plan_design_proposal_plan_export_path(@plan_design_proposal) %>')">Download PDF</a>
     <label class="sbc-download-label" for="sbc-checkbox"><%= check_box_tag "include_sbc", true, true, class: "sbc-download-checkbox" %> Include SBC</label>
   </div>
 </div>

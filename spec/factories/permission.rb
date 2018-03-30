@@ -14,6 +14,7 @@ FactoryGirl.define do
 
     trait :hbx_staff do
       can_complete_resident_application true
+      can_add_sep true
     end
 
     trait :hbx_update_ssn do

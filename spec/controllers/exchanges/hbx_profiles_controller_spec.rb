@@ -544,4 +544,56 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "GET get_user_info" do
+    let(:user) { double("User", :has_hbx_staff_role? => true)}
+    let(:person) { double("Person", id: double)}
+    let(:family_id) { double("Family_ID")}
+    let(:employer_id) { double("Employer_ID") }
+    let(:organization) { double("Organization")}
+
+    before do
+      sign_in user
+      allow(Person).to receive(:find).with("#{person.id}").and_return person
+    end
+
+    context "when action called through families datatable" do
+
+      before do
+        xhr :get, :get_user_info, family_actions_id: family_id, person_id: person.id
+      end
+
+      it "should populate the person instance variable" do
+        expect(assigns(:person)).to eq person
+      end
+
+      it "should populate the row id to instance variable" do
+        expect(assigns(:element_to_replace_id)).to eq "#{family_id}"
+      end
+    end
+
+    context "when action called through employers datatable" do
+
+      before do
+        allow(Organization).to receive(:find).and_return organization
+        xhr :get, :get_user_info, employers_action_id: employer_id, people_id: [person.id]
+      end
+
+      it "should not populate the person instance variable" do
+        expect(assigns(:person)).to eq nil
+      end
+
+      it "should populate the people instance variable" do
+        expect(assigns(:people).class).to eq Mongoid::Criteria
+      end
+
+      it "should populate the employer_actions instance variable" do
+        expect(assigns(:employer_actions)).to eq true
+      end
+
+      it "should populate the row id to instance variable" do
+        expect(assigns(:element_to_replace_id)).to eq "#{employer_id}"
+      end
+    end
+  end
 end
