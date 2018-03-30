@@ -4,6 +4,11 @@ module BenefitMarkets
     # which must be satisfied by objects returned by any implementation
     # of RosterEntry, via the #dependents method.
     class RosterDependent
+      # Return the dependent's id.
+      def member_id
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
+
       # Return the date of birth.
       def dob
         raise NotImplementedError.new("This is a documentation only interface.")

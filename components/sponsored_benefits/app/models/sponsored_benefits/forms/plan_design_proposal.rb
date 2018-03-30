@@ -4,7 +4,6 @@ module SponsoredBenefits
 
       include ActiveModel::Model
       include ActiveModel::Validations
-      include Config::AcaModelConcern
 
       attr_reader :title, :effective_date, :zip_code, :county, :sic_code, :quote_date, :plan_option_kind, :metal_level_for_elected_plan
       attr_reader :profile
@@ -17,8 +16,7 @@ module SponsoredBenefits
         assign_wrapper_attributes(attrs)
         ensure_proposal
         ensure_profile
-        ensure_sic if standard_industrial_classification_enabled?
-        ensure_zip_county
+        ensure_sic_zip_county
       end
 
       def build_benefit_group
@@ -57,7 +55,7 @@ module SponsoredBenefits
 
       def prepopulate_attributes
         @title = @proposal.title
-        @effective_date = @profile.benefit_sponsorships.first.benefit_applications.first.effective_date.strftime("%Y-%m-%d")
+        @effective_date = @profile.benefit_sponsorships.first.initial_enrollment_period.begin.strftime("%Y-%m-%d")
         @quote_date = @proposal.updated_at.strftime("%m/%d/%Y")
       end
 
@@ -65,11 +63,8 @@ module SponsoredBenefits
         @proposal = @plan_design_organization.plan_design_proposals.build unless @proposal.present?
       end
 
-      def ensure_sic
+      def ensure_sic_zip_county
         @sic_code = @plan_design_organization.sic_code
-      end
-
-      def ensure_zip_county
         if location = @plan_design_organization.office_locations.first
           @zip_code = location.address.zip
           @county = location.address.county
@@ -78,7 +73,7 @@ module SponsoredBenefits
 
       def ensure_profile
         if @profile.blank?
-          @profile = SponsoredBenefits::Organizations.const_get("AcaShop#{aca_state_abbreviation.titleize}EmployerProfile").new
+          @profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new
           sponsorship = @profile.benefit_sponsorships.first
           sponsorship.benefit_applications.build
         end
@@ -105,15 +100,11 @@ module SponsoredBenefits
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
         benefit_group = application.benefit_groups.first || construct_new_benefit_group
-
-        if use_simple_employer_calculation_model?
-          if benefit_group.relationship_benefits.empty?
-            benefit_group.build_relationship_benefits
-          end
-        else
-          if benefit_group.composite_tier_contributions.empty?
-            benefit_group.build_composite_tier_contributions
-          end
+        if benefit_group.relationship_benefits.empty?
+          benefit_group.build_relationship_benefits
+        end
+        if benefit_group.composite_tier_contributions.empty?
+          benefit_group.build_composite_tier_contributions
         end
       end
 
@@ -121,11 +112,8 @@ module SponsoredBenefits
         sponsorship = @proposal.profile.benefit_sponsorships.first
         application = sponsorship.benefit_applications.first
         benefit_group = application.benefit_groups.build
-        if use_simple_employer_calculation_model?
-          benefit_group.build_relationship_benefits
-        else
-          benefit_group.build_composite_tier_contributions
-        end
+        benefit_group.build_relationship_benefits
+        benefit_group.build_composite_tier_contributions
         benefit_group
       end
 
@@ -135,14 +123,18 @@ module SponsoredBenefits
         if @proposal.persisted?
           @proposal.assign_attributes(title: @title)
         else
-          profile = SponsoredBenefits::Organizations.const_get("AcaShop#{aca_state_abbreviation.titleize}EmployerProfile").new
-          if standard_industrial_classification_enabled?
-            profile.sic_code = @sic_code
-          end
+          profile = SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new({sic_code: @sic_code})
           @proposal = @plan_design_organization.plan_design_proposals.build({title: @title, profile: profile})
         end
+
         sponsorship = @proposal.profile.benefit_sponsorships.first
-        sponsorship.assign_attributes({initial_enrollment_period: initial_enrollment_period})
+        sponsorship.assign_attributes({initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
+        if sponsorship.present?
+          enrollment_dates = BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date)
+          benefit_application = (sponsorship.benefit_applications.first || sponsorship.benefit_applications.build)
+          benefit_application.effective_period= enrollment_dates[:effective_period]
+          benefit_application.open_enrollment_period= enrollment_dates[:open_enrollment_period]
+        end
 
         @proposal.save!
       end

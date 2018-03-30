@@ -88,13 +88,13 @@ module BenefitSponsors
                                                       )
                                                     }
       let(:shop_benefit_market)  { FactoryGirl.build(:benefit_markets_benefit_market, 
-                                                        :with_benefit_catalog,
+                                                        # :with_benefit_catalog, #TODO enable when benefit_catalog class is added
                                                         kind: shop_kind
                                                       ) 
                                                     }
 
       let(:ivl_benefit_market)    { FactoryGirl.build(:benefit_markets_benefit_market, 
-                                                        :with_benefit_catalog,
+                                                        # :with_benefit_catalog, #TODO enable when benefit_catalog class is added
                                                         kind: individual_kind
                                                       ) 
                                                     }
@@ -105,7 +105,7 @@ module BenefitSponsors
 
       context "and an employer sponsors benefits" do
         let(:employer_name)            { "Spacely Sprockets, Inc." }
-        let(:employer_organization)    { FactoryGirl.build(:benefits_organizations_general_organization, 
+        let(:employer_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, 
                                                               legal_name: employer_name, 
                                                               profiles: [employer_profile],
                                                               site: hbx_site

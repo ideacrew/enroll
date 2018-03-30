@@ -1,4 +1,4 @@
-module BenefitSponsors
+module BenefitMarkets
   module PricingModels
   end
 end
