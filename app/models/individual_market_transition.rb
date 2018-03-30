@@ -32,7 +32,7 @@ class IndividualMarketTransition
           allow_nil:   false,
           inclusion: {in: REASON_CODES, message: "%{value} is not a valid transistion reason code"}
 
-  before_save :set_submitted_at, :set_submitted_by
+  before_validation :set_submitted_at, :set_submitted_by
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
