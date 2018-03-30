@@ -20,6 +20,7 @@ module BenefitSponsors
     }
 
     def index
+      @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
     end
 
     def new
@@ -116,9 +117,22 @@ module BenefitSponsors
       end
     end
 
+    def find_hbx_profile
+      @profile = current_user.person.hbx_staff_role.hbx_profile
+    end
+
     def find_broker_agency_profile
       @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(params[:id])).first.broker_agency_profile
       # authorize @broker_agency_profile, :access_to_broker_agency_profile?
+    end
+
+    def check_admin_staff_role
+      if current_user.has_hbx_staff_role? || current_user.has_csr_role?
+      elsif current_user.has_broker_agency_staff_role?
+        redirect_to profiles_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
+      else
+        redirect_to new_profiles_broker_agency_profile_path
+      end
     end
 
     def check_broker_agency_staff_role
