@@ -2,7 +2,7 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationsController < ApplicationController
 
-      before_action :find_benefit_sponsorship
+      before_action :find_benefit_sponsorship, :find_employer
 
       def new
         @benefit_application = build_benefit_application
@@ -38,6 +38,10 @@ module BenefitSponsors
 
       def find_benefit_sponsorship
         @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
+      end
+
+      #benefit sponsor
+      def find_employer
       end
 
     end
