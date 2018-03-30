@@ -188,4 +188,8 @@ module Config::AcaHelper
     Settings.aca.plan_match_tool
   end
 
+  def invoice_bill_url_helper
+    Settings.site.invoice_bill_url
+  end
+
 end
