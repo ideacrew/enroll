@@ -17,7 +17,7 @@ module BenefitMarkets
         coverage_age,
         rating_area
       )
-        raise NotImplementedError.new("we haven't written this yet")
+        ::Caches::PlanDetails.lookup_rate(product.id, rate_schedule_date, coverage_age)
       end
     end
   end

@@ -26,7 +26,7 @@ module BenefitMarkets
       # Transform an external relationship into the mapped relationship
       # specified by this pricing model.
       def map_relationship_for(relationship)
-        member_relatiohships.detect? { |mr| mr.match?(relationship) }.relationship_name
+        member_relationships.detect { |mr| mr.match?(relationship) }.relationship_name
       end
     end
   end
