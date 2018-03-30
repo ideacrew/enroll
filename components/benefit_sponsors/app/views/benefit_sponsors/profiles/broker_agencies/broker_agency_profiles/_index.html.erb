@@ -26,7 +26,7 @@
 
             <% @broker_agency_profiles.each do |broker_agency_profile| %>
               <tbody>
-                <td><%= link_to broker_agency_profile.legal_name, profiles_broker_agency_profile_path(broker_agency_profile) %></td>
+                <td><%= link_to broker_agency_profile.legal_name, profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile) %></td>
                 <td><%= broker_agency_profile.dba %></td>
                 <td><%= broker_agency_profile.fein %></td>
                 <td><%= broker_agency_profile.entity_kind.try(:to_s).try(:titleize) %></td>
