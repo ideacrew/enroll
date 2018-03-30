@@ -1,0 +1,197 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <% if notice.notification_type == "projected_eligibility_notice_2" && !notice.irs_consent_needed %>
+        <td>
+          <h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017<br>
+            IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <%= notice.coverage_year %></h3>
+        </td>
+      <% else %>
+        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017</h3></td>
+      <% end %>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname.titleize %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+   content: "We’re sending you this letter because it’s almost time to renew your health or dental plan for next year.", bottom_margin: '8px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: [""],
+   heading: 'Here’s What You Need to Do Now', sub_heading: ''} %>
+
+<% if notice.notification_type == "projected_eligibility_notice_1" %>
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+    listings: ["Review your household information, and make sure it’s correct",
+               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
+               "Review your projected eligibility results for #{notice.coverage_year}"]} %>
+<% end %>
+
+<% if notice.notification_type == "projected_eligibility_notice_2" %>
+  <% if notice.irs_consent_needed %>
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+    listings: ["Review your household information, and make sure it’s correct",
+               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
+               "Review your projected eligibility results for #{notice.coverage_year}"]} %>
+  <% else %>
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+      listings: ["Call us as soon as possible if you still need help paying for coverage in #{notice.coverage_year}",
+                 "Review your household information, and make sure it’s correct",
+                 "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
+                 "Review your projected eligibility results for #{notice.coverage_year}"]} %>
+    <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+       contents: ["The federal government requires us to verify your household income every year to see if you’re still eligible for help paying for coverage. We do this by checking tax data from the Internal Revenue Service (IRS), but need your consent. If you do not give us permission to check IRS data, you can’t get help paying for coverage.", "If you want to continue to receive a tax credit to help pay your monthly premiums, or cost-sharing reductions that lower other health care costs in #{notice.coverage_year}, call DC Health Link as soon as possible at #{notice.hbe.phone}. Tell customer service that you want to update your IRS consent."],
+         heading: 'It’s Urgent that You Call Us if You Still Need Help Paying for Coverage', sub_heading: '', bottom_margin: '5px'} %>
+  <% end %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: [""],
+   heading: 'Review Your Household Information', sub_heading: ''} %>
+
+<% if notice.notification_type == "projected_eligibility_notice_1"%>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."} %>
+
+  <% notice.uqhp_individuals.each do |member| %>
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
+                               rows: [['Household Member:', "#{member.first_name} #{member.last_name}  Age: #{member.age}"],
+                                  ['DC Resident:', "#{member.residency_verified}"],
+                                  ['Citizenship/Lawful Presence:', "#{member.citizen_status}"],
+                                  ['Incarcerated:',"#{member.incarcerated}"]],
+      col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
+  <%end%>
+<% end %>
+
+<% if notice.notification_type == "projected_eligibility_notice_2"%>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+   contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
+  <% notice.individuals.each do |member| %>
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
+                               rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],
+                                  ['DC Resident:', "#{member.residency_verified}"],
+                                  ['Citizenship/Lawful Presence:', "#{member.citizen_status}"],
+                                  ['Incarcerated:',"#{member.incarcerated}"],
+                                  ['Other Coverage:', "#{member.mec}"],
+                                  ['Federal Tax Filing Status:', "#{member.tax_status}"],
+                                  ['Tax Household Size:', "#{member.taxhh_count}"],
+                                  ["Expected Income for #{notice.coverage_year}:",number_to_currency("#{member.actual_income}", precision: 0)]],
+      col_styles: ['width: 35%;', 'width: 65%; text-align: left;'], table_width: '100%'} %>
+  <%end%>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["Based on the information we have in our records about your household, your projected results are listed below. This is not a final eligibility decision. Your eligibility may change once we get more information from you, or from our electronic data sources. You will get another notice with your final eligibility determination for #{notice.coverage_year} in about a month."],
+   heading: "Your Projected Eligibility Results for #{notice.coverage_year}", sub_heading: '', top_margin: '8px'} %>
+
+<!-- [If likely MAGI Medicaid=YES] -->
+<% if notice.notification_type == "projected_eligibility_notice_2" %>
+  <% if notice.magi_medicaid_eligible.present? %>
+    <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+      previous: "<strong>Likely Qualify for Medicaid:</strong>",
+      listings: notice.magi_medicaid_eligible} %>
+  <% end %>
+  <% if notice.aqhp_or_non_magi_medicaid_eligible.present? %>
+  <!-- [If AQHP=YES for AQHP OR for NON MAGI MEDICAID ONLY] -->
+    <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+      previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
+      listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
+    <% notice.tax_households.each do |thh|%>
+      <% if thh.max_aptc.present? %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+          content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit before open enrollment begins.", bottom_margin: '5px'} %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if notice.tax_hh_with_csr.present? %>
+    <% notice.tax_hh_with_csr.each do |hh_csr|%>
+      <% case hh_csr.csr_percent_as_integer %>
+      <% when 73 %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      <% when 87 %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      <% when 94 %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      <% when 100 %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+      <% else %>
+        <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+      <% end %>
+    <% end %>
+    <% unless notice.irs_consent_needed %>
+      <%= render partial: 'notices/shared/custom_listing', locals: {
+      listing: "Remember, we need you to call us right away at #{notice.hbe.phone} if you want to receive these savings. Tell customer service that you want to update your IRS consent."} %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if notice.uqhp_or_non_magi_medicaid_individuals.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
+    listings: notice.uqhp_or_non_magi_medicaid_individuals} %>
+<% end %>
+
+<% if notice.notification_type == "projected_eligibility_notice_2" && notice.ineligible_applicants.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Does Not Qualify for Coverage:</strong>",
+    listings: notice.ineligible_applicants} %>
+<% end %>
+
+<% if notice.notification_type == "projected_eligibility_notice_1"%>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+   contents: ["If your household meets certain income and other requirements, you may be able to get help paying for your health coverage in #{notice.coverage_year}. There are several types of help that may be available to you:"],
+     heading: 'Need Help Paying for Your Health Plan?', sub_heading: '', top_margin: '8px'} %>
+
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "",
+    listings: ["<strong>Medicaid</strong> – free, comprehensive health coverage",
+              "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance",
+              "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services"]} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+   content: "To see if you can get help, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at #{notice.hbe.phone}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["If your plan is terminated, or cancelled for any reason before the end of the year, it will not be automatically renewed. You must go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> during open enrollment to enroll for #{notice.coverage_year}.","Open enrollment for #{notice.coverage_year} begins on #{notice.ivl_open_enrollment_start_on.strftime("%B %d, %Y")}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
+   heading: 'What if I Don’t Have a Plan Anymore?', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+content: "If you have questions or concerns, we’re here to help.<br><br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________", top_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
+"Basic exchange eligibility standards: 45 CFR §155.305(a)",
+"Advanced premium tax credit eligibility standards: 45 CFR §155.305(f)",
+"Cost-sharing reduction eligibility standards: 45 CFR §155.305(g)",
+"Annual eligibility redetermination and renewal standards: 45 CFR §155.335",
+"Open enrollment period: 45 CFR §155.410",
+"<i>Medicaid Regulations</i>",
+"State residence: 42 CFR § 435.403",
+"Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+"Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
+"Medicaid determination of eligibility: 42 CFR § 435.911",
+"Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
+"Verification of other non-financial information: 42 CFR § 435.956",
+"Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>

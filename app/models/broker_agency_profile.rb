@@ -30,7 +30,7 @@ class BrokerAgencyProfile
 
   field :ach_routing_number, type: String
   field :ach_account_number, type: String
-  
+
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
   delegate :dba, :dba=, to: :organization, allow_nil: true
@@ -201,6 +201,11 @@ class BrokerAgencyProfile
     def find(id)
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+    end
+
+    def get_organization_from_broker_profile_id(id)
+      organizations = Organization.where("broker_agency_profile._id" => id).to_a
+      organizations.size > 0 ? organizations.first : nil
     end
   end
 

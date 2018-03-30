@@ -1,6 +1,9 @@
 <!-- This notice goes to all the employees that are currently active in coverage and have an auto-renewal plan option available. -->
 
-<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -31,7 +34,7 @@
   { content: "<strong>You Are Able to Change Your Plan Selection during Open Enrollment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "In order to make a change to your employer-sponsored coverage through #{Settings.site.short_name}, you must complete your plan selection for enrollment by #{notice.plan_year.open_enrollment_end_on}, for coverage effective #{notice.plan_year.start_on}. If you no longer wish to receive coverage through #{notice.employer_name} you will want to go into your #{Settings.site.short_name} account and “waive” coverage for the upcoming plan year. Please log-in to your existing #{Settings.site.short_name} account at <a href='www.DCHealthLink.com'>DCHealthLink.com</a> to view your plan options and complete the enrollment process."} %>
+  { content: "In order to make a change to your employer-sponsored coverage through #{Settings.site.short_name}, you must complete your plan selection for enrollment by #{notice.plan_year.open_enrollment_end_on}, for coverage effective #{notice.plan_year.start_on}. If you no longer wish to receive coverage through #{notice.employer_name} you will want to go into your #{Settings.site.short_name} account and “waive” coverage for the upcoming plan year. Please log-in to your existing #{Settings.site.short_name} account at <a href='www.DCHealthLink.com'>#{Settings.site.website_name}</a> to view your plan options and complete the enrollment process."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "If you would like to change the dependents you cover on your plan, if available from your employer, you can simply check or uncheck what dependents you cover on the “Choose Coverage for your Household” page. If you need to add dependents to your accounts you can do so under the “Manage Family” tab."} %>

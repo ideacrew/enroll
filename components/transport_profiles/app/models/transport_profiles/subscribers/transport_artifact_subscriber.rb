@@ -1,14 +1,19 @@
 module TransportProfiles
   module Subscribers
-    class TransportArtifactSubscriber < ::Acapi::Subscription
+    class TransportArtifactSubscriber
       include Acapi::Notifiers
 
-      def self.subscription_details
-        ["acapi.info.events.transport_artifact.transport_requested"]
+      def self.worker_specification
+        Acapi::Amqp::WorkerSpecification.new(
+          :queue_name => "transport_artifact_subscriber",
+          :kind => :direct,
+          :routing_key => "info.events.transport_artifact.transport_requested"
+        )
       end
 
-      def call(event_name, e_start, e_end, msg_id, payload)
-        stringed_payload = payload.stringify_keys
+      def work_with_params(body, delivery_info, properties)
+        headers = properties.headers || {}
+        stringed_payload = headers.stringify_keys
         artifact_key = stringed_payload["artifact_key"]
         file_name = stringed_payload["file_name"]
         transport_process = stringed_payload["transport_process"]
@@ -27,23 +32,10 @@ module TransportProfiles
               )
             }
           )
-          return
+          return :ack
         end
-        begin
-          atr.execute
-        rescue Exception => e
-          notify(
-            "acapi.error.events.transport_artifact.transport_execution_error",
-            {
-              :return_status => "500",
-              :body => JSON.dump({
-                 :error => e.inspect,
-                 :error_message => e.message,
-                 :error_backtrace => e.backtrace
-              })
-            }
-          )
-        end
+        atr.execute
+        :ack
       end
     end
   end

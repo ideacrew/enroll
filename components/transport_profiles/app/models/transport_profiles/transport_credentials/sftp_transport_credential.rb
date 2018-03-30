@@ -1,4 +1,6 @@
+# @deprecated This is for the legacy method of dynamic credential resolution.
 module TransportProfiles::TransportCredentials
+  # @deprecated This is for the legacy method of dynamic credential resolution.
   class SftpTransportCredential < TransportProfiles::TransportCredential
     field :user, type: String
     field :host, type: String
