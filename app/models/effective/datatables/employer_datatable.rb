@@ -50,6 +50,14 @@ module Effective
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
           ]
+          if individual_market_is_enabled?
+            people_id = Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id)
+            dropdown.insert(2,['View Username and Email', get_user_info_exchanges_hbx_profiles_path(
+              people_id: people_id,
+              employers_action_id: "employer_actions_#{@employer_profile.id}"
+              ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'])
+
+          end
           if employer_attestation_is_enabled?
             dropdown.insert(2,['Attestation', edit_employers_employer_attestation_path(id: row.employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
@@ -167,7 +175,7 @@ module Effective
          ],
         top_scope: :employers
         }
-        if employer_attestation_is_enabled?          
+        if employer_attestation_is_enabled?
           filters[:employers] << {scope:'employer_attestations', label: 'Employer Attestations', subfilter: :attestations}
         end
         filters
