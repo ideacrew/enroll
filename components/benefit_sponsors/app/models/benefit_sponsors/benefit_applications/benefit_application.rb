@@ -4,6 +4,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include AASM
+
       include BenefitApplicationAasmCallbacks
       include BenefitSponsors::Concerns::RecordTransition
 
@@ -17,6 +18,16 @@ module BenefitSponsors
       INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
       INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
+      # Unique Resource Name identifier for benefit catalog
+      field :benefit_catalog_urn,      type: String
+
+      belongs_to  :benefit_catalog, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitCatalog"
+
+      ## TODO Deprecate -- BenefitMarket is associated with BenefitSponsorship
+      belongs_to  :benefit_market, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitMarket"
+
       # The date range when this application is active
       field :effective_period,        type: Range
 
@@ -28,38 +39,19 @@ module BenefitSponsors
       field :terminated_on,           type: Date
 
       # This application's workflow status
-      field :aasm_state, type: String, default: :draft
-
-      field :imported_plan_year, type: Boolean, default: false
-
-      # Plan year created to support Employer converted into system. May not be complaint with Hbx Business Rules
-      field :is_conversion, type: Boolean, default: false
-
-      # Number of full-time employees
-      field :fte_count, type: Integer, default: 0
-
-      # Number of part-time employess
-      field :pte_count, type: Integer, default: 0
-
-      # Number of Medicare Second Payers
-      field :msp_count, type: Integer, default: 0
+      field :aasm_state,              type: String, default: :draft
 
       # Calculated Fields for DataTable
       field :enrolled_summary, type: Integer, default: 0
       field :waived_summary, type: Integer, default: 0
 
-      field :benefit_sponsorship_id, type: BSON::ObjectId
       belongs_to  :benefit_sponsorship, 
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-      belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "BenefitMarkets::BenefitMarket"
 
-      embeds_many :benefit_packages,    class_name: "BenefitSponsors::BenefitPackages::BenefitPackage",
-        cascade_callbacks: true, 
-        validate: true
+      embeds_many :benefit_packages, 
+                  class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
       
       embeds_many :workflow_state_transitions, as: :transitional
-
 
       validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
       
@@ -525,7 +517,7 @@ module BenefitSponsors
       def validate_application_dates
         return if canceled? || expired? || renewing_canceled?
         return if effective_period.blank? || open_enrollment_period.blank?
-        return if imported_plan_year
+        # return if imported_plan_year
 
         if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
           errors.add(:effective_period, "start date must be first day of the month")

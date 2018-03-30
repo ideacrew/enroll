@@ -165,6 +165,9 @@ module BenefitSponsors
 
       end
 
+      def primary_office_location
+        office_locations.detect(&:is_primary?)
+      end
 
       private
 
