@@ -3,7 +3,7 @@
   
   <h5 class="enroll-lead">Personal Information</h5>
   
-  <%= form_for :object, html: { class: "needs-validation", id:'broker_registration_form' } do |f| %>
+  <%= form_for :object, html: { class: "needs-validation", id:'broker_registration_form', novalidate:true } do |f| %>
   <%= render partial: './ui-components/v1/forms/broker_registration/personal_information', locals: {f: f} %>
       
   <h5 class="enroll-lead mb-2">Broker Agency Information</h5>
@@ -15,6 +15,8 @@
   <h5 class="enroll-lead mb-2">Office Location</h5>
   
   <%= render partial: './ui-components/v1/forms/office_locations/office_location', locals: {f: f} %>
+  
+  <%= render partial: './ui-components/v1/forms/office_locations/phones', locals: {f: f} %>
   <div id="office-locations"></div>
       
   <div class="row">
@@ -26,3 +28,7 @@
       
   <% end %>
 </div>
+
+<script>
+  validateForm()
+</script>

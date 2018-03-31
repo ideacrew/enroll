@@ -16,6 +16,17 @@ module BenefitMarkets
         raise NotImplementedError.new("This is a documentation only interface.")
       end
 
+      # Return the date from which the premium is eligible to be calculated
+      # for each member.
+      # Can differ from the coverage_start_date for the group.
+      # It is this rate date that should be used for the 'age on coverage'
+      # calculation.
+      # @return [Hash<String, Date>] a map of member id to coverage
+      #   eligibility date.
+      def coverage_eligibility_dates
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
+
       # The selected product.
       # @return [::BenefitMarkets::Products::Product] the product
       def product

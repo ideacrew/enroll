@@ -1,25 +1,40 @@
 <div class="row">
   <div class="col-md-4 mb-3">
-    <label for="validationCustom01">First name *</label>
-    <%= f.text_field :first_name, placeholder:'First Name', required:'true', id:'validationCustom01', class:'form-control' %>
+    <label for="inputFirstname">First name *</label>
+    <%= f.text_field :first_name, placeholder:'First Name', required:'true', id:'inputFirstname', class:'form-control' %>
+    <div class="invalid-feedback">
+      Please provide a first name.
+    </div>
   </div>
   <div class="col-md-4 mb-3">
-    <label for="validationCustom02">Last name *</label>
-    <%= f.text_field :last_name, placeholder:'Last Name', required:'true', id:'validationCustom02', class:'form-control' %>
+    <label for="inputLastname">Last name *</label>
+    <%= f.text_field :last_name, placeholder:'Last Name', required:'true', id:'inputLastname', class:'form-control' %>
+    <div class="invalid-feedback">
+      Please provide a last name.
+    </div>
   </div>
   <div class="col-md-4 mb-3">
-    <label for="validationCustomDOB">Date of Birth *</label>
-    <%= f.text_field :dob, placeholder:'Date of Birth', required:'true', id:'validationCustomDOB', class:'form-control' %>
+    <label for="inputDOB">Date of Birth *</label>
+    <%= f.text_field :dob, placeholder:'MM/DD/YYYY', required:'true', id:'inputDOB', class:'form-control' %>
+    <div class="invalid-feedback">
+      Please provide a date of birth.
+    </div>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-6 mb-3">
-    <label for="validationCustomEmail">Email *</label>
-    <%= f.text_field :email, placeholder:'Email', required:'true', id:'validationCustomEmail', class:'form-control' %>
+    <label for="inputEmail">Email *</label>
+    <%= f.email_field :email, placeholder:'Email', required:'true', id:'inputEmail', class:'form-control' %>
+    <div class="invalid-feedback">
+      Please provide a email address.
+    </div>
   </div>
   <div class="col-md-6 mb-3">
-    <label for="validationCustomNPN">NPN *</label>
-    <%= f.text_field :npn, placeholder:'NPN', required:'true', id:'validationCustomNPN', class:'form-control' %>
+    <label for="inputNPN">NPN *</label>
+    <%= f.text_field :npn, placeholder:'NPN', required:'true', id:'inputNPN', class:'form-control', maxlength:'10', onkeypress:'return isNumberKey(event)' %>
+    <div class="invalid-feedback">
+      Please provide a NPN.
+    </div>
   </div>
 </div>

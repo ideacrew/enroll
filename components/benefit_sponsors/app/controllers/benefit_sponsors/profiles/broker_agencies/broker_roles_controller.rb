@@ -35,7 +35,7 @@ module BenefitSponsors
       end
 
       def search_broker_agency
-        orgs = Organization.has_broker_agency_profile.or({legal_name: /#{params[:broker_agency_search]}/i}, {"fein" => /#{params[:broker_agency_search]}/i})
+        orgs = BenefitSponsors::Organizations::Organization.broker_agency_profiles.or({legal_name: /#{params[:broker_agency_search]}/i}, {"fein" => /#{params[:broker_agency_search]}/i})
 
         @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
       end
@@ -84,7 +84,7 @@ module BenefitSponsors
       private
 
       def get_site_key
-        #@site_key = self.class.superclass.current_site.site_key
+        @site_key = self.class.superclass.current_site.site_key
       end
 
       def initiate_broker_profile

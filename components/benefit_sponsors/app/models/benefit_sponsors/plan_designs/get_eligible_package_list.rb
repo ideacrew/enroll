@@ -5,5 +5,5 @@ module BenefitSponsors
       def process
       end
     end
-  end
+  end 
 end
