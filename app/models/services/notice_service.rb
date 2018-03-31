@@ -10,7 +10,7 @@ module Services
     end
 
     def create_notice_job(recipient, event_object, notice_event)
-      ShopNoticesNotifierJob.perform_later(recipient.id.to_s, notice_event)
+      ShopNoticesNotifierJob.perform_later(recipient, event_object, notice_event)
     end
 
     def trigger_notice_event(recipient, event_object, notice_event)
