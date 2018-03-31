@@ -1,5 +1,5 @@
 module Observers
-  class NoticeObserver < Observer
+  class NoticeObserver
 
     attr_reader :notifier
 
