@@ -13,9 +13,12 @@ module BenefitSponsors
         :limited_liability_corporation,
         :limited_liability_partnership,
         :household_employer,
+      ]
+
+      EXEMPT_ENTITY_KINDS = [
         :governmental_employer,
         :foreign_embassy_or_consulate,
-        :health_insurance_exchange
+        :health_insurance_exchange,
       ]
 
       field :hbx_id, type: String
@@ -31,6 +34,9 @@ module BenefitSponsors
 
       # Business structure or entity type 
       field :entity_kind, type: Symbol
+
+      # TODO -- track history on changes
+      # field :updated_by, type: Symbol
 
 
       # Association that enables organizational hierarchies.
@@ -93,6 +99,11 @@ module BenefitSponsors
       accepts_nested_attributes_for :office_locations
 
       validates_presence_of :legal_name, :site, :profiles
+
+      validates :entity_kind,
+        inclusion: { in: ENTITY_KINDS + EXEMPT_ENTITY_KINDS, message: "%{value} is not a valid entity kind" },
+        allow_blank: false
+
 
       before_save :generate_hbx_id
 
