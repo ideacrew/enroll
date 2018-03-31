@@ -22,6 +22,10 @@ module BenefitSponsors
         provider.generate_organization_id
       end
 
+      def generate_benefit_sponsorship_id
+        provider.generate_benefit_sponsorship_id
+      end
+
       def self.slug!
         self.instance.provider = SlugSource
       end
@@ -36,6 +40,10 @@ module BenefitSponsors
 
       def self.generate_organization_id
         self.instance.generate_organization_id
+      end
+
+      def self.generate_benefit_sponsorship_id
+        self.instance.generate_benefit_sponsorship_id
       end
 
       class AmqpSource
@@ -60,10 +68,18 @@ module BenefitSponsors
         def self.generate_organization_id
           generate_id_from_sequence("organization_id")
         end
+
+        def self.generate_benefit_sponsorship_id
+          generate_id_from_sequence("benefit_sponsorship_id")
+        end
       end
 
       class SlugSource
         def self.generate_organization_id
+          random_uuid
+        end
+
+        def self.generate_benefit_sponsorship_id
           random_uuid
         end
 
