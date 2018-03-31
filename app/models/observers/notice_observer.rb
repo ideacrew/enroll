@@ -1,6 +1,12 @@
 module Observers
   class NoticeObserver < Observer
 
+    attr_reader :notifier
+
+    def initialize
+      @notifier = Services::NoticeService.new
+    end
+
     def plan_year_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
@@ -11,51 +17,51 @@ module Observers
           errors = plan_year.enrollment_errors
 
           if(errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
-            trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
 
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               if ce.employee_role.present?
-                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
               end
             end
           end
         end
 
         if new_model_event.event_key == :renewal_employer_open_enrollment_completed
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
         end
 
         if new_model_event.event_key == :renewal_application_submitted
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
         end
 
         if new_model_event.event_key == :renewal_application_created
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
         end
 
         if new_model_event.event_key == :renewal_application_autosubmitted
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
 
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
-            trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               if ce.employee_role.present?
-                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
               end
             end
           end
         end
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
-          trigger_notice(recipient: plan_year.employer_profile,  event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed" )
+          deliver(recipient: plan_year.employer_profile,  event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed" )
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
               enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
               if enrollment.present?
-                trigger_notice(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
+                deliver(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
               end
             end
         end
@@ -75,7 +81,7 @@ module Observers
         if new_model_event.event_key == :application_coverage_selected
           if hbx_enrollment.is_shop?
             if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
-              trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
+              deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             end
           end
         end
@@ -109,16 +115,20 @@ module Observers
 
       if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
         census_employee = new_model_event.klass_instance
-        trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
+        deliver(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
       end
     end
 
     def trigger_on_queried_records(event_name)
       current_date = TimeKeeper.date_of_record
-      organizations_for_force_publish(current_date).each do |organization|
+      EmployerProfile.organizations_for_force_publish(current_date).each do |organization|
         plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-        trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
+        deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
       end
+    end
+
+    def deliver(recipient:, event_object:, notice_event:)
+      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
     end
   end
 end
