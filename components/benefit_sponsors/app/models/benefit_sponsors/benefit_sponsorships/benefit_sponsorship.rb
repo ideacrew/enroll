@@ -18,41 +18,42 @@ module BenefitSponsors
       include Mongoid::Timestamps
       # include Concerns::Observable
 
-      belongs_to  :organization,
-                  class_name: "BenefitSponsors::Organizations::Organization"
-
-      # Unique Resource Name identifier for benefit market 
-      field :benefit_market_urn,      type: String
-      belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "::BenefitMarkets::BenefitMarket"
-
+      field :hbx_id,                  type: String
+      field :sponsorship_profile_id,  type: BSON::ObjectId
+      field :contact_method,          type: Symbol
 
       # This sponsorship's workflow status
-      field :initial_effective_date,  type: Date
-      field :sponsorship_profile_id,  type: BSON::ObjectId
-
-      field :contact_method_kind,     type: Symbol
       field :aasm_state,              type: String, default: :applicant
 
 
-      belongs_to  :rating_area,
+      belongs_to  :organization,
+                  class_name: "BenefitSponsors::Organizations::Organization"
+
+      belongs_to  :benefit_market, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitMarket"
+
+      belongs_to  :rating_area, counter_cache: true,
                   class_name: "BenefitSponsors::Locations::RatingArea"
 
-      has_many    :service_areas,
+      has_many    :service_areas, 
                   class_name: "BenefitSponsors::Locations::ServiceArea"
 
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :benefit_market, :sponsorship_profile_id
+      validates_presence_of :organization, :sponsorship_profile_id, :benefit_market
 
-      after_create :build_nested_models
+      validates :contact_method,
+        inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
+        allow_blank: false
 
-# TODO move this to Profile
-      def sic_code
-        sponsorship_profile.sic_code
-      end
-###
+
+      before_create :generate_hbx_id
+
+      index({ aasm_state: 1 })
+
+
+
       def sponsorship_profile=(sponsorship_profile)
         write_attribute(:sponsorship_profile_id, sponsorship_profile._id)
         @sponsorship_profile = sponsorship_profile
@@ -63,29 +64,25 @@ module BenefitSponsors
         @sponsorship_profile = organization.sponsorship_profiles.detect { |sponsorship_profile| sponsorship_profile._id == self.sponsorship_profile_id }
       end
 
+
+# TODO -- point this to main app census employees
       def census_employees
-        BenefitSponsors::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(self)
+        BenefitSponsors::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsorship(self)
       end
 
-      def initial_enrollment_period=(new_initial_enrollment_period)
-        initial_enrollment_range = BenefitSponsors.tidy_date_range(new_initial_enrollment_period, :initial_enrollment_period)
-        write_attribute(:initial_enrollment_period, initial_enrollment_range) if initial_enrollment_range.present?
-      end
 
-      def initial_enrollment_period_to_s
-        date_start = initial_enrollment_period.begin
-        date_end = initial_enrollment_period.end
-        "#{date_start.strftime('%B')} #{date_start.day.ordinalize} #{date_start.strftime('%Y')}  -  #{date_end.strftime('%B')} #{date_end.day.ordinalize} #{date_end.strftime('%Y')}"
+
+
+# TODO move this to Profile
+      def sic_code
+        sponsorship_profile.sic_code
       end
+###
 
       # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
       def roster_size
         return @roster_size if defined? @roster_size
         @roster_size = census_employees.active.size
-      end
-
-      def find_benefit_application(id)
-        benefit_applications.where(id: id).first
       end
 
       def earliest_plan_year_start_on_date
@@ -114,19 +111,12 @@ module BenefitSponsors
         end
       end
 
+
       private
 
-      def build_nested_models
-        # build_inbox if inbox.nil?
+      def generate_hbx_id
+        write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
       end
-
-      def save_inbox
-        welcome_subject = "Welcome to #{Settings.site.short_name}"
-        welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your employee's health needs and budget."
-        @inbox.save
-        @inbox.messages.create(subject: welcome_subject, body: welcome_body)
-      end
-
 
     end
   end

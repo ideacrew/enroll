@@ -3,148 +3,95 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
 
-    let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new }
     let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
-    let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
+    let(:organization)              { BenefitSponsors::Organizations::GeneralOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [sponsorship_profile])}
+    let(:sponsorship_profile)       { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
     let(:benefit_market)            { BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "DC Health SHOP", site: site) }
+    let(:contact_method)            { :paper_and_electronic }
 
-    let(:contact_method_kind)                        { :paper_and_electronic }
 
-    let(:sponsorship_profile)                { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
-
-    let(:initial_enrollment_period)             { Date.new(2018,5,1)..Date.new(2019,4,30) }
-    let(:open_enrollment_period)                { Date.new(2018,4,1)..Date.new(2019,4,10) }
-    let(:annual_enrollment_period_begin_month)  { initial_enrollment_period.min.month }
-
-    let(:required_params) do 
+    let(:params) do 
       {
+        organization: organization,
         benefit_market: benefit_market,
-        sponsorship_profile_id: sponsorship_profile.id
-#        contact_method_kind: contact_method_kind,
-#        enrollment_frequency: enrollment_frequency,
+        sponsorship_profile: sponsorship_profile,
+        contact_method: contact_method,
       }
     end
 
-    let(:optional_params) do
-      {
-        initial_enrollment_period: initial_enrollment_period
-#        annual_enrollment_period_begin_month: annual_enrollment_period_begin_month,
-      }
-    end
+    context "A new model instance" do
+      context "with no arguments" do
+        subject { described_class.new }
 
-
-    context "with required parameters" do
-      let(:invalid_enrollment_frequency)  { :weekly }
-
-      subject {
-          described_class.new(required_params)
-        }
-
-      it "is valid with required valid attributes" do
-        expect(subject).to be_valid
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
       end
 
-      it "is not valid without a benefit market" do
-        subject.benefit_market = nil
-        expect(subject).to_not be_valid
+      context "with no organization" do
+        subject { described_class.new(params.except(:organization)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
       end
 
-    end
+      context "with no benefit market" do
+        subject { described_class.new(params.except(:benefit_market)) }
 
-    context "with all parameters" do
-      let(:all_params)                    { required_params.merge optional_params }
-      let(:month_value_under)             { 0 }
-      let(:month_value_over)              { 13 }
-      let(:enrollment_dates_reversed)     { initial_enrollment_period.end..initial_enrollment_period.begin  }
-
-      let(:first_of_next_month)           { Date.today.end_of_month + 1.day }
-      let(:enrollment_dates_as_time)      { (first_of_next_month.to_time)..(first_of_next_month + 1.year - 1.day).to_time  }
-
-
-     subject {
-          described_class.new(all_params)
-        }
-
-      it "is valid with all valid attributes" do
-        expect(subject).to be_valid
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
       end
 
-      # it "is not valid with an invalid enrollment frequency" do
-      #   subject.enrollment_frequency = nil
-      #   subject.contact_method_kind = nil
-      #   expect(subject).to_not be_valid
-      # end
+      context "with no open sponsorship_profile" do
+        subject { described_class.new(params.except(:sponsorship_profile)) }
 
-      # it "is not valid with an out-of-range annual enrollment period begin month" do
-      #   subject.annual_enrollment_period_begin_month = month_value_under
-      #   subject.validate
-      #   expect(subject.errors[:annual_enrollment_period_begin_month].first).to match /is not included in the list/
-
-      #   subject.annual_enrollment_period_begin_month = month_value_over
-      #   subject.validate
-      #   expect(subject.errors[:annual_enrollment_period_begin_month].first).to match /is not included in the list/
-      # end
-
-      it "is valid with initial enrollment period as date range" do
-        subject.initial_enrollment_period = initial_enrollment_period
-        subject.validate
-        expect(subject).to be_valid
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
       end
 
-      it "is valid with initial enrollment period as time range" do
-        subject.initial_enrollment_period = enrollment_dates_as_time
-        expect(enrollment_dates_as_time.begin.class).to eq Time
-        subject.validate
-        expect(subject).to be_valid
+      context "with no open contact_method" do
+        subject { described_class.new(params.except(:contact_method)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
       end
 
-      # TODO: Validation is missing in the model
-      # it "is not valid with initial enrollment period start date following end date" do
-      #   subject.initial_enrollment_period = enrollment_dates_reversed
-      #   subject.validate
-      #   expect(subject.errors[:initial_enrollment_period].first).to match /end date may not preceed begin date/
-      # end
+      context "with all required arguments" do
+        subject { described_class.new(params) }
 
+        context "and contact method is invalid" do
+          let(:invalid_contact_method)  { :snapchat }
+
+          before { subject.contact_method = invalid_contact_method }
+
+          it "should not be valid" do
+            subject.validate
+            expect(subject).to_not be_valid
+          end
+        end
+
+        context "and all arguments are valid" do
+          it "should reference the correct sponsorship_profile_id" do
+            expect(subject.sponsorship_profile_id).to eq sponsorship_profile.id
+          end
+
+          it "should be valid" do
+            subject.validate
+            expect(subject).to be_valid
+          end
+        end
+      end
     end
 
-
-
-    context "as component of a Plan Design Organization" do
-      let(:title)                     { 'New proposal' }
-      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
-
-      let(:plan_design_organization)  { Organizations::PlanDesignOrganization.new(fein: fein, legal_name: legal_name, sic_code: sic_code) }
-      let(:plan_design_proposal)      { plan_design_organization.plan_design_proposals.build(title: title, profile: cca_employer_profile) }
-      let(:profile)                   { plan_design_organization.plan_design_proposals.first.profile }
-
-      before { plan_design_organization.save! }
-
-      it "should not validate presence of initial enrollment period or annual enrollment period begin month"
-      it "should allow updates to initial enrollment period"
-
-
-    end
-
-    context "as component of an Organization" do
-      let(:fein)            { '42-6854567' }
-      let(:legal_name)      { 'Acme Widgets, Inc.' }
-      let(:sic_code)        { '1111' }
-      let(:organization)    { ::Organization.new(fein: fein, legal_name: legal_name, sic_code: sic_code) }
-
-      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
-
-
-      # it "is not valid without an initial enrollment period" do
-      #   subject.initial_enrollment_period = nil
-      #   expect(subject).to_not be_valid
-      # end
-
-      # it "is not valid without an annual enrollment period begin month" do
-      #   subject.annual_enrollment_period_begin_month = nil
-      #   expect(subject).to_not be_valid
-      # end
-
-    end
  
   end
 end
