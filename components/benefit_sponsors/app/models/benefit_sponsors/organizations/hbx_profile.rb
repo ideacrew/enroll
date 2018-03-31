@@ -2,8 +2,9 @@ module BenefitSponsors
   module Organizations
     class HbxProfile < BenefitSponsors::Organizations::Profile
 
-      field :cms_id, type: String
-      field :us_state_abbreviation, type: String
+      field :benefit_sponsorship_id,  type: BSON::ObjectId
+      field :cms_id,                  type: String
+      field :us_state_abbreviation,   type: String
 
       private
 

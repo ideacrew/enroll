@@ -4,6 +4,8 @@ module BenefitSponsors
     include Mongoid::Document
 
 
+      field :benefit_sponsorship_id,  type: BSON::ObjectId
+
       private 
 
       def initialize_profile
