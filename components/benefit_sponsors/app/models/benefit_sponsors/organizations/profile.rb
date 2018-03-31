@@ -38,7 +38,9 @@ module BenefitSponsors
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
-      def benefit_sponsorships
+      # TODO make benefit sponsorships a has_many collection
+      # Inverse of BenefitSponsoship#organization_profile
+      def benefit_sponsorship
         raise Errors::SponsorshipIneligibleError unless is_benefit_sponsorship_eligible?
         return @benefit_sponsorship if defined?(@benefit_sponsorship)
         @benefit_sponsorship = organization.benefit_sponsorships.detect { |benefit_sponsorship| benefit_sponsorship._id == self.benefit_sponsorship_id }

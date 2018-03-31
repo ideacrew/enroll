@@ -19,7 +19,7 @@ module BenefitSponsors
       # include Concerns::Observable
 
       field :hbx_id,                  type: String
-      field :sponsorship_profile_id,  type: BSON::ObjectId
+      field :organization_profile_id, type: BSON::ObjectId
       field :contact_method,          type: Symbol
 
       # This sponsorship's workflow status
@@ -41,7 +41,7 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :organization, :sponsorship_profile_id, :benefit_market
+      validates_presence_of :organization, :organization_profile_id, :benefit_market
 
       validates :contact_method,
         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
@@ -52,16 +52,15 @@ module BenefitSponsors
 
       index({ aasm_state: 1 })
 
-
-
-      def sponsorship_profile=(sponsorship_profile)
-        write_attribute(:sponsorship_profile_id, sponsorship_profile._id)
-        @sponsorship_profile = sponsorship_profile
+      # Inverse of Profile#benefit_sponsorship
+      def organization_profile
+        return @organization_profile if defined?(@organization_profile)
+        @organization_profile = organization.organization_profiles.detect { |organization_profile| organization_profile._id == self.organization_profile_id }
       end
 
-      def sponsorship_profile
-        return @sponsorship_profile if defined?(@sponsorship_profile)
-        @sponsorship_profile = organization.sponsorship_profiles.detect { |sponsorship_profile| sponsorship_profile._id == self.sponsorship_profile_id }
+      def organization_profile=(organization_profile)
+        write_attribute(:organization_profile_id, organization_profile._id)
+        @organization_profile = organization_profile
       end
 
 
@@ -70,19 +69,26 @@ module BenefitSponsors
         BenefitSponsors::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsorship(self)
       end
 
-
-
-
-# TODO move this to Profile
-      def sic_code
-        sponsorship_profile.sic_code
-      end
-###
-
       # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
       def roster_size
         return @roster_size if defined? @roster_size
         @roster_size = census_employees.active.size
+      end
+
+
+      # Helper method to access Profile attribute
+      def sic_code
+        return @sic_code if defined? @sic_code
+        if organization_profile.attributes.member?("sic_code") && organization_profile.sic_code.present?
+          @sic_code = organization_profile.sic_code
+        end
+      end
+
+      def rating_area
+        return @rating_area if defined? @rating_area
+        if organization_profile.class.method_defined?(:rating_area)
+          @rating_area = organization_profile.rating_area
+        end
       end
 
       def earliest_plan_year_start_on_date
