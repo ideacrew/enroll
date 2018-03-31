@@ -29,7 +29,11 @@ module BenefitSponsors
         @subtasks[index] = new_task
       end
 
-
+      def process
+        @subtasks.each do |task|
+          task.new.process
+        end
+      end
     end
   end
 end

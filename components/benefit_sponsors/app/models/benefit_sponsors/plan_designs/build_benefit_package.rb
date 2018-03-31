@@ -3,17 +3,49 @@ module BenefitSponsors
     class BuildBenefitPackage < CompositeTask
 
       def initialize
-        # super("Process an organization and it's members initial benefit coverage")
-        # add_subtask(SponsorBenefits::FindOrCreateSponsorOrganization.new)
-        # add_subtask(SponsorBenefits::HireBroker.new)
+        super(BenefitSponsors::BenefitPackages::BenefitPackage)
 
         add_subtask(BenefitSponsors::PlanDesigns::GetEligibleProductPackages)
-        add_subtask(BenefitSponsors::PlanDesigns::TransformSelectedProductToBenefit)
-        add_subtask()
-        add_subtask(BuildSponsoredBenefit)
-        add_subtask(GetEligibleProductPackages)
-      end
+        add_subtask(BenefitSponsors::PlanDesigns::SetProbationPeriod)
 
+#     # GetBenefitCatalog   (effective on date)
+#     # GetEligibleProductPackage  (effective on date, effective on kind)
+#     # TransformProductPackage
+
+#   benefit_package
+#             add_subtask(BenefitSponsors::PlanDesigns::SetProbationPeriod.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::GetEligiblePackageList.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::TransformPackageToSponsoredBenefit.new)
+
+#   sponsored_benefit
+
+#             add_subtask(BenefitSponsors::PlanDesigns::BuildSponsoredBenefit.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::SetHealthOneIssuerOptions.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::SetHealthOnePlanOptions.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::SetHealthCompositePlanOptions.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::CalculateCompositeRate.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::SetHealthMetalLevelOptions.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::SetDentalOnePlanOptions.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
+
+#             add_subtask(BenefitSponsors::PlanDesigns::SetDentalManyPlanOptions.new)
+#             add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
+      end
     end
   end
 end
+
+
+
+
+

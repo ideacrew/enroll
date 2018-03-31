@@ -39,6 +39,14 @@ module BenefitSponsors
       def build_dental_relationship_benefits
       end
 
+      def self.transform_to_sponsored_benefit_template(product_package)
+        sponsored_benefit = TransformProductPackageToSponsoredBenefit.new(product_package).transform
+      end
+
+      def set_sponsor_choices(sponsored_benefit)
+        # trigger composite
+
+      end
     end
   end
 end
