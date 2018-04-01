@@ -74,21 +74,15 @@ namespace :reports do
     end
 
     def workflow_transitions(person)
-      transitions1 = person.consumer_role.workflow_state_transitions.where(:event =>
-                                                        {"$in" => [
-                                                            "reject!",
-                                                            "ssn_invalid!",
-                                                            "fail_residency!"]},
-                                                    :transition_at =>
-                                                        {'$gte'=>start_date, '$lte' => end_date}).to_a
+      transitions_reject = person.consumer_role.workflow_state_transitions.where(:event => "reject!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
 
-      transitions2 = person.consumer_role.workflow_state_transitions.where(:event =>
-                                                                               {"$in" => [
-                                                                                   "ssn_valid_citizenship_invalid!",
-                                                                                   "fail_dhs!"]},
-                                                                           :transition_at =>
-                                                                               {'$gte'=>start_date, '$lte' => end_date}).to_a
-      transitions = transitions1 + transitions2.uniq{|t| t.created_at.to_date}
+      transitions_dc = person.consumer_role.workflow_state_transitions.where(:event => "fail_residency!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
+
+      transitions_ssn = person.consumer_role.workflow_state_transitions.where(:event => "ssn_invalid!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
+
+      transitions_cit = person.consumer_role.workflow_state_transitions.where(:event => {"$in" => ["ssn_valid_citizenship_invalid!", "fail_dhs!"]},
+                                                                              :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
+      transitions = transitions_reject + transitions_dc + transitions_ssn + transitions_cit
 
       remove_dup_override? ? transitions.sort_by{|t| t.created_at}.reverse.uniq{|e| e.event} : transitions
     end
