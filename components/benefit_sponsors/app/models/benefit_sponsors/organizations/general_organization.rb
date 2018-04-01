@@ -8,6 +8,11 @@ module BenefitSponsors
 
       validates_presence_of :entity_kind, :legal_name
 
+      validates :entity_kind,
+        inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid entity kind" },
+        allow_blank: false
+
+
       validates :fein,
         presence: true,
         length: { is: 9, message: "%{value} is not a valid FEIN" },

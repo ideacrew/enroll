@@ -1,8 +1,8 @@
 module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile < BenefitSponsors::Organizations::Profile
-      include Concerns::AcaRatingAreaConfigConcern
-      include Concerns::EmployerProfileConcern
+      # include Concerns::AcaRatingAreaConfigConcern
+      # include Concerns::EmployerProfileConcern
 
       field :benefit_sponsorship_id,  type: BSON::ObjectId
       field :sic_code,                type: String

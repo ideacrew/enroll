@@ -100,11 +100,6 @@ module BenefitSponsors
 
       validates_presence_of :legal_name, :site, :profiles
 
-      validates :entity_kind,
-        inclusion: { in: ENTITY_KINDS + EXEMPT_ENTITY_KINDS, message: "%{value} is not a valid entity kind" },
-        allow_blank: false
-
-
       before_save :generate_hbx_id
 
       index({ legal_name: 1 })
@@ -129,16 +124,16 @@ module BenefitSponsors
         @fein = numeric_fein
       end
 
-      def sponsor_benefits_for(sponsorship_profile)
-        if sponsorship_profile.is_benefit_sponsorship_eligible?
+      def sponsor_benefits_for(organization_profile)
+        if organization_profile.is_benefit_sponsorship_eligible?
 
-          if sponsorship_profile._type == "BenefitSponsors::Organizations::HbxProfile"
+          if organization_profile._type == "BenefitSponsors::Organizations::HbxProfile"
             benefit_market = site.benefit_market_for(:aca_individual)
           else
             benefit_market = site.benefit_market_for(:aca_shop)
           end
 
-          new_sponsorship = benefit_sponsorships.build(sponsorship_profile: sponsorship_profile, benefit_market: benefit_market)
+          new_sponsorship = benefit_sponsorships.build(organization_profile: organization_profile, benefit_market: benefit_market)
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end

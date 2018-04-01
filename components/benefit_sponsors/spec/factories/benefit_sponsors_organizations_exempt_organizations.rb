@@ -5,7 +5,7 @@ FactoryGirl.define do
     entity_kind :s_corporation
 
     office_locations do
-      [ build(:benefit_sponsors_office_location, :primary) ]
+      [ build(:benefit_sponsors_locations_office_location, :primary) ]
     end
 
     # association :profiles, factory: :benefit_sponsors_organizations_hbx_profile

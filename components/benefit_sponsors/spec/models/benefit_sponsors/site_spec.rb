@@ -8,11 +8,15 @@ module BenefitSponsors
     let(:short_name)          { "Benefit Website" }
     let(:domain_name)         { "hbxshop.org" }
     let(:benefit_market_kind) { :aca_shop }
+    let(:entity_kind)         { :s_corporation }
 
     let(:owner_legal_name)    { "ACME Widgets" }
-    let(:owner_organization)  { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, profiles: [profile]) }
-    let(:office_location)     { ::Address.new(kind: "primary", address_1: "101 Main St, NW", city: "Washington", state: "DC", zip: "20002") }
-    let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
+    let(:owner_organization)  { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: owner_legal_name, entity_kind: entity_kind, profiles: [profile]) }
+    let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+    let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+    let(:office_location)   { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
+    let(:office_locations)  { [office_location] }
+    let(:profile)           { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
 
     let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) } 
 
@@ -157,8 +161,10 @@ module BenefitSponsors
       let!(:loony_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
       let!(:acme_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
 
-      let(:employer_profile)    { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
-      let(:hbx_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
+      let(:employer_profile)    { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile, office_locations: office_locations) }
+
+      # let(:hbx_profile)         { BenefitSponsors::Organizations::HbxProfile.new(office_locations: office_locations) }
+      let(:hbx_profile)       { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
 
 
       # this will include the owner_organization in the count
@@ -171,7 +177,7 @@ module BenefitSponsors
       end
 
       context "and benefit_market associations must be valid" do
-        let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
+        let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
         # let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, :with_benefit_catalog) }
         let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market) } #TODO enable benefit catalog when its implemented under benefit_market engine
 

@@ -75,14 +75,17 @@ module BenefitSponsors
       let(:shop_kind)           { :aca_shop }
       let(:individual_kind)     { :aca_individual }
       let(:hbx_name)            { "Health Exchange Unlimited, LTD" }
-      let(:hbx_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
-      let!(:hbx_site)           { FactoryGirl.create(:benefit_sponsors_site, 
+      let(:entity_kind)         { :s_corporation }
+
+
+      let(:hbx_site)            { FactoryGirl.build(:benefit_sponsors_site, 
                                                         owner_organization: hbx_organization, 
-                                                        site_organizations: [ hbx_organization ],
                                                         benefit_markets: [shop_benefit_market, ivl_benefit_market]
                                                       ) 
                                                     }
+      let(:hbx_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
       let(:hbx_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_exempt_organization, 
+                                                        entity_kind: entity_kind, 
                                                         legal_name: hbx_name, 
                                                         profiles: [hbx_profile]
                                                       )
@@ -100,6 +103,7 @@ module BenefitSponsors
                                                     }
 
       it "a site should exist with an individual and shop market" do
+        # binding.pry
         expect(hbx_site.benefit_markets.size).to eq 2
       end
 
@@ -120,7 +124,7 @@ module BenefitSponsors
         end
 
         it "benefit sponsorship should be associated with the correct profile" do
-          expect(employer_organization.benefit_sponsorships.first.sponsorship_profile).to eq employer_profile
+          expect(employer_organization.benefit_sponsorships.first.organization_profile).to eq employer_profile
         end
 
         it "benefit sponsorship should be associated with the correct benefit market" do

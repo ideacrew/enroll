@@ -1,6 +1,6 @@
 FactoryGirl.define do
-  factory :benefit_sponsors_phone, class: 'BenefitSponsors::Locations::Phone' do
-    kind 'home'
+  factory :benefit_sponsors_locations_phone, class: 'BenefitSponsors::Locations::Phone' do
+    kind 'work'
     # sequence(:area_code, WrappingSequence.new(100, 999)) { |n| "#{n}"}
     area_code 202
     sequence(:number, 1111111) { |n| "#{n}"}
