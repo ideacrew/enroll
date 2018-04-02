@@ -41,7 +41,6 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["general_agency_staff"]) }
     let(:person) { FactoryGirl.create(:person, :with_general_agency_staff_role) }
     let(:general_agency_staff) { person.general_agency_staff_roles.last }
-    #let(:org) { double }
     let(:org) { GeneralAgencyProfile.find( person.general_agency_staff_roles.first.general_agency_profile_id).organization}
     let(:general_agency_staff_role) { person.general_agency_staff_roles.first }
     let(:general_agency_profile){ GeneralAgencyProfile.find( person.general_agency_staff_roles.first.general_agency_profile_id) }
