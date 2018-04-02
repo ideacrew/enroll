@@ -35,7 +35,7 @@
       <% end %>
     </div>
   <% end %>
-
+<!-- TODO refactor pundit related work-->
   <div class="module employer-staff-table <%#= pundit_class(EmployerProfile, :updateable?) %>">
     <h4>
       Point of Contact - Employer Staff
@@ -77,7 +77,6 @@
                 <% end %>
               </td>
             </tr>
-            <!--todo check if this is needed-->
         <% end if @staff %>
       </table>
     </div>
@@ -137,6 +136,7 @@
             <% end %>
             <br>
             <div class="form-inputs">
+              <!-- TODO refactor pundit related work and link to add fields-->
               <%#= pundit_span(EmployerProfile, :updateable?) %>
               <%#= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
               </span>
