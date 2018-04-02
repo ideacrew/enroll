@@ -192,4 +192,8 @@ module Config::AcaHelper
     Settings.site.invoice_bill_url
   end
 
+  def payment_phone_number
+    Settings.contact_center.payment_phone_number
+  end
+
 end
