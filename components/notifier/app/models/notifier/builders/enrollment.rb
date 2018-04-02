@@ -1,5 +1,5 @@
 module Notifier
-  module Builders::HbxEnrollment
+  module Builders::Enrollment
 
     def enrollment
       return @enrollment if defined? @enrollment
