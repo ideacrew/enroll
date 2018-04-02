@@ -1,3 +1,4 @@
+# BenefitSponsorship
 # Manage enrollment-related behavior for a benefit-sponsoring organization (e.g. employers, congress, HBX, etc.)
 # The model design assumes a once annual enrollment period and effective date.  For scenarios where there's a once-yearly
 # open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
@@ -18,21 +19,25 @@ module BenefitSponsors
       include Mongoid::Timestamps
       # include Concerns::Observable
 
-      field :hbx_id,                  type: String
-      field :organization_profile_id, type: BSON::ObjectId
-      field :contact_method,          type: Symbol
+      field :hbx_id,          type: String
+      field :profile_id,      type: BSON::ObjectId
+      field :contact_method,  type: Symbol
 
       # This sponsorship's workflow status
-      field :aasm_state,              type: String, default: :applicant
+      field :aasm_state,      type: String, default: :applicant
 
 
-      belongs_to  :organization,
+      belongs_to  :organization, 
+                  inverse_of: :benefit_sponorships, 
+                  counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
-      belongs_to  :benefit_market, counter_cache: true,
+      belongs_to  :benefit_market, 
+                  counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarket"
 
-      belongs_to  :rating_area, counter_cache: true,
+      belongs_to  :rating_area, 
+                  counter_cache: true,
                   class_name: "BenefitSponsors::Locations::RatingArea"
 
       has_many    :service_areas, 
@@ -41,7 +46,7 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      validates_presence_of :organization, :organization_profile_id, :benefit_market
+      validates_presence_of :organization, :profile_id, :benefit_market
 
       validates :contact_method,
         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
@@ -53,14 +58,14 @@ module BenefitSponsors
       index({ aasm_state: 1 })
 
       # Inverse of Profile#benefit_sponsorship
-      def organization_profile
-        return @organization_profile if defined?(@organization_profile)
-        @organization_profile = organization.organization_profiles.detect { |organization_profile| organization_profile._id == self.organization_profile_id }
+      def profile
+        return @profile if defined?(@profile)
+        @profile = organization.profiles.detect { |profile| profile._id == self.profile_id }
       end
 
-      def organization_profile=(organization_profile)
-        write_attribute(:organization_profile_id, organization_profile._id)
-        @organization_profile = organization_profile
+      def profile=(profile)
+        write_attribute(:profile_id, profile._id)
+        @profile = profile
       end
 
 
@@ -75,19 +80,19 @@ module BenefitSponsors
         @roster_size = census_employees.active.size
       end
 
-
+# TODO -- move this to concern
       # Helper method to access Profile attribute
       def sic_code
         return @sic_code if defined? @sic_code
-        if organization_profile.attributes.member?("sic_code") && organization_profile.sic_code.present?
-          @sic_code = organization_profile.sic_code
+        if profile.attributes.member?("sic_code") && profile.sic_code.present?
+          @sic_code = profile.sic_code
         end
       end
 
       def rating_area
         return @rating_area if defined? @rating_area
-        if organization_profile.class.method_defined?(:rating_area)
-          @rating_area = organization_profile.rating_area
+        if profile.class.method_defined?(:rating_area)
+          @rating_area = profile.rating_area
         end
       end
 
@@ -101,12 +106,6 @@ module BenefitSponsors
       end
 
       class << self
-        def find(id)
-          organization = BenefitSponsors::Organizations::PlanDesignOrganization.where("benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first || BenefitSponsors::Organizations::PlanDesignOrganization.find('5abbe7b6c324df1134000005')
-          return if organization.blank?
-          organization.benefit_sponsorships.detect{|sponsorship| sponsorship.id.to_s == id.to_s}
-        end
-
         def find_broker_for_sponsorship(id)
           organization = nil
           Organizations::PlanDesignOrganization.all.each do |pdo|

@@ -1,4 +1,5 @@
-# Parent model for any business, government agency, or other organized entity
+# Organization
+# Base class for any business, government agency, or other organized entity
 module BenefitSponsors
   module Organizations
     class Organization
@@ -105,7 +106,8 @@ module BenefitSponsors
       index({ legal_name: 1 })
       index({ dba: 1 },   { sparse: true })
       index({ fein: 1 },  { unique: true, sparse: true })
-      index({ :"profiles._type" => 1 }, { sparse: true })
+      index({ :"profiles._id" => 1 })
+      index({ :"profiles._type" => 1 })
       index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
 
       scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
@@ -124,16 +126,16 @@ module BenefitSponsors
         @fein = numeric_fein
       end
 
-      def sponsor_benefits_for(organization_profile)
-        if organization_profile.is_benefit_sponsorship_eligible?
+      def sponsor_benefits_for(profile)
+        if profile.is_benefit_sponsorship_eligible?
 
-          if organization_profile._type == "BenefitSponsors::Organizations::HbxProfile"
+          if profile._type == "BenefitSponsors::Organizations::HbxProfile"
             benefit_market = site.benefit_market_for(:aca_individual)
           else
             benefit_market = site.benefit_market_for(:aca_shop)
           end
 
-          new_sponsorship = benefit_sponsorships.build(organization_profile: organization_profile, benefit_market: benefit_market)
+          new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end

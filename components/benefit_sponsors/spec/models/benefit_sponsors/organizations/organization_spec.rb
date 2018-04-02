@@ -124,7 +124,7 @@ module BenefitSponsors
         end
 
         it "benefit sponsorship should be associated with the correct profile" do
-          expect(employer_organization.benefit_sponsorships.first.organization_profile).to eq employer_profile
+          expect(employer_organization.benefit_sponsorships.first.profile).to eq employer_profile
         end
 
         it "benefit sponsorship should be associated with the correct benefit market" do

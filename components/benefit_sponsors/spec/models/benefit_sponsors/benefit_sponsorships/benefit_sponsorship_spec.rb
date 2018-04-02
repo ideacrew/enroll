@@ -5,7 +5,7 @@ module BenefitSponsors
 
     let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
     let(:organization)              { BenefitSponsors::Organizations::GeneralOrganization.new(site: site, fein: 123456789, legal_name: "DC")}
-    let(:organization_profile)      { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(organization: organization) }
+    let(:profile)                   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(organization: organization) }
     let(:benefit_market)            { BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "DC Health SHOP", site: site) }
     let(:contact_method)            { :paper_and_electronic }
 
@@ -14,7 +14,7 @@ module BenefitSponsors
       {
         organization: organization,
         benefit_market: benefit_market,
-        organization_profile: organization_profile,
+        profile: profile,
         contact_method: contact_method,
       }
     end
@@ -47,8 +47,8 @@ module BenefitSponsors
         end
       end
 
-      context "with no open organization_profile" do
-        subject { described_class.new(params.except(:organization_profile)) }
+      context "with no open profile" do
+        subject { described_class.new(params.except(:profile)) }
 
         it "should not be valid" do
           subject.validate
@@ -80,8 +80,8 @@ module BenefitSponsors
         end
 
         context "and all arguments are valid" do
-          it "should reference the correct organization_profile_id" do
-            expect(subject.organization_profile_id).to eq organization_profile.id
+          it "should reference the correct profile_id" do
+            expect(subject.profile_id).to eq profile.id
           end
 
           it "should be valid" do
@@ -100,7 +100,7 @@ module BenefitSponsors
         let(:profile_without_sic_code)  { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
 
         context "on profile without attribute defined" do
-          subject { described_class.new(organization_profile: profile_without_sic_code) }
+          subject { described_class.new(profile: profile_without_sic_code) }
 
           it "should not return value" do
             expect(subject.sic_code).to be_nil
@@ -108,7 +108,7 @@ module BenefitSponsors
         end
 
         context "on profile with attribute defined but not set" do
-          subject { described_class.new(organization_profile: profile_with_nil_sic_code) }
+          subject { described_class.new(profile: profile_with_nil_sic_code) }
 
           it "should return correct value" do
             expect(subject.sic_code).to be_nil
@@ -116,7 +116,7 @@ module BenefitSponsors
         end
 
         context "on profile with attribute defined" do
-          subject { described_class.new(organization_profile: profile_with_sic_code) }
+          subject { described_class.new(profile: profile_with_sic_code) }
 
           it "should return correct value" do
             expect(subject.sic_code).to eq sic_code
@@ -131,7 +131,7 @@ module BenefitSponsors
         let(:profile_without_rating_area)   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
 
         context "on profile without attribute defined" do
-          subject { described_class.new(organization_profile: profile_without_rating_area) }
+          subject { described_class.new(profile: profile_without_rating_area) }
 
           it "should not return value" do
             expect(subject.rating_area).to be_nil
@@ -139,7 +139,7 @@ module BenefitSponsors
         end
 
         context "on profile with attribute defined but not set" do
-          subject { described_class.new(organization_profile: profile_with_nil_rating_area) }
+          subject { described_class.new(profile: profile_with_nil_rating_area) }
 
           it "should return correct value" do
             expect(subject.rating_area).to be_nil
@@ -147,7 +147,7 @@ module BenefitSponsors
         end
 
         context "on profile with attribute defined" do
-          subject { described_class.new(organization_profile: profile_with_rating_area) }
+          subject { described_class.new(profile: profile_with_rating_area) }
 
           it "should return correct value" do
             expect(subject.rating_area).to eq rating_area
