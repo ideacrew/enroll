@@ -29,7 +29,7 @@ site:
   broker_quoting_enabled: true
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
-  plan_options_title_for_ma: true
+  plan_options_title_for_ma: false
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
@@ -93,6 +93,7 @@ plan_option_titles:
   sole_source: 'One Plan'
   metal_level: 'One Level'
   single_carrier: 'One Carrier'
+  plan_year_tooltip: "Employee premium for Health must be at least"
 
 notices:
   mailing_address:
