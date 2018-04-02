@@ -407,6 +407,9 @@ class Organization
         org.documents << document
         logger.debug "associated file #{file_path} with the Organization"
         return document
+      else
+        @errors << "Unable to upload PDF to AWS S3 for #{org.hbx_id}"
+        Rails.logger.warn("Unable to upload PDF to AWS S3")
       end
     else
       logger.warn("Unable to associate invoice #{file_path}")
