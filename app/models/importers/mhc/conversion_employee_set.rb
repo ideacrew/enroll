@@ -73,7 +73,6 @@ module Importers::Mhc
       dep_rows = []
       @dependents.times do |i|
         ["ssn", "dob", "gender", "name_first", "name_middle", "name_last", "email", "phone", "address_1", "address_2", "city", "state", "zip", "relationship"].each do |r|
-            dep_rows << "ignore".to_sym if r == 'name_first'
             dep_rows << "dep_#{i+1}_#{r}".to_sym
         end
       end
