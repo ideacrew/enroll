@@ -173,7 +173,15 @@ module Config::AcaHelper
   def employer_attestation_is_enabled?
     Settings.aca.employer_attestation
   end
-  
+
+  def payment_pdf_helper
+    if Settings.site.payment_pdf_url.match("http")
+      Settings.site.payment_pdf_url
+    else
+      asset_path(Settings.site.payment_pdf_url)
+    end
+  end
+
   def display_plan_cost_warning(bg)
     return false unless offer_sole_source?
     return false if bg.nil?
@@ -182,6 +190,10 @@ module Config::AcaHelper
 
   def plan_match_tool_is_enabled?
     Settings.aca.plan_match_tool
+  end
+
+  def invoice_bill_url_helper
+    Settings.site.invoice_bill_url
   end
 
 end
