@@ -23,6 +23,8 @@
   function initDatepicker(id,minDate,maxDate,allowFutureDate) {
     $("#"+id).datepicker({
       dateFormat:'yy-mm-dd',
+      changeYear: true,
+      yearRange: minDate.getFullYear()+':'+maxDate.getFullYear(),
       minDate:minDate,
       maxDate:maxDate
     })

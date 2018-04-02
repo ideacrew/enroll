@@ -4,7 +4,7 @@ $(document).on('click', '#add-broker-location', addOfficeLocation);
 // Initalize Datepickers for elements
 $(function() {
   // Pass element ID, minDate, maxDate for datepicker options
-  initDatepicker('inputDOB',new Date('<%= Date.today-80.years %>'),new Date('<%= Date.today %>'));
+  initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-90.years %>'),new Date('<%= Date.today.end_of_month-18.years %>'));
 });
 
    a = 0;
