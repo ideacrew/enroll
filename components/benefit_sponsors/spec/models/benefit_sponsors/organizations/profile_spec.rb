@@ -22,7 +22,6 @@ module BenefitSponsors
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
     let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:office_location)   { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
-
     let(:office_locations)  { [office_location] }
 
 
@@ -117,12 +116,7 @@ module BenefitSponsors
           expect(subject.organization.fein).to eq changed_fein
         end            
       end
-
-
     end
-
-
-
 
 
 

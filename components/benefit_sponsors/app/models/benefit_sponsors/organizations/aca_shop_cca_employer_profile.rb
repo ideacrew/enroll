@@ -4,7 +4,6 @@ module BenefitSponsors
       # include Concerns::AcaRatingAreaConfigConcern
       # include Concerns::EmployerProfileConcern
 
-      field :benefit_sponsorship_id,  type: BSON::ObjectId
       field :sic_code,                type: String
       field :rating_area_id,          type: BSON::ObjectId
 

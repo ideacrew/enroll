@@ -19,9 +19,14 @@ module BenefitSponsors
       include Mongoid::Timestamps
       # include Concerns::Observable
 
-      field :hbx_id,          type: String
-      field :profile_id,      type: BSON::ObjectId
-      field :contact_method,  type: Symbol
+      field :hbx_id,            type: String
+      field :profile_id,        type: BSON::ObjectId
+      field :contact_method,    type: Symbol, default: :paper_and_electronic
+
+      # Date period during which this benefit sponsorship is active.  Start date is first effective date benefits 
+      # are offered.  End date (if present) reflects date when all benefit applications are terminated
+      field :effective_period,  type: Range
+
 
       # This sponsorship's workflow status
       field :aasm_state,      type: String, default: :applicant

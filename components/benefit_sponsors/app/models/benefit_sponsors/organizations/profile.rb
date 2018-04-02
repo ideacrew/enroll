@@ -18,7 +18,6 @@ module BenefitSponsors
       delegate :legal_name,               :legal_name=, to: :organization, allow_nil: false
       delegate :dba,                      :dba=,        to: :organization, allow_nil: true
       delegate :fein,                     :fein=,       to: :organization, allow_nil: true
-      delegate :benefit_sponsorship_ids,                to: :organization, allow_nil: true
   
       embeds_many :office_locations,
                   class_name:"BenefitSponsors::Locations::OfficeLocation"
@@ -54,6 +53,15 @@ module BenefitSponsors
       #   write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
       #   @benefit_sponsorship = benefit_sponsorship
       # end
+
+      def add_benefit_sponsorship
+        return unless is_benefit_sponsorship_eligible?
+        organization.sponsor_benefits_for(self)
+      end
+
+      def benefit_sponsorships
+        organization.benefit_sponsorships.collect { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
+      end
 
       class << self
         def find(id)
