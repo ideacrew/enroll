@@ -2,9 +2,9 @@ class VerificationType
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :person, polymorphic: true
+  embedded_in :person
 
-  VALIDATION_STATES = %w(na pending processing review outstanding verified attested)
+  VALIDATION_STATES = %w(na pending processing review outstanding verified valid attested)
 
   field :type_name, type: String
   field :validation_status, type: String
@@ -17,7 +17,8 @@ class VerificationType
   field :updated_by
   field :inactive, type: Boolean #use this field (assign true) only if type was present but for some reason if is not applicable anymore
 
-  scope :active, -> {where(:inactive.ne => true )}
+  scope :active, -> { where(:inactive.ne => true ) }
+  scope :by_name, ->(type_name) { where(:type_name => type_name) }
 
   # embeds_many :external_service_responses  -> needs datamigration
   embeds_many :type_history_elements
@@ -35,7 +36,7 @@ class VerificationType
   end
 
   def type_verified?
-    ["verified", "attested"].include? validation_status
+    ["verified", "attested", "valid"].include? validation_status
   end
 
   def is_type_outstanding?
@@ -44,5 +45,9 @@ class VerificationType
 
   def add_type_history_element(params)
     type_history_elements<<TypeHistoryElement.new(params)
+  end
+
+  def verif_due_date
+    due_date || TimeKeeper.date_of_record
   end
 end
