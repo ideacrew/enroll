@@ -983,7 +983,7 @@ class Family
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.active.each do |v_type|
-        due_dates << v_type.due_date
+        due_dates << v_type.verif_due_date
       end
     end
     due_dates.compact!
@@ -1005,7 +1005,7 @@ class Family
   end
 
   def document_due_date(v_type)
-    ["verified", "attested"].include? v_type.validation_status ? nil : v_type.due_date
+    (["verified", "attested"].include? v_type.validation_status) ? nil : v_type.due_date
   end
 
   def enrolled_policy(family_member)
