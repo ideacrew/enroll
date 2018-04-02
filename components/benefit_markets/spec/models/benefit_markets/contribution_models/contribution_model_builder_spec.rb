@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitMarkets
   class MockContributionUnitValue
-    attr_accessor :contribution_unit
+    attr_accessor :contribution_unit_id
     attr_accessor :contribution_cap
     attr_accessor :contribution_factor
 
@@ -45,7 +45,7 @@ module BenefitMarkets
 
       let(:contribution_model) do
         ContributionModels::FehbContributionModel.new(
-          :contribution_value_kind => "::BenefitMarkets::MockContributionUnitValue",
+          :contribution_level_kind => "::BenefitMarkets::MockContributionUnitValue",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
           :name => "Federal Heath Benefits"
@@ -55,7 +55,7 @@ module BenefitMarkets
       let(:builder) { ContributionModels::ContributionModelBuilder.new }
 
       describe "#build_contribution_unit_values" do
-        let(:subject) { builder.build_contribution_unit_values(contribution_model) }
+        let(:subject) { builder.build_contribution_levels(contribution_model) }
 
         it "builds the correct number" do
           expect(subject.length).to eq 1
@@ -66,7 +66,7 @@ module BenefitMarkets
         end
 
         it "properly assigns the contribution unit" do
-          expect(subject.first.contribution_unit).to eq contribution_unit
+          expect(subject.first.contribution_unit_id).to eq contribution_unit.id
         end
       end
     end
