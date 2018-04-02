@@ -91,6 +91,7 @@ plan_option_titles:
   sole_source: 'One Plan'
   metal_level: 'One Level'
   single_carrier: 'One Carrier'
+  plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 notices:
   mailing_address:
