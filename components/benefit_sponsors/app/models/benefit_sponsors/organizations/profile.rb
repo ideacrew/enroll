@@ -1,4 +1,6 @@
-# Attributes, validations and constraints common to all Profile classes embedded in an Organization
+# Profile
+# Base class with attributes, validations and constraints common to all Profile classes 
+# embedded in an Organization
 module BenefitSponsors
   module Organizations
     class Profile
@@ -12,10 +14,10 @@ module BenefitSponsors
 
 
       # Share common attributes across all Profile kinds
-      delegate :hbx_id,                   to: :organization, allow_nil: false
-      delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
-      delegate :dba,        :dba=,        to: :organization, allow_nil: true
-      delegate :fein,       :fein=,       to: :organization, allow_nil: true
+      delegate :hbx_id,                                 to: :organization, allow_nil: false
+      delegate :legal_name,               :legal_name=, to: :organization, allow_nil: false
+      delegate :dba,                      :dba=,        to: :organization, allow_nil: true
+      delegate :fein,                     :fein=,       to: :organization, allow_nil: true
   
       embeds_many :office_locations,
                   class_name:"BenefitSponsors::Locations::OfficeLocation"
@@ -33,23 +35,40 @@ module BenefitSponsors
       # Initialize settings for the abstract profile
       after_initialize :initialize_profile
 
-      after_create :create_inbox
+      # after_create :create_inbox
 
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
-      # TODO make benefit sponsorships a has_many collection
-      # Inverse of BenefitSponsoship#organization_profile
-      def benefit_sponsorship
-        raise Errors::SponsorshipIneligibleError unless is_benefit_sponsorship_eligible?
-        return @benefit_sponsorship if defined?(@benefit_sponsorship)
-        @benefit_sponsorship = organization.benefit_sponsorships.detect { |benefit_sponsorship| benefit_sponsorship._id == self.benefit_sponsorship_id }
+      # # TODO make benefit sponsorships a has_many collection
+      # # Inverse of BenefitSponsoship#organization_profile
+      # def benefit_sponsorship
+      #   raise Errors::SponsorshipIneligibleError unless is_benefit_sponsorship_eligible?
+      #   return @benefit_sponsorship if defined?(@benefit_sponsorship)
+      #   @benefit_sponsorship = organization.benefit_sponsorships.detect { |benefit_sponsorship| benefit_sponsorship._id == self.benefit_sponsorship_id }
+      # end
+
+      # def benefit_sponsorship=(benefit_sponsorship)
+      #   return unless is_benefit_sponsorship_eligible?
+      #   write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
+      #   @benefit_sponsorship = benefit_sponsorship
+      # end
+
+      def add_benefit_sponsorship
+        return unless is_benefit_sponsorship_eligible?
+        organization.sponsor_benefits_for(self)
       end
 
-      def benefit_sponsorship=(benefit_sponsorship)
-        return unless is_benefit_sponsorship_eligible?
-        write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
-        @benefit_sponsorship = benefit_sponsorship
+      def benefit_sponsorships
+        organization.benefit_sponsorships.collect { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
+      end
+
+      class << self
+        def find(id)
+          organizations = Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).entries
+          return unless organizations.size == 1
+          organizations.first.profiles.detect { |profile| profile.id.to_s == id.to_s }
+        end
       end
 
       private

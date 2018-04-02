@@ -7,20 +7,21 @@ module BenefitSponsors
     let(:legal_name)        { "Tyrell Corporation" }
     let(:dba)               { "Offworld Enterprises" }
     let(:fein)              { "100001001" }
+    let(:entity_kind)       { :c_corporation }
 
-    let(:site)              { BenefitSponsors::Site.new(site_key: :dc) }
+    let!(:site)             { BenefitSponsors::Site.new(site_key: :dc) }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
-                                  site: site, 
+                                  site: site,
                                   hbx_id: hbx_id, 
                                   legal_name: legal_name, 
                                   dba: dba, 
+                                  entity_kind: entity_kind, 
                                   fein: fein, 
                                 )}
 
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
     let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:office_location)   { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
-
     let(:office_locations)  { [office_location] }
 
 
@@ -59,51 +60,63 @@ module BenefitSponsors
         it "should not be valid" 
       end
 
-      context "with all required arguments" do
+      context "with all required arguments", dbclean: :after_each do
         subject { described_class.new(params) }
 
+        it "is_benefit_sponsorship_eligible attribute should default to false" do
+          expect(subject.is_benefit_sponsorship_eligible).to eq false
+        end
+
         context "and all arguments are valid" do
+          before { 
+              site.owner_organization = organization
+              site.site_organizations << organization
+              organization.profiles << subject
+            }
+
           it "should be valid" do
             subject.validate
             expect(subject).to be_valid
           end
 
-          it "should default the is_benefit_sponsorship_eligible attribute to false" do
-            expect(subject.is_benefit_sponsorship_eligible).to eq false
-          end
-
-          it "should access organization values for delegated attributes" do
+          it "should be able to access parent values for delegated attributes" do
             expect(subject.hbx_id).to eq hbx_id
             expect(subject.legal_name).to eq legal_name
             expect(subject.dba).to eq dba
             expect(subject.fein).to eq fein
           end
 
-          context "and delegated attributes are changed in the profile model" do
-            let(:changed_legal_name)    { "Wallace Corporation" }
-            let(:changed_dba)           { "Offworld Adventures" }
-            let(:changed_fein)          { "200002002" }
+          it "should save and be findable" do
+            expect(site.save!).to eq true
+            expect(organization.save!).to eq true
 
-            before do 
-              subject.legal_name  = changed_legal_name
-              subject.dba         = changed_dba
-              subject.fein        = changed_fein
-            end
-
-            it "should update organization values for delegated attributes" do
-              expect(subject.organization.legal_name).to eq changed_legal_name
-              expect(subject.organization.dba).to eq changed_dba
-              expect(subject.organization.fein).to eq changed_fein
-            end            
+            expect(subject.save!).to eq true
+            expect(BenefitSponsors::Organizations::Profile.find(subject.id)).to eq subject
           end
 
         end
       end
 
+      context "local delegated attributes are updated" do
+        subject { described_class.new(params) }
+
+        let(:changed_legal_name)    { "Wallace Corporation" }
+        let(:changed_dba)           { "Offworld Adventures" }
+        let(:changed_fein)          { "200002002" }
+
+        before do 
+          subject.legal_name  = changed_legal_name
+          subject.dba         = changed_dba
+          subject.fein        = changed_fein
+        end
+
+        it "should update attribute values on the parent model" do
+          expect(subject.organization.legal_name).to eq changed_legal_name
+          expect(subject.organization.dba).to eq changed_dba
+          expect(subject.organization.fein).to eq changed_fein
+        end            
+      end
     end
-
-
-
 
 
 

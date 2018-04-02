@@ -1,0 +1,4 @@
+<%= f.fields_for :office_locations do |office_location| %>
+	<%= render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: office_location} %>
+<% end %>
+<%= link_to 'Add Office Location', new_organizations_office_locations_path(:child_index => f.object.office_locations.length, :parent_object => f.object_name), remote: true %>
