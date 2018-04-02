@@ -25,6 +25,22 @@ module BenefitMarkets
       @member_relationship ||= search_member_relationships
     end
 
+    def match?(rel_hash)
+      type_count = rel_hash[self.relationship_name.to_s] || 0
+      case operator
+      when :<
+        type_count < count
+      when :>
+        type_count > count
+      when :<=
+        type_count <= count
+      when :>=
+        type_count >= count
+      else
+        type_count == count
+      end
+    end
+
     protected
 
     def search_member_relationships

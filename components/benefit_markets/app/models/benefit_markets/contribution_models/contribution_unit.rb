@@ -18,7 +18,13 @@ module BenefitMarkets
       validates_numericality_of :order, :allow_blank => false
 
       def assign_contribution_value_defaults(cv)
-        cv.contribution_unit = self
+        cv.contribution_unit_id = self.id
+      end
+
+      def match?(rel_hash)
+        member_relationship_maps.all? do |mrm|
+          mrm.match(rel_hash)
+        end
       end
     end
   end

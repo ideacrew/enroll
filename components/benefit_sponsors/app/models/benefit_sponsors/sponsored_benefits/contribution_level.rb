@@ -9,13 +9,8 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsorContribution"
 
 
+      field :contribution_unit_id, type: BSON::ObjectId
       field :is_offered, type: Boolean
-      field :kind, type: Symbol
-      field :contribution_pct, type: Integer
-      field :contribution_min_pct, type: Integer
-      # field :contribution_amt, type: Money
-      # field :contribution_min_amt, type: Money
-      # field :contribution_max_amt, type: Money
       
     end
   end

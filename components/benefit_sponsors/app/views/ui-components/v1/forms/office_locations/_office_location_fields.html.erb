@@ -1,0 +1,75 @@
+<h5 class="enroll-lead mb-2">Office Location</h5>
+
+<div class="row">
+  <%= f.fields_for :address, errors: {} do |f| %>
+  <div class="col-md-9 mb-3">
+    <label for="inputAddress">Address</label>
+    <%= f.text_field :address_1, placeholder:'1234 Main St', required:'true', id:'inputAddress', class:'form-control' %>
+    <div class="invalid-feedback">
+      Please provide a valid address.
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <label for="inputAddressKind">Kind</label>
+    <% kinds = Address::OFFICE_KINDS; kinds = kinds.rotate if params[:child_index] %>
+    <%= f.select(:kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}), {include_blank: "SELECT KIND"}, class:'form-control', id:'inputAddressKind', required: true) %>
+    <div class="invalid-feedback">
+      Please select a Address kind.
+    </div>
+  </div>
+  <div class="col-md-12 mb-3">
+    <label for="inputAddress2">Address 2</label>
+    <%= f.text_field :address_2, id:'inputAddress2', class:'form-control' %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="form-group col-md-6">
+    <label for="inputCity">City</label>
+    <%= f.text_field :city, required:'true', id:'inputCity', class:'form-control' %>
+    <div class="invalid-feedback">
+      Please provide a valid city.
+    </div>
+  </div>
+  <div class="form-group col-md-3">
+    <label for="inputState">State</label>
+    <%= f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }), {include_blank: "SELECT STATE"}, class:'form-control', id:'inputState', required: true) %>
+    <div class="invalid-feedback">
+      Please provide a valid state.
+    </div>
+  </div>
+  <div class="form-group col-md-3">
+    <label for="inputZip">Zip</label>
+    <%= f.text_field :zip, required:'true', id:'inputZip', class:'form-control', maxlength:'5', onkeypress:'return isNumberKey(event)' %>
+    <div class="invalid-feedback">
+      Please provide a valid zip.
+    </div>
+  </div>
+  <% end %>
+</div>
+
+
+<%= f.fields_for :phone, errors: {} do |f| %>
+<div class="row">
+  <%#= f.hidden_field :kind, value:'phone main' %>
+  <div class="col-md-2 mb-3">
+    <label for="inputAreacode">Area Code *</label>
+    <%= f.text_field :area_code, placeholder:'202', required:'true', id:'inputAreacode', class:'form-control', maxlength:'3', onkeypress:'return isNumberKey(event)' %>
+    <div class="invalid-feedback">
+      Please provide a valid area code.
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <label for="inputNumber">Number *</label>
+    <%= f.text_field :number, placeholder:'1112222', required:'true', id:'inputNumber', class:'form-control', maxlength:'7', onkeypress:'return isNumberKey(event)' %>
+    <div class="invalid-feedback">
+      Please provide a valid number.
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <label for="inputExtension">Extension</label>
+    <%= f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10' %>
+  </div>
+</div>
+<% end %>
+

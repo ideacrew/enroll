@@ -21,7 +21,9 @@ BenefitSponsors::Engine.routes.draw do
       end
     end
 
-    resources :employer_profiles
+    namespace :employers do
+      resources :employer_profiles
+    end
   end
 
   namespace :organizations do

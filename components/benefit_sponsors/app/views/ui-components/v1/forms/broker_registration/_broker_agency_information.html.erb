@@ -1,4 +1,9 @@
+<h5 class="enroll-lead mb-2">Broker Agency Information</h5>
+      
+<h6 class="enroll-lead mb-2">NOTE: If you are not associated with a broker agency, please enter your personal information. Do not enter a General Agency or Third Party Administrator‘s Information.</h6>
+
 <div class="row">
+  <%= f.hidden_field(:entity_kind, :value => "s_corporation") %>
   <div class="col-md-6 mb-3">
     <label for="validationCustomLegalName">Legal Name</label>
     <%= f.text_field :legal_name, placeholder:'Legal Name', required:'true', id:'validationCustomLegalName', class:'form-control' %>
@@ -6,9 +11,16 @@
       Please provide a legal name.
     </div>
   </div>
-  <div class="col-md-6 mb-3">
+  <div class="col-md-3 mb-3">
     <label for="validationCustomLegalName">DBA</label>
     <%= f.text_field :dba, placeholder:'DBA', id:'validationCustomdba', class:'form-control' %>
+  </div>
+  <div class="col-md-3 mb-3">
+    <label for="inputFein">FEIN *</label>
+    <%= f.text_field :fein, placeholder:'FEIN', id:'inputFein', class:'form-control', minlength:'9', maxlength:'9', onkeypress:'return isNumberKey(event)', required:'true' %>
+    <div class="invalid-feedback">
+      Please provide a valid FEIN.
+    </div>
   </div>
 </div>
 

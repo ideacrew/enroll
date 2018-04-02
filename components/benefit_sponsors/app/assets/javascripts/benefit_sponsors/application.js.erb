@@ -11,6 +11,7 @@
 // about supported directives.
 //
 //= require benefit_sponsors/jquery
+//=require jquery_ujs
 //= require benefit_sponsors/jquery-ui
 //= require benefit_sponsors/tether
 //= require benefit_sponsors/bootstrap
@@ -21,7 +22,9 @@
 
   function initDatepicker(id,minDate,maxDate,allowFutureDate) {
     $("#"+id).datepicker({
-      format:'mm/dd/yy',
+      dateFormat:'yy-mm-dd',
+      changeYear: true,
+      yearRange: minDate.getFullYear()+':'+maxDate.getFullYear(),
       minDate:minDate,
       maxDate:maxDate
     })
