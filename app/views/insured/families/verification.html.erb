@@ -5,9 +5,15 @@
 <div class="documents-tab">
   <% if @person && @person.consumer_role %>
       <h4 class="starter"><%= l10n(".verification_information") %></h4>
+        If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.</h4>
 
       <% if individual_market_is_enabled? %>
       	<%= render 'insured/families/verification/verification' %>
       <% end %>
   <% end %>
+</div>
+&nbsp;
+
+<div>
+  <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for Medicaid and tax credit savings, view additional documents"} %>
 </div>

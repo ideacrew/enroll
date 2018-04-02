@@ -321,47 +321,22 @@ describe Person, :dbclean => :after_each do
 
       context "has_multiple_active_employers?" do
         let(:person) { FactoryGirl.build(:person) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-        let(:ce2) { FactoryGirl.build(:census_employee) }
+        let(:er1) { double("EmployeeRole1") }
+        let(:er2) { double("EmployeeRole2") }
 
         it "should return false without census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return([])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return false with only one census_employee" do
-          allow(person).to receive(:active_census_employees).and_return([ce1])
+          allow(person).to receive(:active_employee_roles).and_return([er1])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return true with two census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([ce1, ce2])
+          allow(person).to receive(:active_employee_roles).and_return([er1, er2])
           expect(person.has_multiple_active_employers?).to be_truthy
-        end
-      end
-
-      context "active_census_employees" do
-        let(:person) { FactoryGirl.build(:person) }
-        let(:employee_role) { FactoryGirl.build(:employee_role) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-
-        it "should get census_employees by active_employee_roles" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get census_employees by CensusEmployee match" do
-          allow(person).to receive(:active_employee_roles).and_return([])
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get uniq census_employees" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
         end
       end
 
@@ -389,6 +364,7 @@ describe Person, :dbclean => :after_each do
       context "consumer fields validation" do
         let(:params) {valid_params}
         let(:person) { Person.new(**params) }
+        let!(:consumer_role) { FactoryGirl.create(:consumer_role, citizen_status: nil)}
         errors = { citizenship: "Citizenship status is required.",
                          naturalized: "Naturalized citizen is required.",
                          immigration: "Eligible immigration status is required.",
@@ -399,16 +375,17 @@ describe Person, :dbclean => :after_each do
 
         shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_id, incarceration, is_valid, error_list|
           before do
+            allow(person).to receive(:consumer_role).and_return consumer_role
             person.instance_variable_set(:@is_consumer_role, true)
             person.instance_variable_set(:@indian_tribe_member, native)
             person.instance_variable_set(:@us_citizen, citizenship)
             person.instance_variable_set(:@eligible_immigration_status, immigration_status)
             person.instance_variable_set(:@naturalized_citizen, naturalized)
-            person.instance_variable_set(:@indian_tribe_member, native)
             person.tribal_id = tribal_id
             person.is_incarcerated = incarceration
             person.valid?
           end
+
           it "#{is_valid ? 'pass' : 'fails'} validation" do
             expect(person.valid?).to eq is_valid
           end
@@ -538,6 +515,11 @@ describe Person, :dbclean => :after_each do
 
     it 'ssn present, dob not present then should return empty array' do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
+    end
+
+    it 'ssn present, dob present, first_name, last_name present and person inactive' do
+      @p4.update_attributes(is_active:false)
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
     end
   end
 
@@ -750,90 +732,6 @@ describe Person, :dbclean => :after_each do
       end
     end
   end
-
-  describe "need_to_notify?" do
-    let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:person2) { FactoryGirl.create(:person, :with_employee_role) }
-    let(:person3) { FactoryGirl.create(:person, :with_employer_staff_role) }
-
-    it "should return true when update consumer_role" do
-      consumer_role = person1.consumer_role
-      consumer_role.birth_location = 'DC'
-      person1.updated_at = TimeKeeper.datetime_of_record
-      expect(person1.need_to_notify?).to be_truthy
-    end
-
-    it "should return false when update consumer_role's bookmark_url" do
-      consumer_role = person1.consumer_role
-      consumer_role.bookmark_url = '/families/home'
-      expect(person1.need_to_notify?).to be_falsey
-    end
-
-    it "should return true when update employee_roles" do
-      employee_role = person2.employee_roles.first
-      employee_role.language_preference = "Spanish"
-      expect(person2.need_to_notify?).to be_truthy
-    end
-
-    it "should return false when update employee_role's bookmark_url" do
-      employee_role = person2.employee_roles.first
-      employee_role.bookmark_url = "/families/home"
-      expect(person2.need_to_notify?).to be_falsey
-    end
-
-    it "should return true when update employer_staff_role" do
-      employer_staff_role = person3.employer_staff_roles.first
-      employer_staff_role.is_owner = false
-      expect(person3.need_to_notify?).to be_truthy
-    end
-
-    it "should return false when update employer_staff_role's bookmark_url" do
-      employer_staff_role = person3.employer_staff_roles.first
-      employer_staff_role.bookmark_url = "/families"
-      expect(person3.need_to_notify?).to be_falsey
-    end
-
-    context "call notify" do
-      it "when change person record" do
-        expect(person1).to receive(:notify).exactly(1).times
-        person1.first_name = "Test"
-        person1.save
-      end
-
-      it "when change consumer_role record" do
-        expect(person1).to receive(:notify).exactly(1).times
-        person1.consumer_role.update_attribute(:birth_location, 'DC')
-      end
-
-      it "when change employee_role record" do
-        expect(person2).to receive(:notify).exactly(1).times
-        person2.employee_roles.last.update_attribute(:language_preference, 'Spanish')
-      end
-
-      #it "when change employer_staff_role record" do
-      #  expect(person3).to receive(:notify).exactly(1).times
-      #  person3.employer_staff_roles.first.update_attribute(:aasm_state, 'is_closed')
-      #end
-    end
-
-    context "should not call notify" do
-      it "when change consumer_role's bookmark_url" do
-        expect(person1).to receive(:notify).exactly(0).times
-        person1.consumer_role.update_attribute(:bookmark_url, '/families/home')
-      end
-
-      it "when change employee_role's bookmark_url" do
-        expect(person2).to receive(:notify).exactly(0).times
-        person2.employee_roles.last.update_attribute(:bookmark_url, '/families/home')
-      end
-
-      it "when change employer_staff_role's bookmark_url" do
-        expect(person3).to receive(:notify).exactly(0).times
-        person3.employer_staff_roles.last.update_attribute(:bookmark_url, '/families/home')
-      end
-    end
-  end
-
 
   describe "does not allow two people with the same user ID to be saved" do
     let(:person1){FactoryGirl.build(:person)}
@@ -1091,12 +989,14 @@ describe Person, :dbclean => :after_each do
   end
 
   describe "verification types" do
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role) }
 
-    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native|
+    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
       before do
-        allow(person).to receive(:ssn).and_return(ssn) if ssn
+        allow(person).to receive(:ssn).and_return(nil) unless ssn
         allow(person).to receive(:us_citizen).and_return(citizen)
+        allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
+        allow(person).to receive(:tribal_id).and_return("444444444") if native
         allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
       end
       it "returns array of verification types" do
@@ -1112,30 +1012,57 @@ describe Person, :dbclean => :after_each do
       end
     end
 
-    context "SSN + Citizen" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true
-    end
+    describe "19 plus y.o." do
+      context "SSN + Citizen" do
+        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
+      end
 
-    context "SSN + Immigrant" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false
-    end
+      context "SSN + Immigrant" do
+        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+      end
 
-    context "SSN + Native Citizen" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native"
-    end
+      context "SSN + Native Citizen" do
+        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
+      end
 
-    context "Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true
-    end
+      context "Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
+      end
 
-    context "Immigrant with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false
-    end
+      context "Immigrant with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
+      end
 
-    context "Native Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native"
+      context "Native Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
+      end
     end
+    describe "less then 19y.o." do
+      context "SSN + Citizen" do
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true, nil, 18
+      end
 
+      context "SSN + Immigrant" do
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false, nil, 16
+      end
+
+      context "SSN + Native Citizen" do
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native", 5
+      end
+
+      context "Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true, nil, 13
+      end
+
+      context "Immigrant with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false, nil, 14
+      end
+
+      context "Native Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native", 15
+      end
+
+    end
   end
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do

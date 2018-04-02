@@ -286,12 +286,14 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :is_applying_coverage
     ]
   end
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 
 
