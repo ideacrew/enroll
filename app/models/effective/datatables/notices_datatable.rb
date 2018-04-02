@@ -14,6 +14,9 @@ module Effective
         table_column :title, :proc => Proc.new { |row|
           link_to row.title, notifier.preview_notice_kind_path(row), target: '_blank'
         }, :filter => false, :sortable => false
+        table_column :event_linked?, :proc => Proc.new { |row|
+          boolean_to_glyph_with_hover_text(row.event_name)
+        }, :filter => false, :sortable => false
         table_column :description, :proc => Proc.new { |row|
           row.description
         }, :filter => false, :sortable => false
