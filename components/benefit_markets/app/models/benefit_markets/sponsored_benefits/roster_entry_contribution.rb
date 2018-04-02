@@ -1,15 +1,15 @@
 module BenefitMarkets
   module SponsoredBenefits
-    class RosterEntryPricing
-      # Return the total pricing cost.
-      # @return [BigDecimal] the cost to cover this entry
-      def total_price
+    class RosterEntryContribution
+      # Return the total contribution.
+      # @return [Float, BigDecimal] the contribution
+      def total_contribution
         raise NotImplementedError.new("This is a documentation only interface.")
       end
 
-      # Return a map for the cost of insuring each member.
-      # @return [Hash<String, Float>, Hash<String, BigDecimal>] cost by member
-      def member_pricing
+      # Return a map for the contribution to each member.
+      # @return [Hash<String, Float>, Hash<String, BigDecimal>] contribution by member.
+      def member_contributions
         raise NotImplementedError.new("This is a documentation only interface.")
       end
     end

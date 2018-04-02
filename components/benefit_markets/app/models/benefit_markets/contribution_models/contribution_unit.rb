@@ -20,6 +20,12 @@ module BenefitMarkets
       def assign_contribution_value_defaults(cv)
         cv.contribution_unit = self
       end
+
+      def match?(rel_hash)
+        member_relationship_maps.all? do |mrm|
+          mrm.match(rel_hash)
+        end
+      end
     end
   end
 end
