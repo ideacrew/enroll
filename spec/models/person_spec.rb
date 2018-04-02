@@ -984,17 +984,18 @@ describe Person do
         allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
         allow(person).to receive(:tribal_id).and_return("444444444") if native
         allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
+        person.save
       end
       it "returns array of verification types" do
         expect(person.verification_types).to be_a Array
       end
 
       it "returns #{types_count} verification types" do
-        expect(person.verification_types.count).to eq types_count
+        expect(person.verification_types.active.count).to eq types_count
       end
 
       it "contains #{v_types} verification types" do
-        expect(person.verification_types).to eq v_types
+        expect(person.verification_types.active.map(&:type_name)).to eq v_types
       end
     end
 
@@ -1007,7 +1008,7 @@ describe Person do
     end
 
     context "SSN + Native Citizen" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship", "American Indian Status"], 4, "2222222222", true, "native", 20
     end
 
     context "Citizen with NO SSN" do
@@ -1019,7 +1020,7 @@ describe Person do
     end
 
     context "Native Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship", "American Indian Status"], 3, nil, true, "native", 20
     end
   end
 
