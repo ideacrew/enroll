@@ -1,4 +1,5 @@
 require 'rails_helper'
+include Config::BankHolidaysHelper
 
 describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :start_on }
@@ -29,6 +30,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
+    allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
   context ".new" do
@@ -1646,18 +1649,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "map binder_payment_due_date" do
     it "in interval of map using shop_enrollment_timetable" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(TimeKeeper.date_of_record.year,9,1))
-      expect(binder_payment_due_date).to eq Date.new(TimeKeeper.date_of_record.year,8,Settings.aca.shop_market.binder_payment_due_on)
-    end
-
-    it "interval map using existing specified key values" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
-      expect(binder_payment_due_date).to eq Date.new(2017,8,23)
-    end
-
-    it "out of map" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2019,9,1))
-      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(Date.new(2019,9,1))[:binder_payment_due_date]
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(TimeKeeper.date_of_record.year,binder_pay_month,1))
+      expect(binder_payment_due_date).to eq binder_pay
     end
   end
 

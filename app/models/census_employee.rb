@@ -953,7 +953,7 @@ class CensusEmployee < CensusMember
 
   def has_no_hbx_enrollments?
     return true if employee_role.blank?
-    !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? }
+    !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? && !HbxEnrollment::CANCELED_STATUSES.include?(bga.hbx_enrollment.aasm_state)}
   end
 
   def check_employment_terminated_on

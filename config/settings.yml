@@ -11,6 +11,7 @@ site:
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
   invoice_bill_url: "https://ww2.e-billexpress.com/ebpp/maconnector/"
+  payment_pdf_url: "https://www.mahealthconnector.org/help-center-answers/how-to-pay-your-premiums-online"
   website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
@@ -36,15 +37,16 @@ site:
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   home_forms_url: "https://dchealthlink.com/forms"
-  forms: "https://dchealthlink.com/forms#en"
-  website_url: "www.healthcare.gov"
+  forms_name: "DCHealthLink.com/forms"
+  website_name: "www.DCHealthLink.com"
+  healthcare_name: "www.healthcare.gov"
+  healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "MA0"
+  mail_address: "noreply@healthconnector.org"
 
   social_media:
     facebook_url: ""
-
-  aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
 
 contact_center:
   name: "Health Connector's Customer Care Center"
@@ -54,6 +56,7 @@ contact_center:
   alt_fax: "617-722-4033"
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
+  payment_phone_number: "1-888-813-9220"
   ivl_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
@@ -96,6 +99,9 @@ notices:
     city:
     state: "MA"
     zip:
+
+invoices:
+  addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
 aca:
   state_name: "Massachusetts"
@@ -226,6 +232,7 @@ aca:
   transmit_employers_immediately: false
   employer_attestation: true
   enforce_employer_attestation: true
+  plan_match_tool: false
   rating_areas:
     - R-MA001
     - R-MA002
@@ -260,3 +267,5 @@ style:
   primary_panel: '#c56c24'
   primary_button: '#337ab7'
   primary_button_color: '#286090'
+  primary_button_disabled: '#337ab7'
+  primary_button_border_disabled: '#2e6da4'

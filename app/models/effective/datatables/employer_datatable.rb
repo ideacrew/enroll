@@ -47,15 +47,14 @@ module Effective
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
-           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)]
+           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
           ]
-          if individual_market_is_enabled?
+          if !individual_market_is_enabled?
             people_id = Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id)
             dropdown.insert(2,['View Username and Email', get_user_info_exchanges_hbx_profiles_path(
               people_id: people_id,
               employers_action_id: "employer_actions_#{@employer_profile.id}"
-              ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']) 
-
+              ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'])
           end
 
           if employer_attestation_is_enabled?
@@ -63,7 +62,6 @@ module Effective
           end
 
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
-
         }, :filter => false, :sortable => false
 
       end
@@ -177,7 +175,7 @@ module Effective
          ],
         top_scope: :employers
         }
-        if employer_attestation_is_enabled?          
+        if employer_attestation_is_enabled?
           filters[:employers] << {scope:'employer_attestations', label: 'Employer Attestations', subfilter: :attestations}
         end
         filters
