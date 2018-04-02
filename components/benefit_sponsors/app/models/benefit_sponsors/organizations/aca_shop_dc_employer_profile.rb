@@ -18,6 +18,10 @@ module BenefitSponsors
         CensusEmployee.find_by_employer_profile(self)
       end
 
+      def staff_roles #managing profile staff
+        Person.staff_for_employer(self)
+      end
+
       private
 
       def initialize_profile
