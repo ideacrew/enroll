@@ -9,8 +9,8 @@ module BenefitSponsors
       before_action :assign_filter_and_agency_type
 
       def new_broker
-        @broker_candidate = Forms::BrokerCandidate.new
-        @organization = Forms::BrokerAgencyProfile.new
+        @broker_candidate = BenefitSponsors::Forms::BrokerCandidate.new
+        @organization =  BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(nil)
         respond_to do |format|
           format.html { render 'new' }
           format.js
@@ -18,7 +18,7 @@ module BenefitSponsors
       end
 
       def new_staff_member
-        @broker_candidate = Forms::BrokerCandidate.new
+        @broker_candidate = BenefitSponsors::Forms::BrokerCandidate.new
 
         respond_to do |format|
           format.js
@@ -40,6 +40,7 @@ module BenefitSponsors
         @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
       end
 
+      #TODO: Refactor this after implementing GA & BrokerRole
       def favorite
         @broker_role = BrokerRole.find(params[:id])
         @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
@@ -62,7 +63,7 @@ module BenefitSponsors
       def create
         notice = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         if params[:person].present?
-          @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
+          @broker_candidate = BenefitSponsors::Forms::BrokerCandidate.new(applicant_params)
           if @broker_candidate.save
             flash[:notice] = notice
             redirect_to broker_registration_profiles_broker_agencies_broker_roles_path
@@ -88,6 +89,7 @@ module BenefitSponsors
       end
 
       def initiate_broker_profile
+        return if params[:broker_agency].blank?
         params[:broker_agency].permit!
         @profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new
         #@profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(market_kind: :aca_shop, entity_kind: params[:broker_agency][:entity_kind].to_sym)

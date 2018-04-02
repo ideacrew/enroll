@@ -63,36 +63,47 @@ module BenefitSponsors
       end
 
       def edit
+        @staff = Person.staff_for_employer_including_pending(@employer_profile)
         # This & respective views should go to ER staff roles controller TODO
-        # @staff = Person.staff_for_employer_including_pending(@employer_profile)
         # @add_staff = params[:add_staff]
       end
 
       def update
         sanitize_office_locations_params
 
-        @general_organization = BenefitSponsors::Organizations::Organization.find(params[:id])
-        @employer_profile = @general_organization.profiles.first
-        @org_office_locations_dup = @general_organization.office_locations.as_json
-        @employer = @employer_profile.match_employer(current_user)
+        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
+        @employer_profile = @organization.employer_profile
+        @org_office_locations_dup = @organization.office_locations.as_json
+
+        #TODO check if this is used
+        # @employer = @employer_profile.match_employer(current_user)
 
         if (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
-          @general_organization.assign_attributes(employer_profile_params)
-          if @general_organization.valid?
-            @general_organization.save!
-            #TODO
-            # @general_organization.notify_legal_name_or_fein_change
-            # @general_organization.notify_address_change(@org_office_locations_dup, employer_profile_params)
+          @organization.assign_attributes(organization_profile_params)
+
+          #clear office_locations, don't worry, we will recreate
+          @organization.assign_attributes(:office_locations => [])
+          @organization.save(validate: false)
+
+          if @organization.update_attributes(employer_profile_params)
+            #TODO for new model
+            # @organization.notify_legal_name_or_fein_change
+            # @organization.notify_address_change(@organization_dup,employer_profile_params)
             flash[:notice] = 'Employer successfully Updated.'
-            redirect_to edit_profiles_employer_profile_path(@general_organization)
+            redirect_to edit_profiles_employers_employer_profile_path(@employer_profile)
           else
-            org_error_msg = @general_organization.errors.full_messages.join(",").humanize if @general_organization.errors.present?
+            org_error_msg = @organization.errors.full_messages.join(",").humanize if @organization.errors.present?
+
+            #in case there was an error, reload from saved json
+            @organization.assign_attributes(:office_locations => @organization_dup)
+            @organization.save(validate: false)
+            #@organization.reload
             flash[:error] = "Employer information not saved. #{org_error_msg}."
-            redirect_to edit_profiles_employer_profile_path(@general_organization)
+            redirect_to edit_profiles_employers_employer_profile_path(@employer_profile)
           end
         else
           flash[:error] = 'You do not have permissions to update the details'
-          redirect_to edit_profiles_employer_profile_path(@employer_profile)
+          redirect_to edit_profiles_employers_employer_profile_path(@employer_profile)
         end
       end
 
@@ -107,9 +118,20 @@ module BenefitSponsors
         end
       end
 
+      def organization_profile_params
+        params.require(:organization).permit(
+            :id,
+            :legal_name,
+            :dba,
+            :entity_kind
+        )
+      end
+
       def employer_profile_params
         params.require(:organization).permit(
-            :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
+            :legal_name,
+            :dba,
+            :entity_kind,
             :office_locations_attributes => [
                 {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
                 {:phone_attributes => [:kind, :area_code, :number, :extension]},
