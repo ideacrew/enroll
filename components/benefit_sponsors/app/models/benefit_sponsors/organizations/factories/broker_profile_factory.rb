@@ -15,7 +15,7 @@ module BenefitSponsors
         attr_accessor :broker_applicant_type, :email
 
         validates :market_kind,
-          inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+          inclusion: { in: BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
           allow_blank: false
 
         validates :email, :email => true, :allow_blank => false

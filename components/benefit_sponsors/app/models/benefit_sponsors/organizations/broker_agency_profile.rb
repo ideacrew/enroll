@@ -4,6 +4,14 @@ module BenefitSponsors
       include SetCurrentUser
       include AASM
 
+      MARKET_KINDS = %W[individual shop both]
+
+      MARKET_KINDS_OPTIONS = {
+        "Individual & Family Marketplace ONLY" => "individual",
+        "Small Business Marketplace ONLY" => "shop",
+        "Both – Individual & Family AND Small Business Marketplaces" => "both"
+      }
+
       field :entity_kind, type: Symbol
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
