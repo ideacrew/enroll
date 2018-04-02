@@ -53,11 +53,12 @@ module BenefitSponsors
         end
       end
 
+      def initialize
+        @pricing_unit_map = {}
+      end
+
       def calculate_price_for(pricing_model, benefit_roster_entry)
-        pricing_unit_map = pricing_model.pricing_units.inject({}) do |acc, pu|
-          acc[pu.name.to_s] = pu
-          acc
-        end
+        pricing_unit_map = pricing_unit_map_for(pricing_model)
         roster_entry = benefit_roster_entry
         roster_coverage = benefit_roster_entry.roster_coverage
         members_list = [roster_entry] + roster_entry.dependents
@@ -69,8 +70,8 @@ module BenefitSponsors
           calc.add(mem)
         end
         roster_entry_pricing = OpenStruct.new({
-          total_contribution: calc_results.total,
-          member_contributions: calc_results.member_totals
+          total_price: calc_results.total,
+          member_pricing: calc_results.member_totals
         })
         OpenStruct.new(
           roster_coverage: roster_coverage,
@@ -80,6 +81,13 @@ module BenefitSponsors
           dependents: benefit_roster_entry.dependents,
           roster_entry_pricing: roster_entry_pricing
         )
+      end
+
+      def pricing_unit_map_for(pricing_model)
+        @pricing_unit_map[pricing_model.id] ||= pricing_model.pricing_units.inject({}) do |acc, pu|
+          acc[pu.name.to_s] = pu
+          acc
+        end
       end
     end
   end

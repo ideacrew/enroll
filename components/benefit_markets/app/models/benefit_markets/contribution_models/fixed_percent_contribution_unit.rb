@@ -9,7 +9,7 @@ module BenefitMarkets
 
       def assign_contribution_value_defaults(cv)
         super(cv)
-        cv.contribution_factor = default_contribution_factor
+        cv.contribution_factor = default_contribution_factor * 100
       end
     end
   end

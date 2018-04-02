@@ -19,11 +19,13 @@ module BenefitMarkets
 
       def assign_contribution_value_defaults(cv)
         cv.contribution_unit_id = self.id
+        cv.display_name = display_name
+        cv.order = order
       end
 
       def match?(rel_hash)
         member_relationship_maps.all? do |mrm|
-          mrm.match(rel_hash)
+          mrm.match?(rel_hash)
         end
       end
     end

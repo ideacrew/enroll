@@ -1,10 +1,12 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  class MockContributionUnitValue
+  class MockContributionLevel
     attr_accessor :contribution_unit_id
-    attr_accessor :contribution_cap
     attr_accessor :contribution_factor
+    attr_accessor :contribution_cap
+    attr_accessor :display_name
+    attr_accessor :order
 
     def initialize(opts = {})
       opts.each_key do |k|
@@ -45,7 +47,7 @@ module BenefitMarkets
 
       let(:contribution_model) do
         ContributionModels::FehbContributionModel.new(
-          :contribution_level_kind => "::BenefitMarkets::MockContributionUnitValue",
+          :contribution_level_kind => "::BenefitMarkets::MockContributionLevel",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
           :name => "Federal Heath Benefits"
@@ -61,8 +63,16 @@ module BenefitMarkets
           expect(subject.length).to eq 1
         end
 
-        it "build the specified kind of contribution unit value" do
-          expect(subject.first.kind_of?(::BenefitMarkets::MockContributionUnitValue)).to be_truthy
+        it "builds the correct display_name" do
+          expect(subject.first.display_name).to eq "Employee Only"
+        end
+
+        it "builds the correct order" do
+          expect(subject.first.order).to eq 0
+        end
+
+        it "build the specified kind of contribution level" do
+          expect(subject.first.kind_of?(::BenefitMarkets::MockContributionLevel)).to be_truthy
         end
 
         it "properly assigns the contribution unit" do
