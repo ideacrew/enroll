@@ -2,7 +2,8 @@ module ModelEvents
   module HbxEnrollment
 
     REGISTERED_EVENTS = [
-      :application_coverage_selected
+      :application_coverage_selected,
+      :notify_employee_of_plan_selection_in_open_enrollment
     ]
 
     def notify_on_save
@@ -11,6 +12,11 @@ module ModelEvents
 
         if is_transition_matching?(to: :coverage_selected, from: :shopping, event: :select_coverage)
           is_application_coverage_selected = true
+          is_notify_employee_of_plan_selection_in_open_enrollment = true
+        end
+
+        if is_transition_matching?(to: :renewing_coverage_selected, from: :auto_renewing, event: :select_coverage)
+          is_notify_employee_of_plan_selection_in_open_enrollment = true
         end
       
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
