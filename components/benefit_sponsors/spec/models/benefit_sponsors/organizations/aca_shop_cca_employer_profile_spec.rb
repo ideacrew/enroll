@@ -94,7 +94,7 @@ module BenefitSponsors
 
     context "A BenefitSponsorship association", dbclean: :after_each do
       let(:site)                { BenefitSponsors::Site.new(site_key: :cca) }
-      let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site: site) }
+      let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP") }
       let(:legal_name)          { "MA Health Connector" }
       let(:organization)        { BenefitSponsors::Organizations::GeneralOrganization.new(
                                       site: site,
