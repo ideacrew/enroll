@@ -208,13 +208,6 @@ class QualifyingLifeEventKind
     # This method returns shop market QLE when dependent house hold adding or removing
     #
     # @return [Array<BSON_FIELDS>]
-    def fetch_applicable_market_events_admin
-      unless individual_market_is_enabled?
-        shop_market_events_admin
-      else
-        individual_market_events_admin
-      end
-    end
 
   end
 
