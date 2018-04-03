@@ -35,7 +35,7 @@
       <% end %>
       <% if general_agency_enabled? %>
         <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
-          <%= link_to(general_agency_index_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
+          <%= link_to(main_app.general_agency_index_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
             <span class="hidden-xs">General Agencies</span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
           <% end %>
@@ -51,7 +51,7 @@
         </li>
         <!--TODO : Functionality wise we are disabling because quoting tool needs little more work-->
         <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
-         <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
+         <%= link_to main_app.my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
             <span class="hidden-xs">Quoting Tool</span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Quoting Tool"></span>
           <% end %>
