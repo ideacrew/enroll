@@ -14,6 +14,7 @@ module BenefitSponsors
       field :is_offered, type: Boolean
       field :order, type: Integer
       field :contribution_factor, type: Float
+      field :min_contribution_factor, type: Float
       field :contribution_cap, type: Float
       field :flat_contribution_amount, type: Float
 
