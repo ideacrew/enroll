@@ -116,6 +116,9 @@ module BenefitSponsors
       scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
 
+      scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where(:"profiles._id" => broker_agency_profile_id)}
+      scope :by_broker_role, ->(broker_role_id) { broker_agency_profiles.where(:"profiles.primary_broker_role_id" => broker_role_id)}
+
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
 
@@ -157,6 +160,7 @@ module BenefitSponsors
 
 
       class << self
+
         def default_search_order
           [[:legal_name, 1]]
         end

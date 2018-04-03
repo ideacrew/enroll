@@ -71,6 +71,10 @@ module BenefitSponsors
         end
       end
 
+      def legal_name
+        organization.legal_name
+      end
+
       private
 
       # Subclasses are expected to override this method

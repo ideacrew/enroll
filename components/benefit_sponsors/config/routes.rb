@@ -13,10 +13,15 @@ BenefitSponsors::Engine.routes.draw do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
 
         collection do
+          get :family_index
           get :messages
+          get :agency_messages
         end
         member do
+          post :clear_assign_for_employer
           get :assign
+          post :update_assign
+          post :family_datatable
         end
       end
     end

@@ -60,7 +60,6 @@ module BenefitSponsors
         person = @broker_agency_profile.primary_broker_role.person
         person.update_attributes(person_profile_params)
         @broker_agency_profile.update_attributes(languages_spoken_params)
-
         if @organization.update_attributes(broker_profile_params)
           office_location = @organization.primary_office_location
           if office_location.present? && office_location.phone.present?
@@ -80,10 +79,98 @@ module BenefitSponsors
         end
       end
 
+      def staff_index
+      end
+
+      def family_datatable
+        id = params[:id]
+        is_search = false
+        dt_query = extract_datatable_parameters
+
+        if current_user.has_broker_role?
+          find_broker_agency_profile(current_user.person.broker_role.broker_agency_profile_id)
+        elsif current_user.has_hbx_staff_role?
+          find_broker_agency_profile(BSON::ObjectId.from_string(id))
+        else
+          redirect_to new_profiles_broker_agencies_broker_agency_profile_path
+          return
+        end
+
+        query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
+
+        @total_records = query.total_count
+        @records_filtered = query.filtered_count
+        @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
+
+        primary_member_ids = @families.map do |fam|
+          fam.primary_family_member.person_id
+        end
+        @primary_member_cache = {}
+        Person.where(:_id => { "$in" => primary_member_ids }).each do |pers|
+          @primary_member_cache[pers.id] = pers
+        end
+
+        @draw = dt_query.draw
+      end
+
+      def family_index
+        @q = params.permit(:q)[:q]
+        id = params.permit(:id)[:id]
+        page = params.permit([:page])[:page]
+
+        if current_user.has_broker_role?
+          find_broker_agency_profile(current_user.person.broker_role.broker_agency_profile_id)
+        elsif current_user.has_hbx_staff_role?
+          find_broker_agency_profile(BSON::ObjectId.from_string(id))
+        else
+          redirect_to new_profiles_broker_agencies_broker_agency_profile_path
+          return
+        end
+
+        respond_to do |format|
+          format.js {}
+        end
+      end
+
+      def employers
+      end
+
+      def general_agency_index
+      end
+
+      def set_default_ga
+      end
+
+      def employer_datatable
+      end
+
+      #TODO We may have to look into this once we implement GeneralAgencyProfile in Engine.
       def assign
       end
 
+      def update_assign
+      end
+
+      def clear_assign_for_employer
+      end
+
+      def assign_history
+      end
+
+      def manage_employers
+      end
+
       def messages
+      end
+
+      def agency_messages
+      end
+
+      def inbox
+      end
+
+      def redirect_to_show(broker_agency_profile_id)
+        redirect_to profiles_broker_agencies_broker_agency_profile_path(id: broker_agency_profile_id)
       end
 
       private
@@ -122,9 +209,13 @@ module BenefitSponsors
         @profile = current_user.person.hbx_staff_role.hbx_profile
       end
 
-      def find_broker_agency_profile
-        @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(params[:id])).first.broker_agency_profile
+      def find_broker_agency_profile(broker_agency_profile_id = nil)
+        id = broker_agency_profile_id || BSON::ObjectId(params[:id])
+        @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first.broker_agency_profile
         # authorize @broker_agency_profile, :access_to_broker_agency_profile?
+      end
+
+      def find_hbx_profile
       end
 
       def check_admin_staff_role
@@ -144,6 +235,24 @@ module BenefitSponsors
         else
           flash[:notice] = "You don't have a Broker Agency Profile associated with your Account!! Please register your Broker Agency first."
         end
+      end
+
+      def send_general_agency_assign_msg(general_agency, employer_profile, status)
+      end
+
+      def eligible_brokers
+      end
+
+      def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)
+      end
+
+      def person_market_kind
+      end
+
+      def check_general_agency_profile_permissions_assign
+      end
+
+      def check_general_agency_profile_permissions_set_default
       end
 
       def update_broker_phone(office_location, person)
