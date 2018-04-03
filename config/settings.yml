@@ -270,3 +270,4 @@ style:
   primary_button_color: '#286090'
   primary_button_disabled: '#337ab7'
   primary_button_border_disabled: '#2e6da4'
+  primary_icon_color: '#c56c24'
