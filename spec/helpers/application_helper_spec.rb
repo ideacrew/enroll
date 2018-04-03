@@ -37,7 +37,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
       allow(carrier_profile).to receive_message_chain(:legal_name, :extract_value).and_return('kaiser')
     end
     it "should return the named logo" do
-      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/images/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
     end
 
   end
