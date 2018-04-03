@@ -172,7 +172,7 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
   def boolean_to_glyph_with_hover_text(test)
-    test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'", title: test) : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
+    test ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test}'></i>".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>".html_safe
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
