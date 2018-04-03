@@ -1,4 +1,4 @@
 module BenefitSponsors
-  module ContributionCalculator
+  module ContributionCalculators
   end
 end

@@ -23,6 +23,7 @@ BenefitSponsors::Engine.routes.draw do
 
     namespace :employers do
       resources :employer_profiles
+      resources :employer_staff_roles
     end
   end
 

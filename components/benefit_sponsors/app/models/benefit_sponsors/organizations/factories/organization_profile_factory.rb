@@ -37,6 +37,7 @@ module BenefitSponsors
 
       def assign_wrapper_attributes(attrs = {})
         attrs.each_pair do |k,v|
+          v = v.to_sym if k == 'entity_kind'
           self.send("#{k}=", v)
         end
       end
@@ -49,7 +50,7 @@ module BenefitSponsors
           :fein => fein,
           :legal_name => legal_name,
           :dba => dba,
-          :entity_kind => entity_kind,
+          :entity_kind => entity_kind.to_sym,
           :office_locations => office_locations,
           :site => site
         )

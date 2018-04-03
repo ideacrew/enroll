@@ -15,7 +15,7 @@ module BenefitSponsors
         raise NotImplementedError.new("subclass responsiblity")
       end
 
-      def calc_coverage_age_for(eligiblity_dates, coverage_start_date, member)
+      def calc_coverage_age_for(eligibility_dates, coverage_start_date, member)
         coverage_elig_date = eligibility_dates[member.member_id]
         coverage_as_of_date = coverage_elig_date.blank? ? coverage_start_date : coverage_elig_date
         before_factor = if (coverage_as_of_date.month > member.dob.month)

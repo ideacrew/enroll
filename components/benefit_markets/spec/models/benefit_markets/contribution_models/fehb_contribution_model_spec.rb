@@ -34,7 +34,7 @@ module BenefitMarkets
 
       let(:contribution_model) do
         ContributionModels::FehbContributionModel.new(
-          :contribution_level_kind => "::BenefitSponsors::SponsoredBenefits::FehbContributionLevel",
+          :sponsor_contribution_kind => "::BenefitSponsors::SponsoredBenefits::FehbSponsoredBenefit",
           :contribution_calculator_kind => "::BenefitSponsors::ContributionCalculators::FehbContributionCalculator",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,

@@ -1,6 +1,16 @@
 module BenefitSponsors
   module ContributionCalculators
-    class SimpleShopReferencePlanContributionCalculator < PricingCalculator
+    class SimpleShopReferencePlanContributionCalculator < ContributionCalculator
+      ContributionResult = Struct.new(:total_contribution, :member_contributions)
+      ContributionEntry = Struct.new(
+       :roster_coverage,
+       :relationship,
+       :dob,
+       :member_id,
+       :dependents,
+       :roster_entry_pricing,
+       :roster_entry_contribution
+      )
       class CalculatorState
         attr_reader :total_contribution
         attr_reader :member_contributions
@@ -9,7 +19,7 @@ module BenefitSponsors
           @rate_schedule_date = r_coverage.rate_schedule_date
           @contribution_model = c_model
           @contribution_calculator = c_calc
-          @total_contributions = 0.00
+          @total_contribution = 0.00
           @member_prices = m_prices
           @member_contributions = {}
           @reference_product = r_product
@@ -20,20 +30,20 @@ module BenefitSponsors
         end
 
         def add(member)
-          c_percent = get_contribution_percent(member)
-          c_amount = calc_contribution_amount_for(member, c_percent)
-          @member_totals[member.member_id] = c_amount 
-          @total = BigDecimal.new((@total + c_amount).to_s).round(2)
+          c_factor = contribution_factor_for(member)
+          c_amount = calc_contribution_amount_for(member, c_factor)
+          @member_contributions[member.member_id] = c_amount 
+          @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
           self
         end
 
-        def calc_contribution_amount_for(member, c_percent)
+        def calc_contribution_amount_for(member, c_factor)
           member_price = @member_prices[member.member_id]
-          if (member_price == 0.00) || (c_percent == 0)
+          if (member_price == 0.00) || (c_factor == 0)
             0.00
           end
           ref_rate = reference_rate_for(member)
-          ref_contribution = BigDecimal.new((ref_rate * 0.01 * c_percent).to_s).round(2)
+          ref_contribution = BigDecimal.new((ref_rate * c_factor).to_s).round(2)
           if member_price <= ref_contribution
             member_price
           else
@@ -50,18 +60,22 @@ module BenefitSponsors
           )
         end
 
-        def contribution_percent_for(roster_entry_member)
+        def contribution_factor_for(roster_entry_member)
           cu = get_contribution_unit(roster_entry_member)
           cl = @level_map[cu.id]
-          cl.contribution_pct
+          cl.contribution_factor
         end
 
         def get_contribution_unit(roster_entry_member)
           rel_name = @contribution_model.map_relationship_for(roster_entry_member.relationship)
           @contribution_model.contribution_units.detect do |cu|
-            cu.match?({rel_name => 1})
+            cu.match?({rel_name.to_s => 1})
           end
         end
+      end
+
+      def initialize
+        @level_map = {}
       end
 
       # Calculate contributions for the given entry
@@ -75,9 +89,7 @@ module BenefitSponsors
       #   contribution results paired with the roster
       def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
         reference_product = sponsor_contribution.reference_product
-        level_map = sponsor_contribution.contribution_levels.inject({}) do |acc, cl|
-          acc[cl.contribution_unit_id] = cl
-        end
+        level_map = level_map_for(sponsor_contribution)
         state = CalculatorState.new(
           self,
           contribution_model,
@@ -86,19 +98,32 @@ module BenefitSponsors
           reference_product,
           level_map
         )
-        roster_entry_contribution = OpenStruct.new({
-          total_contribution: state.total_contribution,
-          member_contributions: state.member_contributions
-        })
-        OpenStruct.new(
-          roster_coverage: priced_roster_entry.roster_coverage,
-          relationship: priced_roster_entry.relationship,
-          dob: priced_roster_entry.dob,
-          member_id: priced_roster_entry.member_id,
-          dependents: priced_roster_entry.dependents,
-          roster_entry_pricing: priced_roster_entry.roster_entry_pricing,
-          roster_entry_contribution: roster_entry_contribution
+        member_list = [priced_roster_entry] + priced_roster_entry.dependents
+        member_list.each do |member|
+          state.add(member)
+        end
+        roster_entry_contribution = ContributionResult.new(
+          state.total_contribution,
+          state.member_contributions
         )
+        ContributionEntry.new(
+          priced_roster_entry.roster_coverage,
+          priced_roster_entry.relationship,
+          priced_roster_entry.dob,
+          priced_roster_entry.member_id,
+          priced_roster_entry.dependents,
+          priced_roster_entry.roster_entry_pricing,
+          roster_entry_contribution
+        )
+      end
+
+      protected
+
+      def level_map_for(sponsor_contribution)
+        @level_map[sponsor_contribution.id] ||= sponsor_contribution.contribution_levels.inject({}) do |acc, cl|
+          acc[cl.contribution_unit_id] = cl
+          acc
+        end
       end
     end
   end

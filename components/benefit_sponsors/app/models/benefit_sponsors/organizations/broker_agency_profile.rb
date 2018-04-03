@@ -26,7 +26,6 @@ module BenefitSponsors
 
       field :home_page, type: String
 
-      embeds_one  :inbox, as: :recipient, cascade_callbacks: true
       embeds_many :documents, as: :documentable
       accepts_nested_attributes_for :inbox
 
