@@ -6,9 +6,9 @@ module BenefitSponsors
 
     # let(:date_range) { (Date.today..1.year.from_now) }
     let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new }
-    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
+    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc, benefit_markets: [benefit_market]) }
     let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
-    let(:benefit_market)            { BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "DC Health SHOP", site: site) }
+    let(:benefit_market)            { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "DC Health SHOP") }
 
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -78,10 +78,7 @@ module BenefitSponsors
 
     context "#to_plan_year", dbclean: :after_each do
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
-      let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(
-        benefit_market: "aca_shop_cca",
-#        enrollment_frequency: "rolling_month"
-      )}
+      let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(benefit_market: :aca_shop_cca) }
 
       let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }

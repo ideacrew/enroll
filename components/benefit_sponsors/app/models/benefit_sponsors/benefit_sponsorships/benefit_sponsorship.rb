@@ -37,19 +37,19 @@ module BenefitSponsors
                   counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
+      has_many    :benefit_applications,
+                  class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+
       belongs_to  :benefit_market, 
                   counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarket"
 
       belongs_to  :rating_area, 
                   counter_cache: true,
-                  class_name: "BenefitSponsors::Locations::RatingArea"
+                  class_name: "::BenefitMarkets::Locations::RatingArea"
 
       has_many    :service_areas, 
-                  class_name: "BenefitSponsors::Locations::ServiceArea"
-
-      has_many    :benefit_applications,
-                  class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+                  class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       validates_presence_of :organization, :profile_id, :benefit_market
 

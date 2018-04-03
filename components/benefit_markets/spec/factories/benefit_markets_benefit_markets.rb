@@ -12,7 +12,7 @@ FactoryGirl.define do
 
     trait :with_benefit_catalog do
       after :build do |benefit_market, evaluator|
-        benefit_market.benefit_catalogs << build(:benefit_catalogs_benefit_catalog)
+        benefit_market.benefit_catalogs << build(:benefit_markets_benefit_catalog)
       end
     end
 

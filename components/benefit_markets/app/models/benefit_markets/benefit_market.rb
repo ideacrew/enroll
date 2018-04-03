@@ -6,19 +6,15 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
-
     attr_reader :contact_center_profile
 
     field :kind,        type: Symbol #, default: :aca_individual  # => :aca_shop
     field :title,       type: String, default: "" # => DC Health Link SHOP Market
     field :description, type: String, default: ""
 
-    belongs_to  :site,                  class_name: "BenefitSponsors::Site"
-    #TODO: Commenting out until we connect BenefitApplications into engine
-    #has_many    :benefit_applications,  class_name: "BenefitApplications::BenefitApplication"
-    #TODO: Commenting until we add benefit_catalog class
-    #has_many    :benefit_catalogs,      class_name: "BenefitCatalogs::BenefitCatalog"
+    # belongs_to  :site,                  class_name: "::BenefitSponsors::Site"
+    # has_many    :benefit_sponsorships,  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+    has_many    :benefit_catalogs,      class_name: "BenefitMarkets::BenefitCatalog"
 
     embeds_one :configuration,  as: :configurable
     # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",

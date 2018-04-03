@@ -3,19 +3,17 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
 
-    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
+    let(:benefit_market)            { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "DC Health SHOP") }
+    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc, benefit_markets: [benefit_market]) }
     let(:organization)              { BenefitSponsors::Organizations::GeneralOrganization.new(site: site, fein: 123456789, legal_name: "DC")}
     let(:profile)                   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(organization: organization) }
-    let(:benefit_market)            { BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "DC Health SHOP", site: site) }
-    let(:contact_method)            { :paper_and_electronic }
 
 
     let(:params) do 
       {
-        organization: organization,
         benefit_market: benefit_market,
+        organization: organization,
         profile: profile,
-        contact_method: contact_method,
       }
     end
 
@@ -47,7 +45,7 @@ module BenefitSponsors
         end
       end
 
-      context "with no open profile" do
+      context "with no profile" do
         subject { described_class.new(params.except(:profile)) }
 
         it "should not be valid" do
@@ -56,12 +54,13 @@ module BenefitSponsors
         end
       end
 
-      context "with no open contact_method" do
+      # Contact method set by default in the model
+      context "with no contact_method" do
         subject { described_class.new(params.except(:contact_method)) }
 
         it "should not be valid" do
           subject.validate
-          expect(subject).to_not be_valid
+          expect(subject).to be_valid
         end
       end
 
@@ -125,7 +124,7 @@ module BenefitSponsors
       end
 
       context "using rating_area helper method" do
-        let(:rating_area)                   { BenefitSponsors::Locations::RatingArea.new }
+        let(:rating_area)                   { ::BenefitMarkets::Locations::RatingArea.new }
         let(:profile_with_rating_area)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(rating_area: rating_area ) }
         let(:profile_with_nil_rating_area)  { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new }
         let(:profile_without_rating_area)   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }

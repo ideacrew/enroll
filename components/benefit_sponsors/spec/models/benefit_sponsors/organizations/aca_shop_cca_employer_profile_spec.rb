@@ -25,7 +25,7 @@ module BenefitSponsors
     let(:office_locations)  { [office_location] }
 
     let(:sic_code)          { '1111' }
-    let(:rating_area)       { BenefitSponsors::Locations::RatingArea.new }
+    let(:rating_area)       { ::BenefitMarkets::Locations::RatingArea.new }
 
 
     let(:params) do 
@@ -94,7 +94,7 @@ module BenefitSponsors
 
     context "A BenefitSponsorship association", dbclean: :after_each do
       let(:site)                { BenefitSponsors::Site.new(site_key: :cca) }
-      let(:benefit_market)      { BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site: site) }
+      let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site: site) }
       let(:legal_name)          { "MA Health Connector" }
       let(:organization)        { BenefitSponsors::Organizations::GeneralOrganization.new(
                                       site: site,
@@ -115,7 +115,7 @@ module BenefitSponsors
       let(:office_location)     { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
       let(:office_locations)    { [office_location] }
       let(:sic_code)            { '1111' }
-      let(:rating_area)         { BenefitSponsors::Locations::RatingArea.new }
+      let(:rating_area)         { ::BenefitMarkets::Locations::RatingArea.new }
 
 
 

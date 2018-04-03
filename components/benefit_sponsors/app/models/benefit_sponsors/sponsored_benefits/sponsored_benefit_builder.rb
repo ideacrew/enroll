@@ -1,3 +1,4 @@
+# 
 module BenefitSponsors
   module SponsoredBenefits
     class SponsoredBenefitBuilder
@@ -10,21 +11,25 @@ module BenefitSponsors
         builder.sponsored_benefit
       end
 
-      def initialize()
+      def initialize
         @sponsored_benefit = nil
-        @sponsored_benefit = sponsored_benefit.new
+        # @sponsored_benefit = sponsored_benefit.new
       end
 
-      def product_kind=(new_product_kind)
-        validate_product_kind!(new_product_kind)
-
-        @sponsored_benefit 
-        @product_kind = new_product_kind
+      def add_benefit_products(new_benefit_products)
+        @sponsored_benefit.benefit_products = new_benefit_products
       end
 
-      def product_package_kind=(new_product_package_kind)
-        validate_product_package_kind!(new_product_package_kind)
-        @product_package_kind = new_product_package_kind
+      def add_sponsor_contribution(new_sponsor_contribution)
+        @sponsored_benefit.sponsor_contribution = new_sponsor_contribution
+      end
+
+      def add_sponsor_eligibility_policy(new_sponsor_eligibility_policy)
+        @sponsored_benefit.eligibility_policies << new_sponsor_eligibility_policy
+      end
+
+      def add_member_eligibility_policy(new_member_eligibility_policy)
+        @sponsored_benefit.eligibility_policies << new_member_eligibility_policy
       end
 
       def sponsored_benefit
@@ -48,18 +53,6 @@ module BenefitSponsors
       def product_namespace
         local_namespace = parent_namespace_for(self.class)
         parent_namespace_for(local_namespace) + "::Products"
-      end
-
-      def add_contribution_model(new_contribution_model)
-        @sponsored_benefit.contribution_model = new_contribution_model
-      end
-
-      def add_sponsor_eligibility_policy(new_sponsor_eligibility_policy)
-        @sponsored_benefit.eligibility_policies << new_sponsor_eligibility_policy
-      end
-
-      def add_member_eligibility_policy(new_member_eligibility_policy)
-        @sponsored_benefit.eligibility_policies << new_member_eligibility_policy
       end
 
       def validate_product_kind!(product_kind)
