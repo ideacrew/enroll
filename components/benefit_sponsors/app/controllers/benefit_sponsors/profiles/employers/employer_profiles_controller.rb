@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Profiles
-    class Employers::EmployerProfilesController < ::ApplicationController
+    class Employers::EmployerProfilesController < ApplicationController
       before_action :get_site_key
       before_action :initiate_employer_profile, only: [:create]
       before_action :find_employer, only: [:show, :edit, :show_profile, :destroy, :inbox,
@@ -155,8 +155,7 @@ module BenefitSponsors
       private
 
       def get_site_key
-        @site_key = :dc
-        # @site_key = self.class.superclass.current_site.site_key
+        @site_key = self.class.superclass.current_site.site_key
       end
 
       def initiate_employer_profile

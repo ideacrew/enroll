@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Profiles
-    class Employers::EmployerStaffRolesController < ::ApplicationController
+    class Employers::EmployerStaffRolesController < ApplicationController
 
       #TODO for employer profile and authorization
       # before_action :check_access_to_employer_profile, :updateable?
