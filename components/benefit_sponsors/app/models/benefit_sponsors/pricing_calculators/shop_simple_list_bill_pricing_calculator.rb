@@ -1,6 +1,16 @@
 module BenefitSponsors
   module PricingCalculators
     class ShopSimpleListBillPricingCalculator < PricingCalculator
+      PriceResult = Struct.new(:total_price, :member_pricing)
+      PricedEntry = Struct.new(
+       :roster_coverage,
+       :relationship,
+       :dob,
+       :member_id,
+       :dependents,
+       :roster_entry_pricing
+      )
+
       class CalculatorState
         attr_reader :total
         attr_reader :member_totals
@@ -69,17 +79,17 @@ module BenefitSponsors
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end
-        roster_entry_pricing = OpenStruct.new({
-          total_price: calc_results.total,
-          member_pricing: calc_results.member_totals
-        })
-        OpenStruct.new(
-          roster_coverage: roster_coverage,
-          relationship: benefit_roster_entry.relationship,
-          dob: benefit_roster_entry.dob,
-          member_id: benefit_roster_entry.member_id,
-          dependents: benefit_roster_entry.dependents,
-          roster_entry_pricing: roster_entry_pricing
+        roster_entry_pricing = PriceResult.new(
+          calc_results.total,
+          calc_results.member_totals
+        )
+        PricedEntry.new(
+          roster_coverage,
+          benefit_roster_entry.relationship,
+          benefit_roster_entry.dob,
+          benefit_roster_entry.member_id,
+          benefit_roster_entry.dependents,
+          roster_entry_pricing
         )
       end
 

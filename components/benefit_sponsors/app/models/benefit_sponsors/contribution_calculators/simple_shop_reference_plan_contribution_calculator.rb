@@ -1,6 +1,16 @@
 module BenefitSponsors
   module ContributionCalculators
     class SimpleShopReferencePlanContributionCalculator < ContributionCalculator
+      ContributionResult = Struct.new(:total_contribution, :member_contributions)
+      ContributionEntry = Struct.new(
+       :roster_coverage,
+       :relationship,
+       :dob,
+       :member_id,
+       :dependents,
+       :roster_entry_pricing,
+       :roster_entry_contribution
+      )
       class CalculatorState
         attr_reader :total_contribution
         attr_reader :member_contributions
@@ -92,18 +102,18 @@ module BenefitSponsors
         member_list.each do |member|
           state.add(member)
         end
-        roster_entry_contribution = OpenStruct.new({
-          total_contribution: state.total_contribution,
-          member_contributions: state.member_contributions
-        })
-        OpenStruct.new(
-          roster_coverage: priced_roster_entry.roster_coverage,
-          relationship: priced_roster_entry.relationship,
-          dob: priced_roster_entry.dob,
-          member_id: priced_roster_entry.member_id,
-          dependents: priced_roster_entry.dependents,
-          roster_entry_pricing: priced_roster_entry.roster_entry_pricing,
-          roster_entry_contribution: roster_entry_contribution
+        roster_entry_contribution = ContributionResult.new(
+          state.total_contribution,
+          state.member_contributions
+        )
+        ContributionEntry.new(
+          priced_roster_entry.roster_coverage,
+          priced_roster_entry.relationship,
+          priced_roster_entry.dob,
+          priced_roster_entry.member_id,
+          priced_roster_entry.dependents,
+          priced_roster_entry.roster_entry_pricing,
+          roster_entry_contribution
         )
       end
 
