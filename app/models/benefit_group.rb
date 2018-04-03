@@ -187,7 +187,7 @@ class BenefitGroup
     else
       if plan_option_kind == "single_carrier"
         if offerings_constrained_to_service_areas?
-          plans = Plan.for_service_areas_and_carriers(single_carrier_pair, start_on.year).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/).with_enabled_metal_levels
+          plans = Plan.for_service_areas_and_carriers(single_carrier_pair, start_on.year).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/)
         else
           plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).with_enabled_metal_levels
         end
