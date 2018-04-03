@@ -26,7 +26,16 @@ module BenefitSponsors
 
         def init_benefit_sponsor
           organization = init_organization
+
           profile.entity_kind = entity_kind
+
+          #TODO refactor
+          #currently organization have office locations
+          #profile have office locations
+          profile.office_locations << office_locations
+
+          #TODO
+          #fix for employer profile
           profile.contact_method = contact_method
 
           organization.profiles << profile
@@ -78,13 +87,13 @@ module BenefitSponsors
 
         def create_employer_staff_role(current_user, profile, existing_company)
           person.user = current_user
-          employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
+          employer_ids = person.benefit_sponsors_employer_staff_roles.map(&:employer_profile_id)
           if employer_ids.include? profile.id
             pending = false
           else
-            pending = existing_company && Person.staff_for_employer(profile).detect{|person|person.user_id}
+            pending = existing_company && Person.staff_for_benefit_sponsors_employer(profile).detect{|person|person.user_id}
             role_state = pending ? 'is_applicant' : 'is_active' 
-            person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
+            person.employer_staff_roles << BenefitSponsorsEmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
           end
           current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
           current_user.save!

@@ -61,10 +61,10 @@
                 <% phone = staff.phones.detect {|phone| phone.kind == 'work'} %>
                 <%= phone && phone.to_s %>
               <td>
-                <% role = staff.employer_staff_roles.detect {|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
+                <% role = staff.benefit_sponsors_employer_staff_roles.detect {|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                 <%= role && role.current_state %>
                 <% if role.is_applicant? %>
-                  <%= link_to(approve_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), id: 'approve_' + staff.id.to_s) do %>
+                  <%= link_to(approve_profiles_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), id: 'approve_' + staff.id.to_s) do %>
                     approve
                   <% end %>
                 <% end %>

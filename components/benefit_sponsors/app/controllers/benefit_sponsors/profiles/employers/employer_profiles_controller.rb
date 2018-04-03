@@ -1,10 +1,11 @@
 module BenefitSponsors
   module Profiles
-    class Employers::EmployerProfilesController < ApplicationController
+    class Employers::EmployerProfilesController < ::ApplicationController
       before_action :get_site_key
       before_action :initiate_employer_profile, only: [:create]
       before_action :find_employer, only: [:show, :edit, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
+                                           :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
+      before_action :check_employer_staff_role, only: [:new]
 
       def new
         @sponsor = Organizations::Factories::BenefitSponsorFactory.new(nil)
@@ -34,38 +35,48 @@ module BenefitSponsors
         end
       end
 
+      #New person registered with existing organization and approval request submitted to employer
+      def show_pending
+        respond_to do |format|
+          format.html {render "benefit_sponsors/profiles/employers/employer_profiles/show_pending.html.erb"}
+          format.js
+        end
+      end
+
       def show
         @tab = params['tab']
         if params[:q] || params[:page] || params[:commit] || params[:status]
           # paginate_employees
         else
           case @tab
-          when 'benefits'
-            # @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-            # sort_plan_years(@employer_profile.plan_years)
-          when 'documents'
-          when 'employees'
-            # @current_plan_year = @employer_profile.show_plan_year
-            # paginate_employees
-          when 'brokers'
-            # @broker_agency_accounts = @employer_profile.broker_agency_accounts
-          when 'inbox'
+            when 'benefits'
+              # @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
+              # sort_plan_years(@employer_profile.plan_years)
+            when 'documents'
+            when 'employees'
+              # @current_plan_year = @employer_profile.show_plan_year
+              # paginate_employees
+            when 'brokers'
+              # @broker_agency_accounts = @employer_profile.broker_agency_accounts
+            when 'inbox'
 
-          else
-            # @broker_agency_accounts = @employer_profile.broker_agency_accounts
-            # @current_plan_year = @employer_profile.show_plan_year
-            # collect_and_sort_invoices(params[:sort_order])
-            # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+            else
+              # @broker_agency_accounts = @employer_profile.broker_agency_accounts
+              # @current_plan_year = @employer_profile.show_plan_year
+              # collect_and_sort_invoices(params[:sort_order])
+              # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
-            # set_flash_by_announcement if @tab == 'home'
+              # set_flash_by_announcement if @tab == 'home'
+              respond_to do |format|
+                format.html {render "benefit_sponsors/profiles/employers/employer_profiles/show.html.erb"}
+                format.js
+              end
           end
         end
       end
 
       def edit
-        @staff = Person.staff_for_employer_including_pending(@employer_profile)
-        # This & respective views should go to ER staff roles controller TODO
-        # @add_staff = params[:add_staff]
+        @staff = Person.staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
       end
 
       def update
@@ -144,7 +155,8 @@ module BenefitSponsors
       private
 
       def get_site_key
-        @site_key = self.class.superclass.current_site.site_key
+        @site_key = :dc
+        # @site_key = self.class.superclass.current_site.site_key
       end
 
       def initiate_employer_profile
@@ -163,6 +175,15 @@ module BenefitSponsors
         @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
         @employer_profile = @organization.employer_profile
         render file: 'public/404.html', status: 404 if @employer_profile.blank?
+      end
+
+      #checks if person is approved by employer for staff role
+      #Redirects to home page of employer profile if approved
+      #person with pending/denied approval will be redirected to new registration page
+      def check_employer_staff_role
+        if current_user.person && current_user.person.has_active_benefit_sponsors_employer_staff_role?
+          redirect_to profiles_employers_employer_profile_path(:id => current_user.person.active_benefit_sponsors_employer_staff_roles.first.employer_profile_id, :tab => "home")
+        end
       end
     end
   end
