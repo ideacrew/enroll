@@ -4,6 +4,7 @@ module BenefitMarkets
   class MockContributionLevel
     attr_accessor :contribution_unit_id
     attr_accessor :contribution_factor
+    attr_accessor :min_contribution_factor
     attr_accessor :contribution_cap
     attr_accessor :display_name
     attr_accessor :order
