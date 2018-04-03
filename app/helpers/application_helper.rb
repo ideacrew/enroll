@@ -171,8 +171,8 @@ module ApplicationHelper
   end
 
   # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
-  def boolean_to_glyph_with_hover_text(test)
-    test ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test}'></i>".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>".html_safe
+  def prepend_glyph_to_text(test)
+    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
