@@ -49,11 +49,11 @@ module Config::AcaModelConcern
     end
 
     def aca_shop_market_transmit_scheduled_employers
-      @@aca_aca_shop_market_transmit_scheduled_employers ||= Settings.aca.shop_market.transmit_scheduled_employers
+      @@aca_shop_market_transmit_scheduled_employers ||= Settings.aca.shop_market.transmit_scheduled_employers
     end
     
     def aca_shop_market_employer_transmission_day_of_month
-      @@aca_aca_shop_market_employer_transmission_day_of_month ||= Settings.aca.shop_market.employer_transmission_day_of_month
+      @@aca_shop_market_employer_transmission_day_of_month ||= Settings.aca.shop_market.employer_transmission_day_of_month
     end
 
     def individual_market_is_enabled?
