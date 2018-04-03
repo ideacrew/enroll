@@ -1,6 +1,6 @@
 module BenefitSponsors
   module PricingCalculators
-    class ShopSimpleListBillPricingCalculator < PricingCalculator
+    class CcaShopListBillPricingCalculator < PricingCalculator
       PriceResult = Struct.new(:total_price, :member_pricing)
       PricedEntry = Struct.new(
        :roster_coverage,
@@ -15,7 +15,7 @@ module BenefitSponsors
         attr_reader :total
         attr_reader :member_totals
 
-        def initialize(product, p_model, p_unit_map, r_coverage)
+        def initialize(product, p_model, p_unit_map, r_coverage, gs_factor, sc_factor)
           @pricing_unit_map = p_unit_map
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
@@ -26,6 +26,8 @@ module BenefitSponsors
           @coverage_start_date = r_coverage.coverage_start_date
           @rating_area = r_coverage.rating_area
           @product = product
+          @group_size_factor = gs_factor
+          @sic_code_factor = sc_factor
         end
 
         def add(member)
@@ -44,7 +46,7 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          @member_totals[member.member_id] = member_price
+          @member_totals[member.member_id] = BigDecimal.new((member_price * @group_size_factor * @sic_code_Factor).to_s).round(2)
           @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
         end
@@ -67,7 +69,8 @@ module BenefitSponsors
         @pricing_unit_map = {}
       end
 
-      def calculate_price_for(pricing_model, benefit_roster_entry, _sponsor_contribution = nil)
+      # TODO: how do I get in the place I can pull the group size and 
+      def calculate_price_for(pricing_model, benefit_roster_entry, sponsor_contribution)
         pricing_unit_map = pricing_unit_map_for(pricing_model)
         roster_entry = benefit_roster_entry
         roster_coverage = benefit_roster_entry.roster_coverage
@@ -75,7 +78,10 @@ module BenefitSponsors
         sorted_members = members_list.sort_by do |rm|
           [pricing_model.map_relationship_for(rm.relationship), rm.dob]
         end
-        calc_state = CalculatorState.new(roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage)
+        # CCA policy decision: in non-composite group size is always treated as 1
+        gs_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_group_size_factor(product, 1)
+        sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sponsor_contribution.sic_code)
+        calc_state = CalculatorState.new(roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, gs_factor, sc_factor)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end
