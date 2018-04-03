@@ -205,10 +205,6 @@ class QualifyingLifeEventKind
       where(:market_kind => "individual").active.to_a
     end
 
-    # This method returns shop market QLE when dependent house hold adding or removing
-    #
-    # @return [Array<BSON_FIELDS>]
-
   end
 
   def date_hint
