@@ -262,10 +262,10 @@ style:
   primary_orange: '#333'
   brand_primary: '#007bc4'
   primary_color: '#003260'
-
   primary_notification: '#d41414'
   primary_panel: '#69A30D'
   primary_button: '#e72b2d'
   primary_button_color: '#b7191b'
   primary_button_disabled: ‘#c9302c’
   primary_button_border_disabled: ‘#ac2925’
+  alternate_header_color: '#003260'
