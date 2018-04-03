@@ -17,7 +17,7 @@ module Queries
     end
 
     def build_scope()
-      family = Family
+      family = Family.where("is_active" => true)
       person = Person
       if @custom_attributes['families'] == 'by_enrollment_individual_market'
         family = family.all_enrollments

@@ -501,7 +501,7 @@ end
     end
 
     it "should raise error when non boolean values are passed" do
-      expect{helper.convert_to_bool(val9)}.to raise_error
+      expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
     end
   end
 end

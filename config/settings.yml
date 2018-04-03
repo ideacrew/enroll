@@ -9,15 +9,13 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
-  forms: "https://dchealthlink.com/forms#en"
-  website_url: "www.healthcare.gov"
+  healthcare_name: "www.healthcare.gov"
+  healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
 
   social_media:
     facebook_url: ""
-
-  aca_market_kinds: ["individual", "shop"]
 
 contact_center:
   name: "DC Health Link's Customer Care Center"
@@ -32,6 +30,7 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   hbx_abbreviation: "DC Health Benefit Exchange"
+  market_kinds: ["individual", "shop"]
 #
   qle:
     with_in_sixty_days: 60

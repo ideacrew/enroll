@@ -28,6 +28,9 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
 
     census_employees = CensusEmployee.by_ssn(decrypted_ssn)
     if census_employees.size != 1
+      if census_employees.present? && ENV['employer_fein'].present?
+        census_employee(decrypted_ssn, ENV['employer_fein'])
+      end
       puts "Found 0 or more than 1 Census Records with this SSN" unless Rails.env.test?
       return 
     else
@@ -46,6 +49,7 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
       return
     else
       census_employee.update_attributes!(ssn: new_decrypted_ssn)
+      puts "updated ssn on Census Record" unless Rails.env.test?
     end
   end
 

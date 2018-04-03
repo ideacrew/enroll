@@ -747,6 +747,7 @@ describe Person do
   describe "does not allow two people with the same user ID to be saved", dbclean: :around_each do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
+    before do Person.collection.indexes.create_one({user_id: 1}, {sparse:true, unique: true}) end
 
     it "should let fail to save" do
       user_id = BSON::ObjectId.new
