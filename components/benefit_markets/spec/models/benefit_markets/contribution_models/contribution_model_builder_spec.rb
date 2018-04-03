@@ -47,7 +47,7 @@ module BenefitMarkets
 
       let(:contribution_model) do
         ContributionModels::FehbContributionModel.new(
-          :contribution_level_kind => "::BenefitMarkets::MockContributionLevel",
+          :sponsor_contribution_kind => "Whatever",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
           :name => "Federal Heath Benefits"
@@ -57,7 +57,14 @@ module BenefitMarkets
       let(:builder) { ContributionModels::ContributionModelBuilder.new }
 
       describe "#build_contribution_unit_values" do
-        let(:subject) { builder.build_contribution_levels(contribution_model) }
+        let(:sponsored_benefit) { double("sponsored benefit mock", :contribution_levels => cl_builder) }
+        let(:cl_builder) { double }
+
+        let(:subject) { builder.build_contribution_levels(contribution_model, sponsored_benefit) }
+
+        before :each do
+          allow(cl_builder).to receive(:build).with(no_args).and_return(::BenefitMarkets::MockContributionLevel.new)
+        end
 
         it "builds the correct number" do
           expect(subject.length).to eq 1

@@ -22,9 +22,9 @@ module BenefitMarkets
         expect(subject.errors.has_key?(:member_relationships)).to be_truthy
       end
 
-      it "is missing contribution level kind" do
+      it "is missing sponsor contribution kind" do
         subject.valid?
-        expect(subject.errors.has_key?(:contribution_level_kind)).to be_truthy
+        expect(subject.errors.has_key?(:sponsor_contribution_kind)).to be_truthy
       end
     end
   end
