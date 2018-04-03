@@ -10,6 +10,8 @@ module Notifier
     attribute :mailing_address, MergeDataModels::Address
     attribute :employer_name, String
     # attribute :coverage_begin_date, Date
+    attribute :dependents_name, String
+    attribute :dependent_termination_date, String
     attribute :broker, MergeDataModels::Broker
     attribute :date_of_hire, String
     attribute :earliest_coverage_begin_date, String

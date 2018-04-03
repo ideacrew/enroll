@@ -1819,48 +1819,4 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     end
   end
-
-  describe '.employee_dependent_age_off_termination' do
-    let!(:employer_profile){ create :employer_profile, aasm_state: "enrolled"}
-    let!(:employee_role) {FactoryGirl.create(:employee_role, person: family.primary_applicant.person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
-    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
-    let!(:date) {TimeKeeper.date_of_record - 10.days}
-    let!(:other_child_person1) { FactoryGirl.create(:person)  }
-    let!(:other_child_person2) { FactoryGirl.create(:person)  }
-    let!(:family) {
-      family = FactoryGirl.build(:family, :with_primary_family_member)
-      primary_person = family.family_members.where(is_primary_applicant: true).first.person
-      primary_person.person_relationships << PersonRelationship.new(relative_id: other_child_person1.id, kind: "child")
-      primary_person.person_relationships << PersonRelationship.new(relative_id: other_child_person2.id, kind: "child")
-      primary_person.save
-      other_child_person1.dob = Date.new(date.year, date.month, date.beginning_of_month.day) - 26.years
-      other_child_person2.dob = Date.new(date.year, date.month, date.beginning_of_month.day) - 26.years
-      other_child_person1.save
-      other_child_person2.save
-      family.save
-      family
-    }
-    let!(:family_member1) { FactoryGirl.create(:family_member, family: family, person: other_child_person1)  }
-    let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: other_child_person2)  }
-    let!(:enrollment) do
-      hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", employee_role_id: employee_role.id)
-      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: date, coverage_start_on: date)
-      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: false).first.id, is_subscriber: false, eligibility_date: date, coverage_start_on: date)
-      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.where(is_primary_applicant: false).last.id, is_subscriber: false, eligibility_date: date, coverage_start_on: date)
-      hbx.save
-      hbx
-    end
-
-    before do
-      allow(family.active_household).to receive(:hbx_enrollments).and_return [enrollment]
-      allow(employee_role).to receive(:census_employee).and_return census_employee
-      allow(family.primary_applicant.person).to receive(:active_employee_roles).and_return [employee_role]
-    end
-
-    it "trigger when dependent's age is 26" do
-      expect(enrollment.any_dependent_members_age_above_26?).to eq true
-      expect(CensusEmployee).to receive(:employee_dependent_age_off_termination).with(date.beginning_of_month)
-      expect{CensusEmployee.employee_dependent_age_off_termination(date.beginning_of_month)}.not_to raise_error
-    end
-  end
 end

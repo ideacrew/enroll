@@ -597,28 +597,6 @@ shop_notice_triggers = [
     },
 
     {
-      hbx_id: 'SHOP_M081',
-      title: 'Dependent termination due to age off',
-      description: 'Dependent EE coverage Termination due to Age-Off on policy when turn 26',
-      resource_name: 'employee_role',
-      event_name: 'employee_dependent_age_off_termination',
-      notice_triggers: [
-          {
-              name: 'Notice to EE of DPT Termination due to Age-Off',
-              notice_template: 'notices/shop_employee_notices/employee_dependent_termination_notice',
-              notice_builder: 'ShopEmployeeNotices::EmployeeDependentTerminationNotice',
-              mpi_indicator: 'SHOP_M081',
-              notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employee"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-              }
-          }
-      ]
-    },
-
-    {
         hbx_id: 'SHOP_M022',
         title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
         description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
