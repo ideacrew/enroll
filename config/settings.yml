@@ -18,7 +18,7 @@ site:
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "DC Health Link"
   byline: "DC's Online Health Insurance Marketplace"
-  long_name: ""
+  long_name: "DC Health Link"
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
