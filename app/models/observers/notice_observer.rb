@@ -73,8 +73,9 @@ module Observers
       if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
         hbx_enrollment = new_model_event.klass_instance
         if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
-          is_valid_employer_py_oe = (hbx_enrollment.effective_on == hbx_enrollment.benefit_group.start_on)
           
+          is_valid_employer_py_oe = (hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.submitted_at) || hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.created_at))
+
           if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
             if is_valid_employer_py_oe
               trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
