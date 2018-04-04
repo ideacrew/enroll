@@ -4,6 +4,8 @@ module ModelEvents
     REGISTERED_EVENTS = [
       :application_coverage_selected,
       :employee_waiver_confirmation
+      :employer_notice_for_employee_coverage_termination,
+      :employee_notice_for_employee_coverage_termination
     ]
 
     def notify_on_save
@@ -16,6 +18,12 @@ module ModelEvents
 
         if is_transition_matching?(to: :inactive, from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], event: :waive_coverage)
           is_employee_waiver_confirmation = true
+          
+        if is_transition_matching?(to: :coverage_terminated, from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
+                         :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, 
+                         :renewing_contingent_enrolled, :enrolled_contingent, :unverified], event: :terminate_coverage)
+          is_employer_notice_for_employee_coverage_termination = true
+          is_employee_notice_for_employee_coverage_termination = true
         end
       
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers

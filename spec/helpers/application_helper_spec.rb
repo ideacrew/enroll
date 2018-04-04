@@ -409,44 +409,4 @@ end
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
-
-  describe ".notify_employer_when_employee_terminate_coverage" do
-    let(:published_benefit_group_assignment) { double(hbx_enrollments: hbx_enrollments)}
-    let(:census_employee) { double(published_benefit_group_assignment: published_benefit_group_assignment) }
-    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0, census_employee: census_employee, coverage_kind: 'health') }
-    let(:hbx_enrollments) { [double(coverage_kind: 'health', aasm_state: 'coverage_termination_pending')] }
-
-    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
-      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.notify_employer_when_employee_terminate_coverage(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employer_when_employee_terminate_coverage']
-    end
-  end
-
-  describe ".notify_employee_confirming_coverage_termination" do
-    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
-    let(:census_employee) {FactoryGirl.create(:census_employee)}
-    it "should trigger notify_employee_confirming_coverage_termination job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:coverage_kind).and_return("health")
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
-      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.notify_employee_confirming_coverage_termination(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_coverage_termination']
-    end
-  end
 end

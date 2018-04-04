@@ -2,6 +2,7 @@ module Notifier
   class Builders::EmployerProfile
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
+    include Notifier::Builders::Enrollment
 
     attr_accessor :employer_profile, :merge_model, :payload
     
@@ -10,6 +11,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
+      data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       @merge_model = data_object
     end
 
@@ -18,11 +20,8 @@ module Notifier
     end
 
     def append_contact_details
-      if employer_profile.staff_roles.present?
-        merge_model.first_name = employer_profile.staff_roles.first.first_name
-        merge_model.last_name = employer_profile.staff_roles.first.last_name
-      end
-
+      first_name
+      last_name
       office_address = employer_profile.organization.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
@@ -33,6 +32,14 @@ module Notifier
           zip: office_address.zip
           })
       end
+    end
+
+    def first_name
+      merge_model.first_name = employer_profile.staff_roles.first.first_name
+    end
+
+    def last_name
+      merge_model.last_name = employer_profile.staff_roles.first.last_name
     end
 
     def notice_date
