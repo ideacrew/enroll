@@ -32,7 +32,6 @@ module Effective
               dropdown.unshift(['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), add_sep_link_type( pundit_allow(HbxProfile, :can_add_sep?) ) ])
               dropdown += [
                 ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
-                ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax'],
                 ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
                 ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
               ]
