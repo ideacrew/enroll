@@ -1,13 +1,14 @@
 module BenefitSponsors
   module Profiles
     class Employers::EmployerStaffRolesController < ApplicationController
+      include BenefitSponsors::Employers::EmployerHelper
 
       #TODO for employer profile and authorization
       # before_action :check_access_to_employer_profile, :updateable?
 
       def edit
         @employer_profile = find_employer_profile
-        @staff = Person.staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
+        @staff = staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
         @add_staff = params[:add_staff]
         respond_to do |format|
           format.html { render "benefit_sponsors/profiles/employers/employer_profiles/edit.html.erb" }
@@ -21,7 +22,7 @@ module BenefitSponsors
         first_name = (params[:first_name] || '').strip
         last_name = (params[:last_name] || '').strip
         email = params[:email]
-        @status, @result = Person.add_benefit_sponsors_employer_staff_role(first_name, last_name, dob, email, employer_profile)
+        @status, @result = add_employer_staff(first_name, last_name, dob, email, employer_profile)
         flash[:error] = ('Role was not added because ' + @result) unless @status
         redirect_to edit_profiles_employers_employer_profile_path(employer_profile)
       end
@@ -43,13 +44,15 @@ module BenefitSponsors
       # For this person find an employer_staff_role that match this employer_profile_id and mark the role inactive
       def destroy
         employer_profile_id = params[:id]
-        employer_profile = find_employer_profile
         staff_id = params[:staff_id]
-        staff_list = Person.staff_for_benefit_sponsors_employer(employer_profile).map(&:id)
+
+        employer_profile = find_employer_profile
+        staff_list = staff_for_benefit_sponsors_employer(employer_profile).map(&:id)
+
         if staff_list.count == 1 && staff_list.first.to_s == staff_id
           flash[:error] = 'Please add another staff role before deleting this role'
         else
-          @status, @result = Person.deactivate_benefit_sponsors_employer_staff_role(staff_id, employer_profile_id)
+          @status, @result = deactivate_benefit_sponsors_employer_staff(staff_id, employer_profile_id)
           @status ? (flash[:notice] = 'Staff role was deleted') : (flash[:error] = ('Role was not deactivated because '  + @result))
         end
         redirect_to edit_profiles_employers_employer_profile_path(employer_profile)
@@ -66,11 +69,6 @@ module BenefitSponsors
         # employer_profile = find_employer_profile
         # policy = ::AccessPolicies::EmployerProfile.new(current_user)
         # policy.authorize_edit(employer_profile, self)
-      end
-
-      def find_employer_profile
-        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
-        employer_profile = @organization.employer_profile
       end
     end
   end

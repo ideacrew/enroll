@@ -1,6 +1,8 @@
 module BenefitSponsors
   module Profiles
     class Employers::EmployerProfilesController < ApplicationController
+      include BenefitSponsors::Employers::EmployerHelper
+
       before_action :get_site_key
       before_action :initiate_employer_profile, only: [:create]
       before_action :find_employer, only: [:show, :edit, :show_profile, :destroy, :inbox,
@@ -76,7 +78,7 @@ module BenefitSponsors
       end
 
       def edit
-        @staff = Person.staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
+        @staff ||= staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
       end
 
       def update
