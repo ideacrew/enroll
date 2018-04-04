@@ -47,7 +47,7 @@ module BenefitMarkets
       let(:member_relationships) { [member_relationship] }
 
       let(:contribution_model) do
-        ContributionModels::FehbContributionModel.new(
+        ContributionModels::ContributionModel.new(
           :sponsor_contribution_kind => "Whatever",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
