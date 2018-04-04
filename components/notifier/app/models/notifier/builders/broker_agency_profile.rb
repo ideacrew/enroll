@@ -32,6 +32,10 @@ module Notifier
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
     end
 
+    def broker_agency_name
+      merge_model.broker_agency_name = broker_agency_profile.legal_name
+    end
+
     def first_name
       merge_model.first_name = broker_agency_profile.primary_broker_role.person.first_name
     end
@@ -58,12 +62,16 @@ module Notifier
       merge_model.employer_poc_lastname = employer.staff_roles.first.last_name
     end
 
-    def assignment_date
-      merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
+    def employer_poc_phone
+      merge_model.employer_poc_phone = employer.staff_roles.first.work_phone_or_best
     end
 
-    def broker_agency_name
-      merge_model.broker_agency_name = broker_agency_profile.legal_name
+    def employer_poc_email
+      merge_model.employer_poc_email = employer.staff_roles.first.work_email_or_best
+    end
+
+    def assignment_date
+      merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
     end
   end
 end

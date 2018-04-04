@@ -35,7 +35,9 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
           "broker_agency_profile.assignment_date",
           "broker_agency_profile.broker_agency_name",
           "broker_agency_profile.employer_poc_firstname",
-          "broker_agency_profile.employer_poc_lastname"
+          "broker_agency_profile.employer_poc_lastname",
+          "broker_agency_profile.employer_poc_phone",
+          "broker_agency_profile.employer_poc_email"
       ]
     }
 
@@ -78,6 +80,14 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
     it "should return employer poc name" do
       expect(merge_model.employer_poc_firstname).to eq model_instance.staff_roles.first.first_name
       expect(merge_model.employer_poc_lastname).to eq model_instance.staff_roles.first.last_name
+    end
+
+    it "should return employer poc phone" do
+      expect(merge_model.employer_poc_phone).to eq model_instance.staff_roles.first.work_phone_or_best
+    end
+
+    it "should return employer poc email" do
+      expect(merge_model.employer_poc_email).to eq model_instance.staff_roles.first.work_email_or_best
     end
 
     it "should return broker agency name " do
