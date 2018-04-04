@@ -2,7 +2,7 @@ require 'date'
 module BenefitSponsors
   module Organizations
     module Factories
-      class BrokerProfileFactory < OrganizationProfileFactory
+      class BrokerAgencyProfileFactory < OrganizationProfileFactory
 
         include ActiveModel::Validations
         include Validations::Email

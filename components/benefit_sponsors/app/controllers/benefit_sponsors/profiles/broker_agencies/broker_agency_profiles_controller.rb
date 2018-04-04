@@ -26,7 +26,7 @@ module BenefitSponsors
 
       def new
         @profile = Organizations::BrokerAgencyProfile.new
-        @organization = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(@profile)
+        @organization = BenefitSponsors::Organizations::Factories::BrokerAgencyProfileFactory.new(@profile)
       end
 
       def create
@@ -41,7 +41,7 @@ module BenefitSponsors
       end
 
       def edit
-        @form_broker_agency_profile = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.find(@broker_agency_profile.id)
+        @form_broker_agency_profile = BenefitSponsors::Organizations::Factories::BrokerAgencyProfileFactory.find(@broker_agency_profile.id)
         @id = params[:id]
       end
 

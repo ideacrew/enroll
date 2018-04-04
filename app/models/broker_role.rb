@@ -105,7 +105,7 @@ class BrokerRole
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
+    @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => broker_agency_profile_id).first.broker_agency_profile if has_broker_agency_profile?
   end
 
   def has_broker_agency_profile?

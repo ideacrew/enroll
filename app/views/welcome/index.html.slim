@@ -26,5 +26,7 @@
 
   - if !user_signed_in?
     = link_to l10n(".broker_registration"), broker_registration_path, class: "btn btn-default"
-    = link_to l10n(".broker_registration"), benefit_sponsors.broker_registration_profiles_broker_agencies_broker_roles_path, class: "btn btn-default"
+
+    = link_to l10n(".broker_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-default"
+
     = link_to l10n(".general_agency_registration"), general_agency_registration_path, class: "btn btn-default"
