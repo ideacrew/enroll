@@ -1,4 +1,4 @@
-module SponsoredBenefits
+module BenefitSponsors
   module Errors
     class BenefitSponsorshipIneligibleError < StandardError; end
 
