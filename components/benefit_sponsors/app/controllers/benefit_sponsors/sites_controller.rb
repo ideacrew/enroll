@@ -52,9 +52,20 @@ module BenefitSponsors
     end
 
     def update
+      @site = BenefitSponsors::Site.find params[:id]
+
+      if @site.update_attributes params[:site]
+        redirect_to :index
+      else
+        render 'edit'
+      end
     end
 
     def destroy
+      @site = BenefitSponsors::Site.find params[:id]
+      @site.destroy
+
+      redirect_to 'index'
     end
 
     private
