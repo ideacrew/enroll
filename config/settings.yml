@@ -269,4 +269,4 @@ style:
   primary_button_border_disabled: ‘#ac2925’
   alternate_header_color: '#003260'
   primary_icon_color: '#007bc4'
-  qle_header_color: '##007BC4'
+  qle_header_color: '#007BC4'
