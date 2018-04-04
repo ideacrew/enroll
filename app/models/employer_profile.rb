@@ -789,7 +789,7 @@ class EmployerProfile
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-            plan_year.force_publish!
+            plan_year.force_publish! if plan_year.may_force_publish?
           end
         end
 
@@ -799,8 +799,8 @@ class EmployerProfile
           plan_year.terminate! if plan_year.may_terminate?
         end
 
-        if Settings.aca.shop_market.transmit_scheduled_employers
-          if (new_date.prev_day.mday + 1) == Settings.aca.shop_market.employer_transmission_day_of_month
+        if aca_shop_market_transmit_scheduled_employers
+          if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
         end
