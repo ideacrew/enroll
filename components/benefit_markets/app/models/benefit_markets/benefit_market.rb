@@ -8,6 +8,7 @@ module BenefitMarkets
 
     attr_reader :contact_center_profile
 
+    field :site_urn,    type: String
     field :kind,        type: Symbol #, default: :aca_individual  # => :aca_shop
     field :title,       type: String, default: "" # => DC Health Link SHOP Market
     field :description, type: String, default: ""
@@ -17,8 +18,8 @@ module BenefitMarkets
     has_many    :benefit_catalogs,      class_name: "BenefitMarkets::BenefitCatalog"
 
     embeds_one :configuration,  as: :configurable
-    # embeds_one :contact_center_setting, class_name: "SponsoredBenefits::BenefitMarkets::ContactCenterConfiguration",
-    #                                     autobuild: true
+    embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
+                                        autobuild: true
 
     validates_presence_of :configuration #, :contact_center_setting
 
@@ -34,10 +35,16 @@ module BenefitMarkets
 
     def kind=(new_kind)
       return unless BenefitMarkets::BENEFIT_MARKET_KINDS.include?(new_kind)
-      # write_attribute(:kind, new_kind)
-      # @kind = new_kind
       super(new_kind)
       reset_configuration_attributes
+    end
+
+    # Benefit catalogs may not overlap application_periods
+    def add_benefit_catalog(new_benefit_catalog)
+    end
+
+    # Build Copy existing benefit 
+    def renew_benefit_catalog(benefit_catalog)
     end
 
     # Catalogs with benefit products currently available for purchase
@@ -86,15 +93,10 @@ module BenefitMarkets
       configuration.open_enrollment_minimum_length_days
     end
 
+    private
+
     def reset_configuration_attributes
       return unless kind.present? && BenefitMarkets::BENEFIT_MARKET_KINDS.include?(kind)
-
-      # if kind == :aca_individual
-      #   configuration = aca_individual_configuration
-      # else
-      #   configuration = aca_shop_configuration
-      # end
-
       klass_name = configuration_class_name
       self.configuration = klass_name.constantize.new
     end
@@ -104,8 +106,6 @@ module BenefitMarkets
       config_klass = "#{kind.to_s}_configuration".camelcase
       namespace_for(self.class) + "::#{config_klass}"
     end
-
-    private
 
     # Isolate the namespace portion of the passed class
     def namespace_for(klass)

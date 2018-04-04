@@ -42,8 +42,8 @@ module BenefitMarkets
     # has_many    :benefit_applications,
     #             class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
-    has_many    :product_packages,
-                class_name: "BenefitMarkets::Products::ProductPackage"
+    embeds_many   :product_packages,
+                  class_name: "BenefitMarkets::Products::ProductPackage"
 
     # Entire geography covered by under this catalog
     has_and_belongs_to_many  :service_areas,  

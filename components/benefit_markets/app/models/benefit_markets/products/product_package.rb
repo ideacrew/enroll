@@ -5,7 +5,7 @@
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
 # 
-# Product package examples
+# Product package instance examples
 # Cca::Health::OneIssuer
 # => benefit_option: one_issuer
 # => contribution_model: list_bill_contribution_model
@@ -33,7 +33,7 @@ module BenefitMarkets
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      BENEFIT_OPTION_KINDS = [:any, :one_benefit, :one_issuer, :platinum_level, :gold_level]
+      BENEFIT_OPTION_KINDS = [:any, :one_product, :one_issuer, :platinum_level, :gold_level]
 
       field :reference, type: Symbol # => Issuer, Product, MetalLevel
 
@@ -42,10 +42,13 @@ module BenefitMarkets
       field :kind,                    type: Symbol
       field :contribution_model_kind, type: Symbol
       field :price_model_kind,        type: Symbol
-      field :benefit_option,          type: Symbol
+      field :benefit_option_kind,          type: Symbol
       field :product_list,            type: Array
 
       belongs_to  :benefit_catalog, class_name: "BenefitMarkets::BenefitCatalog"
+
+      validates_presence_of :title, :kind
+
 
       def product_list_for(benefit_option)
         # criteria must use:
