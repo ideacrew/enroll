@@ -179,14 +179,24 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       sep
     }
     context "when building ShopForPlan link" do
+      it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
+        expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
+      end
 
-        it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
-          expect(helper.build_link_for_sep_type(sep_with_date_options)).to include "class=\"existing-sep-item\""
-        end
+      it "should be a link to 'insured/family_members' for a QLE type without date options available" do
+        expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
+      end
+    end
 
-        it "should be a link to 'insured/family_members' for a QLE type without date options available" do
-          expect(helper.build_link_for_sep_type(sep_without_date_options)).to include "href=\"/insured/family_members"
-        end
+    context "#build_link_for_sep_type" do
+      it "returns nil if sep nil" do
+        expect(helper.build_link_for_sep_type(nil)).to be_nil
+      end
+
+      it "can find qle" do
+        expect(QualifyingLifeEventKind).to receive(:find)
+        helper.build_link_for_sep_type(sep_with_date_options)
+      end
     end
 
     context "find QLE for SEP" do
@@ -195,7 +205,6 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         expect(find_qle_for_sep(sep_without_date_options)).to eq qle_first_of_month
       end
     end
-
   end
 
   describe "#tax_info_url" do

@@ -31,18 +31,21 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     end
 
     it 'should terminate plan year & enrollment and update plan year & enrollment end_on and terminated date' do
+      # expect_any_instance_of(Object).to receive(:send_termination_notice_to_employer).with(organization)
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
       active_plan_year.reload
       enrollment.reload
       expect(active_plan_year.end_on).to eq TimeKeeper.date_of_record.end_of_month
       expect(active_plan_year.terminated_on).to eq TimeKeeper.date_of_record
       expect(active_plan_year.aasm_state).to eq "terminated"
-
       expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record.end_of_month
       expect(enrollment.termination_submitted_on).to eq TimeKeeper.date_of_record
       expect(enrollment.aasm_state).to eq "coverage_terminated"
     end
 
     it 'should not terminate published plan year' do
+      # expect_any_instance_of(Object).not_to receive(:send_termination_notice_to_employer).with(organization)
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
       active_plan_year.update_attribute(:aasm_state,'published')
       active_plan_year.reload
       expect(active_plan_year.end_on).to eq active_plan_year.end_on
@@ -54,14 +57,12 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       expect_any_instance_of(Observers::Observer).not_to receive(:trigger_notice).with(params).exactly(employer_profile.census_employees.active.size).times
       Rake::Task["migrations:terminate_employer_account"].reenable
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
-      expect($stdout.string).to match("Notification generated for employer\n")
     end
 
     it 'should not send notification when we pass false in generate_termination_notice attribute' do
       expect_any_instance_of(Observers::Observer).not_to receive(:trigger_notice)
       Rake::Task["migrations:terminate_employer_account"].reenable
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
-      expect($stdout.string).not_to match("Notification generated for\n")
     end
 
   end

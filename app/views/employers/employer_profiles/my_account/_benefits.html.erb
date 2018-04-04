@@ -4,8 +4,6 @@
       <h1>Benefits - Coverage You Offer</h1>
     </div>
     <div class="col-xs-4">
-
-
       <% if site_broker_claim_quoting_enabled? %>
         <% if show_or_hide_claim_quote_button(@employer_profile) %>
           <% claim_warnings, claim_modal_name = claim_quote_warnings(@employer_profile) %>

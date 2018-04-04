@@ -112,3 +112,14 @@ Feature: COBRA basic
     Then I should click on employer portal
     Then John Doe creates a new employer profile with default_office_location
     Then Employer can see the important documents needed
+
+  Scenario: An Employer is new to the Exchange and needs to enter username and email optional
+    Given shop health plans exist for both last and this year
+    Given Employer has not signed up as an HBX user
+    Given vertical and horizontal plan choices are offered
+    When I visit the Employer portal
+    Then I fill employer signup form for Jack Doe
+    And I can see the optional Email field
+    And I fill out the email address with jackdoe@abc.com
+    And I submit button to create account
+    Then I should see a successful sign up message

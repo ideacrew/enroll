@@ -6,8 +6,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
   let(:notice_event) { "employee_plan_selection_confirmation_sep_new_hire" }
   let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
-  let!(:employer) { FactoryGirl.create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year) }
-  let!(:plan_year) { FactoryGirl.create(:custom_plan_year, employer_profile: employer, aasm_state: "enrolling")}
+  let!(:employer) { FactoryGirl.create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: "active") }
   let!(:census_employee){   FactoryGirl.create(:census_employee, employer_profile: employer)  }
   let!(:person) { FactoryGirl.create(:person, :with_family) }
   let!(:role) {  FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer) }
@@ -73,7 +72,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
 
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let!(:template)  { Notifier::Template.new(data_elements: data_elements) }
-    let!(:payload)   { { 
+    let!(:payload)   { {
       "event_object_kind" => "HbxEnrollment",
       "event_object_id" => model_instance.id
     } }
@@ -103,7 +102,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
         expect(merge_model).to be_a(recipient.constantize)
         expect(merge_model.employer_name).to eq employer.organization.legal_name
         expect(merge_model.broker_present?).to be_falsey
-      end 
+      end
     end
   end
 end
