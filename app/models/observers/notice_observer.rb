@@ -75,7 +75,7 @@ module Observers
             census_employees = employer_profile.census_employees.non_terminated
             census_employees.each do |ce|
               if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
-                trigger_notice(recipient: ce.employee_role, event_object: employer_profile, notice_event: "initial_employee_plan_selection_confirmation")
+                trigger_notice(recipient: ce.employee_role, event_object: ce.active_benefit_group_assignment.hbx_enrollment, notice_event: "initial_employee_plan_selection_confirmation")
               end
             end
           end

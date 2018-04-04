@@ -1354,17 +1354,13 @@ describe EmployerProfile, "update_status_to_binder_paid", dbclean: :after_each d
   let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
   let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
   let!(:organization){ employer_profile.organization }
+
   it "should update employer profile aasm state to binder_paid" do
     EmployerProfile.update_status_to_binder_paid([employer_profile.organization.id])
     employer_profile.reload
     expect(employer_profile.aasm_state).to eq 'binder_paid'
   end
-  it "should trigger notice" do
-    allow(Organization).to receive(:find).and_return(organization)
-    allow(organization).to receive(:employer_profile).and_return(employer_profile)
-    expect(organization.employer_profile).to receive(:trigger_shop_notices)
-    EmployerProfile.update_status_to_binder_paid([employer_profile.organization.id])
-  end
+
 end
 
 # describe "#advance_day" do

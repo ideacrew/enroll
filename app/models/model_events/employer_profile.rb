@@ -1,14 +1,24 @@
 module ModelEvents
   module EmployerProfile
-    
-  
+
     REGISTERED_EVENTS = [
       :initial_employee_plan_selection_confirmation
     ]
 
-    def trigger_model_event(event_name, event_options = {})
-      if REGISTERED_EVENTS.include?(event_name)
-        notify_observers(ModelEvent.new(event_name, self, event_options))
+    def notify_on_update
+      if aasm_state_changed?
+
+        if aasm_state == "binder_paid"
+          is_initial_employee_plan_selection_confirmation = true
+        end
+
+        REGISTERED_EVENTS.each do |event|
+          if event_fired = instance_eval("is_" + event.to_s)
+            # event_name = ("on_" + event.to_s).to_sym
+            event_options = {} # instance_eval(event.to_s + "_options") || {}
+            notify_observers(ModelEvent.new(event, self, event_options))
+          end
+        end
       end
     end
   #  def notify_on_save

@@ -1036,7 +1036,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update, :notify_broker_added, :notify_general_agent_added
+  after_update :broadcast_employer_update, :notify_broker_added, :notify_general_agent_added, :notify_on_update
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -1082,16 +1082,7 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        org.employer_profile.trigger_shop_notices("initial_employee_plan_selection_confirmation")
       end
-    end
-  end
-
-  def trigger_shop_notices(event)
-    begin
-      trigger_model_event(event.to_sym)
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{event.humanize} notice to #{self.legal_name} due to #{e}" }
     end
   end
 
