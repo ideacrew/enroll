@@ -1,8 +1,9 @@
 require 'rails_helper'
 
-describe 'ModelEvents::EmployerNoticeForEmployeeCoverageTermination', dbclean: :after_each  do
-  let(:model_event)  { "employer_notice_for_employee_coverage_termination" }
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month - 1.month }
+describe 'ModelEvents::EmployeeCoverageTermination', dbclean: :after_each  do
+  let(:model_event)  { "employee_coverage_termination" }
+  let(:notice_event1) { "employer_notice_for_employee_coverage_termination" }
+  let(:notice_event2) { "employee_notice_for_employee_coverage_termination" }
   let(:person){ FactoryGirl.create(:person, :with_family, :with_employee_role) }
   let(:family) { person.primary_family }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
@@ -16,13 +17,17 @@ describe 'ModelEvents::EmployerNoticeForEmployeeCoverageTermination', dbclean: :
   describe "NoticeTrigger" do
     context "when employee terminates coverage" do
       subject { Observers::Observer.new }
+      let(:model_event) { ModelEvents::ModelEvent.new(:employee_coverage_termination, model_instance, {}) }
+
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.employer_notice_for_employee_coverage_termination"
-          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
-          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        [notice_event1, notice_event2].each do |notice_event|
+          expect(subject).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employer.#{notice_event}"
+            expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+            expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          end
+          subject.trigger_notice(recipient: model_instance.employer_profile, event_object: model_instance, notice_event: notice_event)
         end
-        subject.trigger_notice(recipient: model_instance.employer_profile, event_object: model_instance, notice_event: "employer_notice_for_employee_coverage_termination")
       end
     end
   end
