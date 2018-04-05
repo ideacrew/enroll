@@ -49,6 +49,8 @@ module BenefitMarkets
 
       validates_presence_of :title, :kind
 
+      belongs_to :contribution_model 
+
 
       def product_list_for(benefit_option)
         # criteria must use:
