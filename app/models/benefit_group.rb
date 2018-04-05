@@ -476,12 +476,14 @@ class BenefitGroup
       end
       
     when "metal_level"
+      if carrier_for_elected_plan.blank?
+        carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
+      end    
       if constrain_service_areas?
-        Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).and(:metal_level => reference_plan.metal_level).to_a
+        Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).select { |pair| pair.metal_level == reference_plan.metal_level }.to_a
       else
-        Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).and(:metal_level => reference_plan.metal_level).to_a
+        Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).select { |pair| pair.metal_level == reference_plan.metal_level }.to_a
       end
-
     end
   end
 
