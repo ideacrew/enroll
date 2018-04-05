@@ -12,24 +12,13 @@ module Forms
     validates :open_enrollment_start_on, presence: true
     validates :open_enrollment_end_on, presence: true
 
+    def initialize(params = {})
+      assign_application_attributes(params)
+    end
+
     def assign_application_attributes(atts = {})
       atts.each_pair do |k, v|
         self.send("#{k}=".to_sym, v)
-      end
-    end
-
-    def build(params)
-      assign_application_attributes(params)
-      return false unless valid?
-
-      BenefitSponsors::BenefitApplications::BenefitApplicationBuilder.build do |builder|
-        builder.set_presenter_object(self)
-        builder.set_sponsorhip(benefit_sponsorship)
-        builder.add_effective_period
-        builder.add_open_enrollment_period
-        builder.add_fte_count
-        builder.add_pte_count
-        builder.add_msp_count
       end
     end
 
@@ -39,6 +28,10 @@ module Forms
 
     def open_enrollment_period
       open_enrollment_start_on..open_enrollment_end_on
+    end
+
+    def benefit_application
+      BenefitSponsors::Factories::BenefitApplicationFactory.call(self, benefit_sponsorship)
     end
   end
 end
