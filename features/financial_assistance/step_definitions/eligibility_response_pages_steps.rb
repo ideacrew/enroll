@@ -49,6 +49,10 @@ Then(/^the user is on the Eligibility Response Error page$/) do
   expect(page).to have_content "Eligibility Response Error"
 end
 
+Given(/^the user is on the Waiting for Results page$/) do
+  expect(page).to have_content "Waiting for your Eligibility results..."
+end
+
 Then(/^the user's "([^"]*)" results show$/) do |type|
   case type
   when "medicaid"

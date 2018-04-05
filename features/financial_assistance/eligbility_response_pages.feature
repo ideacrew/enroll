@@ -19,11 +19,13 @@ Feature: The different eligibility response pages received after submitting an a
   Scenario: Eligibility response error
     Given the application is correct
     And the user clicks SUBMIT
+    And the user is on the Waiting for Results page
     Then the user is on the Eligibility Response Error page
 
   Scenario: User does qualify for assistance
     Given the application is correct
     And the user clicks SUBMIT
+    And the user is on the Waiting for Results page
     And the user qualifies for "assistance"
     Then the user is on the Eligibility Results page
     And the user's "assistance" results show
@@ -31,6 +33,7 @@ Feature: The different eligibility response pages received after submitting an a
   Scenario: User qualifies for medicaid
     Given the application is correct
     And the user clicks SUBMIT
+    And the user is on the Waiting for Results page
     And the user qualifies for "medicaid"
     Then the user is on the Eligibility Results page
     And the user's "medicaid" results show
@@ -38,6 +41,7 @@ Feature: The different eligibility response pages received after submitting an a
   Scenario: User does not qualify for assistance
     Given the application is correct
     And the user clicks SUBMIT
+    And the user is on the Waiting for Results page
     And the user qualifies for "no assistance"
     Then the user is on the Eligibility Results page
     And the user's "no assistance" results show
