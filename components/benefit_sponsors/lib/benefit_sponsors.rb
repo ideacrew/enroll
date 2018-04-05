@@ -11,6 +11,13 @@ module BenefitSponsors
 
   CONTACT_METHOD_KINDS    = [:paper_and_electronic, :paper_only]
 
+  # Isolate the namespace portion of the passed class
+  def parent_namespace_for(klass)
+    klass_name = klass.to_s.split("::")
+    klass_name.slice!(-1) || []
+    klass_name.join("::")
+  end
+
   class << self
     attr_writer :configuration
 
