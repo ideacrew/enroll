@@ -30,7 +30,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
   }
 
   let(:employee_role) {
-    FactoryGirl.create(:employee_role, employer_profile: employer_profile)
+    FactoryGirl.build(:employee_role, employer_profile: employer_profile)
   }
 
   describe "After performing the link" do
