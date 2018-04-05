@@ -49,7 +49,7 @@ module Services
         "contribution": employer_contributions,
         "reference_plan": reference_plan.hios_id,
         "filterOption": filter_option,
-        "filterValue": reference_plan.carrier_profile.legal_name
+        "filterValue": filter_value
       }
       end
 
@@ -57,6 +57,15 @@ module Services
         benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.plan_year.end_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
         # benefit_group_assignment = @census_employee.renewal_benefit_group_assignment  || @census_employee.active_benefit_group_assignment
         benefit_group_assignment.benefit_group.plan_year.start_on.strftime("%Y-%m-%d")
+      end
+
+      def filter_value
+        case @hbx_enrollment.benefit_group.plan_option_kind
+        when "single_plan"
+          @hbx_enrollment.benefit_group.reference_plan_id.to_s
+        else
+          reference_plan.carrier_profile.legal_name
+        end
       end
 
 
