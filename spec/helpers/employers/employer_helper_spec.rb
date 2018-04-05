@@ -20,12 +20,14 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
                                               coverage_kind: 'dental',
-                                              plan: dental_plan
+                                              plan: dental_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
     let(:health_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
-                                              plan: health_plan
+                                              plan: health_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
 
     before do
