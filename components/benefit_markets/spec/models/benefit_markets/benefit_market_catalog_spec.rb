@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe BenefitCatalog, type: :model do
+  RSpec.describe BenefitMarketCatalog, type: :model do
 
     let(:benefit_market_kind)       { :aca_shop }
     let(:today)                     { Date.today }
@@ -57,7 +57,7 @@ module BenefitMarkets
       context "with no probation_period_kinds" do
         subject { described_class.new(params.except(:probation_period_kinds)) }
 
-        it "should be valid" do
+        it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
         end
@@ -75,7 +75,7 @@ module BenefitMarkets
 
           it "should save and be findable" do
             expect(subject.save!).to eq true
-            expect(BenefitMarkets::BenefitCatalog.find(subject.id)).to eq subject
+            expect(BenefitMarkets::BenefitMarketCatalog.find(subject.id)).to eq subject
           end
         end
       end

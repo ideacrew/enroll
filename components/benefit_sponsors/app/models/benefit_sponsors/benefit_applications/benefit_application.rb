@@ -18,11 +18,11 @@ module BenefitSponsors
       INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
       INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
-      # Unique Resource Name identifier for benefit catalog
-      field :benefit_catalog_urn,      type: String
+      # Unique Resource Name identifier for benefit market_catalog
+      field :benefit_market_catalog_urn,      type: String
 
-      belongs_to  :benefit_catalog, counter_cache: true,
-                  class_name: "::BenefitMarkets::BenefitCatalog"
+      belongs_to  :benefit_market_catalog, counter_cache: true,
+                  class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
       ## TODO Deprecate -- BenefitMarket is associated with BenefitSponsorship
       belongs_to  :benefit_market, counter_cache: true,

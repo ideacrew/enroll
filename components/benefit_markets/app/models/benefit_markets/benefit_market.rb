@@ -15,7 +15,8 @@ module BenefitMarkets
 
     # belongs_to  :site,                  class_name: "::BenefitSponsors::Site"
     # has_many    :benefit_sponsorships,  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-    has_many    :benefit_catalogs,      class_name: "BenefitMarkets::BenefitCatalog"
+    has_many    :benefit_market_catalogs,      
+                class_name: "BenefitMarkets::BenefitMarketCatalog"
 
     embeds_one :configuration,  as: :configurable
     embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
@@ -39,17 +40,22 @@ module BenefitMarkets
       reset_configuration_attributes
     end
 
-    # Benefit catalogs may not overlap application_periods
-    def add_benefit_catalog(new_benefit_catalog)
+    # BenefitMarketCatalogs may not overlap application_periods
+    def add_benefit_market_catalog(new_benefit_market_catalog)
+      application_period_is_covered = benefit_market_catalogs.detect do | catalog | 
+        catalog.application_period.cover?(new_benefit_market_catalog.application_period.min) ||
+        catalog.application_period.cover?(new_benefit_market_catalog.application_period.max)
+      end
+      # binding.pry
+      benefit_market_catalogs << new_benefit_market_catalog unless application_period_is_covered
     end
 
-    # Build Copy existing benefit 
-    def renew_benefit_catalog(benefit_catalog)
+    def renew_benefit_market_catalog(benefit_market_catalog)
     end
 
     # Catalogs with benefit products currently available for purchase
-    def benefit_catalog_active_on(date = TimeKeeper.date_of_record)
-      benefit_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
+    def benefit_market_catalog_effective_on(date = ::TimeKeeper.date_of_record)
+      benefit_market_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
     end
 
     # Calculate available effective dates periods using passed date

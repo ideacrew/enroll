@@ -1,7 +1,7 @@
 module BenefitMarkets
-  class BenefitCatalog
-  include Mongoid::Document
-  include Mongoid::Timestamps
+  class BenefitMarketCatalog
+    include Mongoid::Document
+    include Mongoid::Timestamps
 
 
     # Frequency at which sponsors may submit an initial or renewal application
@@ -25,7 +25,7 @@ module BenefitMarkets
     field :application_period,          type: Range
 
     # Sponsor choices for length of time new members must wait before they're eligible to enroll
-    field :probation_period_kinds,      type: Array
+    field :probation_period_kinds,      type: Array, default: []
 
     field :title,                       type: String, default: ""
     field :description,                 type: String, default: ""
@@ -120,8 +120,5 @@ module BenefitMarkets
       open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
       open_enrollment_end_on_day - minimum_length
     end
-
-
-
   end
 end
