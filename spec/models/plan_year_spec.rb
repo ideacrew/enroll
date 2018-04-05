@@ -2445,7 +2445,7 @@ describe PlanYear, "plan year schedule changes" do
         }
 
         let(:person) { family.family_members.first.person }
-        let(:passive_renewal) { FactoryGirl.create(:hbx_enrollment,
+        let(:passive_renewal) { FactoryGirl.create(:hbx_esnrollment,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: renewing_plan_year.start_on,
@@ -2544,6 +2544,9 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:employee_role) {FactoryGirl.create(:employee_role)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, :aasm_state => "eligible") }
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
   let!(:renewing_hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_canceled')}
 
@@ -2551,9 +2554,14 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
 
     before do
       allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
 
     it "enrollemnt should be in coverage_termination_pending state " do
+
       expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_termination_pending"
     end
 
@@ -2579,16 +2587,27 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:employee_role) {FactoryGirl.create(:employee_role)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, :aasm_state => "eligible") }
   let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: benefit_group.id,aasm_state:'coverage_selected')}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
 
   context 'schedule_termination with active plan year' do
+
+    before do
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      census_employee.update_attributes(:aasm_state => "employee_termination_pending") #not terminating census employee upon plan year termination
+    end
 
     it "should termiante plan year and enrollments" do
       plan_year.schedule_termination!
       expect(plan_year.aasm_state).to eq "termination_pending"
       expect(plan_year.hbx_enrollments.first.aasm_state).to eq "coverage_termination_pending"
-      expect(plan_year.hbx_enrollments.first.terminated_on).to eq  TimeKeeper.date_of_record.end_of_month
+      expect(plan_year.hbx_enrollments.first.terminated_on).to eq TimeKeeper.date_of_record.end_of_month
     end
   end
 end
