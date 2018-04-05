@@ -23,7 +23,8 @@ module Notifier
         first_name: 'John',
         last_name: 'Whitmore',
         broker_agency_name: 'Best Brokers LLC',
-        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
+        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         employer_name: 'North America Football Federation',
         employer_poc_firstname: 'David',
         employer_poc_lastname: 'Samules'
