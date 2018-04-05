@@ -294,27 +294,6 @@ shop_notice_triggers = [
             }
         ]
     },
-    {
-        hbx_id: 'SHOP_M003',
-        title: 'Employer Denial Notice',
-        description: 'Application to Offer Group Health Coverage in Health Connector',
-        resource_name: 'employer',
-        event_name: 'initial_employer_denial',
-        notice_triggers: [
-            {
-                name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
-                notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
-                notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
-                mpi_indicator: 'SHOP_M003',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
     # {
     #   hbx_id: 'SHOP3B',
     #   title: 'Plan Offerings Finalized',
