@@ -1,0 +1,32 @@
+= form_for @product_package, as: :product_package, url: products_product_packages_url, html: {} do |f|
+  - if @product_package.errors.any?
+    ul
+      - @product_package.errors.full_messages.each do |msg|
+        li= msg
+
+  .form-group
+    = f.label :title
+    = f.text_field :title
+
+  .form-group
+    = f.label :product_year
+    = f.text_field :product_year
+
+  .form-group
+    = f.label :contribution_model_id
+    = f.select :contribution_model_id, options_for_select([["Please select a contribution model", nil]] + @product_package.available_contribution_models, selected: @product_package.contribution_model_id)
+
+  .form-group
+    = f.label :pricing_model_id
+    = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id)
+
+  .form-group
+    = f.label :benefit_catalog_id
+    = f.text_field :benefit_catalog_id
+
+  = f.hidden_field :benefit_option_kind
+
+  - if @product_package.has_additional_attributes?
+    = render partial: "benefit_markets/products/product_packages/#{@product_package.additional_form_fields_partial}", :locals => { :form => f }
+
+  = f.submit "Create", class: "btn btn-primary"

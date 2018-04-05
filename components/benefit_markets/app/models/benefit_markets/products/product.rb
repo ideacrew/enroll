@@ -9,11 +9,6 @@ module BenefitMarkets
 
       field :hbx_id,  type: String
       field :kind,    type: Symbol
-
-
-
-
-
     end
   end
 end
