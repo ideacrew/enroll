@@ -46,8 +46,8 @@ module Config::BankHolidaysHelper
       return time
     end
 
-    def binder_pay_month(effective_date)
-     due = effective_date.month -1
+    def binder_pay_month
+     due = TimeKeeper.date_of_record.month
     end
 
     def binder_pay

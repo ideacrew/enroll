@@ -828,7 +828,8 @@ class PlanYear
         month = 12
         year -=1
       end
-      to_date = Date.new(TimeKeeper.date_of_record.year,binder_pay_month(start_on), Settings.aca.shop_market.binder_payment_due_on)
+      
+      to_date = start_on.prev_month + (Settings.aca.shop_market.binder_payment_due_on).days - 1
       while (event_date_arr.include?(to_date) or to_date.wday == 6 or to_date.wday == 0)
         to_date = to_date+1.day #If to_date is in holidays arr, we are adding +1 day
       end
