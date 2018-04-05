@@ -23,7 +23,6 @@ RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :person => person,
-      :family => family,
       :data => data
   }}
 
