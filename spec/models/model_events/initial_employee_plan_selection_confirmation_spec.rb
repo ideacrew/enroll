@@ -53,8 +53,8 @@ describe 'ModelEvents::InitialEmployeePlanSelectionConfirmation', dbclean: :arou
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.initial_employee_plan_selection_confirmation"
-          expect(payload[:event_object_kind]).to eq 'EmployerProfile'
-          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+          expect(payload[:event_object_id]).to eq hbx_enrollment.id.to_s
         end
         subject.employer_profile_update(model_event)
       end
