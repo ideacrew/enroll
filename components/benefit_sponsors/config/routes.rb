@@ -32,4 +32,12 @@ BenefitSponsors::Engine.routes.draw do
       end
     end
   end
+
+  resources :benefit_sponsorships, only: [] do 
+    resources :benefit_applications do
+      resources :benefit_packages do
+        resources :sponsored_benefits, only: :new
+      end
+    end
+  end
 end

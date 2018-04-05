@@ -2,11 +2,10 @@ require_dependency "benefit_sponsors/application_controller"
 
 module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
-  	before_action :get_site_key
-    before_action :initiate_agency, only: [:create]
+    before_action :initialize_agency, only: [:create]
 
     def new
-      @agency = Object.const_get("BenefitSponsors::Organizations::Factories::#{class_name}ProfileFactory".classify).new(nil)
+      @agency = Object.const_get("BenefitSponsors::Organizations::Factories::#{profile_type}ProfileFactory".classify).new(nil)
 
       respond_to do |format|
         format.html
@@ -27,19 +26,15 @@ module BenefitSponsors
 
     private
 
-    def get_site_key
-      @site_key = self.class.current_site.site_key
-    end
-
-    def class_name
+    def profile_type
       (params[:profile_type] || params[:agency][:profile_type]).camelcase
     end
 
-    def initiate_agency
+    def initialize_agency
       return if params[:agency].blank?
       params[:agency].permit!
-      @profile = Object.const_get("BenefitSponsors::Organizations::#{class_name}Profile".classify).new(nil)
-      @agency = Object.const_get("BenefitSponsors::Organizations::Factories::#{class_name}ProfileFactory".classify).new(@profile, params[:agency].except(:profile_type))
+      @profile = Object.const_get("BenefitSponsors::Organizations::#{profile_type}Profile".classify).new(nil)
+      @agency = Object.const_get("BenefitSponsors::Organizations::Factories::#{profile_type}ProfileFactory".classify).new(@profile, params[:agency].except(:profile_type))
     end
   end
 end

@@ -2,18 +2,24 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationsController < ApplicationController
 
-      before_action :find_benefit_sponsorship, :find_employer
+      before_action :load_benefit_sponsorship
 
       def new
-        @benefit_application = build_benefit_application
+        @benefit_application = BenefitSponsors::Forms::BenefitApplication.new
       end
 
-      def build_benefit_application
-        benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.new
-        benefit_application.benefit_packages.build
-        benefit_application.benefit_packages.first.build_relationship_benefits
-        benefit_application.benefit_packages.first.build_dental_relationship_benefits
-        BenefitSponsors::Forms::BenefitApplicationForm.new(benefit_application)
+      def create
+        # form object valid?
+        benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(params[:benefit_application])
+        if benefit_application_form.valid?
+          benefit_application = benefit_application_form.construct_benefit_application
+
+          if benefit_application && benefit_application.save
+            # redirect to benefit packagess
+          else
+            # redirect with errors
+          end
+        end
       end
 
       def edit
@@ -22,6 +28,7 @@ module BenefitSponsors
           @just_a_warning = !benefit_application.is_application_eligible? ? true : false
           benefit_application.application_warnings
         end
+        
         @benefit_application = BenefitSponsors::Forms::BenefitApplicationForm.new(benefit_application)
         @benefit_application.benefit_packages.each do |benefit_package|
           benefit_package.build_relationship_benefits if benefit_package.relationship_benefits.empty?
@@ -36,14 +43,9 @@ module BenefitSponsors
 
       private
 
-      def find_benefit_sponsorship
+      def load_benefit_sponsorship
         @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
       end
-
-      #benefit sponsor
-      def find_employer
-      end
-
     end
   end
 end
