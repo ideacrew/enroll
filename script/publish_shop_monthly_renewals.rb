@@ -1,5 +1,6 @@
 remote_broker_uri = Rails.application.config.acapi.remote_broker_uri+":5672"
-target_exchange = "dc0.preprod.e.fanout.events"
+environment_name = 'prod'
+target_exchange = "dc0.#{environment_name}.e.fanout.events"
 effective_on_date = "2017-05-01"
 event_routing_key = "info.events.employer.renewal_transmission_authorized"
 
