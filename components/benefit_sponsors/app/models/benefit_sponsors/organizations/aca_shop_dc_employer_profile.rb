@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Organizations
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
-
+      include BenefitSponsors::Employers::EmployerHelper
       include Concerns::EmployerProfileConcern
 
 
@@ -16,7 +16,7 @@ module BenefitSponsors
       end
 
       def staff_roles #managing profile staff
-        Person.staff_for_employer(self)
+        staff_for_benefit_sponsors_employer(self)
       end
 
       private

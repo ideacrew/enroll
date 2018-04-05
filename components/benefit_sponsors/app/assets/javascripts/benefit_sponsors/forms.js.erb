@@ -31,3 +31,7 @@ function validateForm() {
     });
   }, false);
 }
+function removeAddress(e) {
+  var id = $(e).attr('id');
+  $('#'+id).closest('fieldset').remove();
+}
