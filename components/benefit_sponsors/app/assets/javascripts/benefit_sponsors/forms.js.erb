@@ -31,7 +31,12 @@ function validateForm() {
     });
   }, false);
 }
+
 function removeAddress(e) {
   var id = $(e).attr('id');
-  $('#'+id).closest('fieldset').remove();
+  $('#'+id).closest('fieldset').fadeTo(700,0.01, function() {
+    $('#'+id).closest('fieldset').slideUp(150, function() {
+      $('#'+id).closest('fieldset').remove();
+    });
+  });
 }

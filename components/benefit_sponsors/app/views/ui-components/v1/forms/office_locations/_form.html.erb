@@ -1,7 +1,10 @@
 <fieldset>
-  <h5 class="enroll-lead">Office Location</h5>
-  
-  <%= link_to 'Remove Address', '#', onclick:'removeAddress(this)', id:'removeBrokersAddress'%>
+  <div class="row">
+    <div class="col-md-12">
+      <h5 class="enroll-lead float-left">Office Location</h5>
+      <%= link_to raw('<i class="fas fa-times fa-lg"></i>'), '#!', onclick:'removeAddress(this)', id:'removeBrokersAddress', class:'float-right'%>
+    </div>
+  </div>
   <%= fields_for(@parent_object, @slug_owner) do |f| %>
   <%= f.fields_for("office_locations", @office_location, child_index: @child_index) do |builder| %>
   <%= render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: builder} %>
