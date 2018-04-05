@@ -112,6 +112,17 @@ aca:
 
   qle:
     with_in_sixty_days: 60
+    title: "Married"
+    eligible_event_on: 
+      days: 0
+    ineligible_event_on:
+      days: -10
+    start_on: 
+      days: 0
+    end_on: 
+      days: 30
+    reported_on: 
+      days: 0
 #
   individual_market:
     monthly_enrollment_due_on: 15

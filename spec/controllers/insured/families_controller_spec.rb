@@ -671,7 +671,7 @@ RSpec.describe Insured::FamiliesController do
         end
 
         it "should return false and also notify sep request denied" do
-          date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
+          date = (TimeKeeper.date_of_record + Settings.aca.qle.ineligible_event_on.days).strftime("%m/%d/%Y")
           xhr :get, :check_qle_date, qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js
           expect(assigns(:qualified_date)).to eq false
 

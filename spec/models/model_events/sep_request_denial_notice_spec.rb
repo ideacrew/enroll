@@ -2,10 +2,9 @@ require 'rails_helper'
 
 describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
   let(:notice_event) { "sep_request_denial_notice" }
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month }
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, :aasm_state => 'enrolling' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)}
