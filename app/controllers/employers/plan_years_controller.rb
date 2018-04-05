@@ -433,6 +433,7 @@ class Employers::PlanYearsController < ApplicationController
   def generate_dental_carriers_and_plans
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
+    @object_id = params[:object_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
     @dental_carriers_array = Organization.valid_dental_carrier_names_for_options
     respond_to do |format|
@@ -446,6 +447,7 @@ class Employers::PlanYearsController < ApplicationController
     @location_id = params[:location_id]
     @start_on = params[:start_on]
     @carrier_search_level = params[:selected_carrier_level]
+    @object_id = @location_id.split('-').last
 
     ## TODO: different if we dont have service areas enabled
     ## TODO: awfully slow

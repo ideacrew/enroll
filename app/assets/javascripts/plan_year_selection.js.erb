@@ -380,10 +380,10 @@ ready = function() {
 
       if ($(this).find('input[type=radio]').is(':checked')) {
       } else {
-        $(this).find('input[type=radio]').prop('checked', true );
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > *').hide();
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', 0);
         $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
+        $(this).find('input[type=radio]').prop('checked', true ).trigger('change');
       }
       var nav_tabs = $('.nav-tabs li input');
 
