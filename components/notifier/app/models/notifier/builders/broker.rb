@@ -1,11 +1,22 @@
 module Notifier
   module Builders::Broker
+
     def broker_agency_account
       employer_profile.active_broker_agency_account
     end
 
+    def terminated_broker_agency_account
+      if payload['event_object_kind'].constantize == BrokerAgencyAccount
+        employer_profile.broker_agency_accounts.unscoped.find(payload['event_object_id'])
+      end
+    end
+
     def broker
-      broker_agency_account.writing_agent.parent if broker_agency_account.present?
+      if broker_agency_account.present?
+        broker_agency_account.writing_agent.parent
+      elsif terminated_broker_agency_account.present?
+        terminated_broker_agency_account.writing_agent.parent
+      end
     end
 
     def broker_present?
@@ -41,9 +52,17 @@ module Notifier
       end
     end
 
+    def broker_termination_date
+      if terminated_broker_agency_account.present?
+        merge_model.broker.termination_date = terminated_broker_agency_account.end_on
+      end
+    end
+
     def broker_organization
       if broker_agency_account.present?
         merge_model.broker.organization = broker_agency_account.legal_name
+      elsif terminated_broker_agency_account.present?
+        merge_model.broker.organization = terminated_broker_agency_account.legal_name
       end
     end
 
