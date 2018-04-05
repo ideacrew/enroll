@@ -30,8 +30,8 @@ site:
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: false
-  create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
-  sign_in_routes: ['/families/home']
+  create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new','/insured/consumer_role/privacy','/families/home','/broker_agencies','/general_agencies','/exchanges/hbx_profiles']
+  sign_in_routes: ['']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
