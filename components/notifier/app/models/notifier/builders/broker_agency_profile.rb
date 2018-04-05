@@ -61,11 +61,11 @@ module Notifier
     end
 
     def assignment_date
-      merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
+      merge_model.assignment_date = employer.active_broker_agency_account.start_on.strftime('%m/%d/%Y') if employer.active_broker_agency_account
     end
 
     def termination_date
-      merge_model.termination_date = last_broker_agency_account.end_on if last_broker_agency_account
+      merge_model.termination_date = last_broker_agency_account.end_on.strftime('%m/%d/%Y') if last_broker_agency_account
     end
 
     def broker_agency_name
