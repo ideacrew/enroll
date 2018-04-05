@@ -9,6 +9,7 @@ RSpec.describe Insured::FamilyMembersController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
