@@ -62,7 +62,8 @@ module Services
       def filter_value
         case @hbx_enrollment.benefit_group.plan_option_kind
         when "single_plan"
-          @hbx_enrollment.benefit_group.reference_plan_id.to_s
+          # @hbx_enrollment.benefit_group.reference_plan_id.to_s
+          @hbx_enrollment.benefit_group.reference_plan.hios_id
         else
           reference_plan.carrier_profile.legal_name
         end
