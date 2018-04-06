@@ -552,28 +552,6 @@ shop_notice_triggers = [
     },
 
     {
-      hbx_id: 'SHOP_M049',
-      title: 'You Removed Your Broker In The Health Connector',
-      description: ' Broker gets terminated after employer selects change broker',
-      resource_name: 'employer',
-      event_name: 'employer_broker_fired',
-      notice_triggers: [
-          {
-              name: 'YOU REMOVED YOUR BROKER IN THE HEALTH CONNECTOR',
-              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
-              notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
-              mpi_indicator: 'SHOP_M049',
-              notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employer"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-              }
-          }
-      ]
-    },
-
-    {
         hbx_id: 'SHOP_M022',
         title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
         description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
@@ -814,27 +792,6 @@ shop_notice_triggers = [
         ]
     },
 
-   {
-   hbx_id: 'SHOP46',
-   title: 'Broker Hired Confirmation Notice',
-   description: 'Confirmation of Broker Hired Sent to Employer',
-   resource_name: 'employer',
-   event_name: 'broker_hired_confirmation',
-   notice_triggers: [
-     {
-       name: 'Boker Hired Confirmation',
-       notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
-       notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-       mpi_indicator: 'SHOP_M046',
-       notice_trigger_element_group: {
-         market_places: ['shop'],
-         primary_recipients: ["employer"],
-         primary_recipient_delivery_method: ["secure_message"],
-         secondary_recipients: []
-       }
-     }
-   ]
-  },
   # {
   #   hbx_id: 'SHOP_D018',
   #   title: 'Group Open Enrollment Successfully Completed',
