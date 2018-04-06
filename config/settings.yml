@@ -158,6 +158,7 @@ aca:
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
     new_employee_paper_application: true
+    census_employees_template_file: 'DCHL Employee Census'
 
     earliest_enroll_prior_to_effective_on:
       days: -30
