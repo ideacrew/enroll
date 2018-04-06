@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe 'ModelEvents::EmployeeDependentAgeOffTerminationNotice', :dbclean => :after_each do
-let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
+let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.next_month.prev_year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:primary_person){ FactoryGirl.create(:person)}
   let!(:person2){ FactoryGirl.create(:person)}
