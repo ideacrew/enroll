@@ -1,5 +1,15 @@
 module ModelEvents
   module EmployerProfile
+
+    REGISTERED_EVENTS = [
+      :broker_hired_confirmation_to_employer
+    ]
+
+    def trigger_model_event(event_name, event_options = {})
+      if REGISTERED_EVENTS.include?(event_name)
+        notify_observers(ModelEvent.new(event_name, self, event_options))
+      end
+    end
     
   
 

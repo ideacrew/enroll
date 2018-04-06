@@ -9,6 +9,9 @@ class EmployerProfile
   include StateTransitionPublisher
   include ScheduledEventService
   include Config::AcaModelConcern
+  include Concerns::Observable
+  include ModelEvents::EmployerProfile
+  include ApplicationHelper
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -160,18 +163,10 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
-    employer_broker_fired
+    trigger_notice_observer(self, active_broker_agency_account, 'broker_fired_confirmation_to_employer')
     notify_broker_terminated
     broker_fired_confirmation_to_broker
     broker_agency_fired_confirmation
-  end
-
-  def employer_broker_fired
-    begin
-      trigger_notices('employer_broker_fired')
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
-    end
   end
 
   def broker_agency_fired_confirmation
@@ -188,10 +183,6 @@ class EmployerProfile
     rescue Exception => e
       puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
     end
-  end
-
-  def employer_broker_fired
-    trigger_notices('employer_broker_fired')
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -787,7 +778,7 @@ class EmployerProfile
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-            plan_year.force_publish!
+            plan_year.force_publish! if plan_year.may_force_publish?
           end
         end
 
@@ -797,8 +788,8 @@ class EmployerProfile
           plan_year.terminate! if plan_year.may_terminate?
         end
 
-        if Settings.aca.shop_market.transmit_scheduled_employers
-          if (new_date.prev_day.mday + 1) == Settings.aca.shop_market.employer_transmission_day_of_month
+        if aca_shop_market_transmit_scheduled_employers
+          if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
         end
@@ -1280,6 +1271,14 @@ class EmployerProfile
         renewal_plan_year.cancel! if renewal_plan_year.may_cancel?
         renewal_plan_year.cancel_renewal! if renewal_plan_year.may_cancel_renewal?
       end
+    end
+  end
+
+  def trigger_shop_notices(event)
+    begin
+      trigger_model_event(event.to_sym)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
     end
   end
 
