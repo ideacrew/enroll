@@ -10,6 +10,7 @@ module Config::AcaModelConcern
     delegate :aca_shop_market_new_employee_paper_application_is_enabled?, to: :class
     delegate :aca_shop_market_transmit_scheduled_employers, to: :class
     delegate :aca_shop_market_employer_transmission_day_of_month, to: :class
+    delegate :aca_shop_market_census_employees_template_file, to: :class
     delegate :individual_market_is_enabled?, to: :class
     delegate :general_agency_enabled?, to: :class
     delegate :use_simple_employer_calculation_model?, to: :class
@@ -62,6 +63,10 @@ module Config::AcaModelConcern
 
     def aca_shop_market_employer_transmission_day_of_month
       @@aca_shop_market_employer_transmission_day_of_month ||= Settings.aca.shop_market.employer_transmission_day_of_month
+    end
+
+    def aca_shop_market_census_employees_template_file
+      @@aca_shop_market_census_employees_template_file ||= Settings.aca.shop_market.census_employees_template_file
     end
 
     def individual_market_is_enabled?
