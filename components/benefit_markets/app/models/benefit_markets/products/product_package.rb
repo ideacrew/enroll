@@ -6,19 +6,20 @@
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
 module BenefitMarkets
   module Products
-    module ProductPackages
       class ProductPackage
         include Mongoid::Document
         include Mongoid::Timestamps
 
-        BENEFIT_OPTION_KINDS = [
-          :any_dental,
-          :single_product_health,
-          :single_product_dental,
-          :issuer_health,
-          :metal_level_health,
-          :composite_health
-        ]
+        BENEFIT_PACKAGE_MAPPINGS = {
+          :any_dental => ["dental", "any"],
+          :single_product_health => ["health", "single_product"],
+          :single_product_dental => ["dental", "single_product"],
+          :issuer_health => ["health", "issuer"],
+          :metal_level_health => ["health", "metal_level"],
+          :composite_health => ["health", "composite"]
+        }
+
+        BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
 
         field :reference, type: Symbol
 
@@ -34,9 +35,9 @@ module BenefitMarkets
         validates_presence_of :product_year, :allow_blank => false
 
         def self.subclass_for(benefit_option_kind)
-          "::BenefitMarkets::Products::ProductPackages::#{benefit_option_kind.to_s.camelcase}ProductPackage".constantize
+          product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
+          "::BenefitMarkets::Products::#{product_kind.to_s.camelcase}Products::#{constraint.to_s.camelcase}#{product_kind.to_s.camelcase}ProductPackage".constantize
         end
       end
     end
-  end
 end

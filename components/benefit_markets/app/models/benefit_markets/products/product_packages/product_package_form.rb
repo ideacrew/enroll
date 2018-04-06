@@ -26,14 +26,14 @@ module BenefitMarkets
         def self.form_for_new(benefit_option_kind)
           "::BenefitMarkets::Products::ProductPackages::#{benefit_option_kind.to_s.camelcase}ProductPackageForm".constantize.new(
             :benefit_option_kind => benefit_option_kind,
-            :product_package_factory => ::BenefitMarkets::Products::ProductPackages::ProductPackageFactory.new(benefit_option_kind)
+            :product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory.new(benefit_option_kind)
           )
         end
 
         def self.form_for_create(opts)
           benefit_option_kind = opts.require(:benefit_option_kind)
           "::BenefitMarkets::Products::ProductPackages::#{benefit_option_kind.to_s.camelcase}ProductPackageForm".constantize.new(
-            opts.merge({:product_package_factory => ::BenefitMarkets::Products::ProductPackages::ProductPackageFactory.new(benefit_option_kind), benefit_option_kind: benefit_option_kind})
+            opts.merge({:product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory.new(benefit_option_kind), benefit_option_kind: benefit_option_kind})
           )
         end
 
