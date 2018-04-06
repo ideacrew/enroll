@@ -2,11 +2,11 @@ module BenefitMarkets
   module Products
     class ProductPackagesController < ::BenefitMarkets::ApplicationController
       def new
-        @product_package = ::BenefitMarkets::Products::ProductPackages::ProductPackageForm.form_for_new(params.require(:benefit_option_kind))
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.form_for_new(params.require(:benefit_option_kind))
       end
 
       def create
-        @product_package = ::BenefitMarkets::Products::ProductPackages::ProductPackageForm.form_for_create(package_params)
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.form_for_create(package_params)
         if @product_package.save
           redirect_to products_product_packages_url
         else

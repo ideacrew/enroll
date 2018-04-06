@@ -89,7 +89,7 @@ module BenefitSponsors
         )
       }
 
-      let(:plan_design_organization)  { BenefitSponsors::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
+      let(:plan_design_organization)  { BenefitSponsors::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc") }
       let(:plan_design_proposal)      { BenefitSponsors::Organizations::PlanDesignProposal.new(title: "New Proposal") }
       let(:profile) {BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new}
 

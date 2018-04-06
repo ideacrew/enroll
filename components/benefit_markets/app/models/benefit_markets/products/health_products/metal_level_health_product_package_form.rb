@@ -1,7 +1,7 @@
 module BenefitMarkets
   module Products
-    module ProductPackages
-      class MetalLevelHealthProductPackageForm < ProductPackageForm
+    module HealthProducts
+      class MetalLevelHealthProductPackageForm < ::BenefitMarkets::Product::ProductPackageForm
         attr_accessor :metal_level
 
         validates_presence_of :metal_level, :allow_blank => false

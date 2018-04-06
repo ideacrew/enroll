@@ -4,73 +4,40 @@
 # ProductPackage functions:
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
-# 
-# Product package instance examples
-# Cca::Health::OneIssuer
-# => benefit_option: one_issuer
-# => contribution_model: list_bill_contribution_model
-# => price_model: nil
-# Cca::Health::MetalLevel
-# => contribution_model: list_bill_contribution_model
-# => price_model: nil
-# Cca::Health::OnePlan
-# => contribution_model: cca_composite_contribution_model
-# => price_model: composite_price_model
-#
-# Dc::Health::OneIssuer
-# => contribution_model: list_bill_contribution_model
-# => price_model: nil
-# Dc::Health::MetalLevel
-# => contribution_model: list_bill_contribution_model
-# => price_model: nil
-# Dc::Health::OnePlan
-# => contribution_model: list_bill_contribution_model
-# => price_model: nil
-
 module BenefitMarkets
   module Products
-    class ProductPackage
-      include Mongoid::Document
-      include Mongoid::Timestamps
+      class ProductPackage
+        include Mongoid::Document
+        include Mongoid::Timestamps
 
-      BENEFIT_OPTION_KINDS = [:any, :one_product, :one_issuer, :platinum_level, :gold_level]
+        BENEFIT_PACKAGE_MAPPINGS = {
+          :any_dental => ["dental", "any"],
+          :single_product_health => ["health", "single_product"],
+          :single_product_dental => ["dental", "single_product"],
+          :issuer_health => ["health", "issuer"],
+          :metal_level_health => ["health", "metal_level"],
+          :composite_health => ["health", "composite"]
+        }
 
-      field :reference, type: Symbol # => Issuer, Product, MetalLevel
+        BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
 
-      field :hbx_id,                  type: String
-      field :title,                   type: String
-      field :kind,                    type: Symbol
-      field :contribution_model_kind, type: Symbol
-      field :price_model_kind,        type: Symbol
-      field :benefit_option_kind,          type: Symbol
-      field :product_list,            type: Array
+        field :reference, type: Symbol
 
-      belongs_to  :benefit_catalog, class_name: "BenefitMarkets::BenefitCatalog"
+        field :hbx_id,                  type: String
+        field :title,                   type: String
+        field :contribution_model_id, type: BSON::ObjectId
+        field :pricing_model_id, type: BSON::ObjectId
+        field :product_year, type: String
 
-      validates_presence_of :title, :kind
+        belongs_to  :benefit_catalog, class_name: "BenefitMarkets::BenefitMarketCatalog"
 
-      belongs_to :contribution_model 
+        validates_presence_of :title
+        validates_presence_of :product_year, :allow_blank => false
 
-
-      def product_list_for(benefit_option)
-        # criteria must use:
-        # => sponsor's service_area, effective_date
+        def self.subclass_for(benefit_option_kind)
+          product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
+          "::BenefitMarkets::Products::#{product_kind.to_s.camelcase}Products::#{constraint.to_s.camelcase}#{product_kind.to_s.camelcase}ProductPackage".constantize
+        end
       end
-
-# Premium range
-
-
-
-# Deductable range
-# POS, HMO, PPO, EPO
-# Nationwide, DC Network
-# IsStandardPlan
-
-      def sponsored_benefit_for
-      end
-
-
-
     end
-  end
 end
