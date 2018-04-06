@@ -11,6 +11,7 @@ module BenefitSponsors
 
       # Profile subclass may sponsor benefits
       field :is_benefit_sponsorship_eligible, type: Boolean, default: false
+      field :contact_method
 
 
       # Share common attributes across all Profile kinds
@@ -28,6 +29,7 @@ module BenefitSponsors
 
       validates_presence_of :organization, :office_locations
       validate :office_location_kinds
+      accepts_nested_attributes_for :office_locations
 
 
       # @abstract profile subclass is expected to implement #initialize_profile

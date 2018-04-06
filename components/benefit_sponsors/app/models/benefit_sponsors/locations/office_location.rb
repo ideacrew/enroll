@@ -3,7 +3,7 @@ module BenefitSponsors
     class OfficeLocation
       include Mongoid::Document
 
-      embedded_in :organization, class_name: "BenefitSponsors::Organizations::Organization"
+      embedded_in :profile, class_name: "BenefitSponsors::Organizations::Profile"
       #embedded_in :plan_design_employer_profile, class_name: "BenefitSponsors::BenefitSponsorships::PlanDesignEmployerProfile"
 
       field :is_primary, type: Boolean, default: true
@@ -59,6 +59,14 @@ module BenefitSponsors
       #     parent.office_locations.each { |loc| loc.is_primary == false unless loc == self }
       #   end
       # end
+
+      def address_can_be_rejected?
+        attributes["address"].blank? || attributes["address"]["zip"].blank?
+      end
+
+      def phone_can_be_rejected?
+        attributes["phone"].blank? || attributes["phone"]["number"].blank?
+      end
     end
   end
 

@@ -17,33 +17,16 @@ module BenefitSponsors
   module Organizations
     module Factories
       class BenefitSponsorFactory < OrganizationProfileFactory
-        attr_accessor :email, :area_code, :number, :extension, :profile
 
-        def initialize(profile, opts = {})
-          @profile = profile
-          super(opts)
+        attr_accessor :sponsor_profile
+
+        def initialize(attrs)
+          super(attrs)
+          save_benefit_sponsor
         end
 
-        def init_benefit_sponsor
-          organization = init_organization
-
-          profile.entity_kind = entity_kind
-
-          #TODO refactor
-          #currently organization have office locations
-          #profile have office locations
-          profile.office_locations << office_locations
-
-          #TODO
-          #fix for employer profile
-          profile.contact_method = contact_method
-
-          organization.profiles << profile
-          organization.save!
-        end
-
-        def save(current_user)
-          return false unless valid?
+        def save_benefit_sponsor
+          # Todo Current User
           begin
             match_or_create_person(current_user)
             person.save!
@@ -63,12 +46,35 @@ module BenefitSponsors
               return false
             end
             update_organization(existing_org) unless claimed
-            @profile = existing_org.employer_profile
+            sponsor_profile = existing_org.employer_profile
           else
             init_benefit_sponsor
           end
-          pending = create_employer_staff_role(current_user, profile, claimed)
+          pending = create_employer_staff_role(current_user, sponsor_profile, claimed)
           [true, pending]
+        end
+
+        def init_benefit_sponsor
+          organization = init_organization
+          class_name = init_profile_class
+
+          sponsor_profile = class_name.new({
+            :entity_kind => entity_kind,
+            :contact_method => contact_method,
+            :office_locations => office_locations
+          })
+
+          organization.profiles << sponsor_profile
+          organization.save!
+          organization
+        end
+
+        def init_profile_class
+          if site_key == :dc
+            Organizations::AcaShopDcEmployerProfile
+          elsif site_key == :cca
+            Organizations::AcaShopCcaEmployerProfile
+          end
         end
 
         def check_existing_organization
@@ -103,8 +109,12 @@ module BenefitSponsors
 
         def update_organization(org)
           if !org.employer_profile.present?
-            profile.entity_kind = entity_kind
-            org.profiles << profile
+            sponsor_profile = class_name.new({
+              :entity_kind => entity_kind,
+              :contact_method => contact_method,
+              :office_locations => office_locations
+            })
+            org.profiles << sponsor_profile
             org.save!
           end
         end

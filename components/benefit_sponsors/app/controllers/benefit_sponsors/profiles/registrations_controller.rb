@@ -5,7 +5,7 @@ module BenefitSponsors
     before_action :initialize_agency, only: [:create]
 
     def new
-      @agency = Object.const_get("BenefitSponsors::Organizations::Factories::#{profile_type}ProfileFactory".classify).new(nil)
+      @agency= BenefitSponsors::Organizations::Forms::Profile.new(profile_type: profile_type)
 
       respond_to do |format|
         format.html
@@ -15,9 +15,9 @@ module BenefitSponsors
 
     def create
       notice = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-      if @agency.save
+      if @agency.save(current_user, params[:agency])
         flash[:notice] = notice
-        profile_type = @agency.class.to_s.split("::").last.gsub("ProfileFactory","").underscore
+        # profile_type = @agency.class.to_s.split("::").last.gsub("ProfileFactory","").underscore
         redirect_to new_profiles_registration_path(:profile_type => profile_type)
       else
         render 'new'
@@ -33,8 +33,7 @@ module BenefitSponsors
     def initialize_agency
       return if params[:agency].blank?
       params[:agency].permit!
-      @profile = Object.const_get("BenefitSponsors::Organizations::#{profile_type}Profile".classify).new(nil)
-      @agency = Object.const_get("BenefitSponsors::Organizations::Factories::#{profile_type}ProfileFactory".classify).new(@profile, params[:agency].except(:profile_type))
+      @agency= BenefitSponsors::Organizations::Forms::Profile.new(params[:agency])
     end
   end
 end

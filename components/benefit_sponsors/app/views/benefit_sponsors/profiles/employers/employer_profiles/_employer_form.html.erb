@@ -125,13 +125,13 @@
               </div>
             </div>
             <br>
-            <h2> Office Locations </h2>
-            <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location, block| %>
-              <%= render partial: 'benefit_sponsors/shared/office_location_fields', locals: {f: office_location} %>
-                <% @row = true %>
-            <% end %>
-            <br/>
-            <%= f.fields_for @employer_profile, errors: {}, fieldset: false do |f| %>
+            <%= f.fields_for :profiles, @employer_profile, errors: {}, fieldset: false do |f| %>
+              <h2> Office Locations </h2>
+              <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location, block| %>
+                <%= render partial: 'benefit_sponsors/shared/office_location_fields', locals: {f: office_location} %>
+                  <% @row = true %>
+              <% end %>
+              <br/>
               <%= render "employer_contact_preferences", f: f %><br>
             <% end %>
             <br>

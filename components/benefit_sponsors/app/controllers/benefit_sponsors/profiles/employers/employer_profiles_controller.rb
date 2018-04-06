@@ -2,10 +2,9 @@ module BenefitSponsors
   module Profiles
     class Employers::EmployerProfilesController < ApplicationController
       include BenefitSponsors::Employers::EmployerHelper
-
       before_action :get_site_key
       before_action :initiate_employer_profile, only: [:create]
-      before_action :find_employer, only: [:show, :edit, :show_profile, :destroy, :inbox,
+      before_action :find_employer, only: [:show, :edit, :update, :show_profile, :destroy, :inbox,
                                            :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
       before_action :check_employer_staff_role, only: [:new]
 
@@ -83,34 +82,13 @@ module BenefitSponsors
 
       def update
         sanitize_office_locations_params
-
-        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
-        @employer_profile = @organization.employer_profile
-        @org_office_locations_dup = @organization.office_locations.as_json
-
-        #TODO check if this is used
-        # @employer = @employer_profile.match_employer(current_user)
-
-        if (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
-          @organization.assign_attributes(organization_profile_params)
-
-          #clear office_locations, don't worry, we will recreate
-          @organization.assign_attributes(:office_locations => [])
-          @organization.save(validate: false)
-
-          if @organization.update_attributes(employer_profile_params)
-            #TODO for new model
-            # @organization.notify_legal_name_or_fein_change
-            # @organization.notify_address_change(@organization_dup,employer_profile_params)
+        if can_update_profile?
+          if @organization.update_attributes(params["organization"])
             flash[:notice] = 'Employer successfully Updated.'
             redirect_to edit_profiles_employers_employer_profile_path(@employer_profile)
           else
             org_error_msg = @organization.errors.full_messages.join(",").humanize if @organization.errors.present?
 
-            #in case there was an error, reload from saved json
-            @organization.assign_attributes(:office_locations => @organization_dup)
-            @organization.save(validate: false)
-            #@organization.reload
             flash[:error] = "Employer information not saved. #{org_error_msg}."
             redirect_to edit_profiles_employers_employer_profile_path(@employer_profile)
           end
@@ -121,37 +99,15 @@ module BenefitSponsors
       end
 
       def sanitize_office_locations_params
-        params[:organization][:office_locations_attributes].each do |key, location|
-          params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-          location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
-          office_locations = params[:organization][:office_locations_attributes]
-          if office_locations && office_locations[key]
-            params[:organization][:office_locations_attributes][key][:is_primary] = (office_locations[key][:address_attributes][:kind] == 'primary')
+        # TODO - implement in accepts_nested_attributes_for
+        params["organization"].permit!
+        params[:organization][:profiles_attributes].each do |key, profile|
+          profile[:office_locations_attributes].each do |key, location|
+            if location && location[:address_attributes]
+              location[:is_primary] = (location[:address_attributes][:kind] == 'primary')
+            end
           end
         end
-      end
-
-      def organization_profile_params
-        params.require(:organization).permit(
-            :id,
-            :legal_name,
-            :dba,
-            :entity_kind
-        )
-      end
-
-      def employer_profile_params
-        params.require(:organization).permit(
-            :legal_name,
-            :dba,
-            :entity_kind,
-            :office_locations_attributes => [
-                {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
-                {:phone_attributes => [:kind, :area_code, :number, :extension]},
-                {:email_attributes => [:kind, :address]},
-                :is_primary
-            ]
-        )
       end
 
       private
@@ -185,6 +141,10 @@ module BenefitSponsors
         if current_user.person && current_user.person.has_active_benefit_sponsors_employer_staff_role?
           redirect_to profiles_employers_employer_profile_path(:id => current_user.person.active_benefit_sponsors_employer_staff_roles.first.employer_profile_id, :tab => "home")
         end
+      end
+
+      def can_update_profile?
+        (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
       end
     end
   end

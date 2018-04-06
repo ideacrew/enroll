@@ -11,9 +11,9 @@ FactoryGirl.define do
         :allow_special => false, :exactly => 9)
     end
 
-    office_locations do
-      [ build(:benefit_sponsors_locations_office_location, :primary) ]
-    end
+    # office_locations do
+    #   [ build(:benefit_sponsors_locations_office_location, :primary) ]
+    # end
 
     # association :profiles, factory: :benefit_sponsors_organizations_aca_shop_dc_employer_profile
     # profiles { [ build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) ] }

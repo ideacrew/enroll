@@ -1,45 +1,33 @@
 module BenefitSponsors
   module Organizations
     class Factories::OrganizationProfileFactory
-      include ActiveModel::Validations
-      attr_accessor :id
-      attr_accessor :person_id
-      attr_accessor :person
-      attr_accessor :legal_name, :dba, :entity_kind, :fein
-      attr_reader :dob
-      attr_accessor :office_locations
-      attr_accessor :contact_method
 
-      # include FnameLname
+      include BenefitSponsors::Forms::ProfileInformation
+      include BenefitSponsors::Forms::NpnField
 
-      validates :fein,
-        length: { is: 9, message: "%{value} is not a valid FEIN" },
-        numericality: true
-      validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
-      validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
-      validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
-      validates_presence_of :fein, :legal_name
-      validates :entity_kind,
-        inclusion: { in: Organizations::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
-        allow_blank: false
-
-      validate :office_location_validations
-      validate :office_location_kinds
+      attr_accessor :legal_name, :dba, :entity_kind, :email,
+                    :npn, :market_kind, :languages_spoken, :working_hours, :accept_new_clients, :person, :home_page
+      attr_reader :first_name, :last_name, :dob, :fein, :office_locations, :npn
 
       class PersonAlreadyMatched < StandardError; end
       class TooManyMatchingPeople < StandardError; end
 
-      def initialize(attrs = {})
-        @office_locations ||= []
-        assign_wrapper_attributes(attrs)
-        ensure_office_locations
-      end
-
-      def assign_wrapper_attributes(attrs = {})
-        attrs.each_pair do |k,v|
-          v = v.to_sym if k == 'entity_kind'
-          self.send("#{k}=", v)
-        end
+      def initialize(attrs)
+        self.fein = attrs[:fein]
+        self.first_name = attrs[:first_name]
+        self.last_name = attrs[:last_name]
+        self.dob = attrs[:dob]
+        self.legal_name = attrs[:legal_name]
+        self.dba = attrs[:dba]
+        self.entity_kind = attrs[:entity_kind]
+        self.email = attrs[:email]
+        self.npn = attrs[:npn]
+        self.market_kind = attrs[:market_kind]
+        self.home_page = attrs[:home_page]
+        self.languages_spoken = attrs[:languages_spoken]
+        self.working_hours = attrs[:working_hours]
+        self.accept_new_clients = attrs[:accept_new_clients]
+        self.office_locations_attributes = attrs[:office_locations_attributes]
       end
 
       def init_organization
@@ -50,14 +38,17 @@ module BenefitSponsors
           :fein => fein,
           :legal_name => legal_name,
           :dba => dba,
-          :entity_kind => entity_kind.to_sym,
-          :office_locations => office_locations,
+          :entity_kind => entity_kind,
           :site => site
         )
       end
 
       def site
         BenefitSponsors::ApplicationController::current_site
+      end
+
+      def site_key
+        site.site_key
       end
 
       def match_or_create_person(current_user)
@@ -100,89 +91,10 @@ module BenefitSponsors
         end
       end
 
-      def to_key
-        @id
-      end
-
-      def ensure_office_locations
-        if @office_locations.empty?
-          new_office_location = Locations::OfficeLocation.new
-          new_office_location.build_address
-          new_office_location.build_phone
-          @office_locations = [new_office_location]
-        end
-      end
-
-      def office_location_validations
-        @office_locations.each_with_index do |ol, idx|
-          ol.valid?
-          ol.errors.each do |k, v|
-            self.errors.add("office_locations_attributes.#{idx}.#{k}", v)
-          end
-        end
-      end
-
-      def office_location_kinds
-        location_kinds = self.office_locations.flat_map(&:address).flat_map(&:kind)
-        #too_many_of_a_kind = location_kinds.group_by(&:to_s).any? { |k, v| v.length > 1 }
-
-        #if too_many_of_a_kind
-        #  self.errors.add(:base, "may not have more than one of the same kind of address")
-        #end
-
-        if location_kinds.count('primary').zero?
-          self.errors.add(:base, "must select one primary address")
-        elsif location_kinds.count('primary') > 1
-          self.errors.add(:base, "can't have multiple primary addresses")
-        elsif location_kinds.count('mailing') > 1
-          self.errors.add(:base, "can't have more than one mailing address")
-        end
-      end
-
-      def office_locations_attributes
-        @office_locations.map do |office_location|
-          office_location.attributes
-        end
-      end
-
-      def office_locations_attributes=(attrs)
-        @office_locations = []
-        attrs.each_pair do |k, att_set|
-          att_set.delete('phone_attributes') if att_set["phone_attributes"].present? && att_set["phone_attributes"]["number"].blank?
-          @office_locations << Locations::OfficeLocation.new(att_set)
-        end
-        @office_locations
-      end
-
-      def dob=(val)
-        @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
-      end
-      
-      # Strip non-numeric characters
-      def fein=(new_fein)
-        @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
-      end
-
       def regex_for(str)
         #Regexp.compile(Regexp.escape(str.to_s))
         clean_string = Regexp.escape(str.strip)
         /^#{clean_string}$/i
-      end
-
-      def first_name
-        @first_name
-      end
-
-      def last_name
-        @last_name
-      end
-
-      def first_name=(val)
-        @first_name = val.blank? ? nil : val.strip
-      end
-
-      def last_name=(val)
-        @last_name = val.blank? ? nil : val.strip
       end
     end
   end
