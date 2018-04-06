@@ -1,7 +1,7 @@
 module BenefitMarkets
   module Products
-    module ProductPackages
-      class IssuerHealthProductPackageForm < ProductPackageForm
+    module HealthProducts
+      class IssuerHealthProductPackageForm < ::BenefitMarkets::Products::ProductPackageForm
         attr_accessor :issuer_id
 
         validates_presence_of :issuer_id, :allow_blank => false
