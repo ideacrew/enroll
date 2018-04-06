@@ -82,10 +82,6 @@ module BenefitSponsors
       belongs_to  :site_owner, inverse_of: :owner_organization,
                   class_name: "BenefitSponsors::Site"
 
-      embeds_many :office_locations, 
-                  class_name: "BenefitSponsors::Locations::OfficeLocation", 
-                  cascade_callbacks: true, validate: true
-
       embeds_many :profiles, 
                   class_name: "BenefitSponsors::Organizations::Profile"
 
@@ -97,7 +93,7 @@ module BenefitSponsors
       # Use the Document model for managing any/all documents associated with Organization
       has_many :documents, class_name: "BenefitSponsors::Documents::Document"
 
-      accepts_nested_attributes_for :office_locations
+      accepts_nested_attributes_for :profiles
 
       validates_presence_of :legal_name, :site, :profiles
 
