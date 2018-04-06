@@ -3,41 +3,36 @@ module BenefitSponsors
     class BenefitApplicationsController < ApplicationController
 
       before_action :load_benefit_sponsorship
+      before_action :load_benefit_application, only: [:edit, :update, :delete]
 
       def new
-        @benefit_application = BenefitSponsors::Forms::BenefitApplication.new
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new
       end
 
       def create
-        # form object valid?
-        benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(params[:benefit_application])
-        if benefit_application_form.valid?
-          benefit_application = benefit_application_form.construct_benefit_application
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(benefit_application_params)
 
-          if benefit_application && benefit_application.save
-            # redirect to benefit packagess
-          else
-            # redirect with errors
-          end
+        if @benefit_application_form.save
+          redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_sponsorship, @benefit_application_form.benefit_application)
+        else
+          flash[:error] = error_messages(@benefit_application_form)
+          render :new
         end
       end
 
       def edit
-        benefit_application = @benefit_sponsorship.find_benefit_application(params[:id])
-        if params[:publish]
-          @just_a_warning = !benefit_application.is_application_eligible? ? true : false
-          benefit_application.application_warnings
-        end
-        
-        @benefit_application = BenefitSponsors::Forms::BenefitApplicationForm.new(benefit_application)
-        @benefit_application.benefit_packages.each do |benefit_package|
-          benefit_package.build_relationship_benefits if benefit_package.relationship_benefits.empty?
-          benefit_package.build_dental_relationship_benefits if benefit_package.dental_relationship_benefits.empty?
-        end
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.load_from_object(@benefit_application)
+      end
 
-        respond_to do |format|
-          format.js { render 'edit' }
-          format.html { render 'edit' }
+      def update
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(benefit_application_params)
+        @benefit_application_form.reference_benefit_application = @benefit_application
+        
+        if @benefit_application_form.save
+          redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_sponsorship, @benefit_application_form.benefit_application)
+        else
+          flash[:error] = error_messages(@benefit_application_form)
+          render :edit
         end
       end
 
@@ -45,6 +40,21 @@ module BenefitSponsors
 
       def load_benefit_sponsorship
         @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
+      end
+
+      def load_benefit_sponsorship
+        @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:benefit_application_id])
+      end
+
+      def error_messages(instance)
+        instance.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
+      end
+
+      def benefit_application_params
+        params.require(:benefit_application).permit(
+          :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+          :open_enrollment_start_on, :open_enrollment_end_on 
+        )
       end
     end
   end

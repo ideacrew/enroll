@@ -58,8 +58,17 @@ module BenefitMarkets
       benefit_market_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
     end
 
+    def benefit_sponsor_catalogs_for(rating_area, application_date = ::TimeKeeper.date_of_record)
+      find_benefit_catalog.effective_dates_for(application_date)
+      
+      available_effective_dates_for(application_date).collect do |effective_date|
+        benefit_catalog = benefit_market_catalogs.detect { |catalog| catalog.application_period.cover?(effective_date)}
+        BenefitSponsorCatalogFactory.call(effective_date, benefit_catalog, rating_area)
+      end
+    end
+
     # Calculate available effective dates periods using passed date
-    def effective_periods_for(base_date = ::Timekeeper.date_of_record)
+    def available_effective_dates_for(base_date = ::Timekeeper.date_of_record)
       start_on = if TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month
         TimeKeeper.date_of_record.beginning_of_month + open_enrollment_maximum_length
       else
@@ -68,10 +77,6 @@ module BenefitMarkets
 
       end_on = TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
       (start_on..end_on).select {|t| t == t.beginning_of_month}
-    end
-
-    def calculate_start_on_options
-      calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
     def open_enrollment_minimum_begin_day_of_month(use_grace_period = false)
