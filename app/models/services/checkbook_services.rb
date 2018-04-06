@@ -63,7 +63,7 @@ module Services
         case @hbx_enrollment.benefit_group.plan_option_kind
         when "single_plan"
           # @hbx_enrollment.benefit_group.reference_plan_id.to_s
-          @hbx_enrollment.benefit_group.reference_plan.hios_id
+          @hbx_enrollment.benefit_group.reference_plan.hios_id.to_s
         else
           reference_plan.carrier_profile.legal_name
         end
