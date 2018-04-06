@@ -27,6 +27,9 @@ module Config::AcaHelper
     @aca_shop_market_new_employee_paper_application ||= Settings.aca.shop_market.new_employee_paper_application
   end
 
+  def aca_shop_market_census_employees_template_file
+    @aca_shop_market_census_employees_template_file ||= Settings.aca.shop_market.census_employees_template_file
+  end
 
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
