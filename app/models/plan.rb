@@ -70,9 +70,9 @@ class Plan
   field :frozen_plan_year, type: Boolean
 
   # Fields for checking respective carrier is offering or not
-  field :is_horizontal, type: Boolean, default: true
-  field :is_vertical, type: Boolean, default: true
-  field :is_sole_source, type: Boolean, default: true
+  field :is_horizontal, type: Boolean, default: -> { true }
+  field :is_vertical, type: Boolean, default: -> { true }
+  field :is_sole_source, type: Boolean, default: -> { true }
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
