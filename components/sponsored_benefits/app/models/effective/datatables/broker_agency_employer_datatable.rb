@@ -24,7 +24,18 @@
             end
 
             }, :sortable => false, :filter => false
-          table_column :broker, :label => 'Broker', :proc => Proc.new { |row| broker_name(row) }, :sortable => false, :filter => false
+
+          table_column :broker, :label => 'Broker', :proc => Proc.new { |row|
+              if general_agency_enabled?
+                 person_record = row.broker_agency_profile.primary_broker_role.person
+                 redirect_path = main_app.edit_broker_agencies_profile_applicant_path(row.broker_agency_profile, person_record)
+                 link_to row.broker_agency_profile.primary_broker_role.person.full_name, redirect_path
+              else
+                 broker_name(row)
+               end
+            }, :sortable => false, :filter => false
+
+
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
