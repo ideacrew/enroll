@@ -75,6 +75,18 @@ RSpec.describe Employers::BrokerAgencyController do
       end
     end
 
+    context 'post create' do
+      before(:each) do
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in(@user)
+      end
+
+      it "should trigger notice" do
+        expect_any_instance_of(EmployerProfile).to receive(:trigger_shop_notices).with("broker_hired_confirmation_to_employer")
+        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+      end
+    end
+
     context 'with out search string - WITHOUT modify_employer permission' do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: false))
