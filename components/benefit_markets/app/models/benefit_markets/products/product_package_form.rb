@@ -7,7 +7,6 @@ module BenefitMarkets
       attr_accessor :title
       attr_accessor :contribution_model_id
       attr_accessor :pricing_model_id
-      attr_accessor :product_year # Actually belongs to product_catalog
       attr_accessor :benefit_catalog_id
       attr_accessor :benefit_option_kind
       attr_accessor :product_package_factory
@@ -17,7 +16,7 @@ module BenefitMarkets
       validates_presence_of :title, :allow_blank => false
       validates_presence_of :pricing_model_id, :allow_blank => false
       validates_presence_of :contribution_model_id, :allow_blank => false
-      validates_presence_of :product_year, :allow_blank => false
+      validates_presence_of :benefit_catalog_id, :allow_blank => false
       validates_inclusion_of :benefit_option_kind, :in => :allowed_benefit_option_kinds, :allow_blank => false
 
       def allowed_benefit_option_kinds
@@ -50,6 +49,12 @@ module BenefitMarkets
         end
       end
 
+      def available_benefit_catalogs
+        product_package_factory.available_benefit_catalogs.map do |bc|
+          [bc.title, bc.id]
+        end
+      end
+
       def available_contribution_models
         product_package_factory.available_contribution_models.map do |pm|
           [pm.name, pm.id]
@@ -61,8 +66,7 @@ module BenefitMarkets
           benefit_catalog_id,
           title,
           contribution_model_id,
-          pricing_model_id,
-          product_year
+          pricing_model_id
         )
       end
 

@@ -26,7 +26,6 @@ module BenefitMarkets
           :title,
           :pricing_model_id,
           :contribution_model_id,
-          :product_year,
           :benefit_catalog_id,
           :issuer_id,
           :metal_level

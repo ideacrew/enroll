@@ -50,7 +50,7 @@ module BenefitMarkets
                               class_name: "::BenefitMarkets::Locations::ServiceArea"
 
 
-    validates_presence_of :benefit_market, :application_interval_kind, :application_period, :probation_period_kinds
+    validates_presence_of :benefit_market, :application_interval_kind, :application_period #, :probation_period_kinds
 
     validates :application_interval_kind,
       inclusion:    { in: BenefitMarkets::APPLICATION_INTERVAL_KINDS, message: "%{value} is not a valid application interval kind" },
@@ -67,6 +67,21 @@ module BenefitMarkets
 
     # All ProductPackages that Sponsor is eligible to offer to members
     def product_packages_for(benefit_application)
+    end
+
+    # Remove this and delegate properly once Products are implemented
+    def product_market_kind
+      bmk = benefit_market.kind.to_s
+      kind_map = {
+        "aca_shop" => "shop",
+        "aca_individiaul" => "individual"
+      }
+      kind_map[bmk]
+    end
+    
+    # Remove this and delegate properly once Products are implemented
+    def product_active_year
+      application_period.begin.year
     end
 
     def issuers_for(benefit_application)

@@ -12,7 +12,6 @@ module BenefitMarkets
             title,
             contribution_model_id,
             pricing_model_id,
-            product_year,
             metal_level
           )
         end

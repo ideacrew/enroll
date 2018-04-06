@@ -18,37 +18,40 @@ module BenefitMarkets
         ::BenefitMarkets::Products::ProductPackage::BENEFIT_OPTION_KINDS.map(&:to_s)
       end
 
+      def available_benefit_catalogs
+        ::BenefitMarkets::BenefitMarketCatalog.where({})
+      end
+
       def select_model_subclass
         ::BenefitMarkets::Products::ProductPackage.subclass_for(benefit_option_kind)
       end
 
-      def build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year)
+      def build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id)
         {
           benefit_catalog_id: benefit_catalog_id,
           title: title,
           contribution_model_id: contribution_model_id,
-          pricing_model_id: pricing_model_id,
-          product_year: product_year
+          pricing_model_id: pricing_model_id
         }
       end
 
-      def build_product_package(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year)
+      def build_product_package(benefit_catalog_id, title, contribution_model_id, pricing_model_id)
         select_model_subclass.new(
-          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year)
+          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id)
         )
       end
 
-      def build_issuer_product_package(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year, issuer_id)
+      def build_issuer_product_package(benefit_catalog_id, title, contribution_model_id, pricing_model_id, issuer_id)
         select_model_subclass.new(
-          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year).merge({
+          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id).merge({
             issuer_id: issuer_id
           })
         )
       end
 
-      def build_metal_level_product_package(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year, metal_level)
+      def build_metal_level_product_package(benefit_catalog_id, title, contribution_model_id, pricing_model_id, metal_level)
         select_model_subclass.new(
-          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id, product_year).merge({
+          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id).merge({
             metal_level: metal_level
           })
         )

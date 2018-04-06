@@ -9,10 +9,6 @@
     = f.text_field :title
 
   .form-group
-    = f.label :product_year
-    = f.text_field :product_year
-
-  .form-group
     = f.label :pricing_model_id
     = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id)
 
@@ -22,7 +18,7 @@
 
   .form-group
     = f.label :benefit_catalog_id
-    = f.text_field :benefit_catalog_id
+    = f.select :benefit_catalog_id, options_for_select([["Please select a benefit catalog", nil]] + @product_package.available_benefit_catalogs, selected: @product_package.benefit_catalog_id)
 
   = f.hidden_field :benefit_option_kind
 

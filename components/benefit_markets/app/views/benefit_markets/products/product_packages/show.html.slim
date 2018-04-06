@@ -1,0 +1,12 @@
+h2 Product Package
+dl
+  dt= t("product_package.title", default: "Title")
+  dd= @product_package.title
+  dt= t("product_package.pricing_model", default: "Pricing Model")
+  dd= @product_package.pricing_model.name
+  dt= t("product_package.contribution_model", default: "Contribution Model")
+  dd= @product_package.contribution_model.name
+
+ul
+  - @product_package.all_products.each do |product|
+    li= product.name
