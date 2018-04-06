@@ -71,14 +71,7 @@ module BenefitMarkets
       def save
         return false unless self.valid?
         factory_object = build_object_using_factory
-        factory_object.save.tap do |valid|
-          unless valid
-            error_set = factory_object.errors
-            error_set.each do |k, errs|
-              self.errors.add(k, errs)
-            end
-          end
-        end
+        product_package_factory.persist(factory_object, self)
       end
     end
   end

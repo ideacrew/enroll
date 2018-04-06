@@ -2,7 +2,6 @@ module BenefitMarkets
   module Products
     class ProductPackageFactory
       attr_reader :benefit_option_kind
-
       def initialize(bo_kind)
         @benefit_option_kind = bo_kind
       end
@@ -53,6 +52,47 @@ module BenefitMarkets
             metal_level: metal_level
           })
         )
+      end
+
+      def persist(factory_object, e_reporter = nil)
+        error_reporter = e_reporter.nil? ? factory_object : e_reporter
+        return false unless validate(factory_object, error_reporter)
+        factory_object.save.tap do |s_result|
+          unless s_result
+            factory_object.errors.each do |k, err|
+              error_reporter.errors.add(k, err)
+            end
+          end
+        end
+      end
+
+      protected
+
+      def validate(product_package, error_reporter)
+        [
+          is_contribution_model_satisfied?(product_package, error_reporter),
+          is_pricing_model_satisfied?(product_package, error_reporter)
+        ].all?
+      end
+
+      def is_pricing_model_satisfied?(product_package, error_reporter)
+        return true if product_package.pricing_model_id.blank?
+        pricing_model = ::BenefitMarkets::PricingModels::PricingModel.where({:id => product_package.pricing_model_id}).first
+        if pricing_model.nil?
+          error_reporter.errors.add(:pricing_model_id, "does not exist")
+          return false
+        end
+        true
+      end
+
+      def is_contribution_model_satisfied?(product_package, error_reporter)
+        return true if product_package.contribution_model_id.blank?
+        pricing_model = ::BenefitMarkets::ContributionModels::ContributionModel.where({:id => product_package.contribution_model_id}).first
+        if pricing_model.nil?
+          error_reporter.errors.add(:contribution_model, "does not exist")
+          return false
+        end
+        true
       end
     end
   end
