@@ -21,8 +21,8 @@ module Observers
           end
         end
 
-        if new_model_event.event_key == :initial_employer_application_approval
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_approval")
+        if new_model_event.event_key == :initial_application_submitted
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
         end
 
         if new_model_event.event_key == :renewal_employer_open_enrollment_completed

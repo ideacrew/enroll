@@ -3,7 +3,7 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :renewal_application_created,
-      :initial_employer_application_approval,
+      :initial_application_submitted,
       :renewal_application_submitted,
       :renewal_application_autosubmitted,
       :renewal_enrollment_confirmation,
@@ -38,7 +38,7 @@ module ModelEvents
         end
 
         if is_transition_matching?(to: [:published, :enrolling], from: :draft, event: :publish)
-          is_initial_employer_application_approval = true
+          is_initial_application_submitted = true
         end
 
         if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)

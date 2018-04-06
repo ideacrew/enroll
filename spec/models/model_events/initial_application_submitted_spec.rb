@@ -1,8 +1,8 @@
 require 'rails_helper'
 describe 'ModelEvents::InitialEmployerApplicationApproval' do
 
-  let(:model_event) { "initial_employer_application_approval" }
-  let(:notice_event) { "initial_employer_application_approval" }
+  let(:model_event) { "initial_application_submitted" }
+  let(:notice_event) { "initial_application_submitted" }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month}
   let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
   let(:employer_profile){ create :employer_profile}
@@ -19,7 +19,7 @@ describe 'ModelEvents::InitialEmployerApplicationApproval' do
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :initial_employer_application_approval, :klass_instance => model_instance, :options => {})
+            expect(model_event).to have_attributes(:event_key => :initial_application_submitted, :klass_instance => model_instance, :options => {})
           end
         end
         model_instance.publish!
@@ -31,11 +31,11 @@ describe 'ModelEvents::InitialEmployerApplicationApproval' do
     context "when initial application is approved" do
       subject { Observers::NoticeObserver.new }
 
-      let(:model_event) { ModelEvents::ModelEvent.new(:initial_employer_application_approval, model_instance, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:initial_application_submitted, model_instance, {}) }
 
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_approval"
+          expect(event_name).to eq "acapi.info.events.employer.initial_application_submitted"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
