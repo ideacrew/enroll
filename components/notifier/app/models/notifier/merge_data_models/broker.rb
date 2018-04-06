@@ -3,6 +3,10 @@ module Notifier
     include Virtus.model
 
     attribute :primary_fullname, String
+    attribute :primary_first_name, String
+    attribute :primary_last_name, String
+    attribute :assignment_date, Date
+    attribute :termination_date, Date
     attribute :organization, String
     attribute :address, MergeDataModels::Address
     attribute :phone, String
