@@ -5,6 +5,10 @@ module BenefitMarkets
         field :metal_level, type: String
 
         validates_presence_of :metal_level, :allow_blank => false
+
+        def all_products
+          super().where("coverage_kind" => "health", :metal_level => metal_level)
+        end
       end
     end
   end

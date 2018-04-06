@@ -8,14 +8,14 @@ module BenefitMarkets
       def create
         @product_package = ::BenefitMarkets::Products::ProductPackageForm.form_for_create(package_params)
         if @product_package.save
-          redirect_to products_product_packages_url
+          redirect_to products_product_package_url(@product_package.show_page_model)
         else
           render "new"
         end
       end
 
-      def index
-        @product_packages = []
+      def show
+        @product_package = ::BenefitMarkets::Products::ProductPackage.find(params.require(:id))
       end
 
       private

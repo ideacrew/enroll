@@ -13,12 +13,12 @@
     = f.text_field :product_year
 
   .form-group
-    = f.label :contribution_model_id
-    = f.select :contribution_model_id, options_for_select([["Please select a contribution model", nil]] + @product_package.available_contribution_models, selected: @product_package.contribution_model_id)
-
-  .form-group
     = f.label :pricing_model_id
     = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id)
+
+  .form-group
+    = f.label :contribution_model_id
+    = f.select :contribution_model_id, options_for_select([["Please select a contribution model", nil]] + @product_package.available_contribution_models, selected: @product_package.contribution_model_id)
 
   .form-group
     = f.label :benefit_catalog_id

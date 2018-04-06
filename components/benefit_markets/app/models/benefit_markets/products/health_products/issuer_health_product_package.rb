@@ -5,6 +5,10 @@ module BenefitMarkets
         field :issuer_id, type: BSON::ObjectId
 
         validates_presence_of :issuer_id, :allow_blank => false
+
+        def all_products
+          super().where("coverage_kind" => "health", :issuer_id => issuer_id)
+        end
       end
     end
   end

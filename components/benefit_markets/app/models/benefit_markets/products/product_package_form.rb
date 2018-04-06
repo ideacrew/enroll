@@ -12,6 +12,8 @@ module BenefitMarkets
       attr_accessor :benefit_option_kind
       attr_accessor :product_package_factory
 
+      attr_reader :show_page_model
+
       validates_presence_of :title, :allow_blank => false
       validates_presence_of :pricing_model_id, :allow_blank => false
       validates_presence_of :contribution_model_id, :allow_blank => false
@@ -71,6 +73,7 @@ module BenefitMarkets
       def save
         return false unless self.valid?
         factory_object = build_object_using_factory
+        @show_page_model = factory_object
         product_package_factory.persist(factory_object, self)
       end
     end

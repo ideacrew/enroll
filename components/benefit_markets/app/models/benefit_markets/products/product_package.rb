@@ -29,14 +29,32 @@ module BenefitMarkets
         field :pricing_model_id, type: BSON::ObjectId
         field :product_year, type: String
 
-        belongs_to  :benefit_catalog, class_name: "BenefitMarkets::BenefitMarketCatalog"
+        belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
+        belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
+
+        belongs_to  :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
         validates_presence_of :title
         validates_presence_of :product_year, :allow_blank => false
+        validate :has_products
 
         def self.subclass_for(benefit_option_kind)
           product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
           "::BenefitMarkets::Products::#{product_kind.to_s.camelcase}Products::#{constraint.to_s.camelcase}#{product_kind.to_s.camelcase}ProductPackage".constantize
+        end
+
+        def has_products
+          if self.all_products.empty?
+            self.errors.add(:base, "the package would have no products")
+            false
+          else
+            true
+          end
+        end
+
+        # Override this once the actual product implementation is available
+        def all_products
+          Plan.where(:active_year => product_year)
         end
       end
     end
