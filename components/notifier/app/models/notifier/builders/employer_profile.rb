@@ -50,9 +50,32 @@ module Notifier
       merge_model.employer_name = employer_profile.legal_name
     end
 
+    def first_name
+      if employer_profile.staff_roles.present?
+        merge_model.first_name = employer_profile.staff_roles.first.first_name
+      end
+    end
+
+    def last_name
+      if employer_profile.staff_roles.present?
+        merge_model.last_name = employer_profile.staff_roles.first.last_name
+      end
+    end
+
     def invoice_month
       merge_model.invoice_month = TimeKeeper.date_of_record.next_month.strftime('%B')
     end
 
+    def first_name
+      if employer_profile.staff_roles.present?
+        merge_model.first_name = employer_profile.staff_roles.first.first_name
+      end
+    end
+
+    def last_name
+      if employer_profile.staff_roles.present?
+        merge_model.last_name = employer_profile.staff_roles.first.last_name
+      end
+    end
   end
 end

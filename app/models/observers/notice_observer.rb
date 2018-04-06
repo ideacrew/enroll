@@ -65,7 +65,15 @@ module Observers
       end
     end
 
-    def employer_profile_update; end
+    def employer_profile_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        employer_profile = new_model_event.klass_instance
+        if new_model_event.event_key == :broker_hired_confirmation_to_employer
+          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+        end
+      end
+    end
 
     def hbx_enrollment_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
