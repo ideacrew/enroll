@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
+RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyFiredNotice do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile}
   let!(:broker_agency_profile) { create :broker_agency_profile }
@@ -11,11 +11,11 @@ RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
   let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Broker Agency Hired',
-                            :notice_template => 'notices/shop_broker_agency_notices/broker_agency_hired_notice.html.erb',
-                            :notice_builder => 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
-                            :event_name => 'broker_agency_hired_confirmation',
-                            :mpi_indicator => 'SHOP_M044',
+                            :name =>'Broker Agency Fired',
+                            :notice_template => 'notices/shop_broker_agency_notices/broker_agency_fired_notice',
+                            :notice_builder => 'ShopBrokerAgencyNotices::BrokerAgencyFiredNotice',
+                            :event_name => 'broker_agency_fired_confirmation',
+                            :mpi_indicator => 'SHOP_M047',
                             :title => "You have been removed as a Broker"})
                           }
     let(:valid_parmas) {{
