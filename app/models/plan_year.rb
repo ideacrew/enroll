@@ -47,9 +47,6 @@ class PlanYear
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
 
-  # Indicates plan year transmitted to external source(carriers)
-  field :announced_externally, type: Boolean, default: false
-
   embeds_many :benefit_groups, cascade_callbacks: true
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -193,10 +190,6 @@ class PlanYear
       enrollments << coverage_filter.call(health_enrollments, date)
       enrollments << coverage_filter.call(dental_enrollments, date)
     end.compact
-  end
-
-  def update_announced_externally
-    self.update_attribute(:announced_externally, true)
   end
 
   def open_enrollment_completed?

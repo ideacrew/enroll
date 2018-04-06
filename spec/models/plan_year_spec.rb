@@ -2490,15 +2490,3 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     end
   end
 end
-
-describe PlanYear, '.update_announced_externally' do
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
-  let!(:plan_year) { employer_profile.published_plan_year }
-
-  context 'should update announced_externally field' do
-    it "should set to true" do
-      plan_year.update_announced_externally
-      expect(plan_year.announced_externally).to eq true
-    end
-  end
-end
