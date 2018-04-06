@@ -9,11 +9,16 @@ module BenefitSponsors
       end
 
       def create
-        benefit_application = BenefitSponsors::Forms::BenefitApplication.build(params[:benefit_application])
-        if benefit_application && benefit_application.save
-          # redirect to benefit packagess
-        else
-          # redirect with errors
+        # form object valid?
+        benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(params[:benefit_application])
+        if benefit_application_form.valid?
+          benefit_application = benefit_application_form.construct_benefit_application
+
+          if benefit_application && benefit_application.save
+            # redirect to benefit packagess
+          else
+            # redirect with errors
+          end
         end
       end
 
