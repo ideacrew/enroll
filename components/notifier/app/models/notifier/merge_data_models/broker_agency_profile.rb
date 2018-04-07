@@ -12,7 +12,7 @@ module Notifier
 
     attribute :broker_agency_name, String
     attribute :termination_date, String
-    attribute :assignment_date, Date
+    attribute :assignment_date, String
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
     attribute :employer_poc_lastname, String
