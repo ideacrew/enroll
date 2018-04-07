@@ -19,6 +19,14 @@ module Notifier
       end
     end
 
+    def plan_year_next_available_start_date
+      merge_model.plan_year.next_available_start_date = PlanYear.calculate_start_on_options.first.last.to_date
+    end
+
+    def plan_year_next_application_deadline
+      merge_model.plan_year.next_application_deadline = Date.new(plan_year_next_available_start_date.year, plan_year_next_available_start_date.prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month)
+    end
+
     def plan_year_renewal_py_end_date
       if renewal_plan_year.present?
         merge_model.plan_year.renewal_py_end_date = format_date(renewal_plan_year.end_on)

@@ -23,6 +23,9 @@ module Notifier
     attribute :renewal_py_start_on, Date
     attribute :renewal_py_end_on, Date
 
+    attribute :next_available_start_date, Date
+    attribute :next_application_deadline, Date
+
     attribute :carrier_name, String
     attribute :renewal_carrier_name, String
 
@@ -39,7 +42,9 @@ module Notifier
         current_py_oe_start_date: (current_py_start.prev_month).strftime('%m/%d/%Y'),
         current_py_oe_end_date: (current_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         current_py_start_date: current_py_start.strftime('%m/%d/%Y'),
+        next_available_start_date: current_py_start.next_month.strftime('%m/%d/%Y'),
         current_py_end_date: renewal_py_start.prev_day.strftime('%m/%d/%Y'),
+        next_application_deadline: current_py_start.strftime('%m/%d/%Y'),
         renewal_py_oe_start_date: renewal_py_start.prev_month.strftime('%m/%d/%Y'),
         renewal_py_oe_end_date: (renewal_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         renewal_py_start_date: renewal_py_start.strftime('%m/%d/%Y'),
