@@ -1,7 +1,10 @@
 module Notifier
   class Builders::BrokerAgencyProfile
 
-    attr_accessor :payload, :broker_agency_profile, :merge_model
+    include Notifier::Builders::PlanYear
+    include Notifier::Builders::Broker
+
+    attr_accessor :payload, :broker_agency_profile, :broker_agency_account, :merge_model
 
     def initialize
       data_object = Notifier::MergeDataModels::BrokerAgencyProfile.new
@@ -27,7 +30,11 @@ module Notifier
     end
 
     def notice_date
-      merge_model.notice_date = TimeKeeper.date_of_record
+      merge_model.notice_date = format_date(TimeKeeper.date_of_record)
+    end
+
+    def broker_agency_name
+      merge_model.broker_agency_name = broker_agency_profile.legal_name
     end
 
     def first_name
@@ -70,6 +77,14 @@ module Notifier
 
     def broker_agency_name
       merge_model.broker_agency_name = broker_agency_profile.legal_name
+    end
+
+    def employer_poc_phone
+      merge_model.employer_poc_phone = employer.staff_roles.first.work_phone_or_best
+    end
+
+    def employer_poc_email
+      merge_model.employer_poc_email = employer.staff_roles.first.work_email_or_best
     end
   end
 end
