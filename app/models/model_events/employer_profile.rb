@@ -5,7 +5,19 @@ module ModelEvents
       :initial_employee_plan_selection_confirmation
     ]
 
-    def notify_on_update
+    #TODO: The trigger for this notice is in the controller and it has to be eventually moved to observer pattern.
+    #TODO: This is the temporary fix until then.
+    OTHER_EVENTS = [
+      :broker_hired_confirmation_to_employer
+    ]
+
+    def trigger_model_event(event_name, event_options = {})
+      if OTHER_EVENTS.include?(event_name)
+        notify_observers(ModelEvent.new(event_name, self, event_options))
+      end
+    end
+
+    def notify_on_save
       if aasm_state_changed?
 
         if aasm_state == "binder_paid"
