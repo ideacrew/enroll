@@ -2,6 +2,7 @@ module Observers
   class NoticeObserver < Observer
 
     def plan_year_update(new_model_event)
+      current_date = TimeKeeper.date_of_record
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
       if PlanYear::REGISTERED_EVENTS.include?(new_model_event.event_key)
@@ -38,7 +39,9 @@ module Observers
         end
 
         if new_model_event.event_key == :group_advance_termination_confirmation
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+          if plan_year.terminated_on > current_date 
+            trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+          end
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
