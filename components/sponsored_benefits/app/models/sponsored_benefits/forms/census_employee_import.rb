@@ -243,10 +243,10 @@ module SponsoredBenefits
         name_sfx = parse_text(row["name_sfx"])
         email = parse_text(row["email"])
         ssn = parse_ssn(row["ssn"])
-        dob = parse_date(row["dob"])
+        dob = parse_date(row["dob"], "dob")
         gender = parse_text(row["gender"])
-        hire_date = parse_date(row["hire_date"])
-        termination_date = parse_date(row["termination_date"])
+        hire_date = parse_date(row["hire_date"], "hire_date")
+        termination_date = parse_date(row["termination_date"], "termination_date")
         is_business_owner = parse_boolean(row["is_business_owner"])
         benefit_group = parse_text(row["benefit_group"])
         plan_year = parse_text(row["plan_year"])
@@ -323,10 +323,10 @@ module SponsoredBenefits
         cell.blank? ? nil : sanitize_value(cell)
       end
 
-      def parse_date(cell)
+      def parse_date(cell, field_name="date")
         return nil if cell.blank?
-        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, cell if cell.class == String
-        return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
+        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, "#{field_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
+        return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, "#{field_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
         # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
         cell.blank? ? nil : cell

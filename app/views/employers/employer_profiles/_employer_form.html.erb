@@ -57,7 +57,7 @@
                 </td>
                 <td>
                   <% phone = staff.phones.detect{|phone| phone.kind == 'work'} %>
-                  <%= phone && (phone.area_code.to_s + phone.number + (phone.extension? ? ' x'+phone.extension : '')) %>
+                  <%= phone && phone.to_s %>
                 <td>
                   <% role = staff.employer_staff_roles.detect{|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                   <%= role && role.current_state %>
@@ -121,7 +121,10 @@
           <%= render partial: 'shared/office_location_fields', locals: {f: office_location, child_index: f.object.office_locations.length - 1} %>
           <% @row = true %>
         <% end %>
-
+        <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |f| %>
+          <%= render "employer_contact_preferences", f: f %><br>
+        <% end %>
+        <br>
         <div class="form-inputs">
           <%= pundit_span(EmployerProfile,:updateable?) %>
              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default btn-sm' %>

@@ -29,6 +29,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
   describe "ModelEvent" do
     before :each do
      allow(employer).to receive(:is_primary_office_local?).and_return(false)
+     allow(model_instance).to receive(:open_enrollment_date_errors).and_return(nil)
     end
 
     context "when In eligible renewal application created" do
@@ -80,7 +81,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
 
   describe "NoticeBuilder" do
     let(:data_elements) {
-      %w(employer_profile.employer_name employer_profile.plan_year.renewal_py_start_on
+      %w(employer_profile.employer_name employer_profile.plan_year.renewal_py_start_on employer_profile.first_name employer_profile.last_name
          employer_profile.plan_year.renewal_py_start_date employer_profile.broker.primary_fullname employer_profile.broker.organization
          employer_profile.broker.phone employer_profile.broker.email employer_profile.broker_present?)
      }

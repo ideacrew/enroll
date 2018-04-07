@@ -69,6 +69,17 @@ RSpec.describe BrokerAgencies::ProfilesController do
     #let(:org) { double }
     let(:org) { FactoryGirl.create(:organization)}
     let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
+    let(:organization_params) do
+      {
+        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
+        office_locations_attributes: {
+          "0"=> {
+            "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+          }
+        }
+      }
+    end
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
@@ -76,20 +87,30 @@ RSpec.describe BrokerAgencies::ProfilesController do
       allow(controller).to receive(:authorize).and_return(true)
     end
 
-    it "should update record" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+    it "should update person main phone" do
+      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
+      post :update, id: broker_agency_profile.id, organization: organization_params
+       broker_agency_profile.primary_broker_role.person.reload
+       expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
+    end
+
+    it "should update person record" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
 
     it "should update record without a phone extension" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"999-9999", "extension"=>""}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
+    end
+
+    it "should update record by saving accept new clients" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
+      broker_agency_profile.reload
+      expect(broker_agency_profile.accept_new_clients).to be_truthy
+      expect(broker_agency_profile.working_hours).to be_truthy
     end
   end
 
@@ -242,8 +263,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
       end
       context "individual market user" do
-        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
-        let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
 
         it "selects only 'individual' and 'both' market brokers" do
           allow(subject).to receive(:current_user).and_return(user)
@@ -254,8 +275,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
           end
         end
         context "SHOP market user" do
-          let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
-          let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+          let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+          let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
           it "selects only 'shop' and 'both' market brokers" do
             allow(subject).to receive(:current_user).and_return(user)
@@ -284,8 +305,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
       end
       context "SHOP market user" do
-        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
-        let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
         it "selects only 'shop' market brokers" do
           allow(subject).to receive(:current_user).and_return(user)
