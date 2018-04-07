@@ -1,7 +1,9 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
+  include ApplicationHelper
+
   before_action :find_employer
-  before_action :find_borker_agency, :except => [:index, :active_broker]
+  before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
 
   def index
@@ -50,8 +52,8 @@ class Employers::BrokerAgencyController < ApplicationController
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
       broker_hired
-      broker_hired_confirmation
-      broker_agency_hired_confirmation
+      @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer")
+      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
       # @employer_profile.trigger_notices("broker_hired_confirmation_notice") #mirror notice
     end
 
@@ -103,22 +105,6 @@ class Employers::BrokerAgencyController < ApplicationController
     end
   end
 
-  def broker_hired_confirmation
-    begin
-         ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired_confirmation")
-    rescue Exception => e
-       puts "Unable to deliver Employer Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
-    end
-  end
-
-  def broker_agency_hired_confirmation
-    begin
-         ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_agency_hired_confirmation")
-    rescue Exception => e
-       puts "Unable to deliver Broker Agency Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
-    end
-  end
-
   private
 
   def updateable?
@@ -162,7 +148,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])
   end
 
-  def find_borker_agency
+  def find_broker_agency
     id = params[:id] || params[:broker_agency_id]
     @broker_agency_profile = BrokerAgencyProfile.find(id)
   end

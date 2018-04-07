@@ -575,28 +575,6 @@ shop_notice_triggers = [
     },
 
     {
-      hbx_id: 'SHOP_M049',
-      title: 'You Removed Your Broker In The Health Connector',
-      description: ' Broker gets terminated after employer selects change broker',
-      resource_name: 'employer',
-      event_name: 'employer_broker_fired',
-      notice_triggers: [
-          {
-              name: 'YOU REMOVED YOUR BROKER IN THE HEALTH CONNECTOR',
-              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
-              notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
-              mpi_indicator: 'SHOP_M049',
-              notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employer"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-              }
-          }
-      ]
-    },
-
-    {
         hbx_id: 'SHOP_M022',
         title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
         description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
@@ -837,27 +815,6 @@ shop_notice_triggers = [
         ]
     },
 
-   {
-   hbx_id: 'SHOP46',
-   title: 'Broker Hired Confirmation Notice',
-   description: 'Confirmation of Broker Hired Sent to Employer',
-   resource_name: 'employer',
-   event_name: 'broker_hired_confirmation',
-   notice_triggers: [
-     {
-       name: 'Boker Hired Confirmation',
-       notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
-       notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-       mpi_indicator: 'SHOP_M046',
-       notice_trigger_element_group: {
-         market_places: ['shop'],
-         primary_recipients: ["employer"],
-         primary_recipient_delivery_method: ["secure_message"],
-         secondary_recipients: []
-       }
-     }
-   ]
-  },
   # {
   #   hbx_id: 'SHOP_D018',
   #   title: 'Group Open Enrollment Successfully Completed',
@@ -1068,27 +1025,6 @@ shop_notice_triggers = [
             }
           }
       ]
-    },
-    {
-        hbx_id: 'SHOP44',
-        title: 'You have been Hired as a Broker',
-        description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-        resource_name: 'broker_role',
-        event_name: 'broker_agency_hired_confirmation',
-        notice_triggers: [
-           {
-              name: 'Broker Hired',
-              notice_template: 'notices/shop_broker_agency_notices/broker_agency_hired_notice.html.erb',
-              notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
-              mpi_indicator: 'SHOP_M044',
-              notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["broker"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-        ]
     },
 
     {
@@ -1557,27 +1493,6 @@ shop_notice_triggers = [
         ]
     },
 
-    {
-        hbx_id: 'SHOP_M050',
-        title: 'Eligible to Apply for Employer-sponsored Health Insurance',
-        description: 'Employee completes initial application and matches the employee to a SHOP Employer (checks SSN and DOB against roster)',
-        resource_name: 'employee_role',
-        event_name: 'employee_matches_employer_rooster',
-        notice_triggers: [
-            {
-                name: 'Employee must be notified when they successfully match to their employer',
-                notice_template: 'notices/shop_employee_notices/employee_matches_employer_rooster_notification',
-                notice_builder: 'ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice',
-                mpi_indicator: 'SHOP_M050',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employee"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
     {
         hbx_id: 'SHOP_M043',
         title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
