@@ -1,5 +1,6 @@
 module Notifier
   module Builders::PlanYear
+    include ActionView::Helpers::NumberHelper
 
     def plan_year_current_py_start_date
       if current_plan_year.present?
@@ -42,7 +43,7 @@ module Notifier
     def plan_year_monthly_employer_contribution_amount
       if current_plan_year.present?
         payment = current_plan_year.benefit_groups.map(&:monthly_employer_contribution_amount)
-        merge_model.plan_year.monthly_employer_contribution_amount = payment.inject(0){ |sum,a| sum+a }
+        merge_model.plan_year.monthly_employer_contribution_amount = number_to_currency(payment.inject(0){ |sum,a| sum+a })
       end
     end
 

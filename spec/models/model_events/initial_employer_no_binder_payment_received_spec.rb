@@ -99,8 +99,8 @@ describe 'ModelEvents::InitialEmployerNoBinderPaymentReceived' do
       expect(merge_model.employer_name).to eq employer_profile.legal_name
     end
 
-    it "should return employer name" do
-      expect(merge_model.plan_year.monthly_employer_contribution_amount).to eq active_benefit_group.monthly_employer_contribution_amount
+    it "should return monthly employer contribution" do
+      expect(merge_model.plan_year.monthly_employer_contribution_amount).to eq ActiveSupport::NumberHelper.number_to_currency(active_benefit_group.monthly_employer_contribution_amount)
     end
 
     it "should return plan year start date" do
