@@ -913,7 +913,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => :notify_employee_of_initial_employer_ineligibility
 
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
@@ -1349,15 +1349,6 @@ class PlanYear
     end
     if transmit_employers_immediately?
       employer_profile.transmit_renewal_eligible_event
-    end
-  end
-
-  def initial_employer_ineligibility_notice
-    return true if benefit_groups.any? { |bg| bg.is_congress? }
-    begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
