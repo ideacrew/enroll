@@ -540,20 +540,15 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 0
     end
 
-    it 'should trigger broker_agency_fired_confirmation notice' do
-      employer = organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111')
+
+    it 'should trigger broker fired notice to broker and employer' do
+      employer = organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111');
       employer.hire_broker_agency(broker_agency_profile7)
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       employer = Organization.find(employer.organization.id).employer_profile
-      employer.fire_broker_agency(TimeKeeper.date_of_record)
-      expect(observer).to receive(:notify) do |event_name, payload|
-        expect(event_name).to eq "acapi.info.events.broker_agency_profile.broker_agency_fired_confirmation"
-        expect(payload[:event_object_kind]).to eq 'EmployerProfile'
-        expect(payload[:event_object_id]).to eq employer.id.to_s
-      end
-
-      observer.trigger_notice(recipient: broker_agency_profile7, event_object: employer, notice_event: "broker_agency_fired_confirmation")
+      expect_any_instance_of(EmployerProfile).to receive(:trigger_notice_observer).exactly(2).times
+      employer.hire_broker_agency(broker_agency_profile)
       employer.save
     end
 

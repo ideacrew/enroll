@@ -83,6 +83,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it 'should trigger broker_hired_notice_to_broker notice' do
+        allow(controller).to receive(:trigger_notice_observer).with(@org2.broker_agency_profile,  @employer_profile, "broker_agency_hired_confirmation").and_return(nil)
         expect(controller).to receive(:trigger_notice_observer).once.ordered.with(@broker_role2, @employer_profile,"broker_hired_notice_to_broker")
         post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
@@ -107,6 +108,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it "should trigger the notice" do
+        allow(controller).to receive(:trigger_notice_observer).with(@broker_role2, @employer_profile, "broker_hired_notice_to_broker").and_return(nil)
         expect(controller).to receive(:trigger_notice_observer).once.ordered.with(@broker_role2.broker_agency_profile, @employer_profile,"broker_agency_hired_confirmation")
         post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
