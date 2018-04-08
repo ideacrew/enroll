@@ -12,8 +12,8 @@ module Notifier
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
-      data_object.qle = Notifier::MergeDataModels::QualifyingLifeEventKind.new
       data_object.sep = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
+      data_object.qle = Notifier::MergeDataModels::QualifyingLifeEventKind.new
       @merge_model = data_object
     end
 
@@ -103,14 +103,16 @@ module Notifier
     end
 
     def qle
-      if payload['event_object_kind'].constantize == QualifyingLifeEventKind
-        @qle ||= QualifyingLifeEventKind.find(payload['event_object_id'])
-      end
+      return @qle if defined? @qle
+      @qle = sep.qualifying_life_event_kind
     end
 
     def sep
-      if payload['event_object_kind'].constantize == QualifyingLifeEventKind
-        @sep ||= employee_role.person.primary_family.current_sep
+      return @sep if defined? @sep
+      if payload['event_object_kind'].constantize == SpecialEnrollmentPeriod
+        @sep = employee_role.person.primary_family.special_enrollment_periods.find(payload['event_object_id'])
+      else
+        @sep = employee_role.person.primary_family.current_sep
       end
     end
 
