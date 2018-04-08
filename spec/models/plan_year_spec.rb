@@ -2264,7 +2264,6 @@ describe PlanYear, "which has the concept of export eligibility" do
       end
     end
   end
-
 end
 
 describe PlanYear, "filter_active_enrollments_by_date" do
