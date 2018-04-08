@@ -20,9 +20,18 @@ module BenefitSponsors
 
         attr_accessor :sponsor_profile
 
+        def self.call(attrs)
+          bs = new(attrs)
+          result = bs.save_benefit_sponsor
+          return result, redirection_url
+        end
+
+        def self.redirection_url
+          BenefitSponsors::Engine.routes.url_helpers.new_profiles_registration_path(profile_type: 'benefit_sponsor')
+        end
+
         def initialize(attrs)
           super(attrs)
-          save_benefit_sponsor
         end
 
         def save_benefit_sponsor

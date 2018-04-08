@@ -6,9 +6,18 @@ module BenefitSponsors
 
         attr_accessor :broker_agency_profile
 
+        def self.call(attrs)
+          bap = new(attrs)
+          result = bap.save_broker_profile
+          return result, redirection_url
+        end
+
+        def self.redirection_url
+          BenefitSponsors::Engine.routes.url_helpers.new_profiles_registration_path(profile_type: 'broker_agency')
+        end
+
         def initialize(attrs)
           super(attrs)
-          save_broker_profile
         end
 
         def save_broker_profile
@@ -22,7 +31,6 @@ module BenefitSponsors
             errors.add(:base, "organization has already been created.")
             return false
           end
-
           person.save!
           add_broker_role
           organization = create_or_find_organization
@@ -30,7 +38,6 @@ module BenefitSponsors
           self.broker_agency_profile.primary_broker_role = person.broker_role
           self.broker_agency_profile.save!
           person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
-
           ::UserMailer.broker_application_confirmation(person).deliver_now
           true
         end

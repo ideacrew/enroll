@@ -95,11 +95,13 @@ module BenefitSponsors
 
       def save(current_user, attrs)
         return false unless valid?
-        if is_broker_profile?
-          Factories::BrokerAgencyProfileFactory.new(attrs)
-        elsif is_employer_profile?
-          Factories::BenefitSponsorFactory.new(attrs)
-        end
+        result, redirection_path =
+          if is_broker_profile?
+            Factories::BrokerAgencyProfileFactory.call(attrs)
+          elsif is_employer_profile?
+            Factories::BenefitSponsorFactory.call(attrs)
+          end
+        return result, redirection_path
       end
 
       def validate_duplicate_npn

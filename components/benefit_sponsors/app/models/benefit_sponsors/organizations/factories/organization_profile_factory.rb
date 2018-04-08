@@ -11,6 +11,7 @@ module BenefitSponsors
 
       class PersonAlreadyMatched < StandardError; end
       class TooManyMatchingPeople < StandardError; end
+      class OrganizationAlreadyMatched < StandardError; end
 
       def initialize(attrs)
         self.fein = attrs[:fein]

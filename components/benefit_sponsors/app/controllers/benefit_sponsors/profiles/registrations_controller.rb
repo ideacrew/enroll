@@ -14,11 +14,10 @@ module BenefitSponsors
     end
 
     def create
-      notice = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-      if @agency.save(current_user, params[:agency])
-        flash[:notice] = notice
-        # profile_type = @agency.class.to_s.split("::").last.gsub("ProfileFactory","").underscore
-        redirect_to new_profiles_registration_path(:profile_type => profile_type)
+      result, redirection_path = @agency.save(current_user, params[:agency])
+      if result
+        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        redirect_to redirection_path
       else
         render 'new'
       end
