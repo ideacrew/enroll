@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe 'ModelEvents::SepRequestAcceptNotice', :dbclean => :after_each  do
-  let(:notice_event) { "employee_notice_after_sep_accepted" }
+  let(:notice_event) { "employee_sep_request_accepted" }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month }
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -18,11 +18,11 @@ describe 'ModelEvents::SepRequestAcceptNotice', :dbclean => :after_each  do
       subject { Observers::Observer.new }
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.employee_notice_after_sep_accepted"
-          expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
-          expect(payload[:event_object_id]).to eq qle.id.to_s
+          expect(event_name).to eq "acapi.info.events.employee.#{notice_event}"
+          expect(payload[:event_object_kind]).to eq 'SpecialEnrollmentPeriod'
+          expect(payload[:event_object_id]).to eq sep.id.to_s
         end
-        subject.trigger_notice(recipient: employee_role, event_object: qle, notice_event: "employee_notice_after_sep_accepted", notice_params: sep.id)
+        subject.trigger_notice(recipient: employee_role, event_object: sep, notice_event: notice_event)
       end
     end
   end
@@ -50,8 +50,8 @@ describe 'ModelEvents::SepRequestAcceptNotice', :dbclean => :after_each  do
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload)   { {
-        "event_object_kind" => "QualifyingLifeEventKind",
-        "event_object_id" => qle.id
+        "event_object_kind" => "SpecialEnrollmentPeriod",
+        "event_object_id" => sep.id
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }

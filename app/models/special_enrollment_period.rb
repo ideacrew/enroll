@@ -4,7 +4,11 @@ class SpecialEnrollmentPeriod
   include Mongoid::Timestamps
   include ScheduledEventService
   include TimeHelper
+  include Concerns::Observable
+  include ModelEvents::SpecialEnrollmentPeriod
 
+  after_save :notify_on_save
+  
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
 
