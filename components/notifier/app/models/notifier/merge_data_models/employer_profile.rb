@@ -21,6 +21,8 @@ module Notifier
     attribute :plan_year, MergeDataModels::PlanYear
     attribute :addresses, Array[MergeDataModels::Address]
 
+    attribute :offered_products, Array[MergeDataModels::OfferedProduct] # Grouping of employee coverages by plan
+
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployerProfile.new({
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
@@ -35,11 +37,12 @@ module Notifier
       notice.plan_year = Notifier::MergeDataModels::PlanYear.stubbed_object
       notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
       notice.addresses = [ notice.mailing_address ]
+      notice.offered_products = [ Notifier::MergeDataModels::OfferedProduct.stubbed_object ]
       notice
     end
 
     def collections
-      %w{addresses}
+      %w{addresses offered_products}
     end
 
     def conditions

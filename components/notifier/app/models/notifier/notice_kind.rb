@@ -40,7 +40,23 @@ module Notifier
       if template.present?
         tokens = template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
         conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
-        template.data_elements = tokens + conditional_tokens
+        
+        conditional_token_loops = []
+        loop_iterators = conditional_tokens.inject([]) do |iterators, conditional_token|
+          return iterators unless conditional_token.match(/(.+)\.each/i)
+          loop_match = conditional_token.match(/\|(.+)\|/i)
+          if loop_match.present?
+            tokens << conditional_token.match(/(.+)\.each/i)[1]
+            conditional_token_loops << conditional_token
+            iterators << loop_match[1].strip
+          else
+            iterators
+          end
+        end
+
+        conditional_tokens = conditional_tokens - conditional_token_loops
+        data_elements = (tokens + conditional_tokens).reject{|token| loop_iterators.any?{|iterator| token.match(/^#{iterator}\.(.*)$/i).present?} }
+        template.data_elements = data_elements
       end
     end
 

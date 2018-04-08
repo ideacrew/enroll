@@ -2,6 +2,7 @@ module Notifier
   class Builders::EmployerProfile
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
+    include Notifier::Builders::OfferedProduct
 
     attr_accessor :employer_profile, :merge_model, :payload
     
@@ -46,6 +47,5 @@ module Notifier
     def invoice_month
       merge_model.invoice_month = TimeKeeper.date_of_record.next_month.strftime('%B')
     end
-
   end
 end
