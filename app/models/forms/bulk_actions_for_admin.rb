@@ -70,6 +70,14 @@ module Forms
             @result[:success] << person
             # handle endating previous transition(s)
             # creation of SEP?
+            @family = Family.find(params[:family])
+            qle = QualifyingLifeEventKind.find(params[:qle_id])
+            effective_kind = qle.effective_on_kinds.first
+            special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: effective_kind)
+            special_enrollment_period.selected_effective_on = effective_date
+            special_enrollment_period.qualifying_life_event_kind = qle
+            special_enrollment_period.qle_on = effective_date
+            special_enrollment_period.save
           rescue
             @result[:failure] << person
           end

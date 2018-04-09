@@ -6,7 +6,7 @@ class IndividualMarketTransition
   embedded_in :person
 
   ROLE_TYPES   = %W(consumer resident)
-  REASON_CODES = %W(not_eligible_for_marketplace_coverage_due_to_citizenship_or_immigration_status provided_documents_proving_eligibility)
+  REASON_CODES = %W(eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided)
 
   field :role_type, type: String
   field :effective_starting_on, type: Date

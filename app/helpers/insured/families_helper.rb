@@ -262,9 +262,11 @@ module Insured::FamiliesHelper
 
   def transition_reason(person)
     if person.is_consumer_role_active?
-      { 'Not eligible for marketplace coverage due to citizenship or immigration status' => 'not_eligible_for_marketplace_coverage_due_to_citizenship_or_immigration_status'}
+    @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
+      { @qle.title => @qle.reason }
     elsif person.is_resident_role_active?
-      { 'Provided documents proving eligibility' => 'provided_documents_proving_eligibility'}
+     @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
+     { @qle.title => @qle.reason }
     end
   end
 end
