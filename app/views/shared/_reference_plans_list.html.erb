@@ -161,7 +161,7 @@ $(function(){
 $('a[data-remote=true]').click( function() {
    var current_href = $(this).attr('href');
    var location_id = $(this).closest('.benefit-group-fields').attr('id');
-   var object_id = <%= f.object.id %>;
+   var object_id = "<%= f.object.id %>";
    $(this).attr('href', current_href + "&location_id=" + location_id + "&object_id=" + object_id);
 });
 
