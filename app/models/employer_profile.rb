@@ -162,7 +162,7 @@ class EmployerProfile
   end
 
   def broker_fired_confirmation_to_broker
-      trigger_notices('broker_fired_confirmation_to_broker')   
+      trigger_notices('broker_fired_confirmation_to_broker')
   end
 
   def send_broker_notice

@@ -66,13 +66,17 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
-      next if primary_member.nil?
-      person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
+      if primary_member.nil?
+        family_member =  members.first
+        person = Person.where(:hbx_id => family_member["subscriber_id"]).first
+      else
+        person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
+      end
       next if !person.present?
       consumer_role = person.consumer_role
       if consumer_role.present?
         if InitialEvents.include? event
-          family = person.primary_family
+          family = person.primary_family || person.families.first
           set_due_date_on_verification_types(family)
           family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
         end
@@ -82,6 +86,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
+            family: family,
             data: members
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
         )
