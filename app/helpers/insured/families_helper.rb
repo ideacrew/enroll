@@ -208,7 +208,7 @@ module Insured::FamiliesHelper
   end
 
   def person_has_any_roles?
-    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role? 
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role?
   end
 
   def is_strictly_open_enrollment_case?
