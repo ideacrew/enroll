@@ -59,6 +59,9 @@ describe ConsumerRole, dbclean: :after_each do
         it "should have a state of unverified" do
           expect(consumer_role.aasm_state).to eq "unverified"
         end
+        it "should have a default value of native validation as na" do
+          expect(consumer_role.native_validation).to eq "na"
+        end
       end
     end
 
