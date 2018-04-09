@@ -71,6 +71,8 @@ module Observers
         employer_profile = new_model_event.klass_instance
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
           trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+        elsif new_model_event.event_key == :welcome_notice_to_employer
+          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
         end
       end
     end
@@ -105,6 +107,18 @@ module Observers
           trigger_on_queried_records("renewal_plan_year_publish_dead_line")
         end
 
+        if model_event.event_key == :initial_employer_first_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
+        end
+
+        if model_event.event_key == :initial_employer_second_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_second_reminder_to_publish_plan_year")
+        end
+
+        if model_event.event_key == :initial_employer_final_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_final_reminder_to_publish_plan_year")
+        end
+
       end
     end
 
@@ -125,6 +139,14 @@ module Observers
       current_date = TimeKeeper.date_of_record
       organizations_for_force_publish(current_date).each do |organization|
         plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+        trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
+      end
+    end
+
+    def trigger_initial_employer_publish_remainder(event_name)
+      start_on_1 = (TimeKeeper.date_of_record+1.month).beginning_of_month
+      initial_employers_reminder_to_publish(start_on_1).each do|organization|
+        plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
         trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
       end
     end
