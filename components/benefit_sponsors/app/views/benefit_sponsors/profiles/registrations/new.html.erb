@@ -1,3 +1,4 @@
+<% if @profile_type == "broker_agency" %>
 <div class="broker-registration-container mt-4 pt-4 pl-3 pr-3 pb-3">
   <h1 class="enroll-lead">Broker Registration</h1>
   
@@ -22,6 +23,13 @@
       
   <% end %>
 </div>
+<% else %>
+  <%= form_for @agency, as: :agency, url: {action: "create"} do |f| %>
+    <%= f.hidden_field :profile_type, value: params[:profile_type] %>
+    <%= render 'benefit_sponsors/shared/error_messages', :object => @agency %>
+    <%= render 'benefit_sponsors/profiles/employers/employer_profiles/employer_profile_form', f: f %>
+  <% end %>
+<% end %>
 
 <script>
   validateForm()

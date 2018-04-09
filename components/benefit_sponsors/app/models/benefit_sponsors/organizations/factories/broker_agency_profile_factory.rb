@@ -9,11 +9,11 @@ module BenefitSponsors
         def self.call(attrs)
           bap = new(attrs)
           result = bap.save_broker_profile
-          return result, redirection_url
+          return {is_saved: result, url: redirection_url, profile: bap.broker_agency_profile}
         end
 
         def self.redirection_url
-          BenefitSponsors::Engine.routes.url_helpers.new_profiles_registration_path(profile_type: 'broker_agency')
+          :broker_new_registration_url
         end
 
         def initialize(attrs)

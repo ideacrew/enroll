@@ -18,16 +18,23 @@ module BenefitSponsors
     module Factories
       class BenefitSponsorFactory < OrganizationProfileFactory
 
-        attr_accessor :sponsor_profile
+        attr_accessor :sponsor_profile, :current_user
 
-        def self.call(attrs)
+        def self.call(current_user, attrs)
           bs = new(attrs)
-          result = bs.save_benefit_sponsor
-          return result, redirection_url
+          bs.current_user = current_user
+          saved, is_pending = bs.save_benefit_sponsor
+          return {is_saved: saved, url: redirection_url(saved, is_pending), profile: bs.sponsor_profile}
         end
 
-        def self.redirection_url
-          BenefitSponsors::Engine.routes.url_helpers.new_profiles_registration_path(profile_type: 'benefit_sponsor')
+        def self.redirection_url(is_saved, is_pending)
+          if is_pending
+            :sponsor_show_pending_registration_url
+          elsif is_saved
+            :sponsor_home_registration_url
+          else
+            :sponsor_new_registration_url
+          end
         end
 
         def initialize(attrs)
@@ -55,7 +62,7 @@ module BenefitSponsors
               return false
             end
             update_organization(existing_org) unless claimed
-            sponsor_profile = existing_org.employer_profile
+            @sponsor_profile = existing_org.employer_profile
           else
             init_benefit_sponsor
           end
@@ -67,7 +74,7 @@ module BenefitSponsors
           organization = init_organization
           class_name = init_profile_class
 
-          sponsor_profile = class_name.new({
+          @sponsor_profile = class_name.new({
             :entity_kind => entity_kind,
             :contact_method => contact_method,
             :office_locations => office_locations
@@ -102,13 +109,13 @@ module BenefitSponsors
 
         def create_employer_staff_role(current_user, profile, existing_company)
           person.user = current_user
-          employer_ids = person.benefit_sponsors_employer_staff_roles.map(&:employer_profile_id)
+          employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
           if employer_ids.include? profile.id
             pending = false
           else
-            pending = existing_company && Person.staff_for_benefit_sponsors_employer(profile).detect{|person|person.user_id}
+            pending = existing_company && Person.staff_for_employer(profile).detect{|person|person.user_id}
             role_state = pending ? 'is_applicant' : 'is_active' 
-            person.employer_staff_roles << BenefitSponsorsEmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
+            person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
           end
           current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
           current_user.save!
@@ -118,7 +125,7 @@ module BenefitSponsors
 
         def update_organization(org)
           if !org.employer_profile.present?
-            sponsor_profile = class_name.new({
+            @sponsor_profile = class_name.new({
               :entity_kind => entity_kind,
               :contact_method => contact_method,
               :office_locations => office_locations

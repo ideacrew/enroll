@@ -5,7 +5,7 @@ module BenefitSponsors
       include BenefitSponsors::Forms::ProfileInformation
       include BenefitSponsors::Forms::NpnField
 
-      attr_accessor :legal_name, :dba, :entity_kind, :email,
+      attr_accessor :legal_name, :dba, :entity_kind, :email, :person_id, :contact_method,
                     :npn, :market_kind, :languages_spoken, :working_hours, :accept_new_clients, :person, :home_page
       attr_reader :first_name, :last_name, :dob, :fein, :office_locations, :npn
 
@@ -22,6 +22,8 @@ module BenefitSponsors
         self.dba = attrs[:dba]
         self.entity_kind = attrs[:entity_kind]
         self.email = attrs[:email]
+        self.contact_method = attrs[:contact_method]
+        self.person_id = attrs[:person_id]
         self.npn = attrs[:npn]
         self.market_kind = attrs[:market_kind]
         self.home_page = attrs[:home_page]

@@ -7,9 +7,9 @@ module BenefitSponsors
       include BenefitSponsors::Forms::ProfileInformation
 
       attr_accessor :market_kind, :entity_kind, :languages_spoken, :working_hours, 
-                      :accept_new_clients, :home_page, :email, :area_code, :number, :extension
+                      :accept_new_clients, :home_page, :email, :area_code, :number, :extension, :contact_method
 
-      attr_accessor :id, :person_id, :dba, :npn, :office_locations
+      attr_accessor :id, :person_id, :dba, :npn, :office_locations, :profile
       attr_reader :dob, :profile_type, :first_name, :last_name, :fein, :legal_name
 
       validates :fein,
@@ -32,9 +32,9 @@ module BenefitSponsors
           inclusion: { in: BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
           allow_blank: false, if: :is_broker_profile?
 
-      validates :email, :email => true, :allow_blank => false
+      validates :email, :email => true, :allow_blank => false, if: :is_broker_profile?
 
-      validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid"
+      validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid", if: :is_broker_profile?
 
       validate :validate_duplicate_npn, if: :is_broker_profile?
 
@@ -95,13 +95,13 @@ module BenefitSponsors
 
       def save(current_user, attrs)
         return false unless valid?
-        result, redirection_path =
-          if is_broker_profile?
+        attrs = if is_broker_profile?
             Factories::BrokerAgencyProfileFactory.call(attrs)
           elsif is_employer_profile?
-            Factories::BenefitSponsorFactory.call(attrs)
+            Factories::BenefitSponsorFactory.call(current_user, attrs)
           end
-        return result, redirection_path
+        @profile = attrs[:profile]
+        return attrs[:is_saved], attrs[:url]
       end
 
       def validate_duplicate_npn

@@ -20,7 +20,9 @@ BenefitSponsors::Engine.routes.draw do
     end
 
     namespace :employers do
-      resources :employer_profiles
+      resources :employer_profiles do
+        get :show_pending
+      end
       resources :employer_staff_roles
     end
   end
