@@ -31,6 +31,10 @@ module Config::AcaHelper
     @aca_shop_market_census_employees_template_file ||= Settings.aca.shop_market.census_employees_template_file
   end
 
+  def aca_shop_market_coverage_start_period
+    @aca_shop_market_coverage_start_period ||= Settings.aca.shop_market.coverage_start_period
+  end
+
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
   # @return { True } if Settings.aca.general_agency_enabled
