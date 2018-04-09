@@ -104,13 +104,13 @@ module BenefitSponsors
           if existing_org.present? && !existing_org.first.broker_agency_profile.present?
             new_broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(
               entity_kind: entity_kind,
-              market_kind: :aca_shop,
-              office_locations: office_locations,
+              market_kind: market_kind,
               corporate_npn: npn,
-              :home_page => home_page,
-              :languages_spoken => languages_spoken,
-              :working_hours => working_hours,
-              :accept_new_clients => accept_new_clients
+              home_page: home_page,
+              languages_spoken: languages_spoken,
+              working_hours: working_hours,
+              accept_new_clients: accept_new_clients,
+              office_locations: office_locations
             )
             existing_org = existing_org.first
             existing_org.profiles << new_broker_agency_profile
