@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title BenefitSponsors
+    = stylesheet_link_tag    "benefit_sponsors/application", media: "all"
+    = javascript_include_tag "benefit_sponsors/application"
+    = csrf_meta_tags
+  body
+    = render partial: './ui-components/v1/navbar/navbar'
+    .container
+      = yield
