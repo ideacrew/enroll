@@ -4,7 +4,7 @@ class VerificationType
 
   embedded_in :person
 
-  VALIDATION_STATES = %w(na pending processing review outstanding verified valid attested)
+  VALIDATION_STATES = %w(na pending review outstanding verified valid attested)
 
   field :type_name, type: String
   field :validation_status, type: String

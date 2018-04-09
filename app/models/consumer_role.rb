@@ -426,7 +426,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :coverage_purchased, :after => [:record_transition, :notify_of_eligibility_change, :invoke_residency_verification!]  do
+    event :coverage_purchased, :after => [:record_transition, :move_types_to_pending ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
@@ -682,6 +682,10 @@ class ConsumerRole
     CoverageHousehold.update_individual_eligibilities_for(self)
   end
 
+  def verification_types
+    person.verification_types.active.where(applied_roles: "consumer_role")
+  end
+
   def mark_residency_denied(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false,
@@ -775,6 +779,12 @@ class ConsumerRole
     self.update_attributes!(
       ssn_validation: "outstanding"
     )
+  end
+
+  def move_types_to_pending(*args)
+    verification_types.each do |type|
+      type.update_attributes(:validation_status => "pending")
+    end
   end
 
   def fail_ssa_for_no_ssn(*args)

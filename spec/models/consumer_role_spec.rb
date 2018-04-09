@@ -294,6 +294,13 @@ context "Verification process and notices" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, :unverified, :dhs_pending, "coverage_purchased!"
       end
+
+      describe "pending verification type updates" do
+        it "updates validation status to pending for unverified consumers" do
+          consumer.coverage_purchased!
+          expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
+        end
+      end
     end
 
     context "ssn_invalid" do
