@@ -7,7 +7,7 @@ module BenefitMarkets
         validates_presence_of :issuer_id, :allow_blank => false
 
         def all_products
-          super().where("coverage_kind" => "health", :issuer_id => issuer_id)
+          super().where("coverage_kind" => "health", :carrier_profile_id => issuer_id)
         end
       end
     end
