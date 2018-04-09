@@ -29,6 +29,7 @@ site:
   s3_prefix: "mhc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
+  guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
@@ -156,6 +157,7 @@ aca:
     binder_payment_due_on: 23
     new_employee_paper_application: true
     census_employees_template_file: 'Health Connector - Employee Census Template'
+    coverage_start_period: "2 months"
 
     earliest_enroll_prior_to_effective_on:
       days: -30

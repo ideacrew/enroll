@@ -148,6 +148,10 @@ module Config::SiteHelper
     Settings.site.employer_application_deadline_link
   end
 
+  def site_guidance_for_business_owners_url
+    Settings.site.guidance_for_business_owners_url
+  end
+
   def site_non_discrimination_complaint_url
     link_to non_discrimination_complaint_url, non_discrimination_complaint_url
   end
