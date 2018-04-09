@@ -128,8 +128,18 @@ composite_employer_contribution_relationships = [
   ),
   BenefitMarkets::ContributionModels::MemberRelationship.new(
     relationship_name: "dependent",
-    relationship_kinds: ["spouse", "life_partner",
-                         "child", "adopted_child","foster_child","stepchild", "ward"])
+    relationship_kinds: ["spouse", "life_partner"]),
+  BenefitMarkets::ContributionModels::MemberRelationship.new(
+    relationship_name: "dependent",
+    age_threshold: 27,
+    age_comparison: :<,
+    relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]),
+  BenefitMarkets::ContributionModels::MemberRelationship.new(
+    relationship_name: "dependent",
+    age_threshold: 27,
+    age_comparison: :>=,
+    disability_qualifier: true,
+    relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"])
 ]
 
 composite_employer_contribution_units = [

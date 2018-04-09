@@ -9,14 +9,22 @@ module BenefitSponsors
        :member_id,
        :dependents,
        :roster_entry_pricing,
-       :roster_entry_contribution
-      )
+       :roster_entry_contribution,
+       :disabled
+      ) do
+        def is_disabled?
+          disabled
+        end
+      end
 
       class CalculatorState
         attr :total_contribution
         attr :member_contributions
 
-        def initialize(c_model, level_map, t_price)
+        def initialize(c_calc, c_model, level_map, t_price, elig_dates, c_start)
+          @contribution_calculator = c_calc
+          @eligibility_dates = elig_dates
+          @coverage_start = c_start
           @level_map = level_map
           @contribution_model = c_model
           @relationship_totals = Hash.new(0)
@@ -28,7 +36,8 @@ module BenefitSponsors
         end
 
         def add(member)
-          rel_name = @contribution_model.map_relationship_for(member.relationship)
+          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start, member)
+          rel_name = @contribution_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name] + 1
           @member_total = @member_total + 1
           @member_ids = @member_ids + [member.member_id]
@@ -64,7 +73,8 @@ module BenefitSponsors
       # @return [BenefitMarkets::SponsoredBenefits::ContributionRosterEntry] the
       #   contribution results paired with the roster
       def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
-        state = CalculatorState.new(contribution_model, level_map_for(sponsor_contribution), priced_roster_entry.roster_entry_pricing.total_price)
+        roster_coverage = priced_roster_entry.roster_coverage
+        state = CalculatorState.new(self, contribution_model, level_map_for(sponsor_contribution), priced_roster_entry.roster_entry_pricing.total_price, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
         level_map = level_map_for(sponsor_contribution)
         member_list = [priced_roster_entry] + priced_roster_entry.dependents
         member_list.each do |member|
@@ -82,7 +92,8 @@ module BenefitSponsors
           priced_roster_entry.member_id,
           priced_roster_entry.dependents,
           priced_roster_entry.roster_entry_pricing,
-          roster_entry_contribution
+          roster_entry_contribution,
+          priced_roster_entry.is_disabled?
         )
       end
 
