@@ -43,12 +43,14 @@ Organization.where(carrier_profile: {"$ne" => nil}).each do |org|
   end
 end
 
-::BenefitMarkets::Products::HealthProducts::SingleProductHealthProductPackage.create!({
-  :title => "DC Health Single Product",
-  :contribution_model_id => dc_contribution_model.id,
-  :pricing_model_id => dc_pricing_model.id,
-  :benefit_catalog => benefit_market_catalog
-})
+if Plan.where(:market => "shop", :coverage_kind => "health", :active_year => plan_active_year).any?
+  ::BenefitMarkets::Products::HealthProducts::SingleProductHealthProductPackage.create!({
+    :title => "DC Health Single Product",
+    :contribution_model_id => dc_contribution_model.id,
+    :pricing_model_id => dc_pricing_model.id,
+    :benefit_catalog => benefit_market_catalog
+  })
+end
 
 if Plan.where(:market => "shop", :coverage_kind => "dental", :active_year => plan_active_year).any?
   ::BenefitMarkets::Products::DentalProducts::AnyDentalProductPackage.create!({
