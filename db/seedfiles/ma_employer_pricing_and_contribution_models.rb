@@ -101,6 +101,15 @@ composite_employer_member_relationships = [
   ),
   BenefitMarkets::PricingModels::MemberRelationship.new(
     relationship_name: "dependent",
+    age_threshold: 27,
+    age_comparison: :<,
+    relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
+  ),
+  BenefitMarkets::PricingModels::MemberRelationship.new(
+    relationship_name: "dependent",
+    age_threshold: 27,
+    age_comparison: :>=,
+    disability_qualifier: true,
     relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
   )
 ]
@@ -204,6 +213,15 @@ employer_member_relationships = [
   ),
   BenefitMarkets::PricingModels::MemberRelationship.new(
     relationship_name: "dependent",
+    age_threshold: 27,
+    age_comparison: :<,
+    relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
+  ),
+  BenefitMarkets::PricingModels::MemberRelationship.new(
+    relationship_name: "dependent",
+    age_threshold: 27,
+    age_comparison: :>=,
+    disability_qualifier: true,
     relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
   )
 ]
