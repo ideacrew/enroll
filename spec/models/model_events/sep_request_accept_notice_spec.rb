@@ -11,7 +11,7 @@ describe 'ModelEvents::SepRequestAcceptNotice', :dbclean => :after_each  do
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)}
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop") }
-  let(:sep) { FactoryGirl.create(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id) }
+  let(:sep) { FactoryGirl.create(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id, title: "Married") }
 
   describe "NoticeTrigger" do
     context "when employee matches er roster" do
@@ -40,10 +40,11 @@ describe 'ModelEvents::SepRequestAcceptNotice', :dbclean => :after_each  do
         "employee_profile.broker.phone",
         "employee_profile.broker.email",
         "employee_profile.broker_present?",
-        "employee_profile.qle.title",
-        "employee_profile.qle.start_on",
-        "employee_profile.qle.end_on",
-        "employee_profile.qle.event_on",
+        "employee_profile.special_enrollment_period.title",
+        "employee_profile.special_enrollment_period.start_on",
+        "employee_profile.special_enrollment_period.end_on",
+        "employee_profile.special_enrollment_period.qle_reported_on",
+        "employee_profile.special_enrollment_period.submitted_at"
       ]
     }
 
@@ -87,19 +88,23 @@ describe 'ModelEvents::SepRequestAcceptNotice', :dbclean => :after_each  do
 
     context "with QLE data_elements" do
       it "should return qle_title" do
-        expect(merge_model.qle.title).to eq qle.title
+        expect(merge_model.special_enrollment_period.title).to eq sep.title
       end
 
       it "should return qle_start_on" do
-        expect(merge_model.qle.start_on).to eq qle.start_on
+        expect(merge_model.special_enrollment_period.start_on).to eq sep.start_on.strftime('%m/%d/%Y')
       end
 
       it "should return qle_end_on" do
-        expect(merge_model.qle.end_on).to eq qle.end_on
+        expect(merge_model.special_enrollment_period.end_on).to eq sep.end_on.strftime('%m/%d/%Y')
       end
 
       it "should return qle_event_on" do
-        expect(merge_model.qle.event_on).to eq qle.event_on
+        expect(merge_model.special_enrollment_period.qle_reported_on).to eq sep.qle_on.strftime('%m/%d/%Y')
+      end
+
+      it "should return submitted_at" do
+        expect(merge_model.special_enrollment_period.submitted_at).to eq sep.submitted_at.strftime('%m/%d/%Y')
       end
     end
   end

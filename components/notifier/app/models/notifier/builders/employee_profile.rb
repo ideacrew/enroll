@@ -12,8 +12,7 @@ module Notifier
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
-      data_object.sep = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
-      data_object.qle = Notifier::MergeDataModels::QualifyingLifeEventKind.new
+      data_object.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
       @merge_model = data_object
     end
 
@@ -102,51 +101,38 @@ module Notifier
       employee_role.employer_profile
     end
 
-    def qle
-      return @qle if defined? @qle
-      @qle = sep.qualifying_life_event_kind
-    end
-
-    def sep
-      return @sep if defined? @sep
+    def special_enrollment_period
+      return @special_enrollment_period if defined? @special_enrollment_period
       if payload['event_object_kind'].constantize == SpecialEnrollmentPeriod
-        @sep = employee_role.person.primary_family.special_enrollment_periods.find(payload['event_object_id'])
+        @special_enrollment_period = employee_role.person.primary_family.special_enrollment_periods.find(payload['event_object_id'])
       else
-        @sep = employee_role.person.primary_family.current_sep
+        @special_enrollment_period = employee_role.person.primary_family.current_sep
       end
     end
 
-    def sep_title
-      return if sep.blank?
-      merge_model.sep.title = sep.title
+    def special_enrollment_period_title
+      merge_model.special_enrollment_period.title = special_enrollment_period.title
     end
 
-    def sep_end_on
-      return if sep.blank?
-      merge_model.sep.end_on = sep.end_on
+    def special_enrollment_period_qle_reported_on
+      merge_model.special_enrollment_period.qle_reported_on = format_date(special_enrollment_period.qle_on)
     end
 
-    def qle_title
-      return if qle.blank?
-      merge_model.qle.title = qle.title
+    def special_enrollment_period_start_on
+      merge_model.special_enrollment_period.start_on = format_date(special_enrollment_period.start_on)
     end
 
-    def qle_start_on
-      return if qle.blank?
-      merge_model.qle.start_on = qle.start_on
+    def special_enrollment_period_end_on
+      merge_model.special_enrollment_period.end_on = format_date(special_enrollment_period.end_on)
     end
 
-    def qle_end_on
-      return if qle.blank?
-      merge_model.qle.end_on = qle.end_on
+    def special_enrollment_period_submitted_at
+      merge_model.special_enrollment_period.submitted_at = format_date(special_enrollment_period.submitted_at)
     end
 
-    def qle_event_on
-      merge_model.qle.event_on = qle.event_on
-    end
-
-    def qle_reported_on
-      merge_model.qle.reported_on = qle.updated_at.strftime('%m/%d/%Y')
+    def format_date(date)
+      return '' if date.blank?
+      date.strftime('%m/%d/%Y')
     end
   end
 end

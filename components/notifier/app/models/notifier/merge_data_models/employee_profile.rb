@@ -18,8 +18,7 @@ module Notifier
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Enrollment
     attribute :plan_year, MergeDataModels::PlanYear
-    attribute :qle, MergeDataModels::QualifyingLifeEventKind
-    attribute :sep, MergeDataModels::SpecialEnrollmentPeriod
+    attribute :special_enrollment_period, MergeDataModels::SpecialEnrollmentPeriod
   
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployeeProfile.new({
@@ -38,8 +37,7 @@ module Notifier
       notice.addresses = [ notice.mailing_address ]
       notice.enrollment = Notifier::MergeDataModels::Enrollment.stubbed_object
       notice.plan_year = Notifier::MergeDataModels::PlanYear.stubbed_object
-      notice.qle = Notifier::MergeDataModels::QualifyingLifeEventKind.stubbed_object
-      notice.sep = Notifier::MergeDataModels::SpecialEnrollmentPeriod.stubbed_object
+      notice.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.stubbed_object
       notice
     end
 
