@@ -3,6 +3,7 @@ module Observers
     include Acapi::Notifiers
 
     def trigger_notice(recipient:, event_object:, notice_event:)
+      return if recipient.blank? || event_object.blank?
       resource_mapping = Notifier::ApplicationEventMapper.map_resource(recipient.class)
       event_name = Notifier::ApplicationEventMapper.map_event_name(resource_mapping, notice_event)
       notify(event_name, {
