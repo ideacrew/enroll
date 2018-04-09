@@ -35,6 +35,11 @@ namespace :permissions do
 end
 
 namespace :permissions do
+  desc 'hbx admin can add pdc'
+  DefinePermissions.define_task :hbx_admin_can_add_pdc => :environment
+end
+
+namespace :permissions do
   desc 'hbx admin can view username and email'
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
@@ -81,3 +86,4 @@ end
 #rake permissions:hbx_admin_can_complete_resident_application
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_reset_password
+#rake permissions:hbx_admin_can_add_pdc

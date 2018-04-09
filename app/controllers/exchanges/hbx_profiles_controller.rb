@@ -319,6 +319,12 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+  def pdc_type
+    authorize HbxProfile, :can_add_pdc?
+    getActionParams
+    @element_to_replace_id = params[:family_actions_id]
+  end
+
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
@@ -361,6 +367,16 @@ def employer_poc
       respond_to do |format|
         format.js { render :file => "sep/approval/add_sep_result.js.erb", name: @name }
       end
+    end
+  end
+
+  def add_new_pdc
+    return unless params[:qle_id].present?
+
+    @element_to_replace_id = params[:family_actions_id]
+    createSep
+    respond_to do |format|
+      format.js {render :file => "pdc_type/add_pdc_type_result.js.erb", name: @name}
     end
   end
 

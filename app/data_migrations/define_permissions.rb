@@ -108,6 +108,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes(can_lock_unlock: true)
   end
 
+  def hbx_admin_can_add_pdc
+    Permission.hbx_staff.update_attributes!(can_add_pdc: true)
+  end
+
   def hbx_admin_can_view_username_and_email
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
     Permission.super_admin.update_attributes!(can_view_username_and_email: true)

@@ -139,6 +139,13 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_add_sep
   end
 
+  def can_add_pdc?
+    role = user_hbx_staff_role
+    return false unless role
+
+    role.permission.can_add_pdc
+  end
+
   private
 
   def user_hbx_staff_role
