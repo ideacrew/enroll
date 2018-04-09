@@ -71,6 +71,8 @@ module Observers
         employer_profile = new_model_event.klass_instance
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
           trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+        elsif new_model_event.event_key == :welcome_notice_to_employer
+          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
         end
       end
     end
