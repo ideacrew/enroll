@@ -7,26 +7,28 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
     case action
       when "change_effective_date"
-        change_effective_date(enrollments)
+        change_effective_date
       when "revert_termination"
-        revert_termination(enrollments)
+        revert_termination
       when "terminate"
-        terminate_enrollment(enrollments)
+        terminate_enrollment
       when "revert_cancel"
         # When Enrollment with given policy ID is active in Glue & canceled in Enroll(Mostly you will see this with passive enrollments)
-        revert_cancel(enrollments)
+        revert_cancel
       when "cancel", "cancel_enrollment"
-        cancel_enr(enrollments)
+        cancel_enr
       when "generate_hbx_signature"
-        generate_hbx_signature(enrollments)
+        generate_hbx_signature
+      when "expire_coverage"
+        expire_coverage
       when "expire_enrollment"
-        expire_enrollment(enrollments)
+        expire_enrollment
       when "transfer_enrollment_from_glue_to_enroll"
         transfer_enrollment_from_glue_to_enroll
       when "change_plan"
-        change_plan(enrollments)
+        change_plan
       when "change_benefit_group"
-        change_benefit_group(enrollments)
+        change_benefit_group
       when "change_enrollment_status"
         change_enrollment_status
     end
