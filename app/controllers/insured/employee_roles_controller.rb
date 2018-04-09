@@ -226,7 +226,7 @@ class Insured::EmployeeRolesController < ApplicationController
     begin
       ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_matches_employer_rooster")
     rescue Exception => e
-      puts "Unable to send Employee Open Enrollment begin notice to #{census_employee.first.full_name}" unless Rails.env.test?
+      puts "Unable to send Employee Open Enrollment begin notice to #{census_employee.full_name}" unless Rails.env.test?
     end
   end
 

@@ -127,8 +127,6 @@ class Employers::CensusEmployeesController < ApplicationController
     respond_to do |format|
       format.js {
         if termination_date.present? && @fa
-          observer = Observers::Observer.new
-          observer.trigger_notice(recipient: @census_employee.employee_role, event_object: @census_employee, notice_event: "employee_termination_notice")
           flash[:notice] = "Successfully terminated Census Employee."
         else
           flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."

@@ -4,10 +4,14 @@ module ModelEvents
     REGISTERED_EVENTS = [
       :employee_coverage_passively_waived,
       :employee_coverage_passively_renewed,
-      :employee_coverage_passive_renewal_failed
+      :employee_coverage_passive_renewal_failed,
+      :employee_notice_for_employee_terminated_from_roster
     ]
 
     def notify_on_save
+      if is_transition_matching?(to: :employment_terminated, from: [:eligible, :employee_role_linked, :employee_termination_pending, :newly_designated_eligible, :newly_designated_linked], event: :terminate_employee_role)
+         is_employee_notice_for_employee_terminated_from_roster = true
+      end
     end
 
     def is_transition_matching?(from: nil, to: nil, event: nil)

@@ -386,7 +386,6 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET terminate" do
-    let!(:notice_trigger_params) { {recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_termination_notice"} }
 
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
