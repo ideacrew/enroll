@@ -158,3 +158,4 @@ end
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_accept_reject_paper_application_documents
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_delete_identity_application_documents
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_modify_plan_year
+#rake permissions:hbx_admin_can_add_pdc
