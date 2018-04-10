@@ -5,7 +5,7 @@ Given (/a matched Employee exists with only employee role/) do
   @benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
   bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @benefit_group
   @employee_role = person.employee_roles[0]
-  ce =  FactoryGirl.create(:census_employee, 
+  ce =  FactoryGirl.build(:census_employee,
           first_name: person.first_name, 
           last_name: person.last_name, 
           dob: person.dob, 
@@ -16,7 +16,7 @@ Given (/a matched Employee exists with only employee role/) do
 
   ce.benefit_group_assignments << bga
   ce.link_employee_role!
-
+  ce.save!
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
 

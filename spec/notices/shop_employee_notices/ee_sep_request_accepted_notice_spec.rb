@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployeeMidYearPlanChange do
+RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -16,29 +16,33 @@ RSpec.describe EmployeeMidYearPlanChange do
   let(:renewal_plan) { FactoryGirl.create(:plan)}
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Employee Mid-Year Plan change',
-                            :notice_template => 'notices/shop_employer_notices/employee_mid_year_plan_change',
-                            :notice_builder => 'EmployeeMidYearPlanChange',
-                            :event_name => 'eemployee_mid_year_plan_change',
-                            :mpi_indicator => 'MPI_SHOP40',
-                            :title => "EMPLOYEE has made a change to their employer-sponsored coverage selection"})
+                            :name =>'EE SEP Requested Accepted',
+                            :notice_template => 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
+                            :notice_builder => 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
+                            :event_name => 'ee_sep_request_accepted_notice',
+                            :mpi_indicator => 'MPI_SHOP36',
+                            :title => "Special Enrollment Period Approval"})
                           }
+  let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
+  let(:end_on) {qle_on+30.days}
+  let(:title) { "had a baby"}
 
   let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
+      :options => {:qle_on => qle_on.to_s, :end_on => end_on.to_s, :title => title},
       :template => application_event.notice_template
   }}
 
   describe "New" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
     end
     context "valid params" do
       it "should initialze" do
-        expect{EmployeeMidYearPlanChange.new(census_employee, valid_params)}.not_to raise_error
+        expect{ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)}.not_to raise_error
       end
     end
 
@@ -46,7 +50,7 @@ RSpec.describe EmployeeMidYearPlanChange do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{EmployeeMidYearPlanChange.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -55,51 +59,50 @@ RSpec.describe EmployeeMidYearPlanChange do
   describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
     end
 
     it "should build notice with all necessory info" do
-      @employer_notice.build
-      expect(@employer_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      @employee_notice.build
+      expect(@employee_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
+      expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
     end
   end
 
   describe "append data" do
-    let(:effective_on) {Date.new(TimeKeeper.date_of_record.year, 07, 14)}
     let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
-    let(:sep) {family.special_enrollment_periods.new}
-    let(:order) {[sep]}
+    let(:sep1) {family.special_enrollment_periods.new}
+    let(:sep2) {family.special_enrollment_periods.new}
+    let(:order) {[sep1,sep2]}
 
     before do
-      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
-      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
-      sep.effective_on = effective_on
+      @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
+      sep1.qle_on = qle_on
+      sep1.end_on = end_on
+      sep1.title = title
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      @employee_notice.append_data
+      @employee_notice.build
+      @employee_notice.generate_pdf_notice
     end
 
     it "should append data" do
       sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-      @employer_notice.append_data
-      expect(@employer_notice.notice.sep.effective_on).to eq effective_on
+      @employee_notice.append_data
+      expect(@employee_notice.notice.sep.qle_on).to eq qle_on
+      expect(@employee_notice.notice.sep.end_on).to eq end_on
+      expect(@employee_notice.notice.sep.title).to eq title
     end
-  end
-  describe "Rendering employee mid year plan change template and generate pdf" do
-    before do
-      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+
+    it "should render ee_sep_request_accepted_notice" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/ee_sep_request_accepted_notice"
     end
-    it "should render employer reminder notice" do
-      expect(@employer_notice.template).to eq "notices/shop_employer_notices/employee_mid_year_plan_change"
-    end
+
     it "should generate pdf" do
-      census_employee.employee_role.person.primary_family.reload
-      @employer_notice.build
-      @employer_notice.append_data
-      file = @employer_notice.generate_pdf_notice
+      @employee_notice.build
+      file = @employee_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
   end
