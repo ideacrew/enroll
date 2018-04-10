@@ -9,8 +9,13 @@ module BenefitSponsors
        :member_id,
        :dependents,
        :roster_entry_pricing,
-       :roster_entry_contribution
-      )
+       :roster_entry_contribution,
+       :disabled
+      ) do
+        def is_disabled?
+          disabled
+        end
+      end
       class CalculatorState
         attr_reader :total_contribution
         attr_reader :member_contributions
@@ -67,7 +72,8 @@ module BenefitSponsors
         end
 
         def get_contribution_unit(roster_entry_member)
-          rel_name = @contribution_model.map_relationship_for(roster_entry_member.relationship)
+          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, roster_entry_member)
+          rel_name = @contribution_model.map_relationship_for(roster_entry_member.relationship, coverage_age, roster_entry_member.is_disabled?)
           @contribution_model.contribution_units.detect do |cu|
             cu.match?({rel_name.to_s => 1})
           end
@@ -113,7 +119,8 @@ module BenefitSponsors
           priced_roster_entry.member_id,
           priced_roster_entry.dependents,
           priced_roster_entry.roster_entry_pricing,
-          roster_entry_contribution
+          roster_entry_contribution,
+          priced_roster_entry.is_disabled?
         )
       end
 

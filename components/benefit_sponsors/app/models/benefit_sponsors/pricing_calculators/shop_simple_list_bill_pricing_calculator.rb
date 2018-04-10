@@ -8,14 +8,20 @@ module BenefitSponsors
        :dob,
        :member_id,
        :dependents,
-       :roster_entry_pricing
-      )
+       :roster_entry_pricing,
+       :disabled
+      ) do
+        def is_disabled?
+          disabled
+        end
+      end
 
       class CalculatorState
         attr_reader :total
         attr_reader :member_totals
 
-        def initialize(product, p_model, p_unit_map, r_coverage)
+        def initialize(p_calculator, product, p_model, p_unit_map, r_coverage)
+          @pricing_calculator = p_calculator
           @pricing_unit_map = p_unit_map
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
@@ -29,7 +35,8 @@ module BenefitSponsors
         end
 
         def add(member)
-          rel = @pricing_model.map_relationship_for(member.relationship)
+          coverage_age = calc_coverage_age_for(member)
+          rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
@@ -40,7 +47,7 @@ module BenefitSponsors
                            ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
                              @product,
                              @rate_schedule_date,
-                             calc_coverage_age_for(member),
+                             coverage_age,
                              @rating_area
                            )
                          end
@@ -73,9 +80,10 @@ module BenefitSponsors
         roster_coverage = benefit_roster_entry.roster_coverage
         members_list = [roster_entry] + roster_entry.dependents
         sorted_members = members_list.sort_by do |rm|
-          [pricing_model.map_relationship_for(rm.relationship), rm.dob]
+          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
-        calc_state = CalculatorState.new(roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage)
+        calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end
@@ -89,7 +97,8 @@ module BenefitSponsors
           benefit_roster_entry.dob,
           benefit_roster_entry.member_id,
           benefit_roster_entry.dependents,
-          roster_entry_pricing
+          roster_entry_pricing,
+          benefit_roster_entry.is_disabled?
         )
       end
 

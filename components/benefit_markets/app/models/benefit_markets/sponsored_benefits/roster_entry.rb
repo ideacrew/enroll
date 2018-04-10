@@ -25,6 +25,12 @@ module BenefitMarkets
       def dependents
         raise NotImplementedError.new("This is a documentation only interface.")
       end
+      
+      # Return if the member is disabled.
+      # @return [Boolean] is the member is disabled
+      def is_disabled?
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
     end
   end
 end

@@ -4,7 +4,8 @@ module BenefitSponsors
       class CalculatorState
         attr_reader :total
 
-        def initialize(product, p_model, r_coverage, gs_factor, pp_factor, sc_factor)
+        def initialize(p_calculator, product, p_model, r_coverage, gs_factor, pp_factor, sc_factor)
+          @pricing_calculator = p_calculator
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
           @total = 0.00
@@ -19,7 +20,8 @@ module BenefitSponsors
         end
 
         def add(member)
-          rel = @pricing_model.map_relationship_for(member.relationship)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date)
+          rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           # TODO: make this more configurable, this is an awful hack.
           # The literal string value of "child" makes me uneasy.
@@ -32,7 +34,7 @@ module BenefitSponsors
           member_plan_price =  ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
                                   @product,
                                   @rate_schedule_date,
-                                  calc_coverage_age_for(member),
+                                  coverage_age,
                                   @rating_area
                                ) * too_many_kids_make_you_crazy
           member_price = BigDecimal.new((
@@ -51,19 +53,6 @@ module BenefitSponsors
                                pu.match?(@relationship_totals)
                              end
                            end
-        end
-
-        def calc_coverage_age_for(member)
-          coverage_elig_date = @eligibility_dates[member.member_id]
-          coverage_as_of_date = coverage_elig_date.blank? ? @coverage_start_date : coverage_elig_date
-          before_factor = if (coverage_as_of_date.month > member.dob.month)
-                            -1
-                          elsif ((coverage_as_of_date.month == member.dob.month) && (coverage_as_of_date.day > member.dob.day))
-                            -1
-                          else
-                            0
-                          end
-          coverage_as_of_date.year - member.dob.year + (before_factor)
         end
       end
 
@@ -105,9 +94,10 @@ module BenefitSponsors
         pp_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_participation_percent_factor(product, participation_percent)
         sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sic_code)
         sorted_members = members_list.sort_by do |rm|
-          [pricing_model.map_relationship_for(rm.relationship), rm.dob]
+          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
-        calc_state = CalculatorState.new(roster_coverage.product, pricing_model, roster_coverage, gs_factor, pp_factor, sc_factor)
+        calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, roster_coverage, gs_factor, pp_factor, sc_factor)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end

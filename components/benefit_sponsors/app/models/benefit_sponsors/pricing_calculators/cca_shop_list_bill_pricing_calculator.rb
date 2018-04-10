@@ -8,14 +8,20 @@ module BenefitSponsors
        :dob,
        :member_id,
        :dependents,
-       :roster_entry_pricing
-      )
+       :roster_entry_pricing,
+       :disabled
+      ) do
+        def is_disabled?
+          disabled
+        end
+      end
 
       class CalculatorState
         attr_reader :total
         attr_reader :member_totals
 
-        def initialize(product, p_model, p_unit_map, r_coverage, gs_factor, sc_factor)
+        def initialize(p_calculator, product, p_model, p_unit_map, r_coverage, gs_factor, sc_factor)
+          @pricing_calculator = p_calculator
           @pricing_unit_map = p_unit_map
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
@@ -31,7 +37,8 @@ module BenefitSponsors
         end
 
         def add(member)
-          rel = @pricing_model.map_relationship_for(member.relationship)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date)
+          rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, rm.is_disabled?)
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
@@ -42,26 +49,13 @@ module BenefitSponsors
                            ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
                              @product,
                              @rate_schedule_date,
-                             calc_coverage_age_for(member),
+                             coverage_age,
                              @rating_area
                            )
                          end
           @member_totals[member.member_id] = BigDecimal.new((member_price * @group_size_factor * @sic_code_Factor).to_s).round(2)
           @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
-        end
-
-        def calc_coverage_age_for(member)
-          coverage_elig_date = @eligibility_dates[member.member_id]
-          coverage_as_of_date = coverage_elig_date.blank? ? @coverage_start_date : coverage_elig_date
-          before_factor = if (coverage_as_of_date.month > member.dob.month)
-            -1
-          elsif ((coverage_as_of_date.month == member.dob.month) && (coverage_as_of_date.day > member.dob.day))
-            -1
-          else
-            0
-          end
-          coverage_as_of_date.year - member.dob.year + (before_factor)
         end
       end
 
@@ -76,12 +70,13 @@ module BenefitSponsors
         roster_coverage = benefit_roster_entry.roster_coverage
         members_list = [roster_entry] + roster_entry.dependents
         sorted_members = members_list.sort_by do |rm|
-          [pricing_model.map_relationship_for(rm.relationship), rm.dob]
+          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         # CCA policy decision: in non-composite group size is always treated as 1
         gs_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_group_size_factor(product, 1)
         sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sponsor_contribution.sic_code)
-        calc_state = CalculatorState.new(roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, gs_factor, sc_factor)
+        calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, gs_factor, sc_factor)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end
@@ -95,7 +90,8 @@ module BenefitSponsors
           benefit_roster_entry.dob,
           benefit_roster_entry.member_id,
           benefit_roster_entry.dependents,
-          roster_entry_pricing
+          roster_entry_pricing,
+          benefit_roster_entry.is_disabled?
         )
       end
 
