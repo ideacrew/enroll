@@ -436,6 +436,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def languages_spoken_params
     params.require(:organization).permit(
+      :accept_new_clients,
+      :working_hours,
       :languages_spoken => []
     )
   end

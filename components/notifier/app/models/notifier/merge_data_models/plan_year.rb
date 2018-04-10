@@ -12,6 +12,9 @@ module Notifier
     attribute :renewal_py_start_date, String
     attribute :renewal_py_end_date, String
 
+    attribute :initial_py_publish_advertise_deadline, String
+    attribute :initial_py_publish_due_date, String
+
     attribute :renewal_py_submit_soft_due_date, String
     attribute :renewal_py_submit_due_date, String
     attribute :binder_payment_due_date, String

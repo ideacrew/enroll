@@ -444,6 +444,8 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
+  wait_for_ajax
+  page.find('h4', text: "#{Settings.site.byline}").click
 end
 
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
