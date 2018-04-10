@@ -7,8 +7,8 @@ module BenefitSponsors
         @form_obj = form_obj
       end
 
-      def self.call(params)
-        new(params).benefit_application
+      def self.call(*arguments)
+        new(*arguments).benefit_application
       end
 
       def site
