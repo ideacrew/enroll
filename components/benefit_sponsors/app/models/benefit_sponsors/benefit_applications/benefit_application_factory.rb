@@ -1,6 +1,8 @@
 module BenefitSponsors
-  module Factories
+  module BenefitApplications
     class BenefitApplicationFactory
+
+      attr_accessor :benefit_sponsorship
 
       def initialize(form_obj, benefit_sponsorship)
         @benefit_sponsorship = benefit_sponsorship
@@ -16,7 +18,7 @@ module BenefitSponsors
       end
 
       def benefit_market
-        @benefit_sponsorship.benefit_market
+        benefit_sponsorship.benefit_market
       end
 
       def benefit_application
@@ -28,8 +30,9 @@ module BenefitSponsors
           market_kind = "#{benefit_market.kind}".camelcase
           site_key = "#{site.site_key}".camelcase
           klass_name = [market_kind, site, "BenefitApplication"].join('')
+          
           @benefit_application = [namespace, klass_name].join("::").constantize.new
-          @benefit_application.benefit_sponsorship_id = @benefit_sponsorship.id # TODO move to benefit_sponsorship model       
+          @benefit_application.benefit_sponsorship_id = benefit_sponsorship.id
         end
 
         build_application
@@ -38,12 +41,15 @@ module BenefitSponsors
       def build_application
         add_effective_period
         add_open_enrollment_period
-        add_ftp_pte_msp_counts
+        add_ftp_count
+        add_pte_count
+        add_msp_count
 
         if site.site_key == :cca
           add_recorded_sic_code
           add_recorded_rating_area
         end
+
         @benefit_application
       end
 
@@ -55,9 +61,15 @@ module BenefitSponsors
         @benefit_application.open_enrollment_period = @form_obj.open_enrollment_period
       end
 
-      def add_ftp_pte_msp_counts
+      def add_ftp_count
         @benefit_application.fte_count = @form_obj.fte_count
+      end
+
+      def add_pte_count
         @benefit_application.pte_count = @form_obj.pte_count
+      end
+
+      def add_msp_count
         @benefit_application.msp_count = @form_obj.msp_count
       end
 
