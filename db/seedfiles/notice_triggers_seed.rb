@@ -684,28 +684,6 @@ shop_notice_triggers = [
     ]
   },
   {
-        hbx_id: 'SHOP58',
-        title: "Notice To Initial Employer's No Binder Payment Received",
-        description: 'When an initial employer misses the binder payment deadline, this is sent the day after the binder payment deadline.',
-        resource_name: 'employer',
-        event_name: 'initial_employer_no_binder_payment_received',
-        notice_triggers: [
-            {
-                name: ' Initial Employer No Binding Payment Received',
-                notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
-                notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
-                mpi_indicator: 'SHOP_M058',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-
-  {
     hbx_id: 'SHOP33',
     title: 'Special Enrollment Period Denial',
     description: 'EE SEP Requested by Employee outside of allowable time frame',
@@ -1025,27 +1003,6 @@ shop_notice_triggers = [
             }
           }
       ]
-    },
-    {
-        hbx_id: 'SHOP44',
-        title: 'You have been Hired as a Broker',
-        description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-        resource_name: 'broker_role',
-        event_name: 'broker_agency_hired_confirmation',
-        notice_triggers: [
-           {
-              name: 'Broker Hired',
-              notice_template: 'notices/shop_broker_agency_notices/broker_agency_hired_notice.html.erb',
-              notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
-              mpi_indicator: 'SHOP_M044',
-              notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["broker"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-        ]
     },
 
     {
@@ -1493,27 +1450,6 @@ shop_notice_triggers = [
         ]
     },
 
-    {
-        hbx_id: 'SHOP_M050',
-        title: 'Eligible to Apply for Employer-sponsored Health Insurance',
-        description: 'Employee completes initial application and matches the employee to a SHOP Employer (checks SSN and DOB against roster)',
-        resource_name: 'employee_role',
-        event_name: 'employee_matches_employer_rooster',
-        notice_triggers: [
-            {
-                name: 'Employee must be notified when they successfully match to their employer',
-                notice_template: 'notices/shop_employee_notices/employee_matches_employer_rooster_notification',
-                notice_builder: 'ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice',
-                mpi_indicator: 'SHOP_M050',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employee"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
     {
         hbx_id: 'SHOP_M043',
         title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
