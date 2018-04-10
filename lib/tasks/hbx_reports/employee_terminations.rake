@@ -47,8 +47,8 @@ namespace :reports do
         end
       end
 
-      # pubber = Publishers::Legacy::EmployeeTerminationReportPublisher.new
-      # pubber.publish URI.join("file://", file_name)
+      pubber = Publishers::Legacy::EmployeeTerminationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
     end
