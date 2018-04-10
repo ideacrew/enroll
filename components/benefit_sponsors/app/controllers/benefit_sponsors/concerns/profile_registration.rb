@@ -19,6 +19,10 @@ module BenefitSponsors
       def sponsor_home_registration_url
         profiles_employers_employer_profile_path(@agency.profile.id, tab: 'home')
       end
+
+      def sponsor_edit_registration_url
+        edit_profiles_employers_employer_profile_path(@employer_profile.id)
+      end
     end
   end
 end

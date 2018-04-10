@@ -1,0 +1,4 @@
+<% content_for :navigation do %>
+  <%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<% end %>
+<%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_form" %>
