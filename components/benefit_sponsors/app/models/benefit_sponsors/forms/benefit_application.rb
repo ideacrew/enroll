@@ -17,7 +17,6 @@ module BenefitSponsors
 
       def initialize(params = {})
         assign_application_attributes(params)
-        get_benefit_sponsor_catalogs
         init_effective_date_options
       end
 
@@ -33,27 +32,23 @@ module BenefitSponsors
         end
       end
 
-      def effective_period
-        start_on..end_on
-      end
-
-      def open_enrollment_period
-        open_enrollment_start_on..open_enrollment_end_on
+      def benefit_market
+        benefit_sponsorship.benefit_market
       end
 
       def save
         return false unless valid?
         @benefit_application = build_benefit_application
-        # @benefit_application_form.errors.add(benefit_application: @benefit_application_form.benefit_application.errors)
         @benefit_application.save
       end
 
       def build_benefit_application
-        BenefitSponsors::Factories::BenefitApplicationFactory.call(self, benefit_sponsorship)
+        BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(self, benefit_sponsorship)
       end
 
-      def get_benefit_sponsor_catalog
-        @benefit_sponsor_catalogs = benefit_sponsorship.benefit_market.benefit_sponsor_catalogs_for(benefit_sponsorship.rating_area)
+      def benefit_sponsor_catalogs
+        return @benefit_sponsor_catalogs if defined? @benefit_sponsor_catalogs
+        @benefit_sponsor_catalogs = benefit_market.benefit_sponsor_catalogs_for(benefit_sponsorship.rating_area)
       end
 
       def init_effective_date_options
@@ -70,6 +65,14 @@ module BenefitSponsors
         application_form.pte_count = application.pte_count
         application_form.msp_count = application.msp_count
         application_form
+      end
+
+      def effective_period
+        start_on..end_on
+      end
+
+      def open_enrollment_period
+        open_enrollment_start_on..open_enrollment_end_on
       end
     end
   end

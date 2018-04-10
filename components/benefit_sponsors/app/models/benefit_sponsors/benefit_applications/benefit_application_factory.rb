@@ -9,7 +9,7 @@ module BenefitSponsors
         @form_obj = form_obj
       end
 
-      def self.call(params)
+      def self.call(form_obj)
         new(params).benefit_application
       end
 
@@ -30,7 +30,7 @@ module BenefitSponsors
           market_kind = "#{benefit_market.kind}".camelcase
           site_key = "#{site.site_key}".camelcase
           klass_name = [market_kind, site, "BenefitApplication"].join('')
-          
+
           @benefit_application = [namespace, klass_name].join("::").constantize.new
           @benefit_application.benefit_sponsorship_id = benefit_sponsorship.id
         end

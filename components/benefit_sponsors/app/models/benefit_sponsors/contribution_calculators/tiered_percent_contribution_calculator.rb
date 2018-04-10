@@ -21,7 +21,7 @@ module BenefitSponsors
         attr :total_contribution
         attr :member_contributions
 
-        def initialize(c_calc, c_model, level_map, t_price, elig_dates, c_start)
+        def initialize(c_calc, c_model, level_map, t_price, elig_dates, c_start, r_coverage)
           @contribution_calculator = c_calc
           @eligibility_dates = elig_dates
           @coverage_start = c_start
@@ -33,10 +33,12 @@ module BenefitSponsors
           @total_price = t_price
           @total_contribution = 0.00
           @member_contributions = {}
+          @product = r_coverage.product
+          @previous_product = r_coverage.product
         end
 
         def add(member)
-          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start, member)
+          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start, member, @product, @previous_product)
           rel_name = @contribution_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name] + 1
           @member_total = @member_total + 1
@@ -74,7 +76,7 @@ module BenefitSponsors
       #   contribution results paired with the roster
       def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
         roster_coverage = priced_roster_entry.roster_coverage
-        state = CalculatorState.new(self, contribution_model, level_map_for(sponsor_contribution), priced_roster_entry.roster_entry_pricing.total_price, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+        state = CalculatorState.new(self, contribution_model, level_map_for(sponsor_contribution), priced_roster_entry.roster_entry_pricing.total_price, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, roster_coverage)
         level_map = level_map_for(sponsor_contribution)
         member_list = [priced_roster_entry] + priced_roster_entry.dependents
         member_list.each do |member|
