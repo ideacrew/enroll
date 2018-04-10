@@ -178,7 +178,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   find('.carriers-tab a').click
   wait_for_ajax
   find('.reference-plans label').click
-  wait_for_ajax
+  wait_for_ajax(5,5)
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50

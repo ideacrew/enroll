@@ -221,7 +221,7 @@ When(/(.*) enters termination reason/) do |named_person|
   within('.terminate_confirm .modal-dialog') do
     find('p', text: 'Please select terminate reason').click
     within all('.selectric-scroll').last do
-      find('li', text: 'I do not have other coverage').click
+      find('li', text: 'I have coverage through Medicaid').click
     end
    find('.terminate_reason_submit').click
   end
