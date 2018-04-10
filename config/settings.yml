@@ -57,7 +57,7 @@ contact_center:
   phone_number: "1-855-532-5465"
   fax: "1-855-532-5465"
   alt_fax: "617-722-4033"
-  tty_number: "711"
+  tty_number: "1-855-532-5465"
   tty: "711"
   alt_phone_number: "1-855-532-LINK"
   payment_phone_number: "855-532-LINK"
@@ -173,7 +173,7 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 15
+      publish_due_day_of_month: 5
       advertised_deadline_of_month: 10
       earliest_start_prior_to_effective_on:
         months: -3
