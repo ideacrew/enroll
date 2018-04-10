@@ -3,12 +3,12 @@ function validateDate(element, minDate, maxDate) {
   var selectedDate = new Date(element.target.value)
   
   if (selectedDate < minDate) {
-    alert("Date entered is not allowed");
+    swal("Invalid Date!","Date entered is not allowed","error");
     element.target.value = '';
   }
   
   if (selectedDate > maxDate) {
-    alert("Date entered is not allowed");
+    swal("Invalid Date!","Date entered is not allowed","error");
     element.target.value = '';
   }
 }
