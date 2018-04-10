@@ -13,7 +13,7 @@ describe 'ModelEvents::InitialEmployerFinalRemainderToPublishPlanYear', dbclean:
   describe "ModelEvent" do
     context "when initial employer 2 days prior to publishing dead line" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end
@@ -26,7 +26,7 @@ describe 'ModelEvents::InitialEmployerFinalRemainderToPublishPlanYear', dbclean:
       let(:model_event) { ModelEvents::ModelEvent.new(:initial_employer_final_reminder_to_publish_plan_year, PlanYear, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_employer_final_reminder_to_publish_plan_year"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

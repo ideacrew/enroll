@@ -13,7 +13,7 @@ describe 'ModelEvents::InitialEmployerFirstRemainderToPublishPlanYear', dbclean:
   describe "ModelEvent" do
     context "when initial employer 2 days prior to soft dead line" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end

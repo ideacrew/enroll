@@ -4,13 +4,8 @@ module Services
 
     attr_accessor :legacy_triggers
 
-    def self.call(recipient:, event_object:, notice_event:)
-      return if recipient.blank? || event_object.blank?
-      notice_service = self.new
-      notice_service.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
-    end
-
     def deliver(recipient:, event_object:, notice_event:)
+      return if recipient.blank? || event_object.blank?
       delivery_method = can_be_proccessed_as_legacy?(recipient, notice_event) ? :create_notice_job : :trigger_notice_event
       send(delivery_method, recipient, event_object, notice_event)
     end

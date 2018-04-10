@@ -553,8 +553,8 @@ module ApplicationHelper
   end
 
   def trigger_notice_observer(recipient, event_object, notice_event)
-    observer = Observers::Observer.new
-    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
   end
 
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)

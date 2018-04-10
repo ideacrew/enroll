@@ -19,7 +19,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
     end
     context "when renewal employer 2 days prior to publish due date" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: organization.employer_profile, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: organization.employer_profile, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end

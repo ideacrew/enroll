@@ -1,6 +1,12 @@
 module Observers
   class NoticeObserver
 
+    attr_accessor :notifier
+
+    def initialize
+      @notifier = Services::NoticeService.new
+    end
+
     def plan_year_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
@@ -38,7 +44,6 @@ module Observers
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
-
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
@@ -51,13 +56,13 @@ module Observers
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
           deliver(recipient: plan_year.employer_profile,  event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed" )
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
-              enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
-              if enrollment.present?
-                deliver(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
-              end
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+            enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
+            if enrollment.present?
+              deliver(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
             end
+          end
         end
 
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
@@ -131,7 +136,7 @@ module Observers
     end
 
     def deliver(recipient:, event_object:, notice_event:)
-      Services::NoticeService.call(recipient: recipient, event_object: event_object, notice_event: notice_event)
+      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
     end
   end
 end

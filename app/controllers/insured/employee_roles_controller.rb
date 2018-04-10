@@ -88,8 +88,9 @@ class Insured::EmployeeRolesController < ApplicationController
       @family = @person.primary_family
       build_nested_models
     end
-    observer = Observers::Observer.new
-    observer.trigger_notice(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster")
+    
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster")
   end
 
   def update
