@@ -163,6 +163,7 @@ module Observers
           :"open_enrollment_end_on" => current_date+2.days
           }
       })
+    end
 
     def trigger_initial_employer_publish_remainder(event_name)
       start_on_1 = (TimeKeeper.date_of_record+1.month).beginning_of_month

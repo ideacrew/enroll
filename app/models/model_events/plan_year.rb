@@ -19,7 +19,7 @@ module ModelEvents
         :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
         :renewal_plan_year_first_reminder_before_soft_dead_line,
         :renewal_plan_year_publish_dead_line,
-        :low_enrollment_notice_for_employer
+        :low_enrollment_notice_for_employer,
         :initial_employer_first_reminder_to_publish_plan_year,
         :initial_employer_second_reminder_to_publish_plan_year,
         :initial_employer_final_reminder_to_publish_plan_year
@@ -109,7 +109,7 @@ module ModelEvents
         if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
           is_low_enrollment_notice_for_employer = true
         end
-        
+
         # remainder notices for initial application with unpublished plan year
         if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline of month i.e., 8th of the month
           is_initial_employer_first_reminder_to_publish_plan_year = true
