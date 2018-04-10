@@ -552,6 +552,11 @@ module ApplicationHelper
     end
   end
 
+  def trigger_notice_observer(recipient, event_object, notice_event)
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
+  end
+
   def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
     if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
       terminated_enrollment = hbx_enrollment.census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.coverage_kind == hbx_enrollment.coverage_kind && h.aasm_state == 'coverage_termination_pending'}
@@ -689,16 +694,11 @@ module ApplicationHelper
   def convert_to_bool(val)
     return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
     return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
-    raise ArgumentError.new("invalid value for Boolean: \"#{val}\"")
+    raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
 
   def exchange_icon_path(icon)
     site_key = Settings.site.key
-
-    if site_key.blank? || site_key.to_sym == :dchbx
-      "icons/#{icon}"
-    else
       "icons/#{site_key}-#{icon}"
-    end
   end
 end

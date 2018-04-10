@@ -27,6 +27,13 @@ module Config::AcaHelper
     @aca_shop_market_new_employee_paper_application ||= Settings.aca.shop_market.new_employee_paper_application
   end
 
+  def aca_shop_market_census_employees_template_file
+    @aca_shop_market_census_employees_template_file ||= Settings.aca.shop_market.census_employees_template_file
+  end
+
+  def aca_shop_market_coverage_start_period
+    @aca_shop_market_coverage_start_period ||= Settings.aca.shop_market.coverage_start_period
+  end
 
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
@@ -118,6 +125,10 @@ module Config::AcaHelper
     Settings.plan_option_titles.single_carrier
   end
 
+  def fetch_invoices_addendum
+    Settings.invoices.addendum
+  end
+
   def carrier_special_plan_identifier_namespace
     @carrier_special_plan_identifier_namespace ||= Settings.aca.carrier_special_plan_identifier_namespace
   end
@@ -169,7 +180,15 @@ module Config::AcaHelper
   def employer_attestation_is_enabled?
     Settings.aca.employer_attestation
   end
-  
+
+  def payment_pdf_helper
+    if Settings.site.payment_pdf_url.match("http")
+      Settings.site.payment_pdf_url
+    else
+      asset_path(Settings.site.payment_pdf_url)
+    end
+  end
+
   def display_plan_cost_warning(bg)
     return false unless offer_sole_source?
     return false if bg.nil?
@@ -178,6 +197,14 @@ module Config::AcaHelper
 
   def plan_match_tool_is_enabled?
     Settings.aca.plan_match_tool
+  end
+
+  def invoice_bill_url_helper
+    Settings.site.invoice_bill_url
+  end
+
+  def payment_phone_number
+    Settings.contact_center.payment_phone_number
   end
 
 end

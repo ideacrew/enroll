@@ -16,12 +16,18 @@
   <h3><%= site_short_name %>
     offers multiple payment options including:</h3>
     <ol class="twenty">
-      <li><%= link_to 'Pay Online', "https://ww2.e-billexpress.com/ebpp/MAConnector/", target: "_blank"%> -
-        <%= link_to 'How to Pay Online', "https://www.mahealthconnector.org/help-center-answers/how-to-pay-your-premiums-online", target: "_blank"%></li>
+      <li>
+        <% if invoice_bill_url_helper %>
+          <%= link_to 'Pay Online', invoice_bill_url_helper, target: "_blank"%> -
+        <% else %>
+          Pay Online
+        <% end %>
+        <%= link_to 'How to Pay Online', payment_pdf_helper, target: "_blank"%>
+      </li>
       <br/>
       <li>Pay by Phone
         <div class="row col-md-offset-1">
-          <%= Settings.contact_center.phone_number%>, select "Small Business Employer" then "Make a Payment"</li>
+          <%= payment_phone_number %>, select "Small Business Employer" then "Make a Payment"</li>
         <br/>
         <li>Pay by Mail
           <div class="row col-md-offset-1">
