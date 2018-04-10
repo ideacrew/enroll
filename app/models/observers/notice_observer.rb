@@ -1,12 +1,6 @@
 module Observers
   class NoticeObserver
 
-    attr_reader :notifier
-
-    def initialize
-      @notifier = Services::NoticeService.new
-    end
-
     def plan_year_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
@@ -150,7 +144,7 @@ module Observers
     end
 
     def deliver(recipient:, event_object:, notice_event:)
-      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
+      Services::NoticeService.call(recipient: recipient, event_object: event_object, notice_event: notice_event)
     end
 
     def trigger_initial_employer_publish_remainder(event_name)
