@@ -1,18 +1,17 @@
 module BenefitSponsors
   # Sites Controller
   class SitesController < ApplicationController
-    before_action :find_hbx_admin_user
-
     def index
       @sites = BenefitSponsors::Site.all
     end
 
     def new
-      @site = BenefitSponsors::Site.new
+      @site = BenefitSponsors::Forms::Site.new current_user
     end
 
     def create
-      @site = BenefitSponsors::Site.new params[:site]
+      # pundit can I do this here
+      @site = BenefitSponsors::Form::Site.for_create current_user, params[:site]
 
       if @site.save
         redirect_to :index
@@ -22,13 +21,13 @@ module BenefitSponsors
     end
 
     def edit
-      @site = BenefitSponsors::Site.find params[:id]
+      @site = BenefitSponsors::Form::Site.new current_user, params[:id]
     end
 
     def update
-      @site = BenefitSponsors::Site.find params[:id]
+      @site = BenefitSponsors::Site.new current_user, params[:site].merge(id: params[:id])
 
-      if @site.update_attributes params[:site]
+      if @site.save
         redirect_to :index
       else
         render 'edit'

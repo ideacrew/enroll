@@ -5,13 +5,13 @@ module Forms
 
     attr_accessor :title, :description, :probation_period_kind
     attr_accessor :benefit_application, :product_packages
-      
+
     validates :title, presence: true
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
     end
-  
+
     def assign_application_attributes(atts = {})
       atts.each_pair do |k, v|
         self.send("#{k}=".to_sym, v)
