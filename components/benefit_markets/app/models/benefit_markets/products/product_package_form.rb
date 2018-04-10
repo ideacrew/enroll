@@ -23,17 +23,17 @@ module BenefitMarkets
         product_package_factory.allowed_benefit_option_kinds
       end
 
-      def self.form_for_new(benefit_option_kind)
+      def self.for_new(current_user, benefit_option_kind)
         resolve_form_subclass(benefit_option_kind).new(
           :benefit_option_kind => benefit_option_kind,
-          :product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory.new(benefit_option_kind)
+          :product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory
         )
       end
 
-      def self.form_for_create(opts)
+      def self.for_create(current_user, opts)
         benefit_option_kind = opts.require(:benefit_option_kind)
         resolve_form_subclass(benefit_option_kind).new(
-          opts.merge({:product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory.new(benefit_option_kind), benefit_option_kind: benefit_option_kind})
+          opts.merge({:product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory
         )
       end
 
@@ -63,6 +63,7 @@ module BenefitMarkets
 
       def build_object_using_factory
         product_package_factory.build_product_package(
+          benefit_option_kind,
           benefit_catalog_id,
           title,
           contribution_model_id,

@@ -8,6 +8,7 @@ module BenefitMarkets
 
         def build_object_using_factory
           product_package_factory.build_metal_level_product_package(
+            benefit_option_kind,
             benefit_catalog_id,
             title,
             contribution_model_id,
