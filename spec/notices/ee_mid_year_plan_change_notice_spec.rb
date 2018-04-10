@@ -96,6 +96,7 @@ RSpec.describe EmployeeMidYearPlanChange do
       expect(@employer_notice.template).to eq "notices/shop_employer_notices/employee_mid_year_plan_change"
     end
     it "should generate pdf" do
+      census_employee.employee_role.person.primary_family.reload
       @employer_notice.build
       @employer_notice.append_data
       file = @employer_notice.generate_pdf_notice
