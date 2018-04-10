@@ -32,10 +32,11 @@ module BenefitSponsors
           @coverage_start_date = r_coverage.coverage_start_date
           @rating_area = r_coverage.rating_area
           @product = product
+          @previous_product = r_coverage.previous_eligibility_product
         end
 
         def add(member)
-          coverage_age = calc_coverage_age_for(member)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date, @product, @previous_product)
           rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
@@ -55,19 +56,6 @@ module BenefitSponsors
           @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
         end
-
-        def calc_coverage_age_for(member)
-          coverage_elig_date = @eligibility_dates[member.member_id]
-          coverage_as_of_date = coverage_elig_date.blank? ? @coverage_start_date : coverage_elig_date
-          before_factor = if (coverage_as_of_date.month > member.dob.month)
-            -1
-          elsif ((coverage_as_of_date.month == member.dob.month) && (coverage_as_of_date.day > member.dob.day))
-            -1
-          else
-            0
-          end
-          coverage_as_of_date.year - member.dob.year + (before_factor)
-        end
       end
 
       def initialize
@@ -80,7 +68,7 @@ module BenefitSponsors
         roster_coverage = benefit_roster_entry.roster_coverage
         members_list = [roster_entry] + roster_entry.dependents
         sorted_members = members_list.sort_by do |rm|
-          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, roster_coverage.product, roster_coverage.previous_eligibility_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage)

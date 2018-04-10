@@ -32,6 +32,8 @@ module BenefitSponsors
           @coverage_start_on = r_coverage.coverage_start_date
           @rating_area = r_coverage.rating_area
           @level_map = l_map
+          @product = r_coverage.product
+          @previous_product = r_coverage.previous_eligibility_product
         end
 
         def add(member)
@@ -60,7 +62,7 @@ module BenefitSponsors
           ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
             @reference_product,
             @rate_schedule_date,
-            @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, member),
+            @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, member, @product, @previous_product),
             @rating_area
           )
         end
@@ -72,7 +74,7 @@ module BenefitSponsors
         end
 
         def get_contribution_unit(roster_entry_member)
-          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, roster_entry_member)
+          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, roster_entry_member, @product, @previous_product)
           rel_name = @contribution_model.map_relationship_for(roster_entry_member.relationship, coverage_age, roster_entry_member.is_disabled?)
           @contribution_model.contribution_units.detect do |cu|
             cu.match?({rel_name.to_s => 1})

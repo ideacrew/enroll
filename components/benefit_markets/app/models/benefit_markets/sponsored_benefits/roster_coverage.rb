@@ -26,6 +26,14 @@ module BenefitMarkets
       def coverage_eligibility_dates
         raise NotImplementedError.new("This is a documentation only interface.")
       end
+      
+      # If applicable, the product under which the previous eligibility was
+      # determined. This must always be present if there are entries in
+      # the #coverage_eligibility_dates hash.
+      # @return [::BenefitMarkets::Products::Product] the product
+      def previous_eligibility_product
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
 
       # The selected product.
       # @return [::BenefitMarkets::Products::Product] the product

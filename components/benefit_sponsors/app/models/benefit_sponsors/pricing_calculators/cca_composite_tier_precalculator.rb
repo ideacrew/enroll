@@ -1,6 +1,6 @@
 module BenefitSponsors
   module PricingCalculators
-    class CcaCompositeTierPrecalculator
+    class CcaCompositeTierPrecalculator < PricingCalculator
       class CalculatorState
         attr_reader :total
 
@@ -20,7 +20,7 @@ module BenefitSponsors
         end
 
         def add(member)
-          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date, @product, @product)
           rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           # TODO: make this more configurable, this is an awful hack.
@@ -94,7 +94,7 @@ module BenefitSponsors
         pp_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_participation_percent_factor(product, participation_percent)
         sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sic_code)
         sorted_members = members_list.sort_by do |rm|
-          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, product, product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, roster_coverage, gs_factor, pp_factor, sc_factor)

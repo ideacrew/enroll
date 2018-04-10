@@ -29,6 +29,7 @@ module BenefitSponsors
           @member_totals = Hash.new
           @rate_schedule_date = r_coverage.rate_schedule_date
           @eligibility_dates = r_coverage.coverage_eligibility_dates
+          @previous_product = r_coverage.previous_eligibility_product
           @coverage_start_date = r_coverage.coverage_start_date
           @rating_area = r_coverage.rating_area
           @product = product
@@ -37,7 +38,7 @@ module BenefitSponsors
         end
 
         def add(member)
-          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date, @product, @previous_product)
           rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, rm.is_disabled?)
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
@@ -70,7 +71,7 @@ module BenefitSponsors
         roster_coverage = benefit_roster_entry.roster_coverage
         members_list = [roster_entry] + roster_entry.dependents
         sorted_members = members_list.sort_by do |rm|
-          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date)
+          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, roster_coverage.product, roster_coverage.previous_eligibility_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         # CCA policy decision: in non-composite group size is always treated as 1
