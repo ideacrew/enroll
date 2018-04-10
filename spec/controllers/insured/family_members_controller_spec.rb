@@ -83,18 +83,6 @@ RSpec.describe Insured::FamilyMembersController do
         expect(assigns(:sep)).to eq sep
       end
 
-      it "should return false and also notify sep request accepted" do
-        date = (TimeKeeper.date_of_record).strftime("%m/%d/%Y")
-        get :index, :sep_id => sep.id, qle_id: qle.id, date_val: date, format: :js
-        expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.employee_notice_after_sep_accepted"
-          expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
-          expect(payload[:event_object_id]).to eq qle.id.to_s
-        end
-
-        subject.trigger_notice(recipient: employee_role, event_object: qle, notice_event: "employee_notice_after_sep_accepted", notice_params: sep.id)
-      end
-
       context "when using old active sep" do
 
         before do
