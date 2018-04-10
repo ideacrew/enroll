@@ -1,8 +1,6 @@
 module BenefitSponsors
   # Sites Controller
   class SitesController < ApplicationController
-    before_action :find_hbx_admin_user
-
     def index
       @sites = BenefitSponsors::Site.all
     end
@@ -52,9 +50,9 @@ module BenefitSponsors
     end
 
     def update
-      @site = BenefitSponsors::Site.find params[:id]
+      @site = BenefitSponsors::Site.new current_user, params[:site].merge(id: params[:id])
 
-      if @site.update_attributes params[:site]
+      if @site.save
         redirect_to :index
       else
         render 'edit'
