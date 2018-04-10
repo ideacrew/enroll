@@ -69,11 +69,7 @@ module Observers
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
       if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
         employer_profile = new_model_event.klass_instance
-        if new_model_event.event_key == :broker_hired_confirmation_to_employer
-          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
-        elsif new_model_event.event_key == :welcome_notice_to_employer
-          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
-        end
+        deliver(recipient: employer_profile, event_object: employer_profile, notice_event: new_model_event.event_key.to_s)
       end
     end
 
@@ -95,30 +91,29 @@ module Observers
     def plan_year_date_change(model_event)
       current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
-        if model_event.event_key == :renewal_employer_publish_plan_year_reminder_after_soft_dead_line
-          trigger_on_queried_records("renewal_employer_publish_plan_year_reminder_after_soft_dead_line")
+
+        if [ :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
+             :renewal_plan_year_first_reminder_before_soft_dead_line,
+             :renewal_plan_year_publish_dead_line
+        ].include?(model_event.event_key)
+          current_date = TimeKeeper.date_of_record
+          EmployerProfile.organizations_for_force_publish(current_date).each do |organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+          end
         end
 
-        if model_event.event_key == :renewal_plan_year_first_reminder_before_soft_dead_line
-          trigger_on_queried_records("renewal_plan_year_first_reminder_before_soft_dead_line")
+        if [ :initial_employer_first_reminder_to_publish_plan_year,
+             :initial_employer_second_reminder_to_publish_plan_year,
+             :initial_employer_final_reminder_to_publish_plan_year
+        ].include?(model_event.event_key)
+          start_on = TimeKeeper.date_of_record.next_month.beginning_of_month
+          organizations = Queries::NoticeQueries.initial_employers_by_effective_on_and_state(start_on: start_on, aasm_state: :draft)
+          organizations.each do|organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
+            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+          end
         end
-
-        if model_event.event_key == :renewal_plan_year_publish_dead_line
-          trigger_on_queried_records("renewal_plan_year_publish_dead_line")
-        end
-
-        if model_event.event_key == :initial_employer_first_reminder_to_publish_plan_year
-          trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
-        end
-
-        if model_event.event_key == :initial_employer_second_reminder_to_publish_plan_year
-          trigger_initial_employer_publish_remainder("initial_employer_second_reminder_to_publish_plan_year")
-        end
-
-        if model_event.event_key == :initial_employer_final_reminder_to_publish_plan_year
-          trigger_initial_employer_publish_remainder("initial_employer_final_reminder_to_publish_plan_year")
-        end
-
       end
     end
 
@@ -135,24 +130,8 @@ module Observers
       end
     end
 
-    def trigger_on_queried_records(event_name)
-      current_date = TimeKeeper.date_of_record
-      EmployerProfile.organizations_for_force_publish(current_date).each do |organization|
-        plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-        deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
-      end
-    end
-
     def deliver(recipient:, event_object:, notice_event:)
       Services::NoticeService.call(recipient: recipient, event_object: event_object, notice_event: notice_event)
-    end
-
-    def trigger_initial_employer_publish_remainder(event_name)
-      start_on_1 = (TimeKeeper.date_of_record+1.month).beginning_of_month
-      initial_employers_reminder_to_publish(start_on_1).each do|organization|
-        plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
-        trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
-      end
     end
   end
 end

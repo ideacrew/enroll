@@ -20,7 +20,7 @@ class ShopNoticesNotifierJob < ActiveJob::Base
     end
   end
 
-  def build_options
+  def build_options(event_object)
     {}
   end
 end
