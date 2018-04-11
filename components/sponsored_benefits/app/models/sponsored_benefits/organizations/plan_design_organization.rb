@@ -71,6 +71,11 @@ module SponsoredBenefits
         ::BrokerAgencyProfile.find(owner_profile_id)
       end
 
+      def general_agency_profile
+        org = Organization.by_broker_agency_profile(broker_agency_profile.id).first
+        org.try(:employer_profile).try(:active_general_agency_account)
+      end
+
       # TODO Move this method to BenefitMarket Model
       def service_areas_available_on(date)
         if use_simple_employer_calculation_model?

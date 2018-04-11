@@ -366,6 +366,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def clear_assign_for_employer
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
+    
     authorize HbxProfile, :modify_admin_tabs?
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     if @employer_profile.present?
