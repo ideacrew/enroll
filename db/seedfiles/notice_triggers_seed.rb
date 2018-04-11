@@ -918,28 +918,6 @@ shop_notice_triggers = [
             }
         ]
     },
-
-    {
-        hbx_id: 'SHOP56',
-        title: 'Approval Of Application To Offer Group Health Coverage',
-        description: 'Manual trigger when a SHOP Tier 2 team member creates a redmine ticket to generate Approval notice',
-        resource_name: 'employer',
-        event_name: 'initial_shop_application_approval',
-        notice_triggers: [
-            {
-                name: 'Notice sent to employer when initial shop application is approved after Request for Clarifying Documentation',
-                notice_template: 'notices/shop_employer_notices/initial_shop_application_approval_notice',
-                notice_builder: 'ShopEmployerNotices::InitialShopApplicationApprovalNotice',
-                mpi_indicator: 'SHOP_M056',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
   # {
   #   hbx_id: 'SHOP27',
   #   title: 'Final Reminder to publish Application',
