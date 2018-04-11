@@ -1,5 +1,7 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
+  include ApplicationHelper
+
   before_action :find_employer
   before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
@@ -51,7 +53,7 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.save!(validate: false)
       broker_hired
       @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer")
-      broker_agency_hired_confirmation
+      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
       # @employer_profile.trigger_notices("broker_hired_confirmation_notice") #mirror notice
     end
 
@@ -100,14 +102,6 @@ class Employers::BrokerAgencyController < ApplicationController
          ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
     rescue Exception => e
        puts "Unable to deliver Broker Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
-    end
-  end
-
-  def broker_agency_hired_confirmation
-    begin
-         ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_agency_hired_confirmation")
-    rescue Exception => e
-       puts "Unable to deliver Broker Agency Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
   end
 

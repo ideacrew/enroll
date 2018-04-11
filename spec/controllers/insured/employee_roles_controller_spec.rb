@@ -110,7 +110,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   describe "GET edit" do
     let(:user) { double("User") }
     let(:person) { double("Person", broker_role: BrokerRole.new) }
-    let(:census_employee) { double("CensusEmployee") }
+    let(:census_employee) { double("CensusEmployee", id: double("id")) }
     let(:address) { double("Address") }
     let(:addresses) { [address] }
     let(:employee_role) { double("EmployeeRole", id: double("id"), employer_profile_id: "3928392", :person => person) }
@@ -120,6 +120,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:family) { double("Family") }
     let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
+    let!(:notice_trigger_params) { {recipient: employee_role, event_object: census_employee, notice_event: "employee_matches_employer_rooster"} }
 
     before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
@@ -144,30 +145,38 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
+    end
 
+    context 'edit person parameters' do
+      before :each do
+        get :edit, id: employee_role.id
+      end
+
+      it "return success http status" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render edit template" do
+        expect(response).to render_template(:edit)
+      end
+
+      it "return false if person already has address record" do
+        expect(person.addresses.empty?).to eq false
+      end
+
+      it "should NOT overwrite existing address from ER roaster" do
+        expect(person.addresses).to eq addresses
+      end
+
+      it "return true if person doesn't have any address" do
+        allow(person).to receive(:addresses).and_return([])
+        expect(person.addresses.empty?).to eq true
+      end
+    end
+
+    it "should trigger notice" do
+      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(notice_trigger_params).and_return(true)
       get :edit, id: employee_role.id
-
-    end
-
-    it "return success http status" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should render edit template" do
-      expect(response).to render_template(:edit)
-    end
-
-    it "return false if person already has address record" do
-      expect(person.addresses.empty?).to eq false
-    end
-
-    it "should NOT overwrite existing address from ER roaster" do
-      expect(person.addresses).to eq addresses
-    end
-
-    it "return true if person doesn't have any address" do
-      allow(person).to receive(:addresses).and_return([])
-      expect(person.addresses.empty?).to eq true
     end
   end
 

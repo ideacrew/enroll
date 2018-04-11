@@ -10,7 +10,8 @@ module Notifier
     RECIPIENTS = {
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
       "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
-      "Broker" => "Notifier::MergeDataModels::BrokerProfile"
+      "Broker" => "Notifier::MergeDataModels::BrokerProfile",
+      "Broker Agency" => "Notifier::MergeDataModels::BrokerAgencyProfile"
     }
 
     field :title, type: String
