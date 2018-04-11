@@ -127,11 +127,9 @@ Rails.application.routes.draw do
         get :terminate_enrollment
         post :update_terminate_enrollment
         post :add_new_sep
-        post :add_new_pdc
         get :update_effective_date
         get :calculate_sep_dates
         get :add_sep_form
-        get :pdc_type
         get :hide_form
         get :show_sep_history
         get :calendar_index
