@@ -22,6 +22,12 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       generate_hbx_signature(enrollments)
     when "expire_enrollment"
       expire_enrollment(enrollments)
+    when "transfer_enrollment_from_glue_to_enroll"
+      transfer_enrollment_from_glue_to_enroll
+    when "change_plan"
+      change_plan(enrollments)
+    when "change_benefit_group"
+      change_benefit_group(enrollments)
     end
   end
 
@@ -43,6 +49,28 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     enrollments.each do |enrollment|
       enrollment.update_attributes!(:effective_on => new_effective_on)
       puts "Changed Enrollment effective on date to #{new_effective_on}" unless Rails.env.test?
+    end
+  end
+
+  def change_plan(enrollments)
+    if ENV['new_plan_id'].blank?
+      raise "Input required: plan id" unless Rails.env.test?
+    end
+    new_plan_id = ENV['new_plan_id']
+    enrollments.each do |enrollment|
+      enrollment.update_attributes!(:plan_id => new_plan_id)
+      puts "Changed Enrollment's plan to #{new_plan_id}" unless Rails.env.test?
+    end
+  end
+
+  def change_benefit_group(enrollments)
+    if ENV['new_benefit_group_id'].blank?
+      raise "Input required: benefit group id" unless Rails.env.test?
+    end
+    new_benefit_group_id = ENV['new_benefit_group_id']
+    enrollments.each do |enrollment|
+      enrollment.update_attributes!(:benefit_group_id => new_benefit_group_id)
+      puts "Changed Enrollment's benefit group to #{new_benefit_group_id}" unless Rails.env.test?
     end
   end
 
@@ -86,8 +114,12 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def cancel_enr(enrollments)
     enrollments.each do |enrollment|
-      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-      puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        if enrollment.may_cancel_coverage?
+          enrollment.cancel_coverage!
+          puts "enrollment with hbx_id: #{enrollment.hbx_id} cancelled" unless Rails.env.test?
+        else
+          puts " Issue with enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        end
     end
   end
 
@@ -108,5 +140,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be expired" unless Rails.env.test?
       end
     end
+  end
+
+  def transfer_enrollment_from_glue_to_enroll
+    ts = TranscriptGenerator.new
+    ts.display_enrollment_transcripts
   end
 end
