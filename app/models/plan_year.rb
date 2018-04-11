@@ -913,7 +913,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => :notify_employee_of_initial_employer_ineligibility
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?
 
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
@@ -1263,17 +1263,6 @@ class PlanYear
         self.employer_profile.trigger_notices("zero_employees_on_roster")
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
-
- def notify_employee_of_initial_employer_ineligibility
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.census_employees.non_terminated.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
     end
   end
