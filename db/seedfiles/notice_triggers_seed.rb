@@ -579,29 +579,6 @@ if Settings.aca.state_abbreviation == "MA"
               }
           ]
       },
-
-      {
-        hbx_id: 'SHOP_M057',
-        title: 'Denial Of Application To Offer Group Health Coverage In The Massachusetts Health Connector',
-        description: 'Denial Of Application To Offer Group Health Coverage In The Massachusetts Health Connector',
-        resource_name: 'employer',
-        event_name: 'employer_ineligibilty_denial_application',
-        notice_triggers: [
-            {
-                name: 'DENIAL OF APPLICATION TO OFFER GROUP HEALTH COVERAGE IN THE MASSACHUSETTS HEALTH CONNECTOR',
-                notice_template: 'notices/shop_employer_notices/initial_shop_application_is_denied_after_request_for_clarifying_documentation',
-                notice_builder: 'ShopEmployerNotices::InitialShopApplicationIsDeniedAfterRequestForClarifyingDocumentation',
-                mpi_indicator: 'SHOP_M057',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-      },
-
     {
           hbx_id: 'SHOP58',
           title: "Notice To Initial Employer's No Binder Payment Received",
