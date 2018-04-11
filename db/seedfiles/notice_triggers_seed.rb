@@ -552,28 +552,6 @@ shop_notice_triggers = [
             }
         ]
     },
-
-    {
-        hbx_id: 'SHOP_M022',
-        title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
-        description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
-        resource_name: 'employer',
-        event_name: 'initial_employer_invoice_available',
-        notice_triggers: [
-            {
-                name: 'Initial Employer first invoice available in the account',
-                notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-                notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-                mpi_indicator: 'SHOP_M022',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
   {
         hbx_id: 'SHOP58',
         title: "Notice To Initial Employer's No Binder Payment Received",
