@@ -24,8 +24,8 @@ class EmployerInvoice
         FileUtils.mkdir_p(invoice_folder_path)
       end
       pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
-      unless fetch_invoices_addendum.nil?
-        join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', '#{fetch_invoices_addendum}')]
+      unless fetch_invoices_addendum.blank?
+        join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', fetch_invoices_addendum)]
       end
     rescue Exception => e
       @errors << "Unable to create PDF for #{@organization.hbx_id}."
