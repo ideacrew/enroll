@@ -1,24 +1,30 @@
-= form_for @product_package, as: :product_package, url: products_product_packages_url, html: {} do |f|
+h5 Product Package
+
+= form_for @product_package, as: :product_package, url: products_product_packages_url do |f|
   - if @product_package.errors.any?
     ul
       - @product_package.errors.full_messages.each do |msg|
         li= msg
 
-  .form-group
-    = f.label :title
-    = f.text_field :title
+  .row
+    = f.label :title, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.text_field :title, class: "form-control", required: true
 
-  .form-group
-    = f.label :pricing_model_id
-    = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id)
+  .row
+    = f.label :pricing_model_id, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id), class: "form-control"
 
-  .form-group
-    = f.label :contribution_model_id
-    = f.select :contribution_model_id, options_for_select([["Please select a contribution model", nil]] + @product_package.available_contribution_models, selected: @product_package.contribution_model_id)
+  .row
+    = f.label :contribution_model_id, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.select :contribution_model_id, options_for_select([["Please select a contribution model", nil]] + @product_package.available_contribution_models, selected: @product_package.contribution_model_id), class: "form-control"
 
-  .form-group
-    = f.label :benefit_catalog_id
-    = f.select :benefit_catalog_id, options_for_select([["Please select a benefit catalog", nil]] + @product_package.available_benefit_catalogs, selected: @product_package.benefit_catalog_id)
+  .row
+    = f.label :benefit_catalog_id, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.select :benefit_catalog_id, options_for_select([["Please select a benefit catalog", nil]] + @product_package.available_benefit_catalogs, selected: @product_package.benefit_catalog_id)
 
   = f.hidden_field :benefit_option_kind
 
