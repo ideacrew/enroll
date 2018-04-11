@@ -229,7 +229,7 @@ class PlanYear
     if start_on.blank?
       return(false)
     end
-    if (canceled? || renewing_canceled?) && announced_externally?
+    if canceled? && announced_externally?
       return true
     end
     if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
@@ -880,7 +880,7 @@ class PlanYear
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
-    state :renewing_canceled, :after_enter => :notify_employer_py_cancellation
+    state :renewing_canceled
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
