@@ -69,6 +69,10 @@ module BenefitMarkets
         @show_page_model = persisted_object
         true
       end
+
+      def policy_class
+        BenefitMarkets::Products::ProductPackageFormPolicy
+      end
     end
   end
 end

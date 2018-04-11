@@ -5,6 +5,7 @@ PATH
       aasm (~> 4.8.0)
       config
       mongoid (~> 5.0.1)
+      pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)
@@ -152,6 +153,8 @@ GEM
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
     public_suffix (3.0.2)
+    pundit (1.0.1)
+      activesupport (>= 3.0.0)
     rack (1.6.9)
     rack-test (0.6.3)
       rack (>= 1.0)
