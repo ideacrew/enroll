@@ -67,7 +67,7 @@
                 </div>
               </div>
               <% if current_user.has_hbx_staff_role? %>
-                    <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type.id, v_type: v_type, f_member: f_member} %>
+                    <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
               <% end %>
 
               <div class="row">
