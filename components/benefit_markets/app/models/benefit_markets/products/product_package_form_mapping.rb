@@ -74,13 +74,25 @@ module BenefitMarkets
         end
       end
 
+      def contribution_model_for(form)
+        ::BenefitMarkets::ContributionModels::ContributionModel.where(id: form.contribution_model_id).first
+      end
+
+      def pricing_model_for(form)
+        ::BenefitMarkets::PricingModels::PricingModel.where(id: form.pricing_model_id).first
+      end
+
+      def benefit_catalog_for(form)
+        ::BenefitMarkets::BenefitMarketCatalog.where(id: form.benefit_catalog_id).first
+      end
+
       def build_metal_level_product_package(form)
         product_package_factory.build_metal_level_product_package(
           form.benefit_option_kind,
-          form.benefit_catalog_id,
+          benefit_catalog_for(form),
           form.title,
-          form.contribution_model_id,
-          form.pricing_model_id,
+          contribution_model_for(form),
+          pricing_model_for(form),
           form.metal_level
         )
       end
@@ -88,10 +100,10 @@ module BenefitMarkets
       def build_issuer_product_package(form)
         product_package_factory.build_issuer_product_package(
           form.benefit_option_kind,
-          form.benefit_catalog_id,
+          benefit_catalog_for(form),
           form.title,
-          form.contribution_model_id,
-          form.pricing_model_id,
+          contribution_model_for(form),
+          pricing_model_for(form),
           form.issuer_id
         )
       end
@@ -99,10 +111,10 @@ module BenefitMarkets
       def build_vanilla_product_package(form)
         product_package_factory.build_product_package(
           form.benefit_option_kind,
-          form.benefit_catalog_id,
+          benefit_catalog_for(form),
           form.title,
-          form.contribution_model_id,
-          form.pricing_model_id
+          contribution_model_for(form),
+          pricing_model_for(form)
         )
       end
     end
