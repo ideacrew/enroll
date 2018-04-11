@@ -557,28 +557,6 @@ if Settings.aca.state_abbreviation == "MA"
               }
           ]
       },
-
-      {
-          hbx_id: 'SHOP_M022',
-          title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
-          description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
-          resource_name: 'employer',
-          event_name: 'initial_employer_invoice_available',
-          notice_triggers: [
-              {
-                  name: 'Initial Employer first invoice available in the account',
-                  notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-                  notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-                  mpi_indicator: 'SHOP_M022',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
     {
           hbx_id: 'SHOP58',
           title: "Notice To Initial Employer's No Binder Payment Received",
@@ -640,28 +618,6 @@ if Settings.aca.state_abbreviation == "MA"
                       primary_recipient_delivery_method: ["secure_message"],
                       secondary_recipients: []
 
-                  }
-              }
-          ]
-      },
-
-      {
-          hbx_id: 'SHOP_M038',
-          title: 'Termination of Employer’s Health Coverage Offered through the Massachusetts Health Connector',
-          description: 'Notification to employees regarding their Employer’s ineligibility.',
-          resource_name: 'employee_role',
-          event_name: 'notify_employee_of_initial_employer_ineligibility',
-          notice_triggers: [
-              {
-                  name: 'Notification to employees regarding their Employer’s ineligibility.',
-                  notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
-                  notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
-                  mpi_indicator: 'SHOP_M038',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employee"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
                   }
               }
           ]
@@ -920,28 +876,6 @@ if Settings.aca.state_abbreviation == "MA"
                   primary_recipient_delivery_method: ["secure_message"],
                   secondary_recipients: []
                 }
-              }
-          ]
-      },
-
-      {
-          hbx_id: 'SHOP56',
-          title: 'Approval Of Application To Offer Group Health Coverage',
-          description: 'Manual trigger when a SHOP Tier 2 team member creates a redmine ticket to generate Approval notice',
-          resource_name: 'employer',
-          event_name: 'initial_shop_application_approval',
-          notice_triggers: [
-              {
-                  name: 'Notice sent to employer when initial shop application is approved after Request for Clarifying Documentation',
-                  notice_template: 'notices/shop_employer_notices/initial_shop_application_approval_notice',
-                  notice_builder: 'ShopEmployerNotices::InitialShopApplicationApprovalNotice',
-                  mpi_indicator: 'SHOP_M056',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
               }
           ]
       },
