@@ -251,8 +251,10 @@ module ApplicationHelper
     fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
       render("shared/" + association.to_s.singularize + "_fields", f: builder)
     end
-    link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,
+    a = link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,
             '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
+    #binding.pry
+    return a
   end
 
   def render_flash

@@ -1,0 +1,63 @@
+
+
+$('#hello').html("<%= escape_javascript(render partial: 'employers/plan_years/generate_new_benefit_group') %>".replace(/benefit_groups_attributes\]\[0\]/g, "benefit_groups_attributes["+ ($('.benefit-group-fields').length + 1) + "]").replace(/plan_year_benefit_groups_attributes_0/g, "plan_year_benefit_groups_attributes_"+ ($('.benefit-group-fields').length + 1)))
+
+
+target = $('form').first().find('fieldset').closest('.form-inputs')
+//$(target).children('fieldset:last').after($('form').last().find('.reference-summary')[0])
+$(target).children('fieldset:last').after($('form').last().find('fieldset')[0])
+
+$('#hello').html("");
+
+$('.benefit-group-fields:last').attr('data-benefit-group-index', $('.benefit-group-fields').length + 1)
+$(target).children('fieldset:last').find('select').selectric()
+$(target).children('fieldset:last').find("input.floatlabel").floatlabel({slideInput: false});
+
+applyJQDatePickers()
+
+EmployerProfile.validatePlanYear
+
+$('.benefit-group-fields:last').find('.benefits-fields .slider, .dental-benefits-fields .slider').bootstrapSlider({
+  formatter: function(value) {
+    return 'Contribution Percentage: ' + value + '%';
+  }
+});
+
+$('.benefit-group-fields:last').find('.benefits-fields .slider, .dental-benefits-fields .slider').on('slideStop', function(slideEvt) {
+  $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+  $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + '%');
+});
+
+$('.benefit-group-fields:last input[value="child_under_26"]').closest('.row-form-wrapper').attr('style', 'border-bottom: 0px;');
+
+$('.benefit-group-fields:last input:first').focus();
+$('.remove_fields:last').css('display', 'inline-block')
+
+$('.benefit-group-fields:last .contribution_slide_handler').each(function() {
+  $(this).on('slideStop', function(slideEvt) {
+    var coverage_type, location_id;
+    if ($(this).closest('.health').length > 0) {
+      coverage_type = '.health';
+    } else {
+      coverage_type = '.dental';
+    }
+    location_id = $(this).parents('.benefit-group-fields').attr('id');
+    calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id, coverage_type);
+  });
+});
+
+var start_on;
+
+start_on = $('#plan_year_start_on').val();
+
+if (start_on) {
+  start_on = start_on.substr(0, 4);
+  $('.plan-options a').each(function() {
+    var url;
+    url = $(this).attr('href');
+    return $(this).attr('href', url + '&start_on=' + start_on);
+  });
+}
+
+
+//$(target).children('fieldset:last').find("input.floatlabel").floatlabel slideInput: false

@@ -7,6 +7,7 @@ $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .employee-monthly-co
 $('.benefits-fields').css('pointer-events','');
 $('.composite-offerings').css('opacity','1');
 $(".selected-plan").show();
+console.log("when in the world is this called?");
 if ( $("#<%= @location_id %> .select-dental-plan").is(":hidden") ) {
   // $('#<%#=# @location_id %> label.elected_plan:contains("Custom")').trigger('click');
   // $('#<%#=# @location_id %> .elected-plans-continue span').trigger('click');

@@ -14,6 +14,13 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def new_benefit_group
+    @plan_year = build_plan_year
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def dental_reference_plans
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
@@ -127,6 +134,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
+
+    binding.pry
+
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|

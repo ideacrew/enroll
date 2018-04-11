@@ -1,8 +1,9 @@
 $(document).on("change", "select.elected_plan", function() {
+  console.log('this is clicked');
   var target = $(this).parents(".reference-plan-selection-controls");
   $(target).find(".elected-plan-select .hidden_field").hide();
   $(target).find(".reference-plan-select .reference-plan-content").hide();
-  
+
   switch($(this).val()){
     case "single_carrier":
       $(target).find(".carrier_for_elected_plan").show();

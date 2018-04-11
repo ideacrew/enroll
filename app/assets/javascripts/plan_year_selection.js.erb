@@ -394,6 +394,7 @@ ready = function() {
       });
 
     var showCarrierOptions = function() {
+      console.log('Click on Plan Offering options');
       if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
         EmployerProfile.validateEditPlanYear();
 
@@ -405,6 +406,9 @@ ready = function() {
       } else {
         nav = '.dental';
       }
+      console.log('click... ' + $(this).attr('value'))
+      console.log('nav... ' + nav);
+      console.log($(this).attr("id"))
       if ($(this).attr('value') == "single_carrier") {
         $(this).closest('.benefit-group-fields').find(nav+' .carriers-tab').show();
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
@@ -438,6 +442,7 @@ ready = function() {
 
     //toggle plan options checkbox through parent anchor
     var togglePlanOptions = function() {
+      console.log('toggle plan options?')
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
         if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
           EmployerProfile.validateEditPlanYear();
@@ -447,6 +452,7 @@ ready = function() {
         }
         if ( $(this).closest('.plan-options').parent().hasClass('health') ) {
           nav = '.health';
+          console.log('hello');
           $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
           $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').fadeOut();
           $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })

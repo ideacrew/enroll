@@ -1,4 +1,5 @@
 $(document).on 'click', 'form .add_fields', (event) ->
+  console.log('add fields clicked 1')
   if $(this).closest('.census-employee').length || $(this).closest('.census-employee-add').length
     $('.add-dependent-text').hide();
   event.preventDefault()
@@ -162,6 +163,7 @@ $(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
       delete_button.show()
 
 $(document).on 'click', 'form .add_fields', (event) ->
+  console.log('add fields clicked 2')
   if $(this).closest('.census-employee').length || $(this).closest('.census-employee-add').length
     $('.remove_fields').show();
     Freebies.floatlabels();

@@ -1,0 +1,10 @@
+<%= form_for @plan_year, url: employers_employer_profile_plan_years_path do |f| %>
+  <% f.options[:child_index] = 122  %>
+  <% puts "1*******************" + f.options[:child_index].to_s  %>
+  <% puts "2*******************" + f.options[:index].to_s  %>
+  <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+  <% bg.options[:child_index] = 11 %>
+  <% puts "3*******************" + bg.options[:child_index].to_s  %>
+    <%= render "shared/benefit_group_fields", f: bg, p: @plan_year, inc: 1 %><br>
+  <% end %>
+<% end %>

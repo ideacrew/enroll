@@ -335,6 +335,7 @@ Rails.application.routes.draw do
         get 'calc_offered_plan_contributions', on: :collection
         get 'employee_costs', on: :collection
         get 'reference_plan_summary', on: :collection
+        get 'new_benefit_group', on: :collection
 
       end
 
