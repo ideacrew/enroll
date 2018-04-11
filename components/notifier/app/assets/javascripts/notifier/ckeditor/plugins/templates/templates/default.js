@@ -51,7 +51,7 @@ CKEDITOR.addTemplates( 'default', {
 "<p>[[ else ]]</p>" +
 "<p>If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the &ldquo;Find a Broker&rdquo; link in your employer account or calling #{contact_center_phone_number}<br />" +
 "[[ end ]]</p>" +
-"<p>This notice is being provided in accordance with 45 C.F.R. 155.720.</p>"
+"<p>This notice is being provided in accordance with &lt;Insert Legal Compliance Code&gt;.</p>"
 	},
 	{
 		title: 'Employee Template',
@@ -97,7 +97,7 @@ CKEDITOR.addTemplates( 'default', {
 	"</tbody>" +
 "</table>" +
 "[[ end ]]" +
-"<p>This notice is being provided in accordance with 45 C.F.R. 155.735(g).</p>"
+"<p>This notice is being provided in accordance with &lt;Insert Legal Compliance Code&gt;.</p>"
 	},
 	{
 		title: 'General Agency Template',

@@ -21,11 +21,11 @@ module Notifier
     end
 
     def ivl_oe_start_date
-      merge_model.ivl_oe_start_date = Settings.aca.individual_market.open_enrollment.start_on.strftime('%m/%d/%Y')
+      merge_model.ivl_oe_start_date = Settings.aca.individual_market.upcoming_open_enrollment.start_on
     end
 
     def ivl_oe_end_date
-      merge_model.ivl_oe_end_date = Settings.aca.individual_market.open_enrollment.end_on.strftime('%m/%d/%Y')
+      merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on
     end
 
     def notice_date
