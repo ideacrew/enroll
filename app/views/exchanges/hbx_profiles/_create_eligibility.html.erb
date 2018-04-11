@@ -1,0 +1,65 @@
+<div class="container bottom-pd">
+  <% active_household = @person.primary_family.active_household %>
+  <%= form_for @person, remote: true, url: update_tax_household_eligibility_path, method: "post", class: "form" do |f| %>
+    <%= f.hidden_field :person_id, value: @person.id  %>
+    <%= f.hidden_field :family_actions_id, value: "family_actions_#{@person.primary_family.id.to_s}" %>
+    <table class="table table-border">
+      <thead>
+        <th>Max APTC</th>
+        <th>CSR</th>
+        <th>Effective Date</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <%= text_field_tag "person[max_aptc]", nil, class: "required input_txt", :input_html => { width: '100%' } %>
+          </td>
+          <td>
+            <%= text_field_tag "person[csr]", nil, class: "required input_txt", :input_html => { width: '100%' } %>
+          </td>
+          <td>
+            <%= datepicker_control f, :effective_date, {:class => "interaction-field-control-census-employee-dob input_txt", :value => params[:effective_date].present? ? Date.strptime(params[:effective_date], '%m/%d/%Y') : nil, :placeholder => "EFFECTIVE DATE", required: true} %>
+            <i class="fa fa-calendar datepicker" aria-hidden="true"></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table table-border">
+      <thead>
+        <th>Name</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>HBX ID</th>
+        <th>Active Enrollment</th>
+        <th>PDC Type</th>
+        <th>Reason</th>
+      </thead>
+      <tbody>
+        <% @person.primary_family.active_family_members.each do |family_member| %>
+          <tr>
+            <td><h5><%= family_member.person.first_name%> <%= family_member.person.last_name %></h5></td>
+            <td><h5><%= truncate(number_to_obscured_ssn(family_member.person.ssn)) %></h5></tb>
+            <td><h5><%= family_member.person.dob %> </h5></td>
+            <td><h5><%= family_member.person.hbx_id %></h5></tb>
+            <td><%= active_enrollments?(@person) %></td>
+            <td>
+              <% if family_member.is_primary_applicant %>
+                <%= select_tag "person[pdc_type]",
+                    options_for_select(TaxHouseholdMember::PDC_TYPES) %>
+              <% else %>
+                 <%= select_tag "person[dependents][#{family_member.person.hbx_id}][pdc_type]",
+                    options_for_select(TaxHouseholdMember::PDC_TYPES) %>
+              <% end %>
+            </td>
+            <td><%= text_field_tag 'person[reason]', nil, class: "required input_txt" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <div class="row no-buffer child-row">
+      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+        <%= f.submit "Submit", :class => "btn btn-primary", :size => '100px'%> 
+      </div>
+    </div>
+  <% end %>
+</div>
