@@ -61,6 +61,10 @@ module BenefitMarkets
         def all_products
           Plan.where(:active_year => benefit_catalog.product_active_year, :market => benefit_catalog.product_market_kind)
         end
+
+        def policy_class
+          ::BenefitMarkets::Products::ProductPackagePolicy
+        end
       end
     end
 end

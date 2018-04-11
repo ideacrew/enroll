@@ -34,6 +34,7 @@ PATH
       aasm (~> 4.8.0)
       config
       mongoid (~> 5.0.1)
+      pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)
