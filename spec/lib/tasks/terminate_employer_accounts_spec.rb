@@ -55,7 +55,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       Rake::Task["migrations:terminate_employer_account"].reenable
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
-      expect($stdout.string).to match("Notification generated for employer\n")
+      # expect($stdout.string).to match("Notification generated for employer\n")
       expect($stdout.string).to match("Notification generated for employee\n")
     end
 

@@ -65,8 +65,13 @@ module ModelEvents
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
         end
+
+
+        if is_transition_matching?(to: :termination_pending, from: :active, event: :schedule_termination)
+          is_group_advance_termination_confirmation = true
+        end
         
-        if is_transition_matching?(to: :terminated, from: [:active, :suspended, :termination_pending], event: :terminate)
+        if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
           is_group_advance_termination_confirmation = true
         end
 

@@ -48,8 +48,9 @@ namespace :migrations do
         end
 
         if plan_year.may_terminate?
+          plan_year.update(terminated_on: termination_date)
           plan_year.terminate!
-          plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+          plan_year.update(end_on: end_on)
           # send_termination_notice_to_employer(organization) if generate_termination_notice
           bg_ids = plan_year.benefit_groups.map(&:id)
           census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
