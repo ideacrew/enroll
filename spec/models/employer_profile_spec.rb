@@ -806,6 +806,23 @@ describe EmployerProfile, "when a binder premium is credited" do
   end
 end
 
+describe "#update_status_to_binder_paid" do
+  let(:org1) { FactoryGirl.create :organization, legal_name: "Corp 1" }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: org1) }
+
+  before do
+    employer_profile.update_attribute(:aasm_state, 'eligible')
+    EmployerProfile.update_status_to_binder_paid([org1.id])
+  end
+
+  it 'should chnage the state update the workflow state transition' do
+    employer_profile.reload
+    expect(employer_profile.aasm_state).to eq('binder_paid')
+    expect(employer_profile.workflow_state_transitions.map(&:to_state)).to eq(['binder_paid'])
+  end
+
+end
+
 describe EmployerProfile, "Renewal Queries" do
   let(:organization1) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
