@@ -19,9 +19,6 @@ class PlanYear
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
-  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
-  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
-
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -228,9 +225,6 @@ class PlanYear
     return false if is_conversion?
     if start_on.blank?
       return(false)
-    end
-    if canceled? && announced_externally?
-      return true
     end
     if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
       return false
@@ -871,7 +865,7 @@ class PlanYear
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
-    state :canceled, :after_enter => :notify_employer_py_cancellation # Published plan open enrollment has ended and is ineligible for coverage
+    state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
@@ -1049,12 +1043,6 @@ class PlanYear
   def accept_application
     adjust_open_enrollment_date
     transition_success = employer_profile.application_accepted! if employer_profile.may_application_accepted?
-  end
-
-  def notify_employer_py_cancellation
-    if announced_externally?
-      notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
-    end
   end
 
   def decline_application
