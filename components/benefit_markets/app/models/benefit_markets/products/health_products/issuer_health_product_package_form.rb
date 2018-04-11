@@ -13,17 +13,6 @@ module BenefitMarkets
         def additional_form_fields_partial
           "issuer_health_additional_form_fields"
         end
-
-        def build_object_using_factory
-          product_package_factory.build_issuer_product_package(
-            benefit_option_kind,
-            benefit_catalog_id,
-            title,
-            contribution_model_id,
-            pricing_model_id,
-            issuer_id
-          )
-        end
       end
     end
   end

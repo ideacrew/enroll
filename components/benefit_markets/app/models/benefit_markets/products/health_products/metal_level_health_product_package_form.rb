@@ -6,17 +6,6 @@ module BenefitMarkets
 
         validates_presence_of :metal_level, :allow_blank => false
 
-        def build_object_using_factory
-          product_package_factory.build_metal_level_product_package(
-            benefit_option_kind,
-            benefit_catalog_id,
-            title,
-            contribution_model_id,
-            pricing_model_id,
-            metal_level
-          )
-        end
-
         def has_additional_attributes?
           true
         end
