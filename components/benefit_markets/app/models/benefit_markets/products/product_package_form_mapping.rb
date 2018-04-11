@@ -34,12 +34,12 @@ module BenefitMarkets
         valid_according_to_factory = product_package_factory.validate(product_package)
         unless valid_according_to_factory
           map_errors_for(product_package, onto: form)
-          [false, nil]
+          return [false, nil]
         end
         save_successful = product_package.save
         unless save_successful 
           map_errors_for(product_package, onto: form)
-          [false, nil]
+          return [false, nil]
         end
         [true, product_package]
       end
@@ -52,9 +52,9 @@ module BenefitMarkets
         model_attribute_name
       end
 
-      def map_errors_for(product_package, onto: target_form)
+      def map_errors_for(product_package, onto:)
         product_package.errors.each do |att, err|
-          target_form.errors.add(map_model_error_attribute(att), err)
+          onto.errors.add(map_model_error_attribute(att), err)
         end
       end
 

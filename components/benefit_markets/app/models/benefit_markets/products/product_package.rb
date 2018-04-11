@@ -27,6 +27,7 @@ module BenefitMarkets
         field :title,                   type: String
         field :contribution_model_id, type: BSON::ObjectId
         field :pricing_model_id, type: BSON::ObjectId
+        field :product_multiplicity, type: Symbol, default: ->() { default_product_multiplicity }
 
         belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
         belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
@@ -36,6 +37,10 @@ module BenefitMarkets
         validates_presence_of :title, :allow_blank => false
         validates_presence_of :benefit_catalog_id, :allow_blank => false
         validate :has_products
+
+        def default_product_multiplicity 
+          :multiple
+        end
 
         def self.subclass_for(benefit_option_kind)
           product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
