@@ -128,7 +128,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     context "Social Security Number verification type" do
-      it_behaves_like "update verification type", "ssn_type", "E-Verified in Curam", "verify", "validation", "valid"
+      it_behaves_like "update verification type", "ssn_type", "E-Verified in Curam", "verify", "validation", "verified"
       it_behaves_like "update verification type", "ssn_type", "E-Verified in Curam", "verify", "update_reason", "E-Verified in Curam"
     end
 
@@ -136,7 +136,7 @@ RSpec.describe DocumentsController, :type => :controller do
       before do
         person.update_attributes(:tribal_id => "444444444")
       end
-      it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "validation", "valid"
+      it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "validation", "verified"
       it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "update_reason", "Document in EnrollApp"
     end
 

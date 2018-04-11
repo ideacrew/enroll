@@ -1034,36 +1034,23 @@ class Family
   end
 
   def all_persons_vlp_documents_status
-    documents_list = []
-    document_status_outstanding = []
+    outstanding_types = []
     self.active_family_members.each do |member|
-      member.person.verification_types.active.each do |type|
-      if member.person.consumer_role && is_document_not_verified(type)
-        documents_list <<  (type.vlp_documents.where(verification_type: type.type_name) && type.validation_status != "outstanding")
-        document_status_outstanding << (type.vlp_documents.where(verification_type: type.type_name) && type.validation_status != "outstanding")
-      end
-      end
+      outstanding_types = outstanding_types + member.person.verification_types.active.where(validation_status:"outstanding").to_a
     end
-    case
-    when documents_list.include?(true) && documents_list.include?(false)
-      return "Partially Uploaded"
-    when documents_list.include?(true) && !documents_list.include?(false)
-      if document_status_outstanding.include?("outstanding")
-        return "Partially Uploaded"
-      else
-        return "Fully Uploaded"
-      end
-    when !documents_list.include?(true) && documents_list.include?(false)
-      return "None"
+    fully_uploaded = outstanding_types.all?{ |type| type.vlp_documents.any? }
+    partially_uploaded = outstanding_types.any?{ |type| type.vlp_documents.any? }
+    if fully_uploaded
+      "Fully Uploaded"
+    elsif partially_uploaded
+      "Partially Uploaded"
+    else
+      "None"
     end
   end
 
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
-  end
-
-  def is_document_not_verified(type)
-    !(["valid", "attested", "verified", "curam"].include? type.validation_status)
   end
 
   def has_valid_e_case_id?

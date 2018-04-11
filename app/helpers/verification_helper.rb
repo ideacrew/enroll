@@ -52,7 +52,7 @@ module VerificationHelper
 
   def is_not_verified?(family_member, v_type)
     return true if family_member.blank?
-    !(["na", "valid"].include?(v_type.validation_status))
+    !(["na", "valid", "verified"].include?(v_type.validation_status))
   end
 
   def can_show_due_date?(person, options ={})
@@ -139,8 +139,12 @@ module VerificationHelper
   end
 
   def show_v_type(status, admin = false)
-    return "Curam".center(12) if status == "curam" && admin
-    status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe if status
+    if status == "curam"
+      admin ? "Curam".center(12) : "External source".center(12)
+    elsif status
+      status = "verified" if status == "valid"
+      status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+    end
   end
 
   # returns vlp_documents array for verification type
@@ -195,25 +199,25 @@ module VerificationHelper
     raw_request = person.consumer_role.local_residency_requests.select{
         |request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)
     }
-    raw_request ? Nokogiri::XML(raw_request.first.body) : "no request record"
+    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
   end
 
   def show_ssa_dhs_request(person, record)
     requests = person.consumer_role.lawful_presence_determination.ssa_requests + person.consumer_role.lawful_presence_determination.vlp_requests
     raw_request = requests.select{|request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)} if requests.any?
-    raw_request ? Nokogiri::XML(raw_request.first.body) : "no request record"
+    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
   end
 
   def show_residency_response(person, record)
     raw_response = person.consumer_role.local_residency_responses.select{
         |response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)
     }
-    raw_response ? Nokogiri::XML(raw_response.first.body) : "no response record"
+    raw_response.any? ? Nokogiri::XML(raw_response.first.body) : "no response record"
   end
 
   def show_ssa_dhs_response(person, record)
     responses = person.consumer_role.lawful_presence_determination.ssa_responses + person.consumer_role.lawful_presence_determination.vlp_responses
     raw_request = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
-    raw_request ? Nokogiri::XML(raw_request.first.body) : "no response record"
+    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no response record"
   end
 end

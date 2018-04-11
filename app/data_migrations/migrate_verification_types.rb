@@ -84,7 +84,7 @@ class MigrateVerificationTypes < MongoidMigrationTask
   def type_rejected(person, type)
     case type
       when 'DC Residency'
-        person.consumer_role.residency_update_reason
+        person.consumer_role.residency_rejected
       when 'Social Security Number'
         person.consumer_role.ssn_rejected
       when 'American Indian Status'
