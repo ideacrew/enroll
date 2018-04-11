@@ -47,7 +47,7 @@ module BenefitMarkets
       end
 
       def available_pricing_models
-        form_mapping.options_for_pricing_model_id
+        form_mapping.options_for_pricing_model_id(self)
       end
 
       def available_benefit_catalogs

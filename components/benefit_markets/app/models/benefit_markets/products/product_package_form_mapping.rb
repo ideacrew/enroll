@@ -7,8 +7,9 @@ module BenefitMarkets
         @product_package_factory = factory_kind
       end
 
-      def options_for_pricing_model_id
-        ::BenefitMarkets::PricingModels::PricingModel.where({}).map do |pm|
+      def options_for_pricing_model_id(form)
+        product_multiplicity = package_product_multiplicity_for(form)
+        ::BenefitMarkets::PricingModels::PricingModel.where({:product_multiplicities => product_multiplicity}).map do |pm|
           [pm.name, pm.id]
         end
       end
@@ -45,6 +46,10 @@ module BenefitMarkets
       end
 
       protected
+
+      def package_product_multiplicity_for(form)
+        ::BenefitMarkets::Products::ProductPackage.subclass_for(form.benefit_option_kind).new.product_multiplicity
+      end
 
       # We can cheat here because our form and our model are so
       # close together - normally this will be more complex
