@@ -498,7 +498,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
       let(:family) { FactoryGirl.build(:individual_market_family) }
-      let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
+      let(:person) {double("Person",primary_family: family, is_consumer_role_active?: true)}
       let(:user) {double("user",person: person)}
 
       before do

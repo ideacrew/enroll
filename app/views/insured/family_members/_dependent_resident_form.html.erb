@@ -83,7 +83,7 @@
           </div>
         </div>
 
-        <% if @person.has_active_resident_role? %>
+        <% if @person.is_resident_role_active? %>
           <br>
           <%= render 'shared/resident_fields', f: f %>
           <div id="dependent-address">

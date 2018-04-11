@@ -39,7 +39,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(user).to receive(:save!).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
-      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(consumer_role).to receive(:save!).and_return(true)
     end
 
