@@ -36,8 +36,6 @@ module BenefitSponsors
 
       validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid", if: :is_broker_profile?
 
-      validate :validate_duplicate_npn, if: :is_broker_profile?
-
       def initialize(attrs = {})
         @profile_type = attrs[:profile_type]
         @office_locations ||= []
@@ -72,11 +70,6 @@ module BenefitSponsors
 
       def office_location_kinds
         location_kinds = office_locations.flat_map(&:address).flat_map(&:kind)
-        #too_many_of_a_kind = location_kinds.group_by(&:to_s).any? { |k, v| v.length > 1 }
-
-        #if too_many_of_a_kind
-        #  self.errors.add(:base, "may not have more than one of the same kind of address")
-        #end
 
         if location_kinds.count('primary').zero?
           self.errors.add(:base, "must select one primary address")
@@ -95,19 +88,7 @@ module BenefitSponsors
 
       def save(current_user, attrs)
         return false unless valid?
-        attrs = if is_broker_profile?
-            Factories::BrokerAgencyProfileFactory.call(attrs)
-          elsif is_employer_profile?
-            Factories::BenefitSponsorFactory.call(current_user, attrs)
-          end
-        @profile = attrs[:profile]
-        return attrs[:is_saved], attrs[:url]
-      end
-
-      def validate_duplicate_npn
-        if Person.where("broker_role.npn" => npn).any?
-          errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
-        end
+        Factories::ProfileFactory.call(current_user, attrs)
       end
 
       def is_broker_profile?
