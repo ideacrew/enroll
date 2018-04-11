@@ -50,19 +50,27 @@ module BenefitMarkets
                               class_name: "::BenefitMarkets::Locations::ServiceArea"
 
 
-    validates_presence_of :benefit_market, :application_interval_kind, :application_period #, :probation_period_kinds
+    validates_presence_of :benefit_market, :application_interval_kind, :application_period, :probation_period_kinds
 
     validates :application_interval_kind,
       inclusion:    { in: BenefitMarkets::APPLICATION_INTERVAL_KINDS, message: "%{value} is not a valid application interval kind" },
       allow_nil:    false
 
-    # validates :probation_period_kinds,
-    #   inclusion:    { in: BenefitSponsors::PROBATION_PERIOD_KINDS, message: "%{value} is not a valid probation period kind" },
-    #   allow_nil:    false
+    validate :validate_probation_periods
 
     scope :by_application_date,     ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
     index({ "application_period.min" => 1, "application_period.max" => 1 })
+
+    def validate_probation_periods
+      return true if probation_period_kinds.blank?
+      probation_period_kinds.each do |ppk|
+        unless ::BenefitMarkets::PROBATION_PERIOD_KINDS.include?(ppk)
+          errors.add(:probation_period_kinds, "#{ppk} is not a valid probation period kind")
+        end
+      end
+      true
+    end
 
 
     # All ProductPackages that Sponsor is eligible to offer to members
