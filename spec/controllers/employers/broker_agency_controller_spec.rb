@@ -64,6 +64,41 @@ RSpec.describe Employers::BrokerAgencyController do
         expect(assigns(:broker_agency_profiles)).to eq([@org2.broker_agency_profile])
       end
     end
+
+    context 'with search string and pagination' do
+      before :each do
+        sign_in(@user)
+        xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name, organization_page: 1, format: :js
+      end
+
+      it 'should return matching agency' do
+        expect(assigns(:broker_agency_profiles)).to eq([@org2.broker_agency_profile])
+      end
+    end
+
+    context 'with page label and pagination' do
+      before :each do
+        sign_in(@user)
+        xhr :get, :index, employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 1, format: :js
+      end
+
+      it 'should return matching agency' do
+        expect(assigns(:broker_agency_profiles).count).to eq 2
+        expect(assigns(:broker_agency_profiles)).to eq([@org1.broker_agency_profile,@org2.broker_agency_profile])
+      end
+    end
+
+    context 'with page label and invalid pagination number' do
+      before :each do
+        sign_in(@user)
+        xhr :get, :index, employer_profile_id: @employer_profile.id, page: @org2.broker_agency_profile.legal_name[0].upcase, organization_page: 120, format: :js
+      end
+      it 'should return matching agency' do
+        expect(assigns(:broker_agency_profiles).count).to eq 0
+        expect(assigns(:broker_agency_profiles)).to eq([])
+      end
+    end
+
   end
 
   describe ".create" do
