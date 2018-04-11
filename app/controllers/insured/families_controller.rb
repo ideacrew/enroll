@@ -150,7 +150,7 @@ class Insured::FamiliesController < FamiliesController
     if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
       plan_year = @person.active_employee_roles.first.employer_profile.active_plan_year
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-      trigger_notice_observer(@person.active_employee_roles.first, plan_year, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline, qle_event_on: @qle_date)
+      trigger_notice_observer(@person.active_employee_roles.first, plan_year, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
     end
   end
 

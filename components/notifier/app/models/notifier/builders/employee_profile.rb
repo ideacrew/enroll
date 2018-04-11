@@ -109,7 +109,7 @@ module Notifier
     end
 
     def qle_title
-      merge_model.qle.title = qle.blank? ? payload[:qle_title] : qle.title
+      merge_model.qle.title = qle.blank? ? payload['qle_title'] : qle.title
     end
 
     def qle_start_on
@@ -123,15 +123,18 @@ module Notifier
     end
 
     def qle_event_on
-      merge_model.qle.event_on = qle.blank? ? payload[:qle_event_on] : qle.event_on
+      return if qle.blank?
+      merge_model.qle.event_on = qle.event_on.blank? ? Date.strptime(payload['qle_event_on'], '%m/%d/%Y') : qle.event_on
     end
 
     def qle_reported_on
+      return if qle.blank?
       merge_model.qle.reported_on = qle.updated_at
     end
 
     def qle_reporting_deadline
-      merge_model.qle.reporting_deadline = qle.blank? ? payload[:qle_reporting_deadline] : qle.reporting_deadline
+      return if qle.blank? && payload['qle_reporting_deadline'].nil?
+      merge_model.qle.reporting_deadline = Date.strptime(payload['qle_reporting_deadline'], '%m/%d/%Y')
     end
   end
 end

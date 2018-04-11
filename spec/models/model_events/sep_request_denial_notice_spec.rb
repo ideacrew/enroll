@@ -10,6 +10,8 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)}
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop") }
   let(:sep) { FactoryGirl.create(:special_enrollment_period, family: person.primary_family, qualifying_life_event_kind_id: qle.id) }
+  let(:qle_reporting_deadline) {TimeKeeper.date_of_record}
+  let(:qle_event_on) { qle_reporting_deadline.next_day}
 
   describe "NoticeTrigger" do
     context "when employee matches er roster" do
@@ -20,7 +22,7 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
           expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
           expect(payload[:event_object_id]).to eq qle.id.to_s
         end
-        subject.trigger_notice(recipient: employee_role, event_object:qle, notice_event: "sep_request_denial_notice")
+        subject.trigger_notice(recipient: employee_role, event_object: qle, notice_event: "sep_request_denial_notice")
       end
     end
   end
@@ -49,7 +51,9 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload)   { {
         "event_object_kind" => "QualifyingLifeEventKind",
-        "event_object_id" => qle.id
+        "event_object_id" => qle.id,
+        "qle_event_on" => qle_event_on.to_s,
+        "qle_reporting_deadline" => qle_reporting_deadline.to_s
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
@@ -97,7 +101,7 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
       end
 
       it "should return qle_event_on" do
-        expect(merge_model.qle.event_on).to eq qle.event_on
+        expect(merge_model.qle.event_on).to eq  Date.strptime(payload['qle_event_on'], '%m/%d/%Y')
       end
     end
   end
