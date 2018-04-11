@@ -11,23 +11,23 @@ module BenefitSponsors
 
     def create
       # pundit can I do this here
-      @site = BenefitSponsors::Form::Site.for_create current_user, params[:site]
+      @site = BenefitSponsors::Forms::Site.new current_user, params[:site]
 
       if @site.save
-        redirect_to :index
+        redirect_to sites_path
       else
         render 'new'
       end
     end
 
     def edit
-      @site = BenefitSponsors::Form::Site.new current_user, params[:id]
+      @site = BenefitSponsors::Forms::Site.new current_user, id: params[:id]
     end
 
     def update
-      @site = BenefitSponsors::Site.new current_user, params[:site].merge(id: params[:id])
+      @site = BenefitSponsors::Forms::Site.new current_user, id: params[:id]
 
-      if @site.save
+      if @site.save params[:site]
         redirect_to :index
       else
         render 'edit'
