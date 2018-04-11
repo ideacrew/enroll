@@ -38,6 +38,7 @@ module BenefitSponsors
     end
 
     def edit
+      @agency= BenefitSponsors::Organizations::Forms::Profile.new(profile_type: profile_type)
       # Get Staff role person
       # @staff ||= staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
     end
@@ -50,7 +51,6 @@ module BenefitSponsors
           flash[:notice] = 'Employer successfully Updated.'
         else
           org_error_msg = @organization.errors.full_messages.join(",").humanize if @organization.errors.present?
-
           flash[:error] = "Employer information not saved. #{org_error_msg}."
         end
       else
