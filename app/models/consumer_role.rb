@@ -414,8 +414,6 @@ class ConsumerRole
     state :fully_verified
     state :verification_period_ended
 
-    before_all_events :ensure_validation_states
-
     event :import, :after => [:record_transition, :notify_of_eligibility_change, :update_all_verification_types] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
@@ -819,8 +817,9 @@ class ConsumerRole
   end
 
   def update_all_verification_types(*args)
-    person.verification_types.active.each do |v_type|
-      update_verification_type(v_type, "fully verified by curam/migration", lawful_presence_determination.try(:vlp_authority))
+    authority = (args.first && args.first[:authority]) ? args.first[:authority] : lawful_presence_determination.try(:vlp_authority)
+    verification_types.each do |v_type|
+      update_verification_type(v_type, "fully verified by curam", authority)
     end
   end
 
@@ -841,11 +840,12 @@ class ConsumerRole
       lawful_presence_determination.deny!(verification_attr(authority.first))
     end
     reject!(verification_attr(authority.first))
-    "#{v_type} was rejected."
+    "#{v_type.type_name} was rejected."
   end
 
   def update_verification_type(v_type, update_reason, *authority)
-    v_type.update_attributes(:validation_status => "valid", :update_reason => update_reason)
+    status = authority.first == "curam" ? "curam" : "verified"
+    v_type.update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
