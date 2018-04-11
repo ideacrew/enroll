@@ -29,6 +29,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         ethnicity:            ["any"]
     ))}
     let(:bcp) { double }
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
   before do
     allow(Person).to receive(:find).and_return(person)
@@ -40,8 +41,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     allow(person).to receive(:has_active_employee_role?).and_return true
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
-    allow(coverage_household).to receive(:household).and_return(household)
-    allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
+    allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+    allow(individual_market_transition).to receive(:role_type).and_return(nil)
   end
 
   context "GET new" do
