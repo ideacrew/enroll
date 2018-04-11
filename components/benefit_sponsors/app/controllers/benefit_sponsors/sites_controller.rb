@@ -50,9 +50,9 @@ module BenefitSponsors
     end
 
     def update
-      @site = BenefitSponsors::Site.new current_user, params[:site].merge(id: params[:id])
+      @site = BenefitSponsors::Forms::Site.new current_user, id: params[:id]
 
-      if @site.save
+      if @site.save params[:site]
         redirect_to :index
       else
         render 'edit'
