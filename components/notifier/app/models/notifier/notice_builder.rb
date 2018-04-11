@@ -156,6 +156,14 @@ module Notifier
       UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
     end
 
+    def send_generic_notice_alert_to_broker
+      if resource.is_a?(EmployerProfile) && resource.broker_agency_profile.present?
+        broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+        broker_email = resource.broker_agency_profile.primary_broker_role.email_address
+        UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+      end
+    end
+
     def store_paper_notice
       bucket_name= Settings.paper_notice
       notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
