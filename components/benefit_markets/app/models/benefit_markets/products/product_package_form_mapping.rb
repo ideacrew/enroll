@@ -66,11 +66,11 @@ module BenefitMarkets
       def build_object_using_factory(form)
         case form.benefit_option_kind.to_s
         when "issuer_health"
-          build_issuer_product_package(form)
+          build_product_package(form, issuer_id: form.issuer_id)
         when "metal_level_health"
-          build_metal_level_product_package(form)
+          build_product_package(form, metal_level: form.metal_level)
         else
-          build_vanilla_product_package(form)
+          build_product_package(form)
         end
       end
 
@@ -86,35 +86,14 @@ module BenefitMarkets
         ::BenefitMarkets::BenefitMarketCatalog.where(id: form.benefit_catalog_id).first
       end
 
-      def build_metal_level_product_package(form)
-        product_package_factory.build_metal_level_product_package(
-          form.benefit_option_kind,
-          benefit_catalog_for(form),
-          form.title,
-          contribution_model_for(form),
-          pricing_model_for(form),
-          form.metal_level
-        )
-      end
-
-      def build_issuer_product_package(form)
-        product_package_factory.build_issuer_product_package(
-          form.benefit_option_kind,
-          benefit_catalog_for(form),
-          form.title,
-          contribution_model_for(form),
-          pricing_model_for(form),
-          form.issuer_id
-        )
-      end
-
-      def build_vanilla_product_package(form)
-        product_package_factory.build_product_package(
-          form.benefit_option_kind,
-          benefit_catalog_for(form),
-          form.title,
-          contribution_model_for(form),
-          pricing_model_for(form)
+      def build_product_package(form, **other_options)
+        product_package_factory.call(
+          benefit_option_kind: form.benefit_option_kind,
+          benefit_catalog: benefit_catalog_for(form),
+          title: form.title,
+          contribution_model: contribution_model_for(form),
+          pricing_model: pricing_model_for(form),
+          **other_options
         )
       end
     end
