@@ -51,6 +51,28 @@
                 <% end %>
               </div>
             </div>
+          <% elsif can_shop_both_individual_markets(@person) %>
+            <div id="market_kinds" class='row no-buffer'>
+                <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
+              <span class="clear" style="display: il"></span>
+
+              <div class="n-radio-group">
+                <% Plan::INDIVIDUAL_MARKET_KINDS.each_with_index do |kind, index| %>
+                  <div class="n-radio-row">
+                    <label class="n-radio" for="market_kind_<%= kind %>">
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind), disabled: is_market_kind_disabled?(kind) %>
+                      <span class="n-radio">
+                      </span>
+                      <% if kind=="shop" %>
+                        <%= l10n("insured.group_selection.new.employee_sponsored_benifits") %>
+                      <% else %>
+                        <%= l10n("insured.group_selection.new.individual_benifits") %>
+                      <% end %>
+                    </label>
+                  </div>
+                <% end %>
+              </div>
+            </div>
           <% elsif can_shop_shop?(@person) %>
 	           <%= hidden_field_tag 'market_kind', 'shop' %>
 	        <% elsif can_shop_individual?(@person) && !can_shop_resident?(@person) %>

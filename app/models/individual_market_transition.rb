@@ -38,9 +38,8 @@ class IndividualMarketTransition
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
-  #TODO set the id of the admin who is making the transition before saving
   def set_submitted_by
-
+    self.user_id ||= current_user.id
   end
 
   def self.all
