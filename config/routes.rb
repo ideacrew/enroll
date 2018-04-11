@@ -119,11 +119,9 @@ Rails.application.routes.draw do
         get :terminate_enrollment
         post :update_terminate_enrollment
         post :add_new_sep
-        post :add_new_pdc
         get :update_effective_date
         get :calculate_sep_dates
         get :add_sep_form
-        get :pdc_type
         get :hide_form
         get :show_sep_history
         get :calendar_index
@@ -138,6 +136,7 @@ Rails.application.routes.draw do
         post :create_benefit_application
         get :edit_fein
         post :update_fein
+        get :create_eligibility
       end
 
       member do
@@ -558,6 +557,7 @@ Rails.application.routes.draw do
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
+  match "hbx_profiles/update_tax_household_eligibility" => "exchanges/hbx_profiles#update_tax_household_eligibility", as: :update_tax_household_eligibility, via: [:post], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection

@@ -555,6 +555,55 @@ def employer_poc
     end
   end
 
+  def create_eligibility
+    # authorize  Family, :can_add_pdc?
+    @element_to_replace_id = params[:family_actions_id]
+    @person = Person.find(params[:person_id])
+
+    respond_to do |format|
+      format.js { render "create_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
+    end
+  end
+
+  def update_tax_household_eligibility
+    @element_to_replace_id = params[:person][:family_actions_id]
+    @person = Person.find(params[:person][:person_id])
+    @primary_family = @person.primary_family
+    effective_date = params[:person][:effective_date].to_date
+    slcsp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
+    @active_household = @primary_family.active_household
+    @active_household.build_thh_and_eligibility(params[:person][:max_aptc], params[:person][:csr], effective_date, slcsp, params[:person][:reason])
+    update_eligibility_kinds
+  end
+
+  def update_eligibility_kinds
+    @family_members = @primary_family.family_members
+    primary_family_member = @family_members.where(person_id: @person.id).first
+    @latest_active_thh = @active_household.latest_active_thh
+    @tax_household_members = @latest_active_thh.tax_household_members
+    tax_household_member = @tax_household_members.where(applicant_id: primary_family_member.id).first
+    return unless @latest_active_thh.present?
+
+    primary_family_eligibility_kinds_hash = eligibility_kinds_hash({'pdc_type' => params[:person][:pdc_type]})
+    tax_household_member.update_eligibility_kinds(primary_family_eligibility_kinds_hash)
+    return unless params[:person][:dependents].present?
+
+    params[:person][:dependents].each do |dependent_hbx_id, value|
+      dependent = Person.by_hbx_id(dependent_hbx_id).first
+      family_member = @family_members.where(person_id: dependent.id).first
+      tax_household_member = @tax_household_members.where(applicant_id: family_member.id).first
+      tax_household_member.update_eligibility_kinds(eligibility_kinds_hash(value))
+    end
+  end
+
+  def eligibility_kinds_hash(value)
+    if value['pdc_type'] == 'is_medicaid_chip_eligible'
+      { is_medicaid_chip_eligible: true, is_ia_eligible: false }.with_indifferent_access
+    elsif value['pdc_type'] == 'is_ia_eligible'
+      { is_ia_eligible: true, is_medicaid_chip_eligible: false }.with_indifferent_access
+    end
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show

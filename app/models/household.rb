@@ -227,7 +227,7 @@ class Household
     tax_households.tax_household_with_year(year).active_tax_household
   end
 
-  def build_thh_and_eligibility(max_aptc, csr, date, slcsp)
+  def build_thh_and_eligibility(max_aptc, csr, date, slcsp, reason = nil)
     th = tax_households.build(
         allocated_aptc: 0.0,
         effective_starting_on: Date.new(date.year, date.month, date.day),
@@ -239,6 +239,7 @@ class Household
         family_member: family.primary_family_member,
         is_subscriber: true,
         is_ia_eligible: true,
+        reason: reason
     )
 
     deter = th.eligibility_determinations.build(
