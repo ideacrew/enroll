@@ -9,7 +9,8 @@ module BenefitMarkets
       attr_accessor :pricing_model_id
       attr_accessor :benefit_catalog_id
       attr_accessor :benefit_option_kind
-      attr_accessor :product_package_factory
+      
+      attr_accessor :form_mapping
 
       attr_reader :show_page_model
 
@@ -20,20 +21,22 @@ module BenefitMarkets
       validates_inclusion_of :benefit_option_kind, :in => :allowed_benefit_option_kinds, :allow_blank => false
 
       def allowed_benefit_option_kinds
-        product_package_factory.allowed_benefit_option_kinds
+        form_mapping.benefit_option_kinds
       end
 
       def self.for_new(current_user, benefit_option_kind)
         resolve_form_subclass(benefit_option_kind).new(
           :benefit_option_kind => benefit_option_kind,
-          :product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory
+          :form_mapping => ::BenefitMarkets::Products::ProductPackageFormMapping.new
         )
       end
 
       def self.for_create(current_user, opts)
         benefit_option_kind = opts.require(:benefit_option_kind)
         resolve_form_subclass(benefit_option_kind).new(
-          opts.merge({:product_package_factory => ::BenefitMarkets::Products::ProductPackageFactory
+          opts.merge({
+            :form_mapping => ::BenefitMarkets::Products::ProductPackageFormMapping.new
+          })
         )
       end
 
@@ -44,31 +47,15 @@ module BenefitMarkets
       end
 
       def available_pricing_models
-        product_package_factory.available_pricing_models.map do |pm|
-          [pm.name, pm.id]
-        end
+        form_mapping.options_for_pricing_model_id
       end
 
       def available_benefit_catalogs
-        product_package_factory.available_benefit_catalogs.map do |bc|
-          [bc.title, bc.id]
-        end
+        form_mapping.options_for_benefit_catalog_id
       end
 
       def available_contribution_models
-        product_package_factory.available_contribution_models.map do |pm|
-          [pm.name, pm.id]
-        end
-      end
-
-      def build_object_using_factory
-        product_package_factory.build_product_package(
-          benefit_option_kind,
-          benefit_catalog_id,
-          title,
-          contribution_model_id,
-          pricing_model_id
-        )
+        form_mapping.options_for_contribution_model_id
       end
 
       def has_additional_attributes?
@@ -77,9 +64,10 @@ module BenefitMarkets
 
       def save
         return false unless self.valid?
-        factory_object = build_object_using_factory
-        @show_page_model = factory_object
-        product_package_factory.persist(factory_object, self)
+        save_result, persisted_object = form_mapping.save(self)
+        return false unless save_result
+        @show_page_model = persisted_object
+        true
       end
     end
   end
