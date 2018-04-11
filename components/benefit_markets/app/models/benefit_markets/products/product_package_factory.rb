@@ -1,26 +1,8 @@
 module BenefitMarkets
   module Products
     class ProductPackageFactory
-      def self.build_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model)
-        select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog, title, contribution_model, pricing_model)
-        )
-      end
-
-      def self.build_issuer_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, issuer_id)
-        select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog, title, contribution_model, pricing_model).merge({
-            issuer_id: issuer_id
-          })
-        )
-      end
-
-      def self.build_metal_level_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, metal_level)
-        select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog, title, contribution_model, pricing_model).merge({
-            metal_level: metal_level
-          })
-        )
+      def self.call(benefit_option_kind:, benefit_catalog:, title:, contribution_model:, pricing_model:, **other_params)
+        build_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, other_params)
       end
 
       def self.validate(product_package)
@@ -31,6 +13,12 @@ module BenefitMarkets
       end
 
       protected
+
+      def self.build_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, other_params = {})
+        select_model_subclass(benefit_option_kind).new(
+          build_shared_params(benefit_catalog, title, contribution_model, pricing_model).merge(other_params)
+        )
+      end
 
       def self.select_model_subclass(benefit_option_kind)
         ::BenefitMarkets::Products::ProductPackage.subclass_for(benefit_option_kind)
