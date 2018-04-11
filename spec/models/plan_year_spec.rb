@@ -2613,18 +2613,6 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
   end
 end
 
-describe PlanYear, '.update_announced_externally' do
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
-  let!(:plan_year) { employer_profile.published_plan_year }
-
-  context 'should update announced_externally field' do
-    it "should set to true" do
-      plan_year.update_announced_externally
-      expect(plan_year.announced_externally).to eq true
-    end
-  end
-end
-
 describe "notify_employer_py_cancellation" do
   context "notify employer plan year cancellation " do
     let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active',announced_externally:true)}

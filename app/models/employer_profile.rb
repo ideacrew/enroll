@@ -926,11 +926,8 @@ class EmployerProfile
       }).each do |org|
 
       employer_profile = org.employer_profile
-      if employer_profile.is_renewal_transmission_eligible?
-        employer_profile.transmit_renewal_eligible_event
-        employer_profile.renewing_plan_year.update_announced_externally
-      end
-      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop? 
+      employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
+      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
     end
 
     employer_collection.where(:"employer_profile.plan_years" => {
@@ -938,7 +935,6 @@ class EmployerProfile
       }, :"employer_profile.aasm_state".in => ['binder_paid']).each do |org|
 
       org.employer_profile.transmit_initial_eligible_event
-      org.employer_profile.published_plan_year.update_announced_externally
     end
   end
 
