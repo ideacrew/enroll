@@ -183,6 +183,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
+          trigger_notice_observer(@organization.employer_profile, @organization.employer_profile,"notify_employer_for_account_creation")
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end

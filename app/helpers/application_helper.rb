@@ -546,6 +546,11 @@ module ApplicationHelper
     end
   end
 
+  def trigger_notice_observer(recipient, event_object, notice_event)
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
+  end
+
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
