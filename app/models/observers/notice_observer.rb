@@ -30,7 +30,7 @@ module Observers
 
           plan_year.employer_profile.census_employees.non_terminated.each do |ce|
             if ce.employee_role.present?
-              trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
+              trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "dc_employee_renewal_employer_ineligibility_notice")
             end
           end
         end
