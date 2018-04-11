@@ -1,23 +1,23 @@
 module BenefitMarkets
   module Products
     class ProductPackageFactory
-      def self.build_product_package(benefit_option_kind, benefit_catalog_id, title, contribution_model_id, pricing_model_id)
+      def self.build_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model)
         select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id)
+          build_shared_params(benefit_catalog, title, contribution_model, pricing_model)
         )
       end
 
-      def self.build_issuer_product_package(benefit_option_kind, benefit_catalog_id, title, contribution_model_id, pricing_model_id, issuer_id)
+      def self.build_issuer_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, issuer_id)
         select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id).merge({
+          build_shared_params(benefit_catalog, title, contribution_model, pricing_model).merge({
             issuer_id: issuer_id
           })
         )
       end
 
-      def self.build_metal_level_product_package(benefit_option_kind, benefit_catalog_id, title, contribution_model_id, pricing_model_id, metal_level)
+      def self.build_metal_level_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, metal_level)
         select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id).merge({
+          build_shared_params(benefit_catalog, title, contribution_model, pricing_model).merge({
             metal_level: metal_level
           })
         )
@@ -36,22 +36,18 @@ module BenefitMarkets
         ::BenefitMarkets::Products::ProductPackage.subclass_for(benefit_option_kind)
       end
 
-      def self.build_shared_params(benefit_catalog_id, title, contribution_model_id, pricing_model_id)
+      def self.build_shared_params(benefit_catalog, title, contribution_model, pricing_model)
         {
-          benefit_catalog_id: benefit_catalog_id,
+          benefit_catalog: benefit_catalog,
           title: title,
-          contribution_model_id: contribution_model_id,
-          pricing_model_id: pricing_model_id
+          contribution_model: contribution_model,
+          pricing_model: pricing_model
         }
       end
 
       def self.is_pricing_model_satisfied?(product_package)
-        return true if product_package.pricing_model_id.blank?
-        pricing_model = ::BenefitMarkets::PricingModels::PricingModel.where({:id => product_package.pricing_model_id}).first
-        if pricing_model.nil?
-          product_package.errors.add(:pricing_model_id, "does not exist")
-          return false
-        end
+        pricing_model = product_package.pricing_model
+        return true if pricing_model.nil?
         unless pricing_model.product_multiplicities.include?(product_package.product_multiplicity)
           product_package.errors.add(:pricing_model_id, "does not match the multiplicity of the product package")
           return false
@@ -60,12 +56,8 @@ module BenefitMarkets
       end
 
       def self.is_contribution_model_satisfied?(product_package)
-        return true if product_package.contribution_model_id.blank?
-        contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where({:id => product_package.contribution_model_id}).first
-        if contribution_model.nil?
-          product_package.errors.add(:contribution_model_id, "does not exist")
-          return false
-        end
+        contribution_model = product_package.contribution_model
+        return true if product_package.contribution_model.nil?
         unless contribution_model.product_multiplicities.include?(product_package.product_multiplicity)
           product_package.errors.add(:contribution_model_id, "does not match the multiplicity of the product package")
           return false
