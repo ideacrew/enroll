@@ -5,6 +5,10 @@ module BenefitMarkets
         def all_products
           super().where("coverage_kind" => "health")
         end
+
+        def default_product_multiplicity
+          :single
+        end
       end
     end
   end

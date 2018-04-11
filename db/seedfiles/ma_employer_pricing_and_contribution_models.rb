@@ -115,6 +115,7 @@ composite_employer_member_relationships = [
 ]
 
 pricing_model = BenefitMarkets::PricingModels::PricingModel.create!(
+  :product_multiplicities => [:single],
   :price_calculator_kind => "::BenefitSponsors::PricingCalculators::CcaCompositeTieredPriceCalculator",
   :pricing_units => composite_employer_pricing_units,
   :member_relationships => composite_employer_member_relationships,
@@ -184,6 +185,7 @@ composite_employer_contribution_units = [
 
 # Composite Contribution Models
 composite_contribution_model = BenefitMarkets::ContributionModels::ContributionModel.create!({
+  product_multiplicities: [:single],
   sponsor_contribution_kind: "::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution",
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::TieredPercentContributionCalculator",
   contribution_units: composite_employer_contribution_units,

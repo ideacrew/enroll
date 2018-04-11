@@ -52,14 +52,22 @@ module BenefitMarkets
           product_package.errors.add(:pricing_model_id, "does not exist")
           return false
         end
+        unless pricing_model.product_multiplicities.include?(product_package.product_multiplicity)
+          product_package.errors.add(:pricing_model_id, "does not match the multiplicity of the product package")
+          return false
+        end
         true
       end
 
       def self.is_contribution_model_satisfied?(product_package)
         return true if product_package.contribution_model_id.blank?
-        pricing_model = ::BenefitMarkets::ContributionModels::ContributionModel.where({:id => product_package.contribution_model_id}).first
-        if pricing_model.nil?
+        contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where({:id => product_package.contribution_model_id}).first
+        if contribution_model.nil?
           product_package.errors.add(:contribution_model_id, "does not exist")
+          return false
+        end
+        unless contribution_model.product_multiplicities.include?(product_package.product_multiplicity)
+          product_package.errors.add(:contribution_model_id, "does not match the multiplicity of the product package")
           return false
         end
         true

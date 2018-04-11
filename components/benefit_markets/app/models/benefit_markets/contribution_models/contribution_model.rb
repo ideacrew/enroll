@@ -15,6 +15,11 @@ module BenefitMarkets
       # under our profiles
       field :contribution_calculator_kind, type: String
 
+      # Indicates the set of product multiplicities that are compatible
+      # with this contribution model.  Should be some subset of 
+      # :multiple, :single. 
+      field :product_multiplicities, type: Array, default: [:multiple, :single]
+
       embeds_many :contribution_units, class_name: "::BenefitMarkets::ContributionModels::ContributionUnit"
       embeds_many :member_relationships, class_name: "::BenefitMarkets::ContributionModels::MemberRelationship"
 
@@ -23,6 +28,7 @@ module BenefitMarkets
       validates_presence_of :contribution_calculator_kind, :allow_blank => false
       validates_presence_of :member_relationships
       validates_presence_of :name, :allow_blank => false
+      validates_presence_of :product_multiplicities, :allow_blank => false
 
       def contribution_calculator
         @contribution_calculator ||= contribution_calculator_kind.constantize.new

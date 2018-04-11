@@ -11,6 +11,10 @@ module BenefitMarkets
       # without an explicit dependency.
       field :price_calculator_kind, type: String
 
+      # Indicates the allowed multiplicity of products which may function with
+      # this pricing model.  Should be some subset of :multiple and :single
+      field :product_multiplicities, type: Array, default: [:multiple, :single]
+
       embeds_many :member_relationships, class_name: "::BenefitMarkets::PricingModels::MemberRelationship"
       embeds_many :pricing_units, class_name: "::BenefitMarkets::PricingModels::PricingUnit"
 
@@ -18,6 +22,7 @@ module BenefitMarkets
       validates_presence_of :member_relationships
       validates_presence_of :price_calculator_kind, :allow_blank => false
       validates_presence_of :name, :allow_blank => false
+      validates_presence_of :product_multiplicities, :allow_blank => false
 
       def pricing_calculator
         @pricing_calculator ||= price_calculator_kind.constantize.new
