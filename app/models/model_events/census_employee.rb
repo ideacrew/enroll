@@ -9,8 +9,8 @@ module ModelEvents
     ]
 
     def notify_on_save
-      if is_transition_matching?(to: :employment_terminated, from: [:eligible, :employee_role_linked, :employee_termination_pending, :newly_designated_eligible, :newly_designated_linked], event: :terminate_employee_role)
-         is_employee_notice_for_employee_terminated_from_roster = true
+      if is_transition_matching?(to: [:employment_terminated, :employee_termination_pending], from: [:eligible, :employee_role_linked, :newly_designated_eligible, :newly_designated_linked], event: [:terminate_employee_role, :schedule_employee_termination])
+        is_employee_notice_for_employee_terminated_from_roster = true
       end
     end
 
