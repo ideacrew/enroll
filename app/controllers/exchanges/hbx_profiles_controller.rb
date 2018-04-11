@@ -453,19 +453,15 @@ def employer_poc
   end
 
   def update_eligibility_kinds
-    @family_members = @primary_family.family_members
-    primary_family_member = @family_members.where(person_id: @person.id).first
-    @latest_active_thh = @active_household.latest_active_thh
-    @tax_household_members = @latest_active_thh.tax_household_members
-    tax_household_member = @tax_household_members.where(applicant_id: primary_family_member.id).first
-    return unless @latest_active_thh.present?
-    primary_family_eligibility_kinds_hash = eligibility_kinds_hash({ 'pdc_type' => params[:person][:pdc_type] })
-    tax_household_member.update_eligibility_kinds(primary_family_eligibility_kinds_hash)
-    if params[:person][:dependents].present?
-      params[:person][:dependents].each do |dependent_hbx_id, value|
-        dependent = Person.by_hbx_id(dependent_hbx_id).first
-        family_member = @family_members.where(person_id: dependent.id).first
-        tax_household_member = @tax_household_members.where(applicant_id: family_member.id).first
+    family_members = @primary_family.family_members
+    latest_active_thh = @active_household.latest_active_thh
+    tax_household_members = latest_active_thh.tax_household_members
+    return unless latest_active_thh.present?
+    if params[:person][:family_members].present?
+       params[:person][:family_members].each do |person_hbx_id, value|
+        person = Person.by_hbx_id(person_hbx_id).first
+        family_member = family_members.where(person_id: person.id).first
+        tax_household_member = tax_household_members.where(applicant_id: family_member.id).first
         tax_household_member.update_eligibility_kinds(eligibility_kinds_hash(value))
       end
     end

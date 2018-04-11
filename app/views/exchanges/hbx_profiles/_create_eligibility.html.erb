@@ -42,15 +42,7 @@
             <td><h5><%= family_member.person.dob %> </h5></td>
             <td><h5><%= family_member.person.hbx_id %></h5></tb>
             <td><%= active_enrollments?(@person) %></td>
-            <td>
-              <% if family_member.is_primary_applicant %>
-                <%= select_tag "person[pdc_type]",
-                    options_for_select(TaxHouseholdMember::PDC_TYPES) %>
-              <% else %>
-                 <%= select_tag "person[dependents][#{family_member.person.hbx_id}][pdc_type]",
-                    options_for_select(TaxHouseholdMember::PDC_TYPES) %>
-              <% end %>
-            </td>
+            <td><%= select_tag "person[family_members][#{family_member.person.hbx_id}][pdc_type]",options_for_select(TaxHouseholdMember::PDC_TYPES) %></td>
             <td><%= text_field_tag 'person[reason]', nil, class: "required input_txt" %></td>
           </tr>
         <% end %>
