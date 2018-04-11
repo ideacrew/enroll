@@ -303,9 +303,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def check_consumer_role
     set_current_person(required: false)
     # need this check for cover all
-    if @person.try(:has_active_resident_role?)
+    if @person.try(:is_resident_role_active?)
       redirect_to @person.resident_role.bookmark_url || family_account_path
-    elsif @person.try(:has_active_consumer_role?)
+    elsif @person.try(:is_consumer_role_active?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
@@ -320,6 +320,7 @@ class Insured::ConsumerRolesController < ApplicationController
     transition.submitted_at = TimeKeeper.datetime_of_record
     transition.reason_code = "generating_consumer_role"
     transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.user_id = current_user.id
     User.find(params[:person][:user_id]).person.individual_market_transitions << transition
   end
 
