@@ -96,7 +96,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/b').click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "01002"
@@ -210,11 +210,11 @@ And(/^.+ should see the status of Cobra Linked$/) do
 end
 
 And(/^.+ should see the status of Employee Role Linked$/) do
-  expect(page).to have_content('Employee role linked')
+  expect(page).to have_content('Account Linked')
 end
 
 And(/^.+ should see the status of eligible$/) do
-  expect(page).to have_content('Eligible')
+  expect(page).to have_content('eligible')
 end
 
 Then(/^Jack Cobra should see the receipt page and verify employer contribution for cobra employee$/) do
@@ -361,8 +361,9 @@ Then(/^.+ should not see individual on enrollment title/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -389,7 +390,7 @@ And(/^.+ should be able to enter sole source plan year, benefits, relationship b
   wait_for_ajax
 
   find('.reference-plans label').click
-  
+
   wait_for_ajax
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][0][employer_contribution_percent]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50

@@ -73,7 +73,7 @@ module Forms
           :entity_kind => entity_kind,
           :contact_method => contact_method,
           :sic_code => sic_code,
-          :employer_attestation => ::EmployerAttestation.new()
+          :employer_attestation => ::EmployerAttestation.new(),
         }),
         :office_locations => office_locations
       )

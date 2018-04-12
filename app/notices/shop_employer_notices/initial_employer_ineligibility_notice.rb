@@ -20,7 +20,7 @@ class ShopEmployerNotices::InitialEmployerIneligibilityNotice < ShopEmployerNoti
     if plan_year
       if plan_year.enrollment_errors.key?(:enrollment_ratio)
         plan_year_warnings << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
-      end     
+      end
       plan_year_warnings << "One non-owner employee enrolled in health coverage" if plan_year.enrollment_errors.key?(:non_business_owner_enrollment_count)
     end
 

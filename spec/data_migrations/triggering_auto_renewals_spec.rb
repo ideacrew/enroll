@@ -21,8 +21,8 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
       :open_enrollment_start_on => Date.new(2015,10,1), :open_enrollment_end_on => Date.new(2015, 11, 10), fte_count: 37
       renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolling, :created_at => Date.new(2016,9,1), :start_on => Date.new(2016,12,1), :end_on => Date.new(2017,11,30),
       :open_enrollment_start_on => Date.new(2016,10,12), :open_enrollment_end_on => Date.new(2016, 11, 13), fte_count: 37
-      benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
-      renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
+      benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year
+      renewing_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year
       1.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce|
         ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
@@ -66,14 +66,19 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
     context "triggering a new enrollment" do
 
       it "should trigger a auto-renewing enrollment by deleting the waived one", dbclean: :after_each do
-        enrollments = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household.hbx_enrollments.where(aasm_state: "renewing_waived")
-        expect(enrollments.size).to eq 1
-        expect(organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household.hbx_enrollments.size).to eq 2
+        census_employee = organization.employer_profile.census_employees.first
+        employee_role = census_employee.employee_role
+        household = employee_role.person.primary_family.active_household
+
+        enrollments = household.hbx_enrollments.where(aasm_state: "renewing_waived")
+        expect(enrollments.by_coverage_kind('health').size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
         subject.migrate
-        organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household.reload
-        expect(organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household.hbx_enrollments.where(aasm_state: "renewing_waived").size).to eq 0
-        expect(organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household.hbx_enrollments.where(aasm_state: "auto_renewing").size).to eq 1
-        expect(organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household.hbx_enrollments.size).to eq 2
+        household.reload
+
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "renewing_waived").size).to eq 0
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "auto_renewing").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
       end
     end
   end

@@ -1,0 +1,2 @@
+family.id,policy.id,policy.subscriber.coverage_start_on,policy.aasm_state,policy.plan.coverage_kind,policy.plan.metal_level,policy.plan.plan_name,policy.subscriber.person.hbx_id,policy.subscriber.person.is_incarcerated,policy.subscriber.person.citizen_status,policy.subscriber.person.is_dc_resident?,is_dependent
+5670ca78faca144f3b00007b,716826,3/1/17,coverage_selected,dental,dental,BESTOne Plus Silver,39587345,FALSE,lawful_permanent_resident,TRUE,FALSE

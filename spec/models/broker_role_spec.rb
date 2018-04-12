@@ -74,6 +74,37 @@ describe BrokerRole, dbclean: :after_each do
       end
     end
 
+    context "assign to employer" do
+      let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: "active") }
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, aasm_state: "is_approved", primary_broker_role: broker_role)}
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, aasm_state: "registered") }
+      let!(:organization) { employer_profile.organization }
+      let(:person) { FactoryGirl.create(:person)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
+
+      before :each do
+        employer_profile.broker_agency_accounts.create(broker_agency_profile: broker_agency_profile, writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
+        employer_profile.hire_general_agency(general_agency_profile, broker_role.id, start_on = TimeKeeper.datetime_of_record)
+        employer_profile.save!
+        family.hire_broker_agency(broker_role.id)
+      end
+
+      it "should have employer" do
+        expect(employer_profile.active_broker.id).to eq broker_role.person.id
+      end
+
+      it "should remove broker from GA, Employer, and families when decertified" do
+        expect(employer_profile.active_broker.id).to eq broker_role.person.id
+        expect(employer_profile.active_general_agency_account.aasm_state).to eq "active"
+        expect(family.current_broker_agency).to be_truthy
+        broker_role.decertify!
+        expect(EmployerProfile.find(employer_profile.id).active_broker).to eq nil
+        expect(EmployerProfile.find(employer_profile.id).active_general_agency_account).to eq nil
+        expect(Family.find(family.id).current_broker_agency).to eq nil
+      end
+    end
+
     context "with duplicate npn number" do
       let(:params) {valid_params}
 
@@ -214,7 +245,7 @@ describe BrokerRole, dbclean: :after_each do
   end
 
   describe BrokerRole, '.find_by_broker_agency_profile', :dbclean => :after_each do
-    before :each do 
+    before :each do
       @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
 
@@ -240,7 +271,7 @@ describe BrokerRole, dbclean: :after_each do
 
   # Instance methods
   describe BrokerRole, :dbclean => :around_each do
-    before :all do 
+    before :all do
       @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
 
@@ -275,7 +306,8 @@ describe BrokerRole, dbclean: :after_each do
         expect(b1.email.kind).to eq('work')
       end
     end
-    context '#phone returns broker work phone or agency office phone' do
+    context '#phone returns broker office phone or agency office phone or work phone' do
+      # broker will not be able to add any work phone.
       person0= FactoryGirl.create(:person)
       provider_kind = 'broker'
 
@@ -283,11 +315,19 @@ describe BrokerRole, dbclean: :after_each do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
         expect(b1.phone.to_s).to eq b1.broker_agency_profile.phone
       end
-      it 'should return broker person work phone' do
+      it 'should return main office phone' do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
+        person0.phones[1].update_attributes!(kind: 'phone main')
+        expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
+        expect(b1.phone.to_s).to eq person0.phones.where(kind: "phone main").first.to_s
+      end
+
+      it 'should return work phone if office phone & broker agency profile phone not present' do
+        b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
+        allow(b1.broker_agency_profile).to receive(:phone).and_return nil
         person0.phones[1].update_attributes!(kind: 'work')
         expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
-        expect(b1.phone.to_s).to eq person0.phones[1].to_s
+        expect(b1.phone.to_s).to eq person0.phones.where(kind: "work").first.to_s
       end
     end
   end

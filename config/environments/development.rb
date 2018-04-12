@@ -47,6 +47,9 @@ Rails.application.configure do
     :port => 3000
   }
 
+  #Queue adapter 
+  config.active_job.queue_adapter = :resque
+
   HbxIdGenerator.slug!
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"

@@ -63,6 +63,48 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
 
+    # Some times Effective dates vary even for the next day. So creating a new SEP & re-calculating effective on dates
+    context "with sep_id in params" do
+
+      let(:sep) { FactoryGirl.create :special_enrollment_period, family: test_family }
+      let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
+
+      before :each do
+        allow(person).to receive(:broker_role).and_return(nil)
+        allow(user).to receive(:person).and_return(person)
+        sign_in(user)
+        allow(controller.request).to receive(:referer).and_return(nil)
+      end
+
+      it "should not duplicate sep if using current sep on same day" do
+        get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+        expect(assigns(:sep)).to eq sep
+      end
+
+      context "when using old active sep" do
+
+        before do
+          sep.update_attributes(submitted_at: TimeKeeper.datetime_of_record - 1.day)
+        end
+
+        it "should not get assign with old sep" do
+          get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+          expect(assigns(:sep)).not_to eq sep
+        end
+
+        it "should duplicate sep" do
+          allow(controller).to receive(:duplicate_sep).and_return dup_sep
+          get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+          expect(assigns(:sep)).to eq dup_sep
+        end
+
+        it "should have the today's date as submitted_at" do
+          get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+          expect(assigns(:sep).submitted_at.to_date).to eq TimeKeeper.date_of_record
+        end
+      end
+    end
+
     it "with qle_id" do
       allow(person).to receive(:primary_family).and_return(test_family)
       allow(person).to receive(:broker_role).and_return(nil)
@@ -218,7 +260,8 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: 'true') }
+    let(:family_member) { double }
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }

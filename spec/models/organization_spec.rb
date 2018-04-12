@@ -283,11 +283,13 @@ RSpec.describe Organization, dbclean: :after_each do
         end
       end
 
-      context 'by_broker_agency_profile' do
-        let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-        let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "shop", primary_broker_role_id: "8754985")}
-        let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-        let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "shop", primary_broker_role_id: "7754985")}
+      context 'by_broker_agency_profile', dbclean: :after_each do
+        let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585", legal_name: "organization 6")}
+        let(:broker_role6) { FactoryGirl.create(:broker_role)}
+        let!(:broker_agency_profile)  {FactoryGirl.create(:broker_agency_profile, organization: organization6, primary_broker_role_id: broker_role6.id)}
+        let!(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", legal_name: "organization 7")}
+        let!(:broker_agency_profile7)  {FactoryGirl.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
+        let(:broker_role7) { FactoryGirl.create(:broker_role)}
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
@@ -456,6 +458,25 @@ RSpec.describe Organization, dbclean: :after_each do
     it "should save success with one primary office_location" do
       organization.office_locations = [office_location]
       expect(organization.save).to eq true
+    end
+  end
+
+  context "primary_mailing_address" do
+    let!(:organization) {FactoryGirl.build(:organization)}
+    let!(:office_location) {FactoryGirl.build(:office_location, :with_mailing_address)}
+
+    before :each do
+      organization.office_locations = [office_location]
+      organization.primary_mailing_address
+    end
+
+    it 'should return a valid primary_mailing_address for organization' do
+      expect(organization.primary_mailing_address).to eq office_location.address
+      expect(organization.primary_mailing_address.kind).to eq "mailing"
+    end
+
+    it "should not return an invalid address" do
+      expect(organization.primary_mailing_address.kind).not_to eq "branch"
     end
   end
 

@@ -245,7 +245,9 @@
         <br>
         <p><%= l10n("broker_agencies.quotes.actual_costs_may_vary")%></p>
           <%= render :partial => "quote_publish_button" , :locals => { :quote => @q } %>
-        <h4> <%= l10n("employer_claim_code")%>: &nbsp;<b><%=@q.claim_code%></b></h4>
+        <% if @q.published? %>
+          <h4> <%= l10n("employer_claim_code")%>: &nbsp;<b><%=@q.claim_code%></b></h4>
+        <% end %>
         <br>
         <%= link_to "#{l10n('download_pdf')}" , publish_broker_agencies_broker_role_quotes_path(@broker,quote_id: @q.id, :format => "pdf"), class: "btn btn-default" , :target => "_blank " %> <br><br>
       </div>

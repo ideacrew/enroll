@@ -14,25 +14,29 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
   end
 
   def update_verification_type(person, v_type)
-    if v_type == "Social Security Number"
-      person.consumer_role.update_attributes(:ssn_validation => "valid",
-                                              :ssn_update_reason => "data_fix_hub_response")
-    elsif v_type == "American Indian Status"
-      person.consumer_role.update_attributes(:native_validation => "valid",
-                                              :native_update_reason => "data_fix_hub_response")
-    else
-      person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr)
-      person.consumer_role.update_attributes(:lawful_presence_update_reason =>
-                                                  {:v_type => v_type,
-                                                   :update_reason => "data_fix_hub_response"
-                                                  } )
+    case v_type
+      when "Social Security Number"
+        person.consumer_role.update_attributes(:ssn_validation => "valid",
+                                               :ssn_update_reason => "data_fix_hub_response")
+      when "American Indian Status"
+        person.consumer_role.update_attributes(:native_validation => "valid",
+                                               :native_update_reason => "data_fix_hub_response")
+      when "DC Residency"
+        # handle local residency
+      else
+        person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr)
+        person.consumer_role.update_attributes(:lawful_presence_update_reason =>
+                                                   {:v_type => v_type,
+                                                    :update_reason => "data_fix_hub_response"
+                                                   } )
     end
-    if person.all_types_verified?
+
+    if person.all_types_verified? && !person.consumer_role.fully_verified?
       begin
         person.consumer_role.verify_ivl_by_admin
         puts "Person state verified person: #{person.id}" unless Rails.env.test?
       rescue => e
-        puts "Issue migrating person #{person.id}"
+        puts "Issue migrating person #{person.id}" unless Rails.env.test?
       end
     end
   end
@@ -77,7 +81,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
     Person.where({'$or' => [
         {"consumer_role.aasm_state"=>"verification_outstanding"},
         {'$and' => [
-            {"consumer_role.aasm_state"=>"fully_verified"},
+            {"consumer_role.aasm_state"=>{'$in' => ["fully_verified", "sci_verified"]}},
             { '$or' => [
                 {"consumer_role.lawful_presence_determination.ssa_responses" => {'$exists' => true}},
                 {"consumer_role.lawful_presence_determination.vlp_responses" => {'$exists' => true}}

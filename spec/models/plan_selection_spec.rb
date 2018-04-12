@@ -106,4 +106,15 @@ describe PlanSelection do
       end
     end
   end
+  
+  describe ".select_plan_and_deactivate_other_enrollments" do
+
+    context 'hbx_enrollment aasm state check' do
+      it 'should set eligibility dates to that of the previous enrollment' do
+        subject.hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).first.update_attribute("aasm_state","verification_outstanding")
+        subject.select_plan_and_deactivate_other_enrollments(nil,"individual")
+        expect(subject.hbx_enrollment.aasm_state).to eq("enrolled_contingent")
+      end
+    end
+  end
 end

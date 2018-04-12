@@ -8,6 +8,7 @@ class ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted < ShopEmployer
     non_discrimination_attachment
     upload_and_send_secure_message
     send_generic_notice_alert
+    send_generic_notice_alert_to_broker_and_ga
   end
 
   def append_data

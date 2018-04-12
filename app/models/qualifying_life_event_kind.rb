@@ -167,9 +167,17 @@ class QualifyingLifeEventKind
     market_kind == "individual"
   end
 
+  def shop?
+    market_kind == "shop"
+  end
+
   def family_structure_changed?
     #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
     %w(birth adoption marriage divorce domestic_partnership).include? reason
+  end
+
+  def is_loss_of_other_coverage?
+    reason == "lost_access_to_mec"
   end
 
   class << self

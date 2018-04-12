@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <h2><%= l10n("quote_employer_dental_cost_comparison_results")%></h2>
 
-  <p><%= l10n("your_results_are_based_on_your_quote")%><strong><%= @q.quote_name %></strong> <%= l10n("effective_on")%> <strong><%= @q.start_on %></strong></p>
+  <p><%= l10n("your_results_are_based_on_your_quote")%><strong><%= @qbg.quote_name %></strong> <%= l10n("effective_on")%> <strong><%= @qbg.start_on %></strong></p>
 
   <p><%= l10n("employer_dental_percentage_contributions")%></p>
 
@@ -26,8 +26,8 @@
     <tr>
       <td class="quote_detail_results_header" ><%= l10n("plan")%></td>
       <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("lowest_reference_highest")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("lowest_reference_highest")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
     </tr>
     <% i = 0 %>
    <% @quote_results.each do |k,v| %>
@@ -73,9 +73,9 @@
       <td colspan="1" class="quote_detail_plan_header">
         <div style='width: 300px'>
         <b><%= qr[0] %></b><br>
-        <sm><%= l10n("employee")%>: 
+        <sm><%= l10n("employee")%>:
         $<%= qr[1][:total_employee_cost].ceil %>,
-        <%= l10n("employer")%>: 
+        <%= l10n("employer")%>:
 
        <span >$<%= qr[1][:total_employer_cost].ceil %></span>
        <br>

@@ -14,10 +14,11 @@ describe UpdateBenefitGroupFinalizeCompositeRate, dbclean: :after_each do
   end
 
   describe "updating aasm_state of the renewing plan year", dbclean: :after_each do
-
+    let(:benefit_group2) { FactoryGirl.build(:benefit_group, plan_option_kind: "sole_source") }
     let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_option_kind: "sole_source") }
     let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active",benefit_groups:[benefit_group]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [plan_year]) }
+    let(:canceled_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "canceled",benefit_groups:[benefit_group2]) }
+    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [plan_year,canceled_plan_year]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
     let!(:composite_tier_contribution) {plan_year.benefit_groups.first.composite_tier_contributions.first}
 
@@ -32,6 +33,14 @@ describe UpdateBenefitGroupFinalizeCompositeRate, dbclean: :after_each do
       composite_tier_contribution.reload
       plan_year.reload
       expect(composite_tier_contribution.final_tier_premium).to eq 0.0
+    end
+
+    it "employer with multiple plan year with same py start date,should pick active plan year to calculate final tier premium amount" do
+      subject.migrate
+      composite_tier_contribution.reload
+      plan_year.reload
+      expect(composite_tier_contribution.final_tier_premium).to eq 0.0
+      expect(composite_tier_contribution.benefit_group.plan_year).to eq plan_year
     end
   end
 end

@@ -35,8 +35,11 @@ module TransportProfiles
           # TODO determine if steps should continue when an error is raised
         end
       end
+      context.execute_cleanup
     end
 
+    # Define this method in subclasses, it is a list of symbols containing all referenced resources.
+    # This is used by a number of rake tasks to diagnose and list endpoints and make sure they are loaded in the database.
     def self.used_endpoints
       raise NotImplementedError.new("subclass responsibility")
     end

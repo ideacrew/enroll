@@ -366,6 +366,20 @@ describe EmployerProfile, dbclean: :after_each do
   context "has hired a broker" do
   end
 
+  context "trigger employer_invoice_available" do
+    let(:params)  { {} }
+    let(:employer_profile) {EmployerProfile.new(**params)}
+    it "should trigger renewal_notice job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.trigger_notices("employer_invoice_available")
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'employer_invoice_available']
+    end
+  end
+
   context "has employees that have enrolled in coverage" do
     let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
     let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
@@ -485,8 +499,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
     let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", legal_name: 'broker agency organization 7')}
+    let(:broker_agency_profile7)  {FactoryGirl.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
+    let(:broker_role7) { FactoryGirl.create(:broker_role) }
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
@@ -519,8 +534,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
-      expect(employer).to receive(:employer_broker_fired)
-      employer.employer_broker_fired
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
@@ -793,6 +806,23 @@ describe EmployerProfile, "when a binder premium is credited" do
   end
 end
 
+describe "#update_status_to_binder_paid" do
+  let(:org1) { FactoryGirl.create :organization, legal_name: "Corp 1" }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: org1) }
+
+  before do
+    employer_profile.update_attribute(:aasm_state, 'eligible')
+    EmployerProfile.update_status_to_binder_paid([org1.id])
+  end
+
+  it 'should chnage the state update the workflow state transition' do
+    employer_profile.reload
+    expect(employer_profile.aasm_state).to eq('binder_paid')
+    expect(employer_profile.workflow_state_transitions.map(&:to_state)).to eq(['binder_paid'])
+  end
+
+end
+
 describe EmployerProfile, "Renewal Queries" do
   let(:organization1) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
@@ -821,6 +851,7 @@ describe EmployerProfile, "Renewal Queries" do
     plan_year = FactoryGirl.create :plan_year, employer_profile: employer, aasm_state: :draft
     org
   }
+
   unless TimeKeeper.date_of_record.month == 12
     let(:calendar_year) { TimeKeeper.date_of_record.year }
     let(:calendar_month) { TimeKeeper.date_of_record.month + 1 }
@@ -896,6 +927,18 @@ describe EmployerProfile, "Renewal Queries" do
     it 'should return organizations for renewal' do
       expected_renewal_start = first_plan_year_start + 1.year + Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.months
       expect(EmployerProfile.organizations_eligible_for_renewal(expected_renewal_start).to_a).to eq [organization2]
+    end
+  end
+
+  context '.organizations_for_low_enrollment_notice', dbclean: :after_each do
+    let(:date) { TimeKeeper.date_of_record }
+    let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
+    let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
+    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
+    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
+
+    it 'should return organizations elgible low enrollment notice' do
+      expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
     end
   end
 end
@@ -1033,6 +1076,25 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
     end
   end
 
+  describe "#dt_display_plan_year", dbclean: :after_each do
+    let(:organization) { FactoryGirl.create(:organization, :with_draft_and_canceled_plan_years)}
+    let(:invalid_employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "canceled", employer_profile: invalid_employer_profile)}
+    let(:ineligible_employer_profile) { EmployerProfile.new }
+
+    it "should return draft plan year when employer profile has canceled and draft plan years with same py start on date" do
+      draft_plan_year = organization.employer_profile.plan_years.where(aasm_state: "draft").first
+      expect(organization.employer_profile.dt_display_plan_year).to eq draft_plan_year
+    end
+
+    it "should return canceled plan year when there is no other plan year associated with employer" do
+      expect(invalid_employer_profile.dt_display_plan_year).to eq canceled_plan_year
+    end
+
+    it "should return nil when there is no plan year associated with employer" do
+      expect(ineligible_employer_profile.dt_display_plan_year).to eq nil
+    end
+  end
 end
 
 describe EmployerProfile, ".is_converting?", dbclean: :after_each do
@@ -1212,14 +1274,98 @@ describe EmployerProfile, ".terminate", dbclean: :after_each do
   end
 end
 
+describe EmployerProfile, "group transmissions", dbclean: :after_each do
+
+  let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:plan_year_status) { 'renewing_enrolled' }
+  let(:renewing_employer) {
+    FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status)
+  }
+  let(:health_plan) { FactoryGirl.create(:plan, active_year: (start_date).year - 1, carrier_profile_id: carrier_1.id) }
+  let(:dental_plan) { FactoryGirl.create(:plan, active_year: (start_date).year - 1, carrier_profile_id: dental_carrier_1.id) }
+
+  let(:carrier_1)         { FactoryGirl.create(:carrier_profile) }
+  let(:carrier_2)       { FactoryGirl.create(:carrier_profile) }
+  let(:dental_carrier_1)         { FactoryGirl.create(:carrier_profile) }
+  let(:dental_carrier_2)       { FactoryGirl.create(:carrier_profile) }
+
+  let(:plan_year) { renewing_employer.published_plan_year }
+  let(:renewal_plan_year) { renewing_employer.renewing_plan_year }
+  let(:benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 1", plan_year: plan_year, reference_plan_id: health_plan.id, plan_option_kind: 'single_carrier', dental_plan_option_kind: 'single_carrier', dental_reference_plan_id: dental_plan.id)}
+  let(:renewal_benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 2", plan_year: renewal_plan_year, reference_plan_id: new_health_plan.id, plan_option_kind: 'single_carrier', dental_plan_option_kind: 'single_carrier', dental_reference_plan_id: new_dental_plan.id)}
+
+  describe '.is_renewal_transmission_eligible?' do
+    context 'renewing_employer exists in enrolled state' do
+
+      it 'should return true' do
+        expect(renewing_employer.is_renewal_transmission_eligible?).to be_truthy
+      end
+    end
+
+    context 'renewing employer exists in draft state' do
+      let(:plan_year_status) { 'renewing_draft' }
+
+      it 'should return false' do
+        expect(renewing_employer.is_renewal_transmission_eligible?).to be_falsey
+      end
+    end
+  end
+
+  describe '.is_renewal_carrier_drop?' do
+    before do
+      plan_year.benefit_groups = [benefit_group]
+      renewal_plan_year.benefit_groups = [renewal_benefit_group]
+    end
+
+    context 'renewing_employer exists with enrolled renewal plan year' do
+
+      context 'when health carrier switched' do
+        let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_2.id) }
+        let(:new_dental_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: dental_carrier_1.id) }
+
+        it 'should be treated as carrier drop' do
+          expect(renewing_employer.is_renewal_carrier_drop?).to be_truthy
+        end
+      end
+
+      context 'when dental no longer offered' do
+        let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
+        let(:renewal_benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 2", plan_year: renewal_plan_year, reference_plan_id: new_health_plan.id, plan_option_kind: 'single_carrier')}
+
+        it 'should be treated as carrier drop' do
+          expect(renewing_employer.is_renewal_carrier_drop?).to be_truthy
+        end
+      end
+
+      context 'when dental carrier switched' do
+        let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
+        let(:new_dental_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: dental_carrier_2.id) }
+
+        it 'should be treated as carrier drop' do
+          expect(renewing_employer.is_renewal_carrier_drop?).to be_truthy
+        end
+      end
+
+      context 'when both health and dental carriers remains same' do
+        let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
+        let(:new_dental_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: dental_carrier_1.id) }
+
+        it 'should not be considered as carrier drop' do
+          expect(renewing_employer.is_renewal_carrier_drop?).to be_falsey
+        end
+      end
+    end
+  end
+end
+
 describe EmployerProfile, "initial employers enrolled plan year state", dbclean: :after_each do
   let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
   let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
   it "should return employers" do
     expect(EmployerProfile.initial_employers_enrolled_plan_year_state.size).to eq 1
   end
-
 end
+
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }

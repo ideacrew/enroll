@@ -18,6 +18,28 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     def initialize
       @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     end
+
+    def process_renewals
+      @logger.info "Started process at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
+
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
+      aptc_reader.calender_year = renewal_benefit_coverage_period.start_on.year
+      aptc_reader.call
+
+      @assisted_individuals = aptc_reader.assisted_individuals
+      puts "Found #{@assisted_individuals.keys.count} entries in Assisted sheet." unless Rails.env.test?
+
+      process_aqhp_renewals(renewal_benefit_coverage_period)
+      process_uqhp_renewals(renewal_benefit_coverage_period)
+
+      @logger.info "Process ended at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
+    end
+
+    def log_message
+      @logger.info yield unless Rails.env.test?
+    end
      
     def query_criteria
       {
@@ -34,7 +56,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
     def is_individual_assisted?(enrollment)      
       # reader.all_assisted_individuals.keys
-
       # enrollment.applied_aptc_amount > 0 || enrollment.elected_premium_credit > 0 || enrollment.applied_premium_credit > 0 || is_csr?(enrollment)
       
       @all_assisted_individuals.include?(enrollment.subscriber.hbx_id)
@@ -54,100 +75,116 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       enrollments = family.active_household.hbx_enrollments.where({
         :coverage_kind => enrollment.coverage_kind,
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ["auto_renewing", "renewing_coverage_selected"]),
-        :effective_on.gte => renewal_benefit_coverage_period.start_on
+        :effective_on.gte => renewal_benefit_coverage_period.start_on,
+        :kind => enrollment.kind
       })
 
-      enrollments.detect{|e| enrollment.subscriber.hbx_id == e.subscriber.hbx_id }.blank?
+      return true if enrollments.empty?
+      enrollments.none?{|e| enrollment.subscriber.blank? || enrollment.subscriber.hbx_id == e.subscriber.hbx_id }
     end
 
-    def get_assisted_enrollments
+    def process_aqhp_renewals(renewal_benefit_coverage_period)
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-
-      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
-      aptc_reader.call
-      @assisted_individuals = aptc_reader.assisted_individuals
+      query = {
+        :kind => 'individual',
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
+        :coverage_kind => 'health',
+        :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
+      }
 
       count  = 0
       @assisted_individuals.each do |hbx_id, aptc_values|
-        
         person = Person.by_hbx_id(hbx_id).first
         family = person.primary_family
 
         next if family.blank?
         next if family.active_household.blank?
 
-        enrollments = family.active_household.hbx_enrollments.where({
-          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
-          :kind => 'individual',
-          :coverage_kind => 'health'
-          }).order(:"effective_on".desc).select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
+        puts "Processing #{person.full_name}(#{person.hbx_id})" unless Rails.env.test?
 
-        enrollment = enrollments.detect{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
+        enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
+        enrollments = enrollments.select{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
 
-        if enrollment.present?
-          if can_renew_enrollment?(enrollment, family, renewal_benefit_coverage_period)
+        if enrollments.size > 1
+          @logger.info "Found multiple active health enrollments for Person: #{hbx_id}"
+          next
+        end
+
+        if enrollments.present?
+          if can_renew_enrollment?(enrollments.first, family, renewal_benefit_coverage_period)
             count += 1    
-            puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
-
             enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
-            enrollment_renewal.enrollment = enrollment
+            enrollment_renewal.enrollment = enrollments.first
             enrollment_renewal.assisted = true
             enrollment_renewal.aptc_values = aptc_values
-            enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
+            enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+
             enrollment_renewal.renew
           end
+        else
+          @logger.info "Unable to find valid assisted enrollment for Person: #{hbx_id}"
         end
       end
+
       puts count
     end
 
-    def process
-      current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
 
-      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
-      aptc_reader.all_hbx_ids
-      @all_assisted_individuals = aptc_reader.all_assisted_individuals.keys
+    def process_uqhp_renewals(renewal_benefit_coverage_period)
+      current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+
+      query = {
+        :kind => 'individual',
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
+        :coverage_kind.in => HbxEnrollment::COVERAGE_KINDS,
+        :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
+      }
+
+      families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => query})
+
+      @logger.info "Families count #{families.count}"
+
+      enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+      enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+      enrollment_renewal.assisted = false
+      enrollment_renewal.aptc_values = {}
 
       count = 0
-      families.each do |family|
+      families.no_timeout.each do |family|
+        primary_hbx_id = family.primary_applicant.person.hbx_id
+
         begin
-          enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
+          enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
           enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
           enrollments.each do |enrollment|
+            next if @assisted_individuals.has_key?(primary_hbx_id) && enrollment.coverage_kind == 'health'
 
-            next if is_individual_assisted?(enrollment)
-       
             if can_renew_enrollment?(enrollment, family, renewal_benefit_coverage_period)
               count += 1
 
               if count % 100 == 0
-                puts "Found #{count} enrollments"
+                @logger.info "Found #{count} enrollments"
               end
 
-              puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
+              # puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
 
-              enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
               enrollment_renewal.enrollment = enrollment
-              enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
               enrollment_renewal.renew
             end
           end
         rescue Exception => e 
-          @logger.info "Failed #{family.e_case_id} Exception: #{e.inspect}"
+          @logger.info "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
         end
       end
       puts count
     end
-
 
     def process_enrollment_renewal(enrollment, renewal_benefit_coverage_period)
       puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.plan.renewal_plan.try(:active_year)}"
 
       enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
       enrollment_renewal.enrollment = enrollment
-      enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
+      enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
       enrollment_renewal.renew
     end
 
@@ -220,7 +257,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
         # csv << ["Enrollment HBX ID", "Subscriber HBX ID", "SSN", "Last Name", "First Name", "HIOS_ID:PlanName", "Other Effective On",  
         #   "Effective On",  "AASM State",  "Terminated On Action",  "Section:Attribute"]
-
 
         csv << ["Enrollment HBX ID", "Subscriber HBXID",  "Subscriber Firstname",  "Subscriber Lastname", "Market", "Coverage Kind", "Coverage Start Date", "Created At", "Updated At", "Plan Name", "Plan HIOS ID",  "Enrollment Status"]
 

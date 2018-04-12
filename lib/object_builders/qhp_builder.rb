@@ -43,7 +43,7 @@ class QhpBuilder
     elsif file_path.include?("metlife")
       "MetLife"
     elsif file_path.include?("united")
-      "United Health Care"
+      "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
@@ -231,6 +231,7 @@ class QhpBuilder
   end
 
   def parse_metal_level
+    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
     return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end
