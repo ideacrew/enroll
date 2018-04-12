@@ -49,7 +49,7 @@ namespace :reports do
           {:"action" => "verify"},
           {:"modifier" => "external Hub"}
         ]
-      )
+      ).uniq{|element| [element.modifier,element.created_at.to_date,element.verification_type]}
     end
   
     def verified_people
