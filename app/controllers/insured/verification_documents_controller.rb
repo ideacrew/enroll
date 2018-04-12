@@ -2,7 +2,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   include ApplicationHelper
 
   before_action :get_family
-  before_action :updateable?, only: [:upload]
+  before_action :updateable?, :find_type, only: [:upload]
 
   def upload
     @doc_errors = []
@@ -48,6 +48,11 @@ class Insured::VerificationDocumentsController < ApplicationController
     authorize Family, :updateable?
   end
 
+  def find_type
+    set_current_person
+    @verification_type = @person.verification_types.find(params[:verification_type]) if params[:verification_type]
+  end
+
   def get_family
     set_current_person
     @family = @person.primary_family
@@ -70,16 +75,14 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def update_vlp_documents(title, file_uri)
-    v_type = params[:verification_type]
-    document = @docs_owner.consumer_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>v_type})
-    @docs_owner.consumer_role.mark_doc_type_uploaded(v_type)
+    document = @verification_type.vlp_documents.build
+    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+    @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end
 
   def update_paper_application(title, file_uri)
-
     document = @docs_owner.resident_role.vlp_documents.build
     success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
     @doc_errors = document.errors.full_messages unless success
@@ -99,11 +102,8 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def add_type_history_element(file)
     actor = current_user ? current_user.email : "external source or script"
-    verification_type = params[:verification_type]
     action = "Upload #{file_name(file)}" if params[:action] == "upload"
-    @docs_owner.consumer_role.add_type_history_element(verification_type: verification_type,
-                                                   action: action,
-                                                   modifier: actor)
+    @verification_type.add_type_history_element(action: action, modifier: actor)
   end
 
   def vlp_docs_clean(person)

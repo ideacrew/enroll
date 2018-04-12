@@ -108,8 +108,8 @@ describe "#find_document" do
 end
 
 describe "#find_vlp_document_by_key" do
-  let(:person) {Person.new}
-  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
   let(:key) {"sample-key"}
   let(:vlp_document) {VlpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
 
@@ -126,7 +126,7 @@ describe "#find_vlp_document_by_key" do
 
   context "has a vlp_document with a file uploaded" do
     before do
-      consumer_role.vlp_documents << vlp_document
+      consumer_role.verification_types.each{|type| type.vlp_documents << vlp_document }
     end
 
     it "returns vlp_document document" do
@@ -567,8 +567,8 @@ describe "#processing_residency_24h?" do
 end
 
 describe "#find_vlp_document_by_key" do
-  let(:person) {Person.new}
-  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
   let(:key) {"sample-key"}
   let(:vlp_document) {VlpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
 
@@ -585,7 +585,7 @@ describe "#find_vlp_document_by_key" do
 
   context "has a vlp_document with a file uploaded" do
     before do
-      consumer_role.vlp_documents << vlp_document
+      consumer_role.verification_types.each{|type| type.vlp_documents << vlp_document }
     end
 
     it "returns vlp_document document" do

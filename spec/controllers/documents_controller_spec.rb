@@ -20,8 +20,8 @@ RSpec.describe DocumentsController, :type => :controller do
 
   describe "destroy" do
     before :each do
-      person.consumer_role.vlp_documents = [document]
-      delete :destroy, person_id: person.id, id: document.id
+      person.verification_types.each{|type| type.vlp_documents << document}
+      delete :destroy, person_id: person.id, id: document.id, verification_type: citizenship_type.id
     end
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path
@@ -29,50 +29,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
     it "should delete document record" do
       person.reload
-      expect(person.consumer_role.vlp_documents).to be_empty
-    end
-  end
-
-  describe "PUT update" do
-    context "rejecting with comments" do
-      before :each do
-        person.consumer_role.vlp_documents = [document]
-      end
-
-      it "should redirect to verification" do
-        put :update, person_id: person.id, id: document.id
-        expect(response).to redirect_to verification_insured_families_path
-      end
-
-      it "updates document status" do
-        put :update, person_id: person.id, id: document.id, :person=>{ :vlp_document=>{:comment=>"hghghg"}}, :comment => true, :status => "ready"
-        allow(family).to receive(:update_family_document_status!).and_return(true)
-        document.reload
-        expect(document.status).to eq("ready")
-      end
-
-      it "updates family vlp_documents_status" do
-        put :update, person_id: person.id, id: document.id
-        allow(family).to receive(:update_family_document_status!).and_return(true)
-      end
-    end
-
-    context "accepting without comments" do
-      before :each do
-        person.consumer_role.vlp_documents = [document]
-      end
-
-      it "should redirect to verification" do
-        put :update, person_id: person.id, id: document.id
-        expect(response).to redirect_to verification_insured_families_path
-      end
-
-      it "updates document status" do
-        put :update, person_id: person.id, id: document.id, :status => "accept"
-        allow(family).to receive(:update_family_document_status!).and_return(true)
-        document.reload
-        expect(document.status).to eq("accept")
-      end
+      expect(person.verification_types.by_name("Citizenship").first.vlp_documents).to be_empty
     end
   end
 

@@ -584,13 +584,13 @@ class ConsumerRole
   # collect all vlp documents for person and all dependents.
   # return the one with matching key
   def find_vlp_document_by_key(key)
-    candidate_vlp_documents = vlp_documents
+    candidate_vlp_documents = verification_types.flat_map(&:vlp_documents)
     if person.primary_family.present?
       person.primary_family.family_members.flat_map(&:person).each do |family_person|
         next unless family_person.consumer_role.present?
-        candidate_vlp_documents << family_person.consumer_role.vlp_documents
+        candidate_vlp_documents << family_person.consumer_role.verification_types.flat_map(&:vlp_documents)
       end
-      candidate_vlp_documents.uniq!
+      candidate_vlp_documents.flatten!.uniq!
     end
 
     return nil if candidate_vlp_documents.nil?
@@ -667,6 +667,10 @@ class ConsumerRole
     end
   end
 
+  def verification_types
+    person.verification_types.active.where(applied_roles: "consumer_role")
+  end
+
   #class methods
   class << self
     #this method will be used to check 90 days verification period for outstanding verification
@@ -678,10 +682,6 @@ class ConsumerRole
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)
-  end
-
-  def verification_types
-    person.verification_types.active.where(applied_roles: "consumer_role")
   end
 
   def mark_residency_denied(*args)
@@ -744,21 +744,6 @@ class ConsumerRole
 
   def indian_conflict?
     citizen_status == "indian_tribe_member"
-  end
-
-  def mark_doc_type_uploaded(v_type)
-    case v_type
-      when "Social Security Number"
-        update_attributes(:ssn_rejected => false)
-      when "Citizenship"
-        update_attributes(:lawful_presence_rejected => false)
-      when "Immigration status"
-        update_attributes(:lawful_presence_rejected => false)
-      when "American Indian Status"
-        update_attributes(:native_rejected => false)
-      when "DC Residency"
-        update_attributes(:residency_rejected => false)
-    end
   end
 
   def invoke_ssa
