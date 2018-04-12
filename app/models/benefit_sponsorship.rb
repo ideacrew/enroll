@@ -36,6 +36,11 @@ class BenefitSponsorship
     benefit_coverage_periods.detect { |bcp| bcp.contains?(effective_date) }
   end
 
+  def benefit_sponsor_catalogs
+    return [] if benefit_market.blank?
+    benefit_market.benefit_sponsor_catalogs_for(rating_area)
+  end
+
   # def is_under_special_enrollment_period?
   #   benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
   # end
