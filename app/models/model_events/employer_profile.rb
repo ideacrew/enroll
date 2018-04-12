@@ -8,7 +8,8 @@ module ModelEvents
     #TODO: The trigger for this notice is in the controller and it has to be eventually moved to observer pattern.
     #TODO: This is the temporary fix until then.
     OTHER_EVENTS = [
-      :broker_hired_confirmation_to_employer
+      :broker_hired_confirmation_to_employer,
+      :welcome_notice_to_employer
     ]
 
     def trigger_model_event(event_name, event_options = {})
@@ -53,7 +54,7 @@ module ModelEvents
   #       is_benefit_period_start = true
   #     end
 
-  #     # TODO: 
+  #     # TODO:
   #     # is_benefit_application_eligible_change  = false
   #     # old_benefit_application_eligible_change = ""
 
@@ -62,7 +63,7 @@ module ModelEvents
   #     # is_benefit_period_started           = false
   #     # old_benefit_period                  = ""
 
-  #     # is_broker_agency_change            = false 
+  #     # is_broker_agency_change            = false
   #     # old_broker_agency               = ""
 
   #     # is_general_agent_change            = false
@@ -82,7 +83,7 @@ module ModelEvents
 
   #     # yield persists instance at this point
   #     yield
-  #     # set flag that instance has changed state so Obervers are notified 
+  #     # set flag that instance has changed state so Obervers are notified
   #     changed
 
   #     # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
