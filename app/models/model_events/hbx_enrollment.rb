@@ -12,7 +12,6 @@ module ModelEvents
 
         if is_transition_matching?(to: :coverage_selected, from: :shopping, event: :select_coverage)
           is_application_coverage_selected = true
-          is_notify_employee_of_plan_selection_in_open_enrollment = true
         end
 
         if is_transition_matching?(to: :renewing_coverage_selected, from: :auto_renewing, event: :select_coverage)

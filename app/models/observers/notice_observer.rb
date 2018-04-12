@@ -88,11 +88,15 @@ module Observers
 
           if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
             if is_valid_employer_py_oe
-              trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
+              trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
             end
           end
 
           if new_model_event.event_key == :application_coverage_selected
+            if is_valid_employer_py_oe
+              trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #initial EE notice
+            end
+            
             if !is_valid_employer_py_oe && (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
               trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             end

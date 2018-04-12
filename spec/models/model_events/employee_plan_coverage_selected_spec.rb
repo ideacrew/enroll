@@ -23,18 +23,10 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
   describe "ModelEvent" do
     context "when employee plan coverage selected" do
       it "should trigger model event" do
-
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:hbx_enrollment_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :application_coverage_selected, :klass_instance => model_instance, :options => {})
-          end
-        end
-
-        model_instance.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:hbx_enrollment_update) do |model_event|
-            expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :notify_employee_of_plan_selection_in_open_enrollment, :klass_instance => model_instance, :options => {})
           end
         end
         model_instance.select_coverage!
