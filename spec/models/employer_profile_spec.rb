@@ -1368,7 +1368,7 @@ end
 
 describe EmployerProfile, "update_status_to_binder_paid", dbclean: :after_each do
   let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
-  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year], :aasm_state => "eligible") }
   let!(:organization){ employer_profile.organization }
 
   it "should update employer profile aasm state to binder_paid" do

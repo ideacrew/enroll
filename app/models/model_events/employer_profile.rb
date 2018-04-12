@@ -21,7 +21,7 @@ module ModelEvents
     def notify_on_save
       if aasm_state_changed?
 
-        if aasm_state == "binder_paid"
+        if is_transition_matching?(to: :binder_paid, from: :eligible, event: :binder_credited)
           is_initial_employee_plan_selection_confirmation = true
         end
 
@@ -33,6 +33,15 @@ module ModelEvents
           end
         end
       end
+    end
+
+    def is_transition_matching?(from: nil, to: nil, event: nil)
+      aasm_matcher = lambda {|expected, current|
+        expected.blank? || expected == current || (expected.is_a?(Array) && expected.include?(current))
+      }
+
+      current_event_name = aasm.current_event.to_s.gsub('!', '').to_sym
+      aasm_matcher.call(from, aasm.from_state) && aasm_matcher.call(to, aasm.to_state) && aasm_matcher.call(event, current_event_name)
     end
   #  def notify_on_save
 

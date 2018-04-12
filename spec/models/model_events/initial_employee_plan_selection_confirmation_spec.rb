@@ -4,7 +4,7 @@ describe 'ModelEvents::InitialEmployeePlanSelectionConfirmation', dbclean: :arou
   let(:model_event)  { "initial_employee_plan_selection_confirmation" }
   let(:notice_event) { "initial_employee_plan_selection_confirmation" }
   let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:model_instance) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on)}
+  let!(:model_instance) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on, aasm_state: 'eligible')}
   let!(:benefit_group) { model_instance.published_plan_year.benefit_groups.first}
   let!(:organization) { model_instance.organization }
   let!(:census_employee){ employee = FactoryGirl.create :census_employee, employer_profile: model_instance
@@ -28,7 +28,7 @@ describe 'ModelEvents::InitialEmployeePlanSelectionConfirmation', dbclean: :arou
             expect(model_event).to have_attributes(:event_key => :initial_employee_plan_selection_confirmation, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.update_attributes!(:aasm_state => "binder_paid")
+        model_instance.binder_credited!
       end
     end
 
@@ -37,7 +37,7 @@ describe 'ModelEvents::InitialEmployeePlanSelectionConfirmation', dbclean: :arou
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).not_to receive(:employer_profile_update)
         end
-        model_instance.update_attributes!(:aasm_state => "applicant")
+        model_instance.enrollment_expired!
       end
     end
   end
