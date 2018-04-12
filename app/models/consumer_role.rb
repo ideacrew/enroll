@@ -687,13 +687,13 @@ class ConsumerRole
   def mark_residency_denied(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false)
-    verification_types.by_name("DC Residency").first.fail_type if verification_types.by_name("DC Residency").first
+    verification_types.by_name("DC Residency").first.fail_type
   end
 
   def mark_residency_pending(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil)
-    verification_types.by_name("DC Residency").first.pending_type if verification_types.by_name("DC Residency").first
+    verification_types.by_name("DC Residency").first.pending_type
   end
 
   def mark_residency_authorized(*args)
