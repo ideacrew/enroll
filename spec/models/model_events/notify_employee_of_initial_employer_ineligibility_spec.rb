@@ -39,6 +39,13 @@ describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean =
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
+
+        expect(subject).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_denied"
+          expect(payload[:employer_id]).to eq employer_profile.send(:hbx_id).to_s
+          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
         subject.plan_year_update(model_event)
       end
     end
