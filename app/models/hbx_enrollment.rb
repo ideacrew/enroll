@@ -48,8 +48,7 @@ class HbxEnrollment
     "I have coverage through an individual market health plan",
     "I have coverage through Medicare",
     "I have coverage through Tricare",
-    "I have coverage through Medicaid",
-    "I do not have other coverage"
+    "I have coverage through Medicaid"
   ]
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected enrolled_contingent unverified coverage_enrolled)
 

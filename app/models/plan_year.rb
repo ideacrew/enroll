@@ -914,6 +914,7 @@ class PlanYear
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
       transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?
 
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
