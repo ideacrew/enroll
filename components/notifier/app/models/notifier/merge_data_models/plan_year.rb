@@ -23,8 +23,8 @@ module Notifier
     attribute :renewal_py_start_on, Date
     attribute :renewal_py_end_on, Date
 
-    attribute :next_available_start_date, Date
-    attribute :next_application_deadline, Date
+    attribute :next_available_start_date, String
+    attribute :next_application_deadline, String
 
     attribute :carrier_name, String
     attribute :renewal_carrier_name, String
