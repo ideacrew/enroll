@@ -65,6 +65,20 @@ module Notifier
       end
     end
 
+    def plan_year_initial_py_publish_advertise_deadline
+      if current_plan_year.present?
+        prev_month = current_plan_year.start_on.prev_month
+        merge_model.plan_year.initial_py_publish_advertise_deadline = format_date(Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month))
+      end
+    end
+
+    def plan_year_initial_py_publish_due_date
+      if current_plan_year.present?
+        prev_month = current_plan_year.start_on.prev_month
+        merge_model.plan_year.initial_py_publish_due_date = format_date(Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month))
+      end
+    end
+
     def plan_year_renewal_py_submit_soft_due_date
       if renewal_plan_year.present?
         prev_month = renewal_plan_year.start_on.prev_month
