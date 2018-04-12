@@ -1,7 +1,7 @@
 module ApplicationHelper
 
-  def show_or_hide_add_plan_year_button?(employer)
-    false
+  def rates_available?(employer)
+    employer == true ? "blocking" : ""
   end
 
   def deductible_display(hbx_enrollment, plan)
