@@ -14,8 +14,8 @@
           <td>
             <%= text_field_tag "person[max_aptc]", nil, class: "required input_txt", :input_html => { width: '100%' } %>
           </td>
-          <td>
-            <%= text_field_tag "person[csr]", nil, class: "required input_txt", :input_html => { width: '100%' } %>
+          <td class="select_person_csr">
+            <%= select_tag "person[csr]", options_for_select(EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.keys.map{|variant| variant.gsub('csr_', '')}), prompt: 'Select one' %>
           </td>
           <td>
             <%= datepicker_control f, :effective_date, {:class => "interaction-field-control-census-employee-dob input_txt", :value => params[:effective_date].present? ? Date.strptime(params[:effective_date], '%m/%d/%Y') : nil, :placeholder => "EFFECTIVE DATE", required: true} %>
@@ -50,7 +50,7 @@
     </table>
     <div class="row no-buffer child-row">
       <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-        <%= f.submit "Submit", :class => "btn btn-primary", :size => '100px'%> 
+        <%= f.submit "Submit", :class => "btn btn-primary update_tax_household_eligibility", id: 'update_tax_household_eligibility', :size => '100px', disabled: true %>
       </div>
     </div>
   <% end %>

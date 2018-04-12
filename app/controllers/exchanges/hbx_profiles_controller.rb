@@ -218,11 +218,6 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
-  def pdc_type
-    authorize HbxProfile, :can_add_pdc?
-    getActionParams
-    @element_to_replace_id = params[:family_actions_id]
-  end
 
   def show_sep_history
     getActionParams
@@ -431,10 +426,9 @@ def employer_poc
   end
 
   def create_eligibility
-    # authorize  Family, :can_add_pdc?
-    @element_to_replace_id = params[:family_actions_id]
+    authorize  HbxProfile, :can_add_pdc?
     @person = Person.find(params[:person_id])
-
+    @element_to_replace_id = params[:family_actions_id]
     respond_to do |format|
       format.js { render "create_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
     end
