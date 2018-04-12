@@ -1,18 +1,8 @@
-// Broker Registration Form
-$(document).on('click', '#add-broker-location', addOfficeLocation);
-
 // Initalize Datepickers for elements
 $(function() {
   // Pass element ID, minDate, maxDate for datepicker options
   initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-90.years %>'),new Date('<%= Date.today.end_of_month-18.years %>'));
 });
-
-   a = 0;
-   function addOfficeLocation() {
-     a += 1;
-     $('#office-locations').append('<div class="col-md-12 mb-3 p-0"><label for="inputAddress">Address</label><input name="organization[office_locations_attributes]['+(a-1)+'][address_attributes][address_1]" type="text" placeholder="1234 Main st" id="office_locations_attributes_'+(a-1)+'_address_1" class="form-control" required><div class="invalid-feedback">Please provide a valid address.</div></div><div class="col-md-12 mb-3"><label for="inputAddress2">Address 2</label><input name="organization[office_locations_attributes]['+(a-1)+'][address_attributes][address_2]" type="text" placeholder="1234 Main st" id="office_locations_attributes_'+(a-1)+'_address_2" class="form-control"></div>')
-   }
-
 
 function validateForm() {
   'use strict';
