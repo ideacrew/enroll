@@ -1,4 +1,4 @@
-require 'rails_helper'
+    require 'rails_helper'
 
 RSpec.describe "insured/families/personal.html.erb" do
   before :each do
@@ -10,52 +10,57 @@ RSpec.describe "insured/families/personal.html.erb" do
   end
 
   shared_examples_for "display_heading" do
-      it "should display the title" do
-    expect(rendered).to have_selector('h1', text: "Manage Family")
-   end
+    it "should display the title" do
+      expect(rendered).to have_selector('h1', text: "Manage Family")
+    end
 
-      it "should display notice of action title " do
-    expect(rendered).to have_selector('h5', text: "Please indicate preferred method to receive notices (OPTIONAL)")
-   end
-
+    it "should display notice of action title " do
+      expect(rendered).to have_selector('h5', text: "Please indicate preferred method to receive notices (OPTIONAL)")
+    end
   end
 
   context "for employee role" do
-   let(:person) {FactoryGirl.create(:person, :with_employee_role)}
+    let(:person) {FactoryGirl.create(:person, :with_employee_role)}
+    let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person)}
 
+    before do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:active_individual_market_role).and_return(false)
+    end
 
-   it "should renders home address fields" do
-    expect(response).to render_template("shared/_home_address_fields")
-   end
+    it "should renders home address fields" do
+      binding.pry
+      expect(response).to render_template("shared/_home_address_fields")
+    end
 
-   it_should_behave_like "display_heading"
+    it_should_behave_like "display_heading"
 
-   it "should display contact method dropdown " do
-    expect(rendered).to have_select("person[employee_roles_attributes][0][contact_method]", :selected => "Paper and Electronic communications")
-   end
+    it "should display contact method dropdown " do
+      expect(rendered).to have_select("person[employee_roles_attributes][0][contact_method]", :selected => "Paper and Electronic communications")
+    end
 
-   it "should display language preference dropdown " do
-    expect(rendered).to have_select("person[employee_roles_attributes][0][language_preference]", :selected => "English")
-   end
- end
- 
+    it "should display language preference dropdown " do
+      expect(rendered).to have_select("person[employee_roles_attributes][0][language_preference]", :selected => "English")
+    end
+  end
+
    context "for consumer role" do
-   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-  
+     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
 
-   it "should renders home address fields and consumer fields" do
-     expect(response).to render_template("shared/_consumer_fields")
-     expect(response).to render_template("shared/_consumer_home_address_fields")
-   end
-   it_should_behave_like "display_heading"
 
-   it "should display contact method dropdown " do
-    expect(rendered).to have_select("person[consumer_role_attributes][contact_method]", :selected => "Paper and Electronic communications")
-   end
+     it "should renders home address fields and consumer fields" do
+       expect(response).to render_template("shared/_consumer_fields")
+       expect(response).to render_template("shared/_consumer_home_address_fields")
+     end
+     it_should_behave_like "display_heading"
 
-   it "should display language preference dropdown " do
-    expect(rendered).to have_select("person[consumer_role_attributes][language_preference]", :selected => "English")
+     it "should display contact method dropdown " do
+       expect(rendered).to have_select("person[consumer_role_attributes][contact_method]", :selected => "Paper and Electronic communications")
+     end
+
+     it "should display language preference dropdown " do
+       expect(rendered).to have_select("person[consumer_role_attributes][language_preference]", :selected => "English")
+     end
    end
- end
 end
 
