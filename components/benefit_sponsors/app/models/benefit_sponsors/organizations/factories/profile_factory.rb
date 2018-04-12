@@ -79,7 +79,7 @@ module BenefitSponsors
             errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
             return false
           rescue OrganizationAlreadyMatched
-            errors.add(:base, "organization has already been created.")
+            errors.add(:base, "Organization has already been created for this Agency type")
             return false
           end
 
@@ -267,11 +267,11 @@ module BenefitSponsors
         def check_existing_organization
           existing_org = Organization.where(:fein => fein).first
           if existing_org.present?
-            if existing_org.employer_profile.present?
+            if existing_org.employer_profile.present? && is_employer_profile?
               if (Person.where({"employer_staff_roles.employer_profile_id" => existing_org.employer_profile._id}).any?)
                 claimed = true
               end
-            elsif existing_org.broker_agency_profile.present?
+            elsif existing_org.broker_agency_profile.present? && is_broker_profile?
               raise OrganizationAlreadyMatched.new
             end
           end
