@@ -30,6 +30,9 @@ module BenefitSponsors
           end
           redirect_to result_url
           return
+        else
+          redirect_to default_url
+          return
         end
       rescue Exception => e
         flash[:error] = e.message
