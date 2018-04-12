@@ -30,9 +30,10 @@ module BenefitSponsors
           profile = new(attrs)
           profile.current_user = current_user
           if profile.valid?
-            save_result, is_pending = profile.save_profile
+            save_result, is_pending = profile.save
             return save_result, profile.redirection_url(save_result, is_pending)
-            return false, profile.redirection_url(false, nil)
+          else
+            return false, profile.redirection_url
           end
         end
 
@@ -67,7 +68,7 @@ module BenefitSponsors
           self.office_locations_attributes = attrs[:office_locations_attributes]
         end
 
-        def save_profile
+        def save
           begin
             match_or_create_person(current_user)
             existing_org, claimed =  check_existing_organization
@@ -85,28 +86,39 @@ module BenefitSponsors
           return false if person.errors.present?
 
           if is_broker_profile?
-            add_broker_role
-            organization = create_or_find_organization
-            self.profile = organization.broker_agency_profile
-            self.profile.primary_broker_role = person.broker_role
-            self.profile.save!
-            person.broker_role.update_attributes({ broker_agency_profile_id: profile.id , market_kind:  market_kind })
-            ::UserMailer.broker_application_confirmation(person).deliver_now
+            update_broker_agency_profile
           elsif is_employer_profile?
-            if existing_org
-              if existing_org.is_an_issuer_profile?
-                errors.add(:base, "Issuer cannot sponsor benefits")
-                return false
-              end
-              update_organization(existing_org) unless claimed
-              @sponsor_profile = existing_org.employer_profile
-            else
-              init_benefit_sponsor
-            end
-            pending = create_employer_staff_role(current_user, sponsor_profile, claimed)
+            update_employer_profile existing_org, claimed
+            pending = create_employer_staff_role(current_user, @sponsor_profile, claimed)
           end
-
           [true, pending]
+        end
+
+        def update_broker_agency_profile
+          add_broker_role
+          organization = create_or_find_organization
+          self.profile = organization.broker_agency_profile
+          self.profile.primary_broker_role = person.broker_role
+          self.profile.save!
+          update_broker_role
+        end
+
+        def update_employer_profile(existing_org, claimed)
+          if existing_org
+            if existing_org.is_an_issuer_profile?
+              errors.add(:base, "Issuer cannot sponsor benefits")
+              return false
+            end
+            update_organization(existing_org) unless claimed
+            @sponsor_profile = existing_org.employer_profile
+          else
+            init_benefit_sponsor
+          end
+        end
+
+        def update_broker_role
+          person.broker_role.update_attributes({ broker_agency_profile_id: profile.id , market_kind:  market_kind })
+          ::UserMailer.broker_application_confirmation(person).deliver_now
         end
 
         def add_broker_role
@@ -124,7 +136,7 @@ module BenefitSponsors
         end
 
         def init_organization
-          # for now we're always doing General Organization
+          # Use GeneralOrganization for now
           class_name = GeneralOrganization || ExemptOrganization 
 
           class_name.new(
@@ -186,7 +198,6 @@ module BenefitSponsors
             working_hours: working_hours,
             accept_new_clients: accept_new_clients
           )
-
           organization.profiles << profile
           organization.save!
           organization
@@ -208,7 +219,6 @@ module BenefitSponsors
           pending
         end
 
-        ### put some of these methods in a different factory? ###
         def match_or_create_person(current_user=nil)
           if is_employer_profile? || is_broker_profile?
             matched_people = Person.where(
@@ -265,7 +275,6 @@ module BenefitSponsors
               raise OrganizationAlreadyMatched.new
             end
           end
-
           return [existing_org, claimed]
         end
 
@@ -281,7 +290,6 @@ module BenefitSponsors
         def is_employer_profile?
           @profile_type == "benefit_sponsor"
         end
-
       end
     end
   end
