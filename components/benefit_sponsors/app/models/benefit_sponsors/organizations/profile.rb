@@ -24,8 +24,7 @@ module BenefitSponsors
                   class_name:"BenefitSponsors::Locations::OfficeLocation"
 
       embeds_one  :inbox, as: :recipient,
-                  class_name:"BenefitSponsors::Organizations::Inbox"
-
+                  class_name:"BenefitSponsors::Inboxes::Inbox"
 
       validates_presence_of :organization, :office_locations
       validate :office_location_kinds
@@ -35,10 +34,7 @@ module BenefitSponsors
       # @abstract profile subclass is expected to implement #initialize_profile
       # @!method initialize_profile
       # Initialize settings for the abstract profile
-      after_initialize :initialize_profile
-
-      # after_create :create_inbox
-
+      after_initialize :initialize_profile , :build_nested_models
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
@@ -83,6 +79,9 @@ module BenefitSponsors
       def initialize_profile
       end
 
+      def build_nested_models
+      end
+
       def office_location_kinds
         location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
 
@@ -101,17 +100,6 @@ module BenefitSponsors
           end
         end
       end
-
-      def create_inbox
-        return if inbox.present?
-
-        build_inbox
-        @inbox.save
-        welcome_subject = "Welcome to #{Settings.site.short_name}"
-        welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
-        @inbox.messages.create(subject: welcome_subject, body: welcome_body)
-      end
-
     end
   end
 end

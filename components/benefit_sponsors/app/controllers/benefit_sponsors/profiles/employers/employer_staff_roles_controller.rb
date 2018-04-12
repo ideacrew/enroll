@@ -17,7 +17,7 @@ module BenefitSponsors
       end
 
       def create
-        dob = DateTime.strptime(params[:dob], '%m/%d/%Y').try(:to_date)
+        dob = convert_to_date(params[:dob])
         employer_profile = find_employer_profile
         first_name = (params[:first_name] || '').strip
         last_name = (params[:last_name] || '').strip
@@ -32,7 +32,7 @@ module BenefitSponsors
       def approve
         employer_profile = find_employer_profile
         person = Person.find(params[:staff_id])
-        role = person.benefit_sponsors_employer_staff_roles.detect{|role| role.is_applicant? && role.employer_profile_id.to_s == params[:id]}
+        role = person.employer_staff_roles.detect{|role| role.is_applicant? && role.benefit_sponsors_employer_profile_id.to_s == params[:id]}
         if role && role.approve && role.save!
           flash[:notice] = 'Role is approved'
         else
@@ -48,7 +48,6 @@ module BenefitSponsors
 
         employer_profile = find_employer_profile
         staff_list = staff_for_benefit_sponsors_employer(employer_profile).map(&:id)
-
         if staff_list.count == 1 && staff_list.first.to_s == staff_id
           flash[:error] = 'Please add another staff role before deleting this role'
         else
