@@ -16,7 +16,7 @@ module BenefitSponsors
 
     def authentication_not_required?
       devise_controller? ||
-      (controller_name == "registrations" && params["profile_type"] == "broker_agency")||
+      (controller_name == "registrations") ||
       (controller_name == "office_locations") ||
       (controller_name == "invitations") ||
       (controller_name == "saml")
