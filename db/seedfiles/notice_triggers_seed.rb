@@ -613,7 +613,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP32',
+    hbx_id: 'SHOP_D020',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
     resource_name: 'employer',
@@ -623,7 +623,7 @@ shop_notice_triggers = [
         name: 'Initial Employer ineligible to obtain coverage.',
         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP32',
+        mpi_indicator: 'SHOP_D020',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -1463,6 +1463,28 @@ ivl_notice_triggers = [
         }
       }
     ]
+  },
+
+  {
+      hbx_id: 'IVL_BV',
+      title: 'You Must Submit Documents by the Deadline to Keep Your Insurance',
+      description: 'This is an Backlog Notice and is sent for people need to submit their documents',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_backlog_verification_notice_uqhp',
+      notice_triggers: [
+          {
+              name: 'Backlog Notice',
+              notice_template: 'notices/ivl/ivl_backlog_verification_notice_uqhp',
+              notice_builder: 'IvlNotices::IvlBacklogVerificationNoticeUqhp',
+              mpi_indicator: 'IVL_BV',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
   },
 ]
 

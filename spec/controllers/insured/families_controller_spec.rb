@@ -32,7 +32,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -54,7 +54,7 @@ RSpec.describe Insured::FamiliesController do
     allow(family).to receive_message_chain("family_members.active").and_return(family_members)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:active_employee_roles).and_return(employee_roles)
-    allow(person).to receive(:has_active_resident_role?).and_return(true)
+    allow(person).to receive(:is_resident_role_active?).and_return(true)
     allow(person).to receive(:resident_role).and_return(resident_role)
     allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
@@ -97,7 +97,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:user).and_return(user)
         allow(user).to receive(:identity_verified?).and_return(false)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
         allow(person).to receive(:employee_roles).and_return([])
         allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
@@ -170,7 +170,7 @@ RSpec.describe Insured::FamiliesController do
         allow(user).to receive(:last_portal_visited).and_return ''
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
         allow(person).to receive(:employee_roles).and_return(nil)
         allow(family).to receive(:active_family_members).and_return(family_members)
@@ -207,7 +207,7 @@ RSpec.describe Insured::FamiliesController do
           allow(user).to receive(:last_portal_visited).and_return ''
           allow(person).to receive(:user).and_return(user)
           allow(person).to receive(:has_active_employee_role?).and_return(false)
-          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return([])
           sign_in user
           get :home
@@ -234,7 +234,7 @@ RSpec.describe Insured::FamiliesController do
         allow(person).to receive(:active_employee_roles).and_return(employee_roles)
         allow(employee_roles).to receive(:first).and_return(employee_role)
         allow(employee_roles).to receive(:count).and_return(1)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(employee_roles).to receive(:active).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(hbx_enrollments).to receive(:waived).and_return([waived_hbx])
@@ -415,7 +415,7 @@ RSpec.describe Insured::FamiliesController do
     before :each do
       allow(person).to receive(:user).and_return(user)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
-      allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return(employee_role)
@@ -580,7 +580,7 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(true)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
         @qle = FactoryGirl.create(:qualifying_life_event_kind)
         @family = FactoryGirl.build(:family, :with_primary_family_member)
         allow(person).to receive(:primary_family).and_return(@family)

@@ -406,18 +406,22 @@ describe Person do
         it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
       end
 
-      context "has_active_consumer_role?" do
+      context "is_consumer_role_active?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:consumer_role) {double(is_active?: true)}
 
         it "should return true" do
           allow(person).to receive(:consumer_role).and_return(consumer_role)
-          expect(person.has_active_consumer_role?).to eq true
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
+          expect(person.is_consumer_role_active?).to eq true
         end
 
         it "should return false" do
           allow(person).to receive(:consumer_role).and_return(nil)
-          expect(person.has_active_consumer_role?).to eq false
+          allow(person).to receive(:is_consumer_role_active?).and_return(false)
+
+          expect(person.is_consumer_role_active?).to eq false
         end
       end
 
@@ -747,6 +751,7 @@ describe Person do
   describe "does not allow two people with the same user ID to be saved", dbclean: :around_each do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
+    before do Person.collection.indexes.create_one({user_id: 1}, {sparse:true, unique: true}) end
 
     it "should let fail to save" do
       user_id = BSON::ObjectId.new

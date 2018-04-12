@@ -6,7 +6,7 @@ class IndividualMarketTransition
   embedded_in :person
 
   ROLE_TYPES   = %W(consumer resident)
-  REASON_CODES = %W(eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided)
+  REASON_CODES = %W(eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided generating_consumer_role generating_resident_role)
 
   field :role_type, type: String
   field :effective_starting_on, type: Date
@@ -14,10 +14,11 @@ class IndividualMarketTransition
   # a single individual_market_transition on a person that is not nil, e.g. the active role
   field :effective_ending_on, type: Date, default: nil
   field :reason_code, type: String
-  field :submitted_at, type: DateTime
+  field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
 
-	validates_presence_of :effective_starting_on, :submitted_at
+
+	validates_presence_of :submitted_at
 
   validates :role_type,
             presence: true,
@@ -31,15 +32,14 @@ class IndividualMarketTransition
           allow_nil:   false,
           inclusion: {in: REASON_CODES, message: "%{value} is not a valid transistion reason code"}
 
-  before_save :set_submitted_at, :set_submitted_by
+  before_validation :set_submitted_at
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
-  #TODO set the id of the admin who is making the transition before saving
   def set_submitted_by
-
+    self.user_id ||= current_user.id
   end
 
   def self.all
