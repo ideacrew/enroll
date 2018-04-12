@@ -143,7 +143,7 @@ class ApplicationController < ActionController::Base
         unless request.format.js?
           session[:portal] = url_for(params)
         end
-        redirect_to new_user_registration_path
+        redirect_to main_app.new_user_registration_path
       end
     rescue Exception => e
       message = {}
