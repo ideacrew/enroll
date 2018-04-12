@@ -1,5 +1,9 @@
 module ApplicationHelper
 
+  def show_or_hide_add_plan_year_button?(employer)
+    false
+  end
+
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
       plan.family_deductible.split("|").last.squish
