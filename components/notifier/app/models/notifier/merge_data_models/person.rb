@@ -6,7 +6,7 @@ module Notifier
     attribute :last_name, String
 
     def self.stubbed_object
-      Notifier::MergeDataModels::Enrollment.new({
+      Notifier::MergeDataModels::Person.new({
         first_name: "John",
         last_name: "Adams"
         })

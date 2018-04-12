@@ -71,7 +71,7 @@ module Observers
         employer_profile = new_model_event.klass_instance
         if new_model_event.event_key == :generate_initial_employer_invoice
           if employer_profile.is_new_employer?
-            trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "generate_initial_employer_invoice")
+            trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first, notice_event: "generate_initial_employer_invoice")
           end
         end
       end

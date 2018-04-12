@@ -35,8 +35,13 @@ module Notifier
     end
 
     def render_envelope(params)
+      template_location = if self.event_name == 'generate_initial_employer_invoice'
+                            'notifier/notice_kinds/initial_invoice/invoice_template.html.erb'
+                          else
+                            'notifier/notice_kinds/template.html.erb'
+                          end
        Notifier::NoticeKindsController.new.render_to_string({
-        :template => 'notifier/notice_kinds/template.html.erb', 
+        :template => template_location, 
         :layout => false,
         :locals => params.merge(notice_number: self.notice_number)
       })
@@ -126,9 +131,28 @@ module Notifier
     end
 
     def upload_to_amazonS3
-      Aws::S3Storage.save(notice_path, 'notices')
+      Aws::S3Storage.save(notice_path, bucket_type, file_name)
     rescue => e
       raise "unable to upload to amazon #{e}"
+    end
+
+    def bucket_type
+      if self.event_name == 'generate_initial_employer_invoice'
+        'invoices'
+      else
+        'notices'
+      end
+    end
+
+    def file_name
+      if self.event_name == 'generate_initial_employer_invoice'
+        "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
+      end
+    end
+
+    def invoice_date
+      date_string = file_name.split("_")[1]
+      Date.strptime(date_string, "%m%d%Y")
     end
 
     def recipient_name
@@ -179,8 +203,9 @@ module Notifier
       notice = receiver.documents.build({
         title: notice_filename, 
         creator: "hbx_staff",
-        subject: "notice",
+        subject: document_subject,
         identifier: doc_uri,
+        date: invoice_date,
         format: "application/pdf"
         })
 
@@ -191,14 +216,25 @@ module Notifier
       end
     end
 
+    def document_subject
+      if self.event_name == 'generate_initial_employer_invoice'
+        'invoice'
+      else
+        'notice'
+      end
+    end
+
     def create_secure_inbox_message(notice)
       receiver = resource
       receiver = resource.person if resource.is_a?(EmployeeRole)
 
+      if self.event_name == 'generate_initial_employer_invoice'
+        body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
+      else
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
       receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    
+      end
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end

@@ -3,6 +3,9 @@ module Notifier
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
     include Notifier::Builders::OfferedProduct
+    include ActionView::Helpers::NumberHelper
+    include Config::ContactCenterHelper
+    include Config::SiteHelper
 
     attr_accessor :employer_profile, :merge_model, :payload
     
@@ -23,7 +26,10 @@ module Notifier
         merge_model.first_name = employer_profile.staff_roles.first.first_name
         merge_model.last_name = employer_profile.staff_roles.first.last_name
       end
+      addresses
+    end
 
+    def addresses
       office_address = employer_profile.organization.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
@@ -46,6 +52,42 @@ module Notifier
 
     def invoice_month
       merge_model.invoice_month = TimeKeeper.date_of_record.next_month.strftime('%B')
+    end
+
+    def account_number
+      merge_model.account_number = employer_profile.organization.hbx_id
+    end
+
+    def invoice_number
+      merge_model.invoice_number = "#{employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime('%m%Y')}"
+    end
+
+    def invoice_date
+      merge_model.invoice_date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+    end
+
+    def coverage_month
+      merge_model.coverage_month = TimeKeeper.date_of_record.next_month.strftime("%m/%Y")
+    end
+
+    def total_amount_due
+      merge_model.total_amount_due = number_to_currency(employer_profile.plan_years.enrolled.first.hbx_enrollments.map(&:total_premium).sum)
+    end
+
+    def date_due
+      merge_model.date_due = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
+    end
+
+    def first_name
+      if employer_profile.staff_roles.present?
+        merge_model.first_name = employer_profile.staff_roles.first.first_name
+      end
+    end
+
+    def last_name
+      if employer_profile.staff_roles.present?
+        merge_model.last_name = employer_profile.staff_roles.first.last_name
+      end
     end
   end
 end
