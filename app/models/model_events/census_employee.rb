@@ -4,7 +4,10 @@ module ModelEvents
     REGISTERED_EVENTS = [
       :employee_coverage_passively_waived,
       :employee_coverage_passively_renewed,
-      :employee_coverage_passive_renewal_failed,
+      :employee_coverage_passive_renewal_failed
+    ]
+
+    OTHER_EVENTS = [
       :employee_notice_for_employee_terminated_from_roster
     ]
 
