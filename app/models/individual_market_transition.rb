@@ -6,7 +6,7 @@ class IndividualMarketTransition
   embedded_in :person
 
   ROLE_TYPES   = %W(consumer resident)
-  REASON_CODES = %W(eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided generating_consumer_role generating_resident_role)
+  REASON_CODES = %W(initial_individual_market_transition_created_using_data_migration eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided generating_consumer_role generating_resident_role)
 
   field :role_type, type: String
   field :effective_starting_on, type: Date
