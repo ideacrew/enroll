@@ -232,6 +232,7 @@ context "Verification process and notices" do
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
+    let(:verification_types) { consumer.verification_types }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
@@ -279,7 +280,6 @@ context "Verification process and notices" do
           allow(consumer).to receive(:citizen_status).and_return "us_citizen"
           consumer.coverage_purchased!
           expect(consumer.ssn_validation).to eq("na")
-          expect(consumer.ssn_update_reason).to eq("no_ssn_for_native")
         end
       end
       describe "immigrant with ssn" do
@@ -311,7 +311,7 @@ context "Verification process and notices" do
       it "fails ssn with callback" do
         consumer.aasm_state = "ssa_pending"
         consumer.ssn_invalid! verification_attr
-        expect(consumer.ssn_validation).to eq("outstanding")
+        expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("outstanding")
       end
       it "fails lawful presence with callback" do
         consumer.aasm_state = "ssa_pending"
@@ -336,7 +336,7 @@ context "Verification process and notices" do
       it "updates ssn validation with callback" do
         consumer.aasm_state = "ssa_pending"
         consumer.ssn_valid_citizenship_invalid! verification_attr
-        expect(consumer.ssn_validation).to eq("valid")
+        expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("verified")
       end
 
       it "fails lawful presence with callback" do
@@ -372,7 +372,7 @@ context "Verification process and notices" do
             it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", residency, from_state, to_state, "ssn_valid_citizenship_valid!"
             it "updates ssn citizenship with callback and doesn't change consumer citizen input" do
               consumer.ssn_valid_citizenship_valid! verification_attr
-              expect(consumer.ssn_validation).to eq("valid")
+              expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("verified")
               expect(consumer.lawful_presence_determination.verification_successful?).to eq true
               expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
             end

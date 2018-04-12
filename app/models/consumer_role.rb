@@ -425,12 +425,12 @@ class ConsumerRole
     end
 
     event :coverage_purchased, :after => [:record_transition, :move_types_to_pending ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn]
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssn]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
     end
 
-    event :coverage_purchased_no_residency, :after => [:record_transition, :notify_of_eligibility_change]  do
+    event :coverage_purchased_no_residency, :after => [:record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
@@ -686,20 +686,20 @@ class ConsumerRole
 
   def mark_residency_denied(*args)
     update_attributes(:residency_determined_at => DateTime.now,
-                      :is_state_resident => false,
-                      :local_residency_validation => "outstanding")
+                      :is_state_resident => false)
+    verification_types.by_name("DC Residency").first.fail_type if verification_types.by_name("DC Residency").first
   end
 
   def mark_residency_pending(*args)
     update_attributes(:residency_determined_at => DateTime.now,
-                      :is_state_resident => nil,
-                      :local_residency_validation => "pending")
+                      :is_state_resident => nil)
+    verification_types.by_name("DC Residency").first.pending_type if verification_types.by_name("DC Residency").first
   end
 
   def mark_residency_authorized(*args)
     update_attributes(:residency_determined_at => DateTime.now,
-                      :is_state_resident => true,
-                      :local_residency_validation => "valid")
+                      :is_state_resident => true)
+    verification_types.by_name("DC Residency").first.pass_type
   end
 
   def lawful_presence_pending?
@@ -755,30 +755,22 @@ class ConsumerRole
   end
 
   def pass_ssn(*args)
-    self.update_attributes!(ssn_validation: "valid")
+    verification_types.by_name("Social Security Number").first.pass_type
   end
 
   def fail_ssn(*args)
-    self.update_attributes!(
-      ssn_validation: "outstanding"
-    )
+    verification_types.by_name("Social Security Number").first.fail_type
   end
 
   def move_types_to_pending(*args)
     verification_types.each do |type|
-      type.update_attributes(:validation_status => "pending")
+      type.pending_type unless type.type_name == "DC Residency"
     end
-  end
-
-  def fail_ssa_for_no_ssn(*args)
-    self.update_attributes!(
-      ssn_validation: "outstanding",
-      ssn_update_reason: "no_ssn_for_native"
-    )
   end
 
   def pass_lawful_presence(*args)
     lawful_presence_determination.authorize!(*args)
+    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.pass_type }
   end
 
   def record_partial_pass(*args)
@@ -787,18 +779,20 @@ class ConsumerRole
 
   def fail_lawful_presence(*args)
     lawful_presence_determination.deny!(*args)
+    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type }
   end
 
   def revert_ssn
-    update_attributes(:ssn_validation => "pending")
+    verification_types.by_name("Social Security Number").first.pending_type
   end
 
   def revert_native
-    update_attributes(:native_validation => "pending")
+    verification_types.by_name("American Indian Status").first.pending_type
   end
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
+    (verification_types - VerificationType::NON_CITIZEN_IMMIGRATION_TYPES).each{ |type| type.pending_type }
   end
 
   def update_all_verification_types(*args)

@@ -4,6 +4,9 @@ class VerificationType
 
   embedded_in :person
 
+  ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
+  NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
+
   VALIDATION_STATES = %w(na pending review outstanding verified valid attested)
 
   field :type_name, type: String
@@ -49,5 +52,17 @@ class VerificationType
 
   def verif_due_date
     due_date || TimeKeeper.date_of_record
+  end
+
+  def pass_type
+    update_attributes(:validation_status => "verified")
+  end
+
+  def fail_type
+    update_attributes(:validation_status => "outstanding")
+  end
+
+  def pending_type
+    update_attributes(:validation_status => "pending")
   end
 end
