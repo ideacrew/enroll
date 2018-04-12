@@ -10,7 +10,7 @@ module BenefitSponsors
       end
 
       def create
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(benefit_application_params)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(@benefit_sponsorship, benefit_application_params)
 
         if @benefit_application_form.save
           redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_sponsorship, @benefit_application_form.benefit_application)
@@ -25,7 +25,7 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(benefit_application_params)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplication.new(@benefit_spnsorship, benefit_application_params)
         @benefit_application_form.reference_benefit_application = @benefit_application
         
         if @benefit_application_form.save

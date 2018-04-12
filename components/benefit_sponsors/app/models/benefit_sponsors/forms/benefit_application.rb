@@ -15,7 +15,8 @@ module BenefitSponsors
 
       validates :validate_application_dates
 
-      def initialize(params = {})
+      def initialize(benefit_sponsorship, params = {})
+        @benefit_sponsorship = benefit_sponsorship
         assign_application_attributes(params)
       end
 
@@ -29,15 +30,20 @@ module BenefitSponsors
         benefit_sponsorship.benefit_market
       end
 
-      def save
+      def save(benefit_sponsorship, params)
         return false unless valid?
-        @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(self, benefit_sponsorship)
-        @benefit_application.save
+        params.merge({benefit_application: reference_benefit_application}) if reference_benefit_application.present?
+
+        begin
+          benefit_application_factory = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(benefit_sponsorship, params)
+          @benefit_application = benefit_application_factory.benefit_application
+        rescue Exception => e
+          return false
+        end
       end
 
       def benefit_sponsor_catalogs
-        return @benefit_sponsor_catalogs if defined? @benefit_sponsor_catalogs
-        @benefit_sponsor_catalogs = benefit_market.benefit_sponsor_catalogs_for(benefit_sponsorship.rating_area)
+        BenefitSponsors::BenefitApplications::BenefitApplicationFactory.benefit_sponsor_catalogs_for(benefit_sponsorship)
       end
 
       def available_effective_date_options
