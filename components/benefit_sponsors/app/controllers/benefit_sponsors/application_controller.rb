@@ -13,10 +13,10 @@ module BenefitSponsors
     end
 
     protected
-    # Broker Signup form should be accessibile for anonymous users
+
     def authentication_not_required?
       devise_controller? ||
-      (controller_name == "broker_roles") ||
+      (controller_name == "registrations" && params["profile_type"] == "broker_agency")||
       (controller_name == "office_locations") ||
       (controller_name == "invitations") ||
       (controller_name == "saml")
