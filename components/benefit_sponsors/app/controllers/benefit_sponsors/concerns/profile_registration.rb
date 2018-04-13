@@ -13,15 +13,15 @@ module BenefitSponsors
       end
 
       def sponsor_show_pending_registration_url
-        profiles_employers_employer_profile_show_pending(@agency.profile.id)
+        profiles_employers_employer_profile_show_pending(@agency.organization.employer_profile.id)
       end
 
       def sponsor_home_registration_url
-        profiles_employers_employer_profile_path(@agency.profile.id, tab: 'home')
+        profiles_employers_employer_profile_path(@agency.organization.employer_profile.id, tab: 'home')
       end
 
       def sponsor_edit_registration_url
-        edit_profiles_employers_employer_profile_path(@employer_profile.id)
+        edit_profiles_registration_path(@agency.organization.employer_profile.id)
       end
     end
   end
