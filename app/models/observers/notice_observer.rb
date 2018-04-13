@@ -85,6 +85,7 @@ module Observers
           if employer_profile.is_new_employer?
             trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first, notice_event: "generate_initial_employer_invoice")
           end
+        end
 
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
           trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
@@ -105,6 +106,18 @@ module Observers
               trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             end
           end
+        end
+      end
+    end
+
+    def document_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+
+      if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        document = new_model_event.klass_instance
+        if new_model_event.event_key == :initial_employer_invoice_available
+          employer_profile = document.documentable
+          trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first, notice_event: "initial_employer_invoice_available")
         end
       end
     end
@@ -142,6 +155,7 @@ module Observers
     def employer_profile_date_change; end
     def hbx_enrollment_date_change; end
     def census_employee_date_change; end
+    def document_date_change; end
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)

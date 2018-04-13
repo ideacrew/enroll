@@ -2,7 +2,7 @@ module ModelEvents
   module EmployerProfile
 
     REGISTERED_EVENTS = [
-      :generate_initial_employer_invoice
+      :generate_initial_employer_invoice,
       :broker_hired_confirmation_to_employer,
       :welcome_notice_to_employer
     ]

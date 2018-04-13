@@ -66,6 +66,7 @@ module Notifier
     end
 
     def generate_pdf_notice
+      save_html
       File.open(notice_path, 'wb') do |file|
         file << self.to_pdf
       end
@@ -225,7 +226,7 @@ module Notifier
 
     def document_subject
       if self.event_name == 'generate_initial_employer_invoice'
-        'invoice'
+        'initial_invoice'
       else
         'notice'
       end

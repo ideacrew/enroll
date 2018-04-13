@@ -265,6 +265,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
+        allow(employer_profile).to receive(:documents).and_return(Document.all)
         sign_in(user)
       end
 

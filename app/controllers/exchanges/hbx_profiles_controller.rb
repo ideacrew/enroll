@@ -65,8 +65,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations = Organization.where(:id.in => params[:ids]).all
 
     @organizations.each do |org|
-      # @employer_invoice = EmployerInvoice.new(org)
-      # @employer_invoice.save_and_notify_with_clean_up
       org.employer_profile.trigger_model_event(:generate_initial_employer_invoice)
     end
 
