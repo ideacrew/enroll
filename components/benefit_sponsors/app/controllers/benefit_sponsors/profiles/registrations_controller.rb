@@ -18,8 +18,10 @@ module BenefitSponsors
     end
 
     def create
+      params[:agency].permit!
+      @agency= BenefitSponsors::Organizations::Forms::Profile.new(params[:agency])
       begin
-        saved, result_url = @agency.save(current_user, params[:agency])
+        saved, result_url = @agency.persist(current_user, params[:agency])
         result_url = self.send(result_url)
         if saved
           if is_employer_profile?
@@ -30,9 +32,6 @@ module BenefitSponsors
           end
           redirect_to result_url
           return
-        else
-          redirect_to default_url
-          return
         end
       rescue Exception => e
         flash[:error] = e.message
@@ -41,19 +40,20 @@ module BenefitSponsors
     end
 
     def edit
-      @agency= BenefitSponsors::Organizations::Forms::Profile.new(profile_type: profile_type)
       # Get Staff role person
       # @staff ||= staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
+      @agency = BenefitSponsors::Organizations::Forms::Profile.new(id: params[:id])
     end
 
     def update
-      # TODO should handle all profiles
+      @agency = BenefitSponsors::Organizations::Forms::Profile.new(organization_params)
       sanitize_office_locations_params
       if can_update_profile?
-        if @organization.update_attributes(params["organization"]) # Move to domain layer while handling other profiles if needed
+        if @agency.update(organization_params)
           flash[:notice] = 'Employer successfully Updated.'
         else
-          org_error_msg = @organization.errors.full_messages.join(",").humanize if @organization.errors.present?
+          org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
+
           flash[:error] = "Employer information not saved. #{org_error_msg}."
         end
       else
@@ -69,20 +69,21 @@ module BenefitSponsors
     end
 
     def initialize_agency
-      return if params[:agency].blank?
-      params[:agency].permit!
-      @agency= BenefitSponsors::Organizations::Forms::Profile.new(params[:agency])
+      # return if params[:agency].blank?
+      # params[:agency].permit!
+      # @agency= BenefitSponsors::Organizations::Forms::Profile.new(params[:agency])
     end
 
     def find_agency
-      id_params = params.permit(:id, :employer_profile_id)
-      id = id_params[:id] || id_params[:employer_profile_id]
-      @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
-      @employer_profile = @organization.employer_profile # TODO PICK correct Profile
-      render file: 'public/404.html', status: 404 if @employer_profile.blank?
+      # id_params = params.permit(:id, :employer_profile_id)
+      # id = id_params[:id] || id_params[:employer_profile_id]
+      # @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
+      # @employer_profile = @organization.employer_profile # TODO PICK correct Profile
+      # render file: 'public/404.html', status: 404 if @employer_profile.blank?
     end
 
     def can_update_profile?
+      return true # TODO
       (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
     end
 
@@ -108,6 +109,10 @@ module BenefitSponsors
           end
         end
       end
+    end
+
+    def organization_params
+      params["organization"].merge!({"id" => params["id"]}).permit!
     end
 
     #checks if person is approved by employer for staff role
