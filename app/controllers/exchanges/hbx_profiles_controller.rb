@@ -442,7 +442,7 @@ def employer_poc
     slcsp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
     @active_household = @primary_family.active_household
     @active_household.build_thh_and_eligibility(params[:person][:max_aptc],
-      params[:person][:csr], effective_date, slcsp, params[:person][:reason])
+      params[:person][:csr], effective_date, slcsp)
     update_eligibility_kinds
   end
 
@@ -456,6 +456,7 @@ def employer_poc
         person = Person.by_hbx_id(person_hbx_id).first
         family_member = family_members.where(person_id: person.id).first
         tax_household_member = tax_household_members.where(applicant_id: family_member.id).first
+        tax_household_member.update_attribute(:reason, value['reason'])
         tax_household_member.update_eligibility_kinds(eligibility_kinds_hash(value))
       end
     end
