@@ -6,6 +6,8 @@ module BenefitSponsors
       field :cms_id,                  type: String
       field :us_state_abbreviation,   type: String
 
+      validates_presence_of :us_state_abbreviation, :cms_id
+
       private
 
       def initialize_profile
@@ -16,6 +18,9 @@ module BenefitSponsors
         self
       end
 
+      def build_nested_models
+        build_inbox if inbox.nil?
+      end
     end
   end
 end
