@@ -1,19 +1,24 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MigrateVerificationTypes < MongoidMigrationTask
-  def get_people
-    Person.where(:"consumer_role" => {"$exists" => true})
+  def get_people(offset, limit)
+    Person.where(:"consumer_role" => {"$exists" => true}).offset(offset).limit(limit)
   end
 
   def migrate
-    people = get_people
-    people.each do |person|
-      begin
-        ensure_verification_types(person)
-        puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
-      rescue
-        $stderr.puts "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
+    run_size = 500
+    offset = 0
+    while offset < Person.count do
+      people = get_people(offset, run_size)
+      people.each do |person|
+        begin
+          ensure_verification_types(person)
+          puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
+        rescue
+          $stderr.puts "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
+        end
       end
+      offset = offset + run_size
     end
   end
 
