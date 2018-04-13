@@ -7,7 +7,7 @@ module BenefitSponsors
         include BenefitSponsors::Forms::NpnField
 
         attr_accessor :profile_id, :profile_type, :organization, :current_user
-        attr_accessor :first_name, :last_name, :dob, :npn, :person, :market_kind
+        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :person, :market_kind
 
         validate :validate_duplicate_npn, if: :is_broker_profile?
 
@@ -35,8 +35,10 @@ module BenefitSponsors
           self.profile_type = attrs[:profile_type]
           self.first_name = attrs[:first_name]
           self.last_name = attrs[:last_name]
+          self.email = attrs[:email]
           self.dob = attrs[:dob]
           self.npn = attrs[:npn]
+          self.fein = attrs[:fein]
           self.profile_id = attrs[:id]
         end
 
@@ -76,7 +78,7 @@ module BenefitSponsors
         end
 
         def build_broker_profile
-          # TODO
+          Organizations::BrokerAgencyProfile.new
         end
 
         def build_sponsor_profile
@@ -121,9 +123,7 @@ module BenefitSponsors
             return false, redirection_url
           end
 
-          return false, redirection_url if issuer_requesting_sponsor_beneefits?
-
-          return false, redirection_url if person.errors.present?
+          return false, redirection_url if check_validity(existing_org)
 
           if is_broker_profile?
             update_broker_agency_profile(existing_org, attributes)
@@ -135,13 +135,24 @@ module BenefitSponsors
           [true, redirection_url(pending, true)]
         end
 
+        def check_validity(org)
+          issuer_requesting_sponsor_benefits?(org) || broker_profile_already_registered?(org) || person.errors.present?
+        end 
+
         def update_broker_agency_profile(organization, attributes)
           add_broker_role
-          organization = init_broker_organization(organization).assign_attributes(attributes)
+          organization = init_broker_organization(organization)
+          #TODO: Fix next line for attributes
+          organization = organization.assign_attributes(broker_agency_profile_attrs(attributes))
           profile = organization.broker_agency_profile
           profile.primary_broker_role = person.broker_role
           profile.save!
           update_broker_role(profile)
+        end
+
+        def broker_agency_profile_attrs attrs
+          attrs["profiles_attributes"].merge!(attrs.slice(:entity_kind, :market_kind, :npn, :languages_spoken, :working_hours, :accept_new_clients))
+          attrs.except!(:profile_type, :first_name, :last_name, :npn, :dob, :email, :entity_kind, :market_kind, :languages_spoken, :working_hours, :accept_new_clients)
         end
 
         def init_broker_organization(organization)
@@ -150,6 +161,12 @@ module BenefitSponsors
             organization
           else
             build_organization
+          end
+        end
+
+        def broker_profile_already_registered?(organization)
+          if is_broker_profile?
+            organization.present? && organization.broker_agency_profile.present?
           end
         end
 
@@ -173,8 +190,8 @@ module BenefitSponsors
           end
         end
 
-        def issuer_requesting_sponsor_beneefits?(organization)
-          if organization.is_an_issuer_profile?
+        def issuer_requesting_sponsor_benefits?(organization)
+          if organization.present? && organization.is_an_issuer_profile?
             errors.add(:base, "Issuer cannot sponsor benefits")
             return true
           end
@@ -269,9 +286,10 @@ module BenefitSponsors
 
           if is_broker_profile?
             self.person.add_work_email(email)
-            @office_locations.each do  |office_location|
-              self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
-            end
+            #TODO: Handling update Phones on Person using OL hash
+            # @office_locations.each do  |office_location|
+            #   self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
+            # end
           elsif is_employer_profile?
             person.contact_info(email, area_code, number, extension) if email
           end
