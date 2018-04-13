@@ -2445,7 +2445,7 @@ describe PlanYear, "plan year schedule changes" do
         }
 
         let(:person) { family.family_members.first.person }
-        let(:passive_renewal) { FactoryGirl.create(:hbx_esnrollment,
+        let(:passive_renewal) { FactoryGirl.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: renewing_plan_year.start_on,

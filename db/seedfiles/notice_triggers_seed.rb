@@ -1209,27 +1209,6 @@ shop_notice_triggers = [
   #     }
   #   ]
   # },
-    {
-        hbx_id: 'SHOP_M043',
-        title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
-        description: 'EE Made Mid-Year Plan Change (Reason: New Hire, SEP, OR DPT Age-Off)',
-        resource_name: 'employer',
-        event_name: 'employee_mid_year_plan_change',
-        notice_triggers: [
-          {
-                name: 'Employee Mid-Year Plan change',
-                notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change',
-                notice_builder: 'EmployeeMidYearPlanChange',
-                mpi_indicator: 'SHOP_M043',
-                notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employer"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-                }
-            }
-        ]
-    }
 ]
 
 ivl_notice_triggers = [

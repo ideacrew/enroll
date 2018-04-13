@@ -7,6 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
+  include ApplicationHelper
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -145,11 +146,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
     def employee_mid_year_plan_change(person,change_plan)
      begin
-      employee_role_id = person.active_employee_roles.first.census_employee.id
-      if employee_role_id.present?
-        if change_plan.present? or person.active_employee_roles.first.census_employee.new_hire_enrollment_period.present?
-          ShopNoticesNotifierJob.perform_later(employee_role_id.to_s, "employee_mid_year_plan_change")
-        end
+      ce = person.active_employee_roles.first.census_employee
+      if change_plan.present? or ce.new_hire_enrollment_period.present?
+        trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer')
       end
      rescue Exception => e
        log("#{e.message}; person_id: #{person.id}")
