@@ -598,7 +598,11 @@ class Person
   end
 
   def active_individual_market_role
-    current_individual_market_transition.role_type
+    if current_individual_market_transition.present? && current_individual_market_transition.role_type
+      current_individual_market_transition.role_type
+    else
+      nil
+    end
   end
 
   def is_consumer_role_active?
