@@ -2,6 +2,21 @@ require "rails_helper"
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+  describe "#rates_available?" do
+    let(:employer_profile){ double("EmployerProfile") }
+
+    it "should return blocking when true" do
+      allow(employer_profile).to receive(:applicant?).and_return(true)
+      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(true)
+      expect(helper.rates_available?(employer_profile)).to eq "blocking"
+    end
+
+    it "should return empty string when false" do
+      allow(employer_profile).to receive(:applicant?).and_return(false)
+      expect(helper.rates_available?(employer_profile)).to eq ""
+    end
+  end
+
   describe "#deductible_display" do
     let(:hbx_enrollment) {double(hbx_enrollment_members: [double, double])}
     let(:plan) { double("Plan", deductible: "$500", family_deductible: "$500 per person | $1000 per group",) }
