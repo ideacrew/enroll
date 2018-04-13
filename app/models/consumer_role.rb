@@ -84,7 +84,7 @@ class ConsumerRole
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
 
-  field :native_validation, type: String, default: nil
+  field :native_validation, type: String, default: -> {"na"}
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
   # DC residency
