@@ -4,13 +4,17 @@ module BenefitSponsors
       include ActiveModel::Validations
       include ::Validations::Email
       include BenefitSponsors::Forms::NpnField
-      include BenefitSponsors::Forms::ProfileInformation
 
-      attr_accessor :market_kind, :entity_kind, :languages_spoken, :working_hours, 
-                      :accept_new_clients, :home_page, :email, :area_code, :number, :extension, :contact_method
-
-      attr_accessor :id, :person_id, :dba, :npn, :office_locations, :profile
-      attr_reader :dob, :profile_type, :first_name, :last_name, :fein, :legal_name
+      attr_accessor :organization
+      attr_accessor :legal_name, :fein, :dba, :entity_kind, :market_kind, :entity_kind, :languages_spoken, :working_hours, 
+                      :accept_new_clients, :home_page, :email
+      attr_accessor :is_primary
+      attr_accessor :address_1, :address_2, :address_3, :county, :country_name, :kind, :city, :state, :zip
+      attr_accessor :country_code, :area_code, :number, :extension, :full_phone_number
+      attr_accessor :profile_type
+      attr_accessor :first_name, :last_name, :dob
+      attr_accessor :profiles_attributes, :office_locations_attributes, :address_attributes, :phone_attributes
+      attr_accessor :first_name, :last_name, :dob
 
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
@@ -23,8 +27,8 @@ module BenefitSponsors
         inclusion: { in: Organizations::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
         allow_blank: false
 
-      validate :office_location_validations
-      validate :office_location_kinds
+      # validate :office_location_validations
+      # validate :office_location_kinds
 
 
 
@@ -38,28 +42,77 @@ module BenefitSponsors
 
       def initialize(attrs = {})
         @profile_type = attrs[:profile_type]
-        @office_locations ||= []
-        assign_wrapper_attributes(attrs.except(:profile_type))
-        ensure_office_locations
+        assign_wrapper_attributes(attrs)
+        build_parent_organization_obj(attrs)
       end
 
-      def assign_wrapper_attributes(attrs = {})
-        attrs.each_pair do |k,v|
-          v = v.to_sym if k == 'entity_kind'
+      def build_parent_organization_obj(attributes)
+        @organization = Factories::ProfileFactory.initialize_parent(attributes)
+      end
+
+      def assign_wrapper_attributes(attributes)
+        attributes.each_pair do |k, v|
+          next unless self.class.method_defined?("#{k}")
           self.send("#{k}=", v)
         end
       end
 
-      def ensure_office_locations
-        if @office_locations.empty?
-          new_office_location = Locations::OfficeLocation.new
-          new_office_location.build_address
-          new_office_location.build_phone
-          @office_locations = [new_office_location]
+      def persist(current_user, attrs)
+        return false unless valid?
+        Factories::ProfileFactory.call_persist(current_user, attrs)
+      end
+
+      def update(attrs)
+        return false unless valid?
+        Factories::ProfileFactory.call_update(organization, attrs.merge({id: organization.id}))
+      end
+
+      def first_name=(val)
+        @first_name = val.blank? ? nil : val.strip
+      end
+
+      def last_name=(val)
+        @last_name = val.blank? ? nil : val.strip
+      end
+
+      def legal_name=(val)
+        @legal_name = val.blank? ? nil : val.strip
+      end
+
+      def dob=(val)
+        @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
+      end
+      
+      # Strip non-numeric characters
+      def fein=(new_fein)
+        @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
+      end
+
+      def entity_kind=(entity_kind)
+        @entity_kind = entity_kind.to_sym
+      end
+
+      def profiles_attributes=(profiles)
+        profiles.values.each do |attributes|
+          assign_wrapper_attributes(attributes)
         end
       end
 
-      def office_location_validations
+      def office_locations_attributes=(locations)
+        locations.values.each do |attributes|
+          assign_wrapper_attributes(attributes)
+        end
+      end
+
+      def address_attributes=(attributes)
+        assign_wrapper_attributes(attributes)
+      end
+
+      def phone_attributes=(attributes)
+        assign_wrapper_attributes(attributes)
+      end
+
+      def office_location_validations # Should be in factory
         @office_locations.each_with_index do |ol, idx|
           ol.valid?
           ol.errors.each do |k, v|
@@ -68,8 +121,13 @@ module BenefitSponsors
         end
       end
 
-      def office_location_kinds
+      def office_location_kinds # Should be in factory
         location_kinds = office_locations.flat_map(&:address).flat_map(&:kind)
+        #too_many_of_a_kind = location_kinds.group_by(&:to_s).any? { |k, v| v.length > 1 }
+
+        #if too_many_of_a_kind
+        #  self.errors.add(:base, "may not have more than one of the same kind of address")
+        #end
 
         if location_kinds.count('primary').zero?
           self.errors.add(:base, "must select one primary address")
@@ -78,17 +136,6 @@ module BenefitSponsors
         elsif location_kinds.count('mailing') > 1
           self.errors.add(:base, "can't have more than one mailing address")
         end
-      end
-
-      def office_locations_attributes
-        @office_locations.map do |office_location|
-          office_location.attributes
-        end
-      end
-
-      def save(current_user, attrs)
-        return false unless valid?
-        Factories::ProfileFactory.call(current_user, attrs)
       end
 
       def is_broker_profile?

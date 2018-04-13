@@ -9,6 +9,7 @@ BenefitSponsors::Engine.routes.draw do
           get :family_index
           get :messages
           get :agency_messages
+          get :broker_portal
         end
         member do
           post :clear_assign_for_employer
