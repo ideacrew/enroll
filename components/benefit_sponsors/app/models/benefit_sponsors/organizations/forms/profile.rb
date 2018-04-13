@@ -14,6 +14,7 @@ module BenefitSponsors
       attr_accessor :profile_type
       attr_accessor :first_name, :last_name, :dob
       attr_accessor :profiles_attributes, :office_locations_attributes, :address_attributes, :phone_attributes
+      attr_accessor :first_name, :last_name, :dob
 
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },

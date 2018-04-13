@@ -19,7 +19,7 @@
 
       = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right'
 - else
-  = form_for @agency.organization, as: :agency, url: {action: "create"} do |f|
+  = form_for @agency, as: :agency, url: {action: "create"} do |f|
     = f.hidden_field :profile_type, value: params[:profile_type]
     = render 'benefit_sponsors/shared/error_messages', :object => @agency
     = render 'benefit_sponsors/profiles/employers/employer_profiles/employer_profile_form', f: f
