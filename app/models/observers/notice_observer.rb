@@ -122,6 +122,10 @@ module Observers
       end
     end
 
+    def vlp_document_update; end
+    def paper_application_update; end
+    def employer_attestation_document_update; end
+
     def plan_year_date_change(model_event)
       current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
@@ -156,6 +160,7 @@ module Observers
     def hbx_enrollment_date_change; end
     def census_employee_date_change; end
     def document_date_change; end
+
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)

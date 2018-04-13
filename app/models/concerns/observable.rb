@@ -25,8 +25,8 @@ module Concerns::Observable
 
     def notify_observers(*arg)
       if defined? @observer_peers
-        @observer_peers.each do |k, v|
-          k.send v, *arg
+        @observer_peers.each do |k, m|
+          k.send m, *arg
         end
       end
     end
