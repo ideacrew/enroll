@@ -344,14 +344,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   context "GET print_waiver" do
     let(:enrollment){ double(:HbxEnrollment) }
 
-    it "should return hbx_enrollment to print waiver" do
+   it "should return hbx_enrollment to print waiver" do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       sign_in(user)
-      allow(hbx_enrollment).to receive(:census_employee).and_return(double)
-      allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
-      allow(subject).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
-      # allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end
