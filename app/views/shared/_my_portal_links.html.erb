@@ -10,7 +10,7 @@
     <span>
       <%= link_to l10n(".my_insured_portal"), family_account_path(tab: 'home'), class: 'header-text' if insured %>
       <%= link_to "My Employer Portal", new_employers_employer_profile_path, class: 'header-text' if employer_staff.present? %>
-      <%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' if broker %>
+      <%= link_to "My Broker Agency Portal", benefit_sponsors.broker_portal_profiles_broker_agencies_broker_agency_profiles_path, class: 'header-text' if broker %>
       <span> | </span>
     </span>
     <%elsif portal_count > 1 %>
@@ -35,7 +35,7 @@
             <li><%= link_to employer.legal_name, employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
         <% end %>
         <% if broker %>
-          <li><%= link_to "My Broker Agency Portal", broker_agencies_root_path, class: 'header-text' %></li>
+          <li><%= link_to "My Broker Agency Portal", benefit_sponsors.broker_portal_profiles_broker_agencies_broker_agency_profiles_path, class: 'header-text' %></li>
         <% end %>
       </ul>
       <span> | </span>

@@ -4,11 +4,11 @@ module BenefitSponsors
       include Acapi::Notifiers
       include DataTablesAdapter
 
-      before_action :check_broker_agency_staff_role, only: [:new, :create]
+      before_action :check_broker_agency_staff_role, only: [:broker_portal, :create]
       before_action :check_admin_staff_role, only: [:index]
       before_action :find_hbx_profile, only: [:index]
       before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
-      before_action :set_current_person, only: [:staff_index, :new]
+      before_action :set_current_person, only: [:staff_index, :broker_portal]
       before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
       before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
@@ -25,8 +25,9 @@ module BenefitSponsors
       end
 
       def new
-        @profile = Organizations::BrokerAgencyProfile.new
-        @organization = BenefitSponsors::Organizations::Factories::BrokerAgencyProfileFactory.new(@profile)
+      end
+
+      def broker_portal
       end
 
       def create
@@ -92,7 +93,7 @@ module BenefitSponsors
         elsif current_user.has_hbx_staff_role?
           find_broker_agency_profile(BSON::ObjectId.from_string(id))
         else
-          redirect_to new_profiles_broker_agencies_broker_agency_profile_path
+          redirect_to broker_portal_profiles_broker_agencies_broker_agency_profiles_path
           return
         end
 
@@ -123,7 +124,7 @@ module BenefitSponsors
         elsif current_user.has_hbx_staff_role?
           find_broker_agency_profile(BSON::ObjectId.from_string(id))
         else
-          redirect_to new_profiles_broker_agencies_broker_agency_profile_path
+          redirect_to broker_portal_profiles_broker_agencies_broker_agency_profiles_path
           return
         end
 
@@ -223,7 +224,7 @@ module BenefitSponsors
         elsif current_user.has_broker_agency_staff_role?
           redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
         else
-          redirect_to new_profiles_broker_agencies_broker_agency_profile_path
+          redirect_to broker_portal_profiles_broker_agencies_broker_agency_profiles_path
         end
       end
 

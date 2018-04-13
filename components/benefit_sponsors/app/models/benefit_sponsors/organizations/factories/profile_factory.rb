@@ -117,7 +117,7 @@ module BenefitSponsors
             errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
             return false, redirection_url
           rescue OrganizationAlreadyMatched
-            errors.add(:base, "organization has already been created.")
+            errors.add(:base, "Organization has already been created for this Agency type")
             return false, redirection_url
           end
 
