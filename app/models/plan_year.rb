@@ -879,7 +879,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolled,  :after_enter => :ratify_enrollment # Published plan open enrollment has ended and is eligible for coverage,
+    state :enrolled,  :after_enter => [:ratify_enrollment, :finalize_composite_rates] # Published plan open enrollment has ended and is eligible for coverage,
     state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -891,7 +891,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-    state :renewing_enrolled, :after_enter => [:renewal_successful]
+    state :renewing_enrolled, :after_enter => [:renewal_successful, :finalize_composite_rates]
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled,          :after_enter => :cancel_application
 
@@ -1319,10 +1319,13 @@ class PlanYear
     end
   end
 
-  def renewal_successful
+  def finalize_composite_rates
     benefit_groups.each do |bg|
       bg.finalize_composite_rates
     end
+  end
+
+  def renewal_successful
     if transmit_employers_immediately?
       employer_profile.transmit_renewal_eligible_event
     end
