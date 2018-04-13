@@ -1,10 +1,11 @@
-    require 'rails_helper'
+require 'rails_helper'
 
 RSpec.describe "insured/families/personal.html.erb" do
   before :each do
   stub_template "insured/families/_navigation.html.erb" => ''
   stub_template "insured/families/_profile_submenu.html.erb" => ''
   assign(:person, person)
+  #assign(:individual_market_transition, individual_market_transition)
   allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
   render file: "insured/families/personal.html.erb"
   end
@@ -21,15 +22,13 @@ RSpec.describe "insured/families/personal.html.erb" do
 
   context "for employee role" do
     let(:person) {FactoryGirl.create(:person, :with_employee_role)}
-    let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person)}
+    #let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person)}
 
     before do
-      allow(person).to receive(:is_consumer_role_active?).and_return(false)
-      allow(person).to receive(:active_individual_market_role).and_return(false)
+      #allow(person).to receive(:is_consumer_role_active?).and_return(false)
     end
 
     it "should renders home address fields" do
-      binding.pry
       expect(response).to render_template("shared/_home_address_fields")
     end
 
@@ -45,8 +44,8 @@ RSpec.describe "insured/families/personal.html.erb" do
   end
 
    context "for consumer role" do
-     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-
+     let(:person) {FactoryGirl.create(:person, :with_active_consumer_role)}
+     #let(:person) { double("Person") }
 
      it "should renders home address fields and consumer fields" do
        expect(response).to render_template("shared/_consumer_fields")

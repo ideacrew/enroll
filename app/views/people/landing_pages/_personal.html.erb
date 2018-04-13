@@ -41,7 +41,7 @@
           </div>
         </div>
 
-        <% if @person.is_consumer_role_active? %>
+        <% if can_shop_individual?(@person) %>
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
             <span>Is <%= @person.first_name %> applying for coverage?</span>
