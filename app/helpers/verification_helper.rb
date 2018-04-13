@@ -28,7 +28,7 @@ module VerificationHelper
         "default"
       when "valid"
         "success"
-      when "processing"
+      when "pending"
         "info"
     end
   end
