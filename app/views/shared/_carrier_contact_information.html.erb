@@ -10,7 +10,7 @@
         <i class="fa fa-phone fa-3x"></i>
         <% if plan.coverage_kind == 'health' %>
           <div class="carrier-numbers">
-            <% if plan.carrier_profile.legal_name == "BMC HealthNet Plan" %>
+            <% if plan.carrier_profile.fein == "043373331" %>
               <div>
                 <strong> Call: </strong>
                 <strong><a href="tel:+18558338120"> 1-855-833-8120 </a></strong> <br>
@@ -20,7 +20,7 @@
                 <br>
                 <strong> Email: </strong> memberquestions@bmchp.org <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Fallon Health" %>
+            <% elsif plan.carrier_profile.fein == "237442369" %>
               <div>
                 <strong> Call: </strong>
                 <strong><a href="tel:+18008685200"> 1-800-868-5200 </a></strong> <br>
@@ -28,7 +28,7 @@
                 <strong> Hours: </strong> Monday, Tuesday, Thursday, and Friday from 8:00 a.m. to 6:00 p.m. Eastern Time, and Wednesday from 10:00 a.m. to 6:00 p.m. Eastern Time <br>
                 <strong> Email: </strong> FCHPcustomerservice@fallonhealth.org <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Health New England" %>
+            <% elsif plan.carrier_profile.fein == "042864973" %>
               <div>
                 <strong> Call: </strong>
                 <strong> Local: </strong> <a href="tel:+14137874004"> 1-413-787-4004 </a> <br>
@@ -37,7 +37,7 @@
                 <strong> Hours: </strong> Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time <br>
                 <strong> Email: </strong> memberservices@hne.com <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Blue Cross Blue Shield MA" %>
+            <% elsif plan.carrier_profile.fein == "041045815" %>
               <div>
                 <strong> Call: </strong>
                 <strong> For Small Group/FOM: </strong> <a href="tel:+18007823675"> 1-800-782-3675 </a> <br>
@@ -45,7 +45,7 @@
                 <strong> Hours: </strong> Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time <br>
                 <strong> Email: </strong> send secure email after login to member account <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Harvard Pilgrim Health Care" %>
+            <% elsif plan.carrier_profile.fein == "042452600" %>
               <div>
                 <strong> Call: </strong>
                 <a href="tel:+18779074742"> 1-877-907-4742 </a> <br>
@@ -53,7 +53,7 @@
                 <strong> Hours: </strong> Monday, Tuesday, & Thursday from 8:00 a.m. to 6:00 p.m.; Wednesday from 10:00 a.m. to 6:00 p.m.; and Friday from 8:00 a.m. to 5:30 p.m <br>
                 <strong> Email: </strong> send secure email after login to member account <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Neighborhood Health Plan" %>
+            <% elsif plan.carrier_profile.fein == "234547586" %>
               <div>
                 <strong> Call: </strong>
                 <a href="tel:+18664145533"> 1-866-414-5533 </a> <br>
@@ -61,14 +61,14 @@
                 <strong> Hours: </strong> Monday, Tuesday, Wednesday, Friday from 8:00 a.m. to 6:00 p.m.; Thursday from 8:00 a.m. to 8:00 p.m.  <br>
                 <strong> Email: </strong> memberservices@nhp.org <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Tufts Health Direct" %>
+            <% elsif plan.carrier_profile.fein == "800721489" %>
               <div>
                 <strong> Call: </strong>
                 <a href="tel:+18882571985"> 1-888-257-1985 </a> <br>
                 <strong> Hours: </strong> Monday through Friday, from 8 a.m. to 5 p.m. <br>
                 <strong> Email: </strong><br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Tufts Health Plan Premier" %>
+            <% elsif plan.carrier_profile.fein == "042674079" %>
               <div>
                 <strong> Call: </strong>
                 <a href="tel:+18004620224"> 1-800-462-0224 </a> <br>
