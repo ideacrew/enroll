@@ -12,7 +12,7 @@ require 'csv'
 namespace :reports do
   desc "Outstanding verifications created monthly report"
   task :outstanding_types_created => :environment do
-    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE OUTSTANDING DUE_DATE)
+    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE)
 
     def date
       begin
@@ -116,6 +116,7 @@ namespace :reports do
                 person.first_name,
                 person.last_name,
                 type,
+                transition.transition_at,
                 "outstanding",
                 due_date_for_type(person, type, transition).to_date
             ]
