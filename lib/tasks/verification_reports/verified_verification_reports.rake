@@ -27,9 +27,12 @@ namespace :reports do
       if @person.primary_family
         @person.hbx_id
       else
-        @person.families.map(&:primary_family_member).map(&:hbx_id).join(',')
+        @person.families.to_a.each do |family|
+          @family_array = []
+          @family_array <<  family  if family.active_family_members.map(&:person).map(&:hbx_id).include? @person.hbx_id
+        end
+        @family_array.map(&:primary_family_member).map(&:hbx_id).join(',')
       end
-
     end
 
     def start_date
