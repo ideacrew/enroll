@@ -19,14 +19,16 @@ module BenefitSponsors
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
         numericality: true
-      validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
-      validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
-      validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
+      #TODO: Conditionally Validate on Edit & Update (On Create there is no person_id)
+      #validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
+      #validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
+      #validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :fein, :legal_name
       validates :entity_kind,
         inclusion: { in: Organizations::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
         allow_blank: false
 
+      # TODO: Move to Factory
       # validate :office_location_validations
       # validate :office_location_kinds
 
