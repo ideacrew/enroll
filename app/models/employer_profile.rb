@@ -977,6 +977,8 @@ class EmployerProfile
 
   after_update :broadcast_employer_update, :notify_broker_added, :notify_general_agent_added
 
+  after_save :notify_on_save
+
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
       notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer_id => self.hbx_id})

@@ -78,10 +78,22 @@ module Observers
 
     def employer_profile_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      employer_profile = new_model_event.klass_instance
       if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        employer_profile = new_model_event.klass_instance
+        if new_model_event.event_key == :initial_employee_plan_selection_confirmation
+          if employer_profile.is_new_employer?
+            census_employees = employer_profile.census_employees.non_terminated
+            census_employees.each do |ce|
+              if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
+                trigger_notice(recipient: ce.employee_role, event_object: ce.active_benefit_group_assignment.hbx_enrollment, notice_event: "initial_employee_plan_selection_confirmation")
+              end
+            end
+          end
+        end
+      end
 
-        if new_model_event.event_key == :generate_initial_employer_invoice
+      if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
+       if new_model_event.event_key == :generate_initial_employer_invoice
           if employer_profile.is_new_employer?
             trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first, notice_event: "generate_initial_employer_invoice")
           end
