@@ -2,6 +2,8 @@ BenefitSponsors::Engine.routes.draw do
   namespace :profiles do
     resources :registrations
 
+    resources :employer_profile_registrations, only: [:new, :create]
+
     namespace :broker_agencies do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
 

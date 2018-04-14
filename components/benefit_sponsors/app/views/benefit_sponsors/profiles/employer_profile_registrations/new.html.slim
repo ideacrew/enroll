@@ -1,0 +1,71 @@
+h5 Employer Registration
+
+= form_for @profile_registration, as: :profile_registration, url: profiles_employer_profile_registrations_url do |f|
+  - if @profile_registration.errors.any?
+    ul
+      - @profile_registration.errors.full_messages.each do |msg|
+        li= msg
+
+  .row
+    = f.label :legal_name, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.text_field :legal_name, class: "form-control", required: true
+
+  .row
+    = f.label :dba, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.text_field :dba, class: "form-control"
+
+  .row
+    = f.label :fein, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.text_field :fein, class: "form-control", required: true
+
+  .row
+    = f.label :entity_kind, class: "col-sm-2 col-form-label"
+    .col-sm-5
+      = f.select :entity_kind, options_for_select(@profile_registration.available_entity_kinds, selected: @profile_registration.entity_kind), class: "form-control"
+
+  = f.fields_for :primary_office_location do |polf|
+    .row
+      = polf.label :address_1
+      .col-sm-5
+        = polf.text_field :address_1, class: "form-control", required: true
+    .row
+      = polf.label :address_2
+      .col-sm-5
+        = polf.text_field :address_2, class: "form-control"
+    .row
+      = polf.label :city
+      .col-sm-5
+        = polf.text_field :city, class: "form-control", required: true
+    .row
+      = polf.label :state
+      .col-sm-5
+        = polf.select :state, options_for_select(polf.object.available_states, selected: polf.object.state), class: "form-control"
+    .row
+      = polf.label :zip
+      .col-sm-5
+        = polf.text_field :zip, class: "form-control", required: true
+
+  = f.fields_for :additional_office_locations do |polf|
+    .row
+      = polf.label :address_1
+      .col-sm-5
+        = polf.text_field :address_1, class: "form-control", required: true
+    .row
+      = polf.label :address_2
+      .col-sm-5
+        = polf.text_field :address_2, class: "form-control"
+    .row
+      = polf.label :city
+      .col-sm-5
+        = polf.text_field :city, class: "form-control", required: true
+    .row
+      = polf.label :state
+      .col-sm-5
+        = polf.select :state, options_for_select(polf.object.available_states, selected: polf.object.state), class: "form-control"
+    .row
+      = polf.label :zip
+      .col-sm-5
+        = polf.text_field :zip, class: "form-control", required: true
