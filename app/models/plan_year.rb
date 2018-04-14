@@ -11,7 +11,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -816,10 +816,10 @@ class PlanYear
 
     state :publish_pending      # Plan application as submitted has warnings
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
-    state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+    state :published,         :after_enter => [:accept_application, :link_census_employees]     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
+    state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -1040,6 +1040,12 @@ class PlanYear
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_conversion? && self.is_conversion
+  end
+
+  def link_census_employees
+    self.employer_profile.census_employees.eligible_without_term_pending.each do |census_employee|
+      census_employee.save # This assigns default benefit package if none
+    end
   end
 
   alias_method :external_plan_year?, :can_be_migrated?

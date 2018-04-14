@@ -494,7 +494,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
     end
   end
 
@@ -665,7 +665,7 @@ module ApplicationHelper
   def convert_to_bool(val)
     return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
     return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
-    raise ArgumentError.new("invalid value for Boolean: \"#{val}\"")
+    raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
 end
 

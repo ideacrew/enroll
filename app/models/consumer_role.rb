@@ -507,6 +507,17 @@ class ConsumerRole
       transitions from: :fully_verified, to: :unverified
       transitions from: :sci_verified, to: :unverified
       transitions from: :verification_period_ended, to: :unverified
+      transitions from: :expired, to: :unverified
+    end
+
+    event :move_to_coverall, :after => [:move_to_expired, :notify_of_eligibility_change, :record_transition] do
+      transitions from: :unverified, to: :expired
+      transitions from: :ssa_pending, to: :expired
+      transitions from: :dhs_pending, to: :expired
+      transitions from: :verification_outstanding, to: :expired
+      transitions from: :fully_verified, to: :fully_verified
+      transitions from: :sci_verified, to: :sci_verified
+      transitions from: :verification_period_ended, to: :expired
     end
 
     event :verifications_backlog, :after => [:record_transition] do
@@ -784,6 +795,12 @@ class ConsumerRole
 
   def revert_ssn
     verification_types.by_name("Social Security Number").first.pending_type
+  end
+
+  def move_to_expired(*args)
+    #TODO
+    #update verification types after 23025 will be merged and migrated
+    #verification_types.each{|type| type.fail_type} if expired?
   end
 
   def revert_native
