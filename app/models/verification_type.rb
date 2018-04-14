@@ -7,7 +7,7 @@ class VerificationType
   ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
 
-  VALIDATION_STATES = %w(na pending review outstanding verified valid attested)
+  VALIDATION_STATES = %w(na pending review outstanding verified attested expired)
 
   field :type_name, type: String
   field :validation_status, type: String
@@ -64,5 +64,9 @@ class VerificationType
 
   def pending_type
     update_attributes(:validation_status => "pending")
+  end
+
+  def expire_type
+    update_attributes(:validation_status => "expired")
   end
 end

@@ -30,6 +30,8 @@ module VerificationHelper
         "success"
       when "pending"
         "info"
+      when "expired"
+        "default"
     end
   end
 
@@ -52,7 +54,7 @@ module VerificationHelper
 
   def is_not_verified?(family_member, v_type)
     return true if family_member.blank?
-    !(["na", "valid", "verified"].include?(v_type.validation_status))
+    !(["na", "verified", "attested", "expired"].include?(v_type.validation_status))
   end
 
   def can_show_due_date?(person, options ={})

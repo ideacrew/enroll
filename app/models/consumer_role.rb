@@ -798,9 +798,7 @@ class ConsumerRole
   end
 
   def move_to_expired(*args)
-    #TODO
-    #update verification types after 23025 will be merged and migrated
-    #verification_types.each{|type| type.fail_type} if expired?
+    verification_types.each{|type| type.expire_type} if expired?
   end
 
   def revert_native
