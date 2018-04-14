@@ -523,6 +523,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :unverified
       transitions from: :sci_verified, to: :unverified
       transitions from: :verification_period_ended, to: :unverified
+      transitions from: :expired, to: :unverified
     end
 
     event :move_to_coverall, :after => [:move_to_expired, :notify_of_eligibility_change, :record_transition] do
