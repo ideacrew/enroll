@@ -34,3 +34,20 @@
     });
   }
 
+
+$(document).on('change', "#forms_benefit_application_start_on", function() {
+  if ($('.recommend #notice h4').text() == "Loading Suggested Dates...") {
+    return false;
+  }
+
+  var start_on_date = $(this).val();
+  if(start_on_date != "") {
+    $('.recommend #notice').html("<h4>Loading Suggested Dates...<h4>");
+    var target_url = $("a#generate_recommend_dates").data("href");
+    $.ajax({
+      type: "GET",
+      data:{start_on: start_on_date},
+      url: target_url
+    });
+  };
+});

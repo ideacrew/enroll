@@ -381,26 +381,6 @@ module BenefitSponsors
       end
 
       class << self
-        def schedular
-          ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        end
-       
-        def calculate_start_on_options
-          schedular.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-        end
-
-        def enrollment_timetable_by_effective_date(effective_date)
-          schedular.enrollment_timetable_by_effective_date(effective_date)
-        end
-
-        def calculate_open_enrollment_date(start_on)
-          schedular.calculate_open_enrollment_date(start_on)
-        end
-  
-        def effective_period_by_date(given_date = TimeKeeper.date_of_record, use_grace_period = false)
-          schedular.effective_period_by_date(given_date, use_grace_period)
-        end
-
         def find(id)
           application = nil
           Organizations::PlanDesignOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
@@ -412,7 +392,10 @@ module BenefitSponsors
           end
           application
         end
+
       end
+
+
 
       def due_date_for_publish
         if employer_profile.plan_years.renewing.any?

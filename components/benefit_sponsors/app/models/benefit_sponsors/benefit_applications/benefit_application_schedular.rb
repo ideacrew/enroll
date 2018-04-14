@@ -164,6 +164,50 @@ module BenefitSponsors
         dates_map[start_on.strftime('%Y-%m-%d')] || enrollment_timetable_by_effective_date(start_on)[:binder_payment_due_date]
       end
 
+      def shop_enrollment_timetable(new_effective_date)
+        effective_date = new_effective_date.to_date.beginning_of_month
+        prior_month = effective_date - 1.month
+        plan_year_start_on = effective_date
+        plan_year_end_on = effective_date + 1.year - 1.day
+        employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
+        employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
+        employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+        open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+        open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+        open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
+        binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.binder_payment_due_on}")
+
+
+        timetable = {
+          effective_date: effective_date,
+          benefit_application_start_on: plan_year_start_on,
+          benefit_application_end_on: plan_year_end_on,
+          employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
+          employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
+          employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
+          open_enrollment_earliest_start_on: open_enrollment_earliest_start_on,
+          open_enrollment_latest_start_on: open_enrollment_latest_start_on,
+          open_enrollment_latest_end_on: open_enrollment_latest_end_on,
+          binder_payment_due_date: binder_payment_due_date
+        }
+
+        timetable
+      end
+
+      def check_start_on(start_on)
+        start_on = start_on.to_date
+        shop_enrollment_times = shop_enrollment_timetable(start_on)
+
+        if start_on.day != 1
+          result = "failure"
+          msg = "start on must be first day of the month"
+        elsif TimeKeeper.date_of_record > shop_enrollment_times[:open_enrollment_latest_start_on]
+          result = "failure"
+          msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month} or later"
+        end
+        {result: (result || "ok"), msg: (msg || "")}
+      end
+
       ## TODO - add holidays
       def first_banking_date_prior(date_value)
         date = date_value.to_date
