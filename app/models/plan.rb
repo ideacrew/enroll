@@ -478,8 +478,8 @@ class Plan
 
   class << self
 
-    def has_rates_for_all_carriers?
-      date = PlanYear.calculate_start_on_dates[-1].beginning_of_quarter
+    def has_rates_for_all_carriers?(date=nil)
+      date = date || PlanYear.calculate_start_on_dates[-1].beginning_of_quarter
 
       carrier_count = Plan.where(active_year: date.year).map(&:carrier_profile).uniq.size
       result = Plan.collection.aggregate([
