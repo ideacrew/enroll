@@ -13,16 +13,17 @@ module BenefitSponsors
       attr_accessor :country_code, :area_code, :number, :extension, :full_phone_number
       attr_accessor :profile_type
       attr_accessor :first_name, :last_name, :dob
-      attr_accessor :profiles_attributes, :office_locations_attributes, :address_attributes, :phone_attributes
+      attr_accessor :profiles_attributes, :office_locations_attributes, :address_attributes, :phone_attributes, :agency_organization
       attr_accessor :first_name, :last_name, :dob
+      attr_accessor :person_id
 
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
         numericality: true
       #TODO: Conditionally Validate on Edit & Update (On Create there is no person_id)
-      #validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
-      #validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
-      #validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
+      validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
+      validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
+      validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :fein, :legal_name
       validates :entity_kind,
         inclusion: { in: Organizations::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
@@ -94,6 +95,10 @@ module BenefitSponsors
         @entity_kind = entity_kind.to_sym
       end
 
+      def market_kind=(market_kind)
+        @market_kind = market_kind.to_sym
+      end
+
       def profiles_attributes=(profiles)
         profiles.values.each do |attributes|
           assign_wrapper_attributes(attributes)
@@ -111,6 +116,10 @@ module BenefitSponsors
       end
 
       def phone_attributes=(attributes)
+        assign_wrapper_attributes(attributes)
+      end
+
+      def agency_organization=(attributes)
         assign_wrapper_attributes(attributes)
       end
 
