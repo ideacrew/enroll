@@ -1366,6 +1366,18 @@ describe EmployerProfile, "initial employers enrolled plan year state", dbclean:
   end
 end
 
+describe EmployerProfile, "update_status_to_binder_paid", dbclean: :after_each do
+  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
+  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year], :aasm_state => "eligible") }
+  let!(:organization){ employer_profile.organization }
+
+  it "should update employer profile aasm state to binder_paid" do
+    EmployerProfile.update_status_to_binder_paid([employer_profile.organization.id])
+    employer_profile.reload
+    expect(employer_profile.aasm_state).to eq 'binder_paid'
+  end
+
+end
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
