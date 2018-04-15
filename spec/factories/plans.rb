@@ -78,8 +78,8 @@ FactoryGirl.define do
       end
 
       after(:create) do |plan, evaluator|
-        start_on = TimeKeeper.date_of_record.beginning_of_quarter.next_quarter
-        end_on = start_on + 3.months - 1.day
+        start_on = Date.new(plan.active_year,1,1)
+        end_on = start_on + 1.year - 1.day
 
         unless Settings.aca.rating_areas.empty?
           plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
