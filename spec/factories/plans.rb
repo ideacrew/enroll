@@ -64,8 +64,22 @@ FactoryGirl.define do
       end
 
       after(:create) do |plan, evaluator|
-        start_on = Date.new(plan.active_year,1,1)
-        end_on = start_on + 1.year - 1.day
+        start_on = PlanYear.calculate_start_on_dates[-1].beginning_of_quarter
+        end_on = start_on.end_of_quarter
+
+        unless Settings.aca.rating_areas.empty?
+          plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
+          plan.save!
+          rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
+        else
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
+        end
+      end
+
+      after(:create) do |plan, evaluator|
+        start_on = TimeKeeper.date_of_record.beginning_of_quarter.next_quarter
+        end_on = start_on + 3.months - 1.day
 
         unless Settings.aca.rating_areas.empty?
           plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
