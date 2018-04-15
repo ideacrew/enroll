@@ -67,7 +67,7 @@
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{rates_available?(@employer_profile)}" %>
 
                 <% end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
