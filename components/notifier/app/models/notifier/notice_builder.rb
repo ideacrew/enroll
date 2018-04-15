@@ -208,14 +208,17 @@ module Notifier
     def create_recipient_document(doc_uri)
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
-      notice = receiver.documents.build({
+
+      doc_params = {
         title: notice_filename, 
         creator: "hbx_staff",
         subject: document_subject,
         identifier: doc_uri,
-        date: invoice_date,
         format: "application/pdf"
-        })
+      }
+
+      doc_params[:date] = invoice_date if self.event_name == 'generate_initial_employer_invoice'
+      notice = receiver.documents.build(doc_params)
 
       if notice.save
         notice
