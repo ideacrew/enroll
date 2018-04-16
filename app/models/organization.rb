@@ -272,7 +272,7 @@ class Organization
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         ## don't enable Tufts for now
-        next carrier_names if ["800721489", "042674079"].include?(org.fein)
+        next carrier_names if ["042674079"].include?(org.fein)
 
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
@@ -315,7 +315,7 @@ class Organization
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         ## don't enable Tufts for now
-        next carrier_names if ["800721489", "042674079"].include?(org.fein)
+        next carrier_names if ["042674079"].include?(org.fein)
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
           if filters[:active_year]
