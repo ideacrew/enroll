@@ -46,27 +46,38 @@ module BenefitSponsors
           new(attrs).build_organization
         end
 
-        def build_organization
+        def build_organization(attrs = {})
           if profile_id.blank?
-            self.organization = build_organization_class.new(site: site)
-            self.organization.profiles << build_profile
+            self.organization = build_organization_class.new(organization_attributes(attrs))
+            self.organization.profiles << build_profile(profile_attributes(attrs))
             self.organization
           else
             get_organization
           end
         end
 
+        def organization_attributes(attrs = {})
+          attrs.except(:profiles_attributes).merge({
+            site: site,
+            fein: (fein.present? ? regex_for(fein): nil)
+          })
+        end
+
+        def profile_attributes(attrs={})
+          attrs["profiles_attributes"]["0"] if attrs["profiles_attributes"].present?
+        end
+
         def get_organization
           build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
-        def build_profile
+        def build_profile(attrs = {})
           profile = if is_broker_profile?
-                      build_broker_profile
+                      build_broker_profile(attrs)
                     elsif is_employer_profile?
-                      build_sponsor_profile
+                      build_sponsor_profile(attrs)
                     end
-          profile.office_locations << build_office_locations
+          profile.office_locations << build_office_locations if profile.office_locations.empty?
           profile
         end
 
@@ -77,12 +88,12 @@ module BenefitSponsors
           new_office_location
         end
 
-        def build_broker_profile
-          Organizations::BrokerAgencyProfile.new
+        def build_broker_profile(attrs = {})
+          Organizations::BrokerAgencyProfile.new(attrs)
         end
 
-        def build_sponsor_profile
-          build_sponsor_profile_class.new
+        def build_sponsor_profile(attrs = {})
+          build_sponsor_profile_class.new(attrs)
         end
 
         def build_sponsor_profile_class
@@ -141,26 +152,20 @@ module BenefitSponsors
 
         def update_broker_agency_profile(organization, attributes)
           add_broker_role
-          organization = init_broker_organization(organization)
-          #TODO: Fix next line for attributes
-          organization = organization.assign_attributes(broker_agency_profile_attrs(attributes))
+          # Building Organization as met criteria
+          organization = init_broker_organization(organization, attributes["agency_organization"])
           profile = organization.broker_agency_profile
           profile.primary_broker_role = person.broker_role
           profile.save!
           update_broker_role(profile)
         end
 
-        def broker_agency_profile_attrs attrs
-          attrs["profiles_attributes"].merge!(attrs.slice(:entity_kind, :market_kind, :npn, :languages_spoken, :working_hours, :accept_new_clients))
-          attrs.except!(:profile_type, :first_name, :last_name, :npn, :dob, :email, :entity_kind, :market_kind, :languages_spoken, :working_hours, :accept_new_clients)
-        end
-
-        def init_broker_organization(organization)
+        def init_broker_organization(organization, attributes)
           if organization.present? && !organization.broker_agency_profile.present?
-            organization.profiles << build_profile
+            organization.profiles << build_profile(profile_attributes(attributes))
             organization
           else
-            build_organization
+            build_organization(attributes)
           end
         end
 

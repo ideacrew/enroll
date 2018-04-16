@@ -36,12 +36,12 @@ module BenefitSponsors
         @benefit_application = BenefitSponsors::Forms::BenefitApplication.new(application_params)
 
         if params[:start_on].present?
-          start_on = params[:start_on].to_date
-          @result = @benefit_application.check_start_on(start_on)
+          @start_on = params[:start_on].to_date
+          @result = @benefit_application.check_start_on(@start_on)
 
           if @result[:result] == "ok"
-            @open_enrollment_dates = @benefit_application.calculate_open_enrollment_date(start_on)
-            @schedule = @benefit_application.shop_enrollment_timetable(start_on)
+            @open_enrollment_dates = @benefit_application.calculate_open_enrollment_date(@start_on)
+            @schedule = @benefit_application.shop_enrollment_timetable(@start_on)
           end
         end
       end
