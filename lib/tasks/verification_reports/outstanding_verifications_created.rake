@@ -123,8 +123,7 @@ namespace :reports do
           end
         end
       end
-
-      rows_for_csv = remove_dup_override? ? collect_rows.uniq{|row| row.type } : collect_rows
+      rows_for_csv = remove_dup_override? ? collect_rows.uniq{|row| row[4] } : collect_rows
 
       rows_for_csv.each do |row|
         csv << row
