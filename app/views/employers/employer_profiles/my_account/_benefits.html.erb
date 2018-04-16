@@ -1,6 +1,7 @@
+<% flag = rates_available?(@employer_profile) %>
 <div class="benefits-tab">
   <div class="row">
-    <% if rates_available?(@employer_profile) == 'blocking' %>
+    <% if flag == 'blocking' %>
     <div class="alert alert-info" role="alert">
       <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Benefits for which you may be eligible to offer are not currently approved by <EXCHANGE NAME>, please return in 24 hours.</strong>
     </div>
@@ -67,7 +68,7 @@
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{rates_available?(@employer_profile)}" %>
+                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{flag}" %>
 
                 <% end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
@@ -466,7 +467,7 @@
         groups of employees.
       </p>
       <%=pundit_span EmployerProfile, :updateable?%>
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-lg #{rates_available?(@employer_profile)}", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-lg #{flag}", data: {loading_text: "Loading..."} %>
       </span>
     <% end %>
   </div>
