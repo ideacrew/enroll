@@ -57,12 +57,19 @@ private
   # Use callbacks to share common setup or constraints between actions.
   def set_family
     set_current_person
-    return unless @person.present?
-
+    return if not @person.present?
+    # @family = Family.find(params[:id])
     if @person.primary_family.present?
       @family = @person.primary_family
     else
-      @family = Family.find(params[:family])
+      message = {}
+      message[:message] = '@family was set to nil'
+      message[:session_person_id] = session[:person_id]
+      message[:user_id] = current_user.id
+      message[:oim_id] = current_user.oim_id
+      message[:url] = request.original_url
+      log(message, :severity=>'error')
+      redirect_to "/500.html"
     end
   end
 
