@@ -63,7 +63,7 @@ module Config::AcaHelper
     @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
   end
 
-  def metal_levels_explaned
+  def metal_levels_explained
     response = ""
     metal_level_contributions = {
       'bronze': '60%',
@@ -71,11 +71,11 @@ module Config::AcaHelper
       'gold': '80%',
       'platinum': '90%'
     }.with_indifferent_access
-    reference_plans_for_metal_level.each_with_index do |level, index|
+    enabled_metal_levels_for_single_carrier.each_with_index do |level, index|
       if metal_level_contributions[level]
         if index == 0
           response << "#{level.capitalize} means the plan is expected to pay #{metal_level_contributions[level]} of expenses for an average population of consumers"
-        elsif (index == reference_plans_for_metal_level.length - 2) # subtracting 2 because of dental
+        elsif (index == enabled_metal_levels_for_single_carrier.length - 2) # subtracting 2 because of dental
           response << ", and #{level.capitalize} #{metal_level_contributions[level]}."
         else
           response << ", #{level.capitalize} #{metal_level_contributions[level]}"
@@ -109,8 +109,8 @@ module Config::AcaHelper
     Settings.site.plan_options_title_for_ma
   end
 
-  def reference_plans_for_metal_level
-    Settings.aca.reference_carriers_for_metal_level
+  def enabled_metal_levels_for_single_carrier
+    Settings.aca.enabled_metal_levels_for_single_carrier
   end
 
   def fetch_plan_title_for_sole_source
