@@ -54,7 +54,7 @@ module BenefitSponsors
 
       def application_params
         params.permit(
-          :benefit_sponsorship_id,
+          :benefit_sponsorship_id, :benefit_application_id,
           :benefit_application => [
             :id, :start_on, :end_on, :fte_count, :pte_count, :msp_count,
             :open_enrollment_start_on, :open_enrollment_end_on 
