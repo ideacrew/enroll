@@ -1,4 +1,8 @@
   <div class="col-xs-12 module" id='plan_year' data-benefit-group-count="<%= @plan_year.benefit_groups.count %>"> <!--onKeyPress="return disableEnterKey(event)"-->
+    <div class="alert alert-info hide" role="alert">
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Benefits for which you may be eligible to offer are not currently approved by <EXCHANGE NAME>, please return in 24 hours.</strong>
+    </div>
+    
     <input type="hidden" id="employerMinEmployeeContribution" data-value="<%= aca_shop_market_employer_contribution_percent_minimum %>" />
     <input type="hidden" id="employerMinFamilyContribution" data-value="<%= aca_shop_market_employer_family_contribution_percent_minimum %>" />
     <input type="hidden" id="employerProfileId" data-value="<%= @employer_profile.id %>" />
@@ -73,3 +77,17 @@
       </div>
     </div>
   </div><br>
+  
+<% if rates_available?(@employer_profile) == 'blocking' %>  
+<script>
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
+    var date = $(this).val();
+    $('.benefit-group-fields').hide();
+    $('.interaction-click-control-add-benefit-group').hide();
+    $('.alert-info').removeClass('hide');
+    if ('<%= late_rates_edit_plan_year(@employer_profile, Date.current) == true %>') {
+
+    }
+  });
+</script>
+  <% end %>
