@@ -17,12 +17,7 @@ class Employers::PlanYearsController < ApplicationController
   def late_rates_check
     date = params[:start_on_date].split('/')
     formatted_date = (Date.new(date[2].to_i,date[0].to_i,date[1].to_i) + 1.month).beginning_of_month
-    flag = !Plan.has_rates_for_all_carriers?(formatted_date)
-    if flag == false
-      py = PlanYear.find(params["plan_year_id"])
-      py.update_attributes(benefit_groups: nil)
-    end
-    render json: flag
+    render json: !Plan.has_rates_for_all_carriers?(formatted_date)
   end
 
   def dental_reference_plans
@@ -288,6 +283,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def update
     plan_year = @employer_profile.plan_years.where(id: params[:id]).last
+    if !Plan.has_rates_for_all_carriers?(plan_year.start_on) == false
+      params["plan_year"]["benefit_groups_attributes"] = {}
+      plan_year.benefit_groups.each{|a| a.delete}
+    end
     @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
