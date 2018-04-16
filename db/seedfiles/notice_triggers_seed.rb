@@ -644,29 +644,6 @@ if Settings.aca.state_abbreviation == "MA"
               }
           ]
       },
-
-      {
-          hbx_id: 'SHOP_M039',
-          title: 'Employee Terminating coverage',
-          description: 'Employee Terminating coverage after QLE',
-          resource_name: 'employer',
-          event_name: 'notify_employer_when_employee_terminate_coverage',
-          notice_triggers: [
-            {
-              name: 'Notice to employer when employee terminates coverage',
-              notice_template: 'notices/employee_terminating_coverage',
-              notice_builder: 'EmployeeTerminatingCoverage',
-              mpi_indicator: 'SHOP_M039',
-              notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["employer"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-          ]
-      },
-
     # {
     #   hbx_id: 'SHOP_D018',
     #   title: 'Group Open Enrollment Successfully Completed',
@@ -1112,27 +1089,6 @@ if Settings.aca.state_abbreviation == "MA"
           ]
       },
       {
-          hbx_id: 'SHOP_M040',
-          title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
-          description: 'Employee Terminating coverage after QLE',
-          resource_name: 'employer',
-          event_name: 'notify_employee_confirming_coverage_termination',
-          notice_triggers: [
-              {
-                  name: 'Notice to employer when employee terminates coverage',
-                  notice_template: 'notices/shop_employee_notices/employee_terminating_coverage',
-                  notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverage',
-                  # used unique MPI indicator with two event names
-                  mpi_indicator: 'SHOP_M040',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                       primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []        }
-              }
-          ]
-      },
-      {
           hbx_id: 'SHOP_M041',
           title: 'Notice Confirmation for Group termination due to ER advance request',
           description: 'Group termination confirmation for advance request',
@@ -1258,50 +1214,6 @@ if Settings.aca.state_abbreviation == "MA"
     #     }
     #   ]
     # },
-
-      {
-          hbx_id: 'SHOP_M040',
-          title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
-          description: 'Employee Terminating coverage after QLE',
-          resource_name: 'employer',
-          event_name: 'notify_employee_confirming_dental_coverage_termination',
-          notice_triggers: [
-              {
-                  name: 'Notice to employer when employee terminates coverage',
-                  notice_template: 'notices/shop_employee_notices/employee_terminating_dental_coverage',
-                  notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingDentalCoverage',
-                  mpi_indicator: 'SHOP_M040',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                       primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
-
-      {
-          hbx_id: 'SHOP_M043',
-          title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
-          description: 'EE Made Mid-Year Plan Change (Reason: New Hire, SEP, OR DPT Age-Off)',
-          resource_name: 'employer',
-          event_name: 'employee_mid_year_plan_change',
-          notice_triggers: [
-            {
-                  name: 'Employee Mid-Year Plan change',
-                  notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change',
-                  notice_builder: 'EmployeeMidYearPlanChange',
-                  mpi_indicator: 'SHOP_M043',
-                  notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                  }
-              }
-          ]
-      }
   ]
 elsif Settings.aca.state_abbreviation == "DC"
   shop_notice_triggers = [

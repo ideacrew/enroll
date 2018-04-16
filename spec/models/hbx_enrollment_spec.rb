@@ -1408,6 +1408,8 @@ context "Benefits are terminated" do
 
   context "SHOP benefit" do
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:census_employee)   { FactoryGirl.create(:census_employee)}
+    let(:employee_role)     { FactoryGirl.create(:employee_role)}
     let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
                                                  household: shop_family.latest_household,
                                                  coverage_kind: "health",
@@ -1415,12 +1417,16 @@ context "Benefits are terminated" do
                                                  enrollment_kind: "open_enrollment",
                                                  kind: "employer_sponsored",
                                                  submitted_at: effective_on_date - 10.days,
-                                                 benefit_group_id: benefit_group.id
+                                                 benefit_group_id: benefit_group.id,
+                                                 employee_role_id: employee_role.id
                                                  )
                               }
 
     let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
 
+    before do
+      employee_role.update_attributes(census_employee_id: census_employee.id)
+    end
 
     it "should be SHOP enrollment kind" do
       expect(shop_enrollment.is_shop?).to be_truthy

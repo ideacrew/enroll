@@ -10,16 +10,19 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
     let(:organization) { FactoryGirl.create(:organization,employer_profile:employer_profile)}
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}
-    let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household)}
+    let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_id: benefit_group.id, employee_role_id: employee_role.id)}
     let!(:fein){organization.fein}
     let!(:end_on){TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y')}
     let!(:termination_date){TimeKeeper.date_of_record.strftime('%m/%d/%Y')}
+    let(:census_employee)   { FactoryGirl.create(:census_employee)}
+    let(:employee_role)     { FactoryGirl.create(:employee_role)}
 
     before do
       $stdout = StringIO.new
       load File.expand_path("#{Rails.root}/lib/tasks/migrations/terminate_employer_accounts.rake", __FILE__)
       Rake::Task.define_task(:environment)
-      enrollment.update_attributes(benefit_group_id: benefit_group.id, aasm_state:'coverage_selected')
+      enrollment.update_attributes(aasm_state:'coverage_selected')
+      employee_role.update_attributes(census_employee_id: census_employee.id)
     end
 
     after(:all) do
