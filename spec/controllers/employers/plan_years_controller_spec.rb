@@ -676,13 +676,14 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       @reference_plan = benefit_group.reference_plan
       Caches::PlanDetails.load_record_cache!
       @census_employees = [census_employee, census_employee]
+      @carrier_profile = @reference_plan.carrier_profile
     end
 
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with(@employer_profile.id).and_return(@employer_profile)
       allow(Forms::PlanYearForm).to receive(:build).and_return(plan_year)
       allow(Plan).to receive(:find).with(@reference_plan.id).and_return(@reference_plan)
-      allow(@reference_plan).to receive(:carrier_profile_id).and_return('carrier_id')
+      allow(@reference_plan).to receive(:carrier_profile_id).and_return(@carrier_profile.id)
       allow(plan_year).to receive(:benefit_groups).and_return(benefit_group.to_a)
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)

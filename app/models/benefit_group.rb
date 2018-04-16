@@ -175,6 +175,11 @@ class BenefitGroup
 
   def set_bounding_cost_plans
     return if reference_plan_id.nil?
+    return "" if self.employer_profile.blank?
+    if offerings_constrained_to_service_areas?
+      profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(self.employer_profile, reference_plan.active_year)
+      single_carrier_pair = profile_and_service_area_pairs.select { |pair| pair.first == reference_plan.carrier_profile.id }
+    end
 
     if plan_option_kind == "single_plan"
       plans = [reference_plan]
@@ -182,9 +187,17 @@ class BenefitGroup
       plans = [reference_plan]
     else
       if plan_option_kind == "single_carrier"
-        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+        if offerings_constrained_to_service_areas?
+          plans = Plan.for_service_areas_and_carriers(single_carrier_pair, start_on.year).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/)
+        else
+          plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).with_enabled_metal_levels
+        end
       else
-        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+        if offerings_constrained_to_service_areas?
+          plans = Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on.year).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).with_enabled_metal_levels
+        else
+          plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+        end
       end
     end
 
