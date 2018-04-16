@@ -78,16 +78,25 @@
     </div>
   </div><br>
   
-<% if rates_available?(@employer_profile) == 'blocking' %>  
+
 <script>
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
     var date = $(this).val();
-    $('.benefit-group-fields').hide();
-    $('.interaction-click-control-add-benefit-group').hide();
-    $('.alert-info').removeClass('hide');
-    if ('<%= late_rates_edit_plan_year(@employer_profile, Date.current) == true %>') {
 
-    }
+    $.ajax({
+      type: "GET",
+      data:{
+        start_on_date: date
+      },
+      success: function(res) {
+        if (res != true) {
+          $('.benefit-group-fields').hide();
+          $('.interaction-click-control-add-benefit-group').hide();
+          $('.alert-info').removeClass('hide');
+        }
+      },
+      url: "/employers/employer_profiles/<%= @employer_profile.id %>/plan_years/<%= @plan_year.id %>/late_rates_check"
+    });
   });
 </script>
-  <% end %>
+

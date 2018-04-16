@@ -19,8 +19,10 @@ class Employers::PlanYearsController < ApplicationController
 # make sure you pass the params as start_on_date or if you are passing
 # it with a different param name, change the param name below.
   def late_rates_check
-    date = params[:start_on_date]
-    Plan.has_rates_for_all_carriers?(date)
+    date = params[:start_on_date].split('/')
+    formatted_date = Date.new(date[2].to_i,date[0].to_i,date[1].to_i)
+    Plan.has_rates_for_all_carriers?(formatted_date)
+    render json: Plan.has_rates_for_all_carriers?(formatted_date)
   end
 
   def dental_reference_plans
