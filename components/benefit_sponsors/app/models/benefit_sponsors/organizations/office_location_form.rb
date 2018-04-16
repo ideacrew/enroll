@@ -22,20 +22,6 @@ module BenefitSponsors
       def available_states
         form_mapping.available_states
       end
-
-      def attributes
-        {
-          "address_1" => address_1,
-          "address_2" => address_2,
-          "city" => city,
-          "state" => state,
-          "zip" => zip,
-          "country_code" => country_code,
-          "area_code" => area_code,
-          "number" => number,
-          "extension" => extension
-        }
-      end
     end
   end
 end

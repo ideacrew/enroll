@@ -23,10 +23,6 @@ module BenefitSponsors
                                      end
       end
 
-      def primary_office_location_attributes
-        primary_office_location.attributes
-      end
-
       def primary_office_location_attributes=(params)
         @primary_office_location = OfficeLocationForm.new(params.merge(primary: true, form_mapping: form_mapping))
       end
@@ -35,14 +31,6 @@ module BenefitSponsors
         @additional_office_locations ||= begin
                                            [OfficeLocationForm.new(primary: false, form_mapping: form_mapping)]
                                          end
-      end
-
-      def additional_office_locations_attributes
-        other_office_locations_attributes = {}
-        @additional_office_locations.each_with_index do |ol, idx|
-          other_office_locations_attributes[idx.to_s] = ol.attributes
-        end
-        other_office_locations_attributes
       end
 
       def additional_office_locations_attributes=(params)
