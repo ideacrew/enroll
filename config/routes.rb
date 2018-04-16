@@ -318,6 +318,7 @@ Rails.application.routes.draw do
         get 'generate_sic_tree'
       end
       resources :plan_years do
+        get "late_rates_check"
         get 'reference_plans'
         get 'dental_reference_plans'
         get 'generate_dental_carriers_and_plans'

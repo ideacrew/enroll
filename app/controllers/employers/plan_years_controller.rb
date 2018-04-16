@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   include Config::AcaConcern
-  before_action :find_employer
+  before_action :find_employer, expect: [:late_rates_check]
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
@@ -12,6 +12,15 @@ class Employers::PlanYearsController < ApplicationController
     else
       @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     end
+  end
+
+# employers_employer_profile_plan_year_late_rates_check_path
+# make an ajax call to this method, it eithers returns true / false
+# make sure you pass the params as start_on_date or if you are passing
+# it with a different param name, change the param name below.
+  def late_rates_check
+    date = params[:start_on_date]
+    Plan.has_rates_for_all_carriers?(date)
   end
 
   def dental_reference_plans
