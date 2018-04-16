@@ -1,5 +1,9 @@
 module Insured
   module GroupSelectionHelper
+
+    def can_employee_shop?(date)
+      PlanYear.calculate_start_on_dates[-1] == date
+    end
     def can_shop_individual?(person)
       person.try(:has_active_consumer_role?)
     end
