@@ -34,14 +34,6 @@ module Notifier
       end
     end
 
-    def first_name
-      merge_model.first_name = employer_profile.staff_roles.first.first_name
-    end
-
-    def last_name
-      merge_model.last_name = employer_profile.staff_roles.first.last_name
-    end
-
     def notice_date
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
     end
@@ -64,18 +56,6 @@ module Notifier
 
     def invoice_month
       merge_model.invoice_month = TimeKeeper.date_of_record.next_month.strftime('%B')
-    end
-
-    def first_name
-      if employer_profile.staff_roles.present?
-        merge_model.first_name = employer_profile.staff_roles.first.first_name
-      end
-    end
-
-    def last_name
-      if employer_profile.staff_roles.present?
-        merge_model.last_name = employer_profile.staff_roles.first.last_name
-      end
     end
   end
 end
