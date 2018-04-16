@@ -14,15 +14,15 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
-# employers_employer_profile_plan_year_late_rates_check_path
-# make an ajax call to this method, it eithers returns true / false
-# make sure you pass the params as start_on_date or if you are passing
-# it with a different param name, change the param name below.
   def late_rates_check
     date = params[:start_on_date].split('/')
-    formatted_date = Date.new(date[2].to_i,date[0].to_i,date[1].to_i)
-    Plan.has_rates_for_all_carriers?(formatted_date)
-    render json: Plan.has_rates_for_all_carriers?(formatted_date)
+    formatted_date = (Date.new(date[2].to_i,date[0].to_i,date[1].to_i) + 1.month).beginning_of_month
+    flag = !Plan.has_rates_for_all_carriers?(formatted_date)
+    if flag == false
+      py = PlanYear.find(params["plan_year_id"])
+      py.update_attributes(benefit_groups: nil)
+    end
+    render json: flag
   end
 
   def dental_reference_plans
@@ -547,7 +547,7 @@ class Employers::PlanYearsController < ApplicationController
     ]
     )
 
-    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count < 2 }
+    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count < 2 } if plan_year_params["benefit_groups_attributes"].present?
     plan_year_params
   end
 
