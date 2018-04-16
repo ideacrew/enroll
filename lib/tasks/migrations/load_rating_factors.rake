@@ -4,7 +4,6 @@ namespace :load_rating_factors do
 
   task :run_all_rating_factors => :environment do
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_factors", "**", "*.xlsx"))
-    CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
     puts "*"*80 unless Rails.env.test?
     files.each do |file|
       puts "processing file #{file}" unless Rails.env.test?
@@ -99,7 +98,7 @@ namespace :load_rating_factors do
     when 2017
       return 8
     when 2018
-      return 8
+      return 9
     end
   end
 
