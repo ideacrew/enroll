@@ -37,4 +37,14 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :after_
     person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
     Rake::Task["recurring:employee_dependent_age_off_termination"].invoke
   end
+
+  context 'recurring:dependent_age_off_termination_notification_manual' do
+    it "should trigger dependent age off notice" do
+      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice)
+      person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
+      Rake::Task["recurring:dependent_age_off_termination_notification_manual"].invoke(person.hbx_id)
+    end
+  end
+
+
 end
