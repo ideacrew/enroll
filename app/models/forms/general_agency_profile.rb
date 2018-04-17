@@ -133,7 +133,7 @@ module Forms
           dba: organization.dba,
           fein: organization.fein,
           home_page: organization.home_page,
-          npn: general_agency_profile.corporate_npn,
+          npn: general_agency_role.npn,
           entity_kind: general_agency_profile.entity_kind,
           market_kind: general_agency_profile.market_kind,
           languages_spoken: general_agency_profile.languages_spoken,
