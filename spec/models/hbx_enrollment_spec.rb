@@ -405,13 +405,14 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "waive_coverage_by_benefit_group_assignment" do
-      before :all do
+      before :each do
         @enrollment4 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
           benefit_group: mikes_benefit_group,
           benefit_group_assignment: @mikes_benefit_group_assignments
         )
+        allow(@enrollment4).to receive(:notify_on_save).and_return true
         @enrollment4.save
         @enrollment5 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
@@ -420,6 +421,7 @@ describe HbxEnrollment, dbclean: :after_all do
           benefit_group_assignment: @mikes_benefit_group_assignments
 
         )
+        allow(@enrollment5).to receive(:notify_on_save).and_return true
         @enrollment5.save
         @enrollment4.waive_coverage_by_benefit_group_assignment("start a new job")
         @enrollment5.reload
@@ -443,7 +445,7 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "should shedule termination previous auto renewing enrollment" do
-      before :all do
+      before :each do
         @enrollment6 = household.create_hbx_enrollment_from(
             employee_role: mikes_employee_role,
             coverage_household: coverage_household,
@@ -452,6 +454,7 @@ describe HbxEnrollment, dbclean: :after_all do
         )
         @enrollment6.effective_on=TimeKeeper.date_of_record + 1.days
         @enrollment6.aasm_state = "auto_renewing"
+        allow(@enrollment6).to receive(:notify_on_save).and_return true
         @enrollment6.save
         @enrollment7 = household.create_hbx_enrollment_from(
             employee_role: mikes_employee_role,
@@ -459,6 +462,7 @@ describe HbxEnrollment, dbclean: :after_all do
             benefit_group: mikes_benefit_group,
             benefit_group_assignment: @mikes_benefit_group_assignments
         )
+        allow(@enrollment7).to receive(:notify_on_save).and_return true
         @enrollment7.save
         @enrollment7.cancel_previous(TimeKeeper.date_of_record.year)
       end

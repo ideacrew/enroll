@@ -1070,27 +1070,6 @@ if Settings.aca.state_abbreviation == "MA"
           ]
       },
       {
-        hbx_id: 'SHOP_M029',
-        title: 'Confirmation Of Election To Waive Coverage',
-        description: 'Employee waiver confirmation',
-        resource_name: 'employee_role',
-        event_name: 'employee_waiver_notice',
-        notice_triggers: [
-          {
-              name: 'Notice to employee after they select a plan Annual Open Enrollment',
-              notice_template: 'notices/shop_employee_notices/employee_waiver_confirmation_notification',
-              notice_builder: 'ShopEmployeeNotices::EmployeeWaiverConfirmNotice',
-              mpi_indicator: 'SHOP_M029',
-              notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employee"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                    }
-              }
-          ]
-      },
-      {
           hbx_id: 'SHOP_M041',
           title: 'Notice Confirmation for Group termination due to ER advance request',
           description: 'Group termination confirmation for advance request',
