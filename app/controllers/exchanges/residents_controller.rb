@@ -211,7 +211,8 @@ class Exchanges::ResidentsController < ApplicationController
     transition.reason_code = "generating_resident_role"
     transition.effective_starting_on = TimeKeeper.datetime_of_record
     transition.user_id = current_user.id
-    User.find(params[:person][:user_id]).person.individual_market_transitions << transition
+    Person.find(session[:person_id]).individual_market_transitions << transition
+    #User.find(params[:person][:user_id]).person.individual_market_transitions << transition
     #transition.person = User.find(params[:person][:user_id]).person
     #transition.save!
   end
