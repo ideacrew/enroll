@@ -1,6 +1,8 @@
 require "rails_helper"
 require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "edi_enrollment_termination_report")
+require "#{Rails.root}/app/helpers/config/aca_helper"
+include Config::AcaHelper
 
 describe TerminatedHbxEnrollments do
 
@@ -62,10 +64,13 @@ describe TerminatedHbxEnrollments do
 
   shared_examples_for "returns csv file list with terminated hbx_enrollments" do |field_name, result|
     let(:time_now) { Time.now }
+    let!(:date) { Date.new(2018,1,1) }
+    let!(:fixed_time) { Time.parse("Jan 1 2018 10:00:00") }
 
     before :each do
-     time_str = time_now.utc.strftime("%Y%m%d_%H%M%S")
-     @file = File.expand_path("#{Rails.root}/public/edi_enrollment_termination_report_#{time_str}.csv")
+      allow(TimeKeeper).to receive(:date_of_record).and_return(date)
+      allow(TimeKeeper).to receive(:datetime_of_record).and_return(fixed_time)
+     @file = File.expand_path("#{Rails.root}/public/CCA_test_EDIENROLLMENTTERMINATION_2018_01_01_10_00_00.csv")
      allow(Time).to receive(:now).and_return(time_now)
      allow(Publishers::Legacy::EdiEnrollmentTerminationReportPublisher).to receive(:new).and_return(publisher)
      allow(publisher).to receive(:publish).with(URI.join("file://", @file))

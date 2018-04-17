@@ -74,6 +74,25 @@ module Config::AcaHelper
     response
   end
 
+  # CCA requested a specific file format for MA
+  #
+  # @param task_name_DC [String] it will holds specific report task name for DC
+  # @param task_name_MA[String] it will holds specific report task name for MA
+  # EX: task_name_DC  "employers_list"
+  #     task_name_MA "EMPLOYERSLIST"
+  #
+  # @return [String] absolute path location to writing a CSV
+  def fetch_file_format(task_name_DC, task_name_MA)
+    if individual_market_is_enabled?
+      time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
+      File.expand_path("#{Rails.root}/public/#{task_name_DC}_#{time_stamp}.csv")
+    else
+      # For MA stakeholders requested a specific file format
+      time_extract = TimeKeeper.datetime_of_record.try(:strftime, '%Y_%m_%d_%H_%M_%S')
+      File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name_MA}_#{time_extract}.csv")
+    end
+  end
+
   def enabled_metal_level_years
     @enabled_metal_level_years ||= Settings.aca.plan_option_years.metal_level_carriers_available
   end
