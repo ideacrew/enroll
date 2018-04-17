@@ -45,7 +45,7 @@ site:
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "MA0"
   mail_address: "noreply@healthconnector.org"
-
+  exchange_name: "Massachusetts Health Connector"
   social_media:
     facebook_url: ""
 

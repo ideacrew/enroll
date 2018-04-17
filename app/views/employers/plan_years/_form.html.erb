@@ -1,6 +1,6 @@
   <div class="col-xs-12 module" id='plan_year' data-benefit-group-count="<%= @plan_year.benefit_groups.count %>"> <!--onKeyPress="return disableEnterKey(event)"-->
     <div class="alert alert-info hide" role="alert">
-      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Benefits for which you may be eligible to offer are not currently approved by <EXCHANGE NAME>, please return in 24 hours.</strong>
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= no_rates_error(Settings.site.exchange_name) %></strong>
     </div>
     
     <input type="hidden" id="employerMinEmployeeContribution" data-value="<%= aca_shop_market_employer_contribution_percent_minimum %>" />

@@ -1,4 +1,8 @@
 module ApplicationHelper
+  
+  def no_rates_error(exchange)
+    "Benefits for which you may be eligible to offer are not currently approved by the #{exchange}, please return in 24 hours."
+  end
 
   def rates_available?(employer)
     employer.applicant? && Plan.has_rates_for_all_carriers? ? "blocking" : ""
