@@ -121,7 +121,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
-      employee_waiver_notice(hbx_enrollment)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
@@ -133,15 +132,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
-  end
-
-  def employee_waiver_notice(hbx_enrollment)
-    begin
-      census_employee = CensusEmployee.find(hbx_enrollment.employee_role.census_employee_id.to_s)
-      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_waiver_notice")
-    rescue Exception => e
-      puts "Unable to send Employee Waiver notice to #{census_employee.full_name}" unless Rails.env.test?
-    end
   end
 
     def employee_mid_year_plan_change(person,change_plan)
