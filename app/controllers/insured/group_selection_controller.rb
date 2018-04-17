@@ -6,6 +6,7 @@ class Insured::GroupSelectionController < ApplicationController
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
+    #binding.pry
     set_bookmark_url
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)

@@ -594,7 +594,11 @@ class Person
   end
 
   def current_individual_market_transition
-    self.individual_market_transitions.last
+    if self.individual_market_transitions.present?
+      self.individual_market_transitions.last
+    else
+      nil
+    end
   end
 
   def active_individual_market_role
