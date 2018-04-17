@@ -410,14 +410,22 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET clear_assign_for_employer" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, aasm_state: "is_approved") }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:favorite_general_agency) { FactoryGirl.create(:favorite_general_agency, general_agency_profile_id: general_agency_profile.id, broker_role: broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+
     before :each do
       sign_in user
+      favorite_general_agency.reload
       xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+    end
+
+    it "should assign general agency profiles" do
+      expect(assigns(:broker_role)).to eq broker_role
+      expect(assigns(:general_agency_profiles)).to eq [general_agency_profile]
     end
 
     it "should http success" do
@@ -427,6 +435,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should get employer_profile" do
       expect(assigns(:employer_profile)).to eq employer_profile
     end
+
   end
 
   describe "POST update_assign" do
