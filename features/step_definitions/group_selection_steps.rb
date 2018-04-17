@@ -10,19 +10,19 @@ Given (/a matched Employee exists with multiple employee roles/) do
   @person = FactoryGirl.create(:person, :with_family, first_name: "Employee", last_name: "E", user: user)
   employee_role1 = FactoryGirl.create :employee_role, person: @person, employer_profile: org1.employer_profile
   employee_role2 = FactoryGirl.create :employee_role, person: @person, employer_profile: org2.employer_profile
-  ce1 =  FactoryGirl.build(:census_employee,
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+  ce1 =  FactoryGirl.create(:census_employee,
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role1.id,
           employer_profile: org1.employer_profile
         )
-  ce2 =  FactoryGirl.build(:census_employee,
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+  ce2 =  FactoryGirl.create(:census_employee,
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role2.id,
           employer_profile: org2.employer_profile
         )
@@ -44,13 +44,13 @@ Given (/a matched Employee exists with consumer role/) do
   benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
   bga = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group
   FactoryGirl.create(:user)
-  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
+  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_active_consumer_role, first_name: "Employee", last_name: "E", user: user)
   employee_role = FactoryGirl.create :employee_role, person: @person, employer_profile: org.employer_profile
-  ce =  FactoryGirl.build(:census_employee,
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+  ce =  FactoryGirl.create(:census_employee,
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role.id,
           employer_profile: org.employer_profile
         )
@@ -85,7 +85,7 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   sep = FactoryGirl.create :special_enrollment_period, family: @family
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryGirl.create(:hbx_enrollment,
                                   household: @family.active_household,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
@@ -108,7 +108,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                   else
                     @person.active_employee_roles[1].employer_profile.plan_years[0].benefit_groups[0]
                   end
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryGirl.create(:hbx_enrollment,
                                   household: @person.primary_family.active_household,
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
@@ -136,11 +136,11 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
 
   @employee_role = person.employee_roles[0]
-  ce =  FactoryGirl.build(:census_employee,
-          first_name: person.first_name, 
-          last_name: person.last_name, 
-          dob: person.dob, 
-          ssn: person.ssn, 
+  ce =  FactoryGirl.create(:census_employee,
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob,
+          ssn: person.ssn,
           employee_role_id: @employee_role.id,
           employer_profile: org.employer_profile
         )
