@@ -132,17 +132,13 @@ module Notifier
     end
 
     def upload_to_amazonS3
-      Aws::S3Storage.save(notice_path, bucket_type, file_name)
+      if self.event_name == 'generate_initial_employer_invoice'
+        Aws::S3Storage.save(notice_path, 'invoices', file_name)
+      else
+        Aws::S3Storage.save(notice_path, 'notices')
+      end
     rescue => e
       raise "unable to upload to amazon #{e}"
-    end
-
-    def bucket_type
-      if self.event_name == 'generate_initial_employer_invoice'
-        'invoices'
-      else
-        'notices'
-      end
     end
 
     def file_name
