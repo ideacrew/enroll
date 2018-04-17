@@ -536,9 +536,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector('#coverage_kind_health')
     end
 
-    it "shouldn't see marketplace options" do
+    it "should see marketplace with individual and coverall Marketplaces" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+      expect(rendered).to have_selector('h3', text: 'Marketplace')
     end
   end
 
