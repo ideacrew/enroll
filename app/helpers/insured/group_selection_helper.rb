@@ -55,6 +55,7 @@ module Insured
     end
 
     def select_market(person, params)
+      #binding.pry
       return params[:market_kind] if params[:market_kind].present?
       if params[:qle_id].present? && (!person.is_resident_role_active?)
         qle = QualifyingLifeEventKind.find(params[:qle_id])
