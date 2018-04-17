@@ -1,4 +1,3 @@
-
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -132,7 +131,7 @@
                 Consular report of birth abroad of US citizen
               </li>
               <li>
-                A valid driver’s license from a state that requires proof of citizenship and verification of social security number prior to issuance of the license
+                A valid driver’s license from a state that requires proof of citizenship and verification of Social Security number prior to issuance of the license
               </li>
               <li>
                 A Tribal document issued by a federally recognized Tribe - for example, a Tribal enrollment card, certificate of degree of American Indian blood, or a Tribal census document, which must:
@@ -162,16 +161,16 @@
 <!-- Citizenship -->
 
 <!-- Immigration -->
-<% if notice.dhs_unverified.any? %>
+<% if notice.immigration_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
+   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.dhs_unverified], bottom_margin: '5px'} %>
+   rows: [notice.immigration_unverified], bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Documents you may be able to use to verify your immigration status include:",
-    listings: ["Permanent resident card (I-551, also known as a “green card”)","Temporary I-551 stamp (on passport or I-94, I-94A)","Immigrant visa (with temporary I-551 language)","Employment authorization card (EAD or I-766)","Arrival/departure record (I-94 or I-94A)","Arrival/departure record in foreign passport (I-94)","Foreign passport","Country of issuance reentry permit (I-327)","Refugee travel document (I-571)","Certificate of eligibility for nonimmigrant (F-1) student status (I-20)","Certificate of eligibility for exchange visitor (J-1) status (DS2019)","Notice of action (I-797)"]} %>
+    listings: ["Permanent resident card (I-551, also known as a “green card”)","Temporary I-551 stamp (on passport or I-94, I-94A)","Immigrant visa (with temporary I-551 language)","Employment authorization card (EAD or I-766)","Arrival/departure record (I-94 or I-94A)","Arrival/departure record in foreign passport (I-94)","Non-immigrant visa in a foreign passport","Country of issuance reentry permit (I-327)","Refugee travel document (I-571)","Certificate of eligibility for nonimmigrant (F-1) student status (I-20)","Certificate of eligibility for exchange visitor (J-1) status (DS2019)","Notice of action (I-797)"]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You can also list these documents or statuses:",
@@ -182,17 +181,26 @@
 <!-- Income Verification -->
 <% if notice.income_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '-5px'} %>
+    content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+    rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
 
-  <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "These documents can include:",
-    listings: ["A copy of your most recent tax return, if you expect the income for <coverage year> to be the same as the income reported in that tax return"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, social security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in <coverage year>"]} %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show.", top_margin: '-5px'} %>
+    content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
+
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    listings: ["Recent pay stubs (showing at least 4 weeks in a row)"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, Social Security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in #{notice.coverage_year}"]} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show.", top_margin: '-5px',  bottom_margin: '5px'} %>
 <% end %>
 
 <!-- Residency Verification -->
@@ -212,49 +220,81 @@
 <!-- MEC Conflict -->
 <% if notice.mec_conflict.any? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>Access to Other Health Insurance:</strong> Our records indicate that the people listed below have access to <MEC Data Match Type 1>:", top_margin: '-5px'} %>
+    content: "<strong>Access to Other Health Insurance:</strong> Our records indicate that the people listed below have access to #{notice.mec_conflict.first["mec_type_1"]}:", top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.mec_conflict], top_margin: '5px', bottom_margin: '5px'} %>
 
+<% if notice.mec_conflict.first["mec_type_2"].present? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "Our records indicate that the following individual(s) have access to <MEC Data Match Type 2>:"} %>
-
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended."} %>
-<% end %>
-<!-- MEC Conflict -->
-
-<!-- Indian Inconsistency -->
-<% if notice.indian_inconsistency.any? %>
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "<strong>American Indian Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:", top_margin: '5px'} %>
+  content: "Our records indicate that the following individual(s) have access to #{notice.mec_conflict.first["mec_type_2"]}:"} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.indian_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
+    rows: [notice.mec_conflict], top_margin: '5px', bottom_margin: '5px'} %>
+<%end%>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended.", top_margin: '5px', bottom_margin: '7px'} %>
+<%end %>
+<!-- MEC Conflict -->
+
+<!-- Indian Inconsistency/American Indian or Alaskan Native-->
+<% if notice.american_indian_unverified.any? %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "<strong>American Indian or Alaska Native Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:", top_margin: '5px'} %>
+
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.american_indian_unverified], top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status. Examples of such verifications include, but are not limited to the following:",
-    listings: ["A document issued by a federally recognized American Indian/Alaska Native Tribe, such as an enrollment or membership card, a Tribal passport, a Tribal census document, or a document issued by a Tribe indicating the person’s affiliation with the Tribe;", "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian; or","A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian."]} %>
+    previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian or Alaska Native status. Examples of such verifications include, but are not limited to the following:",
+    listings: ["A document issued by a federally recognized American Indian/Alaska Native Tribe, such as an enrollment or membership card, a Tribal passport, a Tribal census document, or a document issued by a Tribe indicating the person’s affiliation with the Tribe;", "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian or Alaska Native; or","A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian or Alaska Native."]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "For American Indians born outside of the United States, we will accept the following documents:",
+    previous: "For American Indians or Alaska Native born outside of the United States, we will accept the following documents:",
     listings: ["A Form I-94 with a notation of “S1-3”;", "I-551 permanent resident card stamped “S1-3”;", "Temporary I-551 stamp coded “S1-3” in a Canadian passport;", "A Tribal record or document certifying at least 50 percent American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as a birth certificate or baptismal certificate issued on a reservation; a letter from the Canadian Department of Indigenous and Northern Affairs; or school records."]} %>
 <% end %>
-<!-- Indian Inconsistency -->
+<!-- Indian Inconsistency/American Indian or Alaskan Native-->
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong><br></br>_____________________________________________________________________________________________________________", top_margin: '-5px'} %>
+  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong>"} %>
 
-<%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
-"Eligibility standards:  45 CFR §155.305",
-"Social security number requests/use:  45 CFR §155.305(f)(6)",
-"Eligibility process:  45 CFR §155.310",
-"Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
-"Document requests:  45 CFR §155.315(f)(2)(ii)",
-"Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
-"Annual open enrollment period:  45 CFR §155.410(e)",
-"Special enrollment periods: 45 CFR §155.420",
-"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
-"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "<br></br>_____________________________________________________________________________________________________________"} %>
+
+<% if notice.notification_type && notice.notification_type == "enrollment_notice" %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards:  45 CFR §155.305",
+  "Social Security number requests/use:  45 CFR §155.305(f)(6)",
+  "Eligibility process:  45 CFR §155.310",
+  "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+  "Document requests:  45 CFR §155.315(f)(2)(ii)",
+  "Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+  "Annual open enrollment period:  45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)",
+  "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
+<% elsif notice.notification_type && notice.notification_type == "ivl_backlog_verification_notice_uqhp" %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility for enrollment in a qualified health plan: 45 CFR §155.305(a)",
+  "Social Security Number requests/use: 45 CFR §155.305(f)(6)",
+  "Verifying eligibility for enrollment in a qualified health plan: 45 CFR §155.315",
+  "Document requests: 45 CFR §155.315(f)(2)(ii)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<% else %>
+  <%= render partial: 'notices/shared/reference_paragraph', :locals => {
+  contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+  "Eligibility standards:  45 CFR §155.305",
+  "Social Security number requests/use:  45 CFR §155.305(f)(6)",
+  "Eligibility process:  45 CFR §155.310",
+  "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+  "Document requests:  45 CFR §155.315(f)(2)(ii)",
+  "Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+  "Annual open enrollment period:  45 CFR §155.410(e)",
+  "Special enrollment periods: 45 CFR §155.420",
+  "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+<% end %>

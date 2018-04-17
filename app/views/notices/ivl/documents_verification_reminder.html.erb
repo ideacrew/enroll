@@ -1,0 +1,50 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <h3><%= notice.notice_subject %></h3>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+    <td><div> Dear <%= notice.first_name %>  :</div></td>
+    </tr>
+  </tbody>
+</table>
+
+<% if notice.notification_type == "first_verifications_reminder" %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "You submitted an application for health insurance through #{Settings.site.short_name} on #{notice.application_date.strftime("%B %d, %Y")}, and recently enrolled in a plan. We're writing to remind you that you must submit documents if you want to keep your health insurance.", top_margin: '10px'} %>
+<% elsif notice.notification_type == "second_verifications_reminder" || notice.notification_type == "third_verifications_reminder" %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "You submitted an application for health insurance through #{Settings.site.short_name} on #{notice.application_date.strftime("%B %d, %Y")}, and recently enrolled in a plan. We're writing again to remind you that you must submit documents if you want to keep your health insurance.", top_margin: '10px'} %>
+<% elsif notice.notification_type == "fourth_verifications_reminder" %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "You submitted an application for health insurance through #{Settings.site.short_name} on #{notice.application_date.strftime("%B %d, %Y")}, and recently enrolled in a plan. This is your final reminder that you must submit documents if you want to keep your health insurance. Time is running out.", top_margin: '10px'} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. <strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.</strong>"],
+   heading: 'Send Us Documents', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["The list of documents we need from you is at the end of this letter.",
+    "We also tell you how to send them to us.",
+    "We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_margins', locals:
+  { content: "If you have questions or concerns, we're here to help."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', locals: {
+ content: "The #{Settings.site.short_name} Team"} %>

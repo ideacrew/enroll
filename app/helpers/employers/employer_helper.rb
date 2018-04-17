@@ -143,11 +143,14 @@ module Employers::EmployerHelper
     end.html_safe
   end
 
-  def cobra_button(census_employee)
-    disabled = current_user.has_hbx_staff_role? || true && census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
-    if census_employee.employer_profile.present?
-      disabled = true if census_employee.is_disabled_cobra_action?
+  def cobra_button(census_employee)    
+    disabled = true
+    if census_employee.is_cobra_coverage_eligible?
+      if current_user.has_hbx_staff_role? || !census_employee.cobra_eligibility_expired?
+        disabled = false
+      end
     end
+
     button_text = 'COBRA'
     toggle_class = ".cobra_confirm_"
     if census_employee.cobra_terminated?

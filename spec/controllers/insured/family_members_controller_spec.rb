@@ -9,6 +9,7 @@ RSpec.describe Insured::FamilyMembersController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -60,6 +61,48 @@ RSpec.describe Insured::FamilyMembersController do
 
       it "assigns the family" do
         expect(assigns(:family)).to eq nil #wat?
+      end
+    end
+
+    # Some times Effective dates vary even for the next day. So creating a new SEP & re-calculating effective on dates
+    context "with sep_id in params" do
+
+      let(:sep) { FactoryGirl.create :special_enrollment_period, family: test_family }
+      let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
+
+      before :each do
+        allow(person).to receive(:broker_role).and_return(nil)
+        allow(user).to receive(:person).and_return(person)
+        sign_in(user)
+        allow(controller.request).to receive(:referer).and_return(nil)
+      end
+
+      it "should not duplicate sep if using current sep on same day" do
+        get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+        expect(assigns(:sep)).to eq sep
+      end
+
+      context "when using old active sep" do
+
+        before do
+          sep.update_attributes(submitted_at: TimeKeeper.datetime_of_record - 1.day)
+        end
+
+        it "should not get assign with old sep" do
+          get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+          expect(assigns(:sep)).not_to eq sep
+        end
+
+        it "should duplicate sep" do
+          allow(controller).to receive(:duplicate_sep).and_return dup_sep
+          get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+          expect(assigns(:sep)).to eq dup_sep
+        end
+
+        it "should have the today's date as submitted_at" do
+          get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
+          expect(assigns(:sep).submitted_at.to_date).to eq TimeKeeper.date_of_record
+        end
       end
     end
 
@@ -157,6 +200,24 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
 
+    describe "with a valid dependent but not applying for coverage" do
+      let(:save_result) { true }
+      let(:dependent_properties) { { "is_applying_coverage" => "false" } }
+
+      it "should assign the dependent" do
+        expect(assigns(:dependent)).to eq dependent
+      end
+
+      it "should assign the created" do
+        expect(assigns(:created)).to eq true
+      end
+
+      it "should render the show template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show")
+      end
+    end
+
     describe "when update_vlp_documents failed" do
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return false
@@ -218,7 +279,8 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: 'true') }
+    let(:family_member) { double }
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }

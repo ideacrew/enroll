@@ -147,7 +147,17 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
+    broker_fired_confirmation_to_broker
+  end
+
+  def broker_fired_confirmation_to_broker
+      trigger_notices('broker_fired_confirmation_to_broker')
+  end
+
+  def employer_broker_fired
+    trigger_notices('employer_broker_fired')
   end
   
   def remove_decertified_broker_agency(terminate_on = today)
@@ -282,8 +292,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present? 
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -647,19 +657,6 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        organizations_for_low_enrollment_notice(new_date).each do |organization|
-          begin
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-            #exclude congressional employees
-            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
-            end
-          rescue Exception => e
-            Rails.logger.error { "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}" }
-          end
-        end
-
         # Reminder notices to renewing employers to publish thier plan years.
         start_on = new_date.next_month.beginning_of_month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
@@ -717,6 +714,19 @@ class EmployerProfile
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
+          end
+        end
+
+        organizations_for_low_enrollment_notice(new_date).each do |organization|
+          begin
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+            #exclude congressional employees
+            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
+            end
+          rescue Exception => e
+            Rails.logger.error { "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}" }
           end
         end
 
@@ -834,10 +844,10 @@ class EmployerProfile
 
       employer_profile = org.employer_profile
       employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
-      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop? 
+      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
     end
 
-    employer_collection.where(:"employer_profile.plan_years" => { 
+    employer_collection.where(:"employer_profile.plan_years" => {
       :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}
       }, :"employer_profile.aasm_state".in => ['binder_paid']).each do |org|
 
@@ -1036,15 +1046,15 @@ class EmployerProfile
   end
 
   def transmit_initial_eligible_event
-    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def transmit_renewal_eligible_event
-    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def transmit_renewal_carrier_drop_event
-    notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG}) 
+    notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
   end
 
   def conversion_employer?
@@ -1072,7 +1082,11 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
+    end
   end
 
 private

@@ -24,19 +24,27 @@ module PdfTemplates
     attribute :residency_verified, Boolean, :default => false
     attribute :indian_conflict, Boolean, :default => false
     attribute :incarcerated, Boolean, :default => false
+    attribute :mec_type_1, String
+    attribute :mec_type_2, String
 
     attribute :magi_medicaid_monthly_income_limit, Integer
     attribute :magi_as_percentage_of_fpl, Integer
 
     attribute :is_medicaid_chip_eligible, Boolean, :default => false
     attribute :is_ia_eligible, Boolean, :default => false
+    attribute :is_csr_eligible, Boolean, :default => false
     attribute :is_non_magi_medicaid_eligible, Boolean, :default => false
     attribute :is_without_assistance, Boolean, :default => false
     attribute :is_totally_ineligible, Boolean, :default => false
     attribute :no_aptc_because_of_income, Boolean, :default => false
     attribute :no_aptc_because_of_tax, Boolean, :default => false
+    attribute :no_aptc_because_of_mec, Boolean, :default => false
+    attribute :no_medicaid_because_of_immigration, Boolean, :default => false
+    attribute :no_medicaid_because_of_income, Boolean, :default => false
+    attribute :no_medicaid_because_of_age, Boolean, :default => false
     attribute :no_csr_because_of_income, Boolean, :default => false
     attribute :no_csr_because_of_tax, Boolean, :default => false
+    attribute :no_csr_because_of_mec, Boolean, :default => false
     attribute :has_access_to_affordable_coverage, Boolean, :default => false
 
     # attribute :ineligible_members, Array[String]

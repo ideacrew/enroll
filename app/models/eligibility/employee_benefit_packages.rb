@@ -40,11 +40,12 @@ module Eligibility
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
 
       benefit_group_assignments.renewing.each do |benefit_group_assignment|
-        benefit_group_assignment.destroy
+        if benefit_group_assignment.benefit_group_id == new_benefit_group.id
+          benefit_group_assignment.destroy
+        end
       end
 
       bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
-      bga.renew_coverage
       benefit_group_assignments << bga
     end
 

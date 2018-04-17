@@ -144,12 +144,14 @@ class SpecialEnrollmentPeriod
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
+    return true unless is_shop?
     min_date = sep_optional_date family, 'min', self.market_kind
     max_date = sep_optional_date family, 'max', self.market_kind
     errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
   end
 
   def optional_effective_on_dates_within_range
+    return true unless is_shop?
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
       min_date = sep_optional_date family, 'min', self.market_kind
@@ -271,7 +273,7 @@ private
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
       eligible_date = employee_role.census_employee.earliest_eligible_date
-      eligible_date <= TimeKeeper.date_of_record
+      eligible_date.present? && eligible_date <= TimeKeeper.date_of_record
     end
   end
 

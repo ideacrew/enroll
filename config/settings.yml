@@ -6,12 +6,16 @@ site:
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  home_forms_url: "https://dchealthlink.com/forms"
+  forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
+  healthcare_name: "www.healthcare.gov"
+  healthcare_url: "https://www.healthcare.gov/"
+  irs_url: "https://www.irs.gov/"
+  exchange_hbx_id: "DC0"
 
   social_media:
     facebook_url: ""
-
-  aca_market_kinds: ["individual", "shop"]
 
 contact_center:
   name: "DC Health Link's Customer Care Center"
@@ -25,7 +29,8 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-
+  hbx_abbreviation: "DC Health Benefit Exchange"
+  market_kinds: ["individual", "shop"]
 #
   qle:
     with_in_sixty_days: 60
@@ -35,15 +40,12 @@ aca:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
+    verification_due:
+      days: 95
 
     open_enrollment:
-      benefit_year_2016:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
-
-      benefit_year_2017:
-        start_on: <%= Date.new(2016,11,1) %>
-        end_on: <%= Date.new(2017,1,31) %>
+      start_on: <%= Date.new(2017,11,1) %>
+      end_on: <%= Date.new(2018,02,05) %>
 
   shop_market:
     small_market_employee_count_maximum: 50
@@ -111,7 +113,7 @@ aca:
     employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
-checkbook_services: 
+checkbook_services:
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
     base_url:  "https://dc.checkbookhealth.org"
     url: "https://dc.checkbookhealth.org/shop/dc/"
@@ -119,6 +121,7 @@ checkbook_services:
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."
+  plan_premium_smaller_than_applied: "Applied APTC for any Enrollment cannot be greater than the Plan Premium."
   max_aptc_non_numeric: "Max APTC needs to be a numeric value."
   max_aptc_too_small: "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
   max_aptc_too_big: "Max APTC should be less than 9999.99"

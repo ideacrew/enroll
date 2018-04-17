@@ -11,7 +11,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -192,10 +192,43 @@ class PlanYear
     end.compact
   end
 
+  def open_enrollment_completed?
+    return false if open_enrollment_end_on.blank?
+    (TimeKeeper.date_of_record > open_enrollment_end_on)
+  end
+
+  def binder_paid?
+    employer_profile.binder_paid?
+  end
+
+  def past_transmission_threshold?
+    return false if start_on.blank?
+    t_threshold_date = (start_on - 1.month).beginning_of_month + 14.days
+    (TimeKeeper.date_of_record > t_threshold_date)
+  end
+
   def eligible_for_export?
     return false if self.aasm_state.blank?
-    return false if self.is_conversion
-    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+    return false if is_conversion?
+    if start_on.blank?
+      return(false)
+    end
+    if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+      return false
+    end
+    if (TimeKeeper.date_of_record < start_on)
+      if enrolled?
+        if open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+          return true
+        end
+      elsif renewing_enrolled?
+        if open_enrollment_completed? && past_transmission_threshold?
+          return true
+        end
+      end
+      return false
+    end
+    true
   end
 
   def overlapping_published_plan_years
@@ -289,14 +322,14 @@ class PlanYear
   end
 
   def carriers_offered
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.carriers_offered
     end.uniq
   end
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.dental_carriers_offered
     end.uniq
   end
@@ -531,7 +564,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    if self.employer_profile.census_employees.count < 100
+    if self.employer_profile.census_employees.active.count < 200
       #enrolled.count
       enrolled_by_bga.count
     else
@@ -783,10 +816,10 @@ class PlanYear
 
     state :publish_pending      # Plan application as submitted has warnings
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
-    state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+    state :published,         :after_enter => [:accept_application, :link_census_employees]     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -828,7 +861,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -1009,6 +1042,12 @@ class PlanYear
     self.employer_profile.is_conversion? && self.is_conversion
   end
 
+  def link_census_employees
+    self.employer_profile.census_employees.eligible_without_term_pending.each do |census_employee|
+      census_employee.save # This assigns default benefit package if none
+    end
+  end
+
   alias_method :external_plan_year?, :can_be_migrated?
 
   private
@@ -1111,15 +1150,6 @@ class PlanYear
       self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-    end
-  end
-
-  def initial_employer_open_enrollment_begins
-    return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    begin
-      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver employer initial open enrollment notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 

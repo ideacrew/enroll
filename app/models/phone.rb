@@ -52,6 +52,7 @@ class Phone
       elsif length==10
         self.area_code = phone_number[0,3]
         self.number = phone_number[3,7]
+        self.extension = ""
       end
     end
   end

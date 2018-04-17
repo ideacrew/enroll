@@ -3,6 +3,12 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
 
   def migrate
+
+     if ENV['action'].to_s == "trigger_renewal_py_for_employers"
+       trigger_renewal_py_for_employers
+       return
+     end
+
     organization = Organization.where(:'employer_profile'.exists=>true, fein: ENV['fein']).first
     action = ENV['action'].to_s
 
@@ -28,7 +34,7 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
     renewal_factory.employer_profile = organization.employer_profile
     renewal_factory.is_congress = false
     renewal_factory.renew
-    puts "Renewal Plan year created" unless Rails.env.test?
+    puts "triggered renewal plan year for #{organization.legal_name}" unless Rails.env.test?
   end
 
   def create_renewal_plan_year_passive_renewal(organization)
@@ -48,4 +54,15 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
     end
   end
 
+  def trigger_renewal_py_for_employers
+    organizations = Organization.where(:"employer_profile.plan_years" =>
+                                           { :$elemMatch => {
+                                               :"start_on" => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),
+                                               :"aasm_state".in => PlanYear::PUBLISHED
+                                           }
+                                           })
+    organizations.each do |organization|
+      create_renewal_plan_year(organization)
+    end
+  end
 end

@@ -252,8 +252,8 @@ Given(/^a Hbx admin with super admin access exists$/) do
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
-  hbx_profile = FactoryGirl.create :hbx_profile
-  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  hbx_profile = FactoryGirl.create :hbx_profile, :no_open_enrollment_coverage_period
+  user = FactoryGirl.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
@@ -676,16 +676,6 @@ Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
 end
 
-Then(/^.+ should see the group selection page with health or dental dependents list$/) do
-  expect(page).to have_css('form')
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  find(:xpath, '//label[@for="coverage_kind_dental"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
-  find(:xpath, '//label[@for="coverage_kind_health"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  expect(page).to have_selector('.group-selection-table.health', visible: true)
-end
-
 When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
@@ -940,9 +930,9 @@ end
 And(/Employee should have a ER sponsored enrollment/) do
   person = Person.all.first
   bg = Organization.all.first.employer_profile.plan_years[0].benefit_groups[0]
-  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected", 
+  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected",
                                     plan: Plan.all.first, benefit_group_id: bg.id
-  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id, 
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id,
                                         eligibility_date: TimeKeeper.date_of_record - 1.month, coverage_start_on: TimeKeeper.date_of_record)
   enrollment.save
 end
