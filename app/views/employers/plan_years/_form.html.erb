@@ -80,6 +80,14 @@
   
 
 <script>
+  <% flag = rates_available?(@employer_profile) %>
+  <% if flag == 'blocking' %>
+    $(document).ready(function() {
+      $('.interaction-click-control-add-benefit-group').hide();
+      $('.interaction-click-control-save-plan-year').prop('disabled', true);
+      $('.alert-info').removeClass('hide');
+    });
+  <% end %>
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
     var date = $(this).val();
 
