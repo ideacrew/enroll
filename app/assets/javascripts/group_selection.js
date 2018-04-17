@@ -53,10 +53,8 @@ function setGroupSelectionHandlers(){
   }
 
   $(document).on("change", "[id^=census_employee_]", function(event){
-    if($('#coverage_kind_health:checked').length > 0) {
-      errorsForChangeInEmployer(this);
-      event.stopPropagation();
-    }
+    errorsForChangeInEmployer(this);
+    event.stopPropagation();
   })
 }
 
