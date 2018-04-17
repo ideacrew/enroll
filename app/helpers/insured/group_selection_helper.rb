@@ -1,7 +1,8 @@
 module Insured
   module GroupSelectionHelper
     def can_shop_individual?(person)
-      person.try(:is_consumer_role_active?)
+      #person.try(:is_consumer_role_active?)
+      person.present? && person.is_consumer_role_active?
     end
 
     def can_shop_shop?(person)
@@ -13,7 +14,9 @@ module Insured
     end
 
     def can_shop_resident?(person)
-      person.try(:is_resident_role_active?)
+      #person.try(:is_resident_role_active?)
+      person.present? && person.is_resident_role_active?
+
     end
 
     def health_relationship_benefits(benefit_group)
