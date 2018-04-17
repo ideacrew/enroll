@@ -41,6 +41,16 @@ module Insured
         benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
     end
 
+    def  view_market_palces(person)
+      if can_shop_both_markets?(person)
+        Plan::MARKET_KINDS
+      elsif can_shop_individual?(person)
+        Plan::INDIVIDUAL_MARKET_KINDS
+      elsif can_shop_resident?(person)
+        ["coverall"]
+      end
+    end
+
     def select_market(person, params)
       return params[:market_kind] if params[:market_kind].present?
       if params[:qle_id].present? && (!person.is_resident_role_active?)
