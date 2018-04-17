@@ -7,32 +7,7 @@ function setGroupSelectionHandlers(){
   var employers = $("[id^=census_employee_]");
   hideAllErrors();
 
-  if ($("#employer-selection .n-radio-group .n-radio-row").length) {
-
-    var checked_er = $("#employer-selection .n-radio-group .n-radio-row input[checked^= 'checked']:enabled");
-
-    if (checked_er.length) {
-      var employer_id = checked_er.val();
-      if ($('#coverage_kind_health').is(':checked')) {
-        $(".health_errors_" + employer_id ).show();
-      }
-
-      if ($('#coverage_kind_dental').is(':checked')) {
-        $(".dental_errors_" + employer_id ).show();
-      }
-
-      setDentalBenefits(checked_er.attr('dental_benefits'));
-      errorsForChangeInCoverageKind(employer_id);
-      setPrimaryForShop();
-    }
-
-  } else {
-
-    $('#dental-radio-button').show();
-    $('.ivl_errors').show();
-    disableIvlIneligible();
-    setPrimaryForIvl();
-  }
+  toggleErrosOnEmployerSelection();
 
   if($('#market_kinds').length) {
     var employer_id = ""
@@ -77,8 +52,11 @@ function setGroupSelectionHandlers(){
     });
   }
 
-  employers.on("change", function(){
-    errorsForChangeInEmployer(this);
+  $(document).on("change", "[id^=census_employee_]", function(event){
+    if($('#coverage_kind_health:checked').length > 0) {
+      errorsForChangeInEmployer(this);
+      event.stopPropagation();
+    }
   })
 }
 
@@ -92,10 +70,38 @@ function setPrimaryForShop() {
   $("tr.is_primary td:first-child input").prop("readonly", true);
 }
 
-
 function hideAllErrors(){
   hideShopErrors();
   hideIvlErrors();
+}
+
+function toggleErrosOnEmployerSelection() {
+  if ($("#employer-selection .n-radio-group .n-radio-row").length) {
+
+    var checked_er = $("#employer-selection .n-radio-group .n-radio-row input[checked^= 'checked']:enabled");
+
+    if (checked_er.length) {
+      var employer_id = checked_er.val();
+      if ($('#coverage_kind_health').is(':checked')) {
+        $(".health_errors_" + employer_id ).show();
+      }
+
+      if ($('#coverage_kind_dental').is(':checked')) {
+        $(".dental_errors_" + employer_id ).show();
+      }
+
+      setDentalBenefits(checked_er.attr('dental_benefits'));
+      errorsForChangeInCoverageKind(employer_id);
+      setPrimaryForShop();
+    }
+
+  } else {
+
+    $('#dental-radio-button').show();
+    $('.ivl_errors').show();
+    disableIvlIneligible();
+    setPrimaryForIvl();
+  }
 }
 
 function hideShopErrors() {
@@ -108,18 +114,51 @@ function hideIvlErrors() {
 }
 
 function errorsForChangeInEmployer(element) {
-  var employer_id = $(element).attr("value")
+  if ($(element).closest('#employer-selection-group').length > 0) {
+    var employer_id = $(element).attr("value")
+    $("#coverage_kind_health").prop("checked", true);
+    hideAllErrors();
+    if ($(element).is(":checked")) {
+      setDentalBenefits($(element).attr('dental_benefits'));
+    }
+    personId = $('#person_id').val();
+    var dataParams = {};
+    var searchParams = window.location.search.replace('?', '').split('&');
+    searchParams.forEach(function(param) {
+      if(param.split('=')[0] == 'change_plan')
+        dataParams['change_plan'] = param.split('=')[1];
+      if(param.split('=')[0] == 'person_id')
+        dataParams['person_id'] = personId;
+      if(param.split('=')[0] == 'employee_role_id')
+        dataParams['employee_role_id'] = employer_id;
+      if(param.split('=')[0] == 'market_kind')
+        dataParams['market_kind'] = param.split('=')[1];
+      if(param.split('=')[0] == 'shop_for_plans')
+        dataParams['shop_for_plans'] = param.split('=')[1];
+      if(param.split('=')[0] == 'qle_id')
+        dataParams['qle_id'] = param.split('=')[1];
+      if(param.split('=')[0] == 'sep_id')
+        dataParams['sep_id'] = param.split('=')[1];
+    })
 
-  $("#coverage_kind_health").prop("checked", true);
+    console.log(dataParams);
 
-  hideAllErrors();
-
-  $(".health_errors_" + $(element).attr("value") ).show();
-
-  if($(element).is(":checked")){
-    setDentalBenefits($(element).attr('dental_benefits'));
+    errorsForChangeInCoverageKind(employer_id);
+    $.ajax({
+      url: '/insured/group_selections/new.js',
+      type: 'GET',
+      data: dataParams
+    }).done(function () {
+      hideAllErrors();
+      toggleErrosOnEmployerSelection();
+      $('input[type="submit"]').each(function() {
+        var element_id = $.trim($(this).val());
+        if(element_id) {
+            $(this).addClass('interaction-click-control-' + element_id.toLowerCase().replace(/[_&]| /gi, '-'));
+        }
+      });
+    })
   }
-  errorsForChangeInCoverageKind(employer_id)
 }
 
 function errorsForChangeInCoverageKind(employer_id){
