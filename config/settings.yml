@@ -128,7 +128,7 @@ aca:
   user_accounts_enabled: false
 
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-  enabled_metal_levels_for_single_carrier: "bronze", "silver", "gold", "platinum", dental"]
+  enabled_metal_levels_for_single_carrier: ["bronze", "silver", "gold", "platinum", dental"]
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
 
