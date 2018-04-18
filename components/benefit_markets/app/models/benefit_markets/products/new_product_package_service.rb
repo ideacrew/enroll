@@ -1,6 +1,6 @@
 module BenefitMarkets
   module Products
-    class ProductPackageFormMapping
+    class NewProductPackageService
       attr_reader :product_package_factory
 
       def initialize(factory_kind = ::BenefitMarkets::Products::ProductPackageFactory)
@@ -28,6 +28,13 @@ module BenefitMarkets
 
       def benefit_option_kinds
         ::BenefitMarkets::Products::ProductPackage::BENEFIT_OPTION_KINDS.map(&:to_s)
+      end
+
+      def populate_options(form)
+        form.allowed_benefit_option_kinds = benefit_option_kinds
+        form.available_pricing_models = options_for_pricing_model_id(form)
+        form.available_contribution_models = options_for_contribution_model_id
+        form.available_benefit_catalogs = options_for_benefit_catalog_id
       end
 
       def save(form) 
