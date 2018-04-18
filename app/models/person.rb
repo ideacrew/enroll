@@ -148,6 +148,8 @@ class Person
 
   validate :is_ssn_composition_correct?
 
+  validate :is_only_one_individual_role_active?
+
   validates :gender,
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
@@ -939,6 +941,13 @@ class Person
       return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
     end
 
+    true
+  end
+
+  def is_only_one_individual_role_active?
+    if self.is_consumer_role_active? && self.is_resident_role_active?
+      self.errors.add(:base, "Resident role and Consumer role can't both be active.")
+    end
     true
   end
 
