@@ -9,14 +9,13 @@ module BenefitSponsors
       end
 
       def store!(form)
-        benefit_application_factory = BenefitSponsors::BenefitApplications::BenefitApplicationFactory
-        attributes = form_model_to_attributes(form)
+        model_attributes = form_model_to_attributes(form)
 
         # This will instantiate a new application when benefit application is nil or update existing application when present
-        @benefit_application = benefit_application_factory.call(
+        @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(
           benefit_sponsorship: benefit_sponsorship, 
           benefit_application: benefit_application, 
-          attributes)
+          model_attributes)
         
         save_success = @benefit_application.save
 
@@ -24,7 +23,7 @@ module BenefitSponsors
           map_errors_for(form)
           return false
         end
-        
+
         true
       end
 
