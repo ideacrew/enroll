@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'config'
   s.add_dependency 'symmetric-encryption', '~> 3.6.0'
   s.add_dependency 'pundit', '~> 1.0.1'
+  s.add_dependency 'active_model_serializers'
   
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency 'shoulda-matchers'
