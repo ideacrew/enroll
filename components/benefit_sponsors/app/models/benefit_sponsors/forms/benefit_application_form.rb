@@ -5,7 +5,7 @@ module BenefitSponsors
       extend ActiveModel::Naming
       include ActiveModel::Conversion
       include ActiveModel::Validations
-      include Virtus
+      include Virtus.model
 
       attribute :start_on, Date
       attribute :end_on, Date
@@ -22,25 +22,41 @@ module BenefitSponsors
 
       # validates :validate_application_dates
 
-      delegate :benefit_sponsorship, :benefit_application, to: :benefit_application_service
+      delegate :benefit_sponsorship, :benefit_application, to: :@benefit_application_service
 
-      def initialize(params)
-        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+      def initialize(params = {})
+        super(params[:benefit_application]) if params[:benefit_application].present?
         @benefit_application_service = BenefitSponsors::Services::BenefitApplicationService.new(params)
       end
 
+      def load_attributes_from_resource
+        if benefit_application.present?
+          self.assign_attributes(@benefit_application_service.attributes_to_virtus_params)
+        end
+      end
+
+      # Forms cannot be persisted
+      def persisted?
+        false
+      end
+
       def save
-        return false unless self.valid?
-        save_result, persisted_object = @form_mapping.save(self)
-        return false unless save_result
-        @resource = persisted_object
-        true
+        if valid?
+          persist!
+        else
+          false
+        end
       end
     
       def validate_application_dates
         if start_on <= end_on
           errors.add(:start_on, "can't be later than end on date")
         end
+      end
+
+      def scheduler
+        return @scheduler if defined? @scheduler
+        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       end
 
       def calculate_start_on_options
@@ -69,7 +85,9 @@ module BenefitSponsors
 
       private 
 
-      attr_reader :scheduler, :benefit_application_service
+      def persist!
+        @benefit_application_service.store!(self)
+      end
     end
   end
 end

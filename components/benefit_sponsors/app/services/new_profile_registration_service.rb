@@ -3,17 +3,16 @@ module BenefitSponsors
     class NewProfileRegistrationService
 
       attr_reader :organization, :profile, :representative
+      attr_accessor :profile_type
 
-      def initialize(params)
-        @organization   = params[:organization]
-        @profile        = params[:profile]
-        @representative = params[:representative]
+      def initialize(attrs)
+        @profile_type = attrs[:profile_type]
       end
 
       # Serialized model attributes, plus form metadata
-      def build
-        objects = build_classes
-
+      def self.build(attrs)
+        factory_obj = new(attrs)
+        factory_obj.send(:build_classes, profile_type)
       end
 
       def params_to_attributes(params)
@@ -39,10 +38,13 @@ module BenefitSponsors
         self
       end
 
+      def self.office_kind_options
+      end
+
       private
 
-      def build_classes
-        @organization = BenefitSponsors::Organizations::Factories::ProfileFactory.build_organization
+      def build_classes(profile_type)
+        @organization = BenefitSponsors::Organizations::Factories::ProfileFactory.build({profile_type: profile_type})
         # deal with person
         
         attributes_to_params
