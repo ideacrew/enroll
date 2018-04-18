@@ -5,7 +5,7 @@ module BenefitSponsors
       extend ActiveModel::Naming
       include ActiveModel::Conversion
       include ActiveModel::Validations
-      include Virtus
+      include Virtus.model
 
       attribute :start_on, Date
       attribute :end_on, Date
@@ -25,6 +25,7 @@ module BenefitSponsors
       delegate :benefit_sponsorship, :benefit_application, to: :@benefit_application_service
 
       def initialize(params = {})
+        super
         @benefit_application_service = BenefitSponsors::Services::BenefitApplicationService.new(params)
       end
 

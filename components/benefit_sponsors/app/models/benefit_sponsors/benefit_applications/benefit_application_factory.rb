@@ -4,11 +4,11 @@ module BenefitSponsors
 
       attr_accessor :benefit_sponsorship, :benefit_application
 
-      def self.call(benefit_sponsorship:, benefit_application:, *args)
+      def self.call(benefit_sponsorship, benefit_application, args)
         new(benefit_sponsorship, benefit_application, args).benefit_application
       end
 
-      def initialize(benefit_sponsorship, benefit_application, *args)
+      def initialize(benefit_sponsorship, benefit_application, args)
         @benefit_sponsorship = benefit_sponsorship
         @benefit_application = benefit_application
 

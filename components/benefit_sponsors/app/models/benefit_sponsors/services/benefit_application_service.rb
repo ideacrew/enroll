@@ -1,7 +1,6 @@
 module BenefitSponsors
   module Services
     class BenefitApplicationService
-
       attr_reader :params
 
       def initialize(params)
@@ -13,9 +12,8 @@ module BenefitSponsors
 
         # This will instantiate a new application when benefit application is nil or update existing application when present
         @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(
-          benefit_sponsorship: benefit_sponsorship, 
-          benefit_application: benefit_application, 
-          model_attributes)
+          benefit_sponsorship, benefit_application, model_attributes
+        )
         
         save_success = @benefit_application.save
 
