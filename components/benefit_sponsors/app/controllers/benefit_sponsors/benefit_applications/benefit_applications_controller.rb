@@ -1,7 +1,7 @@
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationsController < ApplicationController
-      before_action :initalize_form
+      before_action :initialize_form
 
       def new
       end
@@ -32,7 +32,7 @@ module BenefitSponsors
 
       private
 
-      def initalize_form
+      def initialize_form
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
       end
 
