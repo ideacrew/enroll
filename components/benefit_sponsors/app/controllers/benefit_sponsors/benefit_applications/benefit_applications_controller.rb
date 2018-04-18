@@ -3,7 +3,8 @@ module BenefitSponsors
     class BenefitApplicationsController < ApplicationController
 
       def new
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(params.permit(:benefit_sponsorship_id))
+        permitted = params.permit(:benefit_sponsorship_id)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(permitted)
       end
 
       def create
@@ -17,7 +18,8 @@ module BenefitSponsors
       end
 
       def edit
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(params.permit(:benefit_sponsorship_id, :benefit_application_id))
+        permitted = params.permit(:benefit_sponsorship_id, :benefit_application_id)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(permitted)
         @benefit_application_form.load_attributes_from_resource
       end
 
@@ -32,7 +34,8 @@ module BenefitSponsors
       end
 
       def recommend_dates
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(params.permit(:start_on))
+        permitted = params.permit(:start_on, :benefit_sponsorship_id)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(permitted)
       end
 
       private
