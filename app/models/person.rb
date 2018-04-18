@@ -950,7 +950,7 @@ class Person
 
   def is_only_one_individual_role_active?
     if self.is_consumer_role_active? && self.is_resident_role_active?
-      self.errors.add(:base, "Resident role and Consumer role can't both be active.")
+      self.errors.add(:base, "Resident role and Consumer role can't both be active at the same time.")
     end
     true
   end
