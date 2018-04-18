@@ -56,6 +56,20 @@ module BenefitSponsors
         end
       end
 
+      def create_pricing_determinations(sponsored_benefit, product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
+        rate_hash = calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
+        price_determination_tiers = []
+        rate_hash.each_pair do |k, v|
+          price_determination_tiers << ::BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
+            pricing_unit_id: k,
+            price: v
+          )
+        end 
+        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(price_determination_tiers: price_determination_tiers)
+        sponsored_benefits.pricing_determinations << price_determination
+        sponsored_benefits.save!
+      end
+
       def calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
         price_total, tier_totals = calculate_tier_totals_for(pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
         tier_factors = {}

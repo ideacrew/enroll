@@ -2,6 +2,8 @@ module BenefitSponsors
   class SponsoredBenefits::SponsorContribution
     include Mongoid::Document
 
+    embedded_in :sponsored_benefit,
+      class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
     embeds_many :contribution_levels,
                 class_name: "BenefitSponsors::SponsoredBenefits::ContributionLevel"
 
