@@ -26,7 +26,7 @@ module BenefitSponsors
 
       def initialize(params)
         @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        @benefit_application_service = BenefitSponsors::BenefitApplications::BenefitApplicationFormMapping.new(params)
+        @benefit_application_service = BenefitSponsors::Services::BenefitApplicationService.new(params)
       end
 
       def save
