@@ -91,7 +91,7 @@ module BenefitSponsors
 
 
       # Use the Document model for managing any/all documents associated with Organization
-      has_many :documents, class_name: "BenefitSponsors::Documents::Document"
+      # has_many :documents, class_name: "BenefitSponsors::Documents::Document" #todo CHECK
 
       accepts_nested_attributes_for :profiles
 

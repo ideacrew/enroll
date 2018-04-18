@@ -7,7 +7,8 @@ module BenefitSponsors
 
       # Enable polymorphic associations
       embedded_in :recipient, polymorphic: true
-      embeds_many :messages, class_name:"BenefitSponsors::Inboxes::Message"
+      embeds_many :messages,
+                  class_name:"BenefitSponsors::Inboxes::Message"
       accepts_nested_attributes_for :messages
 
       before_create :generate_acccess_key

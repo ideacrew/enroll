@@ -3,8 +3,8 @@ module BenefitSponsors
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
       include SetCurrentUser
       include AASM
-
-      MARKET_KINDS = %W[individual shop both]
+      # MARKET_KINDS = %W[individual shop both] #TODO check
+      MARKET_KINDS = [:individual, :shop, :both]
 
       MARKET_KINDS_OPTIONS = {
         "Individual & Family Marketplace ONLY" => "individual",
@@ -41,7 +41,8 @@ module BenefitSponsors
         allow_blank: true
 
       validates :market_kind,
-        inclusion: { in: ::BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid practice area" },
+        inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+                # inclusion: { in: ::BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid practice area" }, #TODO check
         allow_blank: false
 
       validates :entity_kind,
