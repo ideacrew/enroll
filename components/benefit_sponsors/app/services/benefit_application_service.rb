@@ -1,6 +1,6 @@
 module BenefitSponsors
-  module BenefitApplications
-    class BenefitApplicationFormMapping
+  module Services
+    class BenefitApplicationService
 
       attr_reader :params
 
@@ -14,26 +14,32 @@ module BenefitSponsors
         benefit_application.save
       end
 
+      def params_to_attributes(params)
+
+      end
+
+      def attributes_to_params(klass)
+
+      end
+
       def benefit_sponsorship
         return @benefit_sponsorship if defined? @benefit_sponsorship
-        @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params.delete(:benefit_sponsorship_id))
+        @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id])
       end
 
       def benefit_application
         return @benefit_application if defined? @benefit_application
-        if benefit_application_id = params.delete(:benefit_application_id)
-          @benefit_application = benefit_sponsorship.benefit_applications.find(benefit_application_id)
-        end
+        @benefit_application = benefit_sponsorship.benefit_applications.find(params[:benefit_application_id])
       end
 
       def build_object_from_form(form)
         @benefit_application_factory.call(benefit_sponsorship: benefit_sponsorship, benefit_application: benefit_application, 
-          {
-            effective_period: form.effective_period,
-            open_enrollment_period: form.open_enrollment_period,
-            fte_count: form.fte_count,
-            pte_count: form.pte_count,
-            msp_count: form.msp_count
+        {
+          effective_period: (form.start_on..form.end_on),
+          open_enrollment_period: (form.open_enrollment_start_on..form.open_enrollment_end_on),
+          fte_count: form.fte_count,
+          pte_count: form.pte_count,
+          msp_count: form.msp_count
           })
       end
 
