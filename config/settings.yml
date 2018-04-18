@@ -276,3 +276,4 @@ style:
   alternate_header_color: '#c56c24'
   primary_icon_color: '#c56c24'
   qle_header_color: '#c56c24'
+  primary_header_font: "'Roboto Slab', serif"
