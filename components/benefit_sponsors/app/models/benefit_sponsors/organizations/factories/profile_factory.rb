@@ -50,6 +50,10 @@ module BenefitSponsors
           new(attrs).build_organization
         end
 
+        def self.build(attrs)
+          new.build_organization(attrs)
+        end
+
         def build_organization(attrs = {})
           if profile_id.blank?
             self.organization = build_organization_class.new(organization_attributes(attrs))
