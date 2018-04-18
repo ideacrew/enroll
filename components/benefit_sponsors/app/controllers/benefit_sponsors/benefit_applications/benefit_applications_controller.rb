@@ -21,7 +21,7 @@ module BenefitSponsors
         @benefit_application_form.load_attributes_from_resource
       end
 
-      def update
+      def update        
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
         if @benefit_application_form.save
           redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.benefit_sponsorship, @benefit_application_form.benefit_application)
@@ -42,13 +42,16 @@ module BenefitSponsors
       end
 
       def application_params
-        params.permit(
-          :benefit_sponsorship_id, :benefit_application_id,
-          :benefit_application => [
-            :id, :start_on, :end_on, :fte_count, :pte_count, :msp_count,
-            :open_enrollment_start_on, :open_enrollment_end_on 
-          ]
-        )
+        permitted = params.permit(:benefit_sponsorship_id, :benefit_application_id)
+        permitted.merge(params.require(:benefit_application).permit(
+          :start_on,
+          :end_on, 
+          :open_enrollment_start_on,
+          :open_enrollment_end_on,
+          :fte_count,
+          :pte_count,
+          :msp_count
+        ))
       end
     end
   end
