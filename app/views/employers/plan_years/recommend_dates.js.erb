@@ -1,21 +1,21 @@
-<% if @result[:result] == "ok" %>
+<% if @benefit_application_form.is_start_on_valid? %>
   $('.recommend #content').html("<%= escape_javascript(render "recommend_dates") %>");
   $('.recommend #content').slideDown();
 
 
-  $("input#jq_datepicker_ignore_plan_year_end_on").val("<%= @schedule[:plan_year_end_on].to_s %>").trigger("change");
-  $("input#plan_year_end_on_jq_datepicker_plain_field").val("<%= @schedule[:plan_year_end_on].to_s(:db) %>");
-  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").val("<%= @open_enrollment_dates[:open_enrollment_start_on].to_s %>").trigger("change");
+  $("input#jq_datepicker_ignore_plan_year_end_on").val("<%= @benefit_application_form.enrollment_schedule[:plan_year_end_on].to_s %>").trigger("change");
+  $("input#plan_year_end_on_jq_datepicker_plain_field").val("<%= @benefit_application_form.enrollment_schedule[:plan_year_end_on].to_s(:db) %>");
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").val("<%= @benefit_application_form.open_enrollment_dates[:open_enrollment_start_on].to_s %>").trigger("change");
   
-  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "minDate", "<%= @open_enrollment_dates[:open_enrollment_start_on]%>");
-  $("input#plan_year_open_enrollment_start_on_jq_datepicker_plain_field").val("<%= @open_enrollment_dates[:open_enrollment_start_on].to_s(:db) %>");
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "minDate", "<%= @benefit_application_form.open_enrollment_dates[:open_enrollment_start_on]%>");
+  $("input#plan_year_open_enrollment_start_on_jq_datepicker_plain_field").val("<%= @benefit_application_form.open_enrollment_dates[:open_enrollment_start_on].to_s(:db) %>");
 
-  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val("<%= @open_enrollment_dates[:open_enrollment_end_on].to_s %>").trigger("change");
-  $("input#plan_year_open_enrollment_end_on_jq_datepicker_plain_field").val("<%= @open_enrollment_dates[:open_enrollment_end_on].to_s(:db) %>");
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val("<%= @benefit_application_form.open_enrollment_dates[:open_enrollment_end_on].to_s %>").trigger("change");
+  $("input#plan_year_open_enrollment_end_on_jq_datepicker_plain_field").val("<%= @benefit_application_form.open_enrollment_dates[:open_enrollment_end_on].to_s(:db) %>");
   if(window.location.href.indexOf("edit") > -1) {
     $('.recommend .btn-primary').remove();
   } else {
   }
 <% else %>
-  $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4><%= @result[:msg] %></h4></div>")
+  $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4><%= @benefit_application_form.start_on_result[:msg] %></h4></div>")
 <% end %>
