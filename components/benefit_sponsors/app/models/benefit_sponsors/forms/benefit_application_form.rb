@@ -25,7 +25,7 @@ module BenefitSponsors
       delegate :benefit_sponsorship, :benefit_application, to: :@benefit_application_service
 
       def initialize(params = {})
-        super
+        super(params[:benefit_application]) if params[:benefit_application].present?
         @benefit_application_service = BenefitSponsors::Services::BenefitApplicationService.new(params)
       end
 

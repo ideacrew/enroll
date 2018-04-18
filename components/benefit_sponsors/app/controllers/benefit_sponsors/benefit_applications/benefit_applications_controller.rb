@@ -45,16 +45,13 @@ module BenefitSponsors
       end
 
       def application_params
-        permitted = params.permit(:benefit_sponsorship_id, :benefit_application_id)
-        permitted.merge(params.require(:benefit_application).permit(
-          :start_on,
-          :end_on, 
-          :open_enrollment_start_on,
-          :open_enrollment_end_on,
-          :fte_count,
-          :pte_count,
-          :msp_count
-        ))
+        params.permit(
+          :benefit_sponsorship_id, :benefit_application_id,
+          :benefit_application => [
+            :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+            :open_enrollment_start_on, :open_enrollment_end_on 
+          ]
+        )
       end
     end
   end
