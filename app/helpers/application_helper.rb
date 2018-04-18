@@ -4,15 +4,8 @@ module ApplicationHelper
     "Benefits for which you may be eligible to offer are not currently approved by the #{exchange}, please return in 24 hours."
   end
 
-  def rates_available?(employer)
-    employer.applicant? && Plan.has_rates_for_all_carriers? ? "blocking" : ""
-  end
-
-  def late_rates_edit_plan_year(employer, date)
-    if employer.applicant? && Plan.has_rates_for_all_carriers?(date)
-      # hide the benefit package part here, please change the code as required
-    else
-    end
+  def rates_available?(employer, date=nil)
+    employer.applicant? && Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
   end
 
   def deductible_display(hbx_enrollment, plan)

@@ -283,7 +283,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def update
     plan_year = @employer_profile.plan_years.where(id: params[:id]).last
-    if !Plan.has_rates_for_all_carriers?(plan_year.start_on) == false
+    if !Plan.has_rates_for_all_carriers?(plan_year_params[:start_on].to_date) == false
       params["plan_year"]["benefit_groups_attributes"] = {}
       plan_year.benefit_groups.each{|a| a.delete}
     end
