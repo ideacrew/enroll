@@ -3,6 +3,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
     $('.add-dependent-text').hide();
   event.preventDefault()
   time = new Date().getTime()
+  console.log("to replace: " + $(this).data('id'))
   regexp = new RegExp($(this).data('id'), 'g')
   html = $(this).data('fields').replace(regexp, time)
   target = $(this).closest('.form-inputs')
@@ -17,7 +18,11 @@ $(document).on 'click', 'form .add_fields', (event) ->
   applyJQDatePickers()
 
   if $('#plan_year_start_on').length
+    console.log('validate plan year?')
     EmployerProfile.validatePlanYear
+    $(".show-dental-plans").show();
+  else
+    console.log('not to validate')
 
 
 
