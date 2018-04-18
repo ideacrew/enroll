@@ -9,6 +9,10 @@ module BenefitMarkets
         def all_products
           super().where("coverage_kind" => "health", :metal_level => metal_level)
         end
+
+        def benefit_option_kind
+          "metal_level_health"
+        end
       end
     end
   end

@@ -5,6 +5,10 @@ module BenefitMarkets
         def all_products
           super().where("coverage_kind" => "dental")
         end
+
+        def benefit_option_kind
+          "any_dental"
+        end
       end
     end
   end
