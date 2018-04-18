@@ -20,7 +20,7 @@ module BenefitSponsors
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
         numericality: true
-      #TODO: Conditionally Validate on Edit & Update (On Create there is no person_id)
+
       validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
@@ -83,7 +83,7 @@ module BenefitSponsors
       end
 
       def dob=(val)
-        @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
+        @dob = Date.strptime(val,"%m/%d/%Y") rescue nil
       end
       
       # Strip non-numeric characters

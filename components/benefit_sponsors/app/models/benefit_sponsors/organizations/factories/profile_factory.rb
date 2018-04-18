@@ -7,7 +7,7 @@ module BenefitSponsors
         include BenefitSponsors::Forms::NpnField
 
         attr_accessor :profile_id, :profile_type, :organization, :current_user
-        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :person, :market_kind
+        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
 
         validate :validate_duplicate_npn, if: :is_broker_profile?
 
@@ -20,6 +20,7 @@ module BenefitSponsors
             errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
           end
         end
+
 
         def self.call_persist(current_user, attributes)
           factory_obj = new(attributes)
@@ -38,7 +39,10 @@ module BenefitSponsors
           self.email = attrs[:email]
           self.dob = attrs[:dob]
           self.npn = attrs[:npn]
-          self.fein = attrs[:fein]
+          if attrs[:agency_organization].present?
+            self.fein = attrs[:agency_organization][:fein]
+            self.legal_name = attrs[:agency_organization][:legal_name]
+          end
           self.profile_id = attrs[:id]
         end
 
@@ -59,7 +63,8 @@ module BenefitSponsors
         def organization_attributes(attrs = {})
           attrs.except(:profiles_attributes).merge({
             site: site,
-            fein: (fein.present? ? regex_for(fein): nil)
+            fein: (fein.present? ? fein.strip : nil),
+            legal_name: (legal_name.present? ? legal_name.strip : nil)
           })
         end
 
@@ -134,10 +139,10 @@ module BenefitSponsors
             return false, redirection_url
           end
 
-          return false, redirection_url if check_validity(existing_org)
-
+          return false, redirection_url if failed_validity?(existing_org)
           if is_broker_profile?
-            update_broker_agency_profile(existing_org, attributes)
+            broker_organization = init_broker_agency(existing_org, attributes)
+            return false, redirection_url unless update_broker_agency_profile(broker_organization)
           elsif is_employer_profile?
             claimed = is_employer_profile_claimed?(existing_org)
             update_employer_profile existing_org, claimed, attributes
@@ -146,18 +151,28 @@ module BenefitSponsors
           [true, redirection_url(pending, true)]
         end
 
-        def check_validity(org)
+        def failed_validity?(org)
           issuer_requesting_sponsor_benefits?(org) || broker_profile_already_registered?(org) || person.errors.present?
         end 
 
-        def update_broker_agency_profile(organization, attributes)
+        def update_broker_agency_profile(org)
+          org.entity_kind = :s_corporation
+          if org.valid?
+            org.save!
+            update_broker_role(org.broker_agency_profile)
+          else
+            self.errors.add(:base, org.errors.full_messages)
+            return false
+          end
+          return true
+        end
+
+        def init_broker_agency(organization, attributes)
           add_broker_role
-          # Building Organization as met criteria
           organization = init_broker_organization(organization, attributes["agency_organization"])
           profile = organization.broker_agency_profile
           profile.primary_broker_role = person.broker_role
-          profile.save!
-          update_broker_role(profile)
+          organization
         end
 
         def init_broker_organization(organization, attributes)
@@ -173,6 +188,7 @@ module BenefitSponsors
           if is_broker_profile?
             organization.present? && organization.broker_agency_profile.present?
           end
+          return false
         end
 
         def update_employer_profile(existing_org, claimed, attributes)
@@ -260,7 +276,7 @@ module BenefitSponsors
             matched_people = Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
-              dob: dob
+              dob: Date.strptime(dob, "%m/%d/%Y")
               )
           else
             matched_people = Person.where(
@@ -285,7 +301,7 @@ module BenefitSponsors
             self.person = Person.new({
               :first_name => first_name,
               :last_name => last_name,
-              :dob => dob
+              :dob => Date.strptime(dob, "%m/%d/%Y")
             })
           end
 

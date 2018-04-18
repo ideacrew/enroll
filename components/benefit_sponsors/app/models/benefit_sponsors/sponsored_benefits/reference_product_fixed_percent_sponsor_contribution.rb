@@ -1,6 +1,7 @@
 module BenefitSponsors
   module SponsoredBenefits
     class ReferenceProductFixedPercentSponsorContribution < FixedPercentSponsorContribution
+      field :reference_product_id, type: BSON::ObjectId
       
       # Return the reference product for calculation.
       # @return [::BenefitMarket::Products::Product] the reference product
