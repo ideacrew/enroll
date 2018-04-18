@@ -6,20 +6,48 @@ module BenefitSponsors
 
       def initialize(params)
         @params = params
-        @benefit_application_factory = BenefitSponsors::BenefitApplications::BenefitApplicationFactory
       end
 
-      def save(form)
-        benefit_application = build_object_from_form(form)
-        benefit_application.save
+      def store!(form)
+        benefit_application_factory = BenefitSponsors::BenefitApplications::BenefitApplicationFactory
+        attributes = form_model_to_attributes(form)
+
+        # This will instantiate a new application when benefit application is nil or update existing application when present
+        @benefit_application = benefit_application_factory.call(
+          benefit_sponsorship: benefit_sponsorship, 
+          benefit_application: benefit_application, 
+          attributes)
+        
+        save_success = @benefit_application.save
+
+        unless save_success
+          map_errors_for(form)
+          return false
+        end
+        
+        true
       end
 
-      def params_to_attributes(params)
-
+      def form_model_to_attributes(form) #create/update
+        {
+          effective_period: (form.start_on..form.end_on),
+          open_enrollment_period: (form.open_enrollment_start_on..form.open_enrollment_end_on),
+          fte_count: form.fte_count,
+          pte_count: form.pte_count,
+          msp_count: form.msp_count
+        }
       end
 
-      def attributes_to_params(klass)
-
+      def attributes_to_form_params # edit
+        {
+          start_on: benefit_application.effective_period.min,
+          end_on: benefit_application.effective_period.max,
+          open_enrollment_start_on: benefit_application.open_enrollment_period.min,
+          open_enrollment_end_on: benefit_application.open_enrollment_period.max,
+          fte_count: benefit_application.fte_count,
+          pte_count: benefit_application.pte_count,
+          msp_count: benefit_application.msp_count
+        }
       end
 
       def benefit_sponsorship
@@ -32,19 +60,20 @@ module BenefitSponsors
         @benefit_application = benefit_sponsorship.benefit_applications.find(params[:benefit_application_id])
       end
 
-      def build_object_from_form(form)
-        @benefit_application_factory.call(benefit_sponsorship: benefit_sponsorship, benefit_application: benefit_application, 
-        {
-          effective_period: (form.start_on..form.end_on),
-          open_enrollment_period: (form.open_enrollment_start_on..form.open_enrollment_end_on),
-          fte_count: form.fte_count,
-          pte_count: form.pte_count,
-          msp_count: form.msp_count
-          })
-      end
-
       def self.benefit_sponsor_catalogs_for(benefit_sponsorship)
         benefit_sponsorship.benefit_sponsor_catalogs
+      end
+
+      # We can cheat here because our form and our model are so
+      # close together - normally this will be more complex
+      def map_model_error_attribute(model_attribute_name)
+        model_attribute_name
+      end
+
+      def map_errors_for(form)
+        benefit_application.errors.each do |att, err|
+          form.errors.add(map_model_error_attribute(att), err)
+        end
       end
     end
   end

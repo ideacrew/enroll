@@ -1,12 +1,13 @@
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationsController < ApplicationController
-      before_action :initialize_form
 
       def new
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
       end
 
       def create
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
         if @benefit_application_form.save
           redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.benefit_sponsorship, @benefit_application_form.benefit_application)
         else
@@ -16,9 +17,12 @@ module BenefitSponsors
       end
 
       def edit
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
+        @benefit_application_form.load_attributes_from_resource
       end
 
       def update
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
         if @benefit_application_form.save
           redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.benefit_sponsorship, @benefit_application_form.benefit_application)
         else
@@ -28,13 +32,10 @@ module BenefitSponsors
       end
 
       def recommend_dates
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
       end
 
       private
-
-      def initialize_form
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
-      end
 
       def error_messages(instance)
         instance.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
