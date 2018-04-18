@@ -26,9 +26,8 @@ namespace :reports do
       if person.primary_family
         person.hbx_id
       else
-        person.families.map(&:primary_family_member).map(&:hbx_id).join(',')
+        person.families.map(&:primary_family_member).select{|member| member.person.consumer_role.present?}.map(&:hbx_id).join(',')
       end
-
     end
 
     def start_date
