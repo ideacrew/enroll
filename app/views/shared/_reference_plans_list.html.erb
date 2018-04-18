@@ -82,6 +82,7 @@
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</p>
       <br/><br/>
+      <% puts "******************* " + f.object.id.to_s %>
       <div id="singleCarrierCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
@@ -162,6 +163,8 @@ $('a[data-remote=true]').click( function() {
    var current_href = $(this).attr('href');
    var location_id = $(this).closest('.benefit-group-fields').attr('id');
    var object_id = "<%= f.object.id %>";
+   console.log("click " + object_id);
+   console.log("location " + location_id);
    $(this).attr('href', current_href + "&location_id=" + location_id + "&object_id=" + object_id);
 });
 
