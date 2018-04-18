@@ -37,9 +37,17 @@ BenefitSponsors::Engine.routes.draw do
   end
 
   resources :benefit_sponsorships, only: [] do 
-    resources :benefit_applications do
-      resources :benefit_packages do
-        resources :sponsored_benefits, only: :new
+
+    namespace :benefit_applications do 
+      resources :benefit_applications do
+
+        collection do
+          get :recommend_dates
+        end
+        
+        resources :benefit_packages do
+          resources :sponsored_benefits, only: :new
+        end
       end
     end
   end

@@ -1,6 +1,6 @@
 <% content_for :navigation do %>
 
 <% end %>
-<%= form_for @benefit_application, url: benefit_applications_benefit_applications_path do |f| %>
+<%= form_for @benefit_application, url: benefit_sponsorship_benefit_applications_benefit_applications_path, method: :post do |f| %>
   <%= render 'form', f: f %>
 <% end %>

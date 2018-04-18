@@ -64,6 +64,11 @@ class BenefitSponsorship
     end
   end
 
+  def self.find(id)
+    organization = BenefitSponsors::Organizations::GeneralOrganization.where(:"benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+    organization.benefit_sponsorships.find(id)
+  end
+
 # effective_coverage_period
 # HBX: Jan-Dec
 # Employers: year-over-year, e.g. Jun-May

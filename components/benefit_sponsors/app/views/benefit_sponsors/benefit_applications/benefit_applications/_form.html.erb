@@ -1,8 +1,7 @@
-<div class="col-xs-12 module" id='plan_year' data-benefit-group-count="<%= @benefit_application.benefit_packages.count %>"> <!--onKeyPress="return disableEnterKey(event)"-->
+<div class="col-xs-12 module" id='plan_year'> <!--onKeyPress="return disableEnterKey(event)"-->
     <div class="row">
       <div class="col-xs-12 planyear-add-tab">
         <div id="choose-coverage">
-          <h1><%= @benefit_application.new_record? ? 'Add Plan Year' : 'Edit Plan Year' %></h1>
           <% if @benefit_application.errors.any? %>
             <div class="alert-plan-year alert-error">
               <% if @just_a_warning == false %>
@@ -13,51 +12,12 @@
                 <% @benefit_application.errors.full_messages.each do |msg| %>
                   <li><%= msg %></li>
                 <% end %>
-
-                <% @benefit_application.benefit_packages.each do |bg| %>
-                  <% bg.errors.full_messages.each do |msg| %>
-                    <li><%= msg %></li>
-                  <% end %>
-                  <% bg.relationship_benefits.each do |rb| %>
-                    <% rb.errors.full_messages.each do |rb_msg| %>
-                      <li><%= rb_msg %></li>
-                    <% end %>
-                  <% end %>
-                <% end %>
               </ul>
             </div>
           <% end %>
 
           <%= render "benefit_sponsors/benefit_applications/benefit_applications/shared/benefit_application_fields", f: f %>
-        </div>
-        <div style="<%= @benefit_application.new_record? ? 'display: none;' : 'display: inline-block;' %>" class="benefits-setup-tab">
-          <div class='form-inputs'>
-            <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
-            <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
-            <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
-            <%= f.fields_for :benefit_packages, errors: {}, fieldset: false do |bg|  %>
-              <%= render "benefit_sponsors/benefit_applications/benefit_applications/shared/benefit_package_field", f: bg, p: @benefit_application %><br>
-            <% end %>
-            <div class="row no-buffer controls module" style="display: none;">
-              <br/>
-              <br/>
-              <div class="vertically-aligned-row">
-                <div class="text-left">
-                  <%= link_to_add_fields "Add Benefit Group", f, :benefit_packages, 'btn btn-default xs_full_width abg btn-lg' %>
-                  <a href="#" class="btn btn-default btn-lg remove_fields">Remove Benefit Group</a>
-                </div>
-                <div class="text-right">
-
-                  <% button_name = @benefit_application.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
-                  <% button_tooltip = @benefit_application.persisted? ? 'Click here to save your plan year' : 'Click here to create your plan year' %>
-                  <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-default btn-lg' %>
-                  <button class="btn btn-primary btn-lg disabled plan-year-primary btn-lg" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>">
-                    <%= "#{button_name}".html_safe %>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <%= f.submit "continue", class:'btn btn-default btn-lg' %>
         </div>
       </div>
     </div>

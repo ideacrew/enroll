@@ -4,7 +4,7 @@ module BenefitSponsors
       include SetCurrentUser
       include AASM
 
-      MARKET_KINDS = %W[individual shop both]
+      MARKET_KINDS = [:individual, :shop, :both]
 
       MARKET_KINDS_OPTIONS = {
         "Individual & Family Marketplace ONLY" => "individual",
@@ -40,8 +40,8 @@ module BenefitSponsors
         uniqueness: true,
         allow_blank: true
 
-      validates :market_kind,
-        inclusion: { in: ::BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid practice area" },
+      validates :market_kind, # TODO - check ::BenefitMarkets::BENEFIT_MARKET_KINDS
+        inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
         allow_blank: false
 
       validates :entity_kind,
