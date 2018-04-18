@@ -51,7 +51,7 @@ module BenefitMarkets
           :sponsor_contribution_kind => "Whatever",
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
-          :name => "Federal Heath Benefits"
+          :title => "Federal Heath Benefits"
         )
       end
 

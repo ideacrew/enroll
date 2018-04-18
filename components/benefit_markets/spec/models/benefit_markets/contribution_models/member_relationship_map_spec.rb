@@ -40,7 +40,7 @@ module BenefitMarkets
         ContributionModels::ContributionModel.new(
           :contribution_units => contribution_units,
           :member_relationships => member_relationships,
-          :name => "Federal Heath Benefits"
+          :title => "Federal Heath Benefits"
         )
       end
 
