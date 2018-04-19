@@ -24,6 +24,13 @@ module BenefitMarkets
       validates_presence_of :benefit_catalog_id, :allow_blank => false
       validates_inclusion_of :benefit_option_kind, :in => :allowed_benefit_option_kinds, :allow_blank => false
 
+      # Create a form for the 'new' action.
+      # Note that usually this method may have few parameters
+      #   other than current user.
+      # @param current_user [Object] the current user object
+      # @param benefit_option_kind [String] the benefit option kind
+      # @return [ProductPackageForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
       def self.for_new(current_user, benefit_option_kind)
         service = ProductPackageFormService.new
         form = resolve_form_subclass(benefit_option_kind).new(
@@ -34,6 +41,12 @@ module BenefitMarkets
         form
       end
 
+      # Create a form for the 'create' action, populated with the provided
+      #   parameters from the controller.
+      # @param current_user [Object] the current user object
+      # @param params [Hash] the params for :product_package from the controller
+      # @return [ProductPackageForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
       def self.for_create(current_user, params)
         service = ProductPackageFormService.new
         benefit_option_kind = params.require(:benefit_option_kind)
@@ -60,6 +73,7 @@ module BenefitMarkets
         find_for(current_user, id)
       end
 
+      # @!visibility private
       def self.find_for(current_user, id)
         service = ProductPackageFormService.new
         params_form = self.new(id: id)
@@ -68,6 +82,9 @@ module BenefitMarkets
         form
       end
 
+      # Validate and attempt to save the form.
+      # This method will populate the errors.
+      # @return [Boolean] the result of the attempted save
       def save
         service = ProductPackageFormService.new
         return false unless self.valid?
@@ -77,6 +94,9 @@ module BenefitMarkets
         true
       end
 
+      # Validate and attempt to persist updates.
+      # This method will populate the errors.
+      # @return [Boolean] the result of the attempted update
       def update_attributes(params)
         service = ProductPackageFormService.new
         self.attributes = params
@@ -87,6 +107,19 @@ module BenefitMarkets
         true
       end
 
+      # Has this form been successfully saved before?  Used mainly by form_for.
+      # @return [Boolean] true if previously saved, otherwise false
+      def persisted?
+        !id.blank?
+      end
+
+      # Return the class of the policy which should be used by pundit.
+      # @return [Class] the class of the policy to be used
+      def policy_class
+        BenefitMarkets::Products::ProductPackageFormPolicy
+      end
+     
+      # @!visibility private
       def self.resolve_form_subclass(benefit_option_kind)
         name_parts = benefit_option_kind.to_s.split("_")
         product_kind = name_parts.last
@@ -98,16 +131,9 @@ module BenefitMarkets
         end
       end
 
+      # @!visibility private
       def has_additional_attributes?
         false
-      end
-
-      def persisted?
-        !id.blank?
-      end
-
-      def policy_class
-        BenefitMarkets::Products::ProductPackageFormPolicy
       end
     end
   end
