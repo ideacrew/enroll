@@ -72,8 +72,14 @@ FactoryGirl.define do
           plan.save!
           rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 3.months, end_on: end_on + 3.months, rating_area: rating_area)
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 6.months, end_on: end_on + 6.months, rating_area: rating_area)
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 9.months, end_on: end_on + 9.months, rating_area: rating_area)
         else
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 3.months, end_on: end_on + 3.months)
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 6.months, end_on: end_on + 6.months)
+          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 9.months, end_on: end_on + 9.months)
         end
       end
 
