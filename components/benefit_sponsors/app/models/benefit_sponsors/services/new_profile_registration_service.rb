@@ -15,7 +15,6 @@ module BenefitSponsors
       end
 
       def attributes_to_form_params(obj)
-        binding.pry
         Serializers::OrganizationSerializer.new(obj).to_hash
       end
 
