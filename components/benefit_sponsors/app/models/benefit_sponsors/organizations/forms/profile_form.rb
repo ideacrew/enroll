@@ -25,6 +25,10 @@ module BenefitSponsors
 
       validates_presence_of :entity_kind
 
+      def persisted?
+        false
+      end
+
     end
   end
 end

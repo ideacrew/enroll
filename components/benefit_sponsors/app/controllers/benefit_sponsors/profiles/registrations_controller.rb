@@ -9,7 +9,7 @@ module BenefitSponsors
     before_action :check_employer_staff_role, only: [:new]
 
     def new
-      @agency= BenefitSponsors::Organizations::Forms::OrganizationForm.for_new(profile_type: profile_type)
+      @agency= BenefitSponsors::Organizations::Forms::OrganizationForm.for_new(profile_type)
 
       respond_to do |format|
         format.html

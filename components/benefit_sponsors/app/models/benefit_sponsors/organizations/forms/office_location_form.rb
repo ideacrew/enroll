@@ -7,6 +7,10 @@ module BenefitSponsors
       attribute :is_primary, Boolean
       attribute :address, Forms::AddressForm
       attribute :phone, Forms::PhoneForm
+
+      def persisted?
+        false
+      end
     end
   end
 end

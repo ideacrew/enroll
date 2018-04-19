@@ -24,8 +24,9 @@
 
       <div class="row no-buffer row-form-wrapper">
         <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
+
       </div><br>
-      <%= f.fields_for :profiles, f.object.organization.profiles, errors: {}, fieldset: false do |f| %>
+      <%= f.fields_for :profiles, f.object.profiles, errors: {}, fieldset: false do |f| %>
         <%= render "benefit_sponsors/shared/office_locations", f: f %>
         <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f %>
       <% end %>

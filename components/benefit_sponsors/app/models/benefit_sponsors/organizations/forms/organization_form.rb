@@ -11,6 +11,7 @@ module BenefitSponsors
       attribute :fein, String
       attribute :entity_kind, String
       attribute :legal_name, String
+      attribute :dba, String
 
       attribute :profiles, Array[Forms::ProfileForm]
       attribute :profile, Forms::ProfileForm
@@ -41,9 +42,9 @@ module BenefitSponsors
       end
 
       def self.for_new(profile_type)
-        form_obj = new(profile_type: profile_type)
-        form_obj.send(:build, profile_type)
-        form_obj
+        service_obj = Services::NewProfileRegistrationService.new
+        form_params = service_obj.build(profile_type: profile_type)
+        new(form_params)
       end
 
       def self.for_create(attrs)
