@@ -667,5 +667,10 @@ module ApplicationHelper
     return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
     raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
 end
 
