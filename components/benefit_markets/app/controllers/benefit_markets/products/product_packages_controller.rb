@@ -4,12 +4,12 @@ module BenefitMarkets
       include Pundit
 
       def new
-        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_new(current_user, params.require(:benefit_option_kind))
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_new(params.require(:benefit_option_kind))
         authorize @product_package
       end
 
       def create
-        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_create(current_user, package_params)
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_create(package_params)
         authorize @product_package
         if @product_package.save
           redirect_to products_product_package_url(@product_package.show_page_model)
@@ -19,12 +19,12 @@ module BenefitMarkets
       end
 
       def edit
-        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_edit(current_user, params.require(:id))
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_edit(params.require(:id))
         authorize @product_package
       end
 
       def update
-        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_update(current_user, params.require(:id))
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_update(params.require(:id))
         authorize @product_package
         if @product_package.update_attributes(package_params)
           redirect_to products_product_package_url(@product_package.show_page_model)

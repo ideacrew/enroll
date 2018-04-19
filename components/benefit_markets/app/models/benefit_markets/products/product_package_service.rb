@@ -1,34 +1,62 @@
 module BenefitMarkets
   module Products
-    class ProductPackageFormService
+    class ProductPackageService
       attr_reader :product_package_factory
 
       def initialize(factory_kind = ::BenefitMarkets::Products::ProductPackageFactory)
         @product_package_factory = factory_kind
       end
 
+      # Load any needed metadata for the form, such as required attributes
+      # and option lists. This service method isolates the form from having
+      # a dependency on persistence models just so it can have dropdown lists.
+      # @param form [Object] the form to load the data into
+      # @return [Object] the form object populated with the metadata
       def load_form_metadata(form)
         form.allowed_benefit_option_kinds = benefit_option_kinds
         form.available_pricing_models = options_for_pricing_model_id(form)
         form.available_contribution_models = options_for_contribution_model_id
         form.available_benefit_catalogs = options_for_benefit_catalog_id
+        form
       end
 
+      # Load default attributes for the form from the persistance layer.
+      # This service method isolates the persistence level attribute defaults
+      # from how they should be presented on a form.
+      # @param form [Object] the form to load the defaults into
+      # @return [Object] the form object populated with the metadata
       def load_default_form_params(form)
         # Nothing for this model
+        form
       end
 
-      def find_form_by_id(id)
-        product_package = find_model_by_id(id)
-        form_klass = ProductPackageForm.resolve_form_subclass(product_package.benefit_option_kind)
-        attributes_to_form_params(product_package, form_klass)
+      # Load the peristance entities and use them to populate the form
+      # attributes.
+      #
+      # Normally this method would contain only a persistence lookup and
+      # attribute mappings.
+      # In my case I have to figure out which form subclass I should be using.
+      # @param form [Object] The form for which to load the parameters.
+      # @return [Object] A form object containing the loaded parameters.
+      def load_form_params_from_resource(form)
+        product_package = find_model_by_id(form.id)
+        form = ProductPackageForm.resolve_form_subclass(product_package.benefit_option_kind).new
+        attributes_to_form_params(product_package, form)
       end
 
+      # Save the new form into it's corresponding persistance entities.
+      # @param form [Object] the form to save
+      # @return [Tuple<Boolean, Object>] the result of the save attempt as
+      # well as any object that should be used for routing
       def save(form) 
         product_package = build_object_using_factory(form)
         store(form, product_package)
       end
 
+      # Persist the changes to the form against an already existing entity.
+      # @param form [Object] the form to save
+      # @return [Tuple<Boolean, Object>] the result of the update attempt as
+      # well as any object that should be used for routing
       def update(form) 
         product_package = find_model_by_id(form.id)
         form_params_to_attributes(form, product_package)
@@ -37,15 +65,15 @@ module BenefitMarkets
 
       protected
 
-      def attributes_to_form_params(product_package, klass)
-        form = klass.new(
+      def attributes_to_form_params(product_package, form)
+        form.attributes = {
           id: product_package.id,
           benefit_option_kind: product_package.benefit_option_kind,
           benefit_catalog_id: product_package.benefit_catalog_id,
           title: product_package.title,
           contribution_model_id: product_package.contribution_model_id,
           pricing_model_id: product_package.pricing_model_id
-        )
+        }
         if form.respond_to?(:metal_level)
           form.metal_level = product_package.metal_level
         end

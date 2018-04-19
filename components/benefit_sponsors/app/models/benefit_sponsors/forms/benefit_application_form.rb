@@ -25,13 +25,13 @@ module BenefitSponsors
       delegate :benefit_sponsorship, :benefit_application, to: :@benefit_application_service
 
       def initialize(params = {})
-        super(params[:benefit_application]) if params[:benefit_application].present?
         @benefit_application_service = BenefitSponsors::Services::BenefitApplicationService.new(params)
+        super
       end
 
       def load_attributes_from_resource
         if benefit_application.present?
-          self.assign_attributes(@benefit_application_service.attributes_to_virtus_params)
+          self.assign_attributes(@benefit_application_service.attributes_to_form_params)
         end
       end
 
