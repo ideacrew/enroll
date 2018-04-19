@@ -9,16 +9,9 @@
         <p class="twenty">Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</p>
         <div style="font-size :24px">
         <% date = @effective_on_date || @new_effective_on %>
-        <% if can_employee_shop?(date) %>
-        <!--
-         <div class="alert alert-info" role="alert">
-           <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= no_rates_error(Settings.site.exchange_name) %></strong>
-         </div> 
-        -->
-        <% end %>
-        <%if @effective_on_date.present? || @new_effective_on %>
+        <% if @effective_on_date.present? || @new_effective_on %>
           <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= @effective_on_date || @new_effective_on %></span>
-        <%end%>
+        <% end %>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
           <%= hidden_field_tag(:person_id, @person.id) %>
