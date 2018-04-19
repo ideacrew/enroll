@@ -1,6 +1,6 @@
 module BenefitMarkets
   module Products
-    class ProductPackageFormService
+    class ProductPackageService
       attr_reader :product_package_factory
 
       def initialize(factory_kind = ::BenefitMarkets::Products::ProductPackageFactory)

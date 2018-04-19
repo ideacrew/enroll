@@ -27,12 +27,11 @@ module BenefitMarkets
       # Create a form for the 'new' action.
       # Note that usually this method may have few parameters
       #   other than current user.
-      # @param current_user [Object] the current user object
       # @param benefit_option_kind [String] the benefit option kind
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
-      def self.for_new(current_user, benefit_option_kind)
-        service = ProductPackageFormService.new
+      def self.for_new(benefit_option_kind)
+        service = ProductPackageService.new
         form = resolve_form_subclass(benefit_option_kind).new(
           :benefit_option_kind => benefit_option_kind
         )
@@ -43,12 +42,11 @@ module BenefitMarkets
 
       # Create a form for the 'create' action, populated with the provided
       #   parameters from the controller.
-      # @param current_user [Object] the current user object
       # @param params [Hash] the params for :product_package from the controller
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
-      def self.for_create(current_user, params)
-        service = ProductPackageFormService.new
+      def self.for_create(params)
+        service = ProductPackageService.new
         benefit_option_kind = params.require(:benefit_option_kind)
         form = resolve_form_subclass(benefit_option_kind).new(params)
         service.load_form_metadata(form)
@@ -56,26 +54,24 @@ module BenefitMarkets
       end
 
       # Find the existing form corresponding to the given ID.
-      # @param current_user [Object] the current user object
       # @param id [Object] an opaque ID from the controller parameters
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
-      def self.for_edit(current_user, id)
-        find_for(current_user, id)
+      def self.for_edit(id)
+        find_for(id)
       end
 
       # Find the 'update' form corresponding to the given ID.
-      # @param current_user [Object] the current user object
       # @param id [Object] an opaque ID from the controller parameters
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
-      def self.for_update(current_user, id)
-        find_for(current_user, id)
+      def self.for_update(id)
+        find_for(id)
       end
 
       # @!visibility private
-      def self.find_for(current_user, id)
-        service = ProductPackageFormService.new
+      def self.find_for(id)
+        service = ProductPackageService.new
         params_form = self.new(id: id)
         form = service.load_form_params_from_resource(params_form)
         service.load_form_metadata(form)
@@ -86,7 +82,7 @@ module BenefitMarkets
       # This method will populate the errors.
       # @return [Boolean] the result of the attempted save
       def save
-        service = ProductPackageFormService.new
+        service = ProductPackageService.new
         return false unless self.valid?
         save_result, persisted_object = service.save(self)
         return false unless save_result
@@ -98,7 +94,7 @@ module BenefitMarkets
       # This method will populate the errors.
       # @return [Boolean] the result of the attempted update
       def update_attributes(params)
-        service = ProductPackageFormService.new
+        service = ProductPackageService.new
         self.attributes = params
         return false unless self.valid?
         update_result, persisted_object = service.update(self)
