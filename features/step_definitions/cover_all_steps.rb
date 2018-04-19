@@ -107,6 +107,7 @@ Then(/^Hbx Admin should see an Transition family members link$/) do
 end
 
 When(/^Hbx Admin clicks on Transition family members link$/) do
+  FactoryGirl.create(:qualifying_life_event_kind, reason: 'eligibility_failed_or_documents_not_received_by_due_date', title: 'Not eligible for marketplace coverage due to citizenship or immigration status')
   click_link('Transition Family Members')
 end
 
@@ -117,8 +118,6 @@ end
 
 When(/^Hbx Admin enter\/update information of each memeber individually$/) do
   find(:xpath, "(//input[@type='checkbox'])[1]").trigger('click')
-  find(:xpath, '/html/body/div[3]/div/div/div/div[2]/div/div/div/div[2]/div[2]/div/div/div[3]/div/table/tbody/tr[2]/td/form/table/tbody/tr[2]/td[6]/div').click
-  find(:xpath, '/html/body/div[3]/div/div/div/div[2]/div/div/div/div[2]/div[2]/div/div/div[3]/div/table/tbody/tr[2]/td/form/table/tbody/tr[2]/td[6]/div/div[3]/div/ul/li[3]').trigger("click")
   find('input.date-picker').click
   find(:xpath, '/html/body/div[4]/table/tbody/tr[3]/td[4]/a').click
 end
