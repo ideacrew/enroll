@@ -2,7 +2,7 @@
   <h4> Office Location </h4>
   <div id="address_info" class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-      <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
+      <%= f.fields_for :address, f.object.address, errors: {}, fieldset: false do |address| %>
 
         <%
           # address_kind = ''
@@ -58,7 +58,7 @@
       </div>
       <div class="col-md-2 key col-sm-3 col-xs-12"></div>
     </div><br>
-    <%= f.fields_for :phone, errors: {}, fieldset: false do |phone| %>
+    <%= f.fields_for :phone, f.object.phone, errors: {}, fieldset: false do |phone| %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.select :kind, options_for_select(BenefitSponsors::Locations::Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
