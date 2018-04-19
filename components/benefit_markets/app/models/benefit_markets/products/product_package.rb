@@ -62,6 +62,10 @@ module BenefitMarkets
           Plan.where(:active_year => benefit_catalog.product_active_year, :market => benefit_catalog.product_market_kind)
         end
 
+        def benefit_package_kind
+          raise NotImplementedError.new("subclass responsibility")
+        end
+
         def policy_class
           ::BenefitMarkets::Products::ProductPackagePolicy
         end

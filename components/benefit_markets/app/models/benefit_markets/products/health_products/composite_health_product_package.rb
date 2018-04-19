@@ -9,6 +9,10 @@ module BenefitMarkets
         def default_product_multiplicity
           :single
         end
+
+        def benefit_option_kind
+          "composite_health"
+        end
       end
     end
   end

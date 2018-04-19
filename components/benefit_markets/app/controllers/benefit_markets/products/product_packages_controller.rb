@@ -18,6 +18,21 @@ module BenefitMarkets
         end
       end
 
+      def edit
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_edit(current_user, params.require(:id))
+        authorize @product_package
+      end
+
+      def update
+        @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_update(current_user, params.require(:id))
+        authorize @product_package
+        if @product_package.update_attributes(package_params)
+          redirect_to products_product_package_url(@product_package.show_page_model)
+        else
+          render "edit"
+        end
+      end
+
       def show
         @product_package = ::BenefitMarkets::Products::ProductPackage.find(params.require(:id))
         authorize @product_package

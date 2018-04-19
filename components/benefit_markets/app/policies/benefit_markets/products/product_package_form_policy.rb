@@ -4,8 +4,9 @@ module BenefitMarkets
       def initialize(current_user, product_package_form)
         @user = current_user
         @product_package_form = product_package_form
-        # We will need this if the authorization logic starts to look actual package
-        @form_mapper = ::BenefitMarkets::Products::ProductPackageFormMapping.new
+        # We will need this if the authorization logic starts to look at 
+        # the actual package
+        @form_service = ::BenefitMarkets::Products::ProductPackageFormService.new
       end
 
       def new?
@@ -13,6 +14,14 @@ module BenefitMarkets
       end
 
       def create?
+        true
+      end
+
+      def edit?
+        true
+      end
+
+      def update?
         true
       end
     end
