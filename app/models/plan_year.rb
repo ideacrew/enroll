@@ -597,7 +597,7 @@ class PlanYear
 
   # Employees who selected or waived and are not owners or direct family members of owners
   def non_business_owner_enrolled
-    enrolled.select{|ce| !ce.is_business_owner}
+    enrolled.select{|ce| !ce.is_business_owner && !ce.waived?}
   end
 
   # Any employee who selected or waived coverage
