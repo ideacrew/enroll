@@ -32,6 +32,10 @@ module BenefitSponsors
       def office_locations_attributes=(location)
       end
 
+      def market_kind=(market_kind)
+        market_kind = market_kind.to_sym
+      end
+
     end
   end
 end
