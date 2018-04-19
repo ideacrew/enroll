@@ -18,8 +18,11 @@ module BenefitMarkets
         # Nothing for this model
       end
 
-      def find_form_by_id(id)
-        product_package = find_model_by_id(id)
+      # Normally here I would just find the persisted model
+      # and then load the attributes onto the form.
+      # In my case I have to figure out which instance I should be using and return that.
+      def load_form_params_from_resource(form)
+        product_package = find_model_by_id(form.id)
         form_klass = ProductPackageForm.resolve_form_subclass(product_package.benefit_option_kind)
         attributes_to_form_params(product_package, form_klass)
       end

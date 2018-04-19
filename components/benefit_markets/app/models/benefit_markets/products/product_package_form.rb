@@ -52,7 +52,8 @@ module BenefitMarkets
 
       def self.find_for(current_user, id)
         service = ProductPackageFormService.new
-        form = service.find_form_by_id(id)
+        params_form = self.new(id: id)
+        form = service.load_form_params_from_resource(params_form)
         service.load_form_metadata(form)
         form
       end
