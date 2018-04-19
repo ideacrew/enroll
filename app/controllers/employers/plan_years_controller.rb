@@ -443,7 +443,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_health_carriers_and_plans
-    #binding.pry
     @plan_year = build_plan_year
     @benefit_group = params[:benefit_group]
     @location_id = params[:location_id]

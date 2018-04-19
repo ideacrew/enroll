@@ -406,7 +406,6 @@ ready = function() {
         nav = '.dental';
       }
       if ($(this).attr('value') == "single_carrier") {
-        console.log('single carrier...');
         $(this).closest('.benefit-group-fields').find(nav+' .carriers-tab').show();
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
 
@@ -727,10 +726,6 @@ function loadCarrierNames() {
   var benefit_group_id = $('#benefitGroupId').data('value');
   var location_id = $(this).closest('fieldset').attr('id');
   var panel_id = $(this).closest('fieldset').attr('data-benefit-group');
-  console.log("clicked on load carriers benefit_group_id: " + benefit_group_id);
-  console.log("clicked on load carriers location: " + location_id);
-  console.log("clicked on load carriers panel_id: " + panel_id);
-  //console.log("clicked on load carriers location 2: " + location_id2);
   $.ajax({
     type: "GET",
     data:{
