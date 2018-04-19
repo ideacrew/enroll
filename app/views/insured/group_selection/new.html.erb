@@ -10,9 +10,11 @@
         <div style="font-size :24px">
         <% date = @effective_on_date || @new_effective_on %>
         <% if can_employee_shop?(date) %>
+        <!--
          <div class="alert alert-info" role="alert">
            <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= no_rates_error(Settings.site.exchange_name) %></strong>
-         </div>
+         </div> 
+        -->
         <% end %>
         <%if @effective_on_date.present? || @new_effective_on %>
           <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= @effective_on_date || @new_effective_on %></span>
