@@ -4,7 +4,7 @@
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <% benefit_application_start_dates = f.object.calculate_start_on_options %>
+        <% benefit_application_start_dates = f.object.start_on_options %>
         <% formatted_start_on = f.object.start_on.try(:to_s, :db) %>
 
         <%# if f.object.start_on.present? && !benefit_application_start_dates.any?{|set| set[1] == formatted_start_on } %>
