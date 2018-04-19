@@ -42,10 +42,20 @@ module BenefitMarkets
         form
       end
 
+      # Find the existing form corresponding to the given ID.
+      # @param current_user [Object] the current user object
+      # @param id [Object] an opaque ID from the controller parameters
+      # @return [ProductPackageForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
       def self.for_edit(current_user, id)
         find_for(current_user, id)
       end
 
+      # Find the 'update' form corresponding to the given ID.
+      # @param current_user [Object] the current user object
+      # @param id [Object] an opaque ID from the controller parameters
+      # @return [ProductPackageForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
       def self.for_update(current_user, id)
         find_for(current_user, id)
       end
