@@ -57,17 +57,6 @@ module BenefitMarkets
         form
       end
 
-      def self.resolve_form_subclass(benefit_option_kind)
-        name_parts = benefit_option_kind.to_s.split("_")
-        product_kind = name_parts.last
-        case benefit_option_kind.to_s
-        when "metal_level_health", "issuer_health"
-          "::BenefitMarkets::Products::#{product_kind.camelcase}Products::#{benefit_option_kind.to_s.camelcase}ProductPackageForm".constantize
-        else
-          self
-        end
-      end
-
       def save
         service = ProductPackageFormService.new
         return false unless self.valid?
@@ -85,6 +74,17 @@ module BenefitMarkets
         return false unless update_result 
         @show_page_model = persisted_object
         true
+      end
+
+      def self.resolve_form_subclass(benefit_option_kind)
+        name_parts = benefit_option_kind.to_s.split("_")
+        product_kind = name_parts.last
+        case benefit_option_kind.to_s
+        when "metal_level_health", "issuer_health"
+          "::BenefitMarkets::Products::#{product_kind.camelcase}Products::#{benefit_option_kind.to_s.camelcase}ProductPackageForm".constantize
+        else
+          self
+        end
       end
 
       def has_additional_attributes?
