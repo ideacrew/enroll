@@ -31,7 +31,7 @@ module BenefitSponsors
 
       def load_attributes_from_resource
         if benefit_application.present?
-          self.assign_attributes(@benefit_application_service.attributes_to_virtus_params)
+          self.assign_attributes(@benefit_application_service.attributes_to_form_params)
         end
       end
 
