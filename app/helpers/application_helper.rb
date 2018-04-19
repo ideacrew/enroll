@@ -5,7 +5,7 @@ module ApplicationHelper
   end
 
   def rates_available?(employer, date=nil)
-    employer.applicant? && Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
+    employer.applicant? && !Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
   end
 
   def deductible_display(hbx_enrollment, plan)

@@ -7,7 +7,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should return blocking when true" do
       allow(employer_profile).to receive(:applicant?).and_return(true)
-      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(true)
+      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(false)
       expect(helper.rates_available?(employer_profile)).to eq "blocking"
     end
 

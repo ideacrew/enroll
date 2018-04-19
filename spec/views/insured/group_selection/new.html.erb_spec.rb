@@ -118,6 +118,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       allow(view).to receive(:shop_health_and_dental_attributes).and_return(false, false, false, true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
       allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
       allow(consumer_role3).to receive(:latest_active_tax_household_with_year).and_return nil
@@ -241,6 +242,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -296,6 +298,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return []
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render file: "insured/group_selection/new.html.erb"
@@ -332,6 +335,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
@@ -422,6 +426,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:employee_role).and_return(nil)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
 
@@ -449,6 +454,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:can_employee_shop?).and_return(false)
     end
 
     it "when present" do
@@ -493,6 +499,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
@@ -533,6 +540,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
@@ -559,6 +567,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_shop_shop?).with(person).and_return true
       allow(view).to receive(:health_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
+      allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
@@ -599,6 +608,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:can_employee_shop?).and_return(false)
     end
 
     it "should see dental radio option" do

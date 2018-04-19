@@ -493,7 +493,7 @@ class Plan
       ],
       :allow_disk_use => true).map{|a| a["count"]}
 
-      carrier_count != result.size
+      carrier_count == result.size
     end
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)

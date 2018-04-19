@@ -2,7 +2,7 @@ module Insured
   module GroupSelectionHelper
 
     def can_employee_shop?(date)
-      PlanYear.calculate_start_on_dates[-1] == date
+      Plan.has_rates_for_all_carriers?(date) == false
     end
     def can_shop_individual?(person)
       person.try(:has_active_consumer_role?)
