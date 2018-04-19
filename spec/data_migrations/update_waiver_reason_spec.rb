@@ -23,7 +23,7 @@ describe UpdateWaiverReason, dbclean: :after_each do
     end
 
 
-    it "should change effective on date" do
+    it "should update waiver reason" do
       expect(hbx_enrollment.waiver_reason).to eq "this is the reason"
       subject.migrate
       hbx_enrollment.reload
@@ -32,3 +32,5 @@ describe UpdateWaiverReason, dbclean: :after_each do
     end
   end
 end
+
+

@@ -9,9 +9,8 @@ class UpdateWaiverReason < MongoidMigrationTask
       if hbx_id.nil?
         puts "No enrollment was found for the given hbx_id"
       else
-        puts "#{hbx_id}"
-        hbx_id.first.update_attributes!(waiver_reason:waiver_reason)
-        puts "Updated waiver reason to #{waiver_reason}"
+        hbx_id.first.update_attributes!(waiver_reason:waiver_reason) 
+        puts "Updated waiver reason to #{waiver_reason}" unless Rails.env.test?
       end
     rescue
       puts "Couldn't update the waiver reason for the enrollment #{hbx_id}"
