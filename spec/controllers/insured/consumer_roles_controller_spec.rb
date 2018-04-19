@@ -188,6 +188,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_consumer_role).and_return(nil)
       allow(User).to receive(:find).and_return(person_user)
+      allow(Person).to receive(:find).and_return(person)
       allow(person_user).to receive(:person).and_return(person)
     end
     it "should throw a 500 error" do
