@@ -358,5 +358,15 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(flash[:error]).to eq 'You must select at least one Eligible applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
+
+    it "should redirect" do
+      user=FactoryGirl.create(:user, id: 8980, person: person)
+      sign_in user
+      allow(hbx_enrollment).to receive(:save).and_return(true)
+      expect_any_instance_of(Insured::GroupSelectionController).to receive(:valid_enrolling_members?).and_return(false)
+      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids.merge({"4"=>"559366ca63686947784e8f03"})
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to eq 'You must select valid members for enrollment kind health'
+    end
   end
 end

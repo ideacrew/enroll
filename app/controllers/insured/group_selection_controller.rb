@@ -1,5 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
+  include Insured::EmployeeRolesHelper
+  include ApplicationHelper
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :set_vars_for_market, only: [:new]
@@ -68,8 +70,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
-
-    if hbx_enrollment.save
+    enrollment_member_status = valid_enrolling_members?(hbx_enrollment)
+    if enrollment_member_status && valid_enrolling_members?(hbx_enrollment) && hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
         hbx_enrollment.update_coverage_kind_by_plan
@@ -82,6 +84,7 @@ class Insured::GroupSelectionController < ApplicationController
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
+      raise "You must select valid members for enrollment kind #{hbx_enrollment.coverage_kind}" unless enrollment_member_status
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
   rescue Exception => error
@@ -200,5 +203,17 @@ class Insured::GroupSelectionController < ApplicationController
         @coverage_family_members_for_cobra = hbx_enrollment.hbx_enrollment_members.map(&:family_member)
       end
     end
+  end
+
+  def valid_enrolling_members?(hbx_enrollment)
+    return true if @employee_role.nil?
+    coverage_kind = hbx_enrollment.coverage_kind
+    invalid_enrolling_members = case coverage_kind
+                                  when "health"
+                                    hbx_enrollment.hbx_enrollment_members.map(&:family_member).select { |family_member| shop_health_and_dental_attributes(family_member, @employee_role)[0] == false }
+                                  when "dental"
+                                    hbx_enrollment.hbx_enrollment_members.map(&:family_member).select { |family_member| shop_health_and_dental_attributes(family_member, @employee_role)[1] == false }
+                                end
+    return invalid_enrolling_members.empty?
   end
 end
