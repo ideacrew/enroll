@@ -100,11 +100,11 @@
         if (res != true) {
           $('.benefit-group-fields').hide();
           $('.interaction-click-control-add-benefit-group').hide();
-          $('.alert-info').removeClass('hide');
+          $('.alert-info').addClass('hide');
         } else if (res == true) {
           $('.benefit-group-fields').show();
           $('.interaction-click-control-add-benefit-group').show();
-          $('.alert-info').addClass('hide');
+          $('.alert-info').removeClass('hide');
         }
       },
       url: "/employers/employer_profiles/<%= @employer_profile.id %>/plan_years/<%= @plan_year.id %>/late_rates_check"
