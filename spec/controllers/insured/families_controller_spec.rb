@@ -12,14 +12,9 @@ RSpec.describe Insured::FamiliesController do
       sign_in user
     end
 
-
-    it "should log the error" do
-      expect(subject).to receive(:log) do |msg, severity|
-        expect(severity[:severity]).to eq('error')
-        expect(msg[:message]).to eq('@family was set to nil')	
-      end
-      get :home
-      expect(response).to redirect_to("/500.html")
+    it "should assigns the family if user is hbx_staff and dependent consumer" do
+      get :home, {:family => family.id.to_s}
+      expect(assigns(:family)).to eq family
     end
 
     it "should redirect" do
