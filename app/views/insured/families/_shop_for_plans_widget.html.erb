@@ -96,16 +96,16 @@
                 </p>
               <% end %>
               <% if @family.latest_active_sep %>
-                <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
+                <p><%= l10n('insured.qualify_for_special_enrollment') %> "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                   <br/>
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
                   <%= build_link_for_sep_type(@active_sep, 'Shop Now')%>
                 </p>
-                <p>There are other types of Special Enrollment Periods that may allow you to start your coverage on a different date.
+                <p> <%= l10n('insured.start_your_coverage') %> </p>
                   <br/>
                   <%= link_to 'Qualify for a new SEP', find_sep_insured_families_path(options), class: "btn btn-default pull-left" %></p>
               <% elsif !is_under_open_enrollment? %>
-                <p>Open enrollment is over, but you still may be able to enroll now if you qualify for a Special Enrollment Period. We need to ask you some questions to see if you qualify. <%= link_to "Continue ", find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
+                <p> <%= l10n('insured.open_enrollment_is_over') %> <%= link_to "Continue ", find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
               <% end %>
             <% else %>
               <% msg = 'You have no Employer Sponsored Insurance.'%>
