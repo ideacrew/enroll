@@ -146,7 +146,7 @@
           <% elsif @change_plan.blank? && can_shop_resident?(@person) %>
             <%= render partial: 'shared/coverall_progress', locals: {step: '4'} %>
           <% elsif @change_plan.blank? %>
-            <%= render  partial: 'shared/signup_progress', locals: {step: '4', effective_on: effective_on} %>
+            <%= render  partial: 'shared/signup_progress', locals: {step: '4', effective_on_flag: late_rate_flag} %>
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:false} %>
           <% elsif @change_plan == "change_plan" %>

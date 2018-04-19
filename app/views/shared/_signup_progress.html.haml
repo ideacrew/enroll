@@ -1,6 +1,6 @@
 = pundit_span EmployerProfile, :updateable?
 - step = (defined? step) ? step.to_i : 1
-- effective_on = (defined? effective_on) ? effective_on : false
+- effective_on_flag = effective_on_flag || false
 
 - percent_complete = 0
 - percent_complete = (step == 2) ? 15 : ((step == 3) ? 30 : ((step == 4) ? 45 : ((step == 5) ? 60 : ((step == 6) ? 75 : ((step == 7) ? 100 : 0)))))
@@ -52,7 +52,7 @@
 - elsif step == 7
   = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - else
-  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit', disabled: can_employee_shop?(effective_on)}
+  %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit', disabled: effective_on_flag}
     CONTINUE
 
 -if step != 7

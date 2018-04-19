@@ -2,8 +2,11 @@ module Insured
   module GroupSelectionHelper
 
     def can_employee_shop?(date)
+      return false if date.blank?
+      date = Date.strptime(date.to_s,"%m/%d/%Y")
       Plan.has_rates_for_all_carriers?(date) == false
     end
+
     def can_shop_individual?(person)
       person.try(:has_active_consumer_role?)
     end
