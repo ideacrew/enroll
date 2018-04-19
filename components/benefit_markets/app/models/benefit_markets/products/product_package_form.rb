@@ -5,6 +5,7 @@ module BenefitMarkets
       include ActiveModel::Model
       include ActiveModel::Validations
 
+      attribute :id, String
       attribute :title, String
       attribute :contribution_model_id, String
       attribute :pricing_model_id, String
@@ -24,19 +25,35 @@ module BenefitMarkets
       validates_inclusion_of :benefit_option_kind, :in => :allowed_benefit_option_kinds, :allow_blank => false
 
       def self.for_new(current_user, benefit_option_kind)
-        service = NewProductPackageService.new
+        service = ProductPackageFormService.new
         form = resolve_form_subclass(benefit_option_kind).new(
           :benefit_option_kind => benefit_option_kind
         )
-        service.populate_options(form)
+        service.load_default_form_params(form)
+        service.load_form_metadata(form)
         form
       end
 
-      def self.for_create(current_user, opts)
-        service = NewProductPackageService.new
-        benefit_option_kind = opts.require(:benefit_option_kind)
-        form = resolve_form_subclass(benefit_option_kind).new(opts)
-        service.populate_options(form)
+      def self.for_create(current_user, params)
+        service = ProductPackageFormService.new
+        benefit_option_kind = params.require(:benefit_option_kind)
+        form = resolve_form_subclass(benefit_option_kind).new(params)
+        service.load_form_metadata(form)
+        form
+      end
+
+      def self.for_edit(current_user, id)
+        find_for(current_user, id)
+      end
+
+      def self.for_update(current_user, id)
+        find_for(current_user, id)
+      end
+
+      def self.find_for(current_user, id)
+        service = ProductPackageFormService.new
+        form = service.find_form_by_id(id)
+        service.load_form_metadata(form)
         form
       end
 
@@ -51,17 +68,31 @@ module BenefitMarkets
         end
       end
 
-      def has_additional_attributes?
-        false
-      end
-
       def save
-        service = NewProductPackageService.new
+        service = ProductPackageFormService.new
         return false unless self.valid?
         save_result, persisted_object = service.save(self)
         return false unless save_result
         @show_page_model = persisted_object
         true
+      end
+
+      def update_attributes(params)
+        service = ProductPackageFormService.new
+        self.attributes = params
+        return false unless self.valid?
+        update_result, persisted_object = service.update(self)
+        return false unless update_result 
+        @show_page_model = persisted_object
+        true
+      end
+
+      def has_additional_attributes?
+        false
+      end
+
+      def persisted?
+        !id.blank?
       end
 
       def policy_class
