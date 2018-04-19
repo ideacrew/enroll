@@ -6,12 +6,13 @@ class Insured::GroupSelectionController < ApplicationController
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
+    #binding.pry
     set_bookmark_url
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @effective_on_date = params[:effective_on_date] || params[:change_plan_date]
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
-    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @resident
+    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @person.try(:is_resident_role_active?) || @resident
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])

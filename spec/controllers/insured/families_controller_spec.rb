@@ -5,9 +5,16 @@ RSpec.describe Insured::FamiliesController do
     let(:user) { FactoryGirl.create(:user, person: person) }
     let(:person) { FactoryGirl.create(:person) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person) }
+
 
     before :each do
       sign_in user
+    end
+
+    it "should assigns the family if user is hbx_staff and dependent consumer" do
+      get :home, {:family => family.id.to_s}
+      expect(assigns(:family)).to eq family
     end
 
     it "should redirect" do

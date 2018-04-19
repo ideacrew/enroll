@@ -249,6 +249,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(individual_market_transition).to receive(:role_type).and_return(nil)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -304,6 +306,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return []
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render file: "insured/group_selection/new.html.erb"
@@ -586,6 +590,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:health_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
 
