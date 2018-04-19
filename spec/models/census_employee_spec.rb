@@ -939,15 +939,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "change the aasm state & populates terminated on of enrollments" do
       let(:census_employee) { FactoryGirl.create(:census_employee) }
+      let(:employee_role)     { FactoryGirl.create(:employee_role)}
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
 
-      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health') }
-      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental') }
-      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived') }
+      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id) }
+      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id) }
+      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id) }
 
       before do
         allow(census_employee).to receive(:active_benefit_group_assignment).and_return(double)
         allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return([hbx_enrollment, hbx_enrollment_two, hbx_enrollment_three], [])
+        employee_role.update_attributes(census_employee_id: census_employee.id)
       end
 
       termination_dates = [TimeKeeper.date_of_record - 5.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 5.days]

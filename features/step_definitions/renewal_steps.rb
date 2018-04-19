@@ -91,7 +91,7 @@ end
 When(/^.+ submits waiver reason$/) do
   waiver_modal = find('#waive_confirm')
   waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select waive reason')]]").click
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I have coverage through Medicaid')]").click
   waiver_modal.find('#waiver_reason_submit').click
 end
 

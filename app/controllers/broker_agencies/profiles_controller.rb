@@ -436,6 +436,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def languages_spoken_params
     params.require(:organization).permit(
+      :accept_new_clients,
+      :working_hours,
       :languages_spoken => []
     )
   end
@@ -470,7 +472,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def collect_and_sort_commission_statements(sort_order='ASC')
     @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
-    sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse!
+    #sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse!
+    @statements.sort_by!(&:date).reverse!
   end
 
   def find_hbx_profile

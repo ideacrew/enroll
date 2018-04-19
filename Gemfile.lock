@@ -92,6 +92,7 @@ PATH
       acapi
       mongoid (= 5.0.1)
       rails (>= 4.2.0)
+      rubyzip (>= 1.2.1)
       symmetric-encryption (~> 3.6.0)
       transport_gateway
 

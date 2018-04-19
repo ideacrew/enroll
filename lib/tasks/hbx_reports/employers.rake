@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Employers"
     task :employers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
 
@@ -42,8 +43,7 @@ namespace :reports do
 
       processed_count = 0
 
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/public/employers_#{time_stamp}.csv")
+      file_name = fetch_file_format('employers', 'EMPLOYERS')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names

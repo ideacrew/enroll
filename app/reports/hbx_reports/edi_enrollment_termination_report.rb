@@ -2,6 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 require 'csv'
 
 class TerminatedHbxEnrollments < MongoidMigrationTask
+
   def migrate
     families = get_families
         field_names  = %w(
@@ -28,8 +29,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
 
         processed_count = 0
 
-        time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
-        file_name = File.expand_path("#{Rails.root}/public/edi_enrollment_termination_report_#{time_stamp}.csv")
+        file_name = fetch_file_format('edi_enrollment_termination_report', 'EDIENROLLMENTTERMINATION')
 
         CSV.open(file_name, "w", force_quotes: true) do |csv|
           csv << field_names

@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
+      include Config::AcaHelper
 
       census_employees = CensusEmployee.unscoped.terminated.where(:employment_terminated_on.gte => (date_start = Date.new(2017,10,1)))
 
@@ -13,9 +14,7 @@ namespace :reports do
         )
 
       processed_count = 0
-
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/public/employee_terminations_#{time_stamp}.csv")
+      file_name = fetch_file_format('employee_terminations', 'EMPLOYEETERMINATIONS')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names

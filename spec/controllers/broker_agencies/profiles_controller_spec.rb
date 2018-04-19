@@ -69,6 +69,17 @@ RSpec.describe BrokerAgencies::ProfilesController do
     #let(:org) { double }
     let(:org) { FactoryGirl.create(:organization)}
     let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
+    let(:organization_params) do
+      {
+        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
+        office_locations_attributes: {
+          "0"=> {
+            "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+          }
+        }
+      }
+    end
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
@@ -78,27 +89,28 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should update person main phone" do
       broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
        broker_agency_profile.primary_broker_role.person.reload
        expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
 
     it "should update record without a phone extension" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"999-9999", "extension"=>""}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
+    end
+
+    it "should update record by saving accept new clients" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
+      broker_agency_profile.reload
+      expect(broker_agency_profile.accept_new_clients).to be_truthy
+      expect(broker_agency_profile.working_hours).to be_truthy
     end
   end
 

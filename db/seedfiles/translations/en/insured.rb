@@ -238,7 +238,6 @@ INSURED_TRANSLATIONS = {
   "en.insured.waived_coverage_for_year" => "You have selected to waive your employer %{coverage_kind} coverage for %{year}",
   "en.waived_date" => "Waived Date",
   "en.reason_waived" => "Reason Waived",
-  "en.insured.employer_assigned_borker" => "Employer Assigned Broker",
   "en.back" => "Back",
   "en.insured.families.documents_view_important_noticies" => "The Documents folder is a safe and convenient way for you to view and keep track of important notices and communications you receive from %{site_short_name}. You'll receive an email notification when there are new documents for you to review.",
   "en.download_tax_documents" => "Download Tax Documents",
