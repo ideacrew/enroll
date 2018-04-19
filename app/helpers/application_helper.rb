@@ -669,6 +669,10 @@ module ApplicationHelper
     raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
 
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
   def exchange_icon_path(icon)
     site_key = Settings.site.key
       "icons/#{site_key}-#{icon}"

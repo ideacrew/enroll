@@ -956,6 +956,10 @@ class CensusEmployee < CensusMember
     %w(enroll waive).include?  expected_selection
   end
 
+  def waived?
+    active_benefit_group_assignment.aasm_state == 'coverage_waived'
+  end
+
   # TODO: Implement for 16219
   def composite_rating_tier
     return CompositeRatingTier::EMPLOYEE_ONLY if self.census_dependents.empty?

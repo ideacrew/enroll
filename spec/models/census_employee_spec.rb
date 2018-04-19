@@ -922,7 +922,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       allow(notice_trigger).to receive_message_chain(:notice_builder,:camelize,:constantize,:new).and_return(builder)
       allow(notice_trigger).to receive_message_chain(:notice_trigger_element_group,:notice_peferences).and_return({})
       allow(ApplicationEventKind).to receive_message_chain(:where,:first).and_return(double("ApplicationEventKind",{:notice_triggers => notice_triggers,:title => "title",:event_name => "OutOfPocketNotice"}))
-      allow_any_instance_of(CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
+      allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("fake_url")
     end
     context "#generate_and_deliver_checkbook_url" do
       it "should create a builder and deliver without expection" do
@@ -1713,6 +1713,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(invalid_waive.expected_to_enroll_or_valid_waive?).to be_falsey
     end
   end
+
+  context "when active employeees opt to waive" do
+    let(:census_employee) { FactoryGirl.build(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived") }
+    
+    it "returns true when employees waive the coverage" do
+      expect(census_employee.waived?).to be_truthy
+    end
+    it "returns false for employees who are enrolling" do
+      benefit_group_assignment.aasm_state = "coverage_selected"
+      expect(census_employee.waived?).to be_falsey
+    end
+  end
+
 
   context '.renewal_benefit_group_assignment' do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
