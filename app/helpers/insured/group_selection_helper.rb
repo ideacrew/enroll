@@ -19,6 +19,10 @@ module Insured
 
     end
 
+    def can_shop_both_individidual_and_resident?(person)
+      can_shop_individual?(person)
+    end
+
     def health_relationship_benefits(benefit_group)
       if benefit_group.present?
         benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
