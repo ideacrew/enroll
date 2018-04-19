@@ -29,6 +29,9 @@ module BenefitSponsors
         false
       end
 
+      def office_locations_attributes=(location)
+      end
+
     end
   end
 end

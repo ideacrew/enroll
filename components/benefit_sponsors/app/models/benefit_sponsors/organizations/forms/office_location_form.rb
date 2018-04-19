@@ -11,6 +11,12 @@ module BenefitSponsors
       def persisted?
         false
       end
+
+      def phone_attributes=(phone)
+      end
+
+      def address_attributes=(address)
+      end
     end
   end
 end
