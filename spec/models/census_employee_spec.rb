@@ -1702,6 +1702,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "when active employeees opt to waive" do
+    let(:census_employee) { FactoryGirl.build(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived") }
+    
+    it "returns true when employees waive the coverage" do
+      expect(census_employee.waived?).to be_truthy
+    end
+    it "returns false for employees who are enrolling" do
+      benefit_group_assignment.aasm_state = "coverage_selected"
+      expect(census_employee.waived?).to be_falsey
+    end
+  end
+
+
   context '.renewal_benefit_group_assignment' do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
     let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }

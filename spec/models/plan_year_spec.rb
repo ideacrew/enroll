@@ -639,6 +639,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+
+
       ## Application Eligibility Warnings
       context "and employer's primary office isn't located in-state" do
         before do
@@ -2263,6 +2265,28 @@ describe PlanYear, "which has the concept of export eligibility" do
         end
       end
     end
+  end
+end
+
+context "non business owner criteria" do
+       
+  let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+  let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile )}
+  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, aasm_state: "coverage_selected") }
+  let(:census_employee) { FactoryGirl.build(:census_employee, is_business_owner:false, aasm_state: "employee_role_linked",expected_selection: "enroll",benefit_group_assignments: [benefit_group_assignment]) }
+    
+  before do
+    allow(plan_year).to receive(:enrolled).and_return([census_employee])
+  end
+
+  it "should pass when there are non owners with enrolled state" do
+    expect(plan_year.non_business_owner_enrolled).to eq [census_employee]
+  end
+
+  it "should fail when there are 0 non owners with enrolled status" do
+    benefit_group_assignment.update_attributes(aasm_state:'coverage_waived')
+    expect(plan_year.non_business_owner_enrolled).to eq []
   end
 end
 
