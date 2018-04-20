@@ -73,7 +73,7 @@ module Effective
       end
 
       def transition_family_members_link_type(row, allow)
-        allow ? 'ajax' : 'disabled'
+        allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
