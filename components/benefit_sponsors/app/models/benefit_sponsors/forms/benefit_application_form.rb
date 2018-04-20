@@ -15,72 +15,82 @@ module BenefitSponsors
       attribute :pte_count, Integer
       attribute :msp_count, Integer
 
+      attribute :id, String
+      attribute :benefit_sponsorship_id, String
+      attribute :start_on_options, Array
+
+
       validates :start_on, presence: true
       validates :end_on, presence: true
       validates :open_enrollment_start_on, presence: true
       validates :open_enrollment_end_on, presence: true
 
       # validates :validate_application_dates
+      attr_reader :service
 
-      delegate :benefit_sponsorship, :benefit_application, to: :@benefit_application_service
+      def service
+        return @service if defined? @service
+        @service = BenefitSponsors::Services::BenefitApplicationService.new
+      end
 
-      def initialize(params = {})
-        super(params[:benefit_application]) if params[:benefit_application].present?
-        @benefit_application_service = BenefitSponsors::Services::BenefitApplicationService.new(params)
+      def self.for_new(benefit_sponsorship_id)
+        form = self.new(:benefit_sponsorship_id => benefit_sponsorship_id)
+        service.load_default_form_params(form)
+        service.load_form_metadata(form)
+        form
+      end
+
+      def self.for_create(params)
+        form = self.new(params)
+        service.load_form_metadata(form)
+        form
+      end
+
+      def self.for_edit(id)
+        form = self.new(id: id)
+        service.load_form_params_from_resource(form)
+        service.load_form_metadata(form)
+        form
+      end
+
+      def self.for_update(id)
+        form = self.new(id: id)
+        service.load_form_params_from_resource(form)
+        service.load_form_metadata(form)
+        form
       end
 
       def load_attributes_from_resource
         if benefit_application.present?
-          self.assign_attributes(@benefit_application_service.attributes_to_virtus_params)
+          self.assign_attributes(@benefit_application_service.attributes_to_form_params)
         end
       end
 
-      # Forms cannot be persisted
       def persisted?
-        false
+        id.present?
+      end
+
+      def persist(update: false)
+        return false unless self.valid?
+        save_result, persisted_object = (update ? service.update(self) : service.save(self))
+        return false unless save_result
+        @show_page_model = persisted_object
+        true
       end
 
       def save
-        if valid?
-          persist!
-        else
-          false
-        end
+        persist
       end
-    
+
+      def update_attributes(params)
+        self.attributes = params
+        persist(update: true)
+      end
+
       def validate_application_dates
         if start_on <= end_on
           errors.add(:start_on, "can't be later than end on date")
         end
-      end
-
-      def scheduler
-        return @scheduler if defined? @scheduler
-        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      end
-
-      def calculate_start_on_options
-        scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-      end
-    
-      def start_on=(date)
-        super(date.to_date)
-      end
-
-      def is_start_on_valid?
-        start_on_result[:result] == "ok"
-      end
-
-      def start_on_result
-        scheduler.check_start_on(start_on)
-      end
-
-      def open_enrollment_dates
-        scheduler.calculate_open_enrollment_date(start_on) if is_start_on_valid?
-      end
-
-      def enrollment_schedule
-        scheduler.shop_enrollment_timetable(start_on) if is_start_on_valid?
       end
 
       private 

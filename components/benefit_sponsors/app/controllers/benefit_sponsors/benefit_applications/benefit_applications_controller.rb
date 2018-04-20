@@ -3,12 +3,11 @@ module BenefitSponsors
     class BenefitApplicationsController < ApplicationController
 
       def new
-        permitted = params.permit(:benefit_sponsorship_id)
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(permitted)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.require(:benefit_sponsorship_id))
       end
 
       def create
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(application_params)
         if @benefit_application_form.save
           redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.benefit_sponsorship, @benefit_application_form.benefit_application)
         else
@@ -18,24 +17,17 @@ module BenefitSponsors
       end
 
       def edit
-        permitted = params.permit(:benefit_sponsorship_id, :benefit_application_id)
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(permitted)
-        @benefit_application_form.load_attributes_from_resource
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.require(:id))
       end
 
       def update        
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(application_params)
-        if @benefit_application_form.save
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.require(:id))
+        if @benefit_application_form.update_attributes(application_params)
           redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.benefit_sponsorship, @benefit_application_form.benefit_application)
         else
           flash[:error] = error_messages(@benefit_application_form)
           render :edit
         end
-      end
-
-      def recommend_dates
-        permitted = params.permit(:start_on, :benefit_sponsorship_id)
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.new(permitted)
       end
 
       private
@@ -45,12 +37,9 @@ module BenefitSponsors
       end
 
       def application_params
-        params.permit(
-          :benefit_sponsorship_id, :benefit_application_id,
-          :benefit_application => [
-            :start_on, :end_on, :fte_count, :pte_count, :msp_count,
-            :open_enrollment_start_on, :open_enrollment_end_on 
-          ]
+        params.require(:benefit_application).permit(
+          :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+          :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id
         )
       end
     end

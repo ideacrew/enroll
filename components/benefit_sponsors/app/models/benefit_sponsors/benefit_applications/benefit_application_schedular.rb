@@ -196,15 +196,16 @@ module BenefitSponsors
 
       def check_start_on(start_on)
         start_on = start_on.to_date
-        shop_enrollment_times = shop_enrollment_timetable(start_on)
+        shop_enrollment_dates = shop_enrollment_timetable(start_on)
 
         if start_on.day != 1
           result = "failure"
           msg = "start on must be first day of the month"
-        elsif TimeKeeper.date_of_record > shop_enrollment_times[:open_enrollment_latest_start_on]
+        elsif TimeKeeper.date_of_record > shop_enrollment_dates[:open_enrollment_latest_start_on]
           result = "failure"
           msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month} or later"
         end
+        
         {result: (result || "ok"), msg: (msg || "")}
       end
 

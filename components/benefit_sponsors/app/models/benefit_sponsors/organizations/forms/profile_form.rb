@@ -25,6 +25,17 @@ module BenefitSponsors
 
       validates_presence_of :entity_kind
 
+      def persisted?
+        false
+      end
+
+      def office_locations_attributes=(location)
+      end
+
+      def market_kind=(market_kind)
+        market_kind = market_kind.to_sym
+      end
+
     end
   end
 end

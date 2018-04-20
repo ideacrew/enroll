@@ -51,7 +51,7 @@ module BenefitSponsors
         end
 
         def self.build(attrs)
-          new.build_organization(attrs)
+          new(attrs).build_organization
         end
 
         def build_organization(attrs = {})

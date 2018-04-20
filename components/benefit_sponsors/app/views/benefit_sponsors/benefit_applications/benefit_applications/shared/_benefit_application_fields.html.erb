@@ -4,14 +4,13 @@
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <% benefit_application_start_dates = f.object.calculate_start_on_options %>
+        <% benefit_application_start_dates = f.object.start_on_options %>
         <% formatted_start_on = f.object.start_on.try(:to_s, :db) %>
 
         <%# if f.object.start_on.present? && !benefit_application_start_dates.any?{|set| set[1] == formatted_start_on } %>
           <%# benefit_application_start_dates << [f.object.start_on.strftime("%B %Y"), formatted_start_on]%>
         <%# end %>
-
-        <%= f.select(:start_on, options_for_select(benefit_application_start_dates, selected: formatted_start_on), {:include_blank => "SELECT START ON"}, { :class => 'benefit-application-start-date', :disabled => (f.object.resource.try(:is_renewing?) ? true : false) }) %>
+        <%= f.select(:start_on, options_for_select(benefit_application_start_dates, selected: formatted_start_on), {:include_blank => "SELECT START ON"}, { :class => 'benefit-application-start-date' }) %>
       </div>
 
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
@@ -45,7 +44,7 @@
   </div>
 </div>
 <br/>
-<a href="#" data-href="<%= recommend_dates_benefit_sponsorship_benefit_applications_benefit_applications_path %>" id='generate_recommend_dates' class='btn btn-primary' data-loading-text="Loading..." style='display:none;'> generate  recommend dates by start on</a>
+<a href="#" data-href="<%= recommend_dates_benefit_sponsorship_benefit_applications_path %>" id='generate_recommend_dates' class='btn btn-primary' data-loading-text="Loading..." style='display:none;'> generate  recommend dates by start on</a>
 <div class="recommend">
   <div id="notice"></div>
   <div id="content">

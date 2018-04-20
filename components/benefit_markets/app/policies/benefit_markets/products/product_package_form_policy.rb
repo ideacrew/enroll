@@ -6,7 +6,7 @@ module BenefitMarkets
         @product_package_form = product_package_form
         # We will need this if the authorization logic starts to look at 
         # the actual package
-        @form_service = ::BenefitMarkets::Products::ProductPackageFormService.new
+        @form_service = ::BenefitMarkets::Products::ProductPackageService.new
       end
 
       def new?

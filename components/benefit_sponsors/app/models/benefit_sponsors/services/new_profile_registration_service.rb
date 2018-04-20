@@ -5,8 +5,28 @@ module BenefitSponsors
       attr_reader :organization, :profile, :representative
       attr_accessor :profile_type
 
-      def initialize(attrs)
+      def initialize(attrs={})
         @profile_type = attrs[:profile_type]
+      end
+
+      def build(attrs)
+        factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
+        organization = factory_class.build(attrs)
+        attributes_to_form_params(attrs[:personal_information], organization)
+      end
+
+      def attributes_to_form_params(person_obj, organization_obj)
+        {
+          :"person" => personal_information_params,
+          :"organization" => Serializers::OrganizationSerializer.new(organization_obj).to_hash
+        }
+      end
+
+
+      def personal_information_params(attrs={})
+        {
+          :"personal_information" => attrs
+        }
       end
 
       # Serialized model attributes, plus form metadata

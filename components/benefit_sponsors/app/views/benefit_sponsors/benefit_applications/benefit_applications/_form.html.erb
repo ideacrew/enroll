@@ -2,14 +2,14 @@
     <div class="row">
       <div class="col-xs-12 planyear-add-tab">
         <div id="choose-coverage">
-          <% if @benefit_application.errors.any? %>
+          <% if @benefit_application_form.errors.any? %>
             <div class="alert-plan-year alert-error">
               <% if @just_a_warning == false %>
-              <h4><%= pluralize(@benefit_application.errors.count, "error") %> prohibited this plan year from being saved:</h4>
+              <h4><%= pluralize(@benefit_application_form.errors.count, "error") %> prohibited this benefit application from being saved:</h4>
               <% end %>
               <ul>
-                <% @benefit_application.errors.delete(:benefit_packages) %>
-                <% @benefit_application.errors.full_messages.each do |msg| %>
+                <% @benefit_application_form.errors.delete(:benefit_packages) %>
+                <% @benefit_application_form.errors.full_messages.each do |msg| %>
                   <li><%= msg %></li>
                 <% end %>
               </ul>
