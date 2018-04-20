@@ -361,6 +361,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'DAE053',
+    title: 'Eligible to Apply for Employer-sponsored Health Insurance',
+    description: 'This notices goes to all the employees who have successfully matched their employer.',
+    resource_name: 'employee_role',
+    event_name: 'employee_eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Employee Eligibility Notice',
+        notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
+        notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
+        mpi_indicator: 'SHOP_D053',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D018',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
@@ -529,6 +550,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP_D041',
+    title: 'Employee Terminating coverage',
+    description: 'Employee Terminating coverage after QLE',
+    resource_name: 'employer',
+    event_name: 'notify_employer_when_employee_terminate_coverage',
+    notice_triggers: [
+      {
+        name: 'Notice to employer when employee terminates coverage',
+        notice_template: 'notices/shop_employer_notices/employee_terminating_coverage',
+        notice_builder: 'ShopEmployerNotices::EmployeeTerminatingCoverage',
+        mpi_indicator: 'SHOP_D041',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP30',
     title: 'Group Renewal – Second Reminder to Publish',
     description: 'Notification to renewing employers with draft plan years to publish their plan year 1 day prior to the renewal employer soft deadline.',
@@ -571,7 +613,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP32',
+    hbx_id: 'SHOP_D020',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
     resource_name: 'employer',
@@ -581,7 +623,7 @@ shop_notice_triggers = [
         name: 'Initial Employer ineligible to obtain coverage.',
         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP32',
+        mpi_indicator: 'SHOP_D020',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -718,6 +760,48 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP_D046',
+    title: 'Employee has made a change to their employer-sponsored coverage selection',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
+    resource_name: 'employer',
+    event_name: 'ee_mid_year_plan_change_congressional_notice',
+    notice_triggers: [
+      {
+        name: 'Employee Mid-Year Plan change Congressional',
+        notice_template: 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
+        notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNotice',
+        mpi_indicator: 'SHOP_D046',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP_D045',
+    title: 'Employee has made a change to their employer-sponsored coverage selection',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
+    resource_name: 'employer',
+    event_name: 'ee_mid_year_plan_change_non_congressional_notice',
+    notice_triggers: [
+      {
+        name: 'Employee Mid-Year Plan change Non-Congressional',
+        notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change_non_congressional',
+        notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNotice',
+        mpi_indicator: 'SHOP_D045',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D001',
     title: 'Welcome to DC Health Link',
     description: 'ER creates an account in DC Health',
@@ -822,6 +906,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOP_D034',
+    title: 'Special Enrollment Period Approval',
+    description: 'SEP request by Employee accepted when an eligiblity determination is reached',
+    resource_name: 'employee_role',
+    event_name: 'ee_sep_request_accepted_notice',
+    notice_triggers: [
+      {
+        name: 'EE SEP Requested Accepted',
+        notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
+        notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
+        mpi_indicator: 'SHOP_D034',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  
   {
     hbx_id: 'SHOP_DAG043',
     title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
@@ -886,6 +993,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP_D093',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market - Excludes 1/1/2018 renewal EEs',
+    resource_name: 'employee_role',
+    event_name: 'dental_carriers_exiting_shop_notice_to_ee',
+    notice_triggers: [
+      {
+        name: 'Renewal EEs Dental Carriers are Exiting SHOP market notice - Excludes 1/1/2018 renewal EEs',
+        notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
+        notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
+        mpi_indicator: 'SHOP_D093',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D042',
     title: 'Confirmation of Election To Terminate Coverage',
     description: 'Employee Terminating coverage after QLE',
@@ -907,7 +1035,6 @@ shop_notice_triggers = [
     ]
   },
 ]
-
 
 ivl_notice_triggers = [
   {
@@ -1380,6 +1507,28 @@ ivl_notice_triggers = [
         }
       }
     ]
+  },
+
+  {
+      hbx_id: 'IVL_BV',
+      title: 'You Must Submit Documents by the Deadline to Keep Your Insurance',
+      description: 'This is an Backlog Notice and is sent for people need to submit their documents',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_backlog_verification_notice_uqhp',
+      notice_triggers: [
+          {
+              name: 'Backlog Notice',
+              notice_template: 'notices/ivl/ivl_backlog_verification_notice_uqhp',
+              notice_builder: 'IvlNotices::IvlBacklogVerificationNoticeUqhp',
+              mpi_indicator: 'IVL_BV',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
   },
 ]
 

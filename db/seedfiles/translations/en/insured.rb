@@ -264,8 +264,7 @@ INSURED_TRANSLATIONS = {
   "en.upload_new_notice" => "Upload New Notice",
   "en.upload_file" => "Upload File",
   "en.uploaded_notices" => "Uploaded Notices",
-  "en.insured.verification_information" => "We verify the information you give us using electronic data sources.
-        If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
+  "en.insured.verification_information" => "We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
   "en.date_of_birth" => "Date Of Birth",
   "en.social_security" => "Social Security",
   "en.relationship" => "Relationship",

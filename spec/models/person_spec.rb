@@ -463,6 +463,7 @@ describe Person do
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
+      @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
 
     after(:all) do
@@ -520,6 +521,16 @@ describe Person do
     it 'ssn present, dob present, first_name, last_name present and person inactive' do
       @p4.update_attributes(is_active:false)
       expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
+    end
+
+    it 'returns person records only where is_active == true' do
+      expect(@p2.is_active).to eq true
+      expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
+    end
+
+    it 'should not match person record if is_active == false' do
+      expect(@p5.is_active).to eq false
+      expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).to be_empty
     end
   end
 
@@ -733,9 +744,10 @@ describe Person do
     end
   end
 
-  describe "does not allow two people with the same user ID to be saved" do
+  describe "does not allow two people with the same user ID to be saved", dbclean: :around_each do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
+    before do Person.collection.indexes.create_one({user_id: 1}, {sparse:true, unique: true}) end
 
     it "should let fail to save" do
       user_id = BSON::ObjectId.new

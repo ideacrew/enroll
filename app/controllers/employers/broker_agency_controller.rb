@@ -27,6 +27,10 @@ class Employers::BrokerAgencyController < ApplicationController
         @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
       end
     end
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def show

@@ -243,7 +243,6 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
-  
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
   end
