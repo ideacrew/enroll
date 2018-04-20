@@ -171,25 +171,25 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
   end
 
-  describe "#view_market_palces" do
+  describe "#view_market_places" do
     let(:person) { FactoryGirl.create(:person) }
 
     it "should return shop & individual if can_shop_both_markets? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
-      expect(helper.view_market_palces(person)).to eq Plan::MARKET_KINDS
-      expect(helper.view_market_palces(person)).to eq ["shop", "individual"]
+      expect(helper.view_market_places(person)).to eq Plan::MARKET_KINDS
+      expect(helper.view_market_places(person)).to eq ["shop", "individual"]
     end
 
     it "should return individual & coverall if can_shop_individual? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
-      expect(helper.view_market_palces(person)).to eq Plan::INDIVIDUAL_MARKET_KINDS
-      expect(helper.view_market_palces(person)).to eq ["individual", "coverall"]
+      expect(helper.view_market_places(person)).to eq Plan::INDIVIDUAL_MARKET_KINDS
+      expect(helper.view_market_places(person)).to eq ["individual", "coverall"]
     end
 
     it "should return coverall if can_shop_resident? return true" do
       allow(person).to receive(:is_resident_role_active?).and_return(true)
-      expect(helper.view_market_palces(person)).to eq ["coverall"]
+      expect(helper.view_market_places(person)).to eq ["coverall"]
     end
   end
 
