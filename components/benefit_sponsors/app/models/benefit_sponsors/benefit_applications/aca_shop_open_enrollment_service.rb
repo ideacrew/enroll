@@ -7,12 +7,14 @@ module BenefitSponsors
 
       ## Trigger events can be dates or from UI
 
-      def sponsors_to_close_open_enrollment
-        # query all benefit_applications in OE state with open_enrollment_period.max
-        @benefit_applications = BenefitSponsors:: by_open_enrollment_end_date
+      def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)
+
+        # query all benefit_applications in OE state with open_enrollment_period.max < date
+        @benefit_applications = BenefitSponsors::BenefitApplications::BenefitApplication.by_open_enrollment_end_date
       end
 
       def begin_open_enrollment(benefit_application)
+        member_enrollments.each { |enrollment| renew_member_enrollment(benefit_application) }
       end
 
       def close_open_enrollment(benefit_application)
@@ -27,6 +29,11 @@ module BenefitSponsors
 
       # Exempt exception handling situation
       def retroactive_open_enrollment(benefit_application)
+      end
+
+      def renew_member_enrollment(renewal_benefit_application, current_member_enrollment)
+
+        renewal_member_enrollment
       end
 
 
