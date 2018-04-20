@@ -13,7 +13,7 @@ module Queries
 
     def build_scope()
       user = klass
-      case @custom_attributes[:users]
+      users = case @custom_attributes[:users]
         when "all_employer_staff_roles"
           if @custom_attributes[:lock_unlock] == "locked"
             user.where(:'roles'.in => ["employer_staff"], :locked_at.ne => nil)
@@ -52,7 +52,13 @@ module Queries
           else
             user.all
           end
-      end
+        end
+        unless @search_string.nil?
+          search_regex = Regexp.new(".*#{@search_string}.*")
+          user_ids = Person.or({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
+          users = users.or({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => user_ids} } )
+        end
+        users
     end
 
     def skip(num)
