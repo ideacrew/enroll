@@ -70,6 +70,8 @@ module BenefitSponsors
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
 
+      scope :by_open_enrollment_end_date,   ->(end_on) { where(:"effective_period.max" => end_on) }
+
       scope :by_effective_date,       ->(effective_date)    { where(:"effective_period.min" => effective_date) }
       scope :by_effective_date_range, ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
       scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
