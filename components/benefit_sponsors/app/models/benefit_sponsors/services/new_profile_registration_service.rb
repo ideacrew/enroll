@@ -10,12 +10,23 @@ module BenefitSponsors
       end
 
       def build(attrs)
-        organization = BenefitSponsors::Organizations::Factories::ProfileFactory.build(attrs)
-        attributes_to_form_params(organization)
+        factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
+        organization = factory_class.build(attrs)
+        attributes_to_form_params(attrs[:personal_information], organization)
       end
 
-      def attributes_to_form_params(obj)
-        Serializers::OrganizationSerializer.new(obj).to_hash
+      def attributes_to_form_params(person_obj, organization_obj)
+        {
+          :"person" => personal_information_params,
+          :"organization" => Serializers::OrganizationSerializer.new(organization_obj).to_hash
+        }
+      end
+
+
+      def personal_information_params(attrs={})
+        {
+          :"personal_information" => attrs
+        }
       end
 
       # Serialized model attributes, plus form metadata

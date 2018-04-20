@@ -6,7 +6,9 @@ module BenefitSponsors
       #include ActiveModel::Conversion
       include Virtus.model
 
-      attribute :person, Forms::PersonForm
+      # TODO - remove person_form, person serializer, registration serializer
+
+      attribute :personal_information, Forms::PersonalInformationForm
       attribute :organization, Forms::OrganizationForm
 
       validate :registration_form
@@ -25,7 +27,6 @@ module BenefitSponsors
       end
 
       def self.for_new(profile_type)
-        binding.pry
         service_obj = Services::NewProfileRegistrationService.new
         form_params = service_obj.build(profile_type: profile_type)
         new(form_params)
