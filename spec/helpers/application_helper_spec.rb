@@ -225,7 +225,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum).to eq 4
     end
   end
 
@@ -501,7 +501,7 @@ end
     end
 
     it "should raise error when non boolean values are passed" do
-      expect{helper.convert_to_bool(val9)}.to raise_error
+      expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
     end
   end
 end

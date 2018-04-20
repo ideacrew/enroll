@@ -243,6 +243,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 context "using matching ssn and dob" do
                   let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
+                  let!(:user)     { FactoryGirl.create(:user, person: valid_employee_role.person) }
 
                   it "should return the roster instance" do
                     expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
@@ -259,7 +260,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { initial_census_employee.employee_role = valid_employee_role }
+                      before { 
+                        initial_census_employee.employee_role = valid_employee_role 
+                      }
 
                       it "should link the roster instance and employer role" do
                         expect(initial_census_employee.employee_role_linked?).to be_truthy
@@ -557,6 +560,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                                               dob: existing_census_employee.dob,
                                               gender: existing_census_employee.gender
                                             )}
+      let!(:user) { create(:user, person: person)}
       let!(:employee_role)                { EmployeeRole.create(
                                               person: person,
                                               hired_on: existing_census_employee.hired_on,
@@ -901,7 +905,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       allow(notice_trigger).to receive_message_chain(:notice_builder,:camelize,:constantize,:new).and_return(builder)
       allow(notice_trigger).to receive_message_chain(:notice_trigger_element_group,:notice_peferences).and_return({})
       allow(ApplicationEventKind).to receive_message_chain(:where,:first).and_return(double("ApplicationEventKind",{:notice_triggers => notice_triggers,:title => "title",:event_name => "OutOfPocketNotice"}))
-      allow_any_instance_of(CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
+      allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("fake_url")
     end
     context "#generate_and_deliver_checkbook_url" do 
       it "should create a builder and deliver without expection" do
@@ -1770,6 +1774,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
 
   end
+
+  describe "#trigger_notice" do
+    let(:census_employee){FactoryGirl.build(:census_employee)}
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+    it "should trigger job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      census_employee.trigger_notice("ee_sep_request_accepted_notice")
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_sep_request_accepted_notice']
+    end
+  end
+
   describe "search_hash" do
     context 'census search query' do
 
