@@ -81,7 +81,7 @@
 
 <script>
   <% flag = rates_available?(@employer_profile) %>
-  <% if flag == 'blocking' || '' %>
+  <% if flag == 'blocking' || flag == '' %>
     $(document).ready(function() {
       setTimeout(function() {
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
