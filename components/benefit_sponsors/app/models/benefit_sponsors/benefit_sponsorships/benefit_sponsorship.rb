@@ -20,7 +20,7 @@ module BenefitSponsors
       # include Concerns::Observable
       include AASM
 
-      SOURCE_KINDS  = [:self_serve, :conversion]
+      SOURCE_KINDS  = %w(self_serve conversion)
 
 
       field :hbx_id,            type: String

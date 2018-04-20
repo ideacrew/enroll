@@ -5,6 +5,13 @@ module BenefitSponsors
       include Concerns::EmployerProfileConcern
 
 
+      def rating_area
+      end
+
+      def sic_code
+      end
+
+
       def active_broker
         # if active_broker_agency_account && active_broker_agency_account.writing_agent_id
         #   Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
