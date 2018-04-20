@@ -18,7 +18,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       # include Concerns::Observable
-
+      include AASM
 
       SOURCE_KINDS  = [:self_serve, :conversion]
 
@@ -41,6 +41,7 @@ module BenefitSponsors
       # This sponsorship's workflow status
       field :aasm_state,    type: String, default: :applicant do
         error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
+      end
 
       delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
       delegate :rating_area,  :rating_area=,  to: :profile, allow_nil: true
