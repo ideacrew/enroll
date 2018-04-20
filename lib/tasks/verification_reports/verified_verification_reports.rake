@@ -3,7 +3,7 @@ require 'csv'
 namespace :reports do
   desc "Verified verifications created monthly report"
   task :verified_verification_report => :environment do
-    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON)
+    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME CURRENT_STATUS VERIFICATION_TYPE VERIFIED_DATE VERIFICATION_REASON IVL_ENROLLMENT SHOP_ENROLLMENT)
 
     CITIZEN_VALID_EVENTS = ["ssn_valid_citizenship_valid!", "ssn_valid_citizenship_valid","pass_dhs!", "pass_dhs"]
 
@@ -34,6 +34,41 @@ namespace :reports do
         @family_array.map(&:primary_family_member).map(&:hbx_id).join(',')
       end
     end
+
+    def ivl_enrollment(person)
+      if person.primary_family
+        if person.primary_family.active_household.hbx_enrollments.individual_market.present?
+          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        else
+          nil
+        end
+      else
+        families = person.families.select{|family| family.active_household.hbx_enrollments.individual_market.present?}
+        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| !(["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
+        active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state)}
+        return "nil" unless all_enrollments.any?
+        active_enrollments.any? ? "YES" : "NO"
+      end
+    end
+
+    def shop_enrollment(person)
+      if person.primary_family
+        if person.primary_family.active_household.hbx_enrollments.shop_market.present?
+          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        else
+          "nil"
+        end
+      else
+        families = person.families.select{|family| family.active_household.hbx_enrollments.shop_market.present?}
+        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| (["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
+        active_enrollments = enrollments.select{|enrollment| enrollment.currently_active?}
+        return "nil" unless all_enrollments.any?
+        active_enrollments.any? ? "YES" : "NO"
+      end
+    end
+
 
     def start_date
       Date.parse(date)
@@ -122,7 +157,9 @@ namespace :reports do
                       person.consumer_role.verification_type_status(history_element.verification_type,person),
                       history_element.verification_type,
                       history_element.created_at,
-                      history_element.update_reason
+                      history_element.update_reason,
+                      ivl_enrollment(person),
+                      shop_enrollment(person)
                     ]
           end
         rescue => e
