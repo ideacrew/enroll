@@ -82,23 +82,21 @@ module BenefitMarkets
       # This method will populate the errors.
       # @return [Boolean] the result of the attempted save
       def save
-        service = ProductPackageService.new
-        return false unless self.valid?
-        save_result, persisted_object = service.save(self)
-        return false unless save_result
-        @show_page_model = persisted_object
-        true
+        persist
       end
 
       # Validate and attempt to persist updates.
       # This method will populate the errors.
       # @return [Boolean] the result of the attempted update
       def update_attributes(params)
-        service = ProductPackageService.new
         self.attributes = params
+        persist(update: true)
+      end
+
+      def persist(update: false)
         return false unless self.valid?
-        update_result, persisted_object = service.update(self)
-        return false unless update_result 
+        persist_result, persisted_object = update ? service.update(self) ? service.save(self)
+        return false unless persist_result
         @show_page_model = persisted_object
         true
       end
@@ -130,6 +128,10 @@ module BenefitMarkets
       # @!visibility private
       def has_additional_attributes?
         false
+      end
+
+      def service
+        @service ||= ProductPackageService.new
       end
     end
   end
