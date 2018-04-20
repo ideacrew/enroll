@@ -31,7 +31,7 @@ module BenefitMarkets
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
       def self.for_new(benefit_option_kind)
-        service = ProductPackageService.new
+        service = resolve_service
         form = resolve_form_subclass(benefit_option_kind).new(
           :benefit_option_kind => benefit_option_kind
         )
@@ -46,7 +46,7 @@ module BenefitMarkets
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
       def self.for_create(params)
-        service = ProductPackageService.new
+        service = resolve_service
         benefit_option_kind = params.require(:benefit_option_kind)
         form = resolve_form_subclass(benefit_option_kind).new(params)
         service.load_form_metadata(form)
@@ -69,15 +69,6 @@ module BenefitMarkets
         find_for(id)
       end
 
-      # @!visibility private
-      def self.find_for(id)
-        service = ProductPackageService.new
-        params_form = self.new(id: id)
-        form = service.load_form_params_from_resource(params_form)
-        service.load_form_metadata(form)
-        form
-      end
-
       # Validate and attempt to save the form.
       # This method will populate the errors.
       # @return [Boolean] the result of the attempted save
@@ -93,14 +84,6 @@ module BenefitMarkets
         persist(update: true)
       end
 
-      def persist(update: false)
-        return false unless self.valid?
-        persist_result, persisted_object = update ? service.update(self) ? service.save(self)
-        return false unless persist_result
-        @show_page_model = persisted_object
-        true
-      end
-
       # Has this form been successfully saved before?  Used mainly by form_for.
       # @return [Boolean] true if previously saved, otherwise false
       def persisted?
@@ -112,7 +95,26 @@ module BenefitMarkets
       def policy_class
         BenefitMarkets::Products::ProductPackageFormPolicy
       end
-     
+
+      # @!visibility private
+      def has_additional_attributes?
+        false
+      end
+
+      protected
+
+      def self.resolve_service
+        ProductPackageService.new
+      end
+
+      def self.find_for(id)
+        service = resolve_service
+        params_form = self.new(id: id)
+        form = service.load_form_params_from_resource(params_form)
+        service.load_form_metadata(form)
+        form
+      end
+      
       # @!visibility private
       def self.resolve_form_subclass(benefit_option_kind)
         name_parts = benefit_option_kind.to_s.split("_")
@@ -125,13 +127,16 @@ module BenefitMarkets
         end
       end
 
-      # @!visibility private
-      def has_additional_attributes?
-        false
+      def persist(update: false)
+        return false unless self.valid?
+        persist_result, persisted_object = update ? service.update(self) : service.save(self)
+        return false unless persist_result
+        @show_page_model = persisted_object
+        true
       end
 
       def service
-        @service ||= ProductPackageService.new
+        @service ||= self.class.resolve_service
       end
     end
   end
