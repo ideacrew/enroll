@@ -245,7 +245,7 @@ class Insured::FamiliesController < FamiliesController
 
   def transition_family_members
     @row_id = params[:family_actions_id]
-    @family_members = @family.family_members
+    @family_members = @family.active_family_members
     @non_shop_market_kinds = Person::NON_SHOP_ROLES
     respond_to do |format|
       format.js { render "insured/families/transition_family_members" }
