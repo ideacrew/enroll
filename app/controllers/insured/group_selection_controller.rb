@@ -6,7 +6,6 @@ class Insured::GroupSelectionController < ApplicationController
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
-    #binding.pry
     set_bookmark_url
     hbx_enrollment = build_hbx_enrollment
     @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page

@@ -204,7 +204,6 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def create_initial_market_transition
-    #binding.pry
     transition = IndividualMarketTransition.new
     transition.role_type = "resident"
     transition.submitted_at = TimeKeeper.datetime_of_record
@@ -212,9 +211,6 @@ class Exchanges::ResidentsController < ApplicationController
     transition.effective_starting_on = TimeKeeper.datetime_of_record
     transition.user_id = current_user.id
     Person.find(session[:person_id]).individual_market_transitions << transition
-    #User.find(params[:person][:user_id]).person.individual_market_transitions << transition
-    #transition.person = User.find(params[:person][:user_id]).person
-    #transition.save!
   end
 
 
