@@ -62,11 +62,41 @@ if missing_plan_dumps
   puts "*"*80
   puts "Loading carriers and plans"
   require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
-  # system "bundle exec rake seed:plans ENROLL_SEEDING=true"
   puts "::: complete :::"
 
   puts "*"*80
-  puts "Loading SERFF data"
+  puts "Loading QLE kinds."
+  require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
+  system "bundle exec rake update_seed:qualifying_life_event"
+  puts "::: complete :::"
+
+  puts "*"*80
+  puts "Loading SIC Codes."
+  system "bundle exec rake load_sic_code:update_sic_codes"
+  puts "::: complete :::"
+
+  puts "*"*80
+  puts "Loading Rating Factors."
+  system "bundle exec rake load_rating_factors:run_all_rating_factors"
+  puts "::: complete :::"
+
+  puts "*"*80
+  puts "Loading Rating Areas."
+  system "bundle exec rake load_rate_reference:update_rating_areas"
+  puts "::: complete :::"
+
+  puts "*"*80
+  puts "Loading Carrier Service Areas."
+  system "bundle exec rake load_service_reference:run_all_service_areas"
+  puts "::: complete :::"
+
+  puts "*"*80
+  puts "Updating Carrier Service Areas."
+  system "bundle exec rake update_service_reference:update_service_areas['UPDATED_SHOP_SA_FCHP.xlsx',2017,'88806']"
+  puts "::: complete :::"
+
+  puts "*"*80
+  puts "Loading SERFF Plan data"
   Products::Qhp.delete_all
   system "bundle exec rake xml:plans"
   puts "::: complete :::"
@@ -77,10 +107,22 @@ if missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
-  # puts "Processing Plan Mapping ..."
-  # system "bundle exec rake xml:plan_cross_walk"
-  # puts "Processing Plan Mapping completed"
-  # puts "*"*80
+  puts "Loading super group ids ..."
+  system "bundle exec rake supergroup:update_plan_id"
+  puts "Loading super group ids complete"
+  puts "*"*80
+
+  puts "Processing Plan Mapping ..."
+  system "bundle exec rake xml:plan_cross_walk"
+  puts "Processing Plan Mapping completed"
+  puts "*"*80
+
+  puts "Marking plans as standard, updating provider and rx formulary url, updating network information... "
+  system "bundle exec rake import:common_data_from_master_xml"
+  puts "completed"
+  puts "*"*80
+
+
   # puts "Marking plans as standard ..."
   # system "bundle exec rake xml:standard_plans"
   # puts "Marking plans as standard completed"
@@ -107,6 +149,7 @@ if missing_plan_dumps
   system "bundle exec rake import:network_information"
   puts "::: Updating network info for 2017 plans complete:::"
 
+  # Needs to be a setting catastrophic plans on/off
   # puts "*"*80
   # system "bundle exec rake migrations:cat_age_off_renewal_plan"
   # puts "*"*80
@@ -128,20 +171,10 @@ puts "::: complete :::"
 
 
 puts "*"*80
-puts "Loading carriers and QLE kinds."
-# require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
-require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
-# require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')
-system "bundle exec rake update_seed:qualifying_life_event"
-puts "::: complete :::"
-
-puts "*"*80
 puts "Loading sanitized people, families, employers, and census."
 load_tasks = %w(
   seed:people
   seed:families
-  hbx:employers:add[db/seedfiles/employers.csv,db/seedfiles/blacklist.csv]
-  hbx:employers:census:add[db/seedfiles/census.csv]
 )
 system "bundle exec rake #{load_tasks.join(" ")} ENROLL_SEEDING=true"
 puts "::: complete :::"
@@ -168,4 +201,10 @@ puts "::: complete :::"
 puts "*"*80
 system "bundle exec rake permissions:initial_hbx"
 puts "*"*80
+
+require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
+puts "importing security questions complete"
+puts "*"*80
+
+
 puts "End of Seed Data"

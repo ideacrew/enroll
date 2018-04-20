@@ -1,56 +1,83 @@
+require 'set'
+
 module SicConcern
-  SIC_NESTING_CODES = {
-    1 => 'major_group_code',
-    2 => 'industry_group_code',
-    3 => 'sic_code'
-  }
-  SIC_NESTING_LABELS = {
-    1 => 'major_group_label',
-    2 => 'industry_group_label',
-    3 => 'sic_label'
-  }
-  SIC_DIVISION_CODES = %w(A B C D E F G H I J)
+
   def generate_sic_array
-    nodes = []
-
-    SIC_DIVISION_CODES.each do |division_code|
-      division_sic = SicCode.where(division_code: division_code).first
-      next unless division_sic.present?
-
-      nodes << {
-                  text: division_sic.division_label.strip,
-                  selectable: false,
-                  nodes: generate_child_nodes(1, division_code: division_code)
-                }
-    end
-    nodes
+    ## Deleted in favor of more efficient method -- brianweiner 8/15
+    generate_nodes
   end
 
   private
 
-  def generate_child_nodes(next_level, **attr)
-    nodes = []
-    all_children = SicCode.where(**attr)
-    child_column_sym = SIC_NESTING_CODES[next_level].to_sym
-    child_column_label = SIC_NESTING_LABELS[next_level].to_sym
-    distinct_child_groups = all_children.distinct(child_column_sym)
+  def generate_nodes
+    nodes = Set.new
+    groupedNodes = Set.new
 
-    distinct_child_groups.each do |next_level_code|
-      last_node = next_level_code.length == 4    ### If the code is a length of 4 e.g 1111 it means it's the actual SIC code
-      node_text = all_children.find_by(child_column_sym => next_level_code).public_send(child_column_label)
-      nodes << {
-                  text: node_text
-                }
-      if last_node
-        nodes.last[:text] = node_text + " - #{next_level_code}"
-        nodes.last[:sic_code] = next_level_code
-        nodes.last[:selectable] = true
+    ## Sic Codes are organized by 4 descending categories
+    ## Division label
+    ##  Major Group label
+    ##    Industry Group label
+    ##      Sic Code Label
+
+    ## JS Tree expects an array of node elements with parent nodes having a 'node' attribute pointing towards the children
+
+    SicCode.all.each do |sic_code|
+      ## We iterate once through all SicCodes and do an initial sort
+      nodes.add({
+          id: [:division, sic_code.division_code],
+          text: sic_code.division_label.strip,
+          selectable: false
+        })
+      nodes.add({
+          id: [:major_group, sic_code.major_group_code],
+          text: sic_code.major_group_label.strip,
+          selectable: false,
+          parent: [:division, sic_code.division_code]
+        })
+      nodes.add({
+          id: [:industry_group, sic_code.industry_group_code],
+          text: sic_code.industry_group_label.strip,
+          selectable: false,
+          parent: [:major_group, sic_code.major_group_code]
+        })
+
+      ## Lowest level nodes are selectable
+      nodes.add({
+          id: [:sic_code, sic_code.sic_code],
+          text: sic_code.sic_label.strip + " - " + sic_code.sic_code,
+          selectable: true,
+          sic_code: sic_code.sic_code,
+          parent: [:industry_group, sic_code.industry_group_code]
+        })
+    end
+
+    parentsAndChildren = Hash.new do |hash, key|
+      hash[key] = Array.new
+    end
+    rootNodes = []
+
+    nodes.each do |node|
+      ## Iterate through the partially grouped nodes
+      unless node.has_key?(:parent)
+        ## If node has no parents it is a root node
+        rootNodes << node
       else
-        nodes.last[:selectable] = false
-        nodes.last[:nodes] = generate_child_nodes(next_level+1, attr.merge(child_column_sym => next_level_code))   ## Generate more nodes
+        parentsAndChildren[node[:parent]] << node
       end
     end
 
-    nodes
+    nodes.each do |node|
+      ## Iterate through the partially grouped nodes a final time
+      nodeChildren = parentsAndChildren[node[:id]]
+      if nodeChildren.any?
+        ## If there are children, assign to node's nodes key
+        node[:nodes] = nodeChildren
+      end
+    end
+
+    ## Return the root nodes with correct keys
+    rootNodes
   end
+
+  ### Deleted in favor of more efficient method -- brianweiner 8/15
 end

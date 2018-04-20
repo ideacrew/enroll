@@ -85,7 +85,7 @@ module Importers
         :ignore,
         :tpa_fein,
         :ignore,
-        :carrier
+        :ignore
       ]
     end
 

@@ -31,8 +31,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Metal Level title text' do
-      expect(rendered).to match /Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.
-    Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan./i
+      expect(rendered).to match /Plans use metal levels as an easy way to help indicate how generous they are in paying expenses.Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan./i
     end
 
     it 'should have Bronze title text' do

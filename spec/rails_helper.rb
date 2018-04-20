@@ -8,6 +8,8 @@ require 'webmock/rspec'
 
 WebMock.allow_net_connect!
 
+require 'kaminari'
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
@@ -44,6 +46,8 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
+  load Rails.root + "db/seedfiles/english_translations_seed.rb"
+  DatabaseCleaner.strategy = :truncation, {:except => %w[translations]}
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
@@ -63,6 +67,7 @@ RSpec.configure do |config|
   config.extend ControllerMacros, :type => :controller #real logins for integration testing
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
+  config.include FederalHolidaysHelper
 
   config.infer_spec_type_from_file_location!
 

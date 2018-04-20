@@ -13,7 +13,8 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                             ssn: person[:ssn],
                                                             dob: person[:dob_date]
 
-
+ employee_role = FactoryGirl.create(:employee_role, employer_profile: secondary_employer_profile)
+ secondary_employee.update_attributes!(employee_role_id: employee_role.id)
 
   open_enrollment_start_on = TimeKeeper.date_of_record
   open_enrollment_end_on = open_enrollment_start_on.end_of_month + 13.days
@@ -49,11 +50,11 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   benefit_group_carrier = benefit_group.reference_plan.carrier_profile
   renewing_carrier = benefit_group.reference_plan.carrier_profile
   [benefit_group_carrier, renewing_carrier].each do |carrier_profile|
-    sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+    sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
       factor_set.rating_factor_entries.new(factor_key: secondary_employer_profile.sic_code, factor_value: 1.0)
     end
     sic_factors.save!
-    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
       [0..5].each do |size|
         factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
       end
@@ -91,6 +92,8 @@ And(/(.*) already matched and logged into employee portal/) do |named_person|
                                                                  census_employee_id: ce.id,
                                                                  employer_profile_id: employer_profile.id,
                                                                  hired_on: ce.hired_on)
+
+  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
   FactoryGirl.create :family, :with_primary_family_member, person: person_record
   user = FactoryGirl.create(:user, person: person_record,
                                    email: person[:email],
@@ -265,7 +268,7 @@ When(/Employee select a past qle date/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find('.interaction-click-control-continue').click
   end
 end
 
@@ -273,7 +276,7 @@ When(/Employee select a qle date based on expired plan year/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find('.interaction-click-control-continue').click
   end
 end
 

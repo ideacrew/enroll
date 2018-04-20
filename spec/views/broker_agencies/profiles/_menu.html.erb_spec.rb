@@ -26,7 +26,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
       end
       it "does not show general agency related links" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-        expect(rendered).not_to match /General Agencies/
+        expect(view.content_for(:horizontal_menu)).not_to match /General Agencies/
       end
     end
   end
@@ -64,7 +64,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
       end
       it "does not show general agency related links" do
-        expect(rendered).not_to match /General Agencies/
+        expect(view.content_for(:horizontal_menu)).not_to match /General Agencies/
       end
     end
   end

@@ -22,22 +22,33 @@ FactoryGirl.define do
       after :create do |plan, evaluator|
         active_year = plan.active_year
         carrier_id = plan.carrier_profile_id
-        SicCodeRatingFactorSet.create!({
-          :carrier_profile_id => carrier_id,
-          :active_year => active_year,
-          :default_factor_value => 1.0
-        })
-        EmployerGroupSizeRatingFactorSet.create!({
-          :carrier_profile_id => carrier_id,
-          :active_year => active_year,
-          :default_factor_value => 1.0,
-          :max_integer_factor_key => 1
-        })
-        EmployerParticipationRateRatingFactorSet.create!({
-          :carrier_profile_id => carrier_id,
-          :active_year => active_year,
-          :default_factor_value => 1.0
-        })
+        [active_year + 1, active_year, active_year - 1].each do |year|
+          SicCodeRatingFactorSet.create!({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0
+          })
+          EmployerGroupSizeRatingFactorSet.create!({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0,
+            :max_integer_factor_key => 1
+          })
+          EmployerParticipationRateRatingFactorSet.create!({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0
+          })
+          crtf = CompositeRatingTierFactorSet.new({
+            :carrier_profile_id => carrier_id,
+            :active_year => year,
+            :default_factor_value => 1.0
+            })
+          CompositeRatingTier::NAMES.each do |name|
+            crtf.rating_factor_entries << RatingFactorEntry.new(factor_key: name, factor_value: 1.0)
+          end
+          crtf.save!
+        end
       end
     end
 

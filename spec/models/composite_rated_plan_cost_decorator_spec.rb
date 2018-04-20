@@ -12,8 +12,9 @@ describe CompositeRatedPlanCostDecorator, "given:
   let(:total_premium_value) { 1234.56 }
   let(:employer_contribution_factor) { 0.65 }
   let(:total_employer_cost) { 802.46 }
+  let(:cobra_status) { false }
 
-  subject { CompositeRatedPlanCostDecorator.new(plan, benefit_group, composite_rating_tier) }
+  subject { CompositeRatedPlanCostDecorator.new(plan, benefit_group, composite_rating_tier, cobra_status) }
 
   before(:each) do
     allow(benefit_group).to receive(:composite_rating_tier_premium_for).with(composite_rating_tier).and_return(total_premium_value)
@@ -30,5 +31,17 @@ describe CompositeRatedPlanCostDecorator, "given:
 
   it "calculates the correct total employee cost for that rating tier" do
     expect(subject.total_employee_cost).to eq((subject.total_premium - subject.total_employer_contribution).round(2))
+  end
+
+  context "for COBRA employees" do
+    let(:cobra_status) { true }
+
+    it "calculates the correct employer contribution for that rating tier" do
+      expect(subject.total_employer_contribution).to eq(0.00)
+    end
+
+    it "calculates the correct total employee cost for that rating tier" do
+      expect(subject.total_employee_cost).to eq((subject.total_premium).round(2))
+    end
   end
 end

@@ -11,7 +11,7 @@ module Queries
       end
     end
 
-    delegate :single_carrier_offered_health_plans, :metal_level_offered_health_plans, :single_option_offered_health_plans, :to => :strategy
+    delegate :single_carrier_offered_health_plans, :metal_level_offered_health_plans, :single_option_offered_health_plans, :sole_source_offered_health_plans, :to => :strategy
 
   end
 end

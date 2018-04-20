@@ -15,7 +15,7 @@ describe "exchanges/scheduled_events/new.html.erb" do
     def view.scheduled_event
       @scheduled_event ||= ScheduledEvent.find(params[:id])
     end
-  	render template: "exchanges/scheduled_events/new"
+  	render template: "exchanges/scheduled_events/_new"
   	expect(rendered).to have_text(/Create Scheduled Events/)
     expect(rendered).to have_text(/Start time/)
     expect(rendered).to have_text(/Recurring rules/)

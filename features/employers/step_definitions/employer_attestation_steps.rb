@@ -120,7 +120,7 @@ When(/^Admin enters the information needed$/) do
 end
 
 When(/^Employer staff clicks employees tab$/) do
-  find('.interaction-click-control-employees').trigger('click')
+  find('.interaction-click-control-employees').click
 end
 
 Then (/^Employer staff should employees coverage status as canceled$/) do
@@ -135,7 +135,8 @@ end
 def enter_plan_year_info
   wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 5).click
+  effective_on_year = TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_on_year).year}')]", :wait => 5).click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -177,7 +178,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   find('.carriers-tab a').click
   wait_for_ajax
   find('.reference-plans label').click
-  wait_for_ajax
+  wait_for_ajax(5,5)
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50

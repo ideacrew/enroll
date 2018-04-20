@@ -2,10 +2,12 @@ require 'rails_helper'
 
 RSpec.describe "insured/families/personal.html.erb" do
   before :each do
-  stub_template "insured/families/_navigation.html.erb" => ''
-  stub_template "insured/families/_profile_submenu.html.erb" => ''
-  assign(:person, person)
-  allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    stub_template "insured/families/_navigation.html.erb" => ''
+    stub_template "insured/families/_profile_submenu.html.erb" => ''
+    stub_template 'devise/passwords/_edit.html.erb' => ''
+    stub_template 'users/security_question_responses/_edit_modal.html.erb' => ''
+    assign(:person, person)
+    allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
   render file: "insured/families/personal.html.erb"
   end
 
@@ -30,17 +32,17 @@ RSpec.describe "insured/families/personal.html.erb" do
    it_should_behave_like "display_heading"
 
    it "should display contact method dropdown " do
-    expect(rendered).to have_select("person[employee_roles_attributes][0][contact_method]", :selected => "Only Electronic communications")
+    expect(rendered).to have_select("person[employee_roles_attributes][0][contact_method]", :selected => "Paper and Electronic communications")
    end
 
    it "should display language preference dropdown " do
     expect(rendered).to have_select("person[employee_roles_attributes][0][language_preference]", :selected => "English")
    end
  end
- 
+
    context "for consumer role" do
    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-  
+
 
    it "should renders home address fields and consumer fields" do
      expect(response).to render_template("shared/_consumer_fields")
@@ -49,7 +51,7 @@ RSpec.describe "insured/families/personal.html.erb" do
    it_should_behave_like "display_heading"
 
    it "should display contact method dropdown " do
-    expect(rendered).to have_select("person[consumer_role_attributes][contact_method]", :selected => "Only Paper communication")
+    expect(rendered).to have_select("person[consumer_role_attributes][contact_method]", :selected => "Paper and Electronic communications")
    end
 
    it "should display language preference dropdown " do
@@ -57,4 +59,3 @@ RSpec.describe "insured/families/personal.html.erb" do
    end
  end
 end
-

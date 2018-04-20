@@ -88,7 +88,7 @@ RSpec.describe 'Carrier Service Area Imports', :type => :task do
     private
 
     def invoke_task
-      Rake.application.invoke_task("load_service_reference:update_service_areas[SHOP_SA_BMCHP.xlsx]")
+      Rake.application.invoke_task("load_service_reference:update_service_areas[#{Rails.root}/spec/test_data/plan_data/service_areas/2017/SHOP_SA_BMCHP.xlsx]")
     end
   end
 end

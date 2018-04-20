@@ -1,3 +1,4 @@
+# @deprecated This is for the legacy method of dynamic credential resolution.
 class TransportProfiles::TransportCredential
   include Mongoid::Document
 

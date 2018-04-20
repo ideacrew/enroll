@@ -24,10 +24,12 @@ namespace :seed do
         :csr_variant_id => plan.csr_variant_id,
         :ehb => plan.ehb.nil? ? "0.0" : plan.ehb.to_s,
         :year => plan.active_year,
-        :carrier_id => plan.carrier_profile_id.to_s,
+        # :carrier_id => plan.carrier_profile_id.to_s,
+        :fein => plan.carrier_profile.fein,
         :metal_level => plan.metal_level,
         :coverage_type => plan.coverage_kind,
         :renewal_plan_id => plan.renewal_plan_id,
+        :renewal_plan_hios_id => plan.try(:renewal_plan).try(:hios_id),
         :minimum_age => 0,
         :maximum_age => 120,
         :market_type => plan.market

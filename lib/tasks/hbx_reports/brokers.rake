@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Brokers"
     task :brokers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
       brokers = Person.exists(broker_role: true).broker_role_having_agency
@@ -31,19 +32,18 @@ namespace :reports do
         )
 
       processed_count = 0
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/brokers_list_#{time_stamp}.csv")
+      file_name = fetch_file_format('brokers_list', 'BROKERSLIST')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        brokers.each do |broker|  
+        brokers.each do |broker|
             csv << [
             broker.broker_role.npn,
             broker.broker_role.broker_agency_profile.try(:legal_name),
             broker.first_name,
-            broker.last_name, 
-            broker.broker_role.email_address, 
+            broker.last_name,
+            broker.broker_role.email_address,
             broker.broker_role.phone,
             broker.broker_role.broker_agency_profile.try(:market_kind),
             broker.broker_role.broker_agency_profile.try(:languages_spoken),
@@ -71,8 +71,8 @@ namespace :reports do
 
     def organization_info(broker)
       validate_broker = broker.broker_role.broker_agency_profile.nil? && broker.broker_role.broker_agency_profile.organization.primary_office_location.nil?
-      return ["","","","",""] if validate_broker 
-      return ["","","","",""] if broker.broker_role.broker_agency_profile.organization.primary_office_location.try(:address).nil?
+      return ["","","","",""] if validate_broker
+      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil? or broker.broker_role.broker_agency_profile.organization.primary_office_location.try(:address).nil?
       [
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1,
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,

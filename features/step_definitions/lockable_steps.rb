@@ -1,28 +1,63 @@
 Then(/^there are (\d+) preloaded (.*?) user accounts$/) do |num, status|
   (0...num.to_i).each do |int|
     user = FactoryGirl.create(:user, :with_family)
-    user.update_lockable if status.eql?('locked')
+    user.lock! if status.eql?('locked')
   end
 end
 
-Then(/^Hbx Admin should see Unlock\/Lock Account link$/) do
-  find_link('Unlock / Lock Account').visible?
+Then(/^there are (\d+) preloaded user accounts without the email$/) do |num|
+  (0...num.to_i).each do |int|
+    FactoryGirl.create(:user, :without_email, :with_family)
+  end
 end
 
-When(/^Hbx Admin clicks on Unlock\/Lock Account link$/) do
-  click_link('Unlock / Lock Account')
+Then(/^Hbx Admin should see (.*?) link on user accounts page$/) do |text|
+  find_link(text).visible?
+end
+
+When(/^Hbx Admin clicks on (.*?) link on user accounts page$/) do |link|
+  click_link(link)
   wait_for_ajax
 end
 
-Then(/^there is a confirm link on in the list$/) do
-  find_link('Confirm').visible?
+Then(/^there is a confirm (.*?) should be visible$/) do |type|
+  send("find_#{type}", 'Confirm').visible?
+end
+
+Then(/^there is a text field should be visible$/) do
+  within('.child-row') do
+    expect(page).to have_css('#user_email', count: 1)
+  end
+end
+
+Then(/^I fill the (.*?) email address for that user$/) do |email|
+  fill_in 'user_email', with: email
 end
 
 When(/^I click on the confirm link$/) do
-  page.all('.child-row').last.should(have_content('Confirm'))
+  find(:link, 'Confirm').trigger 'click'
   wait_for_ajax
+  sleep 2
 end
 
-Then(/^the locked user should be in the list$/) do
-  page.all('table.effective-datatable tbody tr').last.should(have_content('Locked'))
+When 'I click on the confirm button' do
+  find(:button, 'Confirm').trigger 'click'
+  wait_for_ajax
+  sleep 1
+end
+
+Then(/^the (.*?) user should be in the list$/) do |status|
+  within('table.effective-datatable tbody') do
+    page.all('table.effective-datatable tbody tr').last.should(have_content(status))
+  end
+end
+
+Then(/^the error (.*?) should be raised$/) do |error|
+  within('.child-row') do
+    expect(page).to have_content(error)
+  end
+end
+
+Then(/^the user email should be (.*?)$/) do |email|
+  expect(User.all.to_a.last.email).to eq email
 end

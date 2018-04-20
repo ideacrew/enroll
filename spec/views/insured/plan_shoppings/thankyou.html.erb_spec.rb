@@ -13,7 +13,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       @person = employee_role.person
       @plan = plan
       @enrollment = hbx_enrollment
-      @benefit_group = @enrollment.benefit_group
+      @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
       allow(@enrollment).to receive(:employee_role).and_return(true)
       allow(@enrollment).to receive(:is_shop?).and_return(true)
@@ -26,7 +26,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     it 'should display the correct plan selection text' do
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h1', text: 'Confirm Your Plan Selection')
-      expect(rendered).to have_selector('p', text: /Please review your current plan selection. Select PREVIOUS if /)
+      expect(rendered).to have_selector('h4', text: /Please review your current plan selection. Select PREVIOUS if /)
     end
 
     it 'should render coverage_information partial' do
@@ -58,7 +58,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       @person = employee_role.person
       @plan = plan
       @enrollment = hbx_enrollment
-      @benefit_group = @enrollment.benefit_group
+      @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
@@ -70,7 +70,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       allow(@enrollment).to receive(:is_cobra_status?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h1', text: 'Confirm Your Plan Selection')
-      expect(rendered).to have_selector('p', text: /Please review your current plan selection. Select PREVIOUS if /)
+      expect(rendered).to have_selector('h4', text: /Please review your current plan selection. Select PREVIOUS if /)
       expect(rendered).to have_content(/You must complete these steps to enroll/i)
     end
 

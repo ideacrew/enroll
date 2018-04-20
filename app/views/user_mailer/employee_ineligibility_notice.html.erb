@@ -1,6 +1,6 @@
 <html>
   <%= render :partial => "notices/shared/logo" %>
-  <span class="fssize1 health-connector-address" align="right" style="padding-right: 15px">"Notice No.SHOP_M009"%></span><br><br><br><br><br>
+  <span class="fssize1 health-connector-address" align="right" style="padding-right: 15px">"SHOP_M009"%></span><br><br><br><br><br>
    <span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span>
     <body>
       <b> ASSISTANCE ENROLLING IN EMPLOYER-SPONSORED HEALTH INSURANCE</b>
@@ -53,7 +53,7 @@
         </h2>
         You may appeal by completing an Appeal Request For <%= aca_state_name %> <%= site_short_name %> for Business, Employees Form, available at <%=site_main_web_address_text%>.<br>
         The form can be mailed or faxed.<br>
-        <strong>Mail:</strong> <%= site_short_name %> Appeals Unit, PO Box 960189, Boston, MA 02196<br>
+        <strong>Mail:</strong> <%= site_short_name %> <%= contact_center_appeal_name %>, <%= contact_center_appeal_address_one %>, <%= contact_center_appeal_city %>, <%= contact_center_appeal_state %> <%= contact_center_appeal_zip %><br>
         <strong>Fax:</strong> <%= contact_center_fax_number%>
 
         <h2 style="color: #007bc4;">
@@ -70,7 +70,7 @@
           Ending your Appeal Early
         </h2>
         You may withdraw your request for a hearing at any time before the hearing officer makes a final written decision. This includes before the hearing, potentially as a result of your informal resolution with the <%= site_short_name %>. To withdraw your request for a hearing, you must send a written withdrawal request, including your name and case number, to the <%= site_short_name %> by mail, e-mail, or fax.<br>
-        <strong>Mail:</strong> <%= site_short_name %> Appeals Unit, PO Box 960189, Boston, MA 02196<br>
+        <strong>Mail:</strong> <%= site_short_name %> <%= contact_center_appeal_name %>, <%= contact_center_appeal_address_one %>, <%= contact_center_appeal_city %>, <%= contact_center_appeal_state %> <%= contact_center_appeal_zip %><br>
         <strong>Email:</strong><a mail_to="#{contact_center_appeals_link}"><%= contact_center_appeals_link %></a><br>
         <strong>Fax:</strong> <%= contact_center_fax_number%>
 
@@ -79,6 +79,6 @@
     </body>
 </html>
 <br><br>
-<%= render "user_mailer/shared/non_discrimination_language" %>
+<%= render "user_mailer/shared/non_discrimination" %>
 <br><br>
-<%= render "user_mailer/shared/non_discrimination_taglines" %>
+<%= render "user_mailer/shared/taglines" %>

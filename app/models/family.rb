@@ -17,6 +17,7 @@ class Family
   # include Mongoid::Versioning
   include Sortable
   include Mongoid::Autoinc
+  include DocumentsVerificationStatus
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -35,6 +36,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :min_verification_due_date, type: Date, default: nil
+  field :vlp_documents_status, type: String
 
   belongs_to  :person
 
@@ -84,6 +87,7 @@ class Family
          },
          {name: "kind_and_state_and_created_and_terminated"})
 
+  index({"households.hbx_enrollments._id" => 1})
   index({"households.hbx_enrollments.kind" => 1,
          "households.hbx_enrollments.aasm_state" => 1,
          "households.hbx_enrollments.coverage_kind" => 1,
@@ -187,7 +191,15 @@ class Family
   scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
-
+  scope :having_unverified_enrollment,          ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+  scope :with_all_verifications,                ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "ready"}})}
+  scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
+  scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
+  scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+  scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
+  scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
+  scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -378,15 +390,14 @@ class Family
   def current_shop_eligible_open_enrollments(options = {})
     eligible_open_enrollments = []
 
-    if employee_roles = primary_applicant.try(:person).try(:employee_roles) # TODO only active employee roles
-      employee_roles.each do |employee_role|
-        if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
-          (employer_profile = employee_role.try(:employer_profile))
-          employer_profile.try(:published_plan_year).try(:enrolling?) &&
-          benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
+    active_employee_roles = primary_applicant.person.active_employee_roles if primary_applicant.present?
+    active_employee_roles.each do |employee_role|
+      if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
+        (employer_profile = employee_role.try(:employer_profile))
+        employer_profile.try(:published_plan_year).try(:enrolling?) &&
+        benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
 
-          eligible_open_enrollments << EnrollmentEligibilityReason.new(employer_profile)
-        end
+        eligible_open_enrollments << EnrollmentEligibilityReason.new(employer_profile)
       end
     end
 
@@ -428,6 +439,11 @@ class Family
   # @return [ Array<SpecialEnrollmentPeriod> ] The SEP eligibilities active on today's date
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
+  end
+
+
+  def latest_active_sep
+    special_enrollment_periods.order_by(:submitted_at.desc).detect{ |sep| sep.is_active? }
   end
 
   # Get list of HBX Admin assigned {SpecialEnrollmentPeriod} (SEP) eligibilities currently available to this family
@@ -752,6 +768,28 @@ class Family
     def advance_day(new_date)
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
+      send_enrollment_notice_for_ivl(new_date)
+    end
+
+    def send_enrollment_notice_for_ivl(new_date)
+      start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
+      end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
+      families = Family.where({
+        "households.hbx_enrollments" => {
+          "$elemMatch" => {
+            "kind" => "individual",
+            "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
+            "created_at" => { "$gte" => start_time, "$lte" => end_time},
+        } }
+      })
+      families.each do |family|
+        begin
+          person = family.primary_applicant.person
+          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
+        end
+      end
     end
 
     def find_by_employee_role(employee_role)
@@ -832,15 +870,6 @@ class Family
       end
     end
   end
-
-  def enrolled_hbx_enrollments
-    latest_household.try(:enrolled_hbx_enrollments)
-  end
-
-  def enrolled_including_waived_hbx_enrollments
-    latest_household.try(:enrolled_including_waived_hbx_enrollments)
-  end
-
 
   def save_relevant_coverage_households
     households.each do |household|
@@ -931,6 +960,108 @@ class Family
         build_consumer_role(member)
       end
     end
+  end
+
+  def best_verification_due_date
+    due_date = contingent_enrolled_family_members_due_dates.detect do |date|
+      date > TimeKeeper.date_of_record && (date.to_date.mjd - TimeKeeper.date_of_record.mjd) >= 30
+    end
+    due_date || contingent_enrolled_family_members_due_dates.last
+  end
+
+  def contingent_enrolled_family_members_due_dates
+    due_dates = []
+    contingent_enrolled_active_family_members.each do |family_member|
+      family_member.person.verification_types.each do |v_type|
+        due_dates << document_due_date(family_member, v_type)
+      end
+    end
+    due_dates.compact!
+    due_dates.uniq.sort
+  end
+
+  def min_verification_due_date_on_family
+    contingent_enrolled_family_members_due_dates.min.to_date if contingent_enrolled_family_members_due_dates.present?
+  end
+
+  def contingent_enrolled_active_family_members
+    enrolled_family_members = []
+    family_members.active.each do |family_member|
+      if enrolled_policy(family_member).present?
+        enrolled_family_members << family_member
+      end
+    end
+    enrolled_family_members
+  end
+
+  def document_due_date(family_member, v_type)
+    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
+    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
+    sv.present? ? sv.due_date : nil
+  end
+
+  def enrolled_policy(family_member)
+    enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+  end
+
+  def review_status
+    if active_household.hbx_enrollments.verification_needed.any?
+      active_household.hbx_enrollments.verification_needed.first.review_status
+    else
+      "no enrollment"
+    end
+  end
+
+  def person_has_an_active_enrollment?(person)
+    active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
+  end
+
+  def self.min_verification_due_date_range(start_date,end_date)
+    timekeeper_date = TimeKeeper.date_of_record + 95.days
+    if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
+      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
+    else
+     self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
+    end
+  end
+
+  def all_persons_vlp_documents_status
+    documents_list = []
+    document_status_outstanding = []
+    self.active_family_members.each do |member|
+      member.person.verification_types.each do |type|
+      if member.person.consumer_role && is_document_not_verified(type, member.person)
+        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
+        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+      end
+      end
+    end
+    case
+    when documents_list.include?(true) && documents_list.include?(false)
+      return "Partially Uploaded"
+    when documents_list.include?(true) && !documents_list.include?(false)
+      if document_status_outstanding.include?("outstanding")
+        return "Partially Uploaded"
+      else
+        return "Fully Uploaded"
+      end
+    when !documents_list.include?(true) && documents_list.include?(false)
+      return "None"
+    end
+  end
+
+  def update_family_document_status!
+    update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
+  end
+
+  def is_document_not_verified(type, person)
+    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified" &&
+    verification_type_status(type, person, person.hbx_staff_role?) != "curam"
+  end
+
+  def has_valid_e_case_id?
+    return false if !e_case_id
+    e_case_id.split('#').last.scan(/\D/).empty?
   end
 
 private

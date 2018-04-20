@@ -387,6 +387,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user)}
     let(:person) { FactoryGirl.create(:person, user: user) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let(:time_keeper_form) { instance_double(Forms::TimeKeeper) }
+
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -395,9 +397,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
     it "sends timekeeper a date" do
+      timekeeper_form_params = { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+      allow(Forms::TimeKeeper).to receive(:new).with(timekeeper_form_params).and_return(time_keeper_form)
+      allow(time_keeper_form).to receive(:forms_date_of_record).and_return(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
+      expect(time_keeper_form).to receive(:set_date_of_record).with(TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       sign_in(user)
-      expect(TimeKeeper).to receive(:set_date_of_record).with( TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d'))
       post :set_date, :forms_time_keeper => { :date_of_record =>  TimeKeeper.date_of_record.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
     end
@@ -536,6 +541,58 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
       it "should returns http success" do
         expect(:get => :general_agency_index).not_to be_routable
+      end
+    end
+  end
+
+  describe "GET get_user_info" do
+    let(:user) { double("User", :has_hbx_staff_role? => true)}
+    let(:person) { double("Person", id: double)}
+    let(:family_id) { double("Family_ID")}
+    let(:employer_id) { double("Employer_ID") }
+    let(:organization) { double("Organization")}
+
+    before do
+      sign_in user
+      allow(Person).to receive(:find).with("#{person.id}").and_return person
+    end
+
+    context "when action called through families datatable" do
+
+      before do
+        xhr :get, :get_user_info, family_actions_id: family_id, person_id: person.id
+      end
+
+      it "should populate the person instance variable" do
+        expect(assigns(:person)).to eq person
+      end
+
+      it "should populate the row id to instance variable" do
+        expect(assigns(:element_to_replace_id)).to eq "#{family_id}"
+      end
+    end
+
+    context "when action called through employers datatable" do
+
+      before do
+        allow(Organization).to receive(:find).and_return organization
+        xhr :get, :get_user_info, employers_action_id: employer_id, people_id: [person.id]
+      end
+
+      it "should not populate the person instance variable" do
+        expect(assigns(:person)).to eq nil
+      end
+
+      it "should populate the people instance variable" do
+        expect(assigns(:people).class).to eq Mongoid::Criteria
+      end
+
+      it "should populate the employer_actions instance variable" do
+        expect(assigns(:employer_actions)).to eq true
+      end
+
+      it "should populate the row id to instance variable" do
+        expect(assigns(:element_to_replace_id)).to eq "#{employer_id}"
       end
     end
   end

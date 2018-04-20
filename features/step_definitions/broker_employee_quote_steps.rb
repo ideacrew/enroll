@@ -64,7 +64,7 @@ Then(/^the broker should see the data in the table$/) do
 end
 
 Then(/^the broker enters the quote effective date$/) do
-  select "#{(Date.today+3.month).strftime("%B %Y")}", :from => "quote_start_on"
+  select "#{(TimeKeeper.date_of_record+3.month).strftime("%B %Y")}", :from => "quote_start_on"
 end
 
 When(/^the broker selects employer type$/) do
@@ -134,12 +134,12 @@ end
 Given(/^the Plans exist$/) do
   open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month + 1.day
   open_enrollment_end_on = open_enrollment_start_on + 12.days
-  start_on = open_enrollment_start_on + 1.months
+  start_on = open_enrollment_start_on + 2.months
   end_on = start_on + 1.year - 1.day
-  plan1 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
-  plan2 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
-  plan3 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
-  plan4 = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  plan1 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
+  plan2 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
+  plan3 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  plan4 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
   Caches::PlanDetails.load_record_cache!
 end
 

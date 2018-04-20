@@ -1,5 +1,8 @@
 class EmployerInvoice
   include InvoiceHelper
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
 
   attr_reader :errors
 
@@ -71,9 +74,15 @@ class EmployerInvoice
     File.delete(file)
   end
 
+  # It will trigger initial invoice notice
+  # Should trigger for regular employers but on conversion employers
+  # should not trigger with plan year is in renewal related states
+  # should trigger on conversion employers who has PlanYear::PUBLISHED
   def send_first_invoice_available_notice
-    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
+    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting_with_renewal_state? && (@organization.invoices.size < 1)
+      plan_year = @organization.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
+      observer = Observers::Observer.new
+      observer.trigger_notice(recipient: @organization.employer_profile, event_object: plan_year, notice_event: "initial_employer_invoice_available") if plan_year.present?
     end
   end
 
@@ -115,7 +124,7 @@ class EmployerInvoice
       Rails.root.join('tmp',current_month)
     end
   end
- 
+
   def invoice_absolute_file_path
     "#{invoice_folder_path}/#{invoice_file_name}"
   end

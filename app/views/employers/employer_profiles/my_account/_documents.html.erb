@@ -1,3 +1,4 @@
+<div class="row">
 
 <div class="col-xs-12">
   <h1>Verification of Employer Eligibility</h1>
@@ -6,11 +7,14 @@
   </p>
 </div>
 
-<div class="upload-document upload-document-location">
+<div class="col-xs-12">
+<div class="pull-right upload-document-location">
   <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
 </div>
+</div>
+</div>
 
-<div class= "effectivedatatable">
+<div class= "row effectivedatatable">
   <%= render_datatable(@datatable) %>
   <% @documents.each do |doc| %>
     <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

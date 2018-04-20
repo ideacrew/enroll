@@ -23,6 +23,7 @@ class Organization
   FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
   field :hbx_id, type: String
+  field :issuer_assigned_id, type: String
 
   # Registered legal name
   field :legal_name, type: String
@@ -214,6 +215,10 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
+  def primary_mailing_address
+    office_locations.map(&:address).detect{|add| add.kind == "mailing"}
+  end
+
   def self.search_by_general_agency(search_content)
     Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
   end
@@ -237,22 +242,107 @@ class Organization
     all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
-  def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil })
-    cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
+  def self.open_enrollment_year
+    if ("#{TimeKeeper.date_of_record.year}-11-01".to_date.."#{TimeKeeper.date_of_record.year}-12-31".to_date).cover?(TimeKeeper.date_of_record)
+      TimeKeeper.date_of_record.year + 1
+    else
+      TimeKeeper.date_of_record.year
+    end
+  end
+
+  def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+    cache_string = "load-carriers"
+    if (filters[:selected_carrier_level].present?)
+      cache_string << "-for-#{filters[:selected_carrier_level]}"
+    else
+      cache_string << ""
+    end
+
     if (filters[:primary_office_location].present?)
       office_location = filters[:primary_office_location]
-      cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+      cache_string << "-#{office_location.address.zip}-#{office_location.address.county}"
+    end
+
+    if filters[:active_year].present?
+      cache_string << "-carrier-names-at-#{filters[:active_year]}"
+    else
+      cache_string << "-carrier-names-at-#{TimeKeeper.date_of_record.year}"
     end
 
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        ## don't enable Tufts for now
+        next carrier_names if ["042674079"].include?(org.fein)
+
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+          if filters[:active_year]
+            if filters[:active_year].to_s == '2017'
+              # only include HNE, BMCHP, Fallon
+              next carrier_names if ['041045815','042452600','234547586'].include? org.fein
+            end
+            next carrier_names if CarrierServiceArea.valid_for_carrier_on(address: office_location.address, carrier_profile: org.carrier_profile, year: filters[:active_year]).empty?
+          end
         end
         if (filters[:sole_source_only]) ## Only sole source carriers requested
           next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
         end
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
+        carrier_names
+      end
+    end
+  end
+
+  def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+
+    if (filters[:selected_carrier_level].present?)
+      cache_string = "for-#{filters[:selected_carrier_level]}"
+    else
+      cache_string = ""
+    end
+
+    if (filters[:primary_office_location].present?)
+      office_location = filters[:primary_office_location]
+      cache_string << "-#{office_location.address.zip}-#{office_location.address.county}"
+    end
+
+    if filters[:active_year].present?
+      cache_string << "-carrier-names-at-#{filters[:active_year]}"
+    else
+      cache_string << "-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    end
+
+    Rails.cache.fetch(cache_string, expires_in: 2.hour) do
+      Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        ## don't enable Tufts for now
+        next carrier_names if ["042674079"].include?(org.fein)
+        unless (filters[:primary_office_location].nil?)
+          next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+          if filters[:active_year]
+            next carrier_names if CarrierServiceArea.valid_for_carrier_on(address: office_location.address, carrier_profile: org.carrier_profile, year: filters[:active_year]).empty?
+          end
+        end
+        if (filters[:sole_source_only]) ## Only sole source carriers requested
+          next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
+        end
+
+        if (filters[:active_year])
+          carrier_plans = Plan.valid_shop_health_plans("carrier", org.carrier_profile.id, filters[:active_year])
+        else
+          carrier_plans = Plan.valid_shop_health_plans("carrier", org.carrier_profile.id)
+        end
+
+        if (filters[:selected_carrier_level])
+          case filters[:selected_carrier_level]
+          when 'single_carrier'
+            carrier_plans.select! { |plan| plan.is_vertical }
+          when 'metal_level'
+            carrier_plans.select! { |plan| plan.is_horizontal }
+          when 'sole_source'
+            carrier_plans.select! { |plan| plan.is_sole_source }
+          end
+        end
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if carrier_plans.any?
         carrier_names
       end
     end
@@ -289,7 +379,7 @@ class Organization
     invoice_date = invoice_date(file_path) rescue nil
     org = by_invoice_filename(file_path) rescue nil
     if invoice_date && org && !invoice_exist?(invoice_date,org)
-      doc_uri = Aws::S3Storage.save(file_path, "invoices",file_name)
+      doc_uri = Aws::S3Storage.save(file_path, "invoices", file_name)
       if doc_uri
         document = Document.new
         document.identifier = doc_uri
@@ -306,6 +396,28 @@ class Organization
     end
   end
 
+
+  def self.upload_commission_statement(file_path,file_name)
+    statement_date = commission_statement_date(file_path) rescue nil
+    org = by_commission_statement_filename(file_path) rescue nil
+    if statement_date && org && !commission_statement_exist?(statement_date,org)
+      doc_uri = Aws::S3Storage.save(file_path, "commission-statements", file_name)
+      if doc_uri
+        document = Document.new
+        document.identifier = doc_uri
+        document.date = statement_date
+        document.format = 'application/pdf'
+        document.subject = 'commission-statement'
+        document.title = File.basename(file_path)
+        org.documents << document
+        logger.debug "associated commission statement #{file_path} with the Organization"
+        return document
+      end
+    else
+      logger.warn("Unable to associate commission statement #{file_path}")
+    end
+  end
+
   def self.upload_invoice_to_print_vendor(file_path,file_name)
     org = by_invoice_filename(file_path) rescue nil
     if org.employer_profile.is_converting?
@@ -319,6 +431,8 @@ class Organization
   end
 
   # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
+  # Also using this when uploading broker commision statements where the file_path
+  # string is a file_name with format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
   # Returns Organization
   def self.by_invoice_filename(file_path)
     hbx_id= File.basename(file_path).split("_")[0]
@@ -336,6 +450,28 @@ class Organization
     docs =org.documents.where("date" => invoice_date)
     matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
     return true if matching_documents.count > 0
+  end
+
+  def self.commission_statement_exist?(statement_date,org)
+    docs =org.documents.where("date" => statement_date)
+    matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
+    return true if matching_documents.count > 0
+  end
+
+  # Expects file_path string with file_name format /hbx_id_mmddyyyy_commission_NUM-NUM_R.pdf
+  # Returns date
+  # added to decouple functionality from similar method with invoice flow
+  def self.commission_statement_date(file_path)
+    date_string = File.basename(file_path).split("_")[1]
+    Date.strptime(date_string, "%m%d%Y")
+  end
+
+  # Expects file_path string with file_name format /npm_nfpinternalid_mmddyyyy_commission_NUM-NUM_R.pdf
+  # returns organization associated with broker_profile_id
+  def self.by_commission_statement_filename(file_path)
+    npn = File.basename(file_path).split("_")[0]
+    broker_profile_id = BrokerRole.find_by_npn(npn).broker_agency_profile_id
+    BrokerAgencyProfile.get_organization_from_broker_profile_id(broker_profile_id)
   end
 
   def office_location_kinds

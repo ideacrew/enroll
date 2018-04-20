@@ -1,4 +1,9 @@
 module Config::SiteHelper
+
+  def site_redirect_on_timeout_route
+    Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
+  end
+
   def site_byline
     Settings.site.byline
   end
@@ -11,6 +16,10 @@ module Config::SiteHelper
     Settings.site.website_name
   end
 
+  def site_website_link
+    link_to site_website_name, site_website_name
+  end
+
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
@@ -19,8 +28,20 @@ module Config::SiteHelper
     site_home_url + "/find-expert"
   end
 
+  def site_home_business_url
+    Settings.site.home_business_url
+  end
+
   def site_home_url
     Settings.site.home_url
+  end
+
+  def site_curam_enabled?
+    Settings.site.curam_enabled
+  end
+
+  def site_brokers_agreement_path
+    link_to "#{Settings.aca.state_name} #{Settings.site.short_name} Broker Agreement", Settings.site.terms_and_conditions_url
   end
 
   def site_home_link
@@ -43,10 +64,6 @@ module Config::SiteHelper
     Settings.site.nondiscrimination_notice_url
   end
 
-  def link_to_site_business_resource_center
-    link_to "Business Resource Center", site_business_resource_center_url
-  end
-    
   def site_policies_url
     Settings.site.policies_url
   end
@@ -60,7 +77,11 @@ module Config::SiteHelper
   end
 
   def site_registration_path(resource_name, params)
-    Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+    if Settings.site.registration_path.present? && ENV['AWS_ENV'] == 'prod'
+       Settings.site.registration_path
+    else
+      new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+    end
   end
 
   def site_long_name
@@ -99,6 +120,14 @@ module Config::SiteHelper
     Settings.site.ivl_login_url
   end
 
+  def site_main_web_address_url
+     Settings.site.main_web_address_url
+  end
+
+  def site_make_their_premium_payments_online
+    Settings.site.make_their_premium_payments_online
+  end
+
   def site_uses_default_devise_path?
     Settings.site.use_default_devise_path
   end
@@ -123,11 +152,19 @@ module Config::SiteHelper
     mail_to non_discrimination_email, non_discrimination_email
   end
 
+  def site_employer_application_deadline_link
+    Settings.site.employer_application_deadline_link
+  end
+
   def site_non_discrimination_complaint_url
     link_to non_discrimination_complaint_url, non_discrimination_complaint_url
   end
 
   def site_document_verification_checklist_url
     Settings.site.document_verification_checklist_url
+  end
+
+  def site_invoice_bill_url
+    Settings.site.invoice_bill_url
   end
 end

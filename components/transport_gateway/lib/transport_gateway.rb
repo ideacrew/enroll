@@ -20,5 +20,10 @@ module URI
   @@schemes['S3'] = S3
 end
 
+# Provides the raw underlying plumbing for transfering resources.
+#
+# You probably don't want this.
+# 
+# If you are looking to create a workflow that moves artifacts, your starting point is subclassing {TransportProfiles::Processes::Process}.
 module TransportGateway
 end

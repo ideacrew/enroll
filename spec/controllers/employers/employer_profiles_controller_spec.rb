@@ -261,6 +261,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(user).to receive(:save).and_return(true)
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:show_plan_year).and_return(plan_year)
+        allow(employer_profile).to receive(:renewing_published_plan_year).and_return(plan_year)
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
@@ -435,6 +436,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(@user).to receive(:switch_to_idp!)
       allow(Forms::EmployerProfile).to receive(:new).and_return(organization)
       allow(organization).to receive(:save).and_return(save_result)
+      allow(organization).to receive_message_chain(:employer_profile, :trigger_shop_notices){ true }
 
     end
     describe 'updateable organization' do
@@ -508,7 +510,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
       sign_in @user
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
-
+      allow(found_employer).to receive_message_chain(:employer_profile, :trigger_shop_notices).and_return(true)
       allow(@user).to receive(:switch_to_idp!)
 #      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
 #      allow(found_employer).to receive(:organization).and_return(organization)

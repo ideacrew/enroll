@@ -3,7 +3,7 @@
   <b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the Massachusetts <%= site_short_name %></b>
 <br/>
 <br/>
-<div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
+<div>Dear <%= census_employee.first_name.humanize.titleize %>,</div>
 <br/><br/>
   Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored health insurance through the <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>
@@ -18,7 +18,7 @@
   <br/>
   <b>To See Plan Options and Enroll: </b>
   <br/>
-  To complete the application process, please follow the steps below. You can also use our <b>Employee guide to enrolling</b> for help with this process. You can find this guide in our online Business Resource Center. 
+  To complete the application process, please follow the steps below. You can also use our <b>Employee guide to enrolling</b> for help with this process. You can find this guide in our online <%= link_to_site_business_resource_center %>.
   <br/>
   <table class="total_table" border="0">
     <tbody>
@@ -26,7 +26,7 @@
         <td>
           <ul>
           <li style="margin-top: 0px;">
-            Go to <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %> 
+            Go to <%= site_website_address %>
           </li>
           <li style="margin-top: 5px;">
             Log-in or create an account as an employee
@@ -43,10 +43,10 @@
     </tbody>
   </table>
 
-  <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Instructions for how to waive coverage are included in our <b>Employee guide to waiving coverage</b>, also available in the Business Resource Center.
+  <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Instructions for how to waive coverage are included in our <b>Employee guide to waiving coverage</b>, also available in the <%= link_to_site_business_resource_center %>.
 
   <b>What If I Already Have Coverage through the <%= site_short_name %>?</b>
-  If you currently have individual market coverage through the <%= site_short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage, you will need to contact the <%= site_short_name %> at <%= contact_center_ivl_number %>. 
+  If you currently have individual market coverage through the <%= site_short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage, you will need to contact the <%= site_short_name %> at <%= contact_center_ivl_number %>.
 
   <h2 style="color: #007bc4;">
     For Questions or Assistance:
@@ -57,36 +57,38 @@
     <li>By calling <%= contact_center_phone_number %>. TTY: <%= contact_center_tty_number %></li>
     <li> By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%> </li>
   </ul>
-  You can also find more information on our website at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>.
+  You can also find more information on our website at <%= site_website_address %>.
   <br/>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
-  <% location = broker.organization.primary_office_location %>
-  <% if broker.present? && broker.primary_broker_role.person.present? && location.present? %>
-    <table style="width: 100%">
-      <tr>
-        <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
-        <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= broker.organization.legal_name.titleize %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= location.try(:phone) %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= location.try(:email) %></td>
-      </tr>
-    </table>
+  <% if broker.present? %>
+    <% location = broker.organization.primary_office_location %>
+    <% if broker.primary_broker_role.person.present? && location.present? %>
+      <table style="width: 100%">
+        <tr>
+          <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
+          <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= broker.organization.legal_name.titleize %></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= location.try(:phone) %></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= location.try(:email) %></td>
+        </tr>
+      </table>
 
+    <% end %>
   <% end %>
   This notice is being provided in accordance with 45 CFR 155.725.
 </div>
 </body>
 </html>
 <br/><br/>
- <%= render "user_mailer/shared/non_discrimination_language" %>
+ <%= render "user_mailer/shared/taglines" %>
  <br/><br/>
- <%= render "user_mailer/shared/non_discrimination_taglines" %>
+ <%= render "user_mailer/shared/non_discrimination" %>

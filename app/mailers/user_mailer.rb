@@ -32,24 +32,28 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  #Email will sent to census employees as soon as they are added to the roster
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
-    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
-    if email.present?
-      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
-        if census_employee.hired_on > TimeKeeper.date_of_record
-          format.html { render "invitation_email", :locals => { :person_name => census_employee.full_name, :invitation => invitation }}
-        elsif census_employee.hired_on <= TimeKeeper.date_of_record && plan_years.any?{|py| py.employees_are_matchable?}
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_effective_date)}
+    if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
+      if (census_employee.hired_on > TimeKeeper.date_of_record)
+        mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{Settings.site.long_name}"}) do |format|
+          format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+        end
+      else
+        mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
           format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
         end
       end
     end
   end
 
+  #Email will be sent to census employees when they reach the DOH.
   def send_future_employee_open_enrollment_invitation(email, census_employee, invitation)
-    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_effective_date)}
     if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
-      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
-        format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
+        format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
       end
     end
   end
@@ -115,9 +119,30 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def generic_notice_alert(first_name, notice_subject, email)
-    mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
+
+  def generic_notice_alert(first_name, notice_subject, email, files_to_attach={})
+    files_to_attach.each do |file_name, file_path|
+      attachments["#{file_name}"] = File.read(file_path)
+    end
+    message =  mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
+    end
+  end
+
+
+  # def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
+  #   if email.present?
+  #     message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+  #       format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
+  #     end
+  #   end
+  # end
+
+  def generic_notice_alert_to_ba(first_name, email, employer_name)
+    if email.present?
+      message = mail({to: email, subject: "You have a new message from #{site_short_name}", from: 'noreply@healthconnector.org'}) do |format|
+       format.html {render "generic_notice_alert_to_broker", locals: {first_name: first_name, employer_name: employer_name}}
+      end
     end
   end
 

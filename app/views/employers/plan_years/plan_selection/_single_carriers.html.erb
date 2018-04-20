@@ -23,7 +23,7 @@
         <div class="panel-body">
           <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
           <span class="plan-label">Carrier: </span><span><%= @carriers_cache[plan.carrier_profile_id] %></span><br>
-          <span class="plan-label">Level: </span><span><%= plan.metal_level %></span><br>
+          <span class="plan-label">Level: </span><span><%= plan.metal_level.titleize %></span><br>
           <span class="plan-label">Network: </span>
           <span>
             <%= render partial: "shared/network_data", locals: {plan: plan, plans: @plans} %>

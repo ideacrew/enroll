@@ -1,4 +1,5 @@
 var plan_year_selection_loader;
+
 ready = function() {
 
   // match health with dental offering selections
@@ -59,7 +60,7 @@ ready = function() {
 
   // js that runs on edit view
   if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
-
+    onlyShowEnabledCarrierChoices();
     // add dental button for missing dental plans
     $('.edit-add-dental span').on('click', function() {
       $(this).closest('.row').slideUp();
@@ -195,11 +196,14 @@ ready = function() {
         if (plan_option_kind === 'sole_source') {
           premium_pcts.push(premium_pcts[premium_pcts.length - 1]);
           premium_pcts.push(premium_pcts[premium_pcts.length - 1]);
+          is_offered.push(is_offered[is_offered.length - 1]);
+          is_offered.push(is_offered[is_offered.length - 1]);
 
           composite_rating_tier_types.forEach(function(compositeTierType, index, composite_tier_types) {
             relation_benefits[index] = {
               "composite_rating_tier": compositeTierType,
-              "employer_contribution_percent": premium_pcts[index]
+              "employer_contribution_percent": premium_pcts[index],
+              "offered": is_offered[index]
             }
           });
         } else {
@@ -277,7 +281,8 @@ ready = function() {
 
   });
 
-  $(".benefits-fields .slider").on("slideStop", function(slideEvt) {
+  $(".plan-year-setup .benefits-fields .slider").on("slideStop", function(slideEvt) {
+
     $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
     $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
 
@@ -316,7 +321,7 @@ ready = function() {
     });
 
     // MAKE SLIDER AND ADJACENT INPUT FIELD MIRROR EACHOTHER
-    $(document).on('change', 'input.premium-storage-input', function() {
+    $(document).on('change', '.plan-year-setup input.premium-storage-input', function() {
       if ( $(this).hasClass('slider') ) {
         $(this).on("slideStop", function(slideEvt) {
           var data = $(this).val();
@@ -388,7 +393,7 @@ ready = function() {
 
       });
 
-    $(document).on('change', '.nav-tabs li input', function() {
+    $(document).on('change', '.health .nav-tabs li input', function() {
       if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
         EmployerProfile.validateEditPlanYear();
 
@@ -433,7 +438,7 @@ ready = function() {
 
     //toggle plan options checkbox through parent anchor
 
-    $(document).on('click', '.plan-options a', function() {
+    $(document).on('click', '.health .plan-options a', function() {
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
         if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
           EmployerProfile.validateEditPlanYear();
@@ -623,7 +628,6 @@ function calcEmployerContributions(url, location, coverage_type) {
 
   var composite_rating_tier_types = [ 'employee_only', 'family', 'employee_and_spouse', 'employee_and_one_or_more_dependents']
   var relationship_benefit_types = [ 'employee', 'spouse', 'domestic_partner', 'child_under_26', 'child_26_and_over']
-
   relation_benefits = {};
 
   if (plan_option_kind === 'sole_source') {
@@ -703,7 +707,73 @@ function attachEmployerHealthContributionShowHide() {
 	});
 }
 
+function confirmActivePlanYear() {
+  var planYear = $('#plan_year_start_on').val() || "0000"
+  planYear = planYear.substr(0,4);
+
+  if($.inArray(planYear, <%= Settings.aca.dental_plan_years_available %>) !== -1){
+    $(".show-dental-plans").show();
+  }else{
+    $(".show-dental-plans").hide();
+  }
+}
+
+function loadCarrierNames() {
+  var start_on = $("#plan_year_start_on").val().substr(0,4);
+  var selected_carrier_level = $(this).siblings('input').val();
+  var employer_profile_id = $('#employerProfileId').data('value');
+  var benefit_group_id = $('#benefitGroupId').data('value');
+  var location_id = $(this).closest('fieldset').attr('id');
+  $.ajax({
+    type: "GET",
+    data:{
+      start_on: start_on,
+      selected_carrier_level: selected_carrier_level,
+      benefit_group: benefit_group_id,
+      location_id: location_id
+    },
+    url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
+  });
+}
+
+function onlyShowEnabledCarrierChoices() {
+  var enabledYearsForSoleSource = <%= Settings.aca.plan_option_years.sole_source_carriers_available || [TimeKeeper.date_of_record.year.to_s] %>;
+  var enabledYearsForMetalLevel = <%= Settings.aca.plan_option_years.metal_level_carriers_available || [TimeKeeper.date_of_record.year.to_s] %>;
+  var enabledYearsForSingleCarrier = <%= Settings.aca.plan_option_years.single_carriers_available || [TimeKeeper.date_of_record.year.to_s] %>;
+  var startOnYear = parseInt($("#plan_year_start_on").val()).toString();
+  <% if Rails.env == 'test' %>
+    var soleSourceEnabled = true;
+    var singleCarrierEnabled = true;
+    var metalLevelEnabled = true;
+  <% else %>
+    var soleSourceEnabled = (enabledYearsForSoleSource.indexOf(startOnYear) != -1);
+    var singleCarrierEnabled = (enabledYearsForSingleCarrier.indexOf(startOnYear) != -1);
+    var metalLevelEnabled = (enabledYearsForMetalLevel.indexOf(startOnYear) != -1);
+  <% end %>
+
+  if (soleSourceEnabled) {
+    $('li.sole-source-tab').removeClass('hidden');
+  } else {
+    $('li.sole-source-tab').addClass('hidden');
+  }
+
+  if (metalLevelEnabled) {
+    $('li.metal-level-tab').removeClass('hidden');
+  } else {
+    $('li.metal-level-tab').addClass('hidden');
+  }
+
+  if (singleCarrierEnabled) {
+    $('li.single-carrier-tab').removeClass('hidden');
+  } else {
+    $('li.single-carrier-tab').addClass('hidden');
+  }
+
+}
 
 $(document).ready(ready);
 $(document).on('page:load', plan_year_selection_loader);
 $(document).on('ready', attachEmployerHealthContributionShowHide);
+$(document).on('ready', confirmActivePlanYear);
+$(document).on('click','.health .nav-tabs label', loadCarrierNames);
+$(document).on('change','#plan_year_start_on', onlyShowEnabledCarrierChoices);

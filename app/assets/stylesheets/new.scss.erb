@@ -1,6 +1,6 @@
 @import "variables";
 // employer portal
-#home {
+#home, .plan_design_proposals {
   nav {
     ul {
       background-color: $brand-primary;
@@ -39,9 +39,6 @@
   }
   .employees-tab {
     .col-xs-12 {
-      &:first-of-type {
-        margin-bottom: 35px;
-      }
       .button-group-wrapper {
         margin-bottom: 0;
       }
@@ -736,6 +733,7 @@
     }
 
     }
+
     ul.nav.nav-tabs, .plan-options .col-xs-3 a {
       border-bottom: none;
       li {
@@ -1231,13 +1229,9 @@
   }
   .add-new-employees{
     text-align: right;
-    top: 80px;
     margin-left: 15%;
   }
-  .upload-document{
-      text-align: right;
-      margin-left: 16%;
-  }
+
   .document-modal{
      width: 900px;
      .document-modal-body{
@@ -1528,4 +1522,11 @@
   .plan-details {
     display: none;
   }
+}
+
+.carrier-list-container .loading {
+  position: relative;
+  padding-top: 30px;
+  top: 50%;
+  text-align: center;
 }

@@ -6,6 +6,7 @@ html {
 * {
     font-family: 'Open Sans', sans-serif;
 }
+
 body {
     background-color: #f2f2f2;
     min-height: 100%;
@@ -13,10 +14,17 @@ body {
     padding-bottom: 70px;
 }
 
-h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
-#new_person_wrapper p, .group-selection p {
-  font-weight: 300;
-}
+h1, h2, h3, h4, h5, h6
+  {
+    font-family: 'Roboto Slab', serif;
+    font-weight: 300;
+    line-height: 1.6em;
+    }
+
+  #new_person_wrapper p, .group-selection p {
+    font-weight: 300;
+  }
+
 .navbar-default {
     background-color: #eee;
     background-image: none;
@@ -561,6 +569,7 @@ a.family{
 }
 .input-lg, .form-group-lg .form-control{
   border-radius: 0;
+  height: 48px;
   border: none !important;
   font-size: 14px !important;
   font-weight: 300 !important;
@@ -1432,6 +1441,14 @@ a.close-1, a.close-2{
 .navbar-nav li li{
   display: block;
 }
+.nav-list .container {
+  padding-left: 0px;
+  padding-right: 0px;
+  width: inherit;
+  ul {
+    padding-left: 3%;
+  }
+}
 .social.aktif.open > a, .social.aktif.open > a:focus{
   background-color: rgba(0,0,0,0);
 }
@@ -2094,7 +2111,23 @@ input[type="checkbox"] + h4.agree {
 }
 
 .mainmenu {
-    background: $brand-primary none repeat scroll 0 0;
+    background: $mhc-dark-blue none repeat scroll 0 0;
+
+    li.dropdown {
+      a.dropdown-toggle {
+        span {
+          display: inline-block;
+        }
+      }
+      ul.dropdown-menu {
+        li {
+          padding: 2%;
+          a {
+            color: #5C5C5C;
+          }
+        }
+      }
+    }
 }
 .submenu {
     background: #00a3d9 none repeat scroll 0 0;
@@ -4581,18 +4614,16 @@ table.table.table-no-sytle td {
 .carousel-control {
   width: 10%;
 }
-.carousel-control img {
+
+.carousel-control .fa {
+  color: #005e81;
   position: absolute;
   top: 35%;
   z-index: 5;
   display: inline-block;
-  &.left {
-    right: 0;
-  }
-  &.right {
-    left: 0;
-  }
+
 }
+
 .carousel-control .icon-prev,
 .carousel-control .fa-angle-left {
   left: 50%;

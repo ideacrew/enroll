@@ -44,6 +44,10 @@ FactoryGirl.define do
     end
   end
 
+  trait :with_hbx_staff_role do
+    roles ["hbx_staff"]
+  end
+
   trait :consumer do
     roles ["consumer"]
   end

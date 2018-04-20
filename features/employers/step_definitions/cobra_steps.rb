@@ -18,6 +18,7 @@ def people_for_cobra
       password: 'aA1!aA1!aA1!'
     },
     "Jack Doe" => {
+      username: "JackDoe123",
       first_name: "Jack",
       last_name: "Doe",
       dob: '10/11/1978',
@@ -47,6 +48,27 @@ When(/^(.*) create a new account for employer$/) do |named_person|
   find(".interaction-click-control-create-account").click
 end
 
+Then(/^I fill employer signup form for (.*?)$/) do |named_person|
+  find('.interaction-click-control-create-account').click
+  person = people_for_cobra[named_person]
+  fill_in "user[oim_id]", :with => person[:username]
+  fill_in "user[password]", :with => person[:password]
+  fill_in "user[password_confirmation]", :with => person[:password]
+  sleep 1
+end
+
+Then(/^I can see the optional Email field$/) do
+  find('.interaction-field-control-user-email', visible: true)
+end
+
+Then(/^I fill out the email address with (.*?)$/) do |email|
+  fill_in 'user[email]', with: email
+end
+
+Then 'I submit button to create account' do
+  find('.interaction-click-control-create-account').click
+end
+
 Then(/^Employer should see a form to enter information about employee, address and dependents details for Jack Cobra$/) do
   person = people_for_cobra['Jack Cobra']
   # Census Employee
@@ -74,7 +96,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/b').click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "01002"
@@ -188,11 +210,11 @@ And(/^.+ should see the status of Cobra Linked$/) do
 end
 
 And(/^.+ should see the status of Employee Role Linked$/) do
-  expect(page).to have_content('Employee role linked')
+  expect(page).to have_content('Account Linked')
 end
 
 And(/^.+ should see the status of eligible$/) do
-  expect(page).to have_content('Eligible')
+  expect(page).to have_content('eligible')
 end
 
 Then(/^Jack Cobra should see the receipt page and verify employer contribution for cobra employee$/) do
@@ -338,9 +360,10 @@ Then(/^.+ should not see individual on enrollment title/) do
   expect(page).not_to have_content("Individual & Family")
 end
 
-def enter_plan_year_info
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
+And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -365,13 +388,35 @@ And(/^.+ should be able to enter sole source plan year, benefits, relationship b
   wait_for_ajax
   find('.sole-source-plan-tab a').click
   wait_for_ajax
+
   find('.reference-plans label').click
+
   wait_for_ajax
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][0][employer_contribution_percent]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50
 
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
+end
+
+def enter_plan_year_info
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
+
+  screenshot("employer_add_plan_year")
+  find('.interaction-field-control-plan-year-fte-count').click
+
+  fill_in "plan_year[fte_count]", :with => "35"
+  fill_in "plan_year[pte_count]", :with => "15"
+  fill_in "plan_year[msp_count]", :with => "3"
+
+  find('.interaction-click-control-continue').click
+
+  # Benefit Group
+  fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
+
+  find('.interaction-choice-control-plan-year-start-on', :visible => true).click
+  find('li.interaction-choice-control-plan-year-start-on-1').click
 end
 
 And(/^.+ should be able to enter single carrier plan year, benefits, relationship benefits for cobra$/) do

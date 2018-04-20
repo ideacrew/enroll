@@ -8,7 +8,7 @@
     <% end %>
     <%# show_residency_alert = false %>
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
-        <% if @benefit_group.sole_source? %>
+        <% if @benefit_group.sole_source? && coverage_kind == 'health' %>
         <% is_coverage = offered_relationship_benefits.present? ? composite_relationship_check(offered_relationship_benefits, family_member, @new_effective_on) : true
            is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
            is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
@@ -24,7 +24,7 @@
             <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
           </td>
           <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
-          <td><%= "This dependent is ineligible for employer-sponsored #{coverage_kind} coverage."  if !is_coverage %></td>
+          <td><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: coverage_kind) if !is_coverage %></td>
         </tr>
     <% end %>
   </tbody>

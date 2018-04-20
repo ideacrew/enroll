@@ -37,7 +37,7 @@
       <% end %>
 
       <div class="module employer-staff-table <%= pundit_class(EmployerProfile, :updateable?)%>">
-        <p class="twenty">Employer Staff Points-of-Contact</p>
+        <h3>Employer Staff Points-of-Contact</h3>
         <div class='table-responsive col-12' >
           <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
             <thead style='height: 40px;'>
@@ -57,7 +57,7 @@
                 </td>
                 <td>
                   <% phone = staff.phones.detect{|phone| phone.kind == 'work'} %>
-                  <%= phone && (phone.area_code.to_s + phone.number + (phone.extension? ? ' x'+phone.extension : '')) %>
+                  <%= phone && phone.to_s %>
                 <td>
                   <% role = staff.employer_staff_roles.detect{|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                   <%= role && role.current_state %>
@@ -110,18 +110,17 @@
         </div>
 
         <br/>
-        <p class="twenty"> Employer Information</p>
+        <h3> Employer Information</h3>
         <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
           <%= render "shared/employer_profile_fields", f: emp %><br>
         <% end %>
 
-        <h3> Office Locations </h3>
+        <h2> Office Locations </h2>
         <% @row = false %>
         <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location,block| %>
           <%= render partial: 'shared/office_location_fields', locals: {f: office_location, child_index: f.object.office_locations.length - 1} %>
           <% @row = true %>
         <% end %>
-
         <div class="form-inputs">
           <%= pundit_span(EmployerProfile,:updateable?) %>
              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default btn-sm' %>

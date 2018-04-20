@@ -79,11 +79,7 @@ module InvoiceHelper
 
     @pdf.start_new_page
 
-    if @employer_profile.is_converting?
-      payment_page_for_conversion_employer
-    elsif @employer_profile.published_plan_year && @employer_profile.published_plan_year.is_renewing?
-      payment_page_for_renewing_employer
-    else
+    if @employer_profile
       payment_page_for_initial_employer
     end
 
@@ -147,7 +143,7 @@ module InvoiceHelper
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Questions? Call the Health Connector Customer Service at 888-813-9220, go online to MAhealthconnector.org, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
+        @pdf.text_box "Questions? Call the Health Connector Customer Service at 888-813-9220, go online to #{site_website_name}, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
       }
     end
 
@@ -230,184 +226,12 @@ module InvoiceHelper
     end
   end
 
-  def payment_page_for_renewing_employer
-    cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/health_connector.png'
-    initial_y = @pdf.cursor
-    initialmove_y = 25
-    address_x = 15
-    lineheight_y = 12
-    font_size = 11
-    address_x_pos = mm2pt(21.83)
-    address_y_pos = 790.86 - mm2pt(57.15) - 65
-    mpi_x_pos = mm2pt(6.15)
-    mpi_y_pos = 57
-    @pdf.font "Times-Roman"
-    @pdf.font_size font_size
-
-    invoice_header_x = 275
-    activity_header_x = 275
-    logo_x = 360
-    cheque_amount_path_x = 350
-    @pdf.move_down 36
-
-    @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
-      invoice_header_data = [
-        ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
-        ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
-        ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
-        ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
-      ]
-    dchbx_table_light_blue(invoice_header_data,invoice_header_x)
-
-    address = mailing_or_primary_address(@organization)
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 620]
-    if address
-      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 608]
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 596]
-    end
-    @pdf.move_down 24
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 36
-    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on the Massachusetts Health Connector as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on the Massachusetts Health Connector. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from the Massachusetts Health Connector. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
-
-    @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
-    @pdf.move_down 24
-    @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 24
-    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
-    @pdf.move_down 24
-    @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 24
-    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
-    @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
-    @pdf.move_down lineheight_y
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
-    @pdf.move_down 24
-    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 36
-
-    @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
-    stroke_dashed_horizontal_line(10, 225)
-    @pdf.move_down 24
-
-    @pdf.image logopath, :width => 150, :at => [logo_x, @pdf.cursor]
-
-    dchbx_table_light_blue(invoice_header_data,address_x)
-
-    @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
-    @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
-
-    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  48]
-    @pdf.text_box "PO Box 780833", :at => [320,  36]
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  24]
-
-    address = mailing_or_primary_address(@organization)
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
-    if address
-      @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.address_1}", :at => [address_x, 36]
-      @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 24]
-    end
-  end
-
   def mailing_or_primary_address(organization)
     office_locations = organization.try(:office_locations)
     mailing_office_locations, primary_office_locations = office_locations.partition { |ol| ol.address.mailing? }
     mailing_office_locations.present? ? mailing_office_locations.first.address : primary_office_locations.first.address
   end
 
-  def payment_page_for_conversion_employer
-    cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/health_connector.png'
-    initial_y = @pdf.cursor
-    initialmove_y = 25
-    address_x = 15
-    lineheight_y = 12
-    font_size = 11
-    address_x_pos = mm2pt(21.83)
-    address_y_pos = 790.86 - mm2pt(57.15) - 65
-    mpi_x_pos = mm2pt(6.15)
-    mpi_y_pos = 57
-    @pdf.font "Times-Roman"
-    @pdf.font_size font_size
-
-    invoice_header_x = 275
-    activity_header_x = 275
-    logo_x = 360
-    cheque_amount_path_x = 350
-    @pdf.move_down 12
-
-    @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
-      invoice_header_data = [
-        ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
-        ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
-        ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
-        ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        ["DATE DUE:", "#{DateTime.now.end_of_month.strftime("%m/%d/%Y")}"]
-      ]
-    dchbx_table_light_blue(invoice_header_data,invoice_header_x)
-
-    address = mailing_or_primary_address(@organization)
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 632]
-    if address
-      @pdf.text_box "#{address.address_1},#{address.address_2}", :at => [address_x, 620]
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 608]
-    end
-
-    @pdf.move_down 36
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 36
-    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on the Massachusetts Health Connector as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on the Massachusetts Health Connector. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from the Massachusetts Health Connector. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 72
-    @pdf.text_box "You will now receive a monthly invoice from the Massachusetts Health Connector. Payments should be directed to the Massachusetts Health Connector for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of the Massachusetts Health Connector. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 72
-    @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
-    @pdf.move_down 24
-    @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 24
-    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
-    @pdf.move_down 24
-    @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 24
-    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
-    @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
-    @pdf.move_down lineheight_y
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
-    @pdf.move_down 24
-    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
-    @pdf.move_down 24
-
-    @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
-    stroke_dashed_horizontal_line(10, 225)
-    @pdf.move_down 24
-
-    @pdf.image logopath, :width => 150, :at => [logo_x, @pdf.cursor]
-
-    dchbx_table_light_blue(invoice_header_data,address_x)
-
-    @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
-    @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
-
-    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  48]
-    @pdf.text_box "PO Box 780833", :at => [320,  36]
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  24]
-
-    address = mailing_or_primary_address(@organization)
-    @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
-    if address
-      @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.address_1}", :at => [address_x, 36]
-      @pdf.move_down lineheight_y
-      @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 24]
-    end
-  end
 
   def payment_page_for_initial_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
@@ -450,23 +274,23 @@ module InvoiceHelper
     end
 
     @pdf.move_down 72
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts #{site_short_name}. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
+    @pdf.text_box "#{site_invoice_bill_url}", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
+    @pdf.text_box "#{contact_center_mailing_address_name}", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
+    @pdf.text_box "#{contact_center_address_one}", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
+    @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call the Massachusetts #{site_short_name} Customer Service at 888-813-9220 (TTY #{contact_center_tty_number})", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -481,9 +305,9 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 112], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 122]
 
-    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  72]
-    @pdf.text_box "PO Box 780833", :at => [320,  60]
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  48]
+    @pdf.text_box "#{contact_center_mailing_address_name}", :at => [320,  72]
+    @pdf.text_box "#{contact_center_address_one}", :at => [320,  60]
+    @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [320,  48]
 
     address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 72]

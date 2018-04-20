@@ -59,10 +59,17 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
 
   find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
   find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+
+  fill_in 'organization[ach_record][routing_number]', with: '123456789'
+  fill_in 'organization[ach_record][routing_number_confirmation]', with: '123456789'
+  fill_in 'organization[ach_record][account_number]', with: '9999999999999999'
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency"
+  wait_for_ajax
+  page.find('h1', text: 'Broker Registration').click
+  wait_for_ajax
+  click_button "Create Broker Agency", wait: 4
 end
 
 Then(/^.+ should see broker registration successful message$/) do
@@ -74,14 +81,14 @@ And(/^.+ should see the list of broker applicants$/) do
 end
 
 Then(/^.+ clicks? on the current broker applicant show button$/) do
-  find('.interaction-click-control-broker-show').click
+  find('.interaction-click-control-broker-show').trigger('click')
 end
 
 And(/^.+ should see the broker application$/) do
 end
 
 And(/^.+ clicks? on approve broker button$/) do
-  find('.interaction-click-control-broker-approve').click
+  find('.interaction-click-control-broker-approve').trigger('click')
 end
 
 Then(/^.+ should see the broker successfully approved message$/) do
@@ -117,6 +124,10 @@ When(/^.+ registers? with valid information$/) do
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   click_button 'Create account'
+end
+
+Then(/^.+ should see bank information$/) do
+  expect(page).to have_content('Big Bank')
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
@@ -297,6 +308,11 @@ Given(/^zip code for county exists as rate reference$/) do
   FactoryGirl.create(:rating_area, zip_code: '01010', county_name: 'Worcester', rating_area: Settings.aca.rating_areas.first,
     zip_code_in_multiple_counties: true)
 end
+
+Given(/^a valid ach record exists$/) do
+  FactoryGirl.create(:ach_record, routing_number: '123456789', bank_name: 'Big Bank')
+end
+
 #
 Given(/^enters the existing zip code$/) do
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01010'

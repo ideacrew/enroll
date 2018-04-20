@@ -9,7 +9,7 @@
               <td>
                 <% key = vlp_doc.identifier.split('#').last %>
                 <span><%= vlp_doc.verification_type.titleize %>: </span>
-                <%= link_to "#{vlp_doc.subject} <i class='fa fa-cloud-download' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>&nbsp;
+                <%= link_to "#{vlp_doc.subject} <i class='fa fa-cloud-download' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: l10n(".download"), data: {"toggle": "tooltip"} %>&nbsp;
                 <% if vlp_doc.status == "rejected" && vlp_doc.comment && vlp_doc.comment.length > 0 %>
                     <span type="button" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="left" data-content="<%= vlp_doc.comment %>">
                       <i class="fa fa-comments-o fa-2x"></i>&nbsp;
@@ -24,7 +24,7 @@
               <td class="table-functions  <%=pundit_class(Family, :updateable?)%>" >
                 <% if vlp_doc.status != "verified" %>
                   <%= link_to document_path(vlp_doc, :person_id => person.id), method: :delete, remote: true do %>
-                      <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Delete"></i>
+                      <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="<%= l10n('delete') %>"></i>
                   <% end %>
                 <% end %>
               </td>

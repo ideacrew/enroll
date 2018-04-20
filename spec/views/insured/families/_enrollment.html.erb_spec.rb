@@ -40,6 +40,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "without consumer_role", dbclean: :before_each do
+    let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     let(:mock_organization){ instance_double("Organization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
     let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
     let(:plan) { double("Plan",
@@ -60,7 +61,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       :total_employee_cost => 30,
       :id => "1234234234",
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                      :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
+                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
     ) }
 
 
@@ -95,7 +96,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
     it "should open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"http://test.host/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should display the title" do
@@ -174,10 +175,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should display future_enrollment_termination_date when coverage_termination_pending" do
       expect(rendered).to match /Future enrollment termination date:/
     end
-    
+
     it "should not show a Plan End if cobra" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
-      expect(rendered).not_to match /plan ending/i 
+      expect(rendered).not_to match /plan ending/i
     end
   end
 
@@ -332,6 +333,42 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_text(/Coverage End/)
       expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
     end
+  end
 
+  context "when the enrollment is_coverage_waived" do
+    let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
+    let(:enrollment) { double("enrollment", aasm_state: "inactive", coverage_kind: "health", is_shop?: true,
+                        employer_profile: employer_profile, effective_on: TimeKeeper.date_of_record - 1.month,
+                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: nil, id: nil) }
+
+    context "it should render waived_coverage_widget " do
+
+      before :each do
+        allow(enrollment).to receive(:is_coverage_waived?).and_return true
+        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return true
+        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+
+      it "should render waiver template with read_only param as true" do
+        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: true, hbx_enrollment: enrollment})
+      end
+
+      it "should display waiver text" do
+        expect(rendered).to have_text(/You have selected to waive your employer health coverage/)
+      end
+    end
+
+    context "it should render waived_coverage_widget with read_only param value as helper method result" do
+
+      before :each do
+        allow(enrollment).to receive(:is_coverage_waived?).and_return true
+        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return false
+        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+
+      it "should render waiver template with read_only param" do
+        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: view.disable_make_changes_button?(enrollment), hbx_enrollment: enrollment})
+      end
+    end
   end
 end

@@ -318,7 +318,7 @@ class CensusEmployeeImport
 
   def parse_date(cell)
     return nil if cell.blank?
-    return DateTime.strptime(cell.sanitize_value, "%d/%m/%Y") rescue raise ImportErrorValue, cell if cell.class == String
+    return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, cell if cell.class == String
     return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
     # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
@@ -326,7 +326,7 @@ class CensusEmployeeImport
   end
 
   def parse_ssn(cell)
-    cell.blank? ? nil : cell.to_s.gsub(/\D/, '')
+    cell.blank? ? nil : prepend_zeros(cell.to_s.gsub(/\D/, ''), 9)
   end
 
   def parse_boolean(cell)
@@ -408,6 +408,11 @@ class CensusEmployeeImport
     value = value.to_s.split('.')[0] if value.is_a? Float
     value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
   end
+  def prepend_zeros(number, n)
+    (n - number.to_s.size).times { number.prepend('0') }
+    number
+  end
+
 end
 
 class ImportErrorValue < Exception;

@@ -182,8 +182,8 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       before do
         allow(employer_profile).to receive(:is_new_employer?).and_return(true)
         allow(employer_profile).to receive(:active_plan_year).and_return(false)
-        allow(view).to receive(:site_broker_quoting_enabled?).and_return(true)
-
+        # allow(view).to receive(:site_broker_quoting_enabled?).and_return(true)
+        allow(view).to receive(:site_broker_claim_quoting_enabled?).and_return(true)
       end
 
       it "should display claim quote button" do
@@ -193,7 +193,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
 
       context "with quoting disabled" do
         before do
-          allow(view).to receive(:site_broker_quoting_enabled?).and_return(false)
+          allow(view).to receive(:site_broker_claim_quoting_enabled?).and_return(false)
         end
         it "should not display claim quote button" do
           render "employers/employer_profiles/my_account/benefits"
@@ -201,5 +201,19 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
         end
       end
     end
+
+    context "when employer do not have published plan year"do
+      before do
+        allow(employer_profile).to receive(:is_new_employer?).and_return(true)
+        allow(employer_profile).to receive(:published_plan_year).and_return []
+        allow(view).to receive(:site_broker_quoting_enabled?).and_return(true)
+      end
+
+      it "should not display add plan year button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("a", text: "Claim Quote")
+      end
+    end
+
   end
 end

@@ -39,7 +39,7 @@
                 <td class="mpi_indicator">
                   <ul style="list-style: circle;">
                   <li class="notice_spacing">
-                     Email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}", target: "_blank"%>
+                     Email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%>
                   </li>
                   </ul>
                 </td>
@@ -72,7 +72,7 @@
                       TTY: <%=contact_center_tty_number%>
                     </li>
                     <li class="notice-font">
-                      Online at  <a href= "#{site_main_web_address}"><%= site_main_web_address %></a>
+                      Online at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>
                     </li>
                   </ul>
                 </td>

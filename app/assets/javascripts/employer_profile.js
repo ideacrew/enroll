@@ -25,7 +25,7 @@ var EmployerProfile = ( function( window, undefined ) {
       });
       $(this).closest('.injected-edit-status').find('.btn-primary:contains("Terminate")').on('click', function() {
         var url = $(this).closest('.census-employee').data('terminate-url');
-        var termination_date = $(this).val();
+        var termination_date = $('input[placeholder*="Termination Date"][title]').val();
         $.ajax({
           url: url,
           data: {
@@ -61,9 +61,15 @@ var EmployerProfile = ( function( window, undefined ) {
     edit_all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
     editselectedplan = $('input.ref-plan');
-    editbgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
-    editbgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
-    var validatedbgfamilypremiums = false;
+  
+    var benefit_fields = $('.offerings .benefits-fields');
+    if ($('.composite-offerings').is(':visible')) {
+      benefit_fields = $('.composite-offerings .benefits-fields');
+      editbgfamilypremiums = benefit_fields.find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+      editbgemployeeonlypremiums = benefit_fields.find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    }
+
+    var editvalidatedbgfamilypremiums = false;
 
     editbgtitles.each(function() {
         editplantitle = $(this).val();
@@ -93,6 +99,7 @@ var EmployerProfile = ( function( window, undefined ) {
     });
     if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       editvalidatedbgemployeepremiums = true;
+      editvalidatedbgfamilypremiums = true;
       editvalidated = true;
     } else {
       editbgemployeepremiums.each(function() {
@@ -128,10 +135,11 @@ var EmployerProfile = ( function( window, undefined ) {
           } else {
             if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
               editvalidatedbgemployeepremiums = true
+              editvalidatedbgfamilypremiums = true;
               editvalidated = true;
             } else {
 
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -178,7 +186,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidated = true;
             } else {
 
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -317,6 +325,7 @@ var EmployerProfile = ( function( window, undefined ) {
     });
     if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       validatedbgemployeepremiums = true;
+      validatedbgfamilypremiums = true;
       validated = true;
     } else {
       bgemployeepremiums.each(function() {

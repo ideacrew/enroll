@@ -27,7 +27,7 @@ describe "shared/_comparison.html.erb" do
       :id => "1234234234",
       :coverage_kind => "health",
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-      :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
+      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-qa#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }
   let(:mock_qhp){instance_double("Products::Qhp", :qhp_benefits => [], :plan => mock_plan, :plan_marketing_name=> "A Plan Name")}
   let(:mock_qhps) {[mock_qhp]}
@@ -80,7 +80,7 @@ describe "shared/_comparison.html.erb" do
     end
 
     it "should have a link to open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-enroll-sbc-local/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"http://test.host/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should contain some readable text" do

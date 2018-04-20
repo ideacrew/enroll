@@ -19,7 +19,7 @@ describe ::Importers::ConversionEmployerSet do
     let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "sample_conversion_employers.xlsx") }
 
     let(:employer_data) do
-      ({:registered_on => registered_on, :action=>"Add", :fein=>"931100000", :dba=>"AGA DBA", :legal_name=>"AGA LEGAL", :primary_location_address_1=>"799 9TH STREET NW", :primary_location_address_2=>"7TH FLR", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20001", :primary_location_county=>"County", :contact_first_name=>"THE", :contact_last_name=>"CONTACT", :contact_email=>"THECONTACT@AGA.COM", :contact_phone=>"2025552675", :enrolled_employee_count=>"14", :new_hire_count=>"Date of Hire equal to Effective Date", :broker_name=>"THE BROKER", :broker_npn=>"8262800", :carrier => "United Healtcare"})
+      ({:registered_on => registered_on, :action=>"Add", :fein=>"931100000", :dba=>"AGA DBA", :legal_name=>"AGA LEGAL", :primary_location_address_1=>"799 9TH STREET NW", :primary_location_address_2=>"7TH FLR", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20001", :primary_location_county=>"County", :contact_first_name=>"THE", :contact_last_name=>"CONTACT", :contact_email=>"THECONTACT@AGA.COM", :contact_phone=>"2025552675", :enrolled_employee_count=>"14", :new_hire_count=>"Date of Hire equal to Effective Date", :broker_name=>"THE BROKER", :broker_npn=>"8262800"})
     end
 
 
@@ -58,7 +58,7 @@ describe ::Importers::ConversionEmployerSet do
     let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "sample_conversion_employers.csv") }
 
     let(:employer_data) do
-      {:registered_on => registered_on, :action=>"Add", :fein=>"521782000", :dba=>"MCP DBA", :legal_name=>"MCP LEGAL", :primary_location_address_1=>"3001 P Street N.W.", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20007", :primary_location_county=>"County",:mailing_location_address_1=>"3001 P Street N.W.", :mailing_location_city=>"Washington", :mailing_location_state=>"DC", :mailing_location_zip=>"20007", :contact_first_name=>"The", :contact_last_name=>"Contact", :contact_email=>"thecontact@mcp.com", :contact_phone=>"2025554100", :enrolled_employee_count=>"3", :broker_name=>"The Broker", :broker_npn=>"629000", :carrier => "CareFirst BlueCross BlueShield"}
+      {:registered_on => registered_on, :action=>"Add", :fein=>"521782000", :dba=>"MCP DBA", :legal_name=>"MCP LEGAL", :primary_location_address_1=>"3001 P Street N.W.", :primary_location_city=>"Washington", :primary_location_state=>"DC", :primary_location_zip=>"20007", :primary_location_county=>"County",:mailing_location_address_1=>"3001 P Street N.W.", :mailing_location_city=>"Washington", :mailing_location_state=>"DC", :mailing_location_zip=>"20007", :contact_first_name=>"The", :contact_last_name=>"Contact", :contact_email=>"thecontact@mcp.com", :contact_phone=>"2025554100", :enrolled_employee_count=>"3", :broker_name=>"The Broker", :broker_npn=>"629000"}
     end
 
     let(:base_output_result) do

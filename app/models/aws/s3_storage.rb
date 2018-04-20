@@ -20,7 +20,6 @@ module Aws
           nil
         end
       rescue Exception => e
-        nil
       end
     end
 
@@ -43,7 +42,7 @@ module Aws
         read_object(object)
       rescue Exception => e
        puts "Error caused due to %s" %[$!.class]
-       raise e.backtrace
+       raise
       end
     end
 
@@ -76,7 +75,7 @@ module Aws
     end
 
     def aws_env
-      ENV['AWS_ENV'] || "local"
+      ENV['AWS_ENV'] || "qa"
     end
 
     def env_bucket_name(bucket_name)

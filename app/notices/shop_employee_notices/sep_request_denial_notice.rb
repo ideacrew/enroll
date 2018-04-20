@@ -17,7 +17,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   	upload_and_send_secure_message
   	send_generic_notice_alert
   end
-  
+
   def append_data
   	title = self.qle.title
     qle_reported_on = TimeKeeper.date_of_record
@@ -36,5 +36,5 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   	   :start_on => active_plan_year.start_on,
        :renewing_start_on => renewing_plan_year_start_on
   	   })
-  end	
+  end
 end

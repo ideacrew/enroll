@@ -11,6 +11,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
   before_action :redirect_unless_general_agency_is_enabled?, only: [:assign, :update_assign]
+  before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
   layout 'single_column'
 
@@ -60,7 +61,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     params.permit!
 
     # lookup by the origanization and not BrokerAgencyProfile
-    #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
 
     @organization = Organization.find(params[:organization][:id])
     @organization_dup = @organization.office_locations.as_json
@@ -69,28 +70,17 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
-    # person.update_attributes(person_profile_params)
-    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
-    office_locations = broker_agency_profile.office_locations
-    office_locations.each do |office_location|
-      # && office_location.phones.kind == “phone main”
-      if person.phones.any?
-        person.phones.first.update_attributes(country_code: office_location.phone.country_code,
-                                              area_code: office_location.phone.area_code,
-                                              number: office_location.phone.number,
-                                              extension: office_location.phone.extension)
-         full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
-        person.phones.first.update_attributes(full_phone_number: full_phone)
-      end
-    end
 
     person.update_attributes(person_profile_params)
-    person.save!
-
-    @broker_agency_profile.update_attributes(languages_spoken_params)
+    @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
 
 
     if @organization.update_attributes(broker_profile_params)
+      office_location = @organization.primary_office_location
+      if office_location.present?
+        update_broker_phone(office_location, person)
+      end
+
       flash[:notice] = "Successfully Update Broker Agency Profile"
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
     else
@@ -180,6 +170,42 @@ class BrokerAgencies::ProfilesController < ApplicationController
     respond_to do |format|
       format.js {}
     end
+  end
+
+  def commission_statements
+    permitted = params.permit(:id)
+    @id = permitted[:id]
+    if current_user.has_broker_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_hbx_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(@id))
+    else
+      redirect_to new_broker_agencies_profile_path
+      return
+    end
+    documents = @broker_agency_profile.organization.documents
+    if documents
+      @statements = get_commission_statements(documents)
+    end
+    collect_and_sort_commission_statements
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def show_commission_statement
+    options={}
+    options[:filename] = @commission_statement.title
+    options[:type] = 'application/pdf'
+    options[:disposition] = 'inline'
+    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+  end
+
+  def download_commission_statement
+    options={}
+    options[:content_type] = @commission_statement.type
+    options[:filename] = @commission_statement.title
+    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
   end
 
   def employers
@@ -399,6 +425,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     params.require(:organization).permit(
       :legal_name,
       :dba,
+      :home_page,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension],
@@ -409,6 +436,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def languages_spoken_params
     params.require(:organization).permit(
+      :accept_new_clients,
+      :working_hours,
       :languages_spoken => []
     )
   end
@@ -422,6 +451,29 @@ class BrokerAgencies::ProfilesController < ApplicationController
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
       location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
+  end
+
+  def check_and_download_commission_statement
+      @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+      authorize @broker_agency_profile, :access_to_broker_agency_profile?
+      @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
+  end
+
+  def get_commission_statements(documents)
+    commission_statements = []
+    documents.each do |document|
+      # grab only documents that are commission statements by checking the bucket in which they are placed
+      if document.identifier.include?("commission-statements")
+        commission_statements << document
+      end
+    end
+    commission_statements
+  end
+
+  def collect_and_sort_commission_statements(sort_order='ASC')
+    @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
+    #sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse!
+    @statements.sort_by!(&:date).reverse!
   end
 
   def find_hbx_profile
@@ -503,5 +555,21 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_set_default_ga(self, @broker_agency_profile)
+  end
+
+  def update_broker_phone(office_location, person)
+    phone = office_location.phone
+    broker_main_phone = person.phones.where(kind: "phone main").first
+    if broker_main_phone.present?
+      broker_main_phone.update_attributes!(
+        kind: phone.kind,
+        country_code: phone.country_code,
+        area_code: phone.area_code,
+        number: phone.number,
+        extension: phone.extension,
+        full_phone_number: phone.full_phone_number
+      )
+    end
+    person.save!
   end
 end

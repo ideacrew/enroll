@@ -4,6 +4,8 @@ FactoryGirl.define do
     entity_kind "s_corporation"
     association :primary_broker_role, factory: :broker_role
     organization
+    ach_routing_number '123456789'
+    ach_account_number '9999999999999999'
     corporate_npn do
       Forgery('basic').text(:allow_lower   => false,
                             :allow_upper   => false,

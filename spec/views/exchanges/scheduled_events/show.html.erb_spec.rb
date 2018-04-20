@@ -13,7 +13,7 @@ describe "exchanges/scheduled_events/show.html.erb" do
     def view.scheduled_event
       @scheduled_event ||= ScheduledEvent.find(params[:id])
     end
-  	render template: "exchanges/scheduled_events/show"
+  	render template: "exchanges/scheduled_events/_show"
   	expect(rendered).to have_text(/Events/)
     expect(rendered).to have_text(/Event Type/)
     expect(rendered).to have_text(/Event Name/)

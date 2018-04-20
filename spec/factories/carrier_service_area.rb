@@ -9,6 +9,7 @@ FactoryGirl.define do
     state_code nil
     service_area_zipcode nil
     partial_county_justification nil
+    active_year { TimeKeeper.date_of_record.year }
 
     trait :for_partial_state do
       service_area_name 'Partial State Area'

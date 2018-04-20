@@ -13,6 +13,11 @@ class Users::SecurityQuestionResponsesController < ApplicationController
     end
   end
 
+  def replace
+    user.security_question_responses.destroy_all
+    create
+  end
+
   def challenge
     if user_from_email.nil?
       flash[:error] = "We can't find a user record with that email"
@@ -30,6 +35,7 @@ class Users::SecurityQuestionResponsesController < ApplicationController
   def authenticate
     if challenge_question.matching_response? params[:security_question_response][:question_answer].downcase
       @success_token = challenge_question.success_token
+      @form_name = "form#new_user"
       user.identity_confirmed_token = @success_token
       user.save!
     else

@@ -5,21 +5,53 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Mongoid::Attributes::Dynamic
+  include SponsoredBenefits::Concerns::Ssn
+  include SponsoredBenefits::Concerns::Dob
 
   include Notify
   include UnsetableSparseFields
   include FullStrippedNames
 
+  # verification history tracking
+  include Mongoid::History::Trackable
+
+  track_history :on => [:first_name,
+                        :middle_name,
+                        :last_name,
+                        :full_name,
+                        :alternate_name,
+                        :encrypted_ssn,
+                        :dob,
+                        :gender,
+                        :is_incarcerated,
+                        :is_disabled,
+                        :ethnicity,
+                        :race,
+                        :tribal_id,
+                        :no_dc_address,
+                        :no_dc_address_reason,
+                        :is_active,
+                        :no_ssn],
+                :modifier_field => :modifier,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true     # track document destruction, default is false
+
+
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
 
   GENDER_KINDS = %W(male female)
+
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
   PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
+  VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -30,10 +62,11 @@ class Person
   field :full_name, type: String
   field :alternate_name, type: String
 
-  # Sub-model in-common attributes
   field :encrypted_ssn, type: String
-  field :dob, type: Date
   field :gender, type: String
+  field :dob, type: Date
+
+  # Sub-model in-common attributes
   field :date_of_death, type: Date
   field :dob_check, type: Boolean
 
@@ -53,6 +86,7 @@ class Person
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
+  field :is_physically_disabled, type: Boolean
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
@@ -95,7 +129,6 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
@@ -107,14 +140,7 @@ class Person
   validate :date_functional_validations
   validate :no_changing_my_user, :on => :update
 
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
-    numericality: true,
-    allow_blank: true
-
   validates :encrypted_ssn, uniqueness: true, allow_blank: true
-
-  validate :is_ssn_composition_correct?
 
   validates :gender,
     allow_blank: true,
@@ -208,13 +234,13 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
-
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
 
   after_create :notify_created
   after_update :notify_updated
+
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
@@ -247,17 +273,7 @@ class Person
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } ) if need_to_notify?
-  end
-
-  def need_to_notify?
-    changed_fields = changed_attributes.keys
-    changed_fields << consumer_role.changed_attributes.keys if consumer_role.present?
-    changed_fields << employee_roles.map(&:changed_attributes).map(&:keys) if employee_roles.present?
-    changed_fields << employer_staff_roles.map(&:changed_attributes).map(&:keys) if employer_staff_roles.present?
-    changed_fields = changed_fields.flatten.compact.uniq
-    notify_fields = changed_fields.reject{|field| ["bookmark_url", "updated_at"].include?(field)}
-    notify_fields.present?
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def is_aqhp?
@@ -283,17 +299,6 @@ class Person
   end
 
   #after_save :update_family_search_collection
-  after_validation :move_encrypted_ssn_errors
-
-  def move_encrypted_ssn_errors
-    deleted_messages = errors.delete(:encrypted_ssn)
-    if !deleted_messages.blank?
-      deleted_messages.each do |dm|
-        errors.add(:ssn, dm)
-      end
-    end
-    true
-  end
 
   # before_save :notify_change
   # def notify_change
@@ -312,56 +317,18 @@ class Person
     if encrypted_ssn.blank?
       unset_sparse("encrypted_ssn")
     end
+
     if user_id.blank?
       unset_sparse("user_id")
     end
   end
 
-  def ssn_changed?
-    encrypted_ssn_changed?
-  end
-
-  def self.encrypt_ssn(val)
-    if val.blank?
-      return nil
-    end
-    ssn_val = val.to_s.gsub(/\D/, '')
-    SymmetricEncryption.encrypt(ssn_val)
-  end
-
-  def self.decrypt_ssn(val)
-    SymmetricEncryption.decrypt(val)
-  end
-
-  # Strip non-numeric chars from ssn
-  # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
-  def ssn=(new_ssn)
-    if !new_ssn.blank?
-      write_attribute(:encrypted_ssn, Person.encrypt_ssn(new_ssn))
-    else
-      unset_sparse("encrypted_ssn")
-    end
-  end
-
-  def ssn
-    ssn_val = read_attribute(:encrypted_ssn)
-    if !ssn_val.blank?
-      Person.decrypt_ssn(ssn_val)
-    else
-      nil
-    end
+  def date_of_birth=(val)
+    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
   def gender=(new_gender)
     write_attribute(:gender, new_gender.to_s.downcase)
-  end
-
-  def date_of_birth
-    self.dob.blank? ? nil : self.dob.strftime("%m/%d/%Y")
-  end
-
-  def date_of_birth=(val)
-    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
   # Get the {Family} where this {Person} is the primary family member
@@ -391,19 +358,6 @@ class Person
       end
   end
 
-  def age_on(date)
-    age = date.year - dob.year
-    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
-      age - 1
-    else
-      age
-    end
-  end
-
-  def dob_to_string
-    dob.blank? ? "" : dob.strftime("%Y%m%d")
-  end
-
   def is_active?
     is_active
   end
@@ -411,8 +365,9 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
+    verification_types << 'DC Residency' if (consumer_role && age_on(TimeKeeper.date_of_record) > 19)
     verification_types << 'Social Security Number' if ssn
-    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
+    verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
       verification_types << 'Citizenship'
     else
@@ -495,7 +450,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "main" }
+    phones.detect { |phone| phone.kind == "phone main" }
   end
 
   def home_phone
@@ -536,13 +491,7 @@ class Person
   end
 
   def has_multiple_active_employers?
-    active_census_employees.count > 1
-  end
-
-  def active_census_employees
-    census_employees = CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
-    ces = census_employees.select { |ce| ce.is_active? }
-    (ces + active_employee_roles.map(&:census_employee)).uniq
+    active_employee_roles.count > 1
   end
 
   def has_active_employer_staff_role?
@@ -652,10 +601,6 @@ class Person
       return false
     end
 
-    def find_by_ssn(ssn)
-      Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
-    end
-
     def dob_change_implication_on_active_enrollments(person, new_dob)
       # This method checks if there is a premium implication in all active enrollments when a persons DOB is changed.
       # Returns a hash with Key => HbxEnrollment ID and, Value => true if  enrollment has Premium Implication.
@@ -698,7 +643,7 @@ class Person
       if first_name.present? && last_name.present? && dob_query.present?
         first_exp = /^#{first_name}$/i
         last_exp = /^#{last_name}$/i
-        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
+        matches.concat Person.active.where(dob: dob_query, last_name: last_exp, first_name: first_exp).to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
       end
       matches.uniq
     end
@@ -790,6 +735,7 @@ class Person
   end
 
   def indian_tribe_member=(val)
+    self.tribal_id = nil if val.to_s == false
     @indian_tribe_member = (val.to_s == "true")
   end
 
@@ -812,7 +758,7 @@ class Person
   def indian_tribe_member
     return @indian_tribe_member if !@indian_tribe_member.nil?
     return nil if citizen_status.blank?
-    @indian_tribe_member ||= (::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS == citizen_status)
+    @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
   end
 
   def eligible_immigration_status
@@ -824,19 +770,19 @@ class Person
   end
 
   def assign_citizen_status
-    if indian_tribe_member
-      self.citizen_status = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS
-    elsif naturalized_citizen
-      self.citizen_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
+    new_status = nil
+    if naturalized_citizen
+      new_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
     elsif us_citizen
-      self.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
+      new_status = ::ConsumerRole::US_CITIZEN_STATUS
     elsif eligible_immigration_status
-      self.citizen_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
+      new_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
     elsif (!eligible_immigration_status.nil?)
-      self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+      new_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
     end
+    self.consumer_role.lawful_presence_determination.assign_citizen_status(new_status) if new_status
   end
 
   def agent?
@@ -878,27 +824,6 @@ class Person
   end
 
   private
-  def is_ssn_composition_correct?
-    # Invalid compositions:
-    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
-    #   00 in the group number (fourth and fifth digit); or
-    #   0000 in the serial number (last four digits)
-
-    if ssn.present?
-      invalid_area_numbers = %w(000 666)
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
-    end
-
-    true
-  end
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
@@ -923,7 +848,6 @@ class Person
 
   # Verify basic date rules
   def date_functional_validations
-    date_of_birth_is_past
     date_of_death_is_blank_or_past
     date_of_death_follows_date_of_birth
   end
@@ -931,11 +855,6 @@ class Person
   def date_of_death_is_blank_or_past
     return unless self.date_of_death.present?
     errors.add(:date_of_death, "future date: #{self.date_of_death} is invalid date of death") if TimeKeeper.date_of_record < self.date_of_death
-  end
-
-  def date_of_birth_is_past
-    return unless self.dob.present?
-    errors.add(:dob, "future date: #{self.dob} is invalid date of birth") if TimeKeeper.date_of_record < self.dob
   end
 
   def date_of_death_follows_date_of_birth
@@ -948,7 +867,7 @@ class Person
   end
 
   def consumer_fields_validations
-    if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+    if @is_consumer_role.to_s == "true" #&& consumer_role.is_applying_coverage.to_s == "true" #only check this for consumer flow.
       citizenship_validation
       native_american_validation
       incarceration_validation

@@ -11,14 +11,17 @@ class BenefitSponsorship
   SERVICE_MARKET_KINDS = %w(shop individual coverall)
 
   field :service_markets, type: Array, default: []
+  validates_presence_of :service_markets
 
   # 2015, 2016, etc. (aka plan_year)
   embeds_many :benefit_coverage_periods
   embeds_many :geographic_rating_areas
 
   accepts_nested_attributes_for :benefit_coverage_periods, :geographic_rating_areas
-
-  validates_presence_of :service_markets
+  # Query Census member collection
+  def census_employees
+    @census_employees = CensusMembers::PlanDesignCensusEmployee.by_benefit_sponsorship(self)
+  end
 
   def current_benefit_coverage_period
     benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
@@ -93,6 +96,12 @@ class BenefitSponsorship
         hbx_sponsor.advance_month   if new_date.day == 1
         hbx_sponsor.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
         hbx_sponsor.advance_year    if new_date.day == 1 && new_date.month == 1
+      end
+
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+      if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date && !Rails.env.test?
+        oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
+        oe_begin.process_renewals
       end
 
       # # Find families with events today and trigger their respective workflow states

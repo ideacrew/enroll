@@ -295,7 +295,7 @@
                     <td>
                       <p>
                         <% if bg.dental_plan_option_kind == "single_carrier" %>
-                          All Plans From A Single Carrier
+                          All Plans From A <%= fetch_plan_title_for_single_carrier %>
                         <% elsif bg.dental_plan_option_kind == "single_plan" %>
                           <% if bg.elected_dental_plan_ids.count < 13 %>
                             Custom (<%= bg.elected_dental_plans.count %> Plans)
@@ -310,7 +310,7 @@
                   </tr>
                 </table>
                 <!--Dental Plan Summary: end-->
-                <!--Dental plan collapsible: start -->
+                <!--Dental plan collapsible: start-->
                 <div id="collapse-dental-<%=bg.id%>" style="display:none">
                   <!--Dental Contributions: start -->
                   <div class="col-xs-12 package-offering">

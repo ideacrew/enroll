@@ -319,28 +319,28 @@ end
 And(/^Employer can see the plan information on home tab$/) do
   sleep 1
   within('.benefit-group') do
-    expect(page).to have_content('All Plans From A Single Carrier')
+    expect(page).to have_content('One Carrier')
   end
 end
 
 And(/^Employer can see the sole source plan information on home tab$/) do
   sleep 1
   within('.benefit-group') do
-    expect(page).to have_content('A Sole Source Plan')
+    expect(page).to have_content('A Single Plan')
   end
 end
 
 And(/^Employer can see the plan information$/) do
   sleep 1
   within('.benefit-package') do
-    expect(page).to have_content('All Plans From A Single Carrier')
+    expect(page).to have_content('One Carrier')
   end
 end
 
 And(/^Employer can see the sole source plan information$/) do
   sleep 1
   within('.benefit-package') do
-    expect(page).to have_content('A Sole Source Plan')
+    expect(page).to have_content('A Single Plan')
   end
 end
 
@@ -351,8 +351,9 @@ And(/^.+ should see a button to create new plan year$/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -521,6 +522,11 @@ When /^click on one of their employees$/ do
   click_link employees.first.full_name
 end
 
+And /^click on one of their past terminated employee$/ do
+  employees.first.update_attributes(aasm_state: 'employment_terminated', coverage_terminated_on: TimeKeeper.date_of_record - 30.days, employment_terminated_on: TimeKeeper.date_of_record - 30.days)
+  click_link employees.first.full_name
+end
+
 Given /^the employer has employees$/ do
   employees employer_profile: employer.employer_profile
   employees.last.update_attributes(aasm_state: "employment_terminated", employment_terminated_on: TimeKeeper.date_of_record - 5.days)
@@ -639,11 +645,6 @@ And /^employer clicks on non-linked employee without address$/ do
   find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
-And /^employer clicks on back button$/ do
-  expect(page).to have_content "Details"
-  find('.interaction-click-control-back').click
-end
-
 Then /^employer should see employee roaster$/ do
   expect(page).to have_content "Employee Roster"
 end
@@ -658,11 +659,6 @@ And /^employer clicks on all employees$/ do
   wait_for_ajax
 end
 
-And /^employer clicks on cancel button$/ do
-  expect(page).to have_content "Details"
-  find('.interaction-click-control-cancel').click
-end
-
 Then /^employer should not see termination date column$/ do
   wait_for_ajax
   expect(page).not_to have_content "Terminated On"
@@ -672,6 +668,43 @@ Then /^they should see that employee's details$/ do
   wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
+
+And /^employer click on pencil symbol next to employee status bar$/ do
+  find('.fa-pencil').click
+end
+
+Then /^employer should see the (.*) button$/ do |status|
+  find_link(status.capitalize).visible?
+end
+
+And /^employer clicks on (.*) button$/ do |status|
+  click_link(status.capitalize)
+end
+
+Then /^employer should see the field to enter (.*) date$/ do |status|
+  status = status == 'termination' ? 'ENTER DATE OF TERMINATION' : 'ENTER DATE OF REHIRE'
+  expect(page).to have_content status
+end
+
+And /^employer clicks on (.*) button with date as (.*)$/ do |status, date|
+  date = date == 'today' ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 3.months
+  find('.date-picker.date-field').set date
+  find('.btn-primary.btn-sm').click
+end
+
+Then /^employer should see the (.*) success flash notice$/ do |status|
+  result = status == 'terminated' ? "Successfully terminated Census Employee." : "Successfully rehired Census Employee."
+  expect(page).to have_content result
+end
+
+Then /^employer should see the error flash notice$/ do
+  expect(page).to have_content /Census Employee could not be terminated: Termination date must be within the past 60 days./
+end
+
+Then /^employer should see the rehired error flash notice$/ do
+  expect(page).to have_content "Rehiring date can't occur before terminated date."
+end
+
 When(/^the employer goes to benefits tab$/) do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
 end

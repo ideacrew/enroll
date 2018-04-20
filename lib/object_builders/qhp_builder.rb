@@ -1,5 +1,6 @@
 class QhpBuilder
-  INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051", "88806MA0040051"] # These plan ids are suppressed and we dont save these while importing.
+  INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051", "88806MA0040051", 
+  "18076MA0010001", "80538MA0020001", "80538MA0020002", "11821MA0020001", "11821MA0040001"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
 
@@ -42,7 +43,7 @@ class QhpBuilder
     elsif file_path.include?("metlife")
       "MetLife"
     elsif file_path.include?("united")
-      "United Health Care"
+      "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
@@ -196,30 +197,33 @@ class QhpBuilder
           plan = Plan.where(active_year: @plan_year,
             hios_id: /#{@qhp.standard_component_id.strip}/,
             hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
-            csr_variant_id: csr_variant_id).to_a
-          next if plan.present?
-          issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
-          carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
-          carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
-          new_plan = Plan.new(
-            name: cost_share_variance.plan_marketing_name.squish!,
-            hios_id: cost_share_variance.hios_plan_and_variant_id,
-            hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
-            csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
-            active_year: @plan_year,
-            metal_level: parse_metal_level,
-            market: parse_market,
-            ehb: @qhp.ehb_percent_premium,
-            # carrier_profile_id: "53e67210eb899a460300000d",
-            carrier_profile_id: carrier_profile_id,
-            coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
-            dental_level: @dental_metal_level,
-            service_area_id: @qhp.service_area_id
-            )
-          if new_plan.valid?
-            new_plan.save!
+            csr_variant_id: csr_variant_id).to_a.first
+          if plan.present?
+            plan.update_attributes(name: cost_share_variance.plan_marketing_name.squish!)
           else
-            @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
+            issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
+            carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
+            carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
+            new_plan = Plan.new(
+              name: cost_share_variance.plan_marketing_name.squish!,
+              hios_id: cost_share_variance.hios_plan_and_variant_id,
+              hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+              csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+              active_year: @plan_year,
+              metal_level: parse_metal_level,
+              market: parse_market,
+              ehb: @qhp.ehb_percent_premium,
+              # carrier_profile_id: "53e67210eb899a460300000d",
+              carrier_profile_id: carrier_profile_id,
+              coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
+              dental_level: @dental_metal_level,
+              service_area_id: @qhp.service_area_id
+              )
+            if new_plan.valid?
+              new_plan.save!
+            else
+              @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
+            end
           end
         end
       end
@@ -227,6 +231,7 @@ class QhpBuilder
   end
 
   def parse_metal_level
+    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
     return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end
