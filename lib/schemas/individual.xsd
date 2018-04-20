@@ -1413,7 +1413,7 @@
 			<xs:element ref="tax_household_members"/>
 			<xs:element ref="tax_household_size" minOccurs="0"/>
 			<xs:element name="total_incomes_by_year" type="TotalIncomesByYearType" minOccurs="0"/>
-			<xs:element ref="eligibility_determinations"/>
+			<xs:element ref="eligibility_determinations" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="start_date" type="SimpleDateType"/>
 			<xs:element name="end_date" type="SimpleDateType" minOccurs="0"/>
 			<xs:group ref="SubmittedCommentedActiveResourceGroup"/>
@@ -1452,7 +1452,7 @@
 					<xs:element ref="tax_household_members"/>
 					<xs:element ref="tax_household_size" minOccurs="0"/>
 					<xs:element name="total_incomes_by_year" type="TotalIncomesByYearType" minOccurs="0"/>
-					<xs:element ref="eligibility_determinations"/>
+					<xs:element ref="eligibility_determinations" minOccurs="0" maxOccurs="1"/>
 					<xs:element name="start_date" type="SimpleDateType"/>
 					<xs:element name="end_date" type="SimpleDateType" minOccurs="0"/>
 					<xs:group ref="SubmittedCommentedActiveResourceGroup"/>
