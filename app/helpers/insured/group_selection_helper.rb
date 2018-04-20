@@ -1,7 +1,6 @@
 module Insured
   module GroupSelectionHelper
     def can_shop_individual?(person)
-      #person.try(:is_consumer_role_active?)
       person.present? && person.is_consumer_role_active?
     end
 
