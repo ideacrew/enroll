@@ -1,7 +1,6 @@
 module Insured
   module GroupSelectionHelper
     def can_shop_individual?(person)
-      #person.try(:is_consumer_role_active?)
       person.present? && person.is_consumer_role_active?
     end
 
@@ -14,7 +13,6 @@ module Insured
     end
 
     def can_shop_resident?(person)
-      #person.try(:is_resident_role_active?)
       person.present? && person.is_resident_role_active?
 
     end
@@ -41,7 +39,7 @@ module Insured
         benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
     end
 
-    def  view_market_palces(person)
+    def  view_market_places(person)
       if can_shop_both_markets?(person)
         Plan::MARKET_KINDS
       elsif can_shop_individual?(person)
