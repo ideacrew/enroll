@@ -22,3 +22,4 @@ class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
     end
   end
 end
+

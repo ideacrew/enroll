@@ -461,6 +461,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(plan_year_proxy).to receive(:draft?).and_return(false)
+      allow(plan_year_proxy).to receive(:is_application_eligible?).and_return(true)
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
@@ -579,7 +580,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:save_result) { true }
     let(:plan_year_id) { "plan_year_id"}
     let(:benefit_group_id) { "benefit_group_id"}
-    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', destroy!: true, title: 'bg_one'), double('bg_two')]) }
+    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', disable_benefits: true, title: 'bg_one'), double('bg_two')]) }
 
     before :each do
       sign_in user
@@ -650,13 +651,14 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       @reference_plan = benefit_group.reference_plan
       Caches::PlanDetails.load_record_cache!
       @census_employees = [census_employee, census_employee]
+      @carrier_profile = @reference_plan.carrier_profile
     end
 
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with(@employer_profile.id).and_return(@employer_profile)
       allow(Forms::PlanYearForm).to receive(:build).and_return(plan_year)
       allow(Plan).to receive(:find).with(@reference_plan.id).and_return(@reference_plan)
-      allow(@reference_plan).to receive(:carrier_profile_id).and_return('carrier_id')
+      allow(@reference_plan).to receive(:carrier_profile_id).and_return(@carrier_profile.id)
       allow(plan_year).to receive(:benefit_groups).and_return(benefit_group.to_a)
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)

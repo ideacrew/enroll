@@ -27,13 +27,14 @@ RSpec.describe "_employer_broker_widget.html.erb" do
       assign(:employer_profile, employer_profile)
       assign(:broker_agency_accounts, [broker_agency_account])
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+      broker_agency_account.writing_agent.person.phones[0].update_attributes(kind: "phone main")
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       render 'employers/employer_profiles/employer_broker_widget'
     end
 
     it "should display broker information to employer" do
       expect(rendered).to match (broker_agency_account.writing_agent.email.address)
-      expect(rendered).to match (broker_agency_account.writing_agent.person.work_phone.area_code)
+      expect(rendered).to match (broker_agency_account.writing_agent.person.main_phone.area_code)
       expect(rendered).to match (broker_agency_profile.legal_name.titleize)
     end
   end

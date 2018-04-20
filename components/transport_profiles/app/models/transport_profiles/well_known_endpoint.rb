@@ -1,11 +1,21 @@
 module TransportProfiles
+  # Defines an endpoint from which to transport resources from or to.
+  # Includes embedded {TransportProfiles::Credential} records to specify authentication information.
   class WellKnownEndpoint
     include Mongoid::Document
 
+    # Required.  A descriptive title for this endpoint.
     field :title, type: String
+
+    # Required.  Specifies the exchange using this endpoint, such as 'dc0' or 'ma0'.
     field :site_key, type: String
+
+    # Required. Specifies the 'friendly name' which will be referenced using a symbol during steps and processes.
     field :key, type: String
+
     field :market_kind, type: String
+
+    # Required. Specifies the connection URI.
     field :uri, type: String
 
     embeds_many :credentials, class_name: "TransportProfiles::Credential"

@@ -14,11 +14,7 @@
 
           <div class="form-group">
             <%= f.label :email_or_username %>
-            <% if site_curam_enabled? %>
               <%= f.text_field :oim_id, class: "form-control", required: true, onblur: "Register.toggleEmail(this)" %>
-            <% else %>
-              <%= f.text_field :oim_id, class: "form-control", required: true %>
-            <% end %>
           </div>
           <div class="tooltip_box username_tooltip" style="display: none;">
             <p style="margin-bottom:0;">You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.</p>
@@ -55,14 +51,12 @@
             <br />
             <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", required: true %>
           </div>
-          <% if site_curam_enabled? %>
             <div class="email_field form-group <%= 'hidden_field' if (f.object.oim_id.size == 0 || f.object.email.present?) %>">
               <%= f.label :email %>
               <em> (Optional)</em>
               <br/>
               <%= f.text_field :email, class: "form-control" ,:oninput => "Register.trimEmail(this);" %>
             </div>
-          <% end %>
           <%= f.hidden_field :invitation_id %>
           <br/>
           <div class="recaptcha-error alert-error"><p></p></div>

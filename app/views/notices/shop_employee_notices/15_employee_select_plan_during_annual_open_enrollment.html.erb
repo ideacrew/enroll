@@ -41,7 +41,7 @@
                  TTY: <%=contact_center_tty_number%>
                </li>
                <li class="notice-font">
-                 By email: <a mail_to = "#{small_businesss_email}"><%=small_businesss_email %></a>
+                 By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%>
                </li>
              </ul>
          </td>

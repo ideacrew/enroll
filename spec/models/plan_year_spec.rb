@@ -325,6 +325,21 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             expect(plan_year.open_enrollment_date_errors[:open_enrollment_period].first).to match(/Open enrollment must end on or before/i)
           end
         end
+
+        context "when terminated plan year end_on is not end of month" do
+          let(:plan_year)       { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_year, aasm_state: :terminated)}
+
+          before do
+            plan_year.end_on = TimeKeeper.date_of_record.end_of_year - 30.days
+            plan_year.save!
+          end
+
+          it "should pass validation" do
+            expect(plan_year.open_enrollment_date_errors.present?).to be_falsey
+            expect(plan_year.errors.messages).to eq({})
+            expect(plan_year.open_enrollment_date_errors).to eq({})
+          end
+        end
       end
     end
   end
@@ -553,6 +568,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         py.save
         py
       end
+      let(:plan_year1) { FactoryGirl.create(:renewing_plan_year)}
 
       context "and at least one employee is present on the roster sans assigned benefit group" do
         let!(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
@@ -622,6 +638,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(workflow_plan_year_with_benefit_group.application_errors[:employer_profile]).to include(/This employer is ineligible to enroll for coverage at this time/)
         end
       end
+
+
 
       ## Application Eligibility Warnings
       context "and employer's primary office isn't located in-state" do
@@ -796,7 +814,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the employer doesn't request eligibility review" do
             context "and more than 90 days have elapsed since the ineligible application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
@@ -809,7 +827,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the applicant requests eligibility review" do
             context "and 30 days or less have elapsed since application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 10.days)
                 workflow_plan_year_with_benefit_group.request_eligibility_review!
@@ -820,7 +838,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and review overturns ineligible application determination" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before { workflow_plan_year_with_benefit_group.grant_eligibility! }
 
                 it "should transition application into published status" do
@@ -833,7 +851,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and review affirms ineligible application determination" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before { workflow_plan_year_with_benefit_group.deny_eligibility! }
 
                 it "should transition application back into published_invalid status" do
@@ -843,7 +861,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             end
 
             context "and more than 30 days have elapsed since application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 31.days)
               end
@@ -853,7 +871,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before do
                   TimeKeeper.set_date_of_record(submit_date + Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.days)
                 end
@@ -892,7 +910,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "employees should be able to browse, but not purchase plans"
 
           context "and open enrollment begins" do
-            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+            let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
             before do
               # $start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on
               TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
@@ -960,7 +978,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 context "and three of the six employees have enrolled" do
-                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                   before do
                     census_employees[0..2].each do |ee|
                       if ee.active_benefit_group_assignment.may_select_coverage?
@@ -1108,7 +1126,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and today is the day following close of open enrollment" do
-          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
           before do
             TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
@@ -1631,36 +1649,44 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context "calculate_start_on_options" do
-
-    it "should return one option if start date is before settings day of month offset" do
-      next_start = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
-      dates = [next_start].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
-      expect(PlanYear.calculate_start_on_options).to eq dates
-    end
-    it "should return one option but for the next month if after offset and enrollment monthly deadline" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
-      dates = [date1]
-      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 1).times do
-        dates << dates.last.next_month
+    number_of_months_available = Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
+    initial_application_rules = Settings.aca.shop_market.initial_application
+    let(:start_day_offset) { 0.days }
+    let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:dates) {
+      dates = []
+      number_of_months_available.times do
+        next_date = dates.last || initial_signup_date
+        dates << next_date.next_month.beginning_of_month
       end
-      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+      dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+    }
 
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
-      expect(PlanYear.calculate_start_on_options).to eq dates
+    before do
+      allow(PlanYear).to receive(:enrollment_shopping_start_day_offset).and_return(start_day_offset)
+      TimeKeeper.set_date_of_record_unprotected!(initial_signup_date + PlanYear.enrollment_shopping_start_day_offset)
     end
 
-    it "should return three options" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month
-      dates = [date1]
-      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 1).times do
-        dates << dates.last.next_month
-      end
-      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
+    it "should return #{number_of_months_available} options" do
       expect(PlanYear.calculate_start_on_options).to eq dates
+    end
+
+    context "after the publish deadline" do
+      let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month + initial_application_rules.publish_due_day_of_month.days }
+
+      it "should return #{number_of_months_available - 1} option(s) if current date is after the publish deadline" do
+        dates.shift
+        expect(PlanYear.calculate_start_on_options).to eq dates
+      end
+    end
+
+    context "with a enrollment start day offset" do
+      let(:start_day_offset) { 10.days }
+      let(:initial_signup_date) { TimeKeeper.date_of_record.next_month.beginning_of_month + 1.day }
+
+      it "should return #{number_of_months_available - 1} option(s) if date is after the offset" do
+        expect(PlanYear.calculate_start_on_options).to eq dates
+      end
     end
   end
 
@@ -2240,7 +2266,28 @@ describe PlanYear, "which has the concept of export eligibility" do
       end
     end
   end
+end
 
+context "non business owner criteria" do
+       
+  let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+  let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile )}
+  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, aasm_state: "coverage_selected") }
+  let(:census_employee) { FactoryGirl.build(:census_employee, is_business_owner:false, aasm_state: "employee_role_linked",expected_selection: "enroll",benefit_group_assignments: [benefit_group_assignment]) }
+    
+  before do
+    allow(plan_year).to receive(:enrolled).and_return([census_employee])
+  end
+
+  it "should pass when there are non owners with enrolled state" do
+    expect(plan_year.non_business_owner_enrolled).to eq [census_employee]
+  end
+
+  it "should fail when there are 0 non owners with enrolled status" do
+    benefit_group_assignment.update_attributes(aasm_state:'coverage_waived')
+    expect(plan_year.non_business_owner_enrolled).to eq []
+  end
 end
 
 describe PlanYear, "filter_active_enrollments_by_date" do
@@ -2336,13 +2383,15 @@ describe PlanYear, "plan year schedule changes" do
     let(:open_enrollment_start_on)  { plan_year_start_on.prev_month }
     let(:open_enrollment_end_on)    { open_enrollment_start_on + 12.days }
 
+    let(:renewal_py_state) { 'renewing_draft' }
+
     let!(:renewing_plan_year)                     { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: open_enrollment_start_on,
                                                       open_enrollment_end_on: open_enrollment_end_on,
                                                       employer_profile: employer_profile,
-                                                      aasm_state: 'renewing_draft'
+                                                      aasm_state: renewal_py_state
                                                     )
 
                                                     py.benefit_groups = [FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)]
@@ -2394,9 +2443,78 @@ describe PlanYear, "plan year schedule changes" do
         expect(renewing_plan_year.valid?).to be_truthy
       end
     end
+
+    context 'when plan year reverted' do
+
+      context 'employee has enrollment under renewing plan year'  do
+
+        let(:renewal_py_state) { 'renewing_enrolling' }
+
+        let(:census_employee){
+          employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups.first
+          employee
+        }
+
+        let(:family) {
+          person = FactoryGirl.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
+          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)
+          census_employee.update_attributes({employee_role: employee_role})
+          Family.find_or_build_from_employee_role(employee_role)
+        }
+
+        let!(:plan) {
+          FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewing_plan_year.start_on.year, hios_id: "11111111122301-01", csr_variant_id: "01")
+        }
+
+        let(:person) { family.family_members.first.person }
+        let(:passive_renewal) { FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: renewing_plan_year.start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "employer_sponsored",
+                       benefit_group_id: renewing_plan_year.benefit_groups.first.id,
+                       employee_role_id: person.active_employee_roles.first.id,
+                       benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+                       plan_id: plan.id,
+                       aasm_state: 'auto_renewing'
+                       ) }
+
+        it 'should cancel enrollments under reverted plan year' do
+          expect(passive_renewal.auto_renewing?).to be_truthy
+          renewing_plan_year.revert_renewal!
+          passive_renewal.reload
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+        end
+      end
+    end
+  end
+
+  context '.carriers_offered' do
+
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
+    let(:plan_year) { employer_profile.published_plan_year }
+    let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
+    let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
+    let!(:silver_ref_plan)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+    let!(:gold_ref_plan)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+    let(:silver_bg) { FactoryGirl.build(:benefit_group, title: "silver offerings", plan_year: plan_year, reference_plan_id: silver_ref_plan.id, plan_option_kind: 'single_carrier')}
+    let(:gold_bg) { FactoryGirl.build(:benefit_group, title: "gold offerings", plan_year: plan_year, reference_plan_id: gold_ref_plan.id, plan_option_kind: 'single_carrier')}
+
+    before do
+      plan_year.benefit_groups = [silver_bg, gold_bg]
+      plan_year.save(:validate => false)
+    end
+
+    context '.carriers_offered' do
+
+      it "should return carriers offered on multiple benefit groups" do
+        expect(plan_year.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+      end
+    end
   end
 end
-
 
 describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :after_all do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
@@ -2449,6 +2567,9 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:employee_role) {FactoryGirl.create(:employee_role)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, :aasm_state => "eligible") }
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
   let!(:renewing_hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_canceled')}
 
@@ -2456,9 +2577,14 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
 
     before do
       allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
 
     it "enrollemnt should be in coverage_termination_pending state " do
+
       expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_termination_pending"
     end
 
@@ -2484,16 +2610,103 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:employee_role) {FactoryGirl.create(:employee_role)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, :aasm_state => "eligible") }
   let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: benefit_group.id,aasm_state:'coverage_selected')}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
 
   context 'schedule_termination with active plan year' do
+
+    before do
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      census_employee.update_attributes(:aasm_state => "employee_termination_pending") #not terminating census employee upon plan year termination
+    end
 
     it "should termiante plan year and enrollments" do
       plan_year.schedule_termination!
       expect(plan_year.aasm_state).to eq "termination_pending"
       expect(plan_year.hbx_enrollments.first.aasm_state).to eq "coverage_termination_pending"
-      expect(plan_year.hbx_enrollments.first.terminated_on).to eq  TimeKeeper.date_of_record.end_of_month
+      expect(plan_year.hbx_enrollments.first.terminated_on).to eq TimeKeeper.date_of_record.end_of_month
+    end
+  end
+end
+
+describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all do
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+  context 'initial employer profile' do
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: aasm_state, start_on: start_on) }
+    let(:plan_year) { employer_profile.plan_years.where(aasm_state: aasm_state)[0]}
+    let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
+    let(:quiet_period_end) {
+      quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months)
+      TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.initial_application.quiet_period.mday))
+    }
+
+    context 'when enrolling' do
+      let(:aasm_state) { 'enrolling' }
+
+      it 'should return initial employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+
+    context 'when plan year active' do
+      let(:aasm_state) { 'active' }
+
+      it 'should return initial employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+  end
+
+  context 'renewing employer profile' do
+    let!(:employer_profile) {
+      create(:employer_with_renewing_planyear, start_on: start_on,
+        renewal_plan_year_state: aasm_state
+      )
+    }
+
+    let!(:plan_year) {
+      plan_year = employer_profile.plan_years.where(aasm_state: aasm_state)[0]
+      plan_year.workflow_state_transitions.build(from_state: :renewing_draft, to_state: :renewing_enrolling)
+      employer_profile.plan_years.detect{|py| py.active?}.update(aasm_state: 'expired')
+      plan_year.update(aasm_state: 'active')
+      plan_year
+    }
+
+    let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
+    let(:quiet_period_end) {
+      quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months)
+      TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.renewal_application.quiet_period.mday))
+    }
+
+    context "when plan year renewing" do
+      let(:aasm_state) { 'renewing_enrolling' }
+
+      it 'should return renewing employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+
+    context "when plan year active" do
+      let(:aasm_state) { 'renewing_enrolled' }
+
+      it 'should return renewing employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
     end
   end
 end

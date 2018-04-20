@@ -8,7 +8,7 @@ FactoryGirl.define do
 
     end_on { start_on + 1.year - 1.day }
     open_enrollment_start_on { (start_on - 30).beginning_of_month }
-    open_enrollment_end_on { open_enrollment_start_on + 1.weeks }
+    open_enrollment_end_on { (open_enrollment_start_on + Settings.aca.shop_market.open_enrollment.monthly_end_on.days) - 1.day }
     fte_count { 5 }
   end
 
@@ -66,6 +66,8 @@ FactoryGirl.define do
     transient do
       renewing false
       with_dental false
+      reference_plan {FactoryGirl.create(:plan, :with_premium_tables)._id}
+      dental_reference_plan nil
     end
 
     employer_profile
@@ -77,14 +79,15 @@ FactoryGirl.define do
 
     open_enrollment_end_on do
       end_date = renewing ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on : Settings.aca.shop_market.open_enrollment.monthly_end_on
-      Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, end_date)
+      previous_month = start_on.prev_month
+      Date.new(previous_month.year, previous_month.month, end_date)
     end
 
     after(:create) do |custom_plan_year, evaluator|
       if evaluator.with_dental
-        create(:benefit_group, :with_valid_dental, plan_year: custom_plan_year)
+        create(:benefit_group, :with_valid_dental, plan_year: custom_plan_year, reference_plan_id: evaluator.reference_plan, dental_reference_plan_id: evaluator.dental_reference_plan)
       else
-        create(:benefit_group, plan_year: custom_plan_year)
+        create(:benefit_group, plan_year: custom_plan_year, reference_plan_id: evaluator.reference_plan)
       end
     end
   end

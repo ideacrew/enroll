@@ -11,6 +11,29 @@ module Queries
       enroll_pol_ids
     end
 
+    def quiet_period_enrollment(hbx_id)   
+      enrollment = HbxEnrollment.by_hbx_id(hbx_id)[0]
+      plan_year = enrollment.benefit_group.plan_year
+      plan_year.enrollment_quiet_period.cover?(enrollment.submitted_at)
+    end
+
+    def self.shop_quiet_period_enrollments(effective_on, enrollment_statuses)
+      feins = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
+        :start_on => effective_on, :aasm_state => 'enrolled'
+        }}).pluck(:fein)
+
+      qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
+      qs.enrollment_statuses = enrollment_statuses
+
+      qs.query_families_with_quiet_period_enrollments
+        .unwind_enrollments
+        .query_quiet_period_enrollments
+        .sort_enrollments
+        .group_enrollment_events
+        .project_enrollment_ids
+      qs.evaluate.collect{|r| r['enrollment_hbx_id']}
+    end
+    
     def self.shop_monthly_enrollments(feins, effective_on)
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
       qs.query_families_with_active_enrollments
@@ -19,10 +42,8 @@ module Queries
         .sort_enrollments
         .group_enrollments
         .project_enrollment_ids
-
-      qs.evaluate.collect{|r| r['enrollment_hbx_id']}
+      qs.evaluate.reject{|r| Queries::NamedPolicyQueries.new.quiet_period_enrollment(r['enrollment_hbx_id'])}.collect{|r| r['enrollment_hbx_id']}
     end
-
 
     def self.shop_monthly_terminations(feins, effective_on)
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)

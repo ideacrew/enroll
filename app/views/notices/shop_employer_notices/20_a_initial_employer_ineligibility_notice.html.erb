@@ -27,7 +27,7 @@
 </div>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-                                                      content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through #{site_main_web_link}. Please note that you must meet the following requirements to be eligible to obtain employer-sponsored health insurance through the #{site_short_name}:
+                                                      content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through <a href= '#{site_main_web_address_url}'>#{site_main_web_address}</a>. Please note that you must meet the following requirements to be eligible to obtain employer-sponsored health insurance through the #{site_short_name}:
                                                       <ul><li>At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage. </li>
                                                       <li>At least one non-owner employee enrolls in health coverage.</li></ul>"} %>
 
@@ -49,7 +49,7 @@
              TTY: <%=contact_center_tty_number%>
         </li>
         <li class="notice-font">
-            Online at  <a href= "#{site_main_web_address}"><%= site_main_web_address %></a>
+            Online at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>
         </li>
         </ul>
       </td>

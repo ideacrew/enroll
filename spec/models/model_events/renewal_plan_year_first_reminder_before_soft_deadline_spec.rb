@@ -5,19 +5,19 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let(:model_event) { "renewal_plan_year_first_reminder_before_soft_dead_line" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
-  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft', benefit_groups: [benefit_group]) }
-  let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
-
-  let!(:organization) { FactoryGirl.create(:organization, employer_profile: employer) }
-
+  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft') }
+  let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: 8)}
+  let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer.id)}
+  let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
+
   describe "ModelEvent" do
-    after(:each) do
+    around(:each) do
       DatabaseCleaner.clean_with(:truncation, :except => %w[translations])
     end
     context "when renewal employer 2 days prior to soft dead line" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: organization.employer_profile, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end

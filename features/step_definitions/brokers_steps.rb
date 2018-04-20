@@ -66,7 +66,10 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency", wait: 10
+  wait_for_ajax
+  page.find('h1', text: 'Broker Registration').click
+  wait_for_ajax
+  click_button "Create Broker Agency", wait: 4
 end
 
 Then(/^.+ should see broker registration successful message$/) do

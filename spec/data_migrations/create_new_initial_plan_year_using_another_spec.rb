@@ -9,9 +9,9 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:organization) { employer_profile.organization }
   let(:start_on) { "01012017" }
-  let!(:rating_area) { FactoryGirl.create(:rating_area)  }
+  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
 
-  describe "create_initial_plan_year" do
+  describe "create_initial_plan_year", dbclean: :after_each do
     it "creates a new plan year" do
       new_plan_year = subject.create_initial_plan_year(organization, existing_plan_year, "01012017")
       expect(employer_profile.plan_years.length).to be 2

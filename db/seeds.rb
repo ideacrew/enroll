@@ -149,6 +149,7 @@ if missing_plan_dumps
   system "bundle exec rake import:network_information"
   puts "::: Updating network info for 2017 plans complete:::"
 
+  # Needs to be a setting catastrophic plans on/off
   # puts "*"*80
   # system "bundle exec rake migrations:cat_age_off_renewal_plan"
   # puts "*"*80

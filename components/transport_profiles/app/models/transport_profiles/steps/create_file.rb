@@ -7,7 +7,7 @@ module TransportProfiles
       @contents = contents
     end
 
-    def execute
+    def execute(process_context)
       File.write(@path, @contents)
     end
 

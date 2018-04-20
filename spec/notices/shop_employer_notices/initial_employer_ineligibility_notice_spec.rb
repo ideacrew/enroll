@@ -4,7 +4,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile}
   let!(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'application_ineligible' ) }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{plan_year.start_on.year}") }
@@ -46,8 +46,15 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_end_on.next_day)
+      plan_year.advance_date!
       @employer_notice = ShopEmployerNotices::InitialEmployerIneligibilityNotice.new(employer_profile, valid_parmas)
     end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     it "should build notice with all necessary info" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
@@ -58,16 +65,31 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
 
   describe "append_data" do
     before do
-      allow(plan_year).to receive_message_chain("effective_date.yday").and_return(2)
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_end_on.next_day)
+      plan_year.advance_date!
       @employer_notice = ShopEmployerNotices::InitialEmployerIneligibilityNotice.new(employer_profile, valid_parmas)
-    end
-    it "should append necessary information" do
       @employer_notice.append_data
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    it "should return plan year start on" do
       expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
+    end
+
+    it "should return open enrollment end on" do
       expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
-      expect(@employer_notice.notice.plan_year.end_on).to eq plan_year.end_on
-      expect(@employer_notice.notice.plan_year.warnings).to eq ["At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
+    end
+
+    it "should return planyear warnings" do
+      if plan_year.start_on.yday != 1
+        expect(@employer_notice.notice.plan_year.warnings).to eq ["At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
+      else
+        expect(@employer_notice.notice.plan_year.warnings).to eq []
+      end
     end
   end
 

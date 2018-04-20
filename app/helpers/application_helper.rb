@@ -506,6 +506,10 @@ module ApplicationHelper
     end.uniq
   end
 
+  def show_oop_pdf_link(aasm_state)
+    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
+  end
+
   def calculate_age_by_dob(dob)
     now = TimeKeeper.date_of_record
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
@@ -535,7 +539,6 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
@@ -544,22 +547,9 @@ module ApplicationHelper
     end
   end
 
-  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
-    if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
-      ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employer_when_employee_terminate_coverage")
-    elsif hbx_enrollment.coverage_kind == "dental"
-      ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-    end
-  end
-
-  def notify_employee_confirming_coverage_termination(hbx_enrollment)
-    if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
-      if hbx_enrollment.coverage_kind == "health"
-        ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
-      elsif hbx_enrollment.coverage_kind == "dental"
-        ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-      end
-    end
+  def trigger_notice_observer(recipient, event_object, notice_event)
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
   end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
@@ -627,7 +617,8 @@ module ApplicationHelper
       if text == "Yes"
         "Eligible"
       else
-        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+        "Ineligible"
+        #{}"<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='tooltip' title='#{eligibility_text}'></i>".html_safe
       end
     else
       "Ineligible"
@@ -670,11 +661,11 @@ module ApplicationHelper
 
   def exchange_icon_path(icon)
     site_key = Settings.site.key
-    
+
     if site_key.blank? || site_key.to_sym == :dchbx
       "icons/#{icon}"
     else
       "icons/#{site_key}-#{icon}"
-    end     
+    end
   end
 end

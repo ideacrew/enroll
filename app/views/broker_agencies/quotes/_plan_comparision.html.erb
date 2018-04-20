@@ -3,7 +3,7 @@
 <%= hidden_field_tag 'plan_ids' %>
 <div class="container-fluid">
   <h3><%= l10n("plan_comparison_chart")%></h3>
-  <ul>
+  <ul style="padding-left: 18px;">
     <li> <%= l10n("broker_agencies.quotes.rearranged_plans")%> </li>
     <li> <%= l10n("use")%> <i class='fa fa-caret-down fa-lg'></i>,<i class='fa fa-caret-up fa-lg'></i> <%= l10n("broker_agencies.quotes.to_sort_by_copay")%> </li>
   </ul>
@@ -77,6 +77,6 @@
     </table>
   </div>
   <br>
-    <%= link_to "#{l10n('broker_agencies.quotes.export_to_pdf')}", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans]), class: "btn btn-info", target: "_blank" %>
+    <%= link_to "#{l10n('broker_agencies.quotes.export_to_pdf')}", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id), class: "btn btn-info", target: "_blank" %>
   <br><br>
 </div>

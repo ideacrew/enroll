@@ -11,7 +11,8 @@ module Importers
       "first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
       "first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
       "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),
-      "on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0)
+      "on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0),
+      "first of the month following or coinciding with date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
     }
 
     CARRIER_MAPPING = {

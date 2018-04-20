@@ -5,19 +5,19 @@ namespace :reports do
 
     desc "Employer plan year application status by effective date"
     task :employer_roster_report => :environment do
+      include Config::AcaHelper
 
       organizations = Organization.exists(:employer_profile => true).where(:"hbx_id".nin => [100101, 100102, 118510])
-      build_csv_report('er_roster_report', organizations)
+      build_csv_report('er_roster_report', 'ERROSTER', organizations)
 
       organizations = Organization.where(:"hbx_id".in => [100101, 100102, 118510])
-      build_csv_report('congressional_er_roster_report', organizations)
+      build_csv_report('congressional_er_roster_report', 'CONGRESSIONALERROSTER', organizations)
     end
   end
 end
 
-def build_csv_report(file_name, organizations)
-  time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-  file_path = File.expand_path("#{Rails.root}/public/#{file_name}_#{time_stamp}.csv")
+def build_csv_report(file_name_DC, file_name_MA, organizations)
+  file_path = fetch_file_format(file_name_DC, file_name_MA)
 
   CSV.open(file_path, "w", force_quotes: true) do |csv|
     csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID"]
