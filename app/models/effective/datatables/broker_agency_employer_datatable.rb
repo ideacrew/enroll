@@ -48,18 +48,20 @@
 
            end
 
-          table_column :actions, :width => '50px', :proc => Proc.new { |row|
-            dropdown = [
-             # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
-             ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
-             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
-             ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
-                                remove_employer_link_type(row),
-                                "Are you sure you want to remove this employer?"]
-            ]
-            render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
-          }, :filter => false, :sortable => false
+          unless attributes["general_agency_is_enabled"]
+            table_column :actions, :width => '50px', :proc => Proc.new { |row|
+              dropdown = [
+               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+               ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
+               ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
+               ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
+               ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
+                                  remove_employer_link_type(row),
+                                  "Are you sure you want to remove this employer?"]
+              ]
+              render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
+            }, :filter => false, :sortable => false
+          end
         end
 
         def remove_employer_link_type(employer)
