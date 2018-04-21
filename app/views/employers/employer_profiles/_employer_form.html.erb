@@ -145,3 +145,66 @@
     <% end %>
 
 </div>
+
+
+
+<div id="app">
+  <h3>Office Locations</h3>
+  <office-location v-for="(row, index) in rows"
+                    :office="row.address"
+                    :key="index"
+                    v-on:delete="removeRow(index)">
+  </office-location>
+  <div>
+    <button @click="addRow"> Add Row </button>
+    <button @click="save"> Save </button>
+  </div>
+  </br>
+  <pre>{{rows}}</pre>
+</div>
+
+<script>
+
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    rows: [{id: 1, address: '812 Cattail Ct', address_2: '', city: 'West Melbourne', st: 'FL', zip: '32904'},
+           {id: 2, address: '799 Fiddleleaf Cir', address_2: '', city: 'West Melbourne', st: 'FL', zip: '32904'},]
+  },
+  created: function () {
+    console.log('Loading data ...')
+    var rails_path = "<%= employers_employer_profile_office_locations_path(employer_profile_id: @organization.employer_profile.id) %>";
+    this.$http.get(rails_path).then(response => {
+      console.log('Response: ' + response.body);
+      this.rows = response.body;
+    }, response => {
+      console.log('Error occurred trying to fetch office locations');
+    });
+  },
+  methods: {
+      addRow(){
+        // this.$http.get('/welcome/random_key').then(response => {
+        //   console.log('Response: ' + response.body);
+        //   this.rows.push({id: response.body.key});
+        // }, response => {
+        //   console.log('Error occurred trying to fetch key');
+        // });
+        this.rows.push({id: '', address: {}});
+      },
+      save(){
+        var self = this
+        this.$http.post('<%= employers_employer_profile_update_office_location_path(employer_profile_id: @organization.employer_profile.id) %>', this.rows)
+        .then(response => {
+          console.log(response.body);
+        }, response => {
+          console.error(response.body);
+        });
+      },
+      removeRow(index){
+          this.rows.splice(index,1);
+      }
+  }
+});
+
+</script>

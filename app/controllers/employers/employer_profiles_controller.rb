@@ -1,6 +1,6 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
-  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
+  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox, :office_locations, :update_office_location,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -103,6 +103,15 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def my_account
+  end
+
+  def office_locations
+    render json: @employer_profile.organization.office_locations.to_json
+  end
+
+  def update_office_location
+    binding.pry
+    render json: {:ok => 1}
   end
 
   def show

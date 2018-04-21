@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
@@ -208,7 +208,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -242,11 +242,13 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
+      get 'office_locations'
       get 'show_profile'
       get 'link_from_quote'
       get 'consumer_override'
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
+      post 'update_office_location'
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
