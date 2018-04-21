@@ -8,6 +8,8 @@ module BenefitSponsors
       attribute :area_code, String
       attribute :number, String
       attribute :extension, String
+      attribute :office_kind_options, Array
+      
       validates_presence_of :kind, :area_code, :number, :state, :zip
 
 

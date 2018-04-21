@@ -21,8 +21,8 @@
               <div class="row" style="margin: 0;">
                 <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                   <div class="col-md-6 col-sm-6 col-xs-12 no-pd office_kind_select">
-                    <% kinds = BenefitSponsors::Locations::Address::OFFICE_KINDS; kinds = kinds.rotate if params[:child_index] %>
-                    <%= address.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, f.object.address.kind ),class: "floatlabel form-control interaction-choice-control-office-location-address-kind", required: true, placeholder: 'KIND' %>
+                    <% kinds = address.object.office_kind_options; kinds = kinds.rotate if params[:child_index] %>
+                    <%= address.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, address.object.kind ),class: "floatlabel form-control interaction-choice-control-office-location-address-kind", required: true, placeholder: 'KIND' %>
                   </div>
                   <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                 </div>
@@ -48,7 +48,7 @@
                 <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
+                <%= address.select(:state, options_for_select(address.object.state_options.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
@@ -61,7 +61,7 @@
     <%= f.fields_for :phone, f.object.phone, errors: {}, fieldset: false do |phone| %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.select :kind, options_for_select(BenefitSponsors::Locations::Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
+        <%= phone.select :kind, options_for_select(phone.object.office_kind_options.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>

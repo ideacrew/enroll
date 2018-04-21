@@ -14,14 +14,16 @@ module BenefitSponsors
       attribute :accept_new_clients, Boolean
       attribute :home_page, String
       attribute :contact_method, String
+      attribute :entity_kind_options, Array
+      attribute :contact_method_options, Array
 
       attribute :office_locations, Array[Forms::OfficeLocationForm]
 
       # Person related attrs
       # Move this to person form
-      attribute :email, String
-      attribute :first_name, String
-      attribute :last_name, String
+      # attribute :email, String
+      # attribute :first_name, String
+      # attribute :last_name, String
 
       validates_presence_of :entity_kind
 

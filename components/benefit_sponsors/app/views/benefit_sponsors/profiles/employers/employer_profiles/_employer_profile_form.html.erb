@@ -11,7 +11,7 @@
   </p>
   <br/>
 </div>
-  <%= f.fields_for :personal_information, f.object.personal_information, errors: {}, fieldset: false do |f| %>
+  <%= f.fields_for :staff_role, f.object.staff_role, errors: {}, fieldset: false do |f| %>
     <%= render "benefit_sponsors/shared/organization_staff_search", f: f %>
     <%= render "benefit_sponsors/shared/person_contact", f:f %>
   <% end %>
@@ -26,11 +26,11 @@
 
       <div class="row no-buffer row-form-wrapper">
         <%= f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f| %>
-          <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
+          <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f %>
         
-
-          </div><br>
           <%= f.fields_for :profiles, f.object.profiles, errors: {}, fieldset: false do |f| %>
+            <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
+            </div><br>
             <%= render "benefit_sponsors/shared/office_locations", f: f %>
             <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f %>
           <% end %>

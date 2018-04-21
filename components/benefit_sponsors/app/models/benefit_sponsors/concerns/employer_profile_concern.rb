@@ -8,15 +8,15 @@ module BenefitSponsors
 
       included do
         ENTITY_KINDS ||= [
-          "tax_exempt_organization",
-          "c_corporation",
-          "s_corporation",
-          "partnership",
-          "limited_liability_corporation",
-          "limited_liability_partnership",
-          "household_employer",
-          "governmental_employer",
-          "foreign_embassy_or_consulate"
+          :tax_exempt_organization,
+          :c_corporation,
+          :s_corporation,
+          :partnership,
+          :limited_liability_corporation,
+          :limited_liability_partnership,
+          :household_employer,
+          :governmental_employer,
+          :foreign_embassy_or_consulate
         ]
 
         ACTIVE_STATES   ||= ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
@@ -29,11 +29,13 @@ module BenefitSponsors
 
         ENROLLED_STATE ||= %w(enrolled suspended)
 
+        CONTACT_METHODS ||= ["Only Electronic communications", "Paper and Electronic communications"]
+
         # Workflow attributes
         field :aasm_state, type: String, default: "applicant"
 
         field :profile_source, type: String, default: "self_serve"
-        field :entity_kind, type: String
+        field :entity_kind, type: Symbol
         field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
         field :xml_transmitted_timestamp, type: DateTime
         field :contact_method, type: String, default: "Only Electronic communications"
@@ -57,6 +59,14 @@ module BenefitSponsors
 
       def is_conversion?
         self.profile_source.to_s == "conversion"
+      end
+
+      def entity_kinds
+        ENTITY_KINDS
+      end
+
+      def contact_methods
+        CONTACT_METHODS
       end
     end
   end

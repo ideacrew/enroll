@@ -274,6 +274,10 @@ module BenefitSponsors
         attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
       end
 
+      def office_kinds
+        OFFICE_KINDS
+      end
+
       private
 
       def attribute_matches?(attribute, other)

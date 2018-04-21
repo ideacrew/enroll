@@ -8,7 +8,7 @@ module BenefitSponsors
 
       # TODO - remove person_form, person serializer, registration serializer
 
-      attribute :personal_information, Forms::PersonalInformationForm
+      attribute :staff_role, Forms::StaffRoleForm
       attribute :organization, Forms::OrganizationForm
 
       validate :registration_form

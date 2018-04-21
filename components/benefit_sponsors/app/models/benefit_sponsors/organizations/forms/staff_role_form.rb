@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::PersonalInformationForm
+    class Forms::StaffRoleForm
       include ActiveModel::Validations
       include Virtus.model
 

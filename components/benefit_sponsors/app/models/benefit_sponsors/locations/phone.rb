@@ -88,6 +88,10 @@ module BenefitSponsors
         self.full_phone_number = to_s
       end
 
+      def office_kinds
+        OFFICE_KINDS
+      end
+
       private
       def filter_non_numeric(str)
         str.present? ? str.to_s.gsub(/\D/,'') : ""
