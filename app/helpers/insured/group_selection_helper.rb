@@ -14,7 +14,10 @@ module Insured
 
     def can_shop_resident?(person)
       person.present? && person.is_resident_role_active?
+    end
 
+    def can_shop_individual_or_resident?(person)
+      can_shop_individual?(person) && person.has_active_resident_member?
     end
 
     def health_relationship_benefits(benefit_group)
@@ -42,8 +45,10 @@ module Insured
     def  view_market_places(person)
       if can_shop_both_markets?(person)
         Plan::MARKET_KINDS
-      elsif can_shop_individual?(person)
+      elsif can_shop_individual_or_resident?(person)
         Plan::INDIVIDUAL_MARKET_KINDS
+      elsif can_shop_individual?(person)
+        ["individual"]
       elsif can_shop_resident?(person)
         ["coverall"]
       end
