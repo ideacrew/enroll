@@ -107,6 +107,11 @@
           $('.interaction-click-control-add-benefit-group').hide();
           $('.alert-info').removeClass('hide');
           $('.interaction-click-control-save-plan-year').removeClass('disabled');
+          <% if @plan_year.new_record? %>
+          $('.interaction-click-control-continue').hide();
+          $('.col-xs-3.pull-right').append('<button class="btn btn-primary btn-lg plan-year-primary btn-lg" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>"><%= "#{button_name}".html_safe %></button>')
+          $()
+          <% end %>
         } else if (res == true) {
           $('.benefit-group-fields').show();
           $('.interaction-click-control-add-benefit-group').show();
