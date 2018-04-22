@@ -544,6 +544,14 @@ class Person
     resident_role.present? && resident_role.is_active?
   end
 
+  def has_active_resident_member?
+    if self.primary_family.present?
+      active_resident_member = self.primary_family.active_family_members.detect { |member| member.person.is_resident_role_active? }
+      return true if active_resident_member.present?
+    end
+    return false
+  end
+
   def can_report_shop_qle?
     employee_roles.first.census_employee.qle_30_day_eligible?
   end
