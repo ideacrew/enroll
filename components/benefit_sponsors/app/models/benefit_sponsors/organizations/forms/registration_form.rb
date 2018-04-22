@@ -6,63 +6,65 @@ module BenefitSponsors
       #include ActiveModel::Conversion
       include Virtus.model
 
-      # TODO - remove person_form, person serializer, registration serializer
-
-      attribute :staff_role, Forms::StaffRoleForm
+      attribute :profile_type, String
+      attribute :profile_id, String
+      attribute :staff_roles, Array[Forms::StaffRoleForm]
       attribute :organization, Forms::OrganizationForm
 
       validate :registration_form
 
+
+      # set profile when id present
+      def organization=(val)
+        result = super val
+        if profile_id.present?
+          result.profile = result.profiles.detect {|profile| profile.id == profile_id}
+        end
+        result
+      end
+
+      def staff_roles_attributes=(val)
+      end
+
       def persisted?
+        if profile_id.present?
+          return true
+        end
         false
       end
 
-      def save
-        if valid?
-          persist!
-          true
-        else
-          false
-        end
+      def save(attrs, current_user=nil)
+        persist!(attrs, current_user)
       end
 
       def self.for_new(profile_type)
-        service_obj = Services::NewProfileRegistrationService.new
-        form_params = service_obj.build(profile_type: profile_type)
+        service = resolve_service(profile_type)
+        form_params = service.build(profile_type)
         new(form_params)
       end
 
       def self.for_create(attrs)
+        new(attrs)
       end
 
       def self.for_edit(profile_id)
+        service = resolve_service(profile_id)
+        form_params = service.find(profile_id)
+        new(form_params)
       end
 
-      def self.for_update(profile_id, attrs)
+      def self.for_update(attrs)
       end
 
-      def build_parent_organization_obj(attributes)
-        @organization = Factories::ProfileFactory.initialize_parent(attributes)
-      end
-
-      def assign_wrapper_attributes(attributes)
-        attributes.each_pair do |k, v|
-          next unless self.class.method_defined?("#{k}")
-          self.send("#{k}=", v)
-        end
-      end
-
-      def persist(current_user, attrs)
+      def persist!(attrs, current_user)
         return false unless valid?
-        Factories::ProfileFactory.call_persist(current_user, attrs)
+        service.save(attrs, current_user)
       end
 
       def update(attrs)
         return false unless valid?
-        Factories::ProfileFactory.call_update(organization, attrs.merge({id: organization.id}))
+        service.update(attrs)
       end
-
-     
 
       def is_broker_profile?
         profile_type == "broker_agency"
@@ -74,7 +76,9 @@ module BenefitSponsors
 
       # TODO : Refactor validating sub-documents.
       def registration_form
-        validate_form(self.person)
+        self.staff_roles.each do |staff_role|
+          validate_form(self.staff_role)
+        end
         validate_form(self.organization)
         self.organization.profiles.each do |profile_form|
           validate_office_locations(profile_form)
@@ -94,10 +98,21 @@ module BenefitSponsors
         end
       end
 
+      protected
+
+      def self.resolve_service(attrs ={})
+        Services::NewProfileRegistrationService.new(attrs)
+      end
+
+      def service
+        return @service if defined?(@service)
+        @service = self.class.resolve_service
+      end
+
       private
 
       def build(profile_type)
-        BenefitSponsors::Services::NewProfileRegistrationService.build({profile_type: profile_type})
+        service.build({profile_type: profile_type})
       end
     end
   end

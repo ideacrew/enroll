@@ -4,6 +4,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Validations
 
+      attribute :id, String
       attribute :entity_kind, Symbol
       attribute :profile_source, String
       attribute :market_kind, String
@@ -31,7 +32,8 @@ module BenefitSponsors
         false
       end
 
-      def office_locations_attributes=(location)
+      def office_locations_attributes=(locations_params)
+        self.office_locations=(locations_params.values)
       end
 
       def market_kind=(market_kind)

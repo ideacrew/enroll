@@ -2,6 +2,7 @@
   <h4> Office Location </h4>
   <div id="address_info" class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+      <%= f.hidden_field :id, value: f.object.id if f.object.id %>
       <%= f.fields_for :address, f.object.address, errors: {}, fieldset: false do |address| %>
 
         <%
@@ -54,6 +55,7 @@
                 <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
               </div>
           </div>
+          <%= address.hidden_field :id, value: address.object.id if address.object.id %>
         <% end %>
       </div>
       <div class="col-md-2 key col-sm-3 col-xs-12"></div>
@@ -72,6 +74,7 @@
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
         <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>
       </div>
+      <%= phone.hidden_field :id, value: phone.object.id if phone.object.id %>
     </div><br>
   <% end %>
 </fieldset>

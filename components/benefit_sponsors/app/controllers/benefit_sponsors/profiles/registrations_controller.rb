@@ -9,7 +9,7 @@ module BenefitSponsors
     before_action :check_employer_staff_role, only: [:new]
 
     def new
-      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type)
+      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type: profile_type)
 
       respond_to do |format|
         format.html
@@ -19,9 +19,10 @@ module BenefitSponsors
 
     def create
       params[:agency].permit!
-      @agency= BenefitSponsors::Organizations::Forms::Profile.new(params[:agency])
+      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(params[:agency])
       begin
-        saved, result_url = @agency.persist(current_user, params[:agency])
+        # Alternate - use form object inside factory (or) do form.as_json inside service
+        saved, result_url = @agency.save(params[:agency], current_user)
         result_url = self.send(result_url)
         if saved
           if is_employer_profile?
@@ -40,13 +41,11 @@ module BenefitSponsors
     end
 
     def edit
-      # Get Staff role person
-      # @staff ||= staff_for_benefit_sponsors_employer_including_pending(@employer_profile)
-      @agency = BenefitSponsors::Organizations::Forms::Profile.new(id: params[:id])
+      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_edit(profile_id: params[:id])
     end
 
     def update
-      @agency = BenefitSponsors::Organizations::Forms::Profile.new(organization_params)
+      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(profile_id: params[:id])
       sanitize_office_locations_params
       if can_update_profile?
         if @agency.update(organization_params)
@@ -112,7 +111,7 @@ module BenefitSponsors
     end
 
     def organization_params
-      params["organization"].merge!({"id" => params["id"]}).permit!
+      params[:agency][:organization].permit!
     end
 
     #checks if person is approved by employer for staff role

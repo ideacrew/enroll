@@ -9,13 +9,13 @@ module BenefitSponsors
       include Virtus.model
 
       attribute :fein, String
-      attribute :entity_kind, String
+      # attribute :entity_kind, String
       attribute :legal_name, String
       attribute :dba, String
 
       attribute :profiles, Array[Forms::ProfileForm] #Look into handling multiple Profiles.
       attribute :profile, Forms::ProfileForm
-      attribute :profile_type, String
+      # attribute :profile_type, String
 
 
       validates :fein,
@@ -30,21 +30,22 @@ module BenefitSponsors
 
       def legal_name=(val)
         legal_name = val.blank? ? nil : val.strip
+        super legal_name
       end
       
       # Strip non-numeric characters
       def fein=(new_fein)
         fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
+        super fein
       end
 
-      def entity_kind=(entity_kind)
-        entity_kind = entity_kind.to_sym
+      def profile=(val)
+        profile = val
+        super profile
       end
 
-      def profiles_attributes=(profiles)
-        profiles.values.each do |attributes|
-          assign_wrapper_attributes(attributes)
-        end
+      def profiles_attributes=(profiles_params)
+        self.profiles=(profiles_params.values)
       end
 
       def office_location_validations # Should be in factory

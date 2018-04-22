@@ -3,36 +3,67 @@ module BenefitSponsors
     class NewProfileRegistrationService
 
       attr_reader :organization, :profile, :representative
-      attr_accessor :profile_type
+      attr_accessor :profile_type, :profile_id
 
       def initialize(attrs={})
         @profile_type = attrs[:profile_type]
+        @profile_id = attrs[:profile_id]
       end
 
       def build(attrs)
         factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
         organization = factory_class.build(attrs)
-        attributes_to_form_params(attrs[:personal_information], organization)
+        staff_roles = factory_class.find_representatives(profile_id)
+        attributes_to_form_params(organization)
       end
 
-      def attributes_to_form_params(person_obj, organization_obj)
+      def find(profile_id)
+        factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
+        organization = factory_class.build(profile_id)
+        staff_roles = factory_class.find_representatives(profile_id)
+        attributes_to_form_params(organization, staff_roles)
+      end
+
+      def attributes_to_form_params(organization_obj, staff_roles=nil)
         {
-          :"person" => personal_information_params,
+          :"profile_type" => profile_type,
+          :"profile_id" => profile_id,
+          :"staff_roles" => staff_role_params(staff_roles),
           :"organization" => Serializers::OrganizationSerializer.new(organization_obj).to_hash
         }
       end
 
 
-      def personal_information_params(attrs={})
-        {
-          :"personal_information" => attrs
-        }
+      def staff_role_params(staff_roles)
+        return [{}] if staff_roles.blank?
+        staff_roles.inject([]) do |result, role|
+          result << Serializers::StaffRoleSerializer.new(role).to_hash
+          result
+        end
       end
 
       # Serialized model attributes, plus form metadata
       def self.build(attrs)
         factory_obj = new(attrs)
         factory_obj.send(:build_classes, profile_type)
+      end
+
+      # TODO
+
+      def save(attrs, current_user=nil)
+        persist_from_factory(attrs, current_user)
+      end
+
+      def update(attrs)
+        update_from_factory(attrs)
+      end
+
+      def persist_from_factory(attrs, current_user)
+        Organizations::Factories::ProfileFactory.call_persist(attrs, current_user)
+      end
+
+      def update_from_factory(attrs)
+        Organizations::Factories::ProfileFactory.call_update(attrs, profile_id)
       end
 
       def params_to_attributes(params)

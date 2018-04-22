@@ -6,12 +6,13 @@ module BenefitSponsors
       # Federal Employer ID Number
       field :fein, type: String
 
-      validates_presence_of :entity_kind, :legal_name
+      # validates_presence_of :entity_kind, :legal_name
 
-      validates :entity_kind,
-        inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid entity kind" },
-        allow_blank: false
+      # validates :entity_kind,
+      #   inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid entity kind" },
+      #   allow_blank: false
 
+      validates_presence_of :legal_name
 
       validates :fein,
         presence: true,

@@ -4,6 +4,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Validations
 
+      attribute :id, String
       attribute :kind, String
       attribute :area_code, String
       attribute :number, String
