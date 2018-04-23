@@ -85,18 +85,16 @@
     $(document).ready(function() {
       setTimeout(function() {
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
-        var date = $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val();
+        var date = $('#plan_year_start_on').val();
         plansForDate(date);
       },50);
     });
   <% end %>
-  
-  $('select').selectric({
-    onChange: function(element) {
-      var date = $('.interaction-choice-control-plan-year-start-on').val().split('-');
-      plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
-    }
-  });
+
+  $('#plan_year_start_on').change(function() {
+    var date = $(this).val().split('-');
+    plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
+  })
 
   function plansForDate(date) {
     $.ajax({
@@ -106,16 +104,15 @@
       },
       success: function(res) {
         if (res != true) { // late rate scenario
-          $("form").attr('novalidate', 'novalidate');
           $('.benefit-group-fields').hide();
           $('.interaction-click-control-add-benefit-group').hide();
           $('.alert-info').removeClass('hide');
           $('.interaction-click-control-save-plan-year').removeClass('disabled');
           <% if @plan_year.new_record? %>
-          $('.interaction-click-control-continue').hide();
-          $(["input:hidden, textarea:hidden, select:hidden"]).attr("disabled", true);
-          $('.col-xs-3.pull-right').append('<button class="btn btn-primary btn-lg plan-year-primary btn-lg" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>"><%= "#{button_name}".html_safe %></button>')
-          $()
+          setTimeout(function() {
+            $('.interaction-click-control-continue').hide();
+            $('.col-xs-3.pull-right').append('<button class="btn btn-primary btn-lg plan-year-primary btn-lg" type="submit" data-toggle="tooltip" title="<%= button_tooltip %>"><%= "#{button_name}".html_safe %></button>')
+          },800);
           <% end %>
         } else if (res == true) {
           $('.benefit-group-fields').show();
