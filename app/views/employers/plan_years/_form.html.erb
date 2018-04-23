@@ -104,6 +104,7 @@
       },
       success: function(res) {
         if (res != true) { // late rate scenario
+          $("form").attr('novalidate', 'novalidate');
           $('.benefit-group-fields').hide();
           $('.interaction-click-control-add-benefit-group').hide();
           $('.alert-info').removeClass('hide');
