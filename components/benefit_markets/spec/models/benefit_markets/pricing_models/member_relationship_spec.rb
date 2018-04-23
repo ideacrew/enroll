@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe ContributionModels::MemberRelationship do
+  RSpec.describe PricingModels::MemberRelationship do
     describe "for a disabled, >= 27 year old child" do
       subject do
-        ::BenefitMarkets::ContributionModels::MemberRelationship.new(
+        ::BenefitMarkets::PricingModels::MemberRelationship.new(
          relationship_name: "dependent",
          relationship_kinds: ["child"],
          age_threshold: 27,
