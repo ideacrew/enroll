@@ -3,7 +3,9 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :application_coverage_selected,
-      :notify_employee_of_plan_selection_in_open_enrollment
+      :notify_employee_of_plan_selection_in_open_enrollment,
+      :employee_waiver_confirmation,
+      :employee_coverage_termination
     ]
 
     def notify_on_save
@@ -18,6 +20,16 @@ module ModelEvents
           is_notify_employee_of_plan_selection_in_open_enrollment = true
         end
       
+        if is_transition_matching?(to: :inactive, from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], event: :waive_coverage)
+          is_employee_waiver_confirmation = true
+        end
+          
+        if is_transition_matching?(to: [:coverage_terminated, :coverage_termination_pending], from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
+                         :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier, 
+                         :renewing_contingent_enrolled, :enrolled_contingent, :unverified], event: [:terminate_coverage, :schedule_coverage_termination])
+          is_employee_coverage_termination = true
+        end
+
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
         REGISTERED_EVENTS.each do |event|
           if event_fired = instance_eval("is_" + event.to_s)

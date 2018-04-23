@@ -4,10 +4,11 @@ namespace :employers do
   desc "Export employers to csv."
   # Usage rake employers:export
   task :export => [:environment] do
+    include Config::AcaHelper
+
     orgs = Organization.no_timeout.where("employer_profile" => {"$exists" => true})
 
-    time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-    file_name = File.expand_path("#{Rails.root}/public/employer_export_#{time_stamp}.csv")
+    file_name = fetch_file_format('employer_export','EMPLOYEREXPORT')
 
     def get_primary_office_location(organization)
       organization.office_locations.detect do |office_location|

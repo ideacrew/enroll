@@ -806,6 +806,23 @@ describe EmployerProfile, "when a binder premium is credited" do
   end
 end
 
+describe "#update_status_to_binder_paid" do
+  let(:org1) { FactoryGirl.create :organization, legal_name: "Corp 1" }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: org1) }
+
+  before do
+    employer_profile.update_attribute(:aasm_state, 'eligible')
+    EmployerProfile.update_status_to_binder_paid([org1.id])
+  end
+
+  it 'should chnage the state update the workflow state transition' do
+    employer_profile.reload
+    expect(employer_profile.aasm_state).to eq('binder_paid')
+    expect(employer_profile.workflow_state_transitions.map(&:to_state)).to eq(['binder_paid'])
+  end
+
+end
+
 describe EmployerProfile, "Renewal Queries" do
   let(:organization1) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
@@ -1114,6 +1131,20 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       end
     end
   end
+
+  # context "trigger broker_fired_notice" do
+  #   let(:params)  { {} }
+  #   let(:employer_profile) {EmployerProfile.new(**params)}
+  #   it "should trigger When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client." do
+  #     ActiveJob::Base.queue_adapter = :test
+  #     ActiveJob::Base.queue_adapter.enqueued_jobs = []
+  #     employer_profile.trigger_notices("broker_fired_confirmation_to_broker")
+  #     queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+  #       job_info[:job] == ShopNoticesNotifierJob
+  #     end
+  #     expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'broker_fired_confirmation_to_broker']
+  #   end
+  # end
 
   describe "non conversion employer" do
     let(:source) { 'self_serve' }

@@ -9,9 +9,10 @@ module ModelEvents
       :renewal_enrollment_confirmation,
       :ineligible_initial_application_submitted,
       :ineligible_renewal_application_submitted,
-      :open_enrollment_began,
+      # :open_enrollment_began, #not being used
       :application_denied,
-      :renewal_application_denied
+      :renewal_application_denied,
+      :zero_employees_on_roster
     ]
 
     DATA_CHANGE_EVENTS = [
@@ -56,9 +57,10 @@ module ModelEvents
           is_renewal_application_autosubmitted = true
         end
 
-        if enrolling? || renewing_enrolling?
-          is_open_enrollment_began = true
-        end
+        # Not being used any wherer as of now
+        # if enrolling? || renewing_enrolling?
+        #   is_open_enrollment_began = true
+        # end
 
         if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
           is_application_denied = true
@@ -66,6 +68,10 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
+        end
+
+        if is_transition_matching?(to: :published, from: :draft, event: :force_publish)
+          is_zero_employees_on_roster = true
         end
 
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers

@@ -380,10 +380,10 @@ ready = function() {
 
       if ($(this).find('input[type=radio]').is(':checked')) {
       } else {
-        $(this).find('input[type=radio]').prop('checked', true );
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > *').hide();
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', 0);
         $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
+        $(this).find('input[type=radio]').prop('checked', true ).trigger('change');
       }
       var nav_tabs = $('.nav-tabs li input');
 
@@ -393,7 +393,7 @@ ready = function() {
 
       });
 
-    $(document).on('change', '.health .nav-tabs li input', function() {
+    var showCarrierOptions = function() {
       if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
         EmployerProfile.validateEditPlanYear();
 
@@ -431,14 +431,13 @@ ready = function() {
 
         }
       }
-    });
+    }
 
-
-
+    $(document).on('change', '.health .nav-tabs li input', showCarrierOptions);
+    $(document).on('change', '.dental .nav-tabs li input', showCarrierOptions);
 
     //toggle plan options checkbox through parent anchor
-
-    $(document).on('click', '.health .plan-options a', function() {
+    var togglePlanOptions = function() {
       if ( $(this).closest('.elected-plans-tab').length == 0 ) {
         if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
           EmployerProfile.validateEditPlanYear();
@@ -483,7 +482,9 @@ ready = function() {
 
         }
       }
-    });
+    }
+    $(document).on('click', '.health .plan-options a', togglePlanOptions);
+    $(document).on('click', '.dental .plan-options a', togglePlanOptions);
 
 
 
@@ -724,13 +725,15 @@ function loadCarrierNames() {
   var employer_profile_id = $('#employerProfileId').data('value');
   var benefit_group_id = $('#benefitGroupId').data('value');
   var location_id = $(this).closest('fieldset').attr('id');
+  var panel_id = $(this).closest('fieldset').attr('data-benefit-group');
   $.ajax({
     type: "GET",
     data:{
       start_on: start_on,
       selected_carrier_level: selected_carrier_level,
       benefit_group: benefit_group_id,
-      location_id: location_id
+      location_id: location_id,
+      panel_id: panel_id
     },
     url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
   });

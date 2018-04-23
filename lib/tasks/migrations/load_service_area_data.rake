@@ -1,8 +1,9 @@
 namespace :load_service_reference do
 
-  task :run_all_service_areas do
+  task :run_all_service_areas => :environment do
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/service_areas", "**", "*.xlsx"))
     puts "*"*80 unless Rails.env.test?
+    CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
     files.each do |file|
       puts "processing file #{file}" unless Rails.env.test?
       Rake::Task['load_service_reference:update_service_areas'].invoke(file)

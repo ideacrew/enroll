@@ -60,6 +60,7 @@ module Notifier
       generate_pdf_notice
       upload_and_send_secure_message
       send_generic_notice_alert
+      send_generic_notice_alert_to_broker
     end
 
     def recipient_klass_name

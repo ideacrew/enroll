@@ -1,4 +1,3 @@
-
 module Notifier
   module Builders::Enrollment
 
@@ -20,13 +19,13 @@ module Notifier
     end
 
     def enrollment_plan_name
-			return if enrollment.blank?
+      return if enrollment.blank?
       merge_model.enrollment.plan_name = enrollment.plan.name
     end
 
     def enrollment_enrolled_count
-    	return if enrollment.blank?
-    	merge_model.enrollment.enrolled_count = enrollment.humanized_dependent_summary
+      return if enrollment.blank?
+      merge_model.enrollment.enrolled_count = enrollment.humanized_dependent_summary
     end
 
     def enrollment_coverage_kind
@@ -45,12 +44,12 @@ module Notifier
     end
 
     def enrollment_employee_first_name
-    	return if enrollment.blank?
+      return if enrollment.blank?
       merge_model.enrollment.employee_first_name = enrollment.census_employee.first_name
     end
 
     def enrollment_employee_last_name
-    	return if enrollment.blank?
+      return if enrollment.blank?
       merge_model.enrollment.employee_last_name = enrollment.census_employee.last_name
     end
 
