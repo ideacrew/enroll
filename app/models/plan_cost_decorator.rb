@@ -104,7 +104,11 @@ class PlanCostDecorator < SimpleDelegator
       Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age)
     end
     value = if the_plan.health?
-      benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f
+      if use_simple_employer_calculation_model?
+        benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f
+      else
+        1.0
+      end
     else
       1.0
     end

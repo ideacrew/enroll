@@ -7,9 +7,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
+    hbx_enrollment = build_hbx_enrollment
+    @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-    @effective_on_date = params[:effective_on_date] || params[:change_plan_date]
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
       if params[:hbx_enrollment_id].present?
@@ -25,8 +26,8 @@ class Insured::GroupSelectionController < ApplicationController
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
-    qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-    @benefit_group = select_benefit_group(qle)
+    @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+    @benefit_group = select_benefit_group(@qle, @employee_role)
     @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
 
     generate_coverage_family_members_for_cobra
@@ -66,7 +67,6 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
     hbx_enrollment.coverage_kind = @coverage_kind
-
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     if hbx_enrollment.save

@@ -108,8 +108,10 @@
     <div>
       <div class="no-buffer no-border-top">
         <div class="form-group form-group-lg">
-          <p class="sixteen"><a class="change-password-link" href="#">Change my password</a></p>
-          <p class="sixteen"><a class="update-security-responses-link" href="#">Update my security challenge responses</a></p>
+          <% if aca_security_questions %>
+            <p class="sixteen"><a class="change-password-link" href="#">Change my password</a></p>
+            <p class="sixteen"><a class="update-security-responses-link" href="#">Update my security challenge responses</a></p>
+          <% end %>
         </div>
       </div>
     </div>

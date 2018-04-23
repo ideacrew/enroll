@@ -5,22 +5,27 @@ namespace :reports do
 
     desc "Employer plan year application status by effective date"
     task :employer_roster_report => :environment do
+      include Config::AcaHelper
 
       organizations = Organization.exists(:employer_profile => true).where(:"hbx_id".nin => [100101, 100102, 118510])
-      build_csv_report('er_roster_report', organizations)
+      build_csv_report('er_roster_report', 'ERROSTER', organizations)
 
       organizations = Organization.where(:"hbx_id".in => [100101, 100102, 118510])
-      build_csv_report('congressional_er_roster_report', organizations)
+      build_csv_report('congressional_er_roster_report', 'CONGRESSIONALERROSTER', organizations)
     end
   end
 end
 
-def build_csv_report(file_name, organizations)
-  time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-  file_path = File.expand_path("#{Rails.root}/public/#{file_name}_#{time_stamp}.csv")
+def build_csv_report(file_name_DC, file_name_MA, organizations)
+  file_path = fetch_file_format(file_name_DC, file_name_MA)
 
   CSV.open(file_path, "w", force_quotes: true) do |csv|
-    csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID"]
+    if Settings.aca.state_abbreviation.downcase == "ma"
+      csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID"]
+    else
+      csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID","EE active health","active health HIOS ID","EE active dental","active denatl HIOS ID","EE renewal health","renewal health HIOS ID","EE renewal dental","renewal dental HIOS ID"]
+    end
+
     organizations.each do |organization|
       employer_profile = organization.employer_profile
       next if employer_profile.census_employees.blank?
@@ -70,6 +75,24 @@ def build_employee_row(employee, employer_data)
     employee.employee_role.try(:hbx_id)
   ]
 
+  if employee.active_benefit_group_assignment.present? &&  employee.active_benefit_group_assignment.active_and_waived_enrollments.present?
+    health_enrollment= employee.active_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "health"}.first
+    dental_enrollment= employee.active_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "dental"}.first
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
+  else
+    data += add_data(4,'')
+  end
+
+  if employee.renewal_benefit_group_assignment.present? &&  employee.renewal_benefit_group_assignment.active_and_waived_enrollments.present?
+    health_enrollment= employee.renewal_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "health"}.first
+    dental_enrollment= employee.renewal_benefit_group_assignment.active_and_waived_enrollments.select{|enrollment| enrollment.coverage_kind == "dental"}.first
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, health_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, dental_enrollment.try(:plan).try(:hios_id)] : add_data(2,''))
+  else
+    data += add_data(4,'')
+  end
+
   data
 end
 
@@ -87,4 +110,8 @@ end
 def format_date(date)
   return '' if date.blank?
   date.strftime("%m/%d/%Y")
+end
+
+def add_data(count,expression)
+  return Array.new(count,expression)
 end

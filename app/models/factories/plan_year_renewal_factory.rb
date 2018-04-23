@@ -56,6 +56,7 @@ module Factories
 
         if @renewal_plan_year.save
           populate_census_employee_benefit_packages
+          # trigger_notice {"employer_renewal_dental_carriers_exiting_notice"} if @renewal_plan_year.start_on < Date.new(2019,1,1) #mirror notice
           @renewal_plan_year
         else
           raise PlanYearRenewalFactoryError,
@@ -65,6 +66,15 @@ module Factories
         end
       rescue Exception => e
         @logger.debug e.inspect
+      end
+    end
+
+    def trigger_notice
+      notice_name = yield
+      begin
+        ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, yield) unless Rails.env.test?
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver #{notice_name} notice to employer #{@employer_profile.legal_name} due to #{e}" }
       end
     end
 

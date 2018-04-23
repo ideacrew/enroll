@@ -7,10 +7,6 @@ class Employers::EmployerAttestationsController < ApplicationController
     @documents = []
     @documents = @employer_profile.employer_attestation.employer_attestation_documents if @employer_profile.employer_attestation.present?
     @element_to_replace_id = params[:employer_actions_id]
-
-    respond_to do |format|
-      format.js { render "edit" }
-    end
   end
 
   def new
