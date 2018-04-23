@@ -38,7 +38,7 @@ module BenefitSponsors
               @member_ids << rl.first
               dob_listing << member_dobs[rl.first]
             end
-            @dob_list = dob_listing.sort.reverse
+            @dob_list = dob_listing.sort
           end
 
           def <=>(other)
