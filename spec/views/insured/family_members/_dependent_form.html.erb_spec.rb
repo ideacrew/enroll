@@ -68,7 +68,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
   end
 
-  context "without consumer_role" do
+  context "without dependent present" do
     before :each do
       sign_in user
       @request.env['HTTP_REFERER'] = ''
@@ -83,14 +83,14 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).to have_selector("li.dependent_list")
     end
 
-    it "should not have consumer_fields area" do
-      expect(rendered).not_to have_selector("div#consumer_fields")
-      expect(rendered).not_to match /Are you a US Citizen or US National/
+    it "should to have consumer_fields area" do
+      expect(rendered).to have_selector("div#consumer_fields")
+      expect(rendered).to match /Are you a US Citizen or US National/
     end
 
-    it "should not have dependent-address area" do
-      expect(rendered).not_to have_selector("div#dependent-address")
-      expect(rendered).not_to have_selector("div#dependent-home-address-area")
+    it "should to have dependent-address area" do
+      expect(rendered).to match /NO DC ADDRESS/
+      expect(rendered).to match /NEW ADDRESS/
     end
 
     it "should have required indicator for fields" do
@@ -105,11 +105,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should display the affirmative message" do
-      expect(rendered).not_to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
+      expect(rendered).to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
     end
 
     it "should have address info area" do
-      expect(rendered).to have_selector('#address_info')
+      expect(rendered).to match /NO DC ADDRESS/
       expect(rendered).to match /Home Address/
     end
   end

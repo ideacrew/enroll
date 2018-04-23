@@ -3,29 +3,13 @@ require 'rails_helper'
 RSpec.describe "insured/families/_navigation.html.erb" do
   let(:person) {FactoryGirl.create(:person, :with_family)}
   let(:user){ FactoryGirl.create(:user, person: person) }
-
-  let(:person){
-    instance_double(
-      "Person",
-      first_name: "my first name",
-      last_name: "my last name"
-      )
-  }
   let(:employee_role){ instance_double("EmployeeRole") }
   let(:employer_profile){ instance_double("EmployerProfile") }
   let(:broker_agency_profile){ instance_double("BrokerAgencyProfile") }
   let(:inbox){ instance_double("Inbox") }
   let(:active_family_members){ instance_double("ActiveFamilyMembers")}
-  def family_member
-    random_value = rand(999_999_999)
-    instance_double(
-      "FamilyMember#{random_value}",
-      first_name: "my real first name #{random_value}",
-      last_name: "my real last name #{random_value}"
-      )
-  end
-
-  let(:family_members){ [ family_member, family_member ] }
+  let(:family_member1) { FamilyMember.new(:is_primary_applicant => nil, :is_coverage_applicant => nil, :person => person) }
+  let(:family_members){ [ family_member1 ] }
 
   before :each do
     sign_in(user)

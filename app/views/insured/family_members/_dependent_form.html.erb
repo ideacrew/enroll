@@ -112,12 +112,11 @@
             <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
           <% end %>
         </div>
-
-        <% if @person.is_consumer_role_active? %>
+        <% if @dependent.try(:family_member).try(:person).nil? || @dependent.try(:family_member).try(:person).is_consumer_role_active? %>
           <%= render 'shared/ssn_coverage_msg' %>
         <% end %>
 
-        <% if @person.is_consumer_role_active? %>
+        <% if @dependent.try(:family_member).try(:person).nil? || @dependent.try(:family_member).try(:person).is_consumer_role_active? %>
           <br>
           <div id="consumer_fields_sets">
           <%= render 'shared/consumer_fields', f: f %>

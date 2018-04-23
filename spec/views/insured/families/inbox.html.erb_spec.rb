@@ -4,12 +4,15 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
   let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
   let(:person) { FactoryGirl.create(:person) }
   let(:consumer_role) { double('consumer_role', :is_active? => true)}
+  let(:family_member1) { FamilyMember.new(:is_primary_applicant => nil, :is_coverage_applicant => nil, :person => person) }
+  let(:family_members){ [ family_member1 ] }
 
   before :each do
     sign_in(user)
     assign(:person, person)
     assign(:current_user, user)
     assign(:provider, person)
+    assign(:family_members, family_members)
     allow(person).to receive_message_chain("inbox.unread_messages.size").and_return(3)
   end
 
