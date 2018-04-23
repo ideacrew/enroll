@@ -105,6 +105,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def my_account
   end
 
+
+
+  # POC START
+
+
   def office_locations
     render json: @employer_profile.organization.office_locations.to_json(except: [:created_at, :updated_at, :phone, :is_primary, :address_3])
   end
@@ -113,6 +118,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @employer_profile.organization.update_attributes!(office_location_params)
     render json: {:ok => 1}
   end
+
+  def office_location_params
+    params.permit(:office_locations => [:_id, :address => [:address_1, :address_2, :city, :state, :zip]])
+  end
+
+  # POC END
+
+
+
+
 
   def show
     @tab = params['tab']
@@ -450,10 +465,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     )
   end
 
-  def office_location_params
-    params.permit(:office_locations => [:_id, :address => [:address_1, :address_2, :city, :state, :zip]])
-    #params.permit(:office_locations => [:_id])
-  end
+
 
   def sanitize_employer_profile_params
     params[:organization][:office_locations_attributes].each do |key, location|

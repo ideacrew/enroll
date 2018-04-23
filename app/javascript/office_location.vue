@@ -41,6 +41,7 @@
               </div>
           </div>
       </div>
+      <div class="row"></div>
   </div>
 </template>
 
@@ -49,12 +50,11 @@ export default {
   data: function() {
     return {
       office_kinds: ['Primary','Mailing','Other'],
-      kind: '',
-      address_1: '',
+      address_1: this.info.address_1,
       address_2: this.info.address_2,
       city: this.office.city,
-      st: '',
-      zip: ''
+      state: this.office.state,
+      zip: this.office.zip
     }
   },
   props: ['office'],
@@ -71,8 +71,4 @@ export default {
 </script>
 
 <style scoped>
-p {
-  font-size: 2em;
-  text-align: center;
-}
 </style>
