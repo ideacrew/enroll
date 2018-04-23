@@ -5,11 +5,13 @@ module BenefitSponsors
       include Concerns::EmployerProfileConcern
 
 
-      # def rating_area
-      # end
+      def rating_area
+        # FIX this
+      end
 
-      # def sic_code
-      # end
+      def sic_code
+        # Fix this
+      end
 
 
       def active_broker
