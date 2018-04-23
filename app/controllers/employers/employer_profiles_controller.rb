@@ -112,7 +112,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
     # Conditional based columns has to display so we are passing arguments
     data_table_params = {id: params[:id], scopes: params[:scopes]}
-    if @employer_profile.renewing_published_plan_year.present? 
+    if @employer_profile.renewing_published_plan_year.present?
       data_table_params.merge!({renewal: true, renewal_status: true})
     end
     @datatable = Effective::Datatables::EmployeeDatatable.new(data_table_params)
@@ -209,6 +209,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           render action: 'show_pending'
         else
           @organization.employer_profile.trigger_shop_notices("welcome_notice_to_employer") if @organization.employer_profile.present?
+          # employer_account_creation_notice if @organization.employer_profile.present? #mirror notice
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -377,6 +378,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
       render partial: 'employers/employer_profiles/county_field'
   end
+
+  # def employer_account_creation_notice
+  #   begin
+  #     ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
+  #   rescue Exception => e
+  #     Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
+  #   end
+  # end
 
   private
 

@@ -190,5 +190,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.profiles.favorite_general_agency_title" => "favorite General Agency will list on top of other General Agency on assignment page",
 	"en.broker_agencies.quotes.quote_for_benefit_group" => "Quote for Benefit Group: %{title}",
 	"en.dental_plan_options" => "Dental Plan Options",
-	"en.broker_agencies.quotes.actual_costs_may_vary" => "**Actual costs may vary."
+	"en.broker_agencies.quotes.actual_costs_may_vary" => "**Actual costs may vary.",
+	"en.broker_agencies.broker_roles.broker_registration_text" => "By submitting this application to become a certified broker on the %{site_short_name} for Business, I agree to the terms and conditions described in the %{site_brokers_agreement_path}."
 }

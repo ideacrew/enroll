@@ -21,11 +21,21 @@ module Observers
           end
         end
 
+        if new_model_event.event_key == :initial_application_submitted
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
+          trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
+        if new_model_event.event_key == :zero_employees_on_roster
+          trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
         if new_model_event.event_key == :renewal_employer_open_enrollment_completed
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
         end
 
         if new_model_event.event_key == :renewal_application_submitted
+          trigger_zero_employees_on_roster_notice(plan_year)
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
         end
 
@@ -35,6 +45,7 @@ module Observers
 
         if new_model_event.event_key == :renewal_application_autosubmitted
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
@@ -104,6 +115,17 @@ module Observers
             end
           end
         end
+
+        if new_model_event.event_key == :employee_waiver_confirmation
+          trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+        end
+
+        if new_model_event.event_key == :employee_coverage_termination
+          if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.benefit_group.plan_year.active?
+            trigger_notice(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
+            trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+          end
+        end
       end
     end
 
@@ -147,6 +169,12 @@ module Observers
       if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
         census_employee = new_model_event.klass_instance
         trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
+      end
+    end
+
+    def trigger_zero_employees_on_roster_notice(plan_year)
+      if !plan_year.benefit_groups.any?{|bg| bg.is_congress?} && plan_year.employer_profile.census_employees.active.count < 1
+        trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice")
       end
     end
 
