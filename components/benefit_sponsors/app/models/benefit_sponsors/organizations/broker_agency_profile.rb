@@ -40,8 +40,8 @@ module BenefitSponsors
         uniqueness: true,
         allow_blank: true
 
-      validates :market_kind, # TODO - check ::BenefitMarkets::BENEFIT_MARKET_KINDS
-        inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
+      validates :market_kind,
+        inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
         allow_blank: false
 
       validates :entity_kind,
