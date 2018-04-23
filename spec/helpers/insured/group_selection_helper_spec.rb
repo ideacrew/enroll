@@ -183,8 +183,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
     it "should return individual & coverall if can_shop_individual? return true" do
       allow(person).to receive(:is_consumer_role_active?).and_return(true)
-      expect(helper.view_market_places(person)).to eq Plan::INDIVIDUAL_MARKET_KINDS
-      expect(helper.view_market_places(person)).to eq ["individual", "coverall"]
+      expect(helper.view_market_places(person)).to eq ["individual"]
     end
 
     it "should return coverall if can_shop_resident? return true" do
