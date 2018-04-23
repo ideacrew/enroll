@@ -1,5 +1,7 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
+  include ApplicationHelper
+
   before_action :find_employer
   before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
@@ -26,6 +28,10 @@ class Employers::BrokerAgencyController < ApplicationController
         @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
       end
     end
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def show
@@ -39,7 +45,6 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
-
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
@@ -51,10 +56,14 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.save!(validate: false)
       broker_hired
       @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer")
-      broker_agency_hired_confirmation
+      #notice to broker
+      # @employer_profile.trigger_notices('broker_hired') #mirror notice
+      #notice to broker agency
+      # @employer_profile.trigger_notices('broker_agency_hired') #mirror notice
+      #notice to employer
+      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
       # @employer_profile.trigger_notices("broker_hired_confirmation_notice") #mirror notice
     end
-
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
@@ -64,7 +73,6 @@ class Employers::BrokerAgencyController < ApplicationController
     end
     log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
   end
-
 
   def terminate
     authorize EmployerProfile, :updateable?
@@ -100,14 +108,6 @@ class Employers::BrokerAgencyController < ApplicationController
          ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
     rescue Exception => e
        puts "Unable to deliver Broker Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
-    end
-  end
-
-  def broker_agency_hired_confirmation
-    begin
-         ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_agency_hired_confirmation")
-    rescue Exception => e
-       puts "Unable to deliver Broker Agency Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
   end
 

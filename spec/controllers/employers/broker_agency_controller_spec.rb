@@ -16,7 +16,7 @@ RSpec.describe Employers::BrokerAgencyController do
     @org2.broker_agency_profile.update_attributes(primary_broker_role: @broker_role2)
     @broker_role2.update_attributes(broker_agency_profile_id: @org2.broker_agency_profile.id)
     @org2.broker_agency_profile.approve!
-   
+
     @user = FactoryGirl.create(:user)
     p=FactoryGirl.create(:person, user: @user)
     @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
@@ -27,6 +27,12 @@ RSpec.describe Employers::BrokerAgencyController do
   end
 
   describe ".index" do
+
+    it "should render js template" do
+      sign_in(@user)
+      xhr :get, :index, employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name
+      expect(response.content_type).to eq Mime::JS
+    end
 
     context 'with out search string' do
       before(:each) do
@@ -70,6 +76,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it "should be a success" do
+        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
         expect(flash[:notice]).to eq("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
       end
@@ -96,6 +103,18 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should be a success" do
         expect(flash[:error]).to match(/Access not allowed/)
+      end
+    end
+
+    context 'broker-agency hired confirmation notice to broker agency' do
+      before(:each) do
+        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in(@user)
+      end
+
+      it "should trigger the notice" do
+        expect(controller).to receive(:trigger_notice_observer).once.ordered.with(@broker_role2.broker_agency_profile, @employer_profile,"broker_agency_hired_confirmation")
+        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
     end
   end
@@ -188,7 +207,22 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+
     end
+
+    # it "should send notice to employer, broker and agency" do
+    #   @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
+    #   @org2.broker_agency_profile.save
+    #   ActiveJob::Base.queue_adapter = :test
+    #   ActiveJob::Base.queue_adapter.enqueued_jobs = []
+    #   post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+    #   queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
+    #     job_info[:job] == ShopNoticesNotifierJob
+    #   end
+    #   expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired"]}).to eq true
+    #   expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_agency_hired"]}).to eq true
+    #   expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired_confirmation_notice"]}).to eq true
+    # end
 
     context "send_broker_assigned_msg" do
 

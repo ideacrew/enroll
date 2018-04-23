@@ -405,13 +405,14 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "waive_coverage_by_benefit_group_assignment" do
-      before :all do
+      before :each do
         @enrollment4 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
           benefit_group: mikes_benefit_group,
           benefit_group_assignment: @mikes_benefit_group_assignments
         )
+        allow(@enrollment4).to receive(:notify_on_save).and_return true
         @enrollment4.save
         @enrollment5 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
@@ -420,6 +421,7 @@ describe HbxEnrollment, dbclean: :after_all do
           benefit_group_assignment: @mikes_benefit_group_assignments
 
         )
+        allow(@enrollment5).to receive(:notify_on_save).and_return true
         @enrollment5.save
         @enrollment4.waive_coverage_by_benefit_group_assignment("start a new job")
         @enrollment5.reload
@@ -443,7 +445,7 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "should shedule termination previous auto renewing enrollment" do
-      before :all do
+      before :each do
         @enrollment6 = household.create_hbx_enrollment_from(
             employee_role: mikes_employee_role,
             coverage_household: coverage_household,
@@ -452,6 +454,7 @@ describe HbxEnrollment, dbclean: :after_all do
         )
         @enrollment6.effective_on=TimeKeeper.date_of_record + 1.days
         @enrollment6.aasm_state = "auto_renewing"
+        allow(@enrollment6).to receive(:notify_on_save).and_return true
         @enrollment6.save
         @enrollment7 = household.create_hbx_enrollment_from(
             employee_role: mikes_employee_role,
@@ -459,6 +462,7 @@ describe HbxEnrollment, dbclean: :after_all do
             benefit_group: mikes_benefit_group,
             benefit_group_assignment: @mikes_benefit_group_assignments
         )
+        allow(@enrollment7).to receive(:notify_on_save).and_return true
         @enrollment7.save
         @enrollment7.cancel_previous(TimeKeeper.date_of_record.year)
       end
@@ -971,6 +975,39 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment.terminated_on).to eq nil
     end
   end
+
+   context "cancel_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
+
+
+   context "terminate_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
+
+    it "should terminate enrollment" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+    end
+
+    it "should  populate terminate on" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+    end
+  end
+
+
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -1375,6 +1412,8 @@ context "Benefits are terminated" do
 
   context "SHOP benefit" do
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:census_employee)   { FactoryGirl.create(:census_employee)}
+    let(:employee_role)     { FactoryGirl.create(:employee_role)}
     let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
                                                  household: shop_family.latest_household,
                                                  coverage_kind: "health",
@@ -1382,12 +1421,16 @@ context "Benefits are terminated" do
                                                  enrollment_kind: "open_enrollment",
                                                  kind: "employer_sponsored",
                                                  submitted_at: effective_on_date - 10.days,
-                                                 benefit_group_id: benefit_group.id
+                                                 benefit_group_id: benefit_group.id,
+                                                 employee_role_id: employee_role.id
                                                  )
                               }
 
     let(:shop_termination_date)  { TimeKeeper.date_of_record.end_of_month }
 
+    before do
+      employee_role.update_attributes(census_employee_id: census_employee.id)
+    end
 
     it "should be SHOP enrollment kind" do
       expect(shop_enrollment.is_shop?).to be_truthy
@@ -2464,6 +2507,42 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
         expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
       end
     end
+  end
+end
+
+describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :after_all do
+  let(:family)          { FactoryGirl.build(:individual_market_family) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual') }
+
+  context "open enrollment" do
+    before do
+      hbx_enrollment.update(enrollment_kind: 'open_enrollment')
+    end
+
+    it "should return true when auto_renewing" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'auto_renewing')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return true when renewing_coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'renewing_coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return false when coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+    end
+  end
+
+  it "should return false when it is not open_enrollment" do
+    hbx_enrollment.update(enrollment_kind: 'special_enrollment')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+
+  it "should return false when it is individual" do
+    hbx_enrollment.update(kind: 'employer_sponsored')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
   end
 end
 
