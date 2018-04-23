@@ -129,7 +129,7 @@ module BenefitSponsors
           member.validate
           expect(member).to be_invalid
 
-          expect(member.errors[:dob].first[:message]).to match /date of birth cannot be more than 110 years ago/
+          expect(member.errors[:dob].first[:message]).to match(/date of birth cannot be more than 110 years ago/)
         end
       end
 
@@ -141,11 +141,28 @@ module BenefitSponsors
           member.validate
           expect(member).to be_invalid
 
-          expect(member.errors[:dob].first[:message].to_s).to match /future date: #{future_dob.to_s} is not valid for date of birth/
+          expect(member.errors[:dob].first[:message].to_s).to match(/future date: #{future_dob.to_s} is not valid for date of birth/)
         end
       end
 
+      context "with a valid date of birth" do
+        let(:today)         { Date.today }
+        let(:age_today)     { 36 }
+        let(:age_tomorrow)  { age_today + 1 }
+        let(:date_of_birth) { 37.years.ago + 1.day }
+
+        it "should correctly calculate the member's age" do
+          member.dob = date_of_birth
+          expect(member.age_on(today)).to eq age_today
+          expect(member.age_on(today + 1)).to eq age_tomorrow
+        end
+
+      end
+
+
+
     end
+
 
 
   end
