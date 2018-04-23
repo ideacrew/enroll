@@ -95,7 +95,7 @@ module Observers
       if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
        if new_model_event.event_key == :generate_initial_employer_invoice
           if employer_profile.is_new_employer?
-            trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first, notice_event: "generate_initial_employer_invoice")
+            trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "generate_initial_employer_invoice")
           end
         end
 
@@ -129,7 +129,7 @@ module Observers
         document = new_model_event.klass_instance
         if new_model_event.event_key == :initial_employer_invoice_available
           employer_profile = document.documentable
-          trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first, notice_event: "initial_employer_invoice_available")
+          trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
         end
       end
     end
