@@ -228,7 +228,7 @@ class ConsumerRole
   end
 
   def all_types_verified?
-    person.verification_types.active.all?{ |type| type.type_verified? }
+    verification_types.all?{ |type| type.type_verified? }
   end
 
   def local_residency_outstanding?
@@ -839,7 +839,7 @@ class ConsumerRole
 
   def update_verification_type(v_type, update_reason, *authority)
     status = authority.first == "curam" ? "curam" : "verified"
-    v_type.update_attributes(:validation_status => status, :update_reason => update_reason)
+    self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name

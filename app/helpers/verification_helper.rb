@@ -40,7 +40,7 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.contingent_enrolled_active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.is_type_outstanding?}.any?
   end
 
   def verification_needed?(person)
@@ -57,8 +57,8 @@ module VerificationHelper
     !(["na", "verified", "attested", "expired"].include?(v_type.validation_status))
   end
 
-  def can_show_due_date?(person, options ={})
-    enrollment_group_unverified?(person) && verification_needed?(person) && (has_enrolled_policy?(options[:f_member]) && is_not_verified?(options[:f_member], options[:v_type]))
+  def can_show_due_date?(person)
+    enrollment_group_unverified?(person)
   end
 
   def documents_uploaded

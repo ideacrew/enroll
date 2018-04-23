@@ -50,7 +50,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def find_type
     set_current_person
-    @verification_type = @person.verification_types.find(params[:verification_type]) if params[:verification_type]
+    @verification_type = find_docs_owner(params[:family_member]).verification_types.find(params[:verification_type]) if params[:verification_type]
   end
 
   def get_family

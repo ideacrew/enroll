@@ -131,7 +131,7 @@ class MigrateVerificationTypes < MongoidMigrationTask
           elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
             "review"
           elsif consumer.ssa_pending?
-            "processing"
+            "pending"
           else
             "outstanding"
           end
@@ -149,7 +149,7 @@ class MigrateVerificationTypes < MongoidMigrationTask
           elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
             "review"
           elsif consumer.residency_pending?
-            "processing"
+            "pending"
           else
             "outstanding"
           end
@@ -159,7 +159,7 @@ class MigrateVerificationTypes < MongoidMigrationTask
           elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
             "review"
           elsif consumer.citizenship_immigration_processing?
-            "processing"
+            "pending"
           else
             "outstanding"
           end

@@ -1005,7 +1005,7 @@ class Family
   end
 
   def document_due_date(v_type)
-    (["verified", "attested"].include? v_type.validation_status) ? nil : v_type.due_date
+    (["verified", "attested", "valid"].include? v_type.validation_status) ? nil : v_type.due_date
   end
 
   def enrolled_policy(family_member)
@@ -1036,7 +1036,7 @@ class Family
   def all_persons_vlp_documents_status
     outstanding_types = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.where(validation_status:"outstanding").to_a
+      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
     fully_uploaded = outstanding_types.all?{ |type| type.vlp_documents.any? }
     partially_uploaded = outstanding_types.any?{ |type| type.vlp_documents.any? }
