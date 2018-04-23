@@ -2,6 +2,11 @@
 
 <div class="row">
   <div class="col-md-12">
+    
+    <div class="alert alert-info hide" role="alert">
+      <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= no_rates_error(Settings.site.exchange_name) %></strong>
+    </div>
+        
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Quote for <%= @plan_design_proposal.plan_design_organization.legal_name %> <%= link_to "View all quotes for this employer", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization._id), remote: true, class: "pull-right" %></h3>
@@ -33,3 +38,30 @@
   </div>
 </div>
 </div>
+
+<script>
+  $('select').selectric({
+    onChange: function(element) {
+      var date = $('.interaction-choice-control-forms-plan-design-proposal-effective-date').val().split('-');
+      plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
+    }
+  });
+  
+ function plansForDate(date) {
+   $.ajax({
+     type: "GET",
+     data:{
+       start_on_date: date
+     },
+     success: function(res) {
+       if (res != true) { // late rate scenario
+         $('.interaction-click-control-select-health-benefits').hide();
+         $('.alert-info').removeClass('hide');
+       } else if (res == true) {
+  
+       }
+     },
+     url: "/employers/employer_profiles/1/plan_years/1/late_rates_check"
+   });
+ }
+</script>
