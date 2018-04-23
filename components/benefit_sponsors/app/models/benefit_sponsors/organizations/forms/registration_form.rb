@@ -23,7 +23,11 @@ module BenefitSponsors
         result
       end
 
-      def staff_roles_attributes=(val)
+      def staff_roles_attributes=(attrs)
+        self.staff_roles = attrs.values.inject([]) do |result, role|
+                        result << Forms::StaffRoleForm.new(role)
+                        result
+                      end
       end
 
       def persisted?
@@ -77,7 +81,7 @@ module BenefitSponsors
       # TODO : Refactor validating sub-documents.
       def registration_form
         self.staff_roles.each do |staff_role|
-          validate_form(self.staff_role)
+          validate_form(staff_role)
         end
         validate_form(self.organization)
         self.organization.profiles.each do |profile_form|

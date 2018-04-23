@@ -89,6 +89,7 @@ module BenefitSponsors
           
           organization = init_profile_organization(existing_org, attributes)
           
+          #TODO : handle validation errors
           return false, redirection_url unless persist_agency!(organization)
           
           [true, redirection_url(pending, true)]
