@@ -906,6 +906,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOP_D034',
+    title: 'Special Enrollment Period Approval',
+    description: 'SEP request by Employee accepted when an eligiblity determination is reached',
+    resource_name: 'employee_role',
+    event_name: 'ee_sep_request_accepted_notice',
+    notice_triggers: [
+      {
+        name: 'EE SEP Requested Accepted',
+        notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
+        notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
+        mpi_indicator: 'SHOP_D034',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  
   {
     hbx_id: 'SHOP_DAG043',
     title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
@@ -960,6 +983,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
         notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
         mpi_indicator: 'SHOP_D092',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP_D093',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market - Excludes 1/1/2018 renewal EEs',
+    resource_name: 'employee_role',
+    event_name: 'dental_carriers_exiting_shop_notice_to_ee',
+    notice_triggers: [
+      {
+        name: 'Renewal EEs Dental Carriers are Exiting SHOP market notice - Excludes 1/1/2018 renewal EEs',
+        notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
+        notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
+        mpi_indicator: 'SHOP_D093',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

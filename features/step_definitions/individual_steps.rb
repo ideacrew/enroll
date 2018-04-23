@@ -3,6 +3,7 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
 
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
@@ -33,6 +34,22 @@ Then(/Individual creates HBX account$/) do
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
   screenshot("create_account")
   click_button "Create account"
+end
+
+And(/^I can see the select effective date$/) do
+  expect(page).to have_content "SELECT EFFECTIVE DATE"
+end
+
+When 'I click on continue button on select effective date' do
+  click_button "Continue"
+end
+
+Then(/^I can see the error message (.*?)$/) do |message|
+  expect(page).to have_content(message)
+end
+
+And 'I select a effective date from list' do
+  select 'Date of event', from: 'effective_on_kind'
 end
 
 And(/user should see your information page$/) do

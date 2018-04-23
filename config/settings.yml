@@ -9,15 +9,13 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
-  forms: "https://dchealthlink.com/forms#en"
-  website_url: "www.healthcare.gov"
+  healthcare_name: "www.healthcare.gov"
+  healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
 
   social_media:
     facebook_url: ""
-
-  aca_market_kinds: ["individual", "shop"]
 
 contact_center:
   name: "DC Health Link's Customer Care Center"
@@ -32,6 +30,7 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   hbx_abbreviation: "DC Health Benefit Exchange"
+  market_kinds: ["individual", "shop"]
 #
   qle:
     with_in_sixty_days: 60
@@ -114,10 +113,15 @@ aca:
     employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
+# Note: Remote Aceess keys ad URL's Provided by DC checkbook
 checkbook_services:
-    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
-    base_url:  "https://dc.checkbookhealth.org"
-    url: "https://dc.checkbookhealth.org/shop/dc/"
+# Note: Need to replace Remote_access_key with Production keys while deploying to prod.
+    remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
+    reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
+    base_url:  "https://staging.checkbookhealth.org"
+    url: "https://staging.checkbookhealth.org"
+    congress_url: "https://dc.checkbookhealth.org/congress/dc/2018/"
+    plan_match: "DC"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

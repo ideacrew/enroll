@@ -452,7 +452,8 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "POST record_sep" do
+  describe "POST record_sep", dbclean: :after_each do
+
     before :each do
       date = TimeKeeper.date_of_record - 10.days
       @qle = FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date)
@@ -465,6 +466,7 @@ RSpec.describe Insured::FamiliesController do
       allow(person).to receive(:primary_family).and_return(@family)
       allow(person).to receive(:hbx_staff_role).and_return(nil)
     end
+
     context 'when its initial enrollment' do
       before :each do
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
@@ -556,6 +558,7 @@ RSpec.describe Insured::FamiliesController do
     before(:each) do
       sign_in(user)
       allow(person).to receive(:resident_role?).and_return(false)
+      allow(controller).to receive(:is_ee_sep_request_accepted?).and_return false
     end
 
     it "renders the 'check_qle_date' template" do
