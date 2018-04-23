@@ -10,7 +10,6 @@ module BenefitSponsors
 
     def new
       @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type: profile_type)
-
       respond_to do |format|
         format.html
         format.js

@@ -1,7 +1,8 @@
 module BenefitSponsors
   module Serializers
     class ProfileSerializer < ActiveModel::Serializer
-      attributes :id, :entity_kind, :contact_method, :sic_code,  :rating_area_id, :entity_kind_options, :contact_method_options
+      attributes :id, :entity_kind, :contact_method, :sic_code,  :rating_area_id, :entity_kind_options
+      attribute :contact_method_options, if: :is_employer_profile?
       attribute :rating_area_id, if: :is_cca_employer_profile?
       attribute :sic_code, if: :is_cca_employer_profile?
       attribute :id, if: :is_persisted?
@@ -18,6 +19,10 @@ module BenefitSponsors
 
       def is_dc_employer_profile?
         object.is_a?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
+      end
+
+      def is_employer_profile?
+        is_cca_employer_profile? || is_dc_employer_profile?
       end
 
       def entity_kind_options

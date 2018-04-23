@@ -75,6 +75,10 @@ module BenefitSponsors
       def family_clients
       end
 
+      def entity_kinds
+        Organizations::Organization::ENTITY_KINDS[0..3]
+      end
+
       ## Class methods
       class << self
 
