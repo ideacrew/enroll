@@ -23,7 +23,11 @@ module BenefitSponsors
         result
       end
 
-      def staff_roles_attributes=(val)
+      def staff_roles_attributes=(attrs)
+        self.staff_roles = attrs.values.inject([]) do |result, role|
+                        result << Forms::StaffRoleForm.new(role)
+                        result
+                      end
       end
 
       def persisted?
