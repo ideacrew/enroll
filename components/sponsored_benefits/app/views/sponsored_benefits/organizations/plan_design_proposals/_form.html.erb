@@ -58,7 +58,8 @@
          $('.interaction-click-control-select-health-benefits').hide();
          $('.alert-info').removeClass('hide');
        } else if (res == true) {
-  
+         $('.alert-info').addClass('hide');
+         $('.interaction-click-control-select-health-benefits').show();
        }
      },
      url: "/employers/employer_profiles/1/plan_years/1/late_rates_check"
