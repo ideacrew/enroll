@@ -60,12 +60,6 @@ module BenefitSponsors
         form
       end
 
-      def load_attributes_from_resource
-        if benefit_application.present?
-          self.assign_attributes(@benefit_application_service.attributes_to_form_params)
-        end
-      end
-
       def persisted?
         id.present?
       end
