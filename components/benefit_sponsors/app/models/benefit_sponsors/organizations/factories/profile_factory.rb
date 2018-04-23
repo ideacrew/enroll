@@ -6,8 +6,9 @@ module BenefitSponsors
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
-        attr_accessor :profile_id, :profile_type, :organization, :current_user
+        attr_accessor :profile_id, :profile_type, :organization, :current_user, :claimed, :pending
         attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
+        attr_accessor :area_code, :number, :extension
 
         validate :validate_duplicate_npn, if: :is_broker_profile?
 
@@ -22,36 +23,157 @@ module BenefitSponsors
         end
 
 
-        def self.call_persist(current_user, attributes)
+        def self.call_persist(attributes, current_user)
           factory_obj = new(attributes)
           factory_obj.current_user = current_user
-          factory_obj.save(attributes)
+          factory_obj.save(attributes[:organization])
         end
 
-        def self.call_update(organization, attributes)
+        def self.call_update(attributes, profile_id)
+          factory_obj = new(profile_id)
+          organization = factory_obj.get_organization
           organization.update_attributes(attributes)
-        end
-
-        def initialize(attrs)
-          self.profile_type = attrs[:profile_type]
-          self.first_name = attrs[:first_name]
-          self.last_name = attrs[:last_name]
-          self.email = attrs[:email]
-          self.dob = attrs[:dob]
-          self.npn = attrs[:npn]
-          if attrs[:agency_organization].present?
-            self.fein = attrs[:agency_organization][:fein]
-            self.legal_name = attrs[:agency_organization][:legal_name]
-          end
-          self.profile_id = attrs[:id]
-        end
-
-        def self.initialize_parent(attrs)
-          new(attrs).build_organization
         end
 
         def self.build(attrs)
           new(attrs).build_organization
+        end
+
+        def initialize(attrs)
+          self.profile_type = attrs[:profile_type]
+          self.profile_id = attrs[:profile_id]
+          initialize_attributes(attrs)
+        end
+
+        def initialize_attributes(attrs)
+          initialize_staff_role_attributes(staff_role_attributes(attrs[:staff_roles_attributes])) # ToDo - there will be a better way
+          initialize_agency_attributes(attrs[:organization])
+        end
+
+        def initialize_staff_role_attributes(attrs)
+          if attrs.present?
+            self.first_name = attrs[:first_name]
+            self.last_name = attrs[:last_name]
+            self.email = attrs[:email]
+            self.dob = attrs[:dob]
+            self.npn = attrs[:npn]
+            self.area_code = attrs[:area_code]
+            self.number = attrs[:number]
+            self.extension = attrs[:extension]
+          end
+        end
+
+        def initialize_agency_attributes(attrs)
+          if attrs.present?
+            self.fein = attrs[:fein]
+            self.legal_name = attrs[:legal_name]
+          end
+        end
+
+        def save(attributes)
+          begin
+            match_or_create_person(current_user)
+            existing_org = get_existing_organization
+          rescue TooManyMatchingPeople
+            errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
+            return false, redirection_url
+          rescue PersonAlreadyMatched
+            errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
+            return false, redirection_url
+          rescue OrganizationAlreadyMatched
+            errors.add(:base, "Organization has already been created for this Agency type")
+            return false, redirection_url
+          end
+
+          return false, redirection_url if failed_validity?(existing_org)
+          
+          organization = init_profile_organization(existing_org, attributes)
+          
+          #TODO : handle validation errors
+          return false, redirection_url unless persist_agency!(organization)
+          
+          [true, redirection_url(pending, true)]
+        end
+
+        def persist_agency!(organization)
+          if organization.valid?
+            organization.save!
+            persist_representative!(organization)
+          else
+            self.errors.add(:base, organization.errors.full_messages)
+            return false
+          end
+          return true
+        end
+
+        def persist_representative!(organization)
+          if is_broker_profile?
+            persist_broker_staff_role!(organization.broker_agency_profile)
+          elsif is_employer_profile?
+            persist_employer_staff_role!(current_user, organization.employer_profile, claimed)
+          end
+        end
+
+        def persist_broker_staff_role!(profile)
+          person.broker_role = ::BrokerRole.new({
+            :provider_kind => 'broker',
+            :npn => self.npn,
+            :broker_agency_profile_id => profile.id,
+            :market_kind => market_kind
+          })
+
+          profile.office_locations.each do  |office_location|
+            self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
+          end
+          person.save!
+          trigger_broker_application_confirmation_email
+        end
+
+        def persist_employer_staff_role!(current_user, profile, existing_company)
+          person.user = current_user
+          employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
+          if employer_ids.include? profile.id
+            pending = false
+          else
+            pending = existing_company && Person.staff_for_employer(profile).detect{|person|person.user_id}
+            role_state = pending ? 'is_applicant' : 'is_active' 
+            person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
+          end
+          self.pending = pending
+          current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
+          current_user.save!
+          person.save!
+        end
+
+        def init_profile_organization(existing_org, attributes)
+          if is_broker_profile?
+            init_broker_organization(existing_org, attributes)
+          elsif is_employer_profile?
+            init_benefit_organization(existing_org, attributes)
+          end
+        end
+
+        def init_broker_organization(organization, attributes)
+          if organization.present? && !organization.broker_agency_profile.present?
+            organization.profiles << build_profile(profile_attributes(attributes))
+            organization
+          else
+            build_organization(attributes)
+          end
+        end
+
+        def init_benefit_organization(existing_org, attributes)
+          if existing_org
+            self.claimed = is_employer_profile_claimed?(existing_org)
+            unless claimed
+              if existing_org.employer_profile.blank?
+                existing_org.profiles << build_profile(profile_attributes(attributes))
+              end
+            end
+            existing_org
+          else
+            build_organization(attributes)
+          end
         end
 
         def build_organization(attrs = {})
@@ -62,22 +184,6 @@ module BenefitSponsors
           else
             get_organization
           end
-        end
-
-        def organization_attributes(attrs = {})
-          attrs.except(:profiles_attributes).merge({
-            site: site,
-            fein: (fein.present? ? fein.strip : nil),
-            legal_name: (legal_name.present? ? legal_name.strip : nil)
-          })
-        end
-
-        def profile_attributes(attrs={})
-          attrs["profiles_attributes"]["0"] if attrs["profiles_attributes"].present?
-        end
-
-        def get_organization
-          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         def build_profile(attrs = {})
@@ -118,73 +224,67 @@ module BenefitSponsors
           GeneralOrganization || ExemptOrganization
         end
 
-        def redirection_url(is_pending=nil, is_saved=nil)
-          if is_broker_profile?
-            :broker_new_registration_url
-          elsif is_employer_profile?
-            :sponsor_show_pending_registration_url if is_pending
-            :sponsor_home_registration_url if is_saved
-            :sponsor_new_registration_url
-          end
+        def build_person
+          Person.new({
+            :first_name => first_name.strip,
+            :last_name => last_name.strip,
+            :dob => Date.strptime(dob, "%m/%d/%Y")
+          })
         end
 
-        def save(attributes)
-          begin
-            match_or_create_person(current_user)
-            existing_org = check_existing_organization
-          rescue TooManyMatchingPeople
-            errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
-            return false, redirection_url
-          rescue PersonAlreadyMatched
-            errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
-            return false, redirection_url
-          rescue OrganizationAlreadyMatched
-            errors.add(:base, "Organization has already been created for this Agency type")
-            return false, redirection_url
+        def organization_attributes(attrs = {})
+          attrs.except(:profiles_attributes).merge({
+            site: site,
+            fein: (fein.present? ? fein.strip : nil),
+            legal_name: (legal_name.present? ? legal_name.strip : nil)
+          })
+        end
+
+        def profile_attributes(attrs={})
+          attrs["profiles_attributes"]["0"] if attrs["profiles_attributes"].present?
+        end
+
+        def staff_role_attributes(attrs={})
+          attrs.present? ? attrs["0"] : attrs
+        end
+
+        def match_or_create_person(current_user=nil)
+
+          matched_people = get_matched_people
+
+          if matched_people.count > 1
+            raise TooManyMatchingPeople.new
           end
 
-          return false, redirection_url if failed_validity?(existing_org)
-          if is_broker_profile?
-            broker_organization = init_broker_agency(existing_org, attributes)
-            return false, redirection_url unless update_broker_agency_profile(broker_organization)
-          elsif is_employer_profile?
-            claimed = is_employer_profile_claimed?(existing_org)
-            update_employer_profile existing_org, claimed, attributes
-            pending = create_employer_staff_role(current_user, existing_org.employer_profile, claimed)
+          if matched_people.count == 1
+            mp = matched_people.first
+            if is_employer_profile? && mp.user.present?
+              if mp.user.id.to_s != current_user.id
+                raise PersonAlreadyMatched.new
+              end
+            end
+            self.person = mp
+          else
+            self.person = build_person
           end
-          [true, redirection_url(pending, true)]
+
+          add_person_contact_info
+          person.save!
         end
 
         def failed_validity?(org)
           issuer_requesting_sponsor_benefits?(org) || broker_profile_already_registered?(org) || person.errors.present?
-        end 
-
-        def update_broker_agency_profile(org)
-          org.entity_kind = :s_corporation
-          if org.valid?
-            org.save!
-            update_broker_role(org.broker_agency_profile)
-          else
-            self.errors.add(:base, org.errors.full_messages)
-            return false
-          end
-          return true
         end
 
-        def init_broker_agency(organization, attributes)
-          add_broker_role
-          organization = init_broker_organization(organization, attributes["agency_organization"])
-          profile = organization.broker_agency_profile
-          profile.primary_broker_role = person.broker_role
-          organization
-        end
-
-        def init_broker_organization(organization, attributes)
-          if organization.present? && !organization.broker_agency_profile.present?
-            organization.profiles << build_profile(profile_attributes(attributes))
-            organization
-          else
-            build_organization(attributes)
+        def is_employer_profile_claimed?(organization)
+          if organization.present?
+            if organization.employer_profile.present?
+              if (Person.where({"employer_staff_roles.employer_profile_id" => organization.employer_profile._id}).any?)
+                return true
+              end
+            elsif organization.broker_agency_profile.present?
+              raise OrganizationAlreadyMatched.new
+            end
           end
         end
 
@@ -195,26 +295,6 @@ module BenefitSponsors
           return false
         end
 
-        def update_employer_profile(existing_org, claimed, attributes)
-          init_benefit_organization(existing_org).update_attributes!(attributes.merge({
-            legal_name: regex_for(attributes[:legal_name]),
-            fein: regex_for(attributes[:fein])
-          }))
-        end
-
-        def init_benefit_organization(existing_org)
-          if existing_org
-            unless claimed
-              if existing_org.employer_profile.blank?
-                existing_org.profiles << build_profile
-              end
-            end
-            existing_org
-          else
-            build_organization
-          end
-        end
-
         def issuer_requesting_sponsor_benefits?(organization)
           if organization.present? && organization.is_an_issuer_profile?
             errors.add(:base, "Issuer cannot sponsor benefits")
@@ -222,26 +302,21 @@ module BenefitSponsors
           end
         end
 
-        def update_broker_role(broker_profile)
-          person.broker_role.update_attributes({ broker_agency_profile_id: broker_profile.id , market_kind:  market_kind })
+        def redirection_url(is_pending=nil, is_saved=nil)
+          if is_broker_profile?
+            :broker_new_registration_url
+          elsif is_employer_profile?
+            return :sponsor_show_pending_registration_url if is_pending
+            return :sponsor_home_registration_url if is_saved
+            :sponsor_new_registration_url
+          end
+        end
+
+        def trigger_broker_application_confirmation_email
           ::UserMailer.broker_application_confirmation(person).deliver_now
         end
 
-        def add_broker_role
-          person.broker_role = ::BrokerRole.new({
-            :provider_kind => 'broker',
-            :npn => self.npn
-          })
-        end
-
-        def init_organization
-          # Use GeneralOrganization for now
-          class_name = GeneralOrganization || ExemptOrganization 
-
-          class_name.new(
-            :site => site
-          )
-        end
+        protected
 
         def site
           BenefitSponsors::ApplicationController::current_site
@@ -259,85 +334,50 @@ module BenefitSponsors
           profile_type == "benefit_sponsor"
         end
 
-        def create_employer_staff_role(current_user, profile, existing_company)
-          person.user = current_user
-          employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
-          if employer_ids.include? profile.id
-            pending = false
-          else
-            pending = existing_company && Person.staff_for_employer(profile).detect{|person|person.user_id}
-            role_state = pending ? 'is_applicant' : 'is_active' 
-            person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
-          end
-          current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
-          current_user.save!
-          person.save!
-          pending
+        def regex_for(str)
+          clean_string = Regexp.escape(str.strip)
+          /^#{clean_string}$/i
         end
 
-        def match_or_create_person(current_user=nil)
+        def add_person_contact_info
+          if is_broker_profile?
+            person.add_work_email(email)
+          elsif is_employer_profile?
+            person.contact_info(email, area_code, number, extension) if email
+          end
+        end
+
+        def get_organization
+          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+        end
+
+        def get_matched_people
           if is_employer_profile? || is_broker_profile?
-            matched_people = Person.where(
+            Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
               dob: Date.strptime(dob, "%m/%d/%Y")
               )
           else
-            matched_people = Person.where(
+            Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name)
             )
           end
-
-          if matched_people.count > 1
-            raise TooManyMatchingPeople.new
-          end
-
-          if matched_people.count == 1
-            mp = matched_people.first
-            if is_employer_profile? && mp.user.present?
-              if mp.user.id.to_s != current_user.id
-                raise PersonAlreadyMatched.new
-              end
-            end
-            self.person = mp
-          else
-            self.person = Person.new({
-              :first_name => first_name,
-              :last_name => last_name,
-              :dob => Date.strptime(dob, "%m/%d/%Y")
-            })
-          end
-
-          if is_broker_profile?
-            self.person.add_work_email(email)
-            #TODO: Handling update Phones on Person using OL hash
-            # @office_locations.each do  |office_location|
-            #   self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
-            # end
-          elsif is_employer_profile?
-            person.contact_info(email, area_code, number, extension) if email
-          end
-          person.save!
         end
 
-        def is_employer_profile_claimed?(organization)
-          if organization.present? && organization.employer_profile.present?
-            if (Person.where({"employer_staff_roles.employer_profile_id" => organization.employer_profile._id}).any?)
-              return true
-            end
-          elsif organization.broker_agency_profile.present?
-            raise OrganizationAlreadyMatched.new
-          end
-        end
-
-        def check_existing_organization
+        def get_existing_organization
           Organization.where(:fein => fein).first
         end
 
-        def regex_for(str)
-          clean_string = Regexp.escape(str.strip)
-          /^#{clean_string}$/i
+        def self.find_representatives(profile_id)
+          return [Person.new] if profile_id.blank?
+          Person.where(:benefit_sponsors_employer_staff_roles => {
+            '$elemMatch' => {
+              employer_profile_id: profile_id,
+              :aasm_state.ne => :is_closed
+            }
+          })
         end
       end
     end

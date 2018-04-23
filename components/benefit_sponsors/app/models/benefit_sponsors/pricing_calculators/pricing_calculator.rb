@@ -8,9 +8,9 @@ module BenefitSponsors
                                 else
                                   coverage_start_date
                                 end
-          before_factor = if (coverage_as_of_date.month > member.dob.month)
+          before_factor = if (coverage_as_of_date.month < member.dob.month)
             -1
-          elsif ((coverage_as_of_date.month == member.dob.month) && (coverage_as_of_date.day > member.dob.day))
+          elsif ((coverage_as_of_date.month == member.dob.month) && (coverage_as_of_date.day < member.dob.day))
             -1
           else
             0

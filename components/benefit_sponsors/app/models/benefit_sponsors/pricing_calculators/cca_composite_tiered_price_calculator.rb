@@ -79,7 +79,6 @@ module BenefitSponsors
           benefit_roster_entry.dob,
           benefit_roster_entry.member_id,
           benefit_roster_entry.dependents,
-          roster_entry_pricing,
           benefit_roster_entry.is_disabled?
         )
       end

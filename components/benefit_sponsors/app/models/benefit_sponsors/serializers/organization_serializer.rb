@@ -1,11 +1,13 @@
 module BenefitSponsors
   module Serializers
     class OrganizationSerializer < ActiveModel::Serializer
-      attributes :legal_name, :dba
+      attributes :legal_name, :dba, :profile
       attribute :fein, if: :is_general_organization?
 
       has_many :profiles
 
+      def profile
+      end
 
       def is_general_organization?
         object.is_a? BenefitSponsors::Organizations::GeneralOrganization

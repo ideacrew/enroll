@@ -8,6 +8,8 @@ module BenefitSponsors
       attribute :first_name, String
       attribute :last_name, String
       attribute :email, String
+      attribute :phone, String
+      attribute :status, String
       attribute :dob, String
       attribute :person_id, String
       attribute :area_code, String

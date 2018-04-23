@@ -11,7 +11,7 @@
   </p>
   <br/>
 </div>
-  <%= f.fields_for :staff_role, f.object.staff_role, errors: {}, fieldset: false do |f| %>
+  <%= f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f| %>
     <%= render "benefit_sponsors/shared/organization_staff_search", f: f %>
     <%= render "benefit_sponsors/shared/person_contact", f:f %>
   <% end %>

@@ -44,7 +44,8 @@ module BenefitMarkets
       # Transform an external relationship into the mapped relationship
       # specified by this contribution model.
       def map_relationship_for(relationship, age, disability)
-        member_relationships.detect { |mr| mr.match?(relationship, age, disability) }.relationship_name
+        found_rel = member_relationships.detect { |mr| mr.match?(relationship, age, disability) }
+        found_rel ? found_rel.relationship_name : nil
       end
     end
   end
