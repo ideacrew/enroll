@@ -1,4 +1,5 @@
 class Employers::PlanYearsController < ApplicationController
+  include Config::AcaConcern
   before_action :find_employer
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
@@ -6,10 +7,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
-    if @employer_profile.service_areas.any?
-      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
-    else
+    if @employer_profile.constrain_service_areas? && @employer_profile.service_areas.blank?
       redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => no_products_message(@plan_year) }
+    else
+      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     end
   end
 
@@ -430,8 +431,10 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
+
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
+    @object_id = params[:object_id]
     @dental_carrier_names = Plan.valid_for_carrier(params.permit(:active_year)[:active_year])
     @dental_carriers_array = Organization.valid_dental_carrier_names_for_options
     respond_to do |format|
@@ -443,8 +446,10 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = build_plan_year
     @benefit_group = params[:benefit_group]
     @location_id = params[:location_id]
+    @panel_id = params[:panel_id]
     @start_on = params[:start_on]
     @carrier_search_level = params[:selected_carrier_level]
+    @object_id = @location_id.split('-').last
 
     ## TODO: different if we dont have service areas enabled
     ## TODO: awfully slow

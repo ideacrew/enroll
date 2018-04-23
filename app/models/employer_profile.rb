@@ -79,7 +79,8 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
   validates_presence_of :entity_kind
-  validates_presence_of :sic_code
+
+  validates_presence_of :sic_code if EmployerProfile.sic_field_exists_for_employer?
   validates_presence_of :contact_method
 
   validates :profile_source,
@@ -91,7 +92,6 @@ class EmployerProfile
     allow_blank: false
 
   after_initialize :build_nested_models
-  after_save :save_associated_nested_models
 
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
@@ -165,24 +165,20 @@ class EmployerProfile
     active_broker_agency_account.save!
     trigger_notice_observer(self, active_broker_agency_account, 'broker_fired_confirmation_to_employer')
     notify_broker_terminated
-    broker_fired_confirmation_to_broker
+    trigger_notice_observer(active_broker_agency_account.broker_agency_profile.primary_broker_role, self, "broker_fired_confirmation_to_broker")
     broker_agency_fired_confirmation
   end
 
   def broker_agency_fired_confirmation
-    begin
-      trigger_notices("broker_agency_fired_confirmation")
-    rescue Exception => e
-      puts "Unable to deliver broker agency fired confirmation notice to #{active_broker_agency_account.legal_name} due to #{e}" unless Rails.env.test?
-    end
+    trigger_notices("broker_agency_fired_confirmation")
   end
 
   def broker_fired_confirmation_to_broker
-    begin
-      trigger_notices('broker_fired_confirmation_to_broker')
-    rescue Exception => e
-      puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
-    end
+    trigger_notices('broker_fired_confirmation_to_broker')
+  end
+
+  def employer_broker_fired
+    trigger_notices('employer_broker_fired')
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -305,8 +301,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present?
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present?
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -627,16 +623,6 @@ class EmployerProfile
           :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
         }
       })
-    end
-
-    def initial_employers_reminder_to_publish(start_on)
-      Organization.where(:"employer_profile.plan_years" =>
-      {
-        :$elemMatch => {
-        :start_on => start_on,
-        :aasm_state => "draft"
-      }
-    })
     end
 
     def initial_employers_enrolled_plan_year_state
@@ -1056,7 +1042,7 @@ class EmployerProfile
   def self.update_status_to_binder_paid(organization_ids)
     organization_ids.each do |id|
       if org = Organization.find(id)
-        org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+        org.employer_profile.binder_credited!
       end
     end
   end
@@ -1157,7 +1143,7 @@ class EmployerProfile
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
     rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+      Rails.logger.error { "Unable to deliver #{event.humanize} notice #{self.legal_name} due to #{e}" }
     end
   end
 
@@ -1307,9 +1293,6 @@ class EmployerProfile
 
   def build_nested_models
     build_inbox if inbox.nil?
-  end
-
-  def save_associated_nested_models
   end
 
   def save_inbox

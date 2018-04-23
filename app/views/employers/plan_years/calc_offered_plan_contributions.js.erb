@@ -32,9 +32,10 @@ function setOpenEnrollmentDatePicker(){
 //$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
 
 // show dental config links
-<% if (Settings.aca.dental_plan_years_available.include? @plan_year.start_on.year) %>
- $("#<%= @location_id %> .dental-config-links").show();
 
+<% if (Settings.aca.dental_plan_years_available.include? @plan_year.start_on.year.to_s) %>
+ $("#<%= @location_id %> .dental-config-links").show();
+  $("#<%= @location_id %> .show-dental-plans").show();
 if ( $("#<%= @location_id %> .edit-add-dental").is(':hidden') ) {
     $("#<%= @location_id %> .select-dental-plan").show();
 };
@@ -115,7 +116,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
        },
        url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
      });
-     
+
       var plan_options = $(this).closest('.benefit-group-fields').find('.health .plan-options');
       plan_options.slideDown();
 
