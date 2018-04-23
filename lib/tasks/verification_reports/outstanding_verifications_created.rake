@@ -12,13 +12,47 @@ require 'csv'
 namespace :reports do
   desc "Outstanding verifications created monthly report"
   task :outstanding_types_created => :environment do
-    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE)
+    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE IVL_ENROLLMENT SHOP_ENROLLMENT)
 
     def date
       begin
         ENV["date"].strip
       rescue
         puts 'Provide report month.'
+      end
+    end
+
+    def ivl_enrollment(person)
+      if person.primary_family
+        if person.primary_family.active_household.hbx_enrollments.individual_market.present?
+          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        else
+          nil
+        end
+      else
+        families = person.families.select{|family| family.active_household.hbx_enrollments.individual_market.present?}
+        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| !(["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
+        active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state)}
+        return "nil" unless all_enrollments.any?
+        active_enrollments.any? ? "YES" : "NO"
+      end
+    end
+
+    def shop_enrollment(person)
+      if person.primary_family
+        if person.primary_family.active_household.hbx_enrollments.shop_market.present?
+          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+        else
+          "nil"
+        end
+      else
+        families = person.families.select{|family| family.active_household.hbx_enrollments.shop_market.present?}
+        enrollments = families.flat_map(&:active_household).flat_map(&:hbx_enrollments).select{|enrollment| (["employer_sponsored", "employer_sponsored_cobra"].include? enrollment.kind)} if families
+        all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
+        active_enrollments = enrollments.select{|enrollment| enrollment.currently_active?}
+        return "nil" unless all_enrollments.any?
+        active_enrollments.any? ? "YES" : "NO"
       end
     end
 
@@ -117,7 +151,9 @@ namespace :reports do
                 type,
                 transition.transition_at,
                 "outstanding",
-                due_date_for_type(person, type, transition).to_date
+                due_date_for_type(person, type, transition).to_date,
+                ivl_enrollment(person),
+                shop_enrollment(person)
             ]
           end
         end
