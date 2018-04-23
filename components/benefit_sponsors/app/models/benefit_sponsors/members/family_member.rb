@@ -1,6 +1,6 @@
 # Individual Market Primary Member
 module BenefitSponsors
-  class Members::FamilyMember < Member
+  class Members::FamilyMember < Members::Member
 
 
     # Person is applying for coverage
@@ -9,7 +9,7 @@ module BenefitSponsors
     # Person who authorizes auto-renewal eligibility check
     field :is_consent_applicant, type: Boolean, default: false
 
-    after_initilize :set_self_relationship
+    after_initialize :set_self_relationship
 
 
     private

@@ -1,5 +1,6 @@
 module BenefitSponsors
-  class Members::ResponsiblePartyMember
-    include Mongoid::Document
+  class Members::ResponsiblePartyMember < Members::Member
+
+
   end
 end

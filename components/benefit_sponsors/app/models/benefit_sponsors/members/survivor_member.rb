@@ -1,8 +1,8 @@
 module BenefitSponsors
-  class Members::SurvivorMember
+  class Members::SurvivorMember < Members::Member
 
 
-    after_initilize :set_self_relationship
+    after_initialize :set_self_relationship
 
 
     private

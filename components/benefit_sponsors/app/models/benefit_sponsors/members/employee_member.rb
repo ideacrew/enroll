@@ -1,10 +1,10 @@
 module BenefitSponsors
-  class Members::EmployeeMember < Member
+  class Members::EmployeeMember < Members::Member
 
     field :date_of_hire,        type: Date 
     field :date_of_termination, type: Date
 
-    after_initilize :set_self_relationship
+    after_initialize :set_self_relationship
 
 
     private

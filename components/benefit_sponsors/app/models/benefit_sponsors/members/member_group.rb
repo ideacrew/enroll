@@ -58,6 +58,6 @@ module BenefitSponsors
 
   end
 
-  class DuplicatePrimaryMemberError < StandarError; end
-  class MultipleSpouseRelationshipError < StandarError; end
+  class DuplicatePrimaryMemberError < StandardError; end
+  class MultipleSpouseRelationshipError < StandardError; end
 end

@@ -1,5 +1,5 @@
 module BenefitSponsors
-  class Members::DependentMember < Member
+  class Members::DependentMember < Members::Member
 
 
   end
