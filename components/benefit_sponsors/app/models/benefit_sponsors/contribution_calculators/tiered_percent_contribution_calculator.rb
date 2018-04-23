@@ -34,7 +34,7 @@ module BenefitSponsors
           @total_contribution = 0.00
           @member_contributions = {}
           @product = r_coverage.product
-          @previous_product = r_coverage.product
+          @previous_product = r_coverage.previous_eligibility_product
         end
 
         def add(member)
