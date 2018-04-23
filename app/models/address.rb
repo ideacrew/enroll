@@ -38,17 +38,17 @@ class Address
   # The name of the country where this address is located
   field :country_name, type: String, default: ""
 
-  validates_presence_of :address_1, :city, :state, :zip
+  #validates_presence_of :address_1, :city, :state, :zip
 
   # validates :kind,
   #   inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
   #   allow_blank: false
 
-  validates :zip,
-    format: {
-        :with => /\A\d{5}(-\d{4})?\z/,
-        :message => "should be in the form: 12345 or 12345-1234"
-      }
+  # validates :zip,
+  #   format: {
+  #       :with => /\A\d{5}(-\d{4})?\z/,
+  #       :message => "should be in the form: 12345 or 12345-1234"
+  #     }
 
   # @note Add support for GIS location
   def location

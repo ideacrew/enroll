@@ -26,6 +26,7 @@ class BenefitGroup
   field :dental_plan_option_kind, type: String
   field :plan_option_kind, type: String
   field :default, type: Boolean, default: false
+  field :composite_tier_contributions, type: Money
 
   field :contribution_pct_as_int, type: Integer, default: 0
   field :employee_max_amt, type: Money, default: 0

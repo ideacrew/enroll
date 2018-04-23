@@ -61,7 +61,7 @@ class Organization
     numericality: true,
     uniqueness: true
 
-  validate :office_location_kinds
+  #validate :office_location_kinds
 
   index({ hbx_id: 1 }, { unique: true })
   index({ legal_name: 1 })
@@ -171,7 +171,7 @@ class Organization
       })
   }
   scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
-  
+
   def self.generate_fein
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join
@@ -434,6 +434,6 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-    
+
   end
 end
