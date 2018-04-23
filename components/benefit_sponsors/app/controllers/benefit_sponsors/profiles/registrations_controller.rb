@@ -73,6 +73,13 @@ module BenefitSponsors
     end
 
     def find_agency
+      id = BSON::ObjectId.from_string(params[:id])
+      @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first
+      if @organization.broker_agency_profile.present? && @organization.broker_agency_profile.id.to_s == id.to_s
+        @broker_agency_profile = @organization.broker_agency_profile
+      elsif @organization.employer_profile.present? && @organization.employer_profile.id.to_s == id.to_s
+        @employer_profile = @organization.employer_profile
+      end
       # id_params = params.permit(:id, :employer_profile_id)
       # id = id_params[:id] || id_params[:employer_profile_id]
       # @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first

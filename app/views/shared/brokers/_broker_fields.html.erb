@@ -36,7 +36,7 @@
         <tr>
           <th>Office Locations:</th>
           <td>
-            <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+            <% broker_or_staff_role.broker_agency_profile.office_locations.each do |office_location| %>
             <%= office_location.address.to_html %>
             <% end %>
           </td>

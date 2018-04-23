@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Serializers
     class ProfileSerializer < ActiveModel::Serializer
-      attributes :id, :entity_kind, :contact_method, :sic_code,  :rating_area_id, :entity_kind_options
+      attributes :id, :entity_kind, :contact_method, :sic_code,  :rating_area_id, :entity_kind_options, :languages_spoken, :working_hours, :accept_new_clients
       attribute :contact_method_options, if: :is_employer_profile?
       attribute :rating_area_id, if: :is_cca_employer_profile?
       attribute :sic_code, if: :is_cca_employer_profile?

@@ -1,4 +1,9 @@
-<% content_for :navigation do %>
-  <%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<% if @broker_agency_profile.present? %>
+  <%= render 'benefit_sponsors/shared/profiles/broker_agency/menu', :active_tab => "home-tab" %>
+  <%= render "benefit_sponsors/profiles/registrations/broker_agency_form" %>
+<% elsif @employer_profile.present? %>
+  <% content_for :navigation do %>
+    <%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+  <% end %>
+  <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_form" %>
 <% end %>
-<%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_form" %>

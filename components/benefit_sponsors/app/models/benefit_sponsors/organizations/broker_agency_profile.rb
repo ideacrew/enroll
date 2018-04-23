@@ -79,6 +79,15 @@ module BenefitSponsors
         Organizations::Organization::ENTITY_KINDS[0..3]
       end
 
+      def primary_office_location
+        office_locations.detect(&:is_primary?)
+      end
+
+      def phone
+        office = primary_office_location
+        office && office.phone.to_s
+      end
+
       ## Class methods
       class << self
 
