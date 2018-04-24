@@ -1,8 +1,8 @@
 require "rails_helper"
 
 module BenefitSponsors
-	RSpec.describe SponsoredBenefits::RosterEligibilityOptimizer do
-		subject { ::BenefitSponsors::SponsoredBenefits::RosterEligibilityOptimizer.new }
+	RSpec.describe SponsoredBenefits::TieredRosterEligibilityOptimizer do
+		subject { ::BenefitSponsors::SponsoredBenefits::TieredRosterEligibilityOptimizer.new }
 
 		let(:employee_dob) { Date.new(1990, 6, 1) }
 	  let(:employee_member_id) { "some_employee_id" }

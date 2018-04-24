@@ -17,6 +17,9 @@ module BenefitMarkets
       # under our profiles
       field :contribution_calculator_kind, type: String
 
+      # Will an enrollment map to multiple possible contribution units?
+      field :many_simultaneous_contribution_units, default: false
+
       # Indicates the set of product multiplicities that are compatible
       # with this contribution model.  Should be some subset of 
       # :multiple, :single. 
@@ -46,6 +49,10 @@ module BenefitMarkets
       def map_relationship_for(relationship, age, disability)
         found_rel = member_relationships.detect { |mr| mr.match?(relationship, age, disability) }
         found_rel ? found_rel.relationship_name : nil
+      end
+
+      def many_simultaneous_contribution_units?
+        many_simultaneous_contribution_units
       end
     end
   end
