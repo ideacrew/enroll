@@ -23,9 +23,9 @@ module BenefitSponsors
         end
 
 
-        def self.call_persist(attributes, current_user)
+        def self.call_persist(attributes)
           factory_obj = new(attributes)
-          factory_obj.current_user = current_user
+          factory_obj.current_user = current_user(attributes[:current_user_id])
           factory_obj.save(attributes[:organization])
         end
 
@@ -46,7 +46,7 @@ module BenefitSponsors
         end
 
         def initialize_attributes(attrs)
-          initialize_staff_role_attributes(staff_role_attributes(attrs[:staff_roles_attributes])) # ToDo - there will be a better way
+          initialize_staff_role_attributes(staff_role_attributes(attrs[:staff_roles_attributes])) # Always one while creating
           initialize_agency_attributes(attrs[:organization])
         end
 
@@ -72,7 +72,7 @@ module BenefitSponsors
 
         def save(attributes)
           begin
-            match_or_create_person(current_user)
+            match_or_create_person
             existing_org = get_existing_organization
           rescue TooManyMatchingPeople
             errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
@@ -110,7 +110,7 @@ module BenefitSponsors
           if is_broker_profile?
             persist_broker_staff_role!(organization.broker_agency_profile)
           elsif is_employer_profile?
-            persist_employer_staff_role!(current_user, organization.employer_profile, claimed)
+            persist_employer_staff_role!(organization.employer_profile, claimed)
           end
         end
 
@@ -129,7 +129,7 @@ module BenefitSponsors
           trigger_broker_application_confirmation_email
         end
 
-        def persist_employer_staff_role!(current_user, profile, existing_company)
+        def persist_employer_staff_role!(profile, existing_company)
           person.user = current_user
           employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
           if employer_ids.include? profile.id
@@ -228,7 +228,7 @@ module BenefitSponsors
           Person.new({
             :first_name => first_name.strip,
             :last_name => last_name.strip,
-            :dob => Date.strptime(dob, "%m/%d/%Y")
+            :dob => dob
           })
         end
 
@@ -245,10 +245,10 @@ module BenefitSponsors
         end
 
         def staff_role_attributes(attrs={})
-          attrs.present? ? attrs["0"] : attrs
+          attrs.present? ? attrs[0] : attrs
         end
 
-        def match_or_create_person(current_user=nil)
+        def match_or_create_person
 
           matched_people = get_matched_people
 
@@ -356,7 +356,7 @@ module BenefitSponsors
             Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
-              dob: Date.strptime(dob, "%m/%d/%Y")
+              dob: dob
               )
           else
             Person.where(
@@ -368,6 +368,12 @@ module BenefitSponsors
 
         def get_existing_organization
           Organization.where(:fein => fein).first
+        end
+
+        def self.current_user(user_id)
+          if user_id.present?
+            User.find(user_id)
+          end
         end
 
         def self.broker_agency_profile(profile_id)

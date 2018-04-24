@@ -6,6 +6,7 @@ module BenefitSponsors
       #include ActiveModel::Conversion
       include Virtus.model
 
+      attribute :current_user_id, String
       attribute :profile_type, String
       attribute :profile_id, String
       attribute :staff_roles, Array[Forms::StaffRoleForm]
@@ -25,9 +26,9 @@ module BenefitSponsors
 
       def staff_roles_attributes=(attrs)
         self.staff_roles = attrs.values.inject([]) do |result, role|
-                        result << Forms::StaffRoleForm.new(role)
-                        result
-                      end
+          result << Forms::StaffRoleForm.new(role)
+          result
+        end
       end
 
       def persisted?
@@ -37,8 +38,8 @@ module BenefitSponsors
         false
       end
 
-      def save(attrs, current_user=nil)
-        persist!(attrs, current_user)
+      def save
+        persist!
       end
 
       def self.for_new(profile_type)
@@ -60,9 +61,9 @@ module BenefitSponsors
       def self.for_update(attrs)
       end
 
-      def persist!(attrs, current_user)
+      def persist!
         return false unless valid?
-        service.save(attrs, current_user)
+        service.save(self)
       end
 
       def update(attrs)
