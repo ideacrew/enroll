@@ -5,7 +5,7 @@ module BenefitMarkets
   	before_filter :set_site_id, only: [:index]
 
   	def index
-  		@benifit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)
+      @benifit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)
   	end
 
     def new
@@ -44,9 +44,12 @@ module BenefitMarkets
     end
 
     private
+=======
+  	private
+>>>>>>> Refs 23321 Modified Routes and view
 
   	def set_site_id
-        @site_id = params[:site_id]
+      @site_id = params[:site_id]
   	end
 
     def market_params

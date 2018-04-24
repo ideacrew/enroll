@@ -5,7 +5,7 @@
     <tr>
       <th scope="col">Site URN</th>
       <th scope="col">Kind</th>
-      <th scope="col">Tittle</th>
+      <th scope="col">Title</th>
       <th scope="col">Description</th>
       <th></th>
       <th></th>
@@ -16,11 +16,13 @@
       <tr>
         <td><%= bm.site_urn %></td>
         <td><%= bm.kind %></td>
-        <td><%= bm.tittle %></td>
+        <td><%= bm.title %></td>
         <td><%= bm.description %></td>
-        <td><%= link_to "Edit",edit_site_benefit_market_path(site_id: @site_id, bm_id: bm) %></td>
-        <td><%= link_to 'Delete', site_benefit_market_path(site_id: @site_id, bm_id: bm),method: :delete %></td>
+        <td><%= link_to "Edit",edit_benefit_market_path(bm) %></td>
+        <td><%= link_to 'Delete', benefit_market_path(bm),method: :delete %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%= link_to "Create new benefit market", new_site_benefit_market_path(site_id: @site_id) %>
