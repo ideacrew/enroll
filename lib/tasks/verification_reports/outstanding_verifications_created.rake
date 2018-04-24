@@ -42,7 +42,7 @@ namespace :reports do
     def shop_enrollment(person)
       if person.primary_family
         if person.primary_family.active_household.hbx_enrollments.shop_market.present?
-          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+          person.primary_family.active_household.hbx_enrollments.shop_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
         else
           "nil"
         end
@@ -97,7 +97,8 @@ namespace :reports do
                                     "ssn_valid_citizenship_invalid!",
                                     "fail_dhs!",
                                     "fail_residency!",
-                                    "reject!"] }},
+                                    "reject!",
+                                    "coverage_purchased!"] }},
               { :transition_at.gte => start_date },
               { :transition_at.lte => end_date }
           ]
@@ -107,6 +108,8 @@ namespace :reports do
     end
 
     def workflow_transitions(person)
+      transitions_no_ssn = person.consumer_role.workflow_state_transitions.where(:event => "coverage_purchased!", :to_state => "verification_outstanding", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
+
       transitions_reject = person.consumer_role.workflow_state_transitions.where(:event => "reject!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
 
       transitions_dc = person.consumer_role.workflow_state_transitions.where(:event => "fail_residency!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
@@ -115,7 +118,8 @@ namespace :reports do
 
       transitions_cit = person.consumer_role.workflow_state_transitions.where(:event => {"$in" => ["ssn_valid_citizenship_invalid!", "fail_dhs!"]},
                                                                               :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
-      transitions = transitions_reject + transitions_dc + transitions_ssn + transitions_cit
+
+      transitions = transitions_reject + transitions_dc + transitions_ssn + transitions_cit + transitions_no_ssn
 
       remove_dup_override? ? transitions.sort_by{|t| t.created_at}.reverse.uniq{|e| e.event} : transitions
     end
