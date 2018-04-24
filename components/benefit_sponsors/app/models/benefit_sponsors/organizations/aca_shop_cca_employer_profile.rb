@@ -71,6 +71,14 @@ module BenefitSponsors
         self
       end
 
+      def build_nested_models
+        return if inbox.present?
+        build_inbox
+        #TODO: After migration uncomment the lines below to get Welcome message for Initial Inbox creation
+        # welcome_subject = "Welcome to #{Settings.site.short_name}"
+        # welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
+        # inbox.messages.new(subject: welcome_subject, body: welcome_body)
+      end
     end
   end
 end

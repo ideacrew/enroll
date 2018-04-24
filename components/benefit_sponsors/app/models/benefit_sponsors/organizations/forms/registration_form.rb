@@ -24,8 +24,8 @@ module BenefitSponsors
         result
       end
 
-      def staff_roles_attributes=(roles)
-        self.staff_roles = roles.values.inject([]) do |result, role|
+      def staff_roles_attributes=(attrs)
+        self.staff_roles = attrs.values.inject([]) do |result, role|
           result << Forms::StaffRoleForm.new(role)
           result
         end

@@ -9,4 +9,3 @@
   <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*' %>
   <!-- <%= f.text_field :fein, class: "floatlabel form-control fien_field interaction-field-control-organization-fein", required: true, placeholder: 'FEIN*', readonly: defined?(readonly) %> -->
 </div>
-<%= f.hidden_field(:entity_kind, :value => "s_corporation") if is_broker_profile?(@profile_type) %>
