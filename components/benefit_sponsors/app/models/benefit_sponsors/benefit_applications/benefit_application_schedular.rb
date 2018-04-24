@@ -195,6 +195,7 @@ module BenefitSponsors
       end
 
       def check_start_on(start_on)
+        return {result: "ok", msg: ""} if start_on.nil?
         start_on = start_on.to_date
         shop_enrollment_dates = shop_enrollment_timetable(start_on)
 

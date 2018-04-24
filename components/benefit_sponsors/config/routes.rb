@@ -39,10 +39,6 @@ BenefitSponsors::Engine.routes.draw do
   resources :benefit_sponsorships, only: [] do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
 
-      collection do
-        get :recommend_dates
-      end
-
       resources :benefit_packages do
         resources :sponsored_benefits, only: :new
       end
