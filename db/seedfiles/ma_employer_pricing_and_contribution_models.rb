@@ -190,7 +190,7 @@ composite_contribution_model = BenefitMarkets::ContributionModels::ContributionM
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::TieredPercentContributionCalculator",
   contribution_units: composite_employer_contribution_units,
   member_relationships: composite_employer_contribution_relationships,
-  name: "MA Composite Contribution Model"
+  title: "MA Composite Contribution Model"
 })
 
 # List Bill Pricing Models
@@ -309,6 +309,6 @@ contribution_model = BenefitMarkets::ContributionModels::ContributionModel.creat
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::CcaShopReferencePlanContributionCalculator",
   contribution_units: employer_contribution_units,
   member_relationships: employer_contribution_relationships,
-  name: "MA List Bill Shop Contribution Model",
+  title: "MA List Bill Shop Contribution Model",
   many_simultaneous_contribution_units: true
 })
