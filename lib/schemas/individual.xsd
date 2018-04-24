@@ -677,7 +677,7 @@
 					<xs:element name="amount" type="CurrencyType"/>
 					<xs:element name="frequency" type="FinancialAssistanceFrequencyNameType"/>
 					<xs:element name="start_on" type="SimpleDateType"/>
-					<xs:element name="end_on" type="SimpleDateType"/>
+					<xs:element name="end_on" type="SimpleDateType" minOccurs="0"/>
 					<xs:element name="submitted_at" type="xs:dateTime"/>
 				</xs:sequence>
 			</xs:restriction>
@@ -735,7 +735,7 @@
 			<xs:element name="amount" type="CurrencyType"/>
 			<xs:element name="frequency" type="FinancialAssistanceFrequencyNameType"/>
 			<xs:element name="start_on" type="SimpleDateType"/>
-			<xs:element name="end_on" type="SimpleDateType"/>
+			<xs:element name="end_on" type="SimpleDateType" minOccurs="0"/>
 			<xs:element name="submitted_at" type="xs:dateTime"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -2350,6 +2350,9 @@
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_deduction#moving_expenses"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_deduction#health_savings_account"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_deduction#reservists_performing_artists_and_fee_basis_government_official_expenses"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_deduction#student_loan_interest"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_deduction#ira_deduction"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_deduction#tution_and_fees"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="FinancialAssistanceBenefitNameType">
