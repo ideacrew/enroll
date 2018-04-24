@@ -19,7 +19,6 @@ module BenefitSponsors
     def create
       @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(registration_params)
       begin
-        # Alternate - use form object inside factory (or) do form.as_json inside service
         saved, result_url = @agency.save
         result_url = self.send(result_url)
         if saved
