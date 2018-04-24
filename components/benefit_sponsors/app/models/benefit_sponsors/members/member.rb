@@ -54,13 +54,33 @@ module BenefitSponsors
         message: "'%{value}' is not a valid relationship kind"
       }
 
+    def ssn=(new_ssn)
+      if new_ssn.present?
+        ssn_val = new_ssn.to_s.gsub(/\D/, '')
+        if ssn_val.is_ssn_valid?
+          encrypted_ssn = encrypt(ssn_val) 
+        else
+          nil
+        end
+      end
+    end
+
+    def ssn
+      decrypt(encrypted_ssn) if encrypted_ssn.present?
+    end
+
     def age_on(date = TimeKeeper.date_of_record)
       return unless dob.present?
       date.year - dob.year - ((date.month > dob.month || (date.month == dob.month && date.day >= dob.day)) ? 0 : 1)
     end
 
     def full_name
-      [first_name, middle_name, last_name, name_sfx].compact.join(" ")
+      case name_sfx
+      when "ii" ||"iii" || "iv" || "v"
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+      else
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+      end
     end
 
     def gender=(new_gender)
@@ -106,6 +126,38 @@ module BenefitSponsors
 
 
     private
+
+    def is_ssn_valid?(ssn)
+      return false unless ssn.present?
+
+      # Invalid compositions:
+      #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
+      #   00 in the group number (fourth and fifth digit); or
+      #   0000 in the serial number (last four digits)
+
+      if ssn.present?
+        invalid_area_numbers = %w(000 666)
+        invalid_area_range = 900..999
+        invalid_group_numbers = %w(00)
+        invalid_serial_numbers = %w(0000)
+
+        return false if ssn.to_s.blank?
+        return false if invalid_area_numbers.include?(ssn.to_s[0,3])
+        return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
+        return false if invalid_group_numbers.include?(ssn.to_s[3,2])
+        return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+      end
+
+      true    
+    end
+
+    def encrypt(value)
+      SymmetricEncryption.encrypt(value)
+    end
+
+    def decrypt(value)
+      SymmetricEncryption.decrypt(value)
+    end
 
     # Case-insensitve match between start of this class name and compare_array
     def class_name_starts_with?(compare_array)
