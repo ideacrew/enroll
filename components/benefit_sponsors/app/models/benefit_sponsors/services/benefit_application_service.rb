@@ -64,7 +64,9 @@ module BenefitSponsors
 
       def store(form, benefit_application)
         valid_according_to_factory = benefit_application_factory.validate(benefit_application)
-        unless valid_according_to_factory
+        if valid_according_to_factory
+          # benefit_application.benefit_sponsor_catalog = benefit_sponsor_catalog_for(benefit_application)
+        else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
         end
@@ -82,8 +84,9 @@ module BenefitSponsors
         end
       end
 
-      def self.benefit_sponsor_catalogs_for(benefit_sponsorship)
-        benefit_sponsorship.benefit_sponsor_catalogs
+      def benefit_sponsor_catalog_for(benefit_application)
+        benefit_application.benefit_sponsorship
+        # benefit_sponsorship.benefit_sponsor_catalogs
       end
 
       # We can cheat here because our form and our model are so
