@@ -51,7 +51,7 @@ namespace :reports do
     def shop_enrollment(person)
       if person.primary_family
         if person.primary_family.active_household.hbx_enrollments.shop_market.present?
-          person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
+          person.primary_family.active_household.hbx_enrollments.shop_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
         else
           "nil"
         end
