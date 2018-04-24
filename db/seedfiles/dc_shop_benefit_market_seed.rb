@@ -13,7 +13,7 @@ benefit_market_catalog = ::BenefitMarkets::BenefitMarketCatalog.create!({
   probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS
 })
 
-dc_contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where(name: "DC Shop Contribution Model").first
+dc_contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Shop Contribution Model").first
 dc_pricing_model = ::BenefitMarkets::PricingModels::PricingModel.where(name: "DC Shop Pricing Model").first
 
 plan_active_year = benefit_market_catalog.application_period.first.year
