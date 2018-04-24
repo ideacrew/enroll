@@ -17,7 +17,7 @@ module BenefitSponsors
     end
 
     def create
-      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(registration_params)
+      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(registration_params)
       begin
         saved, result_url = @agency.save
         result_url = self.send(result_url)

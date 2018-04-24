@@ -86,12 +86,9 @@ module BenefitSponsors
           end
 
           return false, redirection_url if failed_validity?(existing_org)
-          
           organization = init_profile_organization(existing_org, attributes)
-          
           #TODO : handle validation errors
           return false, redirection_url unless persist_agency!(organization)
-          
           [true, redirection_url(pending, true)]
         end
 
@@ -241,7 +238,7 @@ module BenefitSponsors
         end
 
         def profile_attributes(attrs={})
-          attrs["profiles_attributes"]["0"] if attrs["profiles_attributes"].present?
+          attrs[:profiles_attributes][0] if attrs[:profiles_attributes].present?
         end
 
         def staff_role_attributes(attrs={})
