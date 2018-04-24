@@ -24,10 +24,6 @@ module BenefitSponsors
       belongs_to  :benefit_market_catalog, counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
-      ## TODO Deprecate -- BenefitMarket is associated with BenefitSponsorship
-      belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "::BenefitMarkets::BenefitMarket"
-
       # The date range when this application is active
       field :effective_period,        type: Range
 
@@ -59,10 +55,11 @@ module BenefitSponsors
 
       embeds_many :benefit_packages, 
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
-      
-      embeds_many :workflow_state_transitions, as: :transitional
 
-      validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
+      embeds_one  :benefit_sponsor_catalog,
+                  class_name: "::BenefitMarkets::BenefitSponsorCatalog"
+      
+      validates_presence_of :effective_period, :open_enrollment_period
       
       validate :validate_application_dates
       # validate :open_enrollment_date_checks
