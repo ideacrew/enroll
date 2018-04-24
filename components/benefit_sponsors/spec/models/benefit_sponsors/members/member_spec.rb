@@ -13,8 +13,8 @@ module BenefitSponsors
     let(:gender)          { :male }
     let(:dob)             { Date.new(1966,5,25) }
 
-    let(:relationship_to_primary_member)  { :spouse }
-    let(:sponsor_assigned_group_id)       { "3432" }
+    let(:kinship_to_primary_member)  { :spouse }
+    let(:sponsor_assigned_id)       { "3432" }
 
     let(:params) do
       {
@@ -24,8 +24,8 @@ module BenefitSponsors
         name_sfx: name_sfx,
         gender: gender,
         dob: dob,
-        relationship_to_primary_member: relationship_to_primary_member,
-        sponsor_assigned_group_id: sponsor_assigned_group_id,
+        kinship_to_primary_member: kinship_to_primary_member,
+        sponsor_assigned_id: sponsor_assigned_id,
 
         # TODO: add following parameters to spec
         # address: address,
@@ -59,8 +59,8 @@ module BenefitSponsors
           expect(subject.name_sfx).to eq name_sfx
           expect(subject.gender).to eq gender
           expect(subject.dob).to eq dob
-          expect(subject.relationship_to_primary_member).to eq relationship_to_primary_member
-          expect(subject.sponsor_assigned_group_id).to eq sponsor_assigned_group_id
+          expect(subject.kinship_to_primary_member).to eq kinship_to_primary_member
+          expect(subject.sponsor_assigned_id).to eq sponsor_assigned_id
 
           # expect(subject.address).to eq address
           # expect(subject.email).to eq email
