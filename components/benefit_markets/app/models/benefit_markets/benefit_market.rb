@@ -5,6 +5,7 @@ module BenefitMarkets
   class BenefitMarket
     include Mongoid::Document
     include Mongoid::Timestamps
+    include BenefitMarkets
 
     attr_reader :contact_center_profile
 
