@@ -2,17 +2,15 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationFactory
 
-      attr_accessor :benefit_sponsorship, :benefit_application
+      attr_accessor :benefit_sponsorship
 
-      def self.call(benefit_sponsorship, benefit_application, args)
-        new(benefit_sponsorship, benefit_application, args).benefit_application
+      def self.call(benefit_sponsorship, args)
+        new(benefit_sponsorship, args).benefit_application
       end
 
-      def initialize(benefit_sponsorship, benefit_application, args)
+      def initialize(benefit_sponsorship, args)
         @benefit_sponsorship = benefit_sponsorship
-        @benefit_application = benefit_application
-
-        initialize_benefit_application unless defined? @benefit_application
+        initialize_benefit_application
         assign_application_attributes(args)
       end
 
@@ -22,6 +20,10 @@ module BenefitSponsors
         klass_name  = [benefit_market.kind.to_s.camelcase, site_key.to_s.camelcase, "BenefitApplication"].join('')
         @benefit_application = [parent_namespace_for(self.class), "BenefitApplications", klass_name].join("::").constantize.new
         @benefit_application.benefit_sponsorship = benefit_sponsorship
+      end
+
+      def benefit_application
+        @benefit_application
       end
 
       def assign_application_attributes(args)

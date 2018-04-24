@@ -88,7 +88,19 @@ module BenefitSponsors
       end
 
       def profile_attributes(form)
-        form.attributes.slice(:entity_kind, :contact_method, :id)
+        if broker_agency_profile?
+          form.attributes.slice(:entity_kind, :contact_method, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
+        elsif benefit_sponsor_profile?
+          form.attributes.slice(:entity_kind, :contact_method, :id)
+        end
+      end
+
+      def broker_agency_profile?
+        #TODO need to fix this
+        true
+      end
+
+      def benefit_sponsor_profile?
       end
 
       def staff_role_params(staff_roles)

@@ -126,7 +126,7 @@ module BenefitMarkets
 
       def options_for_contribution_model_id
         ::BenefitMarkets::ContributionModels::ContributionModel.where({}).map do |cm|
-          [cm.name, cm.id]
+          [cm.title, cm.id]
         end
       end
 
