@@ -528,7 +528,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should render update_tax_household_eligibility if save successful" do
       sign_in(user)
       xhr :get, :update_tax_household_eligibility, params
-      binding.pry
       active_household = person.primary_family.active_household
       latest_active_thh = active_household.reload.latest_active_thh
       eligibility_deter = latest_active_thh.eligibility_determinations.first
