@@ -866,6 +866,7 @@ class HbxEnrollment
   end
 
   def decorated_elected_plans(coverage_kind, market=nil)
+    #binding.pry
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
@@ -876,7 +877,7 @@ class HbxEnrollment
     end
 
     tax_household = household.latest_active_tax_household_with_year(effective_on.year)
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 

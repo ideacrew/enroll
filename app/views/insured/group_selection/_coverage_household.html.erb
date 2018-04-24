@@ -13,12 +13,17 @@
 
         <% end %>
 
-        <% if (can_shop_individual?(@person) || can_shop_resident?(@person)) %>
+        <% if (can_shop_individual?(@person)) || (can_shop_resident?(@person)) %>
+        <% binding.pry %>
         <%
             #Handle When Implementing - People with Both Consumer Role & Resident Role
-            role = (family_member.person.consumer_role || family_member.person.resident_role)
+            if family_member.person.is_consumer_role_active?
+              role = family_member.person.consumer_role
+            elsif family_member.person.is_resident_role_active?
+              role = family_member.person.resident_role
+            end
             family = family_member.family
-            rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on})
+            rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
             is_ivl_coverage, errors = rule.satisfied?
             @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
             errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
