@@ -90,9 +90,6 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
 
-      # Use the Document model for managing any/all documents associated with Organization
-      has_many :documents, class_name: "BenefitSponsors::Documents::Document"
-
       accepts_nested_attributes_for :profiles
 
       validates_presence_of :legal_name, :site, :profiles
@@ -114,6 +111,7 @@ module BenefitSponsors
 
       scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where(:"profiles._id" => broker_agency_profile_id)}
       scope :by_broker_role, ->(broker_role_id) { broker_agency_profiles.where(:"profiles.primary_broker_role_id" => broker_role_id)}
+      scope :by_employer_profile,->(profile_id){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
 

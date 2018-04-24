@@ -1,9 +1,7 @@
 module BenefitSponsors
   module Serializers
     class StaffRoleSerializer < ActiveModel::Serializer
-      attributes :first_name, :last_name, :email, :dob, :status, :phone
-      attribute :npn, if: :is_broker_profile?
-
+      attributes :first_name, :last_name, :email, :dob, :status, :phone, :npn
 
       def email
         object.work_email_or_best
@@ -17,7 +15,12 @@ module BenefitSponsors
       def status
       end
 
-      def is_broker_profile?
+      def dob
+        object.dob.to_s
+      end
+
+      def npn
+        object.broker_role.npn if object.broker_role.present?
       end
 
       # provide defaults(if any needed) that were not set on Model

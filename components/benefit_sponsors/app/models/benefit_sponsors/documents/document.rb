@@ -12,8 +12,7 @@ module BenefitSponsors
                       
       ACCESS_RIGHTS = %w(public pii_restricted)
 
-      belongs_to :organization, class_name: "BenefitSponsors::Organizations::Organization"
-
+      belongs_to :documentable, polymorphic: true
 
       # Dublin Core metadata elements
       field :title, type: String, default: "untitled"

@@ -20,8 +20,8 @@ module BenefitSponsors
         attr_reader :total
         attr_reader :member_pricing
 
-        def initialize(p_calculator, p_model, r_coverage, p_determination)
-          @pricing_calculator = p_calculator
+        def initialize(p_model, r_coverage, p_determination)
+          @age_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
           @member_totals = 0
@@ -32,12 +32,13 @@ module BenefitSponsors
           @member_ids = []
           @member_pricing = {}
           @product = r_coverage.product
+          @previous_product = r_coverage.previous_eligibility_product
           @eligibility_dates = r_coverage.coverage_eligibility_dates
           @coverage_start_date = r_coverage.coverage_start_date
         end
 
         def add(member)
-          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date, @product, @product)
+          coverage_age = @age_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
           rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           @member_ids << member.member_id
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
@@ -64,7 +65,7 @@ module BenefitSponsors
         pricing_determination = sponsor_contribution.sponsored_benefit.latest_pricing_determination
         r_coverage = benefit_roster_entry.roster_coverage
         member_list = [benefit_roster_entry] + benefit_roster_entry.dependents
-        calc_state = CalculatorState.new(self, pricing_model, r_coverage, pricing_determination)
+        calc_state = CalculatorState.new(pricing_model, r_coverage, pricing_determination)
         calc_results = member_list.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end
@@ -79,6 +80,7 @@ module BenefitSponsors
           benefit_roster_entry.dob,
           benefit_roster_entry.member_id,
           benefit_roster_entry.dependents,
+          roster_entry_pricing,
           benefit_roster_entry.is_disabled?
         )
       end

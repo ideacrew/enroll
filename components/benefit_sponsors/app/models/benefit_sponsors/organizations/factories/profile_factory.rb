@@ -370,14 +370,25 @@ module BenefitSponsors
           Organization.where(:fein => fein).first
         end
 
+        def self.broker_agency_profile(profile_id)
+          organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+          organization.broker_agency_profile.present? ? organization.broker_agency_profile : nil
+        end
+
         def self.find_representatives(profile_id)
           return [Person.new] if profile_id.blank?
-          Person.where(:benefit_sponsors_employer_staff_roles => {
-            '$elemMatch' => {
-              employer_profile_id: profile_id,
-              :aasm_state.ne => :is_closed
-            }
-          })
+          broker_agency = broker_agency_profile(profile_id[:profile_id])
+
+          if broker_agency.present?
+            [broker_agency.primary_broker_role.person]
+          else
+            Person.where(:benefit_sponsors_employer_staff_roles => {
+              '$elemMatch' => {
+                employer_profile_id: profile_id,
+                :aasm_state.ne => :is_closed
+              }
+            })
+          end
         end
       end
     end
