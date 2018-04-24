@@ -2,19 +2,57 @@
   <div class="form-group">
     <label for="inputSiteKey">Site Key</label>
     <%= f.text_field :site_key, required:'true', id:'inputSiteKey', class:'form-control'%>
-  </div>
-  <div class="form-group">
     <label for="inputLongName">Long Name</label>
     <%= f.text_field :long_name, id:'inputLongName', class:'form-control'%>
-  </div>
-  <div class="form-group">
     <label for="inputShortName">Short Name</label>
     <%= f.text_field :short_name, id:'inputShortName', class:'form-control'%>
-  </div>
-  <div class="form-group">
     <label for="inputByLine">By Line</label>
     <%= f.text_field :byline, id:'inputShByLine', class:'form-control'%>
   </div>
+
+  <%= f.fields_for :owner_organization, @site.owner_organization do |organization_fields| %>
+    <div class="form-group">
+      <label for="inputLegalName">Organization Legal Name</label>
+      <%= organization_fields.text_field :legal_name, id: 'inputLegalName', class: 'form-control' %>
+    </div>
+
+    <%= organization_fields.fields_for :office_locations, organization_fields.object.primary_office_location || organization_fields.object.office_locations.build do |office_fields| %>
+      <%= office_fields.hidden_field :is_primary, value: true %>
+
+      <%= office_fields.fields_for :phone, office_fields.object.phone || BenefitSponsors::Locations::Phone.new do |phone_fields| %>
+        <%= phone_fields.hidden_field :kind, value: 'main' %>
+
+        <label for="inputPhoneAreaCode">Phone</label>
+        <%= phone_fields.text_field :area_code, id: 'inputAreaCode', class: 'form-control' %>
+        <%= phone_fields.text_field :number, id: 'inputPhoneNumber', class: 'form-control' %>
+      <% end %>
+
+      <%= office_fields.fields_for :address, office_fields.object.address || BenefitSponsors::Locations::Address.new do |address_fields| %>
+        <%= address_fields.hidden_field :kind, value: 'primary' %>
+
+        <label for="inputAddress1">Address 1</label>
+        <%= address_fields.text_field :address_1, id: 'inputAddress1', class: 'form-control' %>
+
+        <label for="inputAddress2">Address 2</label>
+        <%= address_fields.text_field :address_2, id: 'inputAddress2', class: 'form-control' %>
+
+        <label for="inputAddress3">Address 3</label>
+        <%= address_fields.text_field :address_3, id: 'inputAddress3', class: 'form-control' %>
+
+        <label for="inputCity">City</label>
+        <%= address_fields.text_field :city, id: 'inputCity', class: 'form-control' %>
+
+        <label for="inputState">State</label>
+        <%= address_fields.text_field :state, id: 'inputState', class: 'form-control' %>
+
+        <label for="inputZip">Zip</label>
+        <%= address_fields.text_field :zip, id: 'inputZip', class: 'form-control' %>
+
+        <label for="inputCounty">County</label>
+        <%= address_fields.text_field :county, id: 'inputCounty', class: 'form-control' %>
+      <% end %>
+    <% end %>
+  <% end %>
 
   <%= link_to 'Back', sites_path, class:'btn btn-default' %><%= f.submit class:'btn btn-primary' %>
 <% end %>
