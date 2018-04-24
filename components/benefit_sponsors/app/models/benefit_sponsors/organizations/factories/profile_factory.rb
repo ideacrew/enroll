@@ -23,16 +23,16 @@ module BenefitSponsors
         end
 
 
-        def self.call_persist(attributes, current_user)
+        def self.call_persist(attributes)
           factory_obj = new(attributes)
-          factory_obj.current_user = current_user
+          factory_obj.current_user = current_user(attributes[:current_user_id])
           factory_obj.save(attributes[:organization])
         end
 
-        def self.call_update(attributes, profile_id)
-          factory_obj = new(profile_id)
+        def self.call_update(attributes)
+          factory_obj = new(attributes)
           organization = factory_obj.get_organization
-          organization.update_attributes(attributes)
+          organization.update_attributes(attributes[:organization])
         end
 
         def self.build(attrs)
@@ -46,7 +46,7 @@ module BenefitSponsors
         end
 
         def initialize_attributes(attrs)
-          initialize_staff_role_attributes(staff_role_attributes(attrs[:staff_roles_attributes])) # ToDo - there will be a better way
+          initialize_staff_role_attributes(staff_role_attributes(attrs[:staff_roles_attributes])) # Always one while creating
           initialize_agency_attributes(attrs[:organization])
         end
 
@@ -72,7 +72,7 @@ module BenefitSponsors
 
         def save(attributes)
           begin
-            match_or_create_person(current_user)
+            match_or_create_person
             existing_org = get_existing_organization
           rescue TooManyMatchingPeople
             errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
@@ -86,11 +86,9 @@ module BenefitSponsors
           end
 
           return false, redirection_url if failed_validity?(existing_org)
-          
           organization = init_profile_organization(existing_org, attributes)
-          
+          #TODO : handle validation errors
           return false, redirection_url unless persist_agency!(organization)
-          
           [true, redirection_url(pending, true)]
         end
 
@@ -109,7 +107,7 @@ module BenefitSponsors
           if is_broker_profile?
             persist_broker_staff_role!(organization.broker_agency_profile)
           elsif is_employer_profile?
-            persist_employer_staff_role!(current_user, organization.employer_profile, claimed)
+            persist_employer_staff_role!(organization.employer_profile, claimed)
           end
         end
 
@@ -128,7 +126,7 @@ module BenefitSponsors
           trigger_broker_application_confirmation_email
         end
 
-        def persist_employer_staff_role!(current_user, profile, existing_company)
+        def persist_employer_staff_role!(profile, existing_company)
           person.user = current_user
           employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
           if employer_ids.include? profile.id
@@ -227,8 +225,12 @@ module BenefitSponsors
           Person.new({
             :first_name => first_name.strip,
             :last_name => last_name.strip,
-            :dob => Date.strptime(dob, "%m/%d/%Y")
+            :dob => dob
           })
+        end
+
+        def get_organization
+          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         def organization_attributes(attrs = {})
@@ -240,14 +242,14 @@ module BenefitSponsors
         end
 
         def profile_attributes(attrs={})
-          attrs["profiles_attributes"]["0"] if attrs["profiles_attributes"].present?
+          attrs[:profiles_attributes][0] if attrs[:profiles_attributes].present?
         end
 
         def staff_role_attributes(attrs={})
-          attrs.present? ? attrs["0"] : attrs
+          attrs.present? ? attrs[0] : attrs
         end
 
-        def match_or_create_person(current_user=nil)
+        def match_or_create_person
 
           matched_people = get_matched_people
 
@@ -346,16 +348,12 @@ module BenefitSponsors
           end
         end
 
-        def get_organization
-          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
-        end
-
         def get_matched_people
           if is_employer_profile? || is_broker_profile?
             Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
-              dob: Date.strptime(dob, "%m/%d/%Y")
+              dob: dob
               )
           else
             Person.where(
@@ -369,14 +367,31 @@ module BenefitSponsors
           Organization.where(:fein => fein).first
         end
 
+        def self.current_user(user_id)
+          if user_id.present?
+            User.find(user_id)
+          end
+        end
+
+        def self.broker_agency_profile(profile_id)
+          organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+          organization.broker_agency_profile.present? ? organization.broker_agency_profile : nil
+        end
+
         def self.find_representatives(profile_id)
           return [Person.new] if profile_id.blank?
-          Person.where(:benefit_sponsors_employer_staff_roles => {
-            '$elemMatch' => {
-              employer_profile_id: profile_id,
-              :aasm_state.ne => :is_closed
-            }
-          })
+          broker_agency = broker_agency_profile(profile_id[:profile_id])
+
+          if broker_agency.present?
+            [broker_agency.primary_broker_role.person]
+          else
+            Person.where(:benefit_sponsors_employer_staff_roles => {
+              '$elemMatch' => {
+                employer_profile_id: profile_id,
+                :aasm_state.ne => :is_closed
+              }
+            })
+          end
         end
       end
     end

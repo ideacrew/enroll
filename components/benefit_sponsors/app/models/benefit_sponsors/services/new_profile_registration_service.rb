@@ -33,6 +33,75 @@ module BenefitSponsors
         }
       end
 
+      def form_attributes_to_params(form)
+        {
+          :"current_user_id" => form.current_user_id,
+          :"profile_type" => form.profile_type,
+          :"profile_id" => form.profile_id,
+          :"staff_roles_attributes" => staff_roles_form_to_params(form.staff_roles),
+          :"organization" => organization_form_to_params(form.organization)
+        }
+      end
+
+      def staff_roles_form_to_params(roles)
+        roles.each_with_index.inject({}) do |result, (form, index_val)|
+          result[index_val] = form.attributes
+          result
+        end
+      end
+
+      def organization_form_to_params(form)
+        organization_attributes(form).merge({
+          :profiles_attributes => profiles_form_to_params(form.profiles)
+        })
+      end
+
+      def profiles_form_to_params(profiles)
+        profiles.each_with_index.inject({}) do |result, (form, index_val)|
+          result[index_val] = profile_attributes(form).merge({
+            :office_locations_attributes =>  office_locations_form_to_params(form.office_locations)
+          })
+          result
+        end
+      end
+
+      def office_locations_form_to_params(locations)
+        locations.each_with_index.inject({}) do |result, (form, index_val)|
+          result[index_val] = form.attributes.slice(:is_primary, :id).merge({
+            :phone_attributes =>  phone_form_to_params(form.phone),
+            :address_attributes =>  address_form_to_params(form.address)
+          })
+          result
+        end
+      end
+
+      def phone_form_to_params(form)
+        form.attributes.slice(:kind, :area_code, :number, :extension, :id)
+      end
+
+      def address_form_to_params(form)
+        form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
+      end
+
+      def organization_attributes(form)
+        form.attributes.slice(:fein, :dba, :legal_name)
+      end
+
+      def profile_attributes(form)
+        if broker_agency_profile?
+          form.attributes.slice(:entity_kind, :contact_method, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
+        elsif benefit_sponsor_profile?
+          form.attributes.slice(:entity_kind, :contact_method, :id)
+        end
+      end
+
+      def broker_agency_profile?
+        #TODO need to fix this
+        true
+      end
+
+      def benefit_sponsor_profile?
+      end
 
       def staff_role_params(staff_roles)
         return [{}] if staff_roles.blank?
@@ -50,20 +119,20 @@ module BenefitSponsors
 
       # TODO
 
-      def save(attrs, current_user=nil)
-        persist_from_factory(attrs, current_user)
+      def save(form)
+        persist_from_factory(form)
       end
 
-      def update(attrs)
-        update_from_factory(attrs)
+      def update(form)
+        update_from_factory(form)
       end
 
-      def persist_from_factory(attrs, current_user)
-        Organizations::Factories::ProfileFactory.call_persist(attrs, current_user)
+      def persist_from_factory(form)
+        Organizations::Factories::ProfileFactory.call_persist(form_attributes_to_params(form))
       end
 
-      def update_from_factory(attrs)
-        Organizations::Factories::ProfileFactory.call_update(attrs, profile_id)
+      def update_from_factory(form)
+        Organizations::Factories::ProfileFactory.call_update(form_attributes_to_params(form))
       end
 
       def params_to_attributes(params)
@@ -90,6 +159,14 @@ module BenefitSponsors
       end
 
       def self.office_kind_options
+      end
+
+      def is_broker_profile?(profile_type)
+        profile_type == "broker_agency"
+      end
+
+      def is_benefit_sponsor?(profile_type)
+        profile_type == "benefit_sponsor"
       end
 
       private

@@ -6,6 +6,7 @@ module BenefitSponsors
       #include ActiveModel::Conversion
       include Virtus.model
 
+      attribute :current_user_id, String
       attribute :profile_type, String
       attribute :profile_id, String
       attribute :staff_roles, Array[Forms::StaffRoleForm]
@@ -23,7 +24,11 @@ module BenefitSponsors
         result
       end
 
-      def staff_roles_attributes=(val)
+      def staff_roles_attributes=(attrs)
+        self.staff_roles = attrs.values.inject([]) do |result, role|
+          result << Forms::StaffRoleForm.new(role)
+          result
+        end
       end
 
       def persisted?
@@ -31,10 +36,6 @@ module BenefitSponsors
           return true
         end
         false
-      end
-
-      def save(attrs, current_user=nil)
-        persist!(attrs, current_user)
       end
 
       def self.for_new(profile_type)
@@ -54,16 +55,25 @@ module BenefitSponsors
       end
 
       def self.for_update(attrs)
+        new(attrs)
       end
 
-      def persist!(attrs, current_user)
-        return false unless valid?
-        service.save(attrs, current_user)
+      def save
+        persist!
       end
 
-      def update(attrs)
+      def update
+        update!
+      end
+
+      def persist!
         return false unless valid?
-        service.update(attrs)
+        service.save(self)
+      end
+
+      def update!
+        return false unless valid?
+        service.update(self)
       end
 
       def is_broker_profile?
@@ -77,7 +87,7 @@ module BenefitSponsors
       # TODO : Refactor validating sub-documents.
       def registration_form
         self.staff_roles.each do |staff_role|
-          validate_form(self.staff_role)
+          validate_form(staff_role)
         end
         validate_form(self.organization)
         self.organization.profiles.each do |profile_form|

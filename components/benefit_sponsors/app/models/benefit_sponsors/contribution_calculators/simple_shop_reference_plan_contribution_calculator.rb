@@ -20,10 +20,10 @@ module BenefitSponsors
         attr_reader :total_contribution
         attr_reader :member_contributions
 
-        def initialize(c_calc, c_model, m_prices, r_coverage, r_product, l_map)
+        def initialize(c_model, m_prices, r_coverage, r_product, l_map)
           @rate_schedule_date = r_coverage.rate_schedule_date
           @contribution_model = c_model
-          @contribution_calculator = c_calc
+          @contribution_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
           @total_contribution = 0.00
           @member_prices = m_prices
           @member_contributions = {}
@@ -62,7 +62,7 @@ module BenefitSponsors
           ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
             @reference_product,
             @rate_schedule_date,
-            @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, member, @product, @previous_product),
+            @contribution_calculator.calc_coverage_age_for(member, @product, @coverage_start_on, @eligibility_dates, @previous_product),
             @rating_area
           )
         end
@@ -74,7 +74,7 @@ module BenefitSponsors
         end
 
         def get_contribution_unit(roster_entry_member)
-          coverage_age = @contribution_calculator.calc_coverage_age_for(@eligibility_dates, @coverage_start_on, roster_entry_member, @product, @previous_product)
+          coverage_age = @contribution_calculator.calc_coverage_age_for(roster_entry_member, @product, @coverage_start_on, @eligibility_dates, @previous_product)
           rel_name = @contribution_model.map_relationship_for(roster_entry_member.relationship, coverage_age, roster_entry_member.is_disabled?)
           @contribution_model.contribution_units.detect do |cu|
             cu.match?({rel_name.to_s => 1})
@@ -99,7 +99,6 @@ module BenefitSponsors
         reference_product = sponsor_contribution.reference_product
         level_map = level_map_for(sponsor_contribution)
         state = CalculatorState.new(
-          self,
           contribution_model,
           priced_roster_entry.roster_entry_pricing.member_pricing,
           priced_roster_entry.roster_coverage,
