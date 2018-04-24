@@ -156,6 +156,14 @@ module Notifier
       UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
     end
 
+    def send_generic_notice_alert_to_broker
+      if resource.is_a?(EmployerProfile) && resource.broker_agency_profile.present?
+        broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+        broker_email = resource.broker_agency_profile.primary_broker_role.email_address
+        UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+      end
+    end
+
     def store_paper_notice
       bucket_name= Settings.paper_notice
       notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
@@ -175,7 +183,6 @@ module Notifier
     def create_recipient_document(doc_uri)
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
-
       notice = receiver.documents.build({
         title: notice_filename, 
         creator: "hbx_staff",
@@ -194,11 +201,9 @@ module Notifier
     def create_secure_inbox_message(notice)
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
-
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
       receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end

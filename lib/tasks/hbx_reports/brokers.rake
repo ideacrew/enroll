@@ -5,6 +5,7 @@ namespace :reports do
 
     desc "All Brokers"
     task :brokers => :environment do
+      include Config::AcaHelper
 
       date_range = Date.new(2015,10,1)..TimeKeeper.date_of_record
       brokers = Person.exists(broker_role: true).broker_role_having_agency
@@ -31,8 +32,7 @@ namespace :reports do
         )
 
       processed_count = 0
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/brokers_list_#{time_stamp}.csv")
+      file_name = fetch_file_format('brokers_list', 'BROKERSLIST')
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names

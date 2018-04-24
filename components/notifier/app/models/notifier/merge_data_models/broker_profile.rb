@@ -12,6 +12,7 @@ module Notifier
 
     attribute :broker_agency_name, String
     attribute :assignment_date, String
+    attribute :termination_date, Date
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
     attribute :employer_poc_lastname, String
@@ -23,6 +24,7 @@ module Notifier
         last_name: 'Whitmore',
         broker_agency_name: 'Best Brokers LLC',
         assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
+        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         employer_name: 'North America Football Federation',
         employer_poc_firstname: 'David',
         employer_poc_lastname: 'Samules'
