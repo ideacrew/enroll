@@ -10,19 +10,26 @@ module Notifier
     attribute :premium_amount, String
     attribute :subscriber, MergeDataModels::Person
     attribute :dependents, Array[MergeDataModels::Person]
-
-    # attribute :coverage_end_on, Date
+    attribute :employee_first_name, String
+    attribute :employee_last_name, String
+    attribute :coverage_end_on, String
+    attribute :enrolled_count, String
     # attribute :metal_level, String
-    # attribute :coverage_kind, String
+    attribute :coverage_kind, String
     # attribute :plan_carrier, String
 
     def self.stubbed_object
       enrollment = Notifier::MergeDataModels::Enrollment.new({
         coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
+        coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y'),
         plan_name: 'KP SILVER',
-        employer_responsible_amount: '250.0',
-        employee_responsible_amount: '90.0',
-        premium_amount: '340.0'
+        employer_responsible_amount: '$250.0',
+        employee_responsible_amount: '$90.0',
+        premium_amount: '340.0',
+        enrolled_count: '2',
+        employee_first_name: 'David',
+        employee_last_name: 'Finch',
+
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object

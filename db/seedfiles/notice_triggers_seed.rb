@@ -253,27 +253,6 @@ shop_notice_triggers = [
   #   ]
   # },
     {
-        hbx_id: 'SHOP_M002',
-        title: 'Approval of Application to Offer Group Health Coverage through the Health Connector',
-        description: 'Application to Offer Group Health Coverage in Health Connector',
-        resource_name: 'employer',
-        event_name: 'initial_employer_approval',
-        notice_triggers: [
-            {
-                name: 'Initial Employer SHOP Approval Notice',
-                notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
-                notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
-                mpi_indicator: 'SHOP_M002',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-    {
         hbx_id: 'SHOP_M003',
         title: 'Employer Denial Notice',
         description: 'Application to Offer Group Health Coverage in Health Connector',
@@ -294,6 +273,29 @@ shop_notice_triggers = [
             }
         ]
     },
+
+    # {
+    #   hbx_id: 'SHOP3A',
+    #   title: 'Plan Offerings Finalized',
+    #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
+    #   resource_name: 'employer',
+    #   event_name: 'planyear_renewal_3a',
+    #   notice_triggers: [
+    #     {
+    #       name: 'PlanYear Renewal',
+    #       notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
+    #       notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
+    #       mpi_indicator: 'MPI_SHOPRA',
+    #       notice_trigger_element_group: {
+    #         market_places: ['shop'],
+    #         primary_recipients: ["employer"],
+    #         primary_recipient_delivery_method: ["secure_message"],
+    #         secondary_recipients: []
+    #       }
+    #     }
+    #   ]
+    # },
+
     # {
     #   hbx_id: 'SHOP3B',
     #   title: 'Plan Offerings Finalized',
@@ -639,29 +641,6 @@ shop_notice_triggers = [
             }
         ]
     },
-
-    {
-        hbx_id: 'SHOP_M039',
-        title: 'Employee Terminating coverage',
-        description: 'Employee Terminating coverage after QLE',
-        resource_name: 'employer',
-        event_name: 'notify_employer_when_employee_terminate_coverage',
-        notice_triggers: [
-          {
-            name: 'Notice to employer when employee terminates coverage',
-            notice_template: 'notices/employee_terminating_coverage',
-            notice_builder: 'EmployeeTerminatingCoverage',
-            mpi_indicator: 'SHOP_M039',
-            notice_trigger_element_group: {
-              market_places: ['shop'],
-              primary_recipients: ["employer"],
-              primary_recipient_delivery_method: ["secure_message"],
-              secondary_recipients: []
-            }
-          }
-        ]
-    },
-
   # {
   #   hbx_id: 'SHOP_D018',
   #   title: 'Group Open Enrollment Successfully Completed',
@@ -1086,48 +1065,6 @@ shop_notice_triggers = [
         ]
     },
     {
-      hbx_id: 'SHOP_M029',
-      title: 'Confirmation Of Election To Waive Coverage',
-      description: 'Employee waiver confirmation',
-      resource_name: 'employee_role',
-      event_name: 'employee_waiver_notice',
-      notice_triggers: [
-        {
-            name: 'Notice to employee after they select a plan Annual Open Enrollment',
-            notice_template: 'notices/shop_employee_notices/employee_waiver_confirmation_notification',
-            notice_builder: 'ShopEmployeeNotices::EmployeeWaiverConfirmNotice',
-            mpi_indicator: 'SHOP_M029',
-            notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employee"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-                  }
-            }
-        ]
-    },
-    {
-        hbx_id: 'SHOP_M040',
-        title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
-        description: 'Employee Terminating coverage after QLE',
-        resource_name: 'employer',
-        event_name: 'notify_employee_confirming_coverage_termination',
-        notice_triggers: [
-            {
-                name: 'Notice to employer when employee terminates coverage',
-                notice_template: 'notices/shop_employee_notices/employee_terminating_coverage',
-                notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverage',
-                # used unique MPI indicator with two event names
-                mpi_indicator: 'SHOP_M040',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                     primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []        }
-            }
-        ]
-    },
-    {
         hbx_id: 'SHOP_M041',
         title: 'Notice Confirmation for Group termination due to ER advance request',
         description: 'Group termination confirmation for advance request',
@@ -1253,50 +1190,6 @@ shop_notice_triggers = [
   #     }
   #   ]
   # },
-
-    {
-        hbx_id: 'SHOP_M040',
-        title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
-        description: 'Employee Terminating coverage after QLE',
-        resource_name: 'employer',
-        event_name: 'notify_employee_confirming_dental_coverage_termination',
-        notice_triggers: [
-            {
-                name: 'Notice to employer when employee terminates coverage',
-                notice_template: 'notices/shop_employee_notices/employee_terminating_dental_coverage',
-                notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingDentalCoverage',
-                mpi_indicator: 'SHOP_M040',
-                notice_trigger_element_group: {
-                    market_places: ['shop'],
-                     primary_recipients: ["employer"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-                }
-            }
-        ]
-    },
-
-    {
-        hbx_id: 'SHOP_M043',
-        title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
-        description: 'EE Made Mid-Year Plan Change (Reason: New Hire, SEP, OR DPT Age-Off)',
-        resource_name: 'employer',
-        event_name: 'employee_mid_year_plan_change',
-        notice_triggers: [
-          {
-                name: 'Employee Mid-Year Plan change',
-                notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change',
-                notice_builder: 'EmployeeMidYearPlanChange',
-                mpi_indicator: 'SHOP_M043',
-                notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employer"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-                }
-            }
-        ]
-    }
 ]
 
 ivl_notice_triggers = [

@@ -354,6 +354,11 @@ ready = function() {
         $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
         $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
         $(this).val(hidden);
+        if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+          EmployerProfile.validateEditPlanYear();
+        } else {
+          EmployerProfile.validatePlanYear();
+        }
       }
     });
 
