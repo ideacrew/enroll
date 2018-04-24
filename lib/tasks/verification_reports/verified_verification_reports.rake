@@ -27,11 +27,7 @@ namespace :reports do
       if @person.primary_family
         @person.hbx_id
       else
-        @person.families.to_a.each do |family|
-          @family_array = []
-          @family_array <<  family  if family.active_family_members.map(&:person).map(&:hbx_id).include? @person.hbx_id
-        end
-        @family_array.map(&:primary_family_member).map(&:hbx_id).join(',')
+        @person.families.map(&:primary_family_member).select{|member| member.person.consumer_role.present?}.first.hbx_id || @person.hbx_id
       end
     end
 
@@ -40,7 +36,7 @@ namespace :reports do
         if person.primary_family.active_household.hbx_enrollments.individual_market.present?
           person.primary_family.active_household.hbx_enrollments.individual_market.select{|enrollment| enrollment.currently_active? }.any? ? "YES" : "NO"
         else
-          nil
+          "nil"
         end
       else
         families = person.families.select{|family| family.active_household.hbx_enrollments.individual_market.present?}
