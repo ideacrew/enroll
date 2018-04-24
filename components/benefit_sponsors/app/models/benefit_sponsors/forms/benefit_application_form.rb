@@ -17,8 +17,7 @@ module BenefitSponsors
 
       attribute :id, String
       attribute :benefit_sponsorship_id, String
-      attribute :start_on_options, Array
-
+      attribute :start_on_options, Hash
 
       validates :start_on, presence: true
       validates :end_on, presence: true
@@ -35,28 +34,28 @@ module BenefitSponsors
 
       def self.for_new(benefit_sponsorship_id)
         form = self.new(:benefit_sponsorship_id => benefit_sponsorship_id)
-        service.load_default_form_params(form)
-        service.load_form_metadata(form)
+        form.service.load_default_form_params(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_create(params)
         form = self.new(params)
-        service.load_form_metadata(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_edit(id)
         form = self.new(id: id)
-        service.load_form_params_from_resource(form)
-        service.load_form_metadata(form)
+        form.service.load_form_params_from_resource(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_update(id)
         form = self.new(id: id)
-        service.load_form_params_from_resource(form)
-        service.load_form_metadata(form)
+        form.service.load_form_params_from_resource(form)
+        form.service.load_form_metadata(form)
         form
       end
 
