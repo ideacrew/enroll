@@ -15,7 +15,7 @@ module BenefitSponsors
     private
 
     def set_self_relationship
-      relationship_to_primary_member = :self
+      kinship_to_primary_member = :self
     end
   end
 
