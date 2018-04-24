@@ -38,10 +38,6 @@ module BenefitSponsors
         false
       end
 
-      def save
-        persist!
-      end
-
       def self.for_new(profile_type)
         service = resolve_service(profile_type)
         form_params = service.build(profile_type)
@@ -59,6 +55,15 @@ module BenefitSponsors
       end
 
       def self.for_update(attrs)
+        new(attrs)
+      end
+
+      def save
+        persist!
+      end
+
+      def update
+        update!
       end
 
       def persist!
@@ -66,9 +71,9 @@ module BenefitSponsors
         service.save(self)
       end
 
-      def update(attrs)
+      def update!
         return false unless valid?
-        service.update(attrs)
+        service.update(self)
       end
 
       def is_broker_profile?

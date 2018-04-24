@@ -4,8 +4,6 @@ module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
 
     include Concerns::ProfileRegistration
-    before_action :initialize_agency, only: [:create]
-    before_action :find_agency, only: [:edit, :update]
     before_action :check_employer_staff_role, only: [:new]
 
     def new
@@ -42,10 +40,10 @@ module BenefitSponsors
     end
 
     def update
-      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(profile_id: params[:id])
+      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(registration_params)
       sanitize_office_locations_params
-      if can_update_profile?
-        if @agency.update(organization_params)
+      if can_update_profile? # pundit policy
+        if @agency.update
           flash[:notice] = 'Employer successfully Updated.'
         else
           org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
@@ -62,27 +60,6 @@ module BenefitSponsors
 
     def profile_type
       @profile_type = params[:profile_type] || params[:agency][:profile_type]
-    end
-
-    def initialize_agency
-      # return if params[:agency].blank?
-      # params[:agency].permit!
-      # @agency= BenefitSponsors::Organizations::Forms::Profile.new(params[:agency])
-    end
-
-    def find_agency
-      id = BSON::ObjectId.from_string(params[:id])
-      @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first
-      if @organization.broker_agency_profile.present? && @organization.broker_agency_profile.id.to_s == id.to_s
-        @broker_agency_profile = @organization.broker_agency_profile
-      elsif @organization.employer_profile.present? && @organization.employer_profile.id.to_s == id.to_s
-        @employer_profile = @organization.employer_profile
-      end
-      # id_params = params.permit(:id, :employer_profile_id)
-      # id = id_params[:id] || id_params[:employer_profile_id]
-      # @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
-      # @employer_profile = @organization.employer_profile # TODO PICK correct Profile
-      # render file: 'public/404.html', status: 404 if @employer_profile.blank?
     end
 
     def can_update_profile?
@@ -104,8 +81,7 @@ module BenefitSponsors
 
     def sanitize_office_locations_params
       # TODO - implement in accepts_nested_attributes_for
-      params["organization"].permit!
-      params[:organization][:profiles_attributes].each do |key, profile|
+      params[:agency][:organization][:profiles_attributes].each do |key, profile|
         profile[:office_locations_attributes].each do |key, location|
           if location && location[:address_attributes]
             location[:is_primary] = (location[:address_attributes][:kind] == 'primary')
@@ -115,9 +91,11 @@ module BenefitSponsors
     end
 
     def registration_params
+      current_user_id = current_user.present? ? current_user.id : nil
       params[:agency].merge!({
-        :current_user_id => current_user.id
-      }) if is_employer_profile?
+        :profile_id => params["id"],
+        :current_user_id => current_user_id
+      })
       params[:agency].permit!
     end
 

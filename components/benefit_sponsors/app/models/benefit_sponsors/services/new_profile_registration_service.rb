@@ -111,16 +111,16 @@ module BenefitSponsors
         persist_from_factory(form)
       end
 
-      def update(attrs)
-        update_from_factory(attrs)
+      def update(form)
+        update_from_factory(form)
       end
 
       def persist_from_factory(form)
         Organizations::Factories::ProfileFactory.call_persist(form_attributes_to_params(form))
       end
 
-      def update_from_factory(attrs)
-        Organizations::Factories::ProfileFactory.call_update(attrs, profile_id)
+      def update_from_factory(form)
+        Organizations::Factories::ProfileFactory.call_update(form_attributes_to_params(form))
       end
 
       def params_to_attributes(params)

@@ -29,10 +29,10 @@ module BenefitSponsors
           factory_obj.save(attributes[:organization])
         end
 
-        def self.call_update(attributes, profile_id)
-          factory_obj = new(profile_id)
+        def self.call_update(attributes)
+          factory_obj = new(attributes)
           organization = factory_obj.get_organization
-          organization.update_attributes(attributes)
+          organization.update_attributes(attributes[:organization])
         end
 
         def self.build(attrs)
@@ -232,6 +232,10 @@ module BenefitSponsors
           })
         end
 
+        def get_organization
+          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+        end
+
         def organization_attributes(attrs = {})
           attrs.except(:profiles_attributes).merge({
             site: site,
@@ -345,10 +349,6 @@ module BenefitSponsors
           elsif is_employer_profile?
             person.contact_info(email, area_code, number, extension) if email
           end
-        end
-
-        def get_organization
-          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         def get_matched_people
