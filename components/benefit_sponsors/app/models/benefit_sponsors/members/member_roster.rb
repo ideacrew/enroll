@@ -1,6 +1,8 @@
 module BenefitSponsors
   class Members::MemberRoster
 
+    attr_reader :member_groups
+
     def initialize
       @member_groups = []
     end
@@ -18,7 +20,9 @@ module BenefitSponsors
     end
 
     def [](index)
-      @member_groups[index]
+      # @member_groups[index]
+      @member_groups = index.each { |new_member_group| add_member(new_member_group) }
+      
     end
 
     def []=(index, new_member_group)
