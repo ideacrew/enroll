@@ -6,28 +6,28 @@ module BenefitSponsors
     end
 
     def new
-      @site = BenefitSponsors::Forms::Site.new current_user
+      @site = BenefitSponsors::Site.new
     end
 
     def create
       # pundit can I do this here
-      @site = BenefitSponsors::Forms::Site.new current_user, params[:site]
+      @site = BenefitSponsors::Forms::Site.for_create current_user, params[:site]
 
       if @site.save
-        redirect_to sites_path
+        redirect_to :index
       else
         render 'new'
       end
     end
 
     def edit
-      @site = BenefitSponsors::Forms::Site.new current_user, id: params[:id]
+      @site = BenefitSponsors::Forms::Site.new current_user, params[:id]
     end
 
     def update
-      @site = BenefitSponsors::Forms::Site.new current_user, id: params[:id]
+      @site = BenefitSponsors::Forms::Site.new current_user, params[:site].merge(id: params[:id])
 
-      if @site.save params[:site]
+      if @site.save
         redirect_to :index
       else
         render 'edit'
