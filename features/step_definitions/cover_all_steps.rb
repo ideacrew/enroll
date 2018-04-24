@@ -127,7 +127,7 @@ When(/^Hbx Admin clicks on submit button$/) do
 end
 
 Then(/^Hbx Admin should show the Transition Results and the close button$/) do
-  expect(page).to have_content(/Transition Results/i)
+  expect(page).to have_content(/Market Transitions Added/i)
   expect(page).to have_content(/Close/i)
 end
 
