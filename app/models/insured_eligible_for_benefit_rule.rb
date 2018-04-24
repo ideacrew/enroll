@@ -17,6 +17,7 @@ class InsuredEligibleForBenefitRule
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
+    @market_kind = options[:market_kind]
   end
 
   def setup
@@ -44,7 +45,11 @@ class InsuredEligibleForBenefitRule
         if self.public_send("is_#{element}_satisfied?")
           true && eligible
         else
-          @errors << ["eligibility failed on #{element}"]
+          if "#{element}" == "active_consumer"
+             @errors << ["eligibility failed on market kind"]
+          else
+            @errors << ["eligibility failed on #{element}"]
+          end
           false
         end
       end
@@ -151,6 +156,11 @@ class InsuredEligibleForBenefitRule
 
   def is_lawful_presence_status_satisfied?
     is_verification_satisfied? || is_person_vlp_verified?
+  end
+
+  def is_active_individual_role_satisfied?
+    return @role.person.is_consumer_role_active? if @market_kind == "individual"
+    return @role.person.is_resident_role_active? if @market_kind == "coverall"
   end
 
   def determination_results

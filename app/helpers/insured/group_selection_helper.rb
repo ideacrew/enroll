@@ -17,7 +17,9 @@ module Insured
     end
 
     def can_shop_individual_or_resident?(person)
-      can_shop_individual?(person) && person.has_active_resident_member?
+      return true if (can_shop_individual?(person) && person.has_active_resident_member?)
+      return true if (can_shop_resident?(person) && person.has_active_consumer_member?)
+      return false
     end
 
     def health_relationship_benefits(benefit_group)
@@ -132,6 +134,7 @@ module Insured
     end
 
     def is_market_kind_checked?(kind)
+      binding.pry
       if @mc_market_kind.present?
         @mc_market_kind == kind
       else

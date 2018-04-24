@@ -1,6 +1,7 @@
 module Forms
   class BulkActionsForAdmin
     include Acapi::Notifiers
+    include Insured::FamiliesHelper
 
     attr_reader :result
     attr_reader :row
@@ -68,6 +69,10 @@ module Forms
           begin
             person.save!
             @result[:success] << person
+            @family = Family.find(params[:family])
+            build_consumer_role(person, @family) if person.is_consumer_role_active? && !person.consumer_role.present?
+            build_resident_role(person, @family) if person.is_resident_role_active? && !person.resident_role.present?
+
             # handle endating previous transition(s)
             # creation of SEP?
             @family = Family.find(params[:family])
