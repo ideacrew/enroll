@@ -21,42 +21,23 @@ module BenefitSponsors
         benefit_application = find_model_by_id(form.id)
         attributes_to_form_params(benefit_application, form)
       end
-
-      def scheduler
-        return @scheduler if defined? @scheduler
-        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      end
-
-      def calculate_start_on_options
-        scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-      end
-
-      def start_on_result
-        scheduler.check_start_on(start_on)
-      end
-
-      def open_enrollment_dates
-        scheduler.calculate_open_enrollment_date(start_on) if is_start_on_valid?
-      end
-
-      def enrollment_schedule
-        scheduler.shop_enrollment_timetable(start_on) if is_start_on_valid?
-      end
   
-      def save(form) 
-        benefit_application = benefit_application_factory.call() # build cca/dc application
+      def save(form)
+        model_attributes = form_params_to_attributes(form)
+        benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
         store(form, benefit_application)
       end
      
       def update(form) 
         benefit_application = find_model_by_id(form.id)
-        form_params_to_attributes(form, benefit_application)
+        model_attributes = form_params_to_attributes(form)
+        benefit_application.assign_attributes(model_attributes)
         store(form, benefit_application)
       end
     
       # TODO: Test this query for benefit applications cca/dc
       def find_model_by_id(id)
-        ::BenefitMarkets::Products::ProductPackage.find(id)
+        BenefitSponsors::BenefitApplications::BenefitApplication.find(id)
       end
 
       def attributes_to_form_params
@@ -71,16 +52,14 @@ module BenefitSponsors
         }
       end
 
-      def form_params_to_attributes(form, benefit_application)
-        model_attributes = {
+      def form_params_to_attributes(form)
+        {
           effective_period: (form.start_on..form.end_on),
           open_enrollment_period: (form.open_enrollment_start_on..form.open_enrollment_end_on),
           fte_count: form.fte_count,
           pte_count: form.pte_count,
           msp_count: form.msp_count
         }
-
-        benefit_application.assign_attributes(model_attributes)
       end
 
       def store(form, benefit_application)
@@ -111,6 +90,27 @@ module BenefitSponsors
       # close together - normally this will be more complex
       def map_model_error_attribute(model_attribute_name)
         model_attribute_name
+      end
+
+      def calculate_start_on_options
+        scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+      end
+
+      def start_on_result
+        scheduler.check_start_on(start_on)
+      end
+
+      def open_enrollment_dates
+        scheduler.calculate_open_enrollment_date(start_on) if is_start_on_valid?
+      end
+
+      def enrollment_schedule
+        scheduler.shop_enrollment_timetable(start_on) if is_start_on_valid?
+      end
+
+      def scheduler
+        return @scheduler if defined? @scheduler
+        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       end
     end
   end
