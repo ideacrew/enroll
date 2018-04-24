@@ -41,9 +41,6 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
         it "should have button for ga assign" do
           expect(rendered).to_not have_selector('#assign_general_agency')
         end
-        it "should have checkbox for employer_profile" do
-          expect(rendered).to have_selector("input[type='checkbox']")
-        end
       end
     end
   end
@@ -63,9 +60,6 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
         expect(rendered).to match(/General Agencies/)
       end
 
-      it "should have checkbox for employer_profile" do
-        expect(rendered).to have_selector("input[type='checkbox']")
-      end
     end
 
     context "when GA is disabled" do
