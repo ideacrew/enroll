@@ -514,7 +514,7 @@ class PlanYear
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
     warnings = {}
-    
+
     if employer_attestation_is_enabled?
       unless employer_profile.is_attestation_eligible?
         if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
@@ -828,7 +828,7 @@ class PlanYear
         month = 12
         year -=1
       end
-      
+
       to_date = start_on.prev_month + (Settings.aca.shop_market.binder_payment_due_on).days - 1
       while (event_date_arr.include?(to_date) or to_date.wday == 6 or to_date.wday == 0)
         to_date = to_date+1.day #If to_date is in holidays arr, we are adding +1 day
