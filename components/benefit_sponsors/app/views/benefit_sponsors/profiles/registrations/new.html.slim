@@ -15,7 +15,7 @@
       
       = f.fields_for :organization, f.object.organization, errors: {}, field_set: false do |f|
         = render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f}
-        = f.fields_for :profiles, f.object.profiles, errors: {}, fieldset: false do |f|
+        = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
           = render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f}
           = render partial: './ui-components/v1/forms/office_locations/office_locations', locals: {f: f}
 

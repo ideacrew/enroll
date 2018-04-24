@@ -108,7 +108,7 @@ module BenefitSponsors
 
       def staff_role_params(staff_roles)
         return [{}] if staff_roles.blank?
-        staff_roles.inject([]) do |result, role|
+        [staff_roles].flatten.inject([]) do |result, role|
           result << Serializers::StaffRoleSerializer.new(role).to_hash
           result
         end
@@ -162,9 +162,9 @@ module BenefitSponsors
       end
 
       def pluck_profile(organization)
-        if is_broker_profile?
+        if broker_agency_profile?
           organization.profiles.where(_type: /BrokerAgencyProfile/).first
-        elsif is_benefit_sponsor?
+        elsif benefit_sponsor_profile?
           organization.profiles.where(_type: /EmployerProfile/).first
         end
       end
