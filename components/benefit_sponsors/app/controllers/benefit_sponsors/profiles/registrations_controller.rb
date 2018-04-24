@@ -17,11 +17,10 @@ module BenefitSponsors
     end
 
     def create
-      params[:agency].permit!
-      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(params[:agency])
+      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(registration_params)
       begin
         # Alternate - use form object inside factory (or) do form.as_json inside service
-        saved, result_url = @agency.save(params[:agency], current_user)
+        saved, result_url = @agency.save
         result_url = self.send(result_url)
         if saved
           if is_employer_profile?
@@ -73,6 +72,13 @@ module BenefitSponsors
     end
 
     def find_agency
+      id = BSON::ObjectId.from_string(params[:id])
+      @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first
+      if @organization.broker_agency_profile.present? && @organization.broker_agency_profile.id.to_s == id.to_s
+        @broker_agency_profile = @organization.broker_agency_profile
+      elsif @organization.employer_profile.present? && @organization.employer_profile.id.to_s == id.to_s
+        @employer_profile = @organization.employer_profile
+      end
       # id_params = params.permit(:id, :employer_profile_id)
       # id = id_params[:id] || id_params[:employer_profile_id]
       # @organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
@@ -107,6 +113,13 @@ module BenefitSponsors
           end
         end
       end
+    end
+
+    def registration_params
+      params[:agency].merge!({
+        :current_user_id => current_user.id
+      }) if is_employer_profile?
+      params[:agency].permit!
     end
 
     def organization_params
