@@ -158,8 +158,8 @@ module BenefitSponsors
         self
       end
 
-      def self.office_kind_options
-      end
+      # def self.office_kind_options
+      # end
 
       def is_broker_profile?(profile_type)
         profile_type == "broker_agency"

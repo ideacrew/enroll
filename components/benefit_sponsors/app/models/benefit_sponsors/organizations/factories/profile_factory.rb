@@ -11,17 +11,27 @@ module BenefitSponsors
         attr_accessor :area_code, :number, :extension
 
         validate :validate_duplicate_npn, if: :is_broker_profile?
-
-        class PersonAlreadyMatched < StandardError; end
-        class TooManyMatchingPeople < StandardError; end
-        class OrganizationAlreadyMatched < StandardError; end
+        validate :office_location_kinds
 
         def validate_duplicate_npn
           if Person.where("broker_role.npn" => npn).any?
-            errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
+            errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
           end
         end
 
+        def office_location_kinds
+          location_groups = organization.profiles.map(&:office_locations)
+          location_groups.each do |locations|
+            location_kinds = locations.flat_map(&:address).flat_map(&:kind)
+            if location_kinds.count('primary').zero?
+              self.errors.add(:office_locations, "must select one primary address")
+            elsif location_kinds.count('primary') > 1
+              self.errors.add(:office_locations, "can't have multiple primary addresses")
+            elsif location_kinds.count('mailing') > 1
+              self.errors.add(:office_locations, "can't have more than one mailing address")
+            end
+          end
+        end
 
         def self.call_persist(attributes)
           factory_obj = new(attributes)
@@ -71,39 +81,26 @@ module BenefitSponsors
         end
 
         def save(attributes)
-          begin
-            match_or_create_person
-            existing_org = get_existing_organization
-          rescue TooManyMatchingPeople
-            errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
-            return false, redirection_url
-          rescue PersonAlreadyMatched
-            errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
-            return false, redirection_url
-          rescue OrganizationAlreadyMatched
-            errors.add(:base, "Organization has already been created for this Agency type")
-            return false, redirection_url
-          end
-
-          return false, redirection_url if failed_validity?(existing_org)
-          organization = init_profile_organization(existing_org, attributes)
-          #TODO : handle validation errors
-          return false, redirection_url unless persist_agency!(organization)
+          return false, redirection_url, errors.full_messages unless match_or_create_person
+          existing_org = get_existing_organization
+          return false, redirection_url, errors.full_messages if failed_validity?(existing_org)
+          self.organization = init_profile_organization(existing_org, attributes)
+          return false, redirection_url, errors.full_messages unless persist_agency!
           [true, redirection_url(pending, true)]
         end
 
-        def persist_agency!(organization)
+        def persist_agency!
           if organization.valid?
             organization.save!
-            persist_representative!(organization)
+            persist_representative!
           else
-            self.errors.add(:base, organization.errors.full_messages)
+            errors.add(:organization, organization.errors.full_messages)
             return false
           end
           return true
         end
 
-        def persist_representative!(organization)
+        def persist_representative!
           if is_broker_profile?
             persist_broker_staff_role!(organization.broker_agency_profile)
           elsif is_employer_profile?
@@ -230,7 +227,7 @@ module BenefitSponsors
         end
 
         def get_organization
-          build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         def organization_attributes(attrs = {})
@@ -254,14 +251,16 @@ module BenefitSponsors
           matched_people = get_matched_people
 
           if matched_people.count > 1
-            raise TooManyMatchingPeople.new
+            errors.add(:staff_role, "too many people match the criteria provided for your identity.  Please contact HBX.")
+            return false
           end
 
           if matched_people.count == 1
             mp = matched_people.first
             if is_employer_profile? && mp.user.present?
               if mp.user.id.to_s != current_user.id
-                raise PersonAlreadyMatched.new
+                errors.add(:staff_role, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
+                return false
               end
             end
             self.person = mp
@@ -283,8 +282,6 @@ module BenefitSponsors
               if (Person.where({"employer_staff_roles.employer_profile_id" => organization.employer_profile._id}).any?)
                 return true
               end
-            elsif organization.broker_agency_profile.present?
-              raise OrganizationAlreadyMatched.new
             end
           end
         end
@@ -292,13 +289,15 @@ module BenefitSponsors
         def broker_profile_already_registered?(organization)
           if is_broker_profile?
             organization.present? && organization.broker_agency_profile.present?
+            errors.add(:organization, "has already been created for this Agency type")
+            return true
           end
           return false
         end
 
         def issuer_requesting_sponsor_benefits?(organization)
           if organization.present? && organization.is_an_issuer_profile?
-            errors.add(:base, "Issuer cannot sponsor benefits")
+            errors.add(:organization, "Issuer cannot sponsor benefits")
             return true
           end
         end

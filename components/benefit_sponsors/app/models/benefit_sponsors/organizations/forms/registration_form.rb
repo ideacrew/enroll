@@ -104,7 +104,7 @@ module BenefitSponsors
 
       def validate_form(form)
         unless form.valid?
-          form.errors.add(:base, form.errors.full_messages)
+          self.errors.add(:base, form.errors.full_messages)
         end
       end
 
