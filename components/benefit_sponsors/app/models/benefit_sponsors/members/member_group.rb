@@ -26,8 +26,7 @@ module BenefitSponsors
     end
 
     def [](index)
-      index.each { |new_member| add_member(new_member) unless is_duplicate_role?(new_member) }
-      @members
+      @members = index.each { |new_member| add_member(new_member) unless is_duplicate_role?(new_member) }
     end
 
     def []=(index, new_member)

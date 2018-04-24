@@ -86,12 +86,6 @@ module BenefitSponsors
           errors.add(:start_on, "can't be later than end on date")
         end
       end
-
-      private 
-
-      def persist!
-        @benefit_application_service.store!(self)
-      end
     end
   end
 end

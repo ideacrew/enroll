@@ -57,7 +57,7 @@ module BenefitSponsors
     def ssn=(new_ssn)
       if new_ssn.present?
         ssn_val = new_ssn.to_s.gsub(/\D/, '')
-        if ssn_val.is_ssn_valid?
+        if is_ssn_valid?(ssn_val)
           encrypted_ssn = encrypt(ssn_val) 
         else
           nil
@@ -152,11 +152,13 @@ module BenefitSponsors
     end
 
     def encrypt(value)
-      SymmetricEncryption.encrypt(value)
+      # ::SymmetricEncryption.encrypt(value)
+      value
     end
 
     def decrypt(value)
-      SymmetricEncryption.decrypt(value)
+      # ::SymmetricEncryption.decrypt(value)
+      value
     end
 
     # Case-insensitve match between start of this class name and compare_array
