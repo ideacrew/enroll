@@ -8,15 +8,39 @@
         <% end %>
       </li>
 
-      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
-                  locals: {
-                    tab_name: 'families',
-                    link_path: main_app.family_index_dt_exchanges_hbx_profiles_path,
-                    display_name: 'Families',
-                    active_tab: active_tab,
-                    glyphicon_class: 'glyphicon-heart'
-                  }
-                  %>
+      <%if individual_market_is_enabled? %>
+        <li class="brokers-dropdown dropdown">
+          <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'families',
+                                                                            link_path: family_index_dt_exchanges_hbx_profiles_path,
+                                                                            display_name: 'Families',
+                                                                            active_tab: active_tab,
+                                                                            glyphicon_class: 'glyphicon-briefcase'
+                                                                          } %>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                              tab_name: 'outstanding-verifications',
+                                                                              link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
+                                                                              display_name: 'Outstanding Verifications',
+                                                                              active_tab: active_tab,
+                                                                              glyphicon_class: 'glyphicon-briefcase'
+                                                                            } %>
+          </ul>
+        </li>
+      <% else %>
+        <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
+        locals: {
+          tab_name: 'families',
+          link_path: main_app.family_index_dt_exchanges_hbx_profiles_path,
+          display_name: 'Families',
+          active_tab: active_tab,
+          glyphicon_class: 'glyphicon-heart'
+        }
+      %>
+      <% end %>
+
+      
 
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
@@ -28,6 +52,7 @@
                   }
                   %>
 
+    <% if aca_user_accounts_enabled %>
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'user-account',
@@ -37,6 +62,9 @@
                     glyphicon_class: 'glyphicon-user'
                   }
                   %>
+
+    <% end %>
+
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'issuers',
@@ -88,13 +116,15 @@
     <li class="admin-dropdown dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                          tab_name: 'calendar',
-                                                                          link_path: main_app.exchanges_scheduled_events_path,
-                                                                          display_name: 'Calendar',
-                                                                          active_tab: active_tab,
-                                                                          glyphicon_class:'glyphicon-calendar'
-                                                                        } %>
+          <% if calendar_is_enabled? %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'calendar',
+                                                                            link_path: main_app.exchanges_scheduled_events_path,
+                                                                            display_name: 'Calendar',
+                                                                            active_tab: active_tab,
+                                                                            glyphicon_class:'glyphicon-calendar'
+                                                                          } %>
+          <% end %>
           <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                           tab_name: 'configuration',
                                                                           link_path: main_app.configuration_exchanges_hbx_profiles_path,
@@ -119,14 +149,6 @@
                                                                         active_tab: active_tab,
                                                                         glyphicon_class: 'glyphicon-search'
                                                                       } %>
-        <% if individual_market_is_enabled? %>
-          <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                          tab_name: 'outstanding-verifications',
-                                                                          link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
-                                                                          display_name: 'Outstanding Verifications',
-                                                                          active_tab: active_tab
-                                                                        } %>
-        <% end %>
         </ul>
     </li>
 
@@ -149,15 +171,6 @@
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Notices"></span>
         <% end %>
       </li>
-
-      <% if individual_market_is_enabled? %>
-      <li role="presentation"<%= menu_tab_class(active_tab, "user-account-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
-        <%= link_to(main_app.user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "users", "role" => "tab" ) do  %>
-          <span class="hidden-xs">User Accounts</span>
-          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="User Accounts"></span>
-        <% end %>
-      </li>
-      <% end %>
 
       <!-- <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
        <%= link_to(main_app.binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>

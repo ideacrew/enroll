@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "create_new_initial_plan_year_using_another")
 
-describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
+describe CreateNewInitialPlanYearUsingAnother, dbclean: :around_each do
   let(:given_task_name) { "create_new_initial_plan_year_using_another" }
   subject { CreateNewInitialPlanYearUsingAnother.new(given_task_name, double(:current_scope => nil)) }
   let(:benefit_group) { existing_plan_year.benefit_groups.first }
@@ -20,7 +20,7 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
     end
   end
 
-  describe "force_publish!", dbclean: :after_each do
+  describe "force_publish!" do
     context "plan_year.application_errors absent" do
       before do
         plan_year = benefit_group.plan_year

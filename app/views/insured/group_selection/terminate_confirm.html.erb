@@ -89,14 +89,11 @@
                 <%= radio_button_tag :agreement, "terminate_confirm_no" %><%= l10n("no") %>
               </div>
               <br/>
-              <p class="text-danger">
-                <%= l10n(".terminate_confirm_note_html", site_short_name: site_short_name) %>
-              </p>
 
               <%= form_tag terminate_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), method: :post %>
                 <div id="term-date-confirm-date" hidden='true'>
                   <h5><%= l10n("enter_the_date_of_termination") %></h5>
-                  <%= text_field_tag 'term_date', '',:'data-date-min'=> "+14d", placeholder: " ", class: "required date-picker term-date-picker floatlabel form-control", required: true %>
+                  <%= text_field_tag 'term_date', '',:'data-date-min'=> "+0d", placeholder: " ", class: "required date-picker term-date-picker floatlabel form-control", required: true %>
                  </div>
                  <div>
                    <br>

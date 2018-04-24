@@ -142,7 +142,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgemployeepremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', '<%= Settings.plan_option_titles.plan_year_tooltip %> ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -239,7 +239,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgemployeepremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', '<%= Settings.plan_option_titles.plan_year_tooltip %> ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -438,7 +438,7 @@ var EmployerProfile = ( function( window, undefined ) {
               validatedbgemployeepremiums = true;
               validated = true;
             } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-create-plan-year').attr('data-original-title', '<%= Settings.plan_option_titles.plan_year_tooltip %> ' + minimumEmployerEmployeeContributionPct + '%');
               validatedbgemployeepremiums = false;
               validated = false;
               return false;
@@ -502,7 +502,7 @@ var EmployerProfile = ( function( window, undefined ) {
             validatedbgfamilypremiums = true
             validated = true;
           } else {
-            $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+            $('.interaction-click-control-create-plan-year').attr('data-original-title', '<%= Settings.plan_option_titles.plan_year_tooltip %> ' + minimumEmployerEmployeeContributionPct + '%');
             validatedbgemployeepremiums = false;
             validated = false;
             return false;

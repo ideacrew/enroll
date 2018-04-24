@@ -64,7 +64,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
     it "should append necessary information" do
       plan_year = employer_profile.plan_years.first
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.warnings).to eq ["Full Time Equivalent must be 1-50", "primary business address not located in Massachusetts"]
+      expect(@employer_notice.notice.plan_year.warnings).to eq ["Full Time Equivalent must be 1-50", "primary business address not located in #{Settings.aca.state_name}"]
     end
   end
 

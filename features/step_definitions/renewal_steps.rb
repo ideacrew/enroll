@@ -62,7 +62,7 @@ When(/(.*) proceed with continue on the group selection page/) do |named_person|
   end
   group_size_factors.save!
   sleep(1)
-  
+
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
@@ -120,6 +120,6 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
 end
 
 When(/^.+ clicks continue on family members page/) do
-  page.find('#dependent_buttons').find('.interaction-click-control-continue').click 
+  page.find('#dependent_buttons').find('.interaction-click-control-continue').click
 end
 

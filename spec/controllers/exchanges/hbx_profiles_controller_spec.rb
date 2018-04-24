@@ -555,6 +555,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     before do
       sign_in user
       allow(Person).to receive(:find).with("#{person.id}").and_return person
+      allow(EmployerProfile).to receive(:find).and_return(double(organization: organization))
     end
 
     context "when action called through families datatable" do

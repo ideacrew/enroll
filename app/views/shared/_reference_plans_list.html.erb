@@ -82,7 +82,7 @@
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</p>
       <br/><br/>
-      <div id="singleCarrierCarrierList" class="carrier-list-container">
+      <div id="singleCarrierCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
     </div>
@@ -129,7 +129,7 @@
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</p>
       <br/>
-      <div id="singlePlanCarrierList" class="carrier-list-container">
+      <div id="singlePlanCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
     </div>
@@ -137,7 +137,7 @@
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.</p>
       <br/>
-      <div id="soleSourceCarrierList" class="carrier-list-container">
+      <div id="soleSourceCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
     </div>
@@ -161,7 +161,8 @@ $(function(){
 $('a[data-remote=true]').click( function() {
    var current_href = $(this).attr('href');
    var location_id = $(this).closest('.benefit-group-fields').attr('id');
-   $(this).attr('href', current_href + "&location_id=" + location_id);
+   var object_id = "<%= f.object.id %>";
+   $(this).attr('href', current_href + "&location_id=" + location_id + "&object_id=" + object_id);
 });
 
 })

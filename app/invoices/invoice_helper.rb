@@ -38,7 +38,7 @@ module InvoiceHelper
 
     @pdf=Prawn::Document.new
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/health_connector.png'
+    logopath = "app/assets/images/#{Settings.site.mailer_logo_file_name}"
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -60,11 +60,11 @@ module InvoiceHelper
     @pdf.move_cursor_to @pdf.bounds.height
     @pdf.move_cursor_to last_measured_y
 
-    @pdf.text_box "Commonwealth Health Insurance", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "#{contact_center_mailing_address_name}", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 780833", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "#{contact_center_address_one}", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "#{contact_center_city}, #{contact_center_state} #{contact_center_postal_code}", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
 
     address = mailing_or_primary_address(@organization)
@@ -143,7 +143,7 @@ module InvoiceHelper
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Questions? Call the Health Connector Customer Service at 888-813-9220, go online to #{site_website_name}, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
+        @pdf.text_box "Questions? Call the #{Settings.site.short_name} Customer Service at #{contact_center_phone_number}, go online to #{site_home_url}, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
       }
     end
 
@@ -235,7 +235,7 @@ module InvoiceHelper
 
   def payment_page_for_initial_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/health_connector.png'
+    logopath = "app/assets/images/#{Settings.site.mailer_logo_file_name}"
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
