@@ -2,7 +2,7 @@
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
       <div id="broker_agency_form" class="container">
-        <%= form_for @agency.organization, as: :organization, url: profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile), method: :patch do |f| %>
+        <%= form_for @agency.organization, as: :organization, url: profiles_broker_agencies_broker_agency_profile_path(@agency.profile_id), method: :patch do |f| %>
           <%= render 'shared/error_messages', :object => @agency %>
           <div class="row">
             <%= f.fields_for :profiles, @agency.staff_roles, errors: {}, fieldset: false do |f| %>

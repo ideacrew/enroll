@@ -21,7 +21,7 @@ module BenefitSponsors
       end
 
       def sponsor_edit_registration_url
-        edit_profiles_registration_path(@agency.organization.employer_profile.id)
+        edit_profiles_registration_path(@agency.organization.profile.id)
       end
     end
   end

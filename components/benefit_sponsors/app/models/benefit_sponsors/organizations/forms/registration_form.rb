@@ -14,16 +14,6 @@ module BenefitSponsors
 
       validate :registration_form
 
-
-      # set profile when id present
-      def organization=(val)
-        result = super val
-        if profile_id.present?
-          result.profile = result.profiles.detect {|profile| profile.id == profile_id}
-        end
-        result
-      end
-
       def staff_roles_attributes=(attrs)
         self.staff_roles = attrs.values.inject([]) do |result, role|
           result << Forms::StaffRoleForm.new(role)
@@ -36,10 +26,6 @@ module BenefitSponsors
           return true
         end
         false
-      end
-
-      def save
-        persist!
       end
 
       def self.for_new(profile_type)
@@ -59,6 +45,15 @@ module BenefitSponsors
       end
 
       def self.for_update(attrs)
+        new(attrs)
+      end
+
+      def save
+        persist!
+      end
+
+      def update
+        update!
       end
 
       def persist!
@@ -66,9 +61,9 @@ module BenefitSponsors
         service.save(self)
       end
 
-      def update(attrs)
+      def update!
         return false unless valid?
-        service.update(attrs)
+        service.update(self)
       end
 
       def is_broker_profile?
@@ -81,13 +76,15 @@ module BenefitSponsors
 
       # TODO : Refactor validating sub-documents.
       def registration_form
+        validate_staff_role
+        validate_form(self.organization)
+        validate_form(self.organization.profile)
+        validate_office_locations(self.organization.profile)
+      end
+
+      def validate_staff_role
         self.staff_roles.each do |staff_role|
           validate_form(staff_role)
-        end
-        validate_form(self.organization)
-        self.organization.profiles.each do |profile_form|
-          validate_office_locations(profile_form)
-          validate_form(profile_form)
         end
       end
 
@@ -99,7 +96,7 @@ module BenefitSponsors
 
       def validate_form(form)
         unless form.valid?
-          form.errors.add(:base, form.errors.full_messages)
+          self.errors.add(:base, form.errors.full_messages)
         end
       end
 

@@ -1,9 +1,12 @@
-<% if @broker_agency_profile.present? %>
+<% profile_type = @agency.organization.profile.profile_type %>
+<% if is_broker_profile?(profile_type) %>
   <%= render 'benefit_sponsors/shared/profiles/broker_agency/menu', :active_tab => "home-tab" %>
   <%= render "benefit_sponsors/profiles/registrations/broker_agency_form" %>
-<% elsif @employer_profile.present? %>
+<% elsif is_sponsor_profile?(profile_type) %>
   <% content_for :navigation do %>
     <%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
   <% end %>
-  <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_form" %>
+  <%= form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f| %>
+    <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_form", f: f %>
+  <% end %>
 <% end %>

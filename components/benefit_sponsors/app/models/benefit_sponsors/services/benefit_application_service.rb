@@ -13,8 +13,8 @@ module BenefitSponsors
       end
 
       def load_form_metadata(form)
-        form.start_on_options = calculate_start_on_options
-        # TODO: load possible effective dates with schedule
+        # form.start_on_options = calculate_start_on_options
+        form.start_on_options = calculate_dates
       end
 
       def load_form_params_from_resource(form)
@@ -95,20 +95,33 @@ module BenefitSponsors
         model_attribute_name
       end
 
-      def calculate_start_on_options
-        scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-      end
+      # def calculate_start_on_options
+      #   scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+      # end
 
-      def start_on_result
+      def start_on_result(start_on)
         scheduler.check_start_on(start_on)
       end
 
-      def open_enrollment_dates
-        scheduler.calculate_open_enrollment_date(start_on) if is_start_on_valid?
+      def is_start_on_valid?(start_on)
+        start_on_result(start_on)[:result] == "ok"
       end
 
-      def enrollment_schedule
-        scheduler.shop_enrollment_timetable(start_on) if is_start_on_valid?
+      # Responsible for calculating all the possible dataes
+      def calculate_dates
+        possible_dates = Hash.new
+        scheduler.calculate_start_on_dates.each do |date|
+          possible_dates[date] = open_enrollment_dates(date).merge(enrollment_schedule(date))
+        end
+        possible_dates
+      end
+
+      def open_enrollment_dates(start_on)
+        scheduler.calculate_open_enrollment_date(start_on) if is_start_on_valid?(start_on)
+      end
+
+      def enrollment_schedule(start_on)
+        scheduler.shop_enrollment_timetable(start_on) if is_start_on_valid?(start_on)
       end
 
       def scheduler

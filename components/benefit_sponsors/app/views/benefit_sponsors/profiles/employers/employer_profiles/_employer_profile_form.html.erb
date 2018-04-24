@@ -28,7 +28,7 @@
         <%= f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f| %>
           <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f %>
         
-          <%= f.fields_for :profiles, f.object.profiles, errors: {}, fieldset: false do |f| %>
+          <%= f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f| %>
             <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
             </div><br>
             <%= render "benefit_sponsors/shared/office_locations", f: f %>
