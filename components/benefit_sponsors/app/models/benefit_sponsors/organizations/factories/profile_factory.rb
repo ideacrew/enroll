@@ -379,6 +379,7 @@ module BenefitSponsors
 
         def self.find_representatives(profile_id)
           return [Person.new] if profile_id.blank?
+          # Should handle the case where Org having both profiles
           broker_agency = broker_agency_profile(profile_id[:profile_id])
 
           if broker_agency.present?

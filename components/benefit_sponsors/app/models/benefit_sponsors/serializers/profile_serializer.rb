@@ -45,7 +45,7 @@ module BenefitSponsors
         str = object.class.to_s
         if str.match(/EmployerProfile/)
           "benefit_sponsor"
-        elsif str.match(/BrokerProfile/)
+        elsif str.match(/BrokerAgencyProfile/)
           "broker_agency"
         end
       end

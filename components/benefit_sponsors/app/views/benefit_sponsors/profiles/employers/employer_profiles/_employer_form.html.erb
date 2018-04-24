@@ -92,7 +92,7 @@
           </div>
 
         <br>
-        <%= f.fields_for :profiles, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
+        <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
           <%= f.hidden_field :id, value: f.object.id %>
           <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
           </div>

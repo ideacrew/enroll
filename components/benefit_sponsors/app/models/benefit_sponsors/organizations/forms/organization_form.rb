@@ -9,13 +9,10 @@ module BenefitSponsors
       include Virtus.model
 
       attribute :fein, String
-      # attribute :entity_kind, String
       attribute :legal_name, String
       attribute :dba, String
 
-      attribute :profiles, Array[Forms::ProfileForm] #Look into handling multiple Profiles.
       attribute :profile, Forms::ProfileForm
-      # attribute :profile_type, String
 
 
       validates :fein,
@@ -39,34 +36,8 @@ module BenefitSponsors
         super fein
       end
 
-      def profile=(val)
-        profile = val
-        super profile
-      end
-
-      def profiles_attributes=(profiles_params)
-        self.profiles=(profiles_params.values)
-      end
-
-      def office_location_validations # Should be in factory
-        @office_locations.each_with_index do |ol, idx|
-          ol.valid?
-          ol.errors.each do |k, v|
-            self.errors.add("office_locations_attributes.#{idx}.#{k}", v)
-          end
-        end
-      end
-
-      def office_location_kinds # Should be in factory
-        location_kinds = office_locations.flat_map(&:address).flat_map(&:kind)
-
-        if location_kinds.count('primary').zero?
-          self.errors.add(:base, "must select one primary address")
-        elsif location_kinds.count('primary') > 1
-          self.errors.add(:base, "can't have multiple primary addresses")
-        elsif location_kinds.count('mailing') > 1
-          self.errors.add(:base, "can't have more than one mailing address")
-        end
+      def profile_attributes=(profile_params)
+        self.profile=(profile_params)
       end
 
       def is_broker_profile?

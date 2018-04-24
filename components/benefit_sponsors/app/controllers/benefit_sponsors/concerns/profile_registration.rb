@@ -21,8 +21,7 @@ module BenefitSponsors
       end
 
       def sponsor_edit_registration_url
-        # form object will always have one profile
-        edit_profiles_registration_path(@agency.organization.profiles.first.id)
+        edit_profiles_registration_path(@agency.organization.profile.id)
       end
     end
   end

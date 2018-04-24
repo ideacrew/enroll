@@ -81,11 +81,9 @@ module BenefitSponsors
 
     def sanitize_office_locations_params
       # TODO - implement in accepts_nested_attributes_for
-      params[:agency][:organization][:profiles_attributes].each do |key, profile|
-        profile[:office_locations_attributes].each do |key, location|
-          if location && location[:address_attributes]
-            location[:is_primary] = (location[:address_attributes][:kind] == 'primary')
-          end
+      params[:agency][:organization][:profile_attributes][:office_locations_attributes].each do |key, location|
+        if location && location[:address_attributes]
+          location[:is_primary] = (location[:address_attributes][:kind] == 'primary')
         end
       end
     end

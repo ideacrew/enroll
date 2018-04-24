@@ -24,12 +24,14 @@ module BenefitSponsors
         attributes_to_form_params(organization, staff_roles)
       end
 
-      def attributes_to_form_params(organization_obj, staff_roles=nil)
+      def attributes_to_form_params(obj, staff_roles=nil)
         {
           :"profile_type" => profile_type,
           :"profile_id" => profile_id,
           :"staff_roles" => staff_role_params(staff_roles),
-          :"organization" => Serializers::OrganizationSerializer.new(organization_obj).to_hash
+          :"organization" => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
+            :"profile" => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash
+          )
         }
       end
 
@@ -52,12 +54,12 @@ module BenefitSponsors
 
       def organization_form_to_params(form)
         organization_attributes(form).merge({
-          :profiles_attributes => profiles_form_to_params(form.profiles)
+          :profiles_attributes => profiles_form_to_params(form.profile)
         })
       end
 
-      def profiles_form_to_params(profiles)
-        profiles.each_with_index.inject({}) do |result, (form, index_val)|
+      def profiles_form_to_params(profile)
+        [profile].each_with_index.inject({}) do |result, (form, index_val)|
           result[index_val] = profile_attributes(form).merge({
             :office_locations_attributes =>  office_locations_form_to_params(form.office_locations)
           })
@@ -97,10 +99,11 @@ module BenefitSponsors
 
       def broker_agency_profile?
         #TODO need to fix this
-        true
+        false
       end
 
       def benefit_sponsor_profile?
+        true
       end
 
       def staff_role_params(staff_roles)
@@ -158,15 +161,12 @@ module BenefitSponsors
         self
       end
 
-      # def self.office_kind_options
-      # end
-
-      def is_broker_profile?(profile_type)
-        profile_type == "broker_agency"
-      end
-
-      def is_benefit_sponsor?(profile_type)
-        profile_type == "benefit_sponsor"
+      def pluck_profile(organization)
+        if is_broker_profile?
+          organization.profiles.where(_type: /BrokerAgencyProfile/).first
+        elsif is_benefit_sponsor?
+          organization.profiles.where(_type: /EmployerProfile/).first
+        end
       end
 
       private
