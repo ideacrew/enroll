@@ -206,14 +206,12 @@ class Insured::GroupSelectionController < ApplicationController
 
   # This method converts active consumers to residents for a household with a family with family member who has a transition to converall
   def convert_individual_members_to_resident
-    binding.pry
     # no need to do anything if shopping in IVL
-    if params[:market_kind] == "coverall"
+    if (params[:market_kind] == "coverall")
       family = @person.primary_family
       family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
-      if person.id == @person.id
       family_member_ids.each do |fm|
         person = FamilyMember.find(fm).person
         # Need to create new invididual market transition instance and resident role if none
@@ -224,10 +222,12 @@ class Insured::GroupSelectionController < ApplicationController
           # create resident role if it doesn't exist
           if person.resident_role.nil?
             #check for primary_person
-            family.build_resident_role(fm, get_values_to_generate_resident_role(person))
-            if (personi.id == @person.id)
+            family.build_resident_role(FamilyMember.find(fm), get_values_to_generate_resident_role(person))
+            if (person.id == @person.id)
+              # need to reload db
+              person = Person.find(person.id)
               person.resident_role.update_attributes!(is_applicant: true)
-            end  
+            end
           else
             transition = IndividualMarketTransition.new
             transition.role_type = "resident"
