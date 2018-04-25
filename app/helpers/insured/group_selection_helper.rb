@@ -205,6 +205,7 @@ module Insured
     end
 
     def is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage)
+      binding.pry
       if benefit_type.present? && benefit_type != "health"
         is_dental_coverage.nil? ? is_ivl_coverage : is_dental_coverage
       else
