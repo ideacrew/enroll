@@ -43,8 +43,11 @@ module BenefitSponsors
       @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(registration_params)
       sanitize_office_locations_params
       if can_update_profile? # pundit policy
-        if @agency.update
-          flash[:notice] = 'Employer successfully Updated.'
+        updated, result_url = @agency.update
+        result_url = self.send(result_url)
+        if updated
+          flash[:notice] = 'Employer successfully Updated.' if is_employer_profile?
+          flash[:notice] = 'Broker Agency Profile successfully Updated.' if is_broker_profile?
         else
           org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
 
@@ -53,13 +56,13 @@ module BenefitSponsors
       else
         flash[:error] = 'You do not have permissions to update the details'
       end
-      redirect_to sponsor_edit_registration_url
+      redirect_to result_url
     end
 
     private
 
     def profile_type
-      @profile_type = params[:profile_type] || params[:agency][:profile_type]
+      @profile_type = params[:profile_type] || params[:agency][:profile_type] || @agency.profile_type
     end
 
     def can_update_profile?
@@ -77,6 +80,10 @@ module BenefitSponsors
 
     def is_employer_profile?
       profile_type == "benefit_sponsor"
+    end
+
+    def is_broker_profile?
+      profile_type == "broker_agency"
     end
 
     def sanitize_office_locations_params

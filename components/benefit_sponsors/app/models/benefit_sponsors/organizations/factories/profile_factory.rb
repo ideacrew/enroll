@@ -9,6 +9,9 @@ module BenefitSponsors
         attr_accessor :profile_id, :profile_type, :organization, :current_user, :claimed, :pending
         attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
         attr_accessor :area_code, :number, :extension
+        cattr_accessor :profile_type
+
+        delegate :is_employer_profile?, :is_broker_profile?, to: :class
 
         validate :validate_duplicate_npn, if: :is_broker_profile?
         validate :office_location_kinds
@@ -33,16 +36,27 @@ module BenefitSponsors
           end
         end
 
-        def self.call_persist(attributes)
+        def self.call(attributes)
           factory_obj = new(attributes)
           factory_obj.current_user = current_user(attributes[:current_user_id])
-          factory_obj.save(attributes[:organization])
+          factory_obj.profile_id.present? ? update!(factory_obj, attributes[:organization]) : persist!(factory_obj, attributes[:organization])
         end
 
-        def self.call_update(attributes)
-          factory_obj = new(attributes)
+        def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
-          organization.update_attributes(attributes[:organization])
+          organization.assign_attributes(attributes)
+          updated = if organization.valid?
+            organization.save!
+          else
+            factory_obj.errors.add(:organization, organization.errors.full_messages)
+            false
+          end
+
+          return updated, factory_obj.redirection_url_on_update
+        end
+
+        def self.persist!(factory_obj, attributes)
+          factory_obj.save(attributes)
         end
 
         def self.build(attrs)
@@ -62,14 +76,18 @@ module BenefitSponsors
 
         def initialize_staff_role_attributes(attrs)
           if attrs.present?
-            self.first_name = attrs[:first_name]
-            self.last_name = attrs[:last_name]
-            self.email = attrs[:email]
-            self.dob = attrs[:dob]
-            self.npn = attrs[:npn]
-            self.area_code = attrs[:area_code]
-            self.number = attrs[:number]
-            self.extension = attrs[:extension]
+            if attrs[:person_id].blank?
+              self.first_name = attrs[:first_name]
+              self.last_name = attrs[:last_name]
+              self.email = attrs[:email]
+              self.dob = attrs[:dob]
+              self.npn = attrs[:npn]
+              self.area_code = attrs[:area_code]
+              self.number = attrs[:number]
+              self.extension = attrs[:extension]
+            else
+              initialize_staff_role_from_person(attrs[:person_id])
+            end
           end
         end
 
@@ -78,6 +96,13 @@ module BenefitSponsors
             self.fein = attrs[:fein]
             self.legal_name = attrs[:legal_name]
           end
+        end
+
+        def initialize_staff_role_from_person(person_id)
+          person = get_person(person_id)
+          self.first_name = person.first_name
+          self.last_name = person.last_name
+          self.dob = person.dob
         end
 
         def save(attributes)
@@ -226,6 +251,10 @@ module BenefitSponsors
           })
         end
 
+        def get_person(person_id)
+          Person.find(person_id)
+        end
+
         def get_organization
           self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
@@ -312,6 +341,14 @@ module BenefitSponsors
           end
         end
 
+        def redirection_url_on_update
+          if is_employer_profile?
+            :agency_edit_registration_url
+          elsif is_broker_profile?
+            :broker_show_registration_url
+          end
+        end
+
         def trigger_broker_application_confirmation_email
           ::UserMailer.broker_application_confirmation(person).deliver_now
         end
@@ -326,11 +363,11 @@ module BenefitSponsors
           site.site_key
         end
 
-        def is_broker_profile?
+        def self.is_broker_profile?
           profile_type == "broker_agency"
         end
 
-        def is_employer_profile?
+        def self.is_employer_profile?
           profile_type == "benefit_sponsor"
         end
 
@@ -372,19 +409,22 @@ module BenefitSponsors
           end
         end
 
-        def self.broker_agency_profile(profile_id)
-          organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
-          organization.broker_agency_profile.present? ? organization.broker_agency_profile : nil
+        def self.get_profile_type(profile_id)
+          organization = new({profile_id: profile_id}).get_organization
+          type = organization.profiles.where(id: profile_id).first.class.to_s
+          if type.match(/EmployerProfile/)
+            "benefit_sponsor"
+          elsif type.match(/BrokerAgencyProfile/)
+            "broker_agency"
+          end
         end
 
-        def self.find_representatives(profile_id)
+        def self.find_representatives(profile_id, profile_type)
           return [Person.new] if profile_id.blank?
-          # Should handle the case where Org having both profiles
-          broker_agency = broker_agency_profile(profile_id[:profile_id])
-
-          if broker_agency.present?
-            [broker_agency.primary_broker_role.person]
-          else
+          self.profile_type = profile_type
+          if is_broker_profile?
+            Person.where(:"broker_role.broker_agency_profile_id" => BSON::ObjectId.from_string(profile_id))
+          elsif is_employer_profile?
             Person.where(:benefit_sponsors_employer_staff_roles => {
               '$elemMatch' => {
                 employer_profile_id: profile_id,
