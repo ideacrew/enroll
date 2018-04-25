@@ -9,7 +9,7 @@ module BenefitSponsors
       def create
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(application_params)
         if @benefit_application_form.save
-          redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.benefit_sponsorship, @benefit_application_form.benefit_application)
+          redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, @benefit_application_form.show_page_model)
         else
           flash[:error] = error_messages(@benefit_application_form)
           render :new
