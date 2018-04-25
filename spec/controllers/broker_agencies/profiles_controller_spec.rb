@@ -496,4 +496,44 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(assigns(:employer_profiles).count).to   eq(2)
     end
   end
+
+  describe "messages action" do
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:person) { broker_role.person }
+    let(:user_broker) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+
+    let(:person1) { FactoryGirl.create(:person)}
+    let(:user_hbx) { FactoryGirl.create(:user, person: person1, roles: ['hbx_staff']) }
+
+    it "should render the messages template and Broker sees all messages in Broker Mail tab" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should render the messages template and Admin should see the messages in Broker Mail tab" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should pass broker data to @provider if you login as Broker User" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq broker_agency_profile.primary_broker_role.person
+    end
+
+    it "should pass admin records to @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq user_hbx.person
+    end
+
+    it "should not have broker data in @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).not_to eq broker_agency_profile.primary_broker_role.person
+    end
+  end
 end
