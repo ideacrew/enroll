@@ -8,7 +8,7 @@ namespace :migrations do
   desc "Terminating active plan year and enrollments"
   task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
     fein = args[:fein]
-    generate_termination_notice = (args[:generate_termination_notice] == 'true') ? true : false
+    generate_termination_notice = (args[:generate_termination_notice].to_s == "true") ? true : false
     organizations = Organization.where(fein: fein)
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
@@ -60,7 +60,7 @@ namespace :migrations do
             end
           end
           if generate_termination_notice
-            send_notice_to_employees(organization)
+            send_notice_to_employees(organization, plan_year)
           end
         end
       end
@@ -127,13 +127,14 @@ namespace :migrations do
     end
   end
 
-  def send_notice_to_employees(org)
+  def send_notice_to_employees(org, plan_year)
     puts "Notification generated for employee"
     org.employer_profile.census_employees.active.each do |ce|
       begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+        observer = Observers::Observer.new
+        observer.trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_when_employer_requests_advance_termination")
       rescue Exception => e
-        (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
+        (Rails.logger.error { "Unable to deliver #{org.legal_name}'s termination notice to employee - #{ce.full_name} due to #{e}" }) unless Rails.env.test?
       end
     end
   end

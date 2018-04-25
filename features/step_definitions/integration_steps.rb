@@ -374,9 +374,6 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewal_plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment renewal_benefit_group
 
-  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
-  employee.update_attributes!(employee_role_id: employee_role.id)
-
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
@@ -444,6 +441,8 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
+  wait_for_ajax
+  page.find('h4', text: "#{Settings.site.byline}").click
 end
 
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
@@ -742,16 +741,6 @@ Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
 end
 
-Then(/^.+ should see the group selection page with health or dental dependents list$/) do
-  expect(page).to have_css('form')
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  find(:xpath, '//label[@for="coverage_kind_dental"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
-  find(:xpath, '//label[@for="coverage_kind_health"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  expect(page).to have_selector('.group-selection-table.health', visible: true)
-end
-
 When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
@@ -911,6 +900,18 @@ When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) option$/) do |
   find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
   wait_for_ajax
   find('#myTabContent').trigger('click')
+end
+
+And(/^clicks on the person in families tab$/) do
+  login_as hbx_admin, scope: :user
+  visit exchanges_hbx_profiles_root_path
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
+  wait_for_ajax(10,2)
+  family_member = page.find('a', :text => "#{user.person.full_name}")
+  family_member.trigger('click')
+  visit verification_insured_families_path
+  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|

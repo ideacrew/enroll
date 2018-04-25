@@ -22,6 +22,14 @@ module TransportProfiles
       @source_credentials = resolve_source_credentials(source_credentials)
     end
 
+    # Set a callback for successful resource transfer.
+    # @yieldparam from_uri [URI] the uri the resource was transferred from
+    # @yieldparam to_uri [URI] the uri the resource was transferred to
+    # @yieldparam process_context [::TransportProfiles::ProcessContext] the current process context
+    def on_success(&blk)
+      @on_success_callback = blk
+    end
+
     # @!visibility private
     def resolve_source_credentials(source_credentials)
       return source_credentials unless source_credentials.kind_of?(Symbol)
@@ -58,6 +66,9 @@ module TransportProfiles
         message = ::TransportGateway::Message.new(from: file_uri, to: uri, destination_credentials: endpoint, source_credentials: @source_credentials)
 
         @gateway.send_message(message)
+        if @on_success_callback
+          @on_success_callback.call(file_uri,uri,process_context)
+        end
       end
     end
 

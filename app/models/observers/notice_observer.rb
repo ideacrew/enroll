@@ -22,11 +22,21 @@ module Observers
           end
         end
 
+        if new_model_event.event_key == :initial_application_submitted
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
+          trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
+        if new_model_event.event_key == :zero_employees_on_roster
+          trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
         if new_model_event.event_key == :renewal_employer_open_enrollment_completed
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
         end
 
         if new_model_event.event_key == :renewal_application_submitted
+          trigger_zero_employees_on_roster_notice(plan_year)
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
         end
 
@@ -36,6 +46,7 @@ module Observers
 
         if new_model_event.event_key == :renewal_application_autosubmitted
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :group_advance_termination_confirmation
@@ -67,12 +78,33 @@ module Observers
             end
         end
 
+        if new_model_event.event_key == :application_denied
+          errors = plan_year.enrollment_errors
+          if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
+            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+              if ce.employee_role.present?
+                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
+              end
+            end
+          end
+        end
+
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
         end
       end
     end
 
-    def employer_profile_update; end
+    def employer_profile_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        employer_profile = new_model_event.klass_instance
+        if new_model_event.event_key == :broker_hired_confirmation_to_employer
+          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+        elsif new_model_event.event_key == :welcome_notice_to_employer
+          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
+        end
+      end
+    end
 
     def hbx_enrollment_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
@@ -84,6 +116,17 @@ module Observers
             if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
               trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             end
+          end
+        end
+
+        if new_model_event.event_key == :employee_waiver_confirmation
+          trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+        end
+
+        if new_model_event.event_key == :employee_coverage_termination
+          if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.benefit_group.plan_year.active?
+            trigger_notice(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
+            trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
           end
         end
       end
@@ -104,6 +147,18 @@ module Observers
           trigger_on_queried_records("renewal_plan_year_publish_dead_line")
         end
 
+        if model_event.event_key == :initial_employer_first_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
+        end
+
+        if model_event.event_key == :initial_employer_second_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_second_reminder_to_publish_plan_year")
+        end
+
+        if model_event.event_key == :initial_employer_final_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_final_reminder_to_publish_plan_year")
+        end
+
       end
     end
 
@@ -120,10 +175,24 @@ module Observers
       end
     end
 
+    def trigger_zero_employees_on_roster_notice(plan_year)
+      if !plan_year.benefit_groups.any?{|bg| bg.is_congress?} && plan_year.employer_profile.census_employees.active.count < 1
+        trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "zero_employees_on_roster_notice")
+      end
+    end
+
     def trigger_on_queried_records(event_name)
       current_date = TimeKeeper.date_of_record
       organizations_for_force_publish(current_date).each do |organization|
         plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+        trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
+      end
+    end
+
+    def trigger_initial_employer_publish_remainder(event_name)
+      start_on_1 = (TimeKeeper.date_of_record+1.month).beginning_of_month
+      initial_employers_reminder_to_publish(start_on_1).each do|organization|
+        plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
         trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:event_name)
       end
     end
