@@ -107,8 +107,8 @@ module BenefitSponsors
           )
       }
 
-      after_update :update_employee_benefit_packages
-      # Refactor code into benefit package updater
+      # after_update :update_employee_benefit_packages
+      # TODO: Refactor code into benefit package updater
       def update_employee_benefit_packages
         if self.start_on_changed?
           bg_ids = self.benefit_groups.pluck(:_id)
@@ -391,7 +391,7 @@ module BenefitSponsors
       class << self
         def find(id)
           application = nil
-          Organizations::PlanDesignOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
+          BenefitSponsors::Organizations::GeneralOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
             sponsorships = pdo.try(:benefit_sponsorships) || []
             sponsorships.each do |sponsorship|
               application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
