@@ -18,18 +18,33 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       # include Concerns::Observable
+      include AASM
+
+      SOURCE_KINDS  = %w(self_serve conversion)
+
 
       field :hbx_id,            type: String
       field :profile_id,        type: BSON::ObjectId
       field :contact_method,    type: Symbol, default: :paper_and_electronic
 
-      # Date period during which this benefit sponsorship is active.  Start date is first effective date benefits 
-      # are offered.  End date (if present) reflects date when all benefit applications are terminated
-      field :effective_period,  type: Range
+      # Effective begin/end are the date period during which this benefit sponsorship is active.  
+      # effective_begin_on is date with initial application coverage effectuates
+      # effective_end_on reflects date when all benefit applications are terminate and sponsorship terminates
+      field :effective_begin_on,  type: Date
+      field :effective_end_on,    type: Date
+
+
+      field :source_kind,   type: String, default: :self_serve
+      field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
 
 
       # This sponsorship's workflow status
-      field :aasm_state,      type: String, default: :applicant
+      field :aasm_state,    type: String, default: :applicant do
+        error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
+      end
+
+      delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
+      delegate :rating_area,  :rating_area=,  to: :profile, allow_nil: true
 
 
       belongs_to  :organization, 
@@ -44,17 +59,28 @@ module BenefitSponsors
                   counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarket"
 
-      belongs_to  :rating_area, 
-                  counter_cache: true,
-                  class_name: "::BenefitMarkets::Locations::RatingArea"
-
       has_many    :service_areas, 
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
+
+      embeds_many :broker_agency_accounts, 
+                  validate: true
+
+      embeds_many :general_agency_accounts, 
+                  validate: true
+
+      has_many    :documents,
+                  inverse_of: :benefit_sponsorship_docs,
+                  class_name: "BenefitSponsors::Documents::Document"
+
 
       validates_presence_of :organization, :profile_id, :benefit_market
 
       validates :contact_method,
         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
+        allow_blank: false
+
+      validates :source_kind,
+        inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
         allow_blank: false
 
 
@@ -74,9 +100,10 @@ module BenefitSponsors
       end
 
 
-# TODO -- point this to main app census employees
+      # TODO: add find_by_benefit_sponsorhip scope to CensusEmployee
       def census_employees
-        BenefitSponsors::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsorship(self)
+        return @census_employees if is_defined?(@census_employees)
+        @census_employees = ::CensusEmployee.find_by_benefit_sponsorship(self)
       end
 
       # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -85,29 +112,27 @@ module BenefitSponsors
         @roster_size = census_employees.active.size
       end
 
-# TODO -- move this to concern
-      # Helper method to access Profile attribute
-      def sic_code
-        return @sic_code if defined? @sic_code
-        if profile.attributes.member?("sic_code") && profile.sic_code.present?
-          @sic_code = profile.sic_code
-        end
-      end
 
-      def rating_area
-        return @rating_area if defined? @rating_area
-        if profile.class.method_defined?(:rating_area)
-          @rating_area = profile.rating_area
-        end
-      end
+      # Workflow for self service
+      aasm do
+        state :applicant, initial: true
+        state :registered                 # Employer has submitted valid application
+        state :eligible                   # Employer has completed enrollment and is eligible for coverage
+        state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+        state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
+      # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
+        state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
+        state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
 
-      def earliest_plan_year_start_on_date
-        plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
-        plan_years.reject!{|py| py.can_be_migrated? }
-        plan_year = plan_years.sort_by {|test| test[:start_on]}.first
-        if !plan_year.blank?
-          plan_year.start_on
+        state :terminated_involuntarily   # Employer is unable to obtain coverage on the HBX per regulation or policy
+        state :voluntarily_terminated     # Employer is unable to obtain coverage on the HBX per regulation or policy
+
+
+        event :application_accepted, :after => :record_transition do
+          transitions from: [:registered], to: :registered
+          transitions from: [:applicant, :ineligible], to: :registered
         end
+
       end
 
       class << self

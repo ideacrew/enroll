@@ -24,16 +24,21 @@ module BenefitSponsors
       belongs_to  :benefit_market_catalog, counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
-      ## TODO Deprecate -- BenefitMarket is associated with BenefitSponsorship
-      belongs_to  :benefit_market, counter_cache: true,
-                  class_name: "::BenefitMarkets::BenefitMarket"
-
       # The date range when this application is active
       field :effective_period,        type: Range
 
       # The date range when members may enroll in benefit products
       # Stored locally to enable sponsor-level exceptions
       field :open_enrollment_period,  type: Range
+
+      # Number of full-time employees
+      field :fte_count, type: Integer, default: 0
+
+      # Number of part-time employess
+      field :pte_count, type: Integer, default: 0
+
+      # Number of Medicare Second Payers
+      field :msp_count, type: Integer, default: 0
 
       # The date on which this application was canceled or terminated
       field :terminated_on,           type: Date
@@ -50,16 +55,19 @@ module BenefitSponsors
 
       embeds_many :benefit_packages, 
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
-      
-      embeds_many :workflow_state_transitions, as: :transitional
 
-      validates_presence_of :benefit_market, :effective_period, :open_enrollment_period
+      embeds_one  :benefit_sponsor_catalog,
+                  class_name: "::BenefitMarkets::BenefitSponsorCatalog"
+      
+      validates_presence_of :effective_period, :open_enrollment_period
       
       validate :validate_application_dates
       # validate :open_enrollment_date_checks
 
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
+
+      scope :by_open_enrollment_end_date,   ->(end_on) { where(:"effective_period.max" => end_on) }
 
       scope :by_effective_date,       ->(effective_date)    { where(:"effective_period.min" => effective_date) }
       scope :by_effective_date_range, ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
@@ -99,8 +107,8 @@ module BenefitSponsors
           )
       }
 
-      after_update :update_employee_benefit_packages
-      # Refactor code into benefit package updater
+      # after_update :update_employee_benefit_packages
+      # TODO: Refactor code into benefit package updater
       def update_employee_benefit_packages
         if self.start_on_changed?
           bg_ids = self.benefit_groups.pluck(:_id)
@@ -381,29 +389,9 @@ module BenefitSponsors
       end
 
       class << self
-        def schedular
-          ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        end
-       
-        def calculate_start_on_options
-          schedular.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-        end
-
-        def enrollment_timetable_by_effective_date(effective_date)
-          schedular.enrollment_timetable_by_effective_date(effective_date)
-        end
-
-        def calculate_open_enrollment_date(start_on)
-          schedular.calculate_open_enrollment_date(start_on)
-        end
-  
-        def effective_period_by_date(given_date = TimeKeeper.date_of_record, use_grace_period = false)
-          schedular.effective_period_by_date(given_date, use_grace_period)
-        end
-
         def find(id)
           application = nil
-          Organizations::PlanDesignOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
+          BenefitSponsors::Organizations::GeneralOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
             sponsorships = pdo.try(:benefit_sponsorships) || []
             sponsorships.each do |sponsorship|
               application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
@@ -412,7 +400,10 @@ module BenefitSponsors
           end
           application
         end
+
       end
+
+
 
       def due_date_for_publish
         if employer_profile.plan_years.renewing.any?

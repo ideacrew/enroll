@@ -1,0 +1,7 @@
+// = render partial: './ui-components/v1/sliders/slider_with_display_box', locals: {id:'myID',min:0,max:100,step:5, defaultValue:50}
+.row.p-0
+  .col-11
+    .slidecontainer
+      input.slider  id="#{id}" max="#{max}" min="#{min}" type="range" value="#{defaultValue}" step="#{step}" class="" onchange="updateSliderBox(this)"
+  .col-1
+    input.text id="#{id}-box" class="slider-value-box" onblur="updateSlider(this)"

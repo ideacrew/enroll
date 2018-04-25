@@ -30,13 +30,13 @@ employer_member_relationships = [
   ),
   BenefitMarkets::PricingModels::MemberRelationship.new(
     relationship_name: "dependent",
-    age_threshold: 27,
+    age_threshold: 26,
     age_comparison: :<,
     relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
   ),
   BenefitMarkets::PricingModels::MemberRelationship.new(
     relationship_name: "dependent",
-    age_threshold: 27,
+    age_threshold: 26,
     age_comparison: :>=,
     disability_qualifier: true,
     relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
@@ -63,13 +63,13 @@ employer_contribution_relationships = [
   ),
   BenefitMarkets::ContributionModels::MemberRelationship.new(
     relationship_name: "dependent",
-    age_threshold: 27,
+    age_threshold: 26,
     age_comparison: :<,
     relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
   ),
   BenefitMarkets::ContributionModels::MemberRelationship.new(
     relationship_name: "dependent",
-    age_threshold: 27,
+    age_threshold: 26,
     age_comparison: :>=,
     disability_qualifier: true,
     relationship_kinds: ["child", "adopted_child","foster_child","stepchild", "ward"]
@@ -123,5 +123,6 @@ contribution_model = BenefitMarkets::ContributionModels::ContributionModel.creat
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator",
   contribution_units: employer_contribution_units,
   member_relationships: employer_contribution_relationships,
-  name: "DC Shop Contribution Model"
+  title: "DC Shop Contribution Model",
+  many_simultaneous_contribution_units: true
 })

@@ -13,11 +13,9 @@
       </div>
       <div class="col-xs-3">
         <span class="icon-calendar-large icon-calendar-large-dims">
-          <h3 class="day">
-            <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%e") %>
+          <h3 class="day" id='benefit_application_latest_submitted_on_day'>
           </h3>
-          <span class="month">
-            <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%B") %>
+          <span class="month" id="benefit_application_latest_submitted_on_month">
           </span>
         </span>
       </div>
@@ -35,22 +33,14 @@
       </div>
       <div class="col-xs-3">
         <span class="icon-calendar-large icon-calendar-large-dims">
-          <h3 class="day">
-            <%= @open_enrollment_dates[:binder_payment_due_date].strftime("%e") %>
+          <h3 class="day" id="binder_payment_deadline_day">
           </h3>
-          <span class="month">
-            <%= @open_enrollment_dates[:binder_payment_due_date].strftime("%B") %>
+          <span class="month" id="binder_payment_deadline_month">
           </span>
         </span>
       </div>
     </div>
   </div>
-</div>
-<div class="col-xs-3 pull-right">
-  <div class="row <%= pundit_class EmployerProfile,:updateable? %>">
-    <a class="btn btn-primary btn-lg btn-block  pull-right interaction-click-control-continue" onclick="$('#choose-coverage').hide();$('.benefits-setup-tab').fadeIn();$('#plan_year_benefit_groups_attributes_0_title').focus();$(window).scrollTop(0);">Continue</a>
-  </div>
-  <br/><br/><br/>
 </div>
 
 <div class="table-responsive" style="display: none;">
@@ -58,22 +48,22 @@
     <tr>
       <td>Employer initial application earliest start on</td>
       <td>:</td>
-      <td><%= @schedule[:employer_initial_application_earliest_start_on].to_s %></td>
+      <td id="benefit_application_earliest_start_on">
     </tr>
     <tr>
       <td>Employer initial application earliest submit on</td>
       <td>:</td>
-      <td><%= @schedule[:employer_initial_application_earliest_submit_on].to_s %></td>
+      <td id="benefit_application_earlies_submit_on">
     </tr>
     <tr>
       <td>Employer initial application latest submit on</td>
       <td>:</td>
-      <td><%= @schedule[:employer_initial_application_latest_submit_on].to_s %></td>
+      <td id="benefit_application_latest_submitted_on">
     </tr>
     <tr>
       <td>Binder payment due date</td>
       <td>:</td>
-      <td><%= @open_enrollment_dates[:binder_payment_due_date].to_s %></td>
+      <td id="binder_payment_due_date">
     </tr>
   </table>
 </div>

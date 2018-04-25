@@ -19,7 +19,8 @@ module BenefitSponsors
       end
 
       def build_nested_models
-        build_inbox if inbox.nil?
+        return if inbox.present?
+        build_inbox
       end
     end
   end

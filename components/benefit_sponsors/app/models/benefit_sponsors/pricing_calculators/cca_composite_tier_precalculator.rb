@@ -17,10 +17,11 @@ module BenefitSponsors
           @group_size_factor = gs_factor
           @participation_percent_factor = pp_factor
           @sic_code_factor = sc_factor
+          @previous_product = r_coverage.previous_eligibility_product
         end
 
         def add(member)
-          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date, @product, @product)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
           rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           # TODO: make this more configurable, this is an awful hack.
@@ -54,6 +55,20 @@ module BenefitSponsors
                              end
                            end
         end
+      end
+
+      def create_pricing_determinations(sponsored_benefit, product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
+        rate_hash = calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
+        price_determination_tiers = []
+        rate_hash.each_pair do |k, v|
+          price_determination_tiers << ::BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
+            pricing_unit_id: k,
+            price: v
+          )
+        end 
+        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(price_determination_tiers: price_determination_tiers)
+        sponsored_benefits.pricing_determinations << price_determination
+        sponsored_benefits.save!
       end
 
       def calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
@@ -93,11 +108,12 @@ module BenefitSponsors
         gs_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_group_size_factor(product, group_size)
         pp_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_participation_percent_factor(product, participation_percent)
         sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sic_code)
+        age_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
         sorted_members = members_list.sort_by do |rm|
-          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, product, product)
+          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_date, roster_coverage.coverage_eligibility_dates, roster_coverage.previous_eligibility_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
-        calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, roster_coverage, gs_factor, pp_factor, sc_factor)
+        calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, roster_coverage, gs_factor, pp_factor, sc_factor)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end

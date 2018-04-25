@@ -50,105 +50,74 @@
         <th style='width: 18%'> Status</th>
         <th style='width: 9%'> Remove Role</th>
         </thead>
-        <% @staff.each do |staff| %>
+        <% @agency.staff_roles.each do |staff| %>
           <tr style='border: 1px solid #d5d5d5; height: 50px; '>
             <td style='padding: 10px'><%= staff.first_name %></td>
             <td><%= staff.last_name %></td>
             <td>
-              <%= staff.work_email_or_best %>
-              </td>
-              <td>
-                <% phone = staff.phones.detect {|phone| phone.kind == 'work'} %>
-                <%= phone && phone.to_s %>
-              <td>
-                <% role = staff.benefit_sponsors_employer_staff_roles.detect {|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
-                <%= role && role.current_state %>
-                <% if role.is_applicant? %>
-                  <%= link_to(approve_profiles_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), id: 'approve_' + staff.id.to_s) do %>
-                    approve
-                  <% end %>
-                <% end %>
-                <br/>
-                <%= staff.user_id ? 'Linked' : 'Unlinked' %>
-              </td>
-              <td>
-                <%= link_to(profiles_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), method: 'delete', id: 'delete_' + staff.id.to_s, data: {confirm: 'Delete this role?'}) do %>
-                  <i class="fa fa-trash-o fa-2x role-trashcan"></i>
-                <% end %>
-              </td>
-            </tr>
-        <% end if @staff %>
+              <%= staff.email %>
+            </td>
+            <td>
+              <%= staff.phone %>
+            </td>
+            <td>
+              <%# TODO - see Main App %>
+              <%= staff.status %>
+            </td>
+            <td>
+              <%# TODO - Delete %>
+              <%= staff.status %>
+            </td>
+          </tr>
+        <% end %>
       </table>
     </div>
-
-    <% if @add_staff == 'yes' %>
-      <%= form_for @agency.organization, {as: :organization, url: profiles_employers_employer_staff_roles_path(id: @agency.organization.employer_profile.id), method: :post} do |f| %>
-        <div>
-          <h4>Add Employer Staff</h4>
-            <div class="row no-buffer row-form-wrapper">
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= text_field_tag :first_name, @employer.try(:first_name), class: "floatlabel form-control", required: true, placeholder: 'FIRST NAME *' %>
-              </div>
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-                <%= text_field_tag :last_name, @employer.try(:last_name), class: "floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
-              </div>
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= text_field_tag :dob, @employer.try(:dob), class: "date-picker floatlabel form-control", required: true, placeholder: 'DATE OF BIRTH *' %>
-              </div>
-            </div>
+    <% # Add Employer Staff Role should be a different controller action - TODO%>
+    <%= f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f| %>
+      <br>
+      <%= link_to 'Add Employer Staff Role', edit_profiles_employers_employer_staff_role_path(@agency.profile_id, add_staff: 'yes'), class: 'btn btn-default pull-left col-12' %>
+      <br/><br><br>
+      <div class="">
+        <h4> Employer Information</h4>
+        <div class="row no-buffer row-form-wrapper">
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
           </div>
-            <br>
-          <button type="submit" class="btn btn-primary pull-left mtz sm_full_width"> <%= "Save".html_safe %></button>
-          <%= link_to 'Cancel', edit_profiles_employers_employer_profile_path(@employer_profile.id, add_staff: 'no'), class: 'btn btn-default pull-left' %>
-      <% end %>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
+            <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :readonly => true %>
+          </div>
 
-    <% else %>
-      <%= form_for @agency.organization, {as: :organization, url: profiles_registration_path(id: @agency.organization.employer_profile.id), method: :put} do |f| %>
         <br>
-          <%= link_to 'Add Employer Staff Role', edit_profiles_employers_employer_staff_role_path(@agency.organization.employer_profile.id, add_staff: 'yes'), class: 'btn btn-default pull-left col-12' %>
-          <br/><br><br>
-          <div class="">
-            <h4> Employer Information</h4>
-            <div class="row no-buffer row-form-wrapper">
-              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
-              </div>
-              <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
-                <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
-              </div>
-              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :readonly => true %>
-              </div>
-              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                <%= f.select(:entity_kind, options_for_select(Organization::ENTITY_KINDS.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.entity_kind || ""), {prompt: "Select Entity Kind"}, {:class => ''}) %>
-              </div>
-            </div>
-            <br>
-            <%= f.fields_for :profiles, @agency.organization.profiles, errors: {}, fieldset: false do |f| %>
-              <h2> Office Locations </h2>
-              <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location, block| %>
-                <%= render partial: 'benefit_sponsors/shared/office_location_fields', locals: {f: office_location} %>
-                  <% @row = true %>
-              <% end %>
-              <br/>
-              <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f %><br>
-            <% end %>
-            <br>
-            <div class="form-inputs">
-              <!-- TODO refactor pundit related work and link to add fields-->
-              <%#= pundit_span(EmployerProfile, :updateable?) %>
-              <%#= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
-              </span>
-              <%= link_to "Cancel", profiles_employers_employer_profile_path(id: @agency.organization.employer_profile.id, tab: 'home'), class: 'btn btn-default' %>
-            </div>
-            <div class="top-row no-border">
-              <% button_name = @agency.organization.persisted? ? 'Save' : 'Create' %>
-              <button type="submit" class="btn btn-primary pull-right  mtz sm_full_width">
-                <%= "#{button_name}".html_safe %>
-              </button> &nbsp;&nbsp;
-            </div>
+        <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
+          <%= f.hidden_field :id, value: f.object.id %>
+          <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
           </div>
-      <% end %>
+          <h2> Office Locations </h2>
+          <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location, block| %>
+            <%= render partial: 'benefit_sponsors/shared/office_location_fields', locals: {f: office_location} %>
+              <% @row = true %>
+          <% end %>
+          <br/>
+          <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f %><br>
+        <% end %>
+        <br>
+        <div class="form-inputs">
+          <!-- TODO refactor pundit related work and link to add fields-->
+          <%#= pundit_span(EmployerProfile, :updateable?) %>
+          <%#= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default' %>
+          </span>
+          <%= link_to "Cancel", profiles_employers_employer_profile_path(id: @agency.profile_id, tab: 'home'), class: 'btn btn-default' %>
+        </div>
+        <div class="top-row no-border">
+          <% button_name = @agency.persisted? ? 'Save' : 'Create' %>
+          <button type="submit" class="btn btn-primary pull-right  mtz sm_full_width">
+            <%= "#{button_name}".html_safe %>
+          </button> &nbsp;&nbsp;
+        </div>
+      </div>
     <% end %>
   </div>
 </div>

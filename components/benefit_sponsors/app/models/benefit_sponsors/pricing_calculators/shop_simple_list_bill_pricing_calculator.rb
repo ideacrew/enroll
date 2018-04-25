@@ -36,7 +36,7 @@ module BenefitSponsors
         end
 
         def add(member)
-          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @eligibility_dates, @coverage_start_date, @product, @previous_product)
+          coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
           rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
@@ -67,11 +67,12 @@ module BenefitSponsors
         roster_entry = benefit_roster_entry
         roster_coverage = benefit_roster_entry.roster_coverage
         members_list = [roster_entry] + roster_entry.dependents
+        age_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
         sorted_members = members_list.sort_by do |rm|
-          coverage_age = calc_coverage_age_for(rm, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, roster_coverage.product, roster_coverage.previous_eligibility_product)
+          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_date, roster_coverage.coverage_eligibility_dates, roster_coverage.previous_eligibility_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
-        calc_state = CalculatorState.new(self, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage)
+        calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end

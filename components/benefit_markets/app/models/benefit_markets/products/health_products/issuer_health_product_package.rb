@@ -9,6 +9,10 @@ module BenefitMarkets
         def all_products
           super().where("coverage_kind" => "health", :carrier_profile_id => issuer_id)
         end
+
+        def benefit_option_kind
+          "issuer_health"
+        end
       end
     end
   end

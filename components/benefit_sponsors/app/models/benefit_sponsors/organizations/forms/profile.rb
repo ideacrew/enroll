@@ -13,12 +13,14 @@ module BenefitSponsors
       attr_accessor :country_code, :area_code, :number, :extension, :full_phone_number
       attr_accessor :profile_type
       attr_accessor :first_name, :last_name, :dob
-      attr_accessor :profiles_attributes, :office_locations_attributes, :address_attributes, :phone_attributes
+      attr_accessor :profiles_attributes, :office_locations_attributes, :address_attributes, :phone_attributes, :agency_organization
       attr_accessor :first_name, :last_name, :dob
+      attr_accessor :person_id
 
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
         numericality: true
+
       validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
@@ -27,6 +29,7 @@ module BenefitSponsors
         inclusion: { in: Organizations::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
         allow_blank: false
 
+      # TODO: Move to Factory
       # validate :office_location_validations
       # validate :office_location_kinds
 
@@ -80,7 +83,7 @@ module BenefitSponsors
       end
 
       def dob=(val)
-        @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
+        @dob = Date.strptime(val,"%m/%d/%Y") rescue nil
       end
       
       # Strip non-numeric characters
@@ -90,6 +93,10 @@ module BenefitSponsors
 
       def entity_kind=(entity_kind)
         @entity_kind = entity_kind.to_sym
+      end
+
+      def market_kind=(market_kind)
+        @market_kind = market_kind.to_sym
       end
 
       def profiles_attributes=(profiles)
@@ -109,6 +116,10 @@ module BenefitSponsors
       end
 
       def phone_attributes=(attributes)
+        assign_wrapper_attributes(attributes)
+      end
+
+      def agency_organization=(attributes)
         assign_wrapper_attributes(attributes)
       end
 

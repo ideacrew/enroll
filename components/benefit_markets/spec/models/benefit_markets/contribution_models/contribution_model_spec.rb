@@ -7,9 +7,9 @@ module BenefitMarkets
         expect(subject.valid?).to be_falsey
       end
 
-      it "is missing a name" do
+      it "is missing a title" do
         subject.valid?
-        expect(subject.errors.has_key?(:name)).to be_truthy
+        expect(subject.errors.has_key?(:title)).to be_truthy
       end
 
       it "is missing contribution units" do

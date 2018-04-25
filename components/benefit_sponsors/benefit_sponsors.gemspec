@@ -7,8 +7,8 @@ require "benefit_sponsors/version"
 Gem::Specification.new do |s|
   s.name        = "benefit_sponsors"
   s.version     = BenefitSponsors::VERSION
-  s.authors     = ["Brian Weiner"]
-  s.email       = ["brian.weiner@dc.gov"]
+  s.authors     = ["Dan Thomas"]
+  s.email       = ["dan.thomas@dc.gov"]
   s.homepage    = "https://github.com/dchbx"
   s.summary     = "Summary of BenefitSponsors."
   s.description = "Description of BenefitSponsors."
@@ -24,8 +24,11 @@ Gem::Specification.new do |s|
   s.add_dependency "aasm", "~> 4.8.0"
   s.add_dependency 'config'
   s.add_dependency 'symmetric-encryption', '~> 3.6.0'
+  s.add_dependency 'pundit', '~> 1.0.1'
   s.add_dependency 'roo', '~> 2.1.0'
   s.add_dependency 'money-rails', '~> 1.3.0'
+  s.add_dependency 'virtus', '~> 1.0.5'
+  s.add_dependency 'active_model_serializers'
 
   s.test_files = Dir["spec/**/*"]
 
