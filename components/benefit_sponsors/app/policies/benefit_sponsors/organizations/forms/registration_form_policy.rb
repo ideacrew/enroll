@@ -15,7 +15,7 @@ module BenefitSponsors
         end
 
         def create?
-          return true unless role = user.person && user.person.hbx_staff_role
+          return true unless role = user && user.person && user.person.hbx_staff_role
           role.permission.modify_employer
         end
 

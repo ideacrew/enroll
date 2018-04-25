@@ -66,7 +66,7 @@ module BenefitSponsors
           result[index_val] = profile_attributes(form).merge({
             :office_locations_attributes =>  office_locations_form_to_params(form.office_locations)
           })
-          result
+          sanitize_id result
         end
       end
 
@@ -76,16 +76,22 @@ module BenefitSponsors
             :phone_attributes =>  phone_form_to_params(form.phone),
             :address_attributes =>  address_form_to_params(form.address)
           })
-          result
+          sanitize_id result
         end
       end
 
       def phone_form_to_params(form)
-        form.attributes.slice(:kind, :area_code, :number, :extension, :id)
+        result = form.attributes.slice(:kind, :area_code, :number, :extension, :id)
+        sanitize_id result
       end
 
       def address_form_to_params(form)
-        form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
+        result = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
+        sanitize_id result
+      end
+
+      def sanitize_id attrs
+        profile_id.blank? ? attrs.except(:id) : attrs
       end
 
       def organization_attributes(form)
