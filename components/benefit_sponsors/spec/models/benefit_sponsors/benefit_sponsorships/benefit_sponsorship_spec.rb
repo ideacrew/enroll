@@ -8,8 +8,7 @@ module BenefitSponsors
     let(:organization)              { BenefitSponsors::Organizations::GeneralOrganization.new(site: site, fein: 123456789, legal_name: "DC")}
     let(:profile)                   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(organization: organization) }
 
-
-    let(:params) do 
+    let(:params) do
       {
         benefit_market: benefit_market,
         organization: organization,
@@ -64,6 +63,14 @@ module BenefitSponsors
         end
       end
 
+     describe "validators for model" do
+       it { is_expected.to be_mongoid_document }
+       it { is_expected.to have_fields(:hbx_id, :profile_id)}
+       it { is_expected.to have_field(:source_kind).of_type(String).with_default_value_of(:self_serve)}
+       it { is_expected.to embed_many(:broker_agency_accounts)}
+       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponorships)}
+     end
+
       context "with all required arguments" do
         subject { described_class.new(params) }
 
@@ -87,6 +94,20 @@ module BenefitSponsors
             subject.validate
             expect(subject).to be_valid
           end
+        end
+      end
+    end
+
+    describe "Working around validating model factory" do
+      context "when benifit sponser has profile and organization" do
+        let(:benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+        let(:valid_build_benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
+        let(:valid_create_benefit_sponsorships) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
+
+        it "should be validate" do
+          expect(benefit_sponsorships.valid?).to be_falsy
+          expect(valid_build_benefit_sponsorships.valid?).to be_truthy
+          expect(valid_create_benefit_sponsorships.valid?).to be_truthy
         end
       end
     end
@@ -154,9 +175,6 @@ module BenefitSponsors
         end
 
       end
-
-
     end
- 
   end
 end
