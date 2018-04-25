@@ -4,7 +4,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
   let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
   context "without consumer_role" do
-    let(:person) {double(has_active_consumer_role?: false)}
+    let(:person) {double(is_consumer_role_active?: false)}
     before :each do
       assign(:person, person)
       assign(:carriers, Array.new)
@@ -97,7 +97,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "without employee_role" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
     let(:metal_levels){ Plan::METAL_LEVEL_KINDS[0..4] }
     before :each do
       assign(:person, person)
@@ -131,7 +131,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:person, person)
       assign(:carriers, Array.new)
       assign(:benefit_group, benefit_group)
-      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       assign(:hbx_enrollment, hbx_enrollment)
 
@@ -171,7 +171,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "with consumer_role and tax_household" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
 
 
     before :each do
@@ -215,7 +215,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "with tax_household plan_shopping in shop market" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
 
     before :each do
       assign(:hbx_enrollment, hbx_enrollment)
@@ -242,7 +242,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "with consumer_role but without tax_household" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
 
     before :each do
       assign(:hbx_enrollment, hbx_enrollment)

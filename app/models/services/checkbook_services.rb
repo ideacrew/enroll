@@ -6,7 +6,7 @@ module Services
 
       attr_accessor :hbx_enrollment,:is_congress
 
-      BASE_URL =  Settings.checkbook_services.base_url
+      BASE_URL =   Rails.application.config.checkbook_services_base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
 
       def initialize(hbx_enrollment, is_congress=false)
@@ -18,8 +18,8 @@ module Services
 
       def generate_url
         return @url if is_congress
+        return Settings.checkbook_services.congress_url if Rails.env.test?
         begin
-          puts construct_body.to_json
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
                 :headers => { 'Content-Type' => 'application/json' } )
@@ -37,7 +37,7 @@ module Services
       private
       def construct_body
       {
-        "remote_access_key": Settings.checkbook_services.remote_access_key,
+        "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
         "reference_id": Settings.checkbook_services.reference_id,
         "employer_effective_date": employer_effective_date,
         "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),

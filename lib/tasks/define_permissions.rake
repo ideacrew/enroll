@@ -56,7 +56,10 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
 end
 
-
+namespace :permissions do
+  desc 'hbx admin can transition family members'
+  DefinePermissions.define_task :hbx_admin_can_transition_family_members => :environment
+end
 
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
@@ -67,4 +70,4 @@ end
 #rake permissions:hbx_admin_can_access_new_consumer_application_sub_tab
 #rake permissions:hbx_admin_can_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_can_access_outstanding_verification_sub_tab
-
+#rake permissions:hbx_admin_can_transition_family_members

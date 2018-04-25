@@ -10,7 +10,7 @@ module HbxAdminWorld
     @hbx_admin
   end
 
-  def create_hbx_admin_role(subrole)
+  def hbx_admin_with_subrole(subrole)
     @u1 = User.create( email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', roles: ["hbx_staff"])
     hbx_profile_id = FactoryGirl.create(:hbx_profile).id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: @u1)
@@ -29,23 +29,23 @@ Given(/^the HBX admin is logged in$/) do
 end
 
 Given(/^a Hbx admin with hbx_staff role exists$/) do
-  create_hbx_admin_role 'hbx_staff'
+  hbx_admin_with_subrole 'hbx_staff'
 end
 
 Given(/^a Hbx admin with hbx_read_only role exists$/) do
-  create_hbx_admin_role 'hbx_read_only'
+  hbx_admin_with_subrole 'hbx_read_only'
 end
 
 Given(/^a Hbx admin with hbx_csr_supervisor role exists$/) do
-  create_hbx_admin_role 'hbx_csr_supervisor'
+  hbx_admin_with_subrole 'hbx_csr_supervisor'
 end
 
 Given(/^a Hbx admin with hbx_csr_tier1 role exists$/) do
-  create_hbx_admin_role 'hbx_csr_tier1'
+  hbx_admin_with_subrole 'hbx_csr_tier1'
 end
 
 Given(/^a Hbx admin with hbx_csr_tier2 role exists$/) do
-  create_hbx_admin_role 'hbx_csr_tier2'
+  hbx_admin_with_subrole 'hbx_csr_tier2'
 end
 
 Given(/^a Hbx admin logs on to Portal$/) do

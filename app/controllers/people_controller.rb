@@ -194,7 +194,7 @@ class PeopleController < ApplicationController
     @family = @person.primary_family
     clean_duplicate_addresses
     @person.updated_by = current_user.oim_id unless current_user.nil?
-    if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
+    if @person.is_consumer_role_active? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
@@ -202,6 +202,10 @@ class PeopleController < ApplicationController
     end
 
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
+
+    if @person.is_consumer_role_active?
+      @person.consumer_role.check_for_critical_changes(person_params, @family)
+    end
 
     respond_to do |format|
       if @person.update_attributes(person_params.except(:is_applying_coverage))
@@ -213,7 +217,7 @@ class PeopleController < ApplicationController
         format.json { head :no_content }
       else
         @person.addresses = @old_addresses
-        if @person.has_active_consumer_role?
+        if @person.is_consumer_role_active?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
         end

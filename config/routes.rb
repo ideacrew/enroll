@@ -200,6 +200,8 @@ Rails.application.routes.draw do
         post 'upload_notice'
         get 'download_tax_documents_form'
         get 'download_tax_documents'
+        get 'transition_family_members'
+        post 'transition_family_members_update'
       end
 
       resources :people do

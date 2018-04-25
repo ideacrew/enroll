@@ -23,6 +23,7 @@ class Permission
   field :can_access_new_consumer_application_sub_tab, type: Boolean, default: false
   field :can_access_identity_verification_sub_tab, type: Boolean, default: false
   field :can_access_outstanding_verification_sub_tab, type: Boolean, default: false
+  field :can_transition_family_members, type: Boolean, default: false
   
   class << self
     def hbx_staff

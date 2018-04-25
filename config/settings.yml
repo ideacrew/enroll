@@ -136,12 +136,6 @@ notices:
       envelope_without_address: "taglines.pdf"
 
 paper_notice: 'paper-notices'
-checkbook_services:
-    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
-    base_url:  "https://dc.checkbookhealth.org"
-    url: "https://dc.checkbookhealth.org/shop/dc/"
-
-aptc_errors:
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
 checkbook_services:
 # Note: Need to replace Remote_access_key with Production keys while deploying to prod.

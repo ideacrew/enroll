@@ -121,7 +121,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       if enrollment.aasm_state == "coverage_canceled"
         puts "enrollment with hbx_id: #{enrollment.hbx_id} can not be cancelled" unless Rails.env.test?
       else
-        puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+        puts " Issue with enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
       end
     end
   end

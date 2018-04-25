@@ -99,4 +99,8 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_access_outstanding_verification_sub_tab: true)
     Permission.hbx_read_only.update_attributes!(can_access_outstanding_verification_sub_tab: true)
   end
+
+  def hbx_admin_can_transition_family_members
+   Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
+  end
 end

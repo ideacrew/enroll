@@ -1,7 +1,7 @@
 module Insured
   module GroupSelectionHelper
     def can_shop_individual?(person)
-      person.try(:has_active_consumer_role?)
+      person.present? && person.is_consumer_role_active?
     end
 
     def can_shop_shop?(person)
@@ -13,7 +13,11 @@ module Insured
     end
 
     def can_shop_resident?(person)
-      person.try(:has_active_resident_role?)
+      person.present? && person.is_resident_role_active?
+    end
+
+    def can_shop_individual_or_resident?(person)
+      can_shop_individual?(person) && person.has_active_resident_member?
     end
 
     def health_relationship_benefits(benefit_group)
@@ -39,17 +43,29 @@ module Insured
         )
     end
 
+    def  view_market_places(person)
+      if can_shop_both_markets?(person)
+        Plan::MARKET_KINDS
+      elsif can_shop_individual_or_resident?(person)
+        Plan::INDIVIDUAL_MARKET_KINDS
+      elsif can_shop_individual?(person)
+        ["individual"]
+      elsif can_shop_resident?(person)
+        ["coverall"]
+      end
+    end
+
     def select_market(person, params)
       return params[:market_kind] if params[:market_kind].present?
-      if params[:qle_id].present? && (!person.has_active_resident_role?)
+      if params[:qle_id].present? && (!person.is_resident_role_active?)
         qle = QualifyingLifeEventKind.find(params[:qle_id])
         return qle.market_kind
       end
       if person.has_active_employee_role?
         'shop'
-      elsif person.has_active_consumer_role? && !person.has_active_resident_role?
+      elsif person.is_consumer_role_active?
         'individual'
-      elsif person.has_active_resident_role?
+      elsif person.is_resident_role_active?
         'coverall'
       else
         nil

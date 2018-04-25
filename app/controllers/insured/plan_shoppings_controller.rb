@@ -62,7 +62,7 @@ class Insured::PlanShoppingsController < ApplicationController
     IvlNoticesNotifierJob.perform_later(@person.id.to_s ,"enrollment_notice") unless @enrollment.is_shop?
 
     @enrollment.mid_year_plan_change_notice
-    
+
     send_receipt_emails if @person.emails.first
   end
 
@@ -167,7 +167,7 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
-    if params[:market_kind] == 'shop'
+    if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
       @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     end
