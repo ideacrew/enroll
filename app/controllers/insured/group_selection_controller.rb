@@ -37,7 +37,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
-    #binding.pry
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
@@ -46,6 +45,7 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
+
     hbx_enrollment = build_hbx_enrollment
     if (keep_existing_plan && @hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
@@ -258,4 +258,5 @@ class Insured::GroupSelectionController < ApplicationController
     options[:language_preference] = person.consumer_role.language_preference
     options
   end
+  
 end

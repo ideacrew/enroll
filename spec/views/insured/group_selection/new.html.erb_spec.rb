@@ -634,7 +634,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should see dental radio option" do
-      #binding.pry
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('#coverage_kind_dental')
     end

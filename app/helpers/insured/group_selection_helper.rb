@@ -133,12 +133,15 @@ module Insured
       end
     end
 
-    def is_market_kind_checked?(kind)
-      binding.pry
+    def is_market_kind_checked?(kind, primary)
       if @mc_market_kind.present?
-        @mc_market_kind == kind
-      else
-        @market_kind == kind
+        return @mc_market_kind == kind
+      elsif can_shop_individual_or_resident?(primary)
+        kind == "individual"
+      elsif primary.is_consumer_role_active?
+        kind == "individual"
+      elsif primary.is_resident_role_active?
+        kind == "coverall"
       end
     end
 
