@@ -120,7 +120,6 @@
         <% if has_active_consumer_dependent?(@person,@dependent) %>
           <br>
           <div id="consumer_fields_sets">
-            <% binding.pry %>
           <%= render 'shared/consumer_fields', f: f %>
           </div>
           <div id="dependent-address">
