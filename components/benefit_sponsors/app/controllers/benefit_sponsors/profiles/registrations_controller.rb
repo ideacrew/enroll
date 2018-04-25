@@ -4,10 +4,13 @@ module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
 
     include Concerns::ProfileRegistration
+    include Pundit
+
     before_action :check_employer_staff_role, only: [:new]
 
     def new
       @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type: profile_type)
+      authorize @agency
       respond_to do |format|
         format.html
         format.js
@@ -16,6 +19,7 @@ module BenefitSponsors
 
     def create
       @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(registration_params)
+      authorize @agency
       begin
         saved, result_url = @agency.save
         result_url = self.send(result_url)
@@ -37,10 +41,12 @@ module BenefitSponsors
 
     def edit
       @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_edit(profile_id: params[:id])
+      authorize @agency
     end
 
     def update
       @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(registration_params)
+      authorize @agency
       sanitize_office_locations_params
       if can_update_profile? # pundit policy
         updated, result_url = @agency.update
