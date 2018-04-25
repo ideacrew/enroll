@@ -552,29 +552,6 @@ module ApplicationHelper
     observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
   end
 
-  # def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
-  #   if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? 
-  #     terminated_enrollment = hbx_enrollment.census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.coverage_kind == hbx_enrollment.coverage_kind && h.aasm_state == 'coverage_termination_pending'}
-  #     return if terminated_enrollment.blank?
-      
-  #     if hbx_enrollment.coverage_kind == "health"
-  #       ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employer_when_employee_terminate_coverage")
-  #     elsif hbx_enrollment.coverage_kind == "dental"
-  #       ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-  #     end
-  #   end
-  # end
-
-  # def notify_employee_confirming_coverage_termination(hbx_enrollment)
-  #   if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
-  #     if hbx_enrollment.coverage_kind == "health"
-  #       ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
-  #     elsif hbx_enrollment.coverage_kind == "dental"
-  #       ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-  #     end
-  #   end
-  # end
-
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end

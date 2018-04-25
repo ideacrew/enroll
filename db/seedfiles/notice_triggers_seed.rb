@@ -2381,25 +2381,6 @@ elsif Settings.aca.state_abbreviation == "DC"
     },
 
     {
-        # hbx_id: 'SHOP44',
-        # title: 'You have been Hired as a Broker',
-        # description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-        # resource_name: 'broker_role',
-        # event_name: 'broker_agency_hired_confirmation',
-        # notice_triggers: [
-        #    {
-        #       name: 'Broker Hired',
-        #       notice_template: 'notices/shop_broker_agency_notices/broker_agency_hired_notice.html.erb',
-        #       notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
-        #       mpi_indicator: 'SHOP_M044',
-        #       notice_trigger_element_group: {
-        #         market_places: ['shop'],
-        #         primary_recipients: ["broker"],
-        #         primary_recipient_delivery_method: ["secure_message"],
-        #         secondary_recipients: []
-        #       }
-        #     }
-        # ]
       hbx_id: 'IVL_FEL_AQHP',
       title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
       description: 'Final Eligibility Notice will be sent to all AQHP individuals',
