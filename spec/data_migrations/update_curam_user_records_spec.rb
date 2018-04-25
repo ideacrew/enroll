@@ -58,5 +58,23 @@ describe UpdateCuramUserRecords, dbclean: :after_each do
       curam_user.reload
       expect(curam_user.email).to eq "updatingemail@gmail.com"
     end
+
+    it "should update the dob of the user by finding user by email" do
+      allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
+      allow(ENV).to receive(:[]).with('action').and_return "update_dob"
+      allow(ENV).to receive(:[]).with('new_dob').and_return "04/04/1990"
+      subject.migrate
+      curam_user.reload
+      expect(curam_user.dob).to eq Date.parse("04/04/1990")
+    end
+
+    it "should update the ssn of the user by finding user by email" do
+      allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
+      allow(ENV).to receive(:[]).with('action').and_return "update_ssn"
+      allow(ENV).to receive(:[]).with('new_ssn').and_return "456738293"
+      subject.migrate
+      curam_user.reload
+      expect(curam_user.ssn).to eq "456738293"
+    end
   end
 end
