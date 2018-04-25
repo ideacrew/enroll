@@ -60,6 +60,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
+    # @enrollment.mid_year_plan_change_notice #mirror notice
 
     # send accepted SEP QLE event notice to enrolled employee
     if @market_kind == "shop" && @enrollment.employee_role_id.present? && @change_plan == "change_by_qle"
@@ -67,6 +68,7 @@ class Insured::PlanShoppingsController < ApplicationController
        @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id }
        sep_qle_request_accept_notice_ee(@employee_role.census_employee.id.to_s, @enrollment)
     end
+
     send_receipt_emails if @person.emails.first
   end
 
@@ -122,6 +124,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
@@ -189,6 +192,10 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
+    if params[:market_kind] == 'shop' && plan_match_dc
+      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
+      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+    end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)

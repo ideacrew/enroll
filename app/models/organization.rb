@@ -1,4 +1,5 @@
 class Organization
+  include Config::AcaModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -251,6 +252,10 @@ class Organization
   end
 
   def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+
+    return self.valid_health_carrier_names unless constrain_service_areas?
+
+
     cache_string = "load-carriers"
     if (filters[:selected_carrier_level].present?)
       cache_string << "-for-#{filters[:selected_carrier_level]}"
@@ -294,6 +299,9 @@ class Organization
   end
 
   def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+
+    return self.valid_health_carrier_names unless constrain_service_areas?
+
 
     if (filters[:selected_carrier_level].present?)
       cache_string = "for-#{filters[:selected_carrier_level]}"
@@ -358,6 +366,15 @@ class Organization
     end
   end
 
+  def self.valid_health_carrier_names
+    Rails.cache.fetch("health-carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+      Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id.to_s, TimeKeeper.date_of_record.year).present?
+        carrier_names
+      end
+    end
+  end
+
   def self.valid_carrier_names_filters
     Rails.cache.fetch("carrier-names-filters-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
@@ -390,6 +407,9 @@ class Organization
         org.documents << document
         logger.debug "associated file #{file_path} with the Organization"
         return document
+      else
+        @errors << "Unable to upload PDF to AWS S3 for #{org.hbx_id}"
+        Rails.logger.warn("Unable to upload PDF to AWS S3")
       end
     else
       logger.warn("Unable to associate invoice #{file_path}")
