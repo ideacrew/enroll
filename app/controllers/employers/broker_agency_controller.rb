@@ -51,6 +51,7 @@ class Employers::BrokerAgencyController < ApplicationController
       if broker_agency_profile.default_general_agency_profile.present?
         @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
+        broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
