@@ -109,6 +109,14 @@ class GeneralAgencyProfile
     aasm_state == "is_applicant"
   end
 
+  def general_agency_hired_notice(employer_profile)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, "general_agency_hired_notice", employer_profile_id: employer_profile.id.to_s)
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{self.legal_name} due to #{e}"}) unless Rails.env.test?
+    end
+  end
+
   class << self
     def list_embedded(parent_list)
       parent_list.reduce([]) { |list, parent_instance| list << parent_instance.general_agency_profile }
