@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Services
     class BenefitApplicationService
-      attr_reader :benefit_application_factory
+      attr_reader :benefit_application_factory, :benefit_sponsorship
 
       def initialize(factory_kind = BenefitSponsors::BenefitApplications::BenefitApplicationFactory)
         @benefit_application_factory = factory_kind
@@ -24,6 +24,7 @@ module BenefitSponsors
   
       def save(form)
         model_attributes = form_params_to_attributes(form)
+        benefit_sponsorship = find_benefit_sponsorship(form)
         benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
         store(form, benefit_application)
       end
@@ -40,6 +41,10 @@ module BenefitSponsors
         BenefitSponsors::BenefitApplications::BenefitApplication.find(id)
       end
 
+      def find_benefit_sponsorship(form)
+        @benefit_sponsorship ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(form.benefit_sponsorship_id)
+      end
+
       def attributes_to_form_params
         {
           start_on: benefit_application.effective_period.min,
@@ -54,12 +59,16 @@ module BenefitSponsors
 
       def form_params_to_attributes(form)
         {
-          effective_period: (form.start_on..form.end_on),
-          open_enrollment_period: (form.open_enrollment_start_on..form.open_enrollment_end_on),
+          effective_period: (date_format(form.start_on)..date_format(form.end_on)),
+          open_enrollment_period: (date_format(form.open_enrollment_start_on)..date_format(form.open_enrollment_end_on)),
           fte_count: form.fte_count,
           pte_count: form.pte_count,
           msp_count: form.msp_count
         }
+      end
+
+      def date_format(date)
+        Date.strptime(date, "%m/%d/%Y")
       end
 
       def store(form, benefit_application)

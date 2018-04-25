@@ -5,26 +5,27 @@
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <% benefit_application_start_dates = f.object.start_on_options.keys %>
-        <% formatted_start_on = f.object.start_on.try(:to_s, :db) %>
+        <% formatted_start_on = f.object.start_on %>
 
         <%# if f.object.start_on.present? && !benefit_application_start_dates.any?{|set| set[1] == formatted_start_on } %>
           <%# benefit_application_start_dates << [f.object.start_on.strftime("%B %Y"), formatted_start_on]%>
         <%# end %>
+        <%= f.hidden_field :benefit_sponsorship_id %>
         <%= f.select(:start_on, options_for_select(benefit_application_start_dates, selected: formatted_start_on), {:include_blank => "SELECT START ON"}, { :class => 'benefit-application-start-date'}) %>
       </div>
 
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= datepicker_control(f, :end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-start_on", :required => true, :placeholder => "END ON", readonly: true}) %>
+        <%= f.text_field :end_on, class: "floatlabel form-control interaction-field-control-plan_year-start_on", required: true, placeholder: 'END ON', readonly: true %>
       </div>
     </div>
     <br/>
     <h3>Select your open enrollment dates</h3> <h4> <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers offering coverage through <%= Settings.site.short_name %> for the first time must have an open enrollment period of no less than 14 days. Employers renewing their <%= Settings.site.short_name %> coverage must have an open enrollment period of at least 30 days."></i></h4>
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= datepicker_control(f, :open_enrollment_start_on, {:class => "floatlabel form-control interaction-field-control-plan_year-open_enrollment_start_on", :required => true, :"data-date-min" => f.object.start_on ? (f.object.start_on - 2.months) : "" , :placeholder => "OPEN ENROLLMENT START DATE"}) %>
+        <%= f.text_field :open_enrollment_start_on, class: "floatlabel form-control interaction-field-control-plan_year-open_enrollment_start_on", required: true, :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "" , placeholder: 'OPEN ENROLLMENT START DATE' %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= datepicker_control(f, :open_enrollment_end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-open_enrollment_end_on", :required => true, :placeholder => "OPEN ENROLLMENT END DATE"}) %>
+        <%= f.text_field :open_enrollment_end_on, class: "floatlabel form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE' %>
       </div>
     </div>
 
@@ -69,7 +70,7 @@
   function getFormattedDate(date){
     var new_date = new Date(date)
     var dd = new_date.getUTCDate();
-    var mm = new_date.getUTCMonth()+1; //January is 0!
+    var mm = new_date.getUTCMonth()+1;
     var yyyy = new_date.getUTCFullYear();
     if(dd<10) {
       dd='0'+dd
@@ -86,9 +87,9 @@
     var date = <%= (@benefit_application_form.start_on_options.to_json.html_safe) %>;
     var latest_submitted_on = new Date(date[target_date]["employer_initial_application_latest_submit_on"]);
     var binder_payment_deadline = new Date(date[target_date]["binder_payment_due_date"]);
-    $("input#benefit_application_end_on_jq_datepicker_plain_field").val(getFormattedDate(date[target_date]["benefit_application_end_on"]));
-    $("input#benefit_application_open_enrollment_start_on_jq_datepicker_plain_field").val(getFormattedDate(date[target_date]["open_enrollment_start_on"]));
-    $("input#benefit_application_open_enrollment_end_on_jq_datepicker_plain_field").val(getFormattedDate(date[target_date]["open_enrollment_end_on"]));
+    $("input#benefit_application_end_on").val(getFormattedDate(date[target_date]["benefit_application_end_on"]));
+    $("input#benefit_application_open_enrollment_start_on").val(getFormattedDate(date[target_date]["open_enrollment_start_on"]));
+    $("input#benefit_application_open_enrollment_end_on").val(getFormattedDate(date[target_date]["open_enrollment_end_on"]));
     setDueDates('benefit_application_latest_submitted_on_day', latest_submitted_on.getDate());
     setDueDates('benefit_application_latest_submitted_on_month', latest_submitted_on.getMonth()+1);
     setDueDates('binder_payment_deadline_day', binder_payment_deadline.getDate());

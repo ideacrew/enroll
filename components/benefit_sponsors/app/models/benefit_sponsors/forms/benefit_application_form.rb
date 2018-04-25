@@ -7,10 +7,10 @@ module BenefitSponsors
       include ActiveModel::Validations
       include Virtus.model
 
-      attribute :start_on, Date
-      attribute :end_on, Date
-      attribute :open_enrollment_start_on, Date
-      attribute :open_enrollment_end_on, Date
+      attribute :start_on, String
+      attribute :end_on, String
+      attribute :open_enrollment_start_on, String
+      attribute :open_enrollment_end_on, String
       attribute :fte_count, Integer
       attribute :pte_count, Integer
       attribute :msp_count, Integer
@@ -25,7 +25,7 @@ module BenefitSponsors
       validates :open_enrollment_end_on, presence: true
 
       # validates :validate_application_dates
-      attr_reader :service
+      attr_reader :service, :show_page_model
 
       def service
         return @service if defined? @service

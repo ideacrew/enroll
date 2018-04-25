@@ -8,6 +8,11 @@ module BenefitSponsors
         new(benefit_sponsorship, args).benefit_application
       end
 
+      def self.validate(benefit_application)
+        #TODO: Check validations
+        true
+      end
+
       def initialize(benefit_sponsorship, args)
         @benefit_sponsorship = benefit_sponsorship
         initialize_benefit_application
@@ -16,14 +21,22 @@ module BenefitSponsors
 
       def initialize_benefit_application
         benefit_market = benefit_sponsorship.benefit_market
-        site_key = benefit_market.site.site_key
+        site_key = benefit_market.site_urn
         klass_name  = [benefit_market.kind.to_s.camelcase, site_key.to_s.camelcase, "BenefitApplication"].join('')
-        @benefit_application = [parent_namespace_for(self.class), "BenefitApplications", klass_name].join("::").constantize.new
+        @benefit_application = [parent_namespace_for(self.class), klass_name].join("::").constantize.new
         @benefit_application.benefit_sponsorship = benefit_sponsorship
       end
 
       def benefit_application
         @benefit_application
+      end
+
+      protected
+
+      def parent_namespace_for(klass)
+        klass_name = klass.to_s.split("::")
+        klass_name.slice!(-1) || []
+        klass_name.join("::")
       end
 
       def assign_application_attributes(args)
