@@ -37,31 +37,56 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:office_location) { double(:office_location, address: address)}
     let(:organization) { double(:organization, primary_office_location: office_location) }
     let(:employer_profile) { double(:employer_profile, organization: organization, service_areas: service_areas) }
+    let(:employer_profile_no_service_area) { double(:employer_profile, organization: organization, service_areas: []) }
     let(:service_areas) { [service_area] }
     let(:service_area) { double }
 
-    before :each do
-      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
-      sign_in user
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
-      allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
+    context "when constrain_service_areas is false" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in user
+        allow(employer_profile).to receive(:constrain_service_areas?).and_return(false)
+        allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
 
-      get :new, :employer_profile_id => employer_profile_id
+        get :new, :employer_profile_id => employer_profile_id
+      end
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render the new template" do
+        expect(response).to render_template("new")
+      end
+
+      ## Don't generate carriers on page load anymore
+      it "should generate benefit_group with nil plan_option_kind" do
+        benefit_group = assigns(:plan_year).benefit_groups.first
+        expect(benefit_group.plan_option_kind).to eq nil
+      end
     end
 
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
+    context "when constrain_service_areas is true and no service areas" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        sign_in user
+        allow(employer_profile_no_service_area).to receive(:constrain_service_areas?).and_return(true)
+        allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile_no_service_area)
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
 
-    it "should render the new template" do
-      expect(response).to render_template("new")
-    end
+        get :new, :employer_profile_id => employer_profile_id
+      end
 
-    ## Don't generate carriers on page load anymore
-    it "should generate benefit_group with nil plan_option_kind" do
-      benefit_group = assigns(:plan_year).benefit_groups.first
-      expect(benefit_group.plan_option_kind).to eq nil
+      it "should be a redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "should redirect back to Employer Profile page" do
+        expect(response).to redirect_to(employers_employer_profile_path(employer_profile_no_service_area, :tab => "benefits"))
+      end
     end
   end
 
@@ -651,13 +676,14 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       @reference_plan = benefit_group.reference_plan
       Caches::PlanDetails.load_record_cache!
       @census_employees = [census_employee, census_employee]
+      @carrier_profile = @reference_plan.carrier_profile
     end
 
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with(@employer_profile.id).and_return(@employer_profile)
       allow(Forms::PlanYearForm).to receive(:build).and_return(plan_year)
       allow(Plan).to receive(:find).with(@reference_plan.id).and_return(@reference_plan)
-      allow(@reference_plan).to receive(:carrier_profile_id).and_return('carrier_id')
+      allow(@reference_plan).to receive(:carrier_profile_id).and_return(@carrier_profile.id)
       allow(plan_year).to receive(:benefit_groups).and_return(benefit_group.to_a)
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)

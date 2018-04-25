@@ -45,7 +45,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def show
     set_flash_by_announcement
     session[:person_id] = nil
-     @provider = current_user.person
+     @provider = @broker_agency_profile.primary_broker_role.person
      @staff_role = current_user.has_broker_agency_staff_role?
      @id=params[:id]
   end
@@ -366,6 +366,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def clear_assign_for_employer
+    @broker_role = current_user.person.broker_role || nil
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
+    
     authorize HbxProfile, :modify_admin_tabs?
     @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
     if @employer_profile.present?
@@ -395,7 +398,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def messages
     @sent_box = true
-    @provider = current_user.person
+    @provider = Person.find(params["id"])
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:profile_id])
   end
 
   def agency_messages

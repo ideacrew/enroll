@@ -1,5 +1,5 @@
 <div style='width: 400px; margin-left: 50px'>
-  <img src="<%= asset_path( 'health_connector.png' ) %>" style='margin-left: 140px; margin-top:30px; width: 200px; margin-bottom:30px;' title=<%= "#{site_short_name}" %>/>
+  <img src="<%= asset_path( Settings.site.mailer_logo_file_name ) %>" style='margin-left: 140px; margin-top:30px; width: 200px; margin-bottom:30px;' title=<%= "#{site_short_name}" %>/>
 <p>
 Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
 </p>

@@ -1,4 +1,5 @@
 require 'rails_helper'
+include Config::BankHolidaysHelper
 
 describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :start_on }
@@ -29,6 +30,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
+    allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
   context ".new" do
@@ -639,6 +642,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+
+
       ## Application Eligibility Warnings
       context "and employer's primary office isn't located in-state" do
         before do
@@ -651,7 +656,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location]).to match(/Is a small business located in Massachusetts/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location]).to match(/Is a small business located in #{Settings.aca.state_name}/)
         end
       end
 
@@ -1011,11 +1016,26 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     expect(workflow_plan_year_with_benefit_group.additional_required_participants_count).to eq (required_employee_count - 3)
                   end
 
-                  context "greater than 100 employees " do
-                    let(:employee_count)    { 101 }
+                  context "greater than 200 employees " do
+                    let(:employee_count)    { 201 }
+                    before do
+                      allow(workflow_plan_year_with_benefit_group).to receive_message_chain(:enrolled_by_bga, :count).and_return 25
+                    end
+                    context "active employees count greater than 200" do
+                      it "should return 0" do
+                        expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
+                      end
+                    end
 
-                    it "return 0" do
-                      expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 0
+                    context "active employees count less than 200" do
+                      before do
+                        workflow_plan_year_with_benefit_group.employer_profile.census_employees.limit(5).each do |census_employee|
+                          census_employee.terminate_employee_role!
+                        end
+                      end
+                      it "return enrolled count" do
+                        expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 25
+                      end
                     end
                   end
 
@@ -1631,18 +1651,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "map binder_payment_due_date" do
     it "in interval of map using shop_enrollment_timetable" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(TimeKeeper.date_of_record.year,9,1))
-      expect(binder_payment_due_date).to eq Date.new(TimeKeeper.date_of_record.year,8,Settings.aca.shop_market.binder_payment_due_on)
-    end
-
-    it "interval map using existing specified key values" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
-      expect(binder_payment_due_date).to eq Date.new(2017,8,23)
-    end
-
-    it "out of map" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2019,9,1))
-      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(Date.new(2019,9,1))[:binder_payment_due_date]
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(TimeKeeper.date_of_record.year,binder_pay_month,1))
+      expect(binder_payment_due_date).to eq binder_pay
     end
   end
 
@@ -2264,7 +2274,28 @@ describe PlanYear, "which has the concept of export eligibility" do
       end
     end
   end
+end
 
+context "non business owner criteria" do
+       
+  let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
+  let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile )}
+  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, aasm_state: "coverage_selected") }
+  let(:census_employee) { FactoryGirl.build(:census_employee, is_business_owner:false, aasm_state: "employee_role_linked",expected_selection: "enroll",benefit_group_assignments: [benefit_group_assignment]) }
+    
+  before do
+    allow(plan_year).to receive(:enrolled).and_return([census_employee])
+  end
+
+  it "should pass when there are non owners with enrolled state" do
+    expect(plan_year.non_business_owner_enrolled).to eq [census_employee]
+  end
+
+  it "should fail when there are 0 non owners with enrolled status" do
+    benefit_group_assignment.update_attributes(aasm_state:'coverage_waived')
+    expect(plan_year.non_business_owner_enrolled).to eq []
+  end
 end
 
 describe PlanYear, "filter_active_enrollments_by_date" do
@@ -2544,6 +2575,9 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:employee_role) {FactoryGirl.create(:employee_role)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, :aasm_state => "eligible") }
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
   let!(:renewing_hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_canceled')}
 
@@ -2551,9 +2585,14 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
 
     before do
       allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
 
     it "enrollemnt should be in coverage_termination_pending state " do
+
       expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_termination_pending"
     end
 
@@ -2579,16 +2618,27 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:employee_role) {FactoryGirl.create(:employee_role)}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, :aasm_state => "eligible") }
   let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: benefit_group.id,aasm_state:'coverage_selected')}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
 
   context 'schedule_termination with active plan year' do
+
+    before do
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      census_employee.update_attributes(:aasm_state => "employee_termination_pending") #not terminating census employee upon plan year termination
+    end
 
     it "should termiante plan year and enrollments" do
       plan_year.schedule_termination!
       expect(plan_year.aasm_state).to eq "termination_pending"
       expect(plan_year.hbx_enrollments.first.aasm_state).to eq "coverage_termination_pending"
-      expect(plan_year.hbx_enrollments.first.terminated_on).to eq  TimeKeeper.date_of_record.end_of_month
+      expect(plan_year.hbx_enrollments.first.terminated_on).to eq TimeKeeper.date_of_record.end_of_month
     end
   end
 end
