@@ -58,20 +58,12 @@ module BenefitSponsors
 
       def persist!
         return false unless valid?
-        service.save(self)
+        service({profile_type: profile_type}).store!(self)
       end
 
       def update!
         return false unless valid?
-        service.update(self)
-      end
-
-      def is_broker_profile?
-        profile_type == "broker_agency"
-      end
-
-      def is_employer_profile?
-        profile_type == "benefit_sponsor"
+        service({profile_id: profile_id}).store!(self)
       end
 
       # TODO : Refactor validating sub-documents.
@@ -106,9 +98,9 @@ module BenefitSponsors
         Services::NewProfileRegistrationService.new(attrs)
       end
 
-      def service
+      def service(attrs={})
         return @service if defined?(@service)
-        @service = self.class.resolve_service
+        @service = self.class.resolve_service(attrs)
       end
 
       private

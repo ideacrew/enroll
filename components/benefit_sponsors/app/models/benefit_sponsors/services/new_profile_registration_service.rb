@@ -3,24 +3,28 @@ module BenefitSponsors
     class NewProfileRegistrationService
 
       attr_reader :organization, :profile, :representative
-      attr_accessor :profile_type, :profile_id
+      attr_accessor :profile_type, :profile_id, :factory_class
 
       def initialize(attrs={})
-        @profile_type = attrs[:profile_type]
         @profile_id = attrs[:profile_id]
+        @factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
+        @profile_type = attrs[:profile_type] || pluck_profile_type(@profile_id)
+      end
+
+      def pluck_profile_type(profile_id)
+        return nil if profile_id.blank?
+        factory_class.get_profile_type(profile_id)
       end
 
       def build(attrs)
-        factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
         organization = factory_class.build(attrs)
-        staff_roles = factory_class.find_representatives(profile_id)
+        staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization)
       end
 
       def find(profile_id)
-        factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
         organization = factory_class.build(profile_id)
-        staff_roles = factory_class.find_representatives(profile_id)
+        staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization, staff_roles)
       end
 
@@ -38,7 +42,7 @@ module BenefitSponsors
       def form_attributes_to_params(form)
         {
           :"current_user_id" => form.current_user_id,
-          :"profile_type" => form.profile_type,
+          :"profile_type" => (form.profile_type || profile_type),
           :"profile_id" => form.profile_id,
           :"staff_roles_attributes" => staff_roles_form_to_params(form.staff_roles),
           :"organization" => organization_form_to_params(form.organization)
@@ -90,20 +94,19 @@ module BenefitSponsors
       end
 
       def profile_attributes(form)
-        if broker_agency_profile?
+        if is_broker_profile?
           form.attributes.slice(:entity_kind, :contact_method, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
-        elsif benefit_sponsor_profile?
+        elsif is_sponsor_profile?
           form.attributes.slice(:entity_kind, :contact_method, :id)
         end
       end
 
-      def broker_agency_profile?
-        #TODO need to fix this
-        false
+      def is_broker_profile?
+        profile_type == "broker_agency"
       end
 
-      def benefit_sponsor_profile?
-        true
+      def is_sponsor_profile?
+        profile_type == "benefit_sponsor"
       end
 
       def staff_role_params(staff_roles)
@@ -114,87 +117,17 @@ module BenefitSponsors
         end
       end
 
-      # Serialized model attributes, plus form metadata
-      def self.build(attrs)
-        factory_obj = new(attrs)
-        factory_obj.send(:build_classes, profile_type)
-      end
-
-      # TODO
-
-      def save(form)
-        persist_from_factory(form)
-      end
-
-      def update(form)
-        update_from_factory(form)
-      end
-
-      def persist_from_factory(form)
-        Organizations::Factories::ProfileFactory.call_persist(form_attributes_to_params(form))
-      end
-
-      def update_from_factory(form)
-        Organizations::Factories::ProfileFactory.call_update(form_attributes_to_params(form))
-      end
-
-      def params_to_attributes(params)
-
-      end
-
-      def attributes_to_params(klass)
-
-      end
-
-      # List of required fields, select option arrays
-      def form_metadata
-
-      end
-
-      def store!
-        match_or_create_organization
-        match_or_create_representative
-        create_profile
-
-        publish_event
-
-        self
+      def store!(form)
+        Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
       end
 
       def pluck_profile(organization)
-        if broker_agency_profile?
+        if is_broker_profile?
           organization.profiles.where(_type: /BrokerAgencyProfile/).first
-        elsif benefit_sponsor_profile?
+        elsif is_sponsor_profile?
           organization.profiles.where(_type: /EmployerProfile/).first
         end
       end
-
-      private
-
-      def build_classes(profile_type)
-        @organization = BenefitSponsors::Organizations::Factories::ProfileFactory.build({profile_type: profile_type})
-        # deal with person
-        
-        attributes_to_params
-      end
-
-      def entity_kind_options
-      end
-
-      def match_or_create_organization
-
-        @organization = BenefitSponsors::Organizations::Organization.new
-      end
-
-      def match_or_create_representative
-      end
-
-      def create_profile
-      end
-
-      def publish_event
-      end
-
     end
   end
 end
