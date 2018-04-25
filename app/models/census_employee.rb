@@ -917,7 +917,8 @@ class CensusEmployee < CensusMember
   end
 
   def waived?
-    active_benefit_group_assignment.aasm_state == 'coverage_waived'
+    bga = renewal_benefit_group_assignment || active_benefit_group_assignment
+    bga.aasm_state == 'coverage_waived'
   end
 
   # TODO: Implement for 16219
