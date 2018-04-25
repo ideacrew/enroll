@@ -258,5 +258,5 @@ class Insured::GroupSelectionController < ApplicationController
     options[:language_preference] = person.consumer_role.language_preference
     options
   end
-  
+
 end

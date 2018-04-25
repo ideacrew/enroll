@@ -71,9 +71,9 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   if role == "employee"
     dependent = FactoryGirl.create :person, dob: dob
   elsif role == "Resident"
-    dependent = FactoryGirl.create :person, :with_resident_role, dob: dob
+    dependent = FactoryGirl.create :person, :with_resident_role, :with_active_resident_role, dob: dob
   else
-    dependent = FactoryGirl.create :person, :with_consumer_role, dob: dob
+    dependent = FactoryGirl.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
   end
   fm = FactoryGirl.create :family_member, family: @family, person: dependent
   user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
