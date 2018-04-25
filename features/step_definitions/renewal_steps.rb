@@ -61,7 +61,6 @@ When(/(.*) proceed with continue on the group selection page/) do |named_person|
     end
   end
   group_size_factors.save!
-  allow(HTTParty).to receive(:post).and_return double("Response", parsed_response: {"URL" => "uri"})
   sleep(1)
 
   if find_all('.interaction-click-control-continue').any?
