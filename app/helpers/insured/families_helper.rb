@@ -260,7 +260,6 @@ module Insured::FamiliesHelper
     end
   end
 
-
   def build_consumer_role(person, family)
     if family.primary_applicant.person == person
       person.build_consumer_role({:is_applicant => true})

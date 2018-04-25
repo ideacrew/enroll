@@ -113,13 +113,14 @@
           <% end %>
         </div>
 
-        <% if @person.is_consumer_role_active? %>
+        <% if has_active_consumer_dependent?(@person,@dependent) %>
           <%= render 'shared/ssn_coverage_msg' %>
         <% end %>
 
-        <% if @person.is_consumer_role_active? %>
+        <% if has_active_consumer_dependent?(@person,@dependent) %>
           <br>
           <div id="consumer_fields_sets">
+            <% binding.pry %>
           <%= render 'shared/consumer_fields', f: f %>
           </div>
           <div id="dependent-address">
