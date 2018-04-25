@@ -188,7 +188,13 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     if @hbx_enrollment.present? && @change_plan == "change_plan"
-      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
       @mc_coverage_kind = @hbx_enrollment.coverage_kind
     end
   end
