@@ -1,4 +1,3 @@
-
 Given (/a matched Employee exists with multiple employee roles/) do
   org1 = FactoryGirl.create :organization, :with_active_plan_year
   org2 = FactoryGirl.create :organization, :with_active_plan_year_and_without_dental
@@ -352,4 +351,3 @@ end
 And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
-
