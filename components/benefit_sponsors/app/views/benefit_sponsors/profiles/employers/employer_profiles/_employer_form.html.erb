@@ -65,12 +65,11 @@
               <%= staff.status %>
             </td>
             <td>
-              <%= link_to(profiles_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), method: 'delete', id: 'delete_' + staff.id.to_s, data: {confirm: 'Delete this role?'}) do %>
-                <i class="fa fa-trash-o fa-2x role-trashcan"></i>
-              <% end %>
+              <%# TODO - Delete %>
+              <%= staff.status %>
             </td>
           </tr>
-        <% end if @staff %>
+        <% end %>
       </table>
     </div>
     <% # Add Employer Staff Role should be a different controller action - TODO%>
