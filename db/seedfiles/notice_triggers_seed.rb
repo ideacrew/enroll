@@ -2597,25 +2597,6 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-<<<<<<< HEAD
-        hbx_id: 'SHOP59',
-        title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
-        description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
-        resource_name: 'employee_role',
-        event_name: 'ee_ers_plan_year_will_not_be_written_notice',
-        notice_triggers: [
-          {
-            name: " Notice to EEs that ER’s plan year will not be written",
-            notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
-            notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
-            mpi_indicator: 'SHOP_M059',
-            notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employee"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-            }
-=======
       hbx_id: 'IVL_CAP',
       title: 'Important Tax Information about your Catastrophic Health Coverage',
       description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2017 for at least a day',
@@ -2653,7 +2634,6 @@ elsif Settings.aca.state_abbreviation == "DC"
             primary_recipients: ["consumer"],
             primary_recipient_delivery_method: ["secure_message", "paper"],
             secondary_recipients: []
->>>>>>> origin/master
           }
         }
       ]
