@@ -135,13 +135,15 @@ module Insured
 
     def is_market_kind_checked?(kind, primary)
       if @mc_market_kind.present?
-        return @mc_market_kind == kind
-      elsif can_shop_individual_or_resident?(primary)
+       @mc_market_kind == kind
+      elsif can_shop_individual_or_resident?(primary) && !(primary.has_active_employee_role?)
         kind == "individual"
-      elsif primary.is_consumer_role_active?
+      elsif primary.is_consumer_role_active? && !(primary.has_active_employee_role?)
         kind == "individual"
-      elsif primary.is_resident_role_active?
+      elsif primary.is_resident_role_active? && !(primary.has_active_employee_role?)
         kind == "coverall"
+      else
+        @market_kind == kind
       end
     end
 
@@ -205,7 +207,6 @@ module Insured
     end
 
     def is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage)
-      binding.pry
       if benefit_type.present? && benefit_type != "health"
         is_dental_coverage.nil? ? is_ivl_coverage : is_dental_coverage
       else
