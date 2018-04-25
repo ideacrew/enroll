@@ -375,11 +375,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq false
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq false
           end
 
           it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq true
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq true
           end
         end
 
@@ -390,11 +390,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq false
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq false
           end
 
           it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq true
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq true
           end
         end
       end

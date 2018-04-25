@@ -111,6 +111,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:benefit, benefit_package)
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
       allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_family_relationships_satisfied?).and_return(true)
+      allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_active_individual_role_satisfied?).and_return(true)  
       allow(benefit_package).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_year)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
