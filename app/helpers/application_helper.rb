@@ -516,7 +516,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.try(:under_open_enrollment?)
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_enrollment_effective_date
