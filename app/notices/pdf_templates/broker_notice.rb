@@ -29,6 +29,7 @@ module PdfTemplates
 
     def general_agency?
       false
+    end
 
     def broker?
       return true
