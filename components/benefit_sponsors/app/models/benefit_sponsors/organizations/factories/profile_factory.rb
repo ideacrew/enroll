@@ -316,8 +316,7 @@ module BenefitSponsors
         end
 
         def broker_profile_already_registered?(organization)
-          if is_broker_profile?
-            organization.present? && organization.broker_agency_profile.present?
+          if is_broker_profile? && organization.present? && organization.broker_agency_profile.present?
             errors.add(:organization, "has already been created for this Agency type")
             return true
           end

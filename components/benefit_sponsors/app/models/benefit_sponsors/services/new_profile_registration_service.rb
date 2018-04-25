@@ -18,12 +18,11 @@ module BenefitSponsors
 
       def build(attrs)
         organization = factory_class.build(attrs)
-        staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization)
       end
 
-      def find(profile_id)
-        organization = factory_class.build(profile_id)
+      def find
+        organization = factory_class.build(profile_id: profile_id)
         staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization, staff_roles)
       end

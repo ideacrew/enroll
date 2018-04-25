@@ -40,7 +40,7 @@ module BenefitSponsors
 
       def self.for_edit(profile_id)
         service = resolve_service(profile_id)
-        form_params = service.find(profile_id)
+        form_params = service.find
         new(form_params)
       end
 

@@ -54,7 +54,7 @@ module BenefitSponsors
       def attributes(*args)
         hash = super
         unless object.persisted?
-          
+          hash[:entity_kind] = :s_corporation if is_broker_profile?
         end
         hash
       end
