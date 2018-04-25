@@ -499,8 +499,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
     let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", legal_name: 'broker agency organization 7')}
+    let(:broker_agency_profile7)  {FactoryGirl.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
+    let(:broker_role7) { FactoryGirl.create(:broker_role) }
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
@@ -533,8 +534,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
-      expect(employer).to receive(:employer_broker_fired)
-      employer.employer_broker_fired
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
@@ -805,6 +804,23 @@ describe EmployerProfile, "when a binder premium is credited" do
     ActiveSupport::Notifications.unsubscribe(event_subscriber)
     expect(@employer_id).to eq hbx_id
   end
+end
+
+describe "#update_status_to_binder_paid" do
+  let(:org1) { FactoryGirl.create :organization, legal_name: "Corp 1" }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: org1) }
+
+  before do
+    employer_profile.update_attribute(:aasm_state, 'eligible')
+    EmployerProfile.update_status_to_binder_paid([org1.id])
+  end
+
+  it 'should chnage the state update the workflow state transition' do
+    employer_profile.reload
+    expect(employer_profile.aasm_state).to eq('binder_paid')
+    expect(employer_profile.workflow_state_transitions.map(&:to_state)).to eq(['binder_paid'])
+  end
+
 end
 
 describe EmployerProfile, "Renewal Queries" do
@@ -1115,6 +1131,20 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       end
     end
   end
+
+  # context "trigger broker_fired_notice" do
+  #   let(:params)  { {} }
+  #   let(:employer_profile) {EmployerProfile.new(**params)}
+  #   it "should trigger When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client." do
+  #     ActiveJob::Base.queue_adapter = :test
+  #     ActiveJob::Base.queue_adapter.enqueued_jobs = []
+  #     employer_profile.trigger_notices("broker_fired_confirmation_to_broker")
+  #     queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+  #       job_info[:job] == ShopNoticesNotifierJob
+  #     end
+  #     expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'broker_fired_confirmation_to_broker']
+  #   end
+  # end
 
   describe "non conversion employer" do
     let(:source) { 'self_serve' }

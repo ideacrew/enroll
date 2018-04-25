@@ -63,8 +63,8 @@ class Notice
   def pdf_options
     options = {
       margin:  {
-        top: 15,
-        bottom: 28,
+        top: 10,
+        bottom: 20,
         left: 22,
         right: 22
       },
@@ -161,7 +161,6 @@ class Notice
       identifier: doc_uri,
       format: "application/pdf"
     })
-
     if notice.save
       notice
     else

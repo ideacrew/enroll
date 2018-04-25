@@ -11,6 +11,7 @@ site:
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
   invoice_bill_url: "https://ww2.e-billexpress.com/ebpp/maconnector/"
+  payment_pdf_url: "https://www.mahealthconnector.org/help-center-answers/how-to-pay-your-premiums-online"
   website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
@@ -21,11 +22,14 @@ site:
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "mhc_logo.svg"
+  tab_icon: 'favicon.ico'
+  mailer_logo_file_name: "health_connector.png"
   make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
+  guidance_for_business_owners_url: "https://www.mahealthconnector.org/help-center-answers/guidance-for-business-owners"
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
@@ -34,10 +38,17 @@ site:
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
+  home_forms_url: "https://dchealthlink.com/forms"
+  forms_name: "DCHealthLink.com/forms"
+  website_name: "www.DCHealthLink.com"
+  healthcare_name: "www.healthcare.gov"
+  healthcare_url: "https://www.healthcare.gov/"
+  irs_url: "https://www.irs.gov/"
+  exchange_hbx_id: "MA0"
+  mail_address: "noreply@healthconnector.org"
+
   social_media:
     facebook_url: ""
-
-  aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
 
 contact_center:
   name: "Health Connector's Customer Care Center"
@@ -47,6 +58,7 @@ contact_center:
   alt_fax: "617-722-4033"
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
+  payment_phone_number: "1-888-813-9220"
   ivl_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
@@ -81,6 +93,7 @@ plan_option_titles:
   sole_source: 'One Plan'
   metal_level: 'One Level'
   single_carrier: 'One Carrier'
+  plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 notices:
   mailing_address:
@@ -90,20 +103,30 @@ notices:
     state: "MA"
     zip:
 
+invoices:
+  addendum: 'ma_non_discrimination_and_language_tags.pdf'
+
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
   market_kinds: ["shop"]
+  hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: false
   general_agency_enabled: false
   dental_market_enabled: false
+  calendar_enabled: true
   dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
+  address_query_county: true
+  broker_routing_information: true
+  recaptcha_enabled: true
+  security_questions: true
+  user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-  reference_carriers_for_metal_level: ["silver", "gold", "dental"]
-    ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+  enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
+  ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
   plan_option_years:
     single_carriers_available: ['2018']
@@ -122,7 +145,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,01,31) %>
+      end_on: <%= Date.new(2018,02,05) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
@@ -132,6 +155,9 @@ aca:
     employee_participation_ratio_minimum: <%= 3 / 4.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 23
+    new_employee_paper_application: true
+    census_employees_template_file: 'Health Connector - Employee Census Template'
+    coverage_start_period: "2 months"
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -199,15 +225,18 @@ aca:
     broker_agency_profile:
       minimum_commission_statement_year: 2017
 
+    transmit_scheduled_employers: true
+    employer_transmission_day_of_month: 26
   transmit_employers_immediately: false
-  transmit_scheduled_employers: true
-  employer_transmission_day_of_month: 26
+  employer_has_sic_field: true
+  validate_county: true
 
   use_simple_employer_calculation_model: false
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
   offerings_constrained_to_service_areas: true
-  transmit_employers_immediately: false
+  employer_attestation: true
   enforce_employer_attestation: true
+  plan_match_tool: false
   rating_areas:
     - R-MA001
     - R-MA002
@@ -218,10 +247,15 @@ aca:
     - R-MA007
 
 paper_notice: 'paper-notices'
+# Note: Remote Aceess keys ad URL's Provided by DC checkbook
 checkbook_services:
-    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
-    base_url:  "https://dc.checkbookhealth.org"
-    url: "https://dc.checkbookhealth.org/shop/dc/"
+# Note: Need to replace Remote_access_key with Production keys while deploying to prod.
+    remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
+    reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
+    base_url:  "https://staging.checkbookhealth.org"
+    url: "https://staging.checkbookhealth.org"
+    congress_url: "https://dc.checkbookhealth.org/congress/dc/2018/"
+    plan_match:
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
@@ -233,3 +267,18 @@ aptc_errors:
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
+
+style:
+  primary_orange: '#c56c24'
+  brand_primary: '#005e81'
+  primary_color: '#005e81'
+  primary_notification: '#c56c24'
+  primary_panel: '#c56c24'
+  primary_button: '#337ab7'
+  primary_button_color: '#286090'
+  primary_button_disabled: '#337ab7'
+  primary_button_border_disabled: '#2e6da4'
+  alternate_header_color: '#c56c24'
+  primary_icon_color: '#c56c24'
+  qle_header_color: '#c56c24'
+  primary_header_font: "'Roboto Slab', serif"

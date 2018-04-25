@@ -89,6 +89,7 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
     end
   end
   group_size_factors.save!
+  allow(HTTParty).to receive(:post).and_return double("Response", parsed_response: {"URL" => "uri"})
   wait_for_ajax(2,2)
   if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
@@ -221,7 +222,7 @@ When(/(.*) enters termination reason/) do |named_person|
   within('.terminate_confirm .modal-dialog') do
     find('p', text: 'Please select terminate reason').click
     within all('.selectric-scroll').last do
-      find('li', text: 'I do not have other coverage').click
+      find('li', text: 'I have coverage through Medicaid').click
     end
    find('.terminate_reason_submit').click
   end

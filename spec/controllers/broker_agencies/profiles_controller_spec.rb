@@ -69,6 +69,17 @@ RSpec.describe BrokerAgencies::ProfilesController do
     #let(:org) { double }
     let(:org) { FactoryGirl.create(:organization)}
     let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
+    let(:organization_params) do
+      {
+        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
+        office_locations_attributes: {
+          "0"=> {
+            "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+          }
+        }
+      }
+    end
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
@@ -78,27 +89,28 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should update person main phone" do
       broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
        broker_agency_profile.primary_broker_role.person.reload
        expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
 
     it "should update record without a phone extension" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"999-9999", "extension"=>""}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
+    end
+
+    it "should update record by saving accept new clients" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
+      broker_agency_profile.reload
+      expect(broker_agency_profile.accept_new_clients).to be_truthy
+      expect(broker_agency_profile.working_hours).to be_truthy
     end
   end
 
@@ -398,14 +410,22 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET clear_assign_for_employer" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, aasm_state: "is_approved") }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:favorite_general_agency) { FactoryGirl.create(:favorite_general_agency, general_agency_profile_id: general_agency_profile.id, broker_role: broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+
     before :each do
       sign_in user
+      favorite_general_agency.reload
       xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+    end
+
+    it "should assign general agency profiles" do
+      expect(assigns(:broker_role)).to eq broker_role
+      expect(assigns(:general_agency_profiles)).to eq [general_agency_profile]
     end
 
     it "should http success" do
@@ -415,6 +435,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should get employer_profile" do
       expect(assigns(:employer_profile)).to eq employer_profile
     end
+
   end
 
   describe "POST update_assign" do
@@ -602,6 +623,46 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should search for employers in BrokerAgencies with empty search string" do
       xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}
       expect(assigns(:employer_profiles).count).to   eq(2)
+    end
+  end
+
+  describe "messages action" do
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:person) { broker_role.person }
+    let(:user_broker) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+
+    let(:person1) { FactoryGirl.create(:person)}
+    let(:user_hbx) { FactoryGirl.create(:user, person: person1, roles: ['hbx_staff']) }
+
+    it "should render the messages template and Broker sees all messages in Broker Mail tab" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should render the messages template and Admin should see the messages in Broker Mail tab" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should pass broker data to @provider if you login as Broker User" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq broker_agency_profile.primary_broker_role.person
+    end
+
+    it "should pass admin records to @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq user_hbx.person
+    end
+
+    it "should not have broker data in @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).not_to eq broker_agency_profile.primary_broker_role.person
     end
   end
 end

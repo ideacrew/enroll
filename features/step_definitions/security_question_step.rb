@@ -79,5 +79,5 @@ When(/I have submit the security questions$/) do
 end
 
 Then 'I have landed on employer profile page' do
-  page.should(have_content('Thank you for logging into your Health Connector employer account.'))
+  page.should(have_content("Thank you for logging into your #{Settings.site.short_name} employer account."))
 end

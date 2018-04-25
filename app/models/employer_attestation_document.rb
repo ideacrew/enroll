@@ -38,6 +38,10 @@ class EmployerAttestationDocument < Document
     event :submit, :after => :record_transition do
       transitions from: :accepted, to: :submitted
     end
+
+    event :revert, :after => :record_transition do
+      transitions from: :rejected, to: :submitted
+    end
   end
  
   def employer_profile
@@ -50,7 +54,7 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-    if submitted? && employer_attestation.editable?
+    if submitted? && employer_attestation.editable? 
       case params[:status].to_sym
       when :rejected
         self.reject! if self.may_reject?

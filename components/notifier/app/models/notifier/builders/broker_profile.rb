@@ -63,6 +63,16 @@ module Notifier
       merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
     end
 
+    def terminated_broker_agency_account
+        employer.broker_agency_accounts.unscoped.select{|br| br.is_active ==  false}.sort_by(&:created_at).last
+    end
+
+    def termination_date
+      if terminated_broker_agency_account.present?
+        merge_model.termination_date = terminated_broker_agency_account.end_on
+      end
+    end
+
     def broker_agency_name
       merge_model.broker_agency_name = broker_role.broker_agency_profile.legal_name
     end
