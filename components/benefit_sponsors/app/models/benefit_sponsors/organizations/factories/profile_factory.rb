@@ -153,6 +153,7 @@ module BenefitSponsors
             self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
           end
           person.save!
+          profile.update_attributes!(primary_broker_role_id: person.broker_role.id)
           trigger_broker_application_confirmation_email
         end
 
