@@ -63,34 +63,34 @@ module BenefitSponsors
 
       def profiles_form_to_params(profile)
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
-          result[index_val] = profile_attributes(form).merge({
+          result[index_val] = sanitize_params(profile_attributes(form)).merge({
             :office_locations_attributes =>  office_locations_form_to_params(form.office_locations)
           })
-          sanitize_id result
+          result
         end
       end
 
       def office_locations_form_to_params(locations)
         locations.each_with_index.inject({}) do |result, (form, index_val)|
-          result[index_val] = form.attributes.slice(:is_primary, :id).merge({
+          result[index_val] = sanitize_params(form.attributes.slice(:is_primary, :id)).merge({
             :phone_attributes =>  phone_form_to_params(form.phone),
             :address_attributes =>  address_form_to_params(form.address)
           })
-          sanitize_id result
+          result
         end
       end
 
       def phone_form_to_params(form)
-        result = form.attributes.slice(:kind, :area_code, :number, :extension, :id)
-        sanitize_id result
+        attrs = form.attributes.slice(:kind, :area_code, :number, :extension, :id)
+        sanitize_params attrs
       end
 
       def address_form_to_params(form)
-        result = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
-        sanitize_id result
+        attrs = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
+        sanitize_params attrs
       end
 
-      def sanitize_id attrs
+      def sanitize_params attrs
         profile_id.blank? ? attrs.except(:id) : attrs
       end
 
