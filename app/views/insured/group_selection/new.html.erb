@@ -41,21 +41,12 @@
                       <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind) %>
                       <span class="n-radio">
                       </span>
-<<<<<<< HEAD
-                      <% if kind == "shop" %>
-                        <%= l10n("insured.group_selection.new.employee_sponsored_benifits") %>
-                      <% elsif kind == "individual"  %>
-                        <%= l10n("insured.group_selection.new.individual_benifits") %>
-                      <% elsif kind == "coverall"  %>
-                        <%= l10n("insured.group_selection.new.coverall_benifits") %>
-=======
                       <% if kind=="shop" %>
                         <%= l10n("insured.group_selection.new.employee_sponsored_benefits") %>
                       <% elsif kind=="individual"  %>
                         <%= l10n("insured.group_selection.new.individual_benefits") %>
                       <% elsif kind=="coverall"  %>
                         <%= l10n("insured.group_selection.new.coverall_benefits") %>
->>>>>>> cadc-2
                       <% end %>
                     </label>
                   </div>
