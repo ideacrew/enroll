@@ -88,7 +88,6 @@ class Exchanges::ResidentsController < ApplicationController
 
 
   def create
-    #binding.pry
     begin
       @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
       if @resident_role.present?

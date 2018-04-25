@@ -866,7 +866,6 @@ class HbxEnrollment
   end
 
   def decorated_elected_plans(coverage_kind, market=nil)
-    #binding.pry
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?

@@ -159,8 +159,8 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_active_individual_role_satisfied?
+    return (@role.person.is_resident_role_active? || @role.person.is_consumer_role_active?) if @market_kind == "coverall"
     return @role.person.is_consumer_role_active? if @market_kind == "individual"
-    return @role.person.is_resident_role_active? if @market_kind == "coverall"
   end
 
   def determination_results

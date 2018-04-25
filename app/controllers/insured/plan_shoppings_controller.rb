@@ -180,7 +180,6 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plans
-    #binding.pry
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     if @person.primary_family.active_household.latest_active_tax_household.present?
@@ -235,7 +234,6 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
-    #binding.pry
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)

@@ -12,9 +12,7 @@
           <% is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role)) %>
 
         <% end %>
-
         <% if (can_shop_individual?(@person)) || (can_shop_resident?(@person)) %>
-        <% binding.pry %>
         <%
             #Handle When Implementing - People with Both Consumer Role & Resident Role
             if family_member.person.is_consumer_role_active?
@@ -23,7 +21,12 @@
               role = family_member.person.resident_role
             end
             family = family_member.family
-            rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
+            #need this to generate errors for IVL for families with members who have different active individual roles
+            if can_shop_individual_or_resident?(@person)
+              rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: "individual"})
+            else
+              rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: @market_kind})
+            end
             is_ivl_coverage, errors = rule.satisfied?
             @show_residency_alert = !rule.is_residency_status_satisfied? if @show_residency_alert == false
             errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
