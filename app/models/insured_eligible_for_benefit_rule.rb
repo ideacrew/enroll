@@ -39,10 +39,17 @@ class InsuredEligibleForBenefitRule
   end
 
   def satisfied?
+    #binding.pry
     if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
-        if self.public_send("is_#{element}_satisfied?")
+        if @market_kind == "shop"
+          if !("#{element}" == "active_consumer")
+            if self.public_send("is_#{element}_satisfied?")
+              true && eligible
+            end
+          end
+        elsif self.public_send("is_#{element}_satisfied?")
           true && eligible
         else
           if "#{element}" == "active_consumer"
@@ -161,8 +168,6 @@ class InsuredEligibleForBenefitRule
   def is_active_individual_role_satisfied?
     return (@role.person.is_resident_role_active? || @role.person.is_consumer_role_active?) if @market_kind == "coverall"
     return @role.person.is_consumer_role_active? if @market_kind == "individual"
-    return @role.person.is_consumer_role_active? if @market_kind == "shop"
-
   end
 
   def determination_results
