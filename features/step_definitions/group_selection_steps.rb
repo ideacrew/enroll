@@ -10,7 +10,7 @@ Given (/a matched Employee exists with multiple employee roles/) do
   @person = FactoryGirl.create(:person, :with_family, first_name: "Employee", last_name: "E", user: user)
   employee_role1 = FactoryGirl.create :employee_role, person: @person, employer_profile: org1.employer_profile
   employee_role2 = FactoryGirl.create :employee_role, person: @person, employer_profile: org2.employer_profile
-  ce1 =  FactoryGirl.create(:census_employee,
+  ce1 =  FactoryGirl.build(:census_employee,
           first_name: @person.first_name,
           last_name: @person.last_name,
           dob: @person.dob,
@@ -18,7 +18,7 @@ Given (/a matched Employee exists with multiple employee roles/) do
           employee_role_id: employee_role1.id,
           employer_profile: org1.employer_profile
         )
-  ce2 =  FactoryGirl.create(:census_employee,
+  ce2 =  FactoryGirl.build(:census_employee,
           first_name: @person.first_name,
           last_name: @person.last_name,
           dob: @person.dob,
@@ -46,7 +46,7 @@ Given (/a matched Employee exists with consumer role/) do
   FactoryGirl.create(:user)
   @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_active_consumer_role, first_name: "Employee", last_name: "E", user: user)
   employee_role = FactoryGirl.create :employee_role, person: @person, employer_profile: org.employer_profile
-  ce =  FactoryGirl.create(:census_employee,
+  ce =  FactoryGirl.build(:census_employee,
           first_name: @person.first_name,
           last_name: @person.last_name,
           dob: @person.dob,
@@ -136,7 +136,7 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
 
   @employee_role = person.employee_roles[0]
-  ce =  FactoryGirl.create(:census_employee,
+  ce =  FactoryGirl.build(:census_employee,
           first_name: person.first_name,
           last_name: person.last_name,
           dob: person.dob,

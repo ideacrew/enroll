@@ -45,7 +45,6 @@ RSpec.describe "insured/families/personal.html.erb" do
 
    context "for consumer role" do
      let(:person) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
-     #let(:person) { double("Person") }
 
      it "should renders home address fields and consumer fields" do
        expect(response).to render_template("shared/_consumer_fields")
