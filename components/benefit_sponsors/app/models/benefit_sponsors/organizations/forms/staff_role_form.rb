@@ -35,7 +35,14 @@ module BenefitSponsors
       end
 
       def dob=(val)
-        @dob = Date.strptime(val,"%m/%d/%Y") rescue nil
+        #TODO refactor according to the date format
+        begin
+          @dob = Date.strptime(val,"%m/%d/%Y") if val.split('/').first.size == 2
+          @dob = Date.strptime(val,"%Y-%m-%d") if val.split('-').first.size == 4
+          return @dob
+        rescue
+          return nil
+        end
       end
 
       def is_broker_profile?

@@ -75,8 +75,12 @@ module BenefitSponsors
       def family_clients
       end
 
-      def entity_kinds
-        Organizations::Organization::ENTITY_KINDS[0..3]
+      def market_kinds
+        BrokerAgencyProfile::MARKET_KINDS_OPTIONS
+      end
+
+      def language_options
+        LanguageList::COMMON_LANGUAGES
       end
 
       def primary_office_location

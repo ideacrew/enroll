@@ -25,6 +25,7 @@ module BenefitSponsors
       end
 
       def broker_show_registration_url
+        profiles_broker_agencies_broker_agency_profile_path(@agency.organization.profile.id)
       end
     end
   end

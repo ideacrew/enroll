@@ -39,12 +39,13 @@ module BenefitSponsors
         def self.call(attributes)
           factory_obj = new(attributes)
           factory_obj.current_user = current_user(attributes[:current_user_id])
-          factory_obj.profile_id.present? ? update!(factory_obj, attributes[:organization]) : persist!(factory_obj, attributes[:organization])
+          factory_obj.profile_id.present? ? update!(factory_obj, attributes) : persist!(factory_obj, attributes)
         end
 
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
-          organization.assign_attributes(attributes)
+          organization.assign_attributes(attributes[:organization])
+          factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes]
           updated = if organization.valid?
             organization.save!
           else
@@ -55,8 +56,15 @@ module BenefitSponsors
           return updated, factory_obj.redirection_url_on_update
         end
 
+        def update_representative(factory_obj, attributes)
+          if is_broker_profile?
+            person = Person.find(attributes[:person_id])
+            person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
+          end
+        end
+
         def self.persist!(factory_obj, attributes)
-          factory_obj.save(attributes)
+          factory_obj.save(attributes[:organization])
         end
 
         def self.build(attrs)
