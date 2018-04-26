@@ -3,11 +3,12 @@ module BenefitSponsors
     class BrokerAgencies::BrokerAgencyProfilesController < ApplicationController
       include Acapi::Notifiers
       include DataTablesAdapter
+      include Concerns::ProfileRegistration
 
-      before_action :check_broker_agency_staff_role, only: [:broker_portal, :create]
+      # before_action :check_broker_agency_staff_role, only: [:broker_portal]
       before_action :check_admin_staff_role, only: [:index]
       before_action :find_hbx_profile, only: [:index]
-      before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+      # before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
       before_action :set_current_person, only: [:staff_index, :broker_portal]
       before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
       before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -24,60 +25,19 @@ module BenefitSponsors
         @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
       end
 
-      def new
-      end
-
       def broker_portal
-      end
+        result, @profile_id = BenefitSponsors::Organizations::Forms::RegistrationForm.for_broker_portal(current_user)
 
-      def create
+        if result
+          redirect_to broker_show_registration_url(@profile_id)
+        else
+          flash[:notice] = "You don't have a Broker Agency Profile associated with your Account!! Please register your Broker Agency first."
+        end
       end
 
       def show
         set_flash_by_announcement
-        session[:person_id] = nil
-        @provider = current_user.person
-        @staff_role = current_user.has_broker_agency_staff_role?
-        @id=params[:id]
-      end
-
-      def edit
-        @form_broker_agency_profile = BenefitSponsors::Organizations::Factories::BrokerAgencyProfileFactory.find(@broker_agency_profile.id)
-        @id = params[:id]
-      end
-
-      def update
-        authorize HbxProfile, :modify_admin_tabs?
-        sanitize_broker_profile_params
-        params.permit!
-
-        # lookup by the origanization and not BrokerAgencyProfile
-        @organization = BenefitSponsors::Organizations::Organization.find(params[:organization][:id])
-        @organization_dup = @organization.office_locations.as_json
-
-        #clear office_locations, don't worry, we will recreate
-        @organization.assign_attributes(:office_locations => [])
-        @organization.save(validate: false)
-        person = @broker_agency_profile.primary_broker_role.person
-        person.update_attributes(person_profile_params)
-        @broker_agency_profile.update_attributes(languages_spoken_params)
-        if @organization.update_attributes(broker_profile_params)
-          office_location = @organization.primary_office_location
-          if office_location.present? && office_location.phone.present?
-            update_broker_phone(office_location, person)
-          end
-
-          flash[:notice] = "Successfully Update Broker Agency Profile"
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile)
-        else
-
-          @organization.assign_attributes(:office_locations => @organization_dup)
-          @organization.save(validate: false)
-
-          flash[:error] = "Failed to Update Broker Agency Profile"
-          #render "edit"
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile)
-        end
+        @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
       end
 
       def staff_index
@@ -97,7 +57,7 @@ module BenefitSponsors
           return
         end
 
-        query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
+        query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
         @total_records = query.total_count
         @records_filtered = query.filtered_count
@@ -116,13 +76,11 @@ module BenefitSponsors
 
       def family_index
         @q = params.permit(:q)[:q]
-        id = params.permit(:id)[:id]
-        page = params.permit([:page])[:page]
 
         if current_user.has_broker_role?
           find_broker_agency_profile(current_user.person.broker_role.broker_agency_profile_id)
         elsif current_user.has_hbx_staff_role?
-          find_broker_agency_profile(BSON::ObjectId.from_string(id))
+          find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
         else
           redirect_to broker_portal_profiles_broker_agencies_broker_agency_profiles_path
           return

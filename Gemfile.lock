@@ -47,8 +47,10 @@ PATH
       aasm (~> 4.8.0)
       active_model_serializers
       config
+      devise (~> 3.4.1)
       money-rails (~> 1.3.0)
       mongoid (~> 5.0.1)
+      pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
       slim (~> 3.0.8)

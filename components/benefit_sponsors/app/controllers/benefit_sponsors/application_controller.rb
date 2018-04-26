@@ -16,6 +16,27 @@ module BenefitSponsors
 
     protected
 
+    def set_current_person(required: true)
+      if current_user.try(:person).try(:agent?) && session[:person_id].present?
+        @person = Person.find(session[:person_id])
+      else
+        @person = current_user.person
+      end
+      redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
+    end
+
+    def set_current_person_succeeded?
+      return true if @person
+      message = {}
+      message[:message] = 'Application Exception - person required'
+      message[:session_person_id] = session[:person_id]
+      message[:user_id] = current_user.id
+      message[:oim_id] = current_user.oim_id
+      message[:url] = request.original_url
+      log(message, :severity=>'error')
+      return false
+    end
+
     def authentication_not_required?
       devise_controller? ||
       (controller_name == "registrations") ||
