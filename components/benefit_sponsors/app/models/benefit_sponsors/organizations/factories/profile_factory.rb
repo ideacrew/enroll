@@ -13,14 +13,7 @@ module BenefitSponsors
 
         delegate :is_employer_profile?, :is_broker_profile?, to: :class
 
-        validate :validate_duplicate_npn, if: :is_broker_profile?
         validate :office_location_kinds
-
-        def validate_duplicate_npn
-          if Person.where("broker_role.npn" => npn).any?
-            errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
-          end
-        end
 
         def office_location_kinds
           location_groups = organization.profiles.map(&:office_locations)
@@ -52,8 +45,7 @@ module BenefitSponsors
             factory_obj.errors.add(:organization, organization.errors.full_messages)
             false
           end
-
-          return updated, factory_obj.redirection_url_on_update
+          return factory_obj
         end
 
         def update_representative(factory_obj, attributes)
@@ -114,12 +106,21 @@ module BenefitSponsors
         end
 
         def save(attributes)
-          return false, redirection_url, errors.full_messages unless match_or_create_person
+          return self unless match_or_create_person
           existing_org = get_existing_organization
-          return false, redirection_url, errors.full_messages if failed_validity?(existing_org)
+          return self if failed_validity?(existing_org)
           self.organization = init_profile_organization(existing_org, attributes)
-          return false, redirection_url, errors.full_messages unless persist_agency!
-          [true, redirection_url(pending, true)]
+          return self if npn_already_taken?(npn)
+          return self unless persist_agency!
+          self
+        end
+
+        def npn_already_taken?(npn)
+          if Person.where("broker_role.npn" => npn).any?
+            errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
+            return true
+          end
+          return false
         end
 
         def persist_agency!
@@ -234,6 +235,7 @@ module BenefitSponsors
 
         def build_broker_profile(attrs = {})
           Organizations::BrokerAgencyProfile.new(attrs)
+
         end
 
         def build_sponsor_profile(attrs = {})
