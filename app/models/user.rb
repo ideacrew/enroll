@@ -16,9 +16,9 @@ class User
   validates_uniqueness_of :email,:case_sensitive => false
 
   scope :datatable_search, ->(query) {
-    search_regex = Regexp.compile(Regexp.escape(query))
-    person_user_ids = Person.or({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
-    User.or({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => person_user_ids} } )
+    search_regex = Regexp.compile(/.*#{query}.*/i)
+    person_user_ids = Person.any_of({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
+    User.any_of({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => person_user_ids} } )
   }
 
   def oim_id_rules

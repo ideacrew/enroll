@@ -53,11 +53,6 @@ module Queries
             user.all
           end
         end
-        unless @search_string.nil?
-          search_regex = Regexp.new(".*#{@search_string}.*")
-          user_ids = Person.or({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
-          users = users.or({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => user_ids} } )
-        end
         users
     end
 
