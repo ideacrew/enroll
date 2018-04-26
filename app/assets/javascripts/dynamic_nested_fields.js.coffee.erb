@@ -18,7 +18,9 @@ $(document).on 'click', 'form .add_fields', (event) ->
 
   if $('#plan_year_start_on').length
     EmployerProfile.validatePlanYear
-
+    <% if Settings.aca.dental_market_enabled %>
+    $(".show-dental-plans").show();
+    <% end %>
 
 
   # get all dental plan options for all plans option or for elected dental plans

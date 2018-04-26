@@ -1,6 +1,7 @@
 module Effective
   module Datatables
     class PlanDesignEmployeeDatatable < ::Effective::MongoidDatatable
+      include Config::AcaModelConcern
 
       datatable do
 
@@ -27,10 +28,12 @@ module Effective
         table_column :status, :proc => Proc.new { |row|
           row.aasm_state.titleize
         }, :sortable => false, :filter => false
-  
-        table_column :est_participation, :proc => Proc.new { |row|
-          row.expected_selection.titleize if row.expected_selection
-        }, :sortable => false, :filter => false
+        
+        unless individual_market_is_enabled?
+          table_column :est_participation, :proc => Proc.new { |row|
+            row.expected_selection.titleize if row.expected_selection
+          }, :sortable => false, :filter => false
+        end
 
         table_column :actions, label: "", :width => '50px', :proc => Proc.new { |row|
           # @employer_profile = row.employer_profile

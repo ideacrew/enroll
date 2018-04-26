@@ -79,7 +79,8 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
   validates_presence_of :entity_kind
-  validates_presence_of :sic_code
+
+  validates_presence_of :sic_code if EmployerProfile.sic_field_exists_for_employer?
   validates_presence_of :contact_method
 
   validates :profile_source,
@@ -147,6 +148,7 @@ class EmployerProfile
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_broker_agency(terminate_on)
+      fire_general_agency!(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
@@ -252,6 +254,7 @@ class EmployerProfile
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
+    self.trigger_notices("general_agency_terminated")
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
@@ -300,8 +303,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present?
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present?
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
