@@ -271,8 +271,13 @@ module Insured::FamiliesHelper
   end
 
   def build_resident_role(person, family)
-    person.build_resident_role
-    person.save!
+    if family.primary_applicant.person == person
+      person.build_resident_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_resident_role({:is_applicant => false})
+      person.save!
+    end
   end
 
   def transition_reason(person)
