@@ -73,10 +73,6 @@ module BenefitMarkets
     end
 
 
-    # All ProductPackages that Sponsor is eligible to offer to members
-    def product_packages_for(benefit_application)
-    end
-
     # Remove this and delegate properly once Products are implemented
     def product_market_kind
       bmk = benefit_market.kind.to_s
@@ -90,6 +86,10 @@ module BenefitMarkets
     # Remove this and delegate properly once Products are implemented
     def product_active_year
       application_period.begin.year
+    end
+
+    # All ProductPackages that Sponsor is eligible to offer to members
+    def product_packages_for(benefit_application)
     end
 
     def issuers_for(benefit_application)
