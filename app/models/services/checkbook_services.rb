@@ -6,7 +6,7 @@ module Services
 
       attr_accessor :hbx_enrollment,:is_congress
 
-      BASE_URL =   Settings.site.checkbook_services.base_url
+      BASE_URL =   Rails.application.config.checkbook_services_base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
 
       def initialize(hbx_enrollment, is_congress=false)
