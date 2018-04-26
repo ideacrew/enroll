@@ -94,7 +94,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
     context "when special verification already exists" do
       it "should not update the due date" do
         special_verification = SpecialVerification.new(due_date: Date.new(2017,5,5), verification_type: citizenship_type.type_name, type: "notice")
-        person.consumer_role.special_verifications << special_verification
+        person.verification_types.by_name(citizenship_type.type_name).first.due_date = special_verification.due_date
         person.consumer_role.save!
         @eligibility_notice.build
         expect(@eligibility_notice.document_due_date(person, citizenship_type.type_name)).to eq special_verification.due_date
@@ -104,7 +104,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
     context "when special verification does not exist" do
       it "should update the due date" do
         special_verification = SpecialVerification.new(due_date: Date.new(2017,5,5), verification_type: "Social Security Number", type: "notice")
-        person.consumer_role.special_verifications << special_verification
+        person.verification_types.by_name(ssn_type.type_name).first.due_date = special_verification.due_date
         person.consumer_role.save!
         @eligibility_notice.build
         date = @eligibility_notice.document_due_date(person, ssn_type.type_name)
@@ -151,10 +151,10 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
 
       it "should return nil when no future dates are present" do
         special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record.prev_day, verification_type: ssn_type.type_name, type: "notice")
-        person.consumer_role.special_verifications << special_verification
+        person.verification_types.by_name(ssn_type.type_name).first.due_date = special_verification.due_date
         person.consumer_role.save!
         special_verification2 = SpecialVerification.new(due_date: TimeKeeper.date_of_record.prev_month, verification_type: ssn_type.type_name, type: "notice")
-        person2.consumer_role.special_verifications << special_verification2
+        person2.verification_types.by_name(ssn_type.type_name).first.due_date = special_verification2.due_date
         person2.consumer_role.save!
         @eligibility_notice.build
         expect(@eligibility_notice.notice.due_date).to eq nil
