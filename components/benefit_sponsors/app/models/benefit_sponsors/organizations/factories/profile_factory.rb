@@ -354,7 +354,7 @@ module BenefitSponsors
           if is_employer_profile?
             :agency_edit_registration_url
           elsif is_broker_profile?
-            :broker_show_registration_url
+            return "broker_show_registration_url@#{profile_id}"
           end
         end
 
