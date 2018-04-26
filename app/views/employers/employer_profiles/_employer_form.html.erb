@@ -121,6 +121,7 @@
           <%= render partial: 'shared/office_location_fields', locals: {f: office_location, child_index: f.object.office_locations.length - 1} %>
           <% @row = true %>
         <% end %>
+        <br>
         <div class="form-inputs">
           <%= pundit_span(EmployerProfile,:updateable?) %>
              <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default btn-sm' %>

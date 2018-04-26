@@ -243,4 +243,8 @@ module Employers::EmployerHelper
       when 'single_plan','sole_source' then 'A Single Plan'
     end
   end
+
+  def display_sic_field_for_employer?
+    Settings.aca.employer_has_sic_field
+  end
 end

@@ -24,7 +24,9 @@ class EmployerInvoice
         FileUtils.mkdir_p(invoice_folder_path)
       end
       pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
-      join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', 'ma_non_discrimination_and_language_tags.pdf')]
+      unless fetch_invoices_addendum.blank?
+        join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', fetch_invoices_addendum)]
+      end
     rescue Exception => e
       @errors << "Unable to create PDF for #{@organization.hbx_id}."
       @errors << e.inspect
@@ -57,17 +59,19 @@ class EmployerInvoice
   end
 
   def send_email_notice
-    subject = "Invoice Now Available"
-    body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
-    message_params = {
-      sender_id: "admins",
-      parent_message_id: @organization.employer_profile.id,
-      from: Settings.site.short_name,
-      to: "Employer Mailbox",
-      subject: subject,
-      body: body
-    }
-    create_secure_message message_params, @organization.employer_profile, :inbox
+    unless (@organization.employer_profile.is_new_employer? && @organization.invoices.empty?)
+      subject = "Invoice Now Available"
+      body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
+      message_params = {
+        sender_id: "admins",
+        parent_message_id: @organization.employer_profile.id,
+        from: Settings.site.short_name,
+        to: "Employer Mailbox",
+        subject: subject,
+        body: body
+      }
+      create_secure_message message_params, @organization.employer_profile, :inbox
+    end
   end
 
   def clear_tmp(file)

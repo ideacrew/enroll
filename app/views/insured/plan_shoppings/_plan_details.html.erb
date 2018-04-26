@@ -56,7 +56,14 @@
                 </span>
               </td>
               <td>
-                <%= render partial: "shared/network_data", locals: {plan: plan} %>
+                <% if offers_nationwide_plans? %>
+                  <%= plan.nationwide ? "Nationwide" : "DC-Metro" %>
+                <% else %>
+                  <% if plan.network_information.present? %>
+                      Network Notes
+                      <i class='fa fa-question-circle' data-toggle="tooltip" title="<%= plan.network_information %>"></i>
+                  <% end %>
+                <% end %>
               </td>
               <td> <%= deductible_display(@hbx_enrollment, plan) %> </td>
             </tr>

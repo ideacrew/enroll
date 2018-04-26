@@ -440,7 +440,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
-    return if plan_year.employer_profile.census_employees.count > 100
+    return if plan_year.employer_profile.census_employees.active.count > 200
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -496,7 +496,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
     end
   end
 
@@ -516,7 +516,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.try(:under_open_enrollment?)
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_enrollment_effective_date
@@ -659,13 +659,22 @@ module ApplicationHelper
     !Rails.env.test?
   end
 
+  def previous_year
+    TimeKeeper.date_of_record.prev_year.year
+  end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
+  end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
   def exchange_icon_path(icon)
     site_key = Settings.site.key
-
-    if site_key.blank? || site_key.to_sym == :dchbx
-      "icons/#{icon}"
-    else
       "icons/#{site_key}-#{icon}"
-    end
   end
 end

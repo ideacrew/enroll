@@ -8,6 +8,7 @@ class PlanYear
   include Config::AcaModelConcern
   include Concerns::Observable
   include ModelEvents::PlanYear
+  include Config::BankHolidaysHelper
 
   embedded_in :employer_profile
 
@@ -16,7 +17,7 @@ class PlanYear
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
   DRAFT_STATES = %w(draft renewing_draft)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -513,13 +514,16 @@ class PlanYear
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
     warnings = {}
-    unless employer_profile.is_attestation_eligible?
-      if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
-        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
-      elsif employer_profile.employer_attestation.denied?
-        warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
-      else
-        warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+
+    if employer_attestation_is_enabled?
+      unless employer_profile.is_attestation_eligible?
+        if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
+          warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+        elsif employer_profile.employer_attestation.denied?
+          warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+        else
+          warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+        end
       end
     end
 
@@ -638,7 +642,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    if self.employer_profile.census_employees.count < 100
+    if self.employer_profile.census_employees.active.count < 200
       #enrolled.count
       enrolled_by_bga.count
     else
@@ -812,38 +816,25 @@ class PlanYear
     end
 
     def map_binder_payment_due_date_by_start_on(start_on)
+      #list of bank holidays.
+      event_arr = [{event_name: "New Year's Day", event_date: schedule_time(Date.new(Date.today.year, 01, 01))}, {event_name: "Martin birthday", event_date: nth_wday(3, 1, 1, Date.today.year)}, {event_name: "President's Day", event_date: nth_wday(3, 1, 2, Date.today.year)}, {event_name: "Memorial Day", event_date: last_monday_may(Date.today.year, 5, 31)}, {event_name: "Labor day", event_date: nth_wday(1, 1, 9, Date.today.year)}, {event_name: "Columbus Day", event_date: nth_wday(2, 1, 10, Date.today.year)}, {event_name: "Veterans Day", event_date: schedule_time(Date.new(Date.today.year, 11, 11))}, {event_name: "Thanksgiving Day", event_date: nth_wday(4, 4, 11, Date.today.year)}, {event_name: "Christmas Day", event_date: schedule_time(Date.new(Date.today.year, 12, 25))}, {event_name: "Independence Day", event_date: schedule_time(Date.new(Date.today.year, 07, 04))}]
+      event_date_arr = event_arr.map{|hsh| schedule_time(hsh[:event_date])}
+      due_day = Settings.aca.shop_market.binder_payment_due_on
       dates_map = {}
-      {
-        "2017-01-01" => '2016,12,23',
-        "2017-02-01" => '2017,1,23',
-        "2017-03-01" => '2017,2,23',
-        "2017-04-01" => '2017,3,23',
-        "2017-05-01" => '2017,4,24',
-        "2017-06-01" => '2017,5,23',
-        "2017-07-01" => '2017,6,23',
-        "2017-08-01" => '2017,7,24',
-        "2017-09-01" => '2017,8,23',
-        "2017-10-01" => '2017,9,25',
-        "2017-11-01" => '2017,10,23',
-        "2017-12-01" => '2017,11,24',
-        "2018-01-01" => '2017,12,26',
-        "2018-02-01" => '2018,1,23',
-        "2018-03-01" => '2018,2,23',
-        "2018-04-01" => '2018,3,23',
-        "2018-05-01" => '2018,4,23',
-        "2018-06-01" => '2018,5,23',
-        "2018-07-01" => '2018,6,25',
-        "2018-08-01" => '2018,7,23',
-        "2018-09-01" => '2018,8,23',
-        "2018-10-01" => '2018,9,24',
-        "2018-11-01" => '2018,10,23',
-        "2018-12-01" => '2018,11,23',
-        "2019-01-01" => '2018,12,24',
-      }.each_pair do |k, v|
-        dates_map[k] = Date.strptime(v, '%Y,%m,%d')
+      month = start_on.month
+      key = Date.new(TimeKeeper.date_of_record.year, month, 1)
+      year = TimeKeeper.date_of_record.year
+      if (month == 0)
+        month = 12
+        year -=1
       end
 
-      dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
+      to_date = start_on.prev_month + (Settings.aca.shop_market.binder_payment_due_on).days - 1
+      while (event_date_arr.include?(to_date) or to_date.wday == 6 or to_date.wday == 0)
+        to_date = to_date+1.day #If to_date is in holidays arr, we are adding +1 day
+      end
+      dates_map[key] = to_date
+      dates_map[start_on]  || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
     end
 
     ## TODO - add holidays
@@ -876,10 +867,10 @@ class PlanYear
 
     state :publish_pending      # Plan application as submitted has warnings
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
-    state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+    state :published,         :after_enter => [:accept_application, :link_census_employees]     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
+    state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
     #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -1137,6 +1128,12 @@ class PlanYear
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_conversion? && self.is_conversion
+  end
+
+  def link_census_employees
+    self.employer_profile.census_employees.eligible_without_term_pending.each do |census_employee|
+      census_employee.save # This assigns default benefit package if none
+    end
   end
 
   alias_method :external_plan_year?, :can_be_migrated?

@@ -425,7 +425,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     let(:save_result) { false }
 
-    let(:organization) { double(:employer_profile => double) }
+    let(:organization) { double(:employer_profile => double(:id => "emp pro id")) }
 
     before(:each) do
       @user = FactoryGirl.create(:user)
@@ -439,6 +439,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(organization).to receive_message_chain(:employer_profile, :trigger_shop_notices){ true }
 
     end
+
     describe 'updateable organization' do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -499,7 +500,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("User", :idp_verified? => true) }
     let(:person) { double("Person", :id => "SOME PERSON ID") }
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double) }
+    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double(:id => "emp pro id") ) }
     let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
     let(:organization) {double(office_locations: office_locations)}
 
@@ -512,8 +513,6 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
       allow(found_employer).to receive_message_chain(:employer_profile, :trigger_shop_notices).and_return(true)
       allow(@user).to receive(:switch_to_idp!)
-#      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
-#      allow(found_employer).to receive(:organization).and_return(organization)
       post :create, :organization => employer_parameters
     end
 
@@ -524,6 +523,15 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to have_http_status(:redirect)
       end
     end
+
+    # context "after account creation" do
+    #   let(:validation_result) { true }
+
+    #   it "sends employer_account_creation_notice" do
+    #     expect(controller).to receive(:employer_account_creation_notice)
+    #     controller.employer_account_creation_notice
+    #   end
+    # end
   end
 
   describe "POST match" do
@@ -750,12 +758,11 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { FactoryGirl.create(:user) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
-   it "should export cvs" do
-     sign_in(user)
-     get :export_census_employees, employer_profile_id: employer_profile, format: :csv
-     expect(response).to have_http_status(:success)
-   end
-
+    it "should export cvs" do
+      sign_in(user)
+      get :export_census_employees, employer_profile_id: employer_profile, format: :csv
+      expect(response).to have_http_status(:success)
+    end
   end
 
   describe "GET new Document" do
@@ -808,6 +815,4 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(response).to have_http_status(:success)
     end
   end
-
-
 end
