@@ -14,3 +14,4 @@ gemspec
 # gem 'byebug', group: [:development, :test]
 
 gem "benefit_markets", path: "../benefit_markets"
+gem "effective_datatables", path: ".../../../../project_gems/effective_datatables-2.6.14"

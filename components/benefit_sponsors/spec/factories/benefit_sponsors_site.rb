@@ -26,5 +26,13 @@ FactoryGirl.define do
         site.benefit_markets << build(:benefit_markets_benefit_market, kind: evaluator.kind)
       end
     end
+
+    trait :dc do
+      site_key :dc
+    end
+
+    trait :cca do
+      site_key :cca
+    end
   end
 end

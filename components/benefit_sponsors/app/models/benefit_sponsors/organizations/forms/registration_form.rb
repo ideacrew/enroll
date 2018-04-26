@@ -14,16 +14,6 @@ module BenefitSponsors
 
       validate :registration_form
 
-
-      # set profile when id present
-      def organization=(val)
-        result = super val
-        if profile_id.present?
-          result.profile = result.profiles.detect {|profile| profile.id == profile_id}
-        end
-        result
-      end
-
       def staff_roles_attributes=(attrs)
         self.staff_roles = attrs.values.inject([]) do |result, role|
           result << Forms::StaffRoleForm.new(role)
@@ -38,10 +28,6 @@ module BenefitSponsors
         false
       end
 
-      def save
-        persist!
-      end
-
       def self.for_new(profile_type)
         service = resolve_service(profile_type)
         form_params = service.build(profile_type)
@@ -54,40 +40,43 @@ module BenefitSponsors
 
       def self.for_edit(profile_id)
         service = resolve_service(profile_id)
-        form_params = service.find(profile_id)
+        form_params = service.find
         new(form_params)
       end
 
       def self.for_update(attrs)
+        new(attrs)
+      end
+
+      def save
+        persist!
+      end
+
+      def update
+        update!
       end
 
       def persist!
         return false unless valid?
-        service.save(self)
+        service({profile_type: profile_type}).store!(self)
       end
 
-      def update(attrs)
+      def update!
         return false unless valid?
-        service.update(attrs)
-      end
-
-      def is_broker_profile?
-        profile_type == "broker_agency"
-      end
-
-      def is_employer_profile?
-        profile_type == "benefit_sponsor"
+        service({profile_id: profile_id}).store!(self)
       end
 
       # TODO : Refactor validating sub-documents.
       def registration_form
+        validate_staff_role
+        validate_form(self.organization)
+        validate_form(self.organization.profile)
+        validate_office_locations(self.organization.profile)
+      end
+
+      def validate_staff_role
         self.staff_roles.each do |staff_role|
           validate_form(staff_role)
-        end
-        validate_form(self.organization)
-        self.organization.profiles.each do |profile_form|
-          validate_office_locations(profile_form)
-          validate_form(profile_form)
         end
       end
 
@@ -99,7 +88,7 @@ module BenefitSponsors
 
       def validate_form(form)
         unless form.valid?
-          form.errors.add(:base, form.errors.full_messages)
+          self.errors.add(:base, form.errors.full_messages)
         end
       end
 
@@ -109,9 +98,9 @@ module BenefitSponsors
         Services::NewProfileRegistrationService.new(attrs)
       end
 
-      def service
+      def service(attrs={})
         return @service if defined?(@service)
-        @service = self.class.resolve_service
+        @service = self.class.resolve_service(attrs)
       end
 
       private

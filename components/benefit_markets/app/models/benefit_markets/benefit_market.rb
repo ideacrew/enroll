@@ -59,12 +59,14 @@ module BenefitMarkets
     end
 
     def benefit_sponsor_catalogs_for(rating_area, application_date = ::TimeKeeper.date_of_record)
-      find_benefit_catalog.effective_dates_for(application_date)
-      
       available_effective_dates_for(application_date).collect do |effective_date|
-        benefit_catalog = benefit_market_catalogs.detect { |catalog| catalog.application_period.cover?(effective_date)}
-        BenefitSponsorCatalogFactory.call(effective_date, benefit_catalog, rating_area)
+        benefit_sponsor_catalog_for_effective_date(effective_date)
       end
+    end
+
+    def benefit_sponsor_catalog_for_effective_date(effective_date, rating_area)
+      benefit_catalog = benefit_market_catalog_effective_on(effective_date)
+      BenefitSponsorCatalogFactory.call(effective_date, benefit_catalog, rating_area)
     end
 
     # Calculate available effective dates periods using passed date

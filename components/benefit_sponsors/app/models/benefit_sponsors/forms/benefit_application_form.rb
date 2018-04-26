@@ -7,18 +7,17 @@ module BenefitSponsors
       include ActiveModel::Validations
       include Virtus.model
 
-      attribute :start_on, Date
-      attribute :end_on, Date
-      attribute :open_enrollment_start_on, Date
-      attribute :open_enrollment_end_on, Date
+      attribute :start_on, String
+      attribute :end_on, String
+      attribute :open_enrollment_start_on, String
+      attribute :open_enrollment_end_on, String
       attribute :fte_count, Integer
       attribute :pte_count, Integer
       attribute :msp_count, Integer
 
       attribute :id, String
       attribute :benefit_sponsorship_id, String
-      attribute :start_on_options, Array
-
+      attribute :start_on_options, Hash
 
       validates :start_on, presence: true
       validates :end_on, presence: true
@@ -26,7 +25,7 @@ module BenefitSponsors
       validates :open_enrollment_end_on, presence: true
 
       # validates :validate_application_dates
-      attr_reader :service
+      attr_reader :service, :show_page_model
 
       def service
         return @service if defined? @service
@@ -35,28 +34,28 @@ module BenefitSponsors
 
       def self.for_new(benefit_sponsorship_id)
         form = self.new(:benefit_sponsorship_id => benefit_sponsorship_id)
-        service.load_default_form_params(form)
-        service.load_form_metadata(form)
+        form.service.load_default_form_params(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_create(params)
         form = self.new(params)
-        service.load_form_metadata(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_edit(id)
         form = self.new(id: id)
-        service.load_form_params_from_resource(form)
-        service.load_form_metadata(form)
+        form.service.load_form_params_from_resource(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_update(id)
         form = self.new(id: id)
-        service.load_form_params_from_resource(form)
-        service.load_form_metadata(form)
+        form.service.load_form_params_from_resource(form)
+        form.service.load_form_metadata(form)
         form
       end
 
@@ -85,12 +84,6 @@ module BenefitSponsors
         if start_on <= end_on
           errors.add(:start_on, "can't be later than end on date")
         end
-      end
-
-      private 
-
-      def persist!
-        @benefit_application_service.store!(self)
       end
     end
   end

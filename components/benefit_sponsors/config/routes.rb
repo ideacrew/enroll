@@ -4,7 +4,6 @@ BenefitSponsors::Engine.routes.draw do
 
     namespace :broker_agencies do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
-
         collection do
           get :family_index
           get :messages
@@ -18,6 +17,7 @@ BenefitSponsors::Engine.routes.draw do
           post :family_datatable
         end
       end
+      resources :broker_applicants
     end
 
     namespace :employers do
@@ -38,10 +38,6 @@ BenefitSponsors::Engine.routes.draw do
 
   resources :benefit_sponsorships, only: [] do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
-
-      collection do
-        get :recommend_dates
-      end
 
       resources :benefit_packages do
         resources :sponsored_benefits, only: :new

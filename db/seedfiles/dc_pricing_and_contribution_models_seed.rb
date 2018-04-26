@@ -123,6 +123,6 @@ contribution_model = BenefitMarkets::ContributionModels::ContributionModel.creat
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator",
   contribution_units: employer_contribution_units,
   member_relationships: employer_contribution_relationships,
-  name: "DC Shop Contribution Model",
+  title: "DC Shop Contribution Model",
   many_simultaneous_contribution_units: true
 })

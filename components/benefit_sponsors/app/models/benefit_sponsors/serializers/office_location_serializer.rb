@@ -11,6 +11,10 @@ module BenefitSponsors
         object.persisted?
       end
 
+      def is_primary
+        object.is_primary
+      end
+
       # provide defaults(if any needed) that were not set on Model
       def attributes(*args)
         hash = super

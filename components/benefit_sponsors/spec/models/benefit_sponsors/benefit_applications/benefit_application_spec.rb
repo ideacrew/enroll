@@ -21,7 +21,6 @@ module BenefitSponsors
     let(:params) do
       {
         effective_period: effective_period,
-        benefit_market: benefit_market,
         open_enrollment_period: open_enrollment_period,
       }
     end
@@ -51,15 +50,6 @@ module BenefitSponsors
 
     context "with no open enrollment period" do
       subject { described_class.new(params.except(:open_enrollment_period)) }
-
-      it "should not be valid" do
-        subject.validate
-        expect(subject).to_not be_valid
-      end
-    end
-
-    context "with no benefit market" do
-      subject { described_class.new(params.except(:benefit_market)) }
 
       it "should not be valid" do
         subject.validate
@@ -231,7 +221,7 @@ module BenefitSponsors
 
         it "timetable date values should be valid" do
           timetable = subject.enrollment_timetable_by_effective_date(effective_date)
-          expect(BenefitApplications::BenefitApplication.new(effective_period: timetable[:effective_period], open_enrollment_period: timetable[:open_enrollment_period], benefit_market: benefit_market)).to be_valid
+          expect(BenefitApplications::BenefitApplication.new(effective_period: timetable[:effective_period], open_enrollment_period: timetable[:open_enrollment_period])).to be_valid
         end
       end
 
