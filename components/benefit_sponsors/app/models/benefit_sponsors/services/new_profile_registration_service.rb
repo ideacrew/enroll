@@ -133,7 +133,29 @@ module BenefitSponsors
       end
 
       def store!(form)
-        Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
+        factory_obj = Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
+        if factory_obj.errors.present?
+          map_errors_for(factory_obj, onto: form)
+          return_type = form.profile_id.present? ? [false, factory_obj.redirection_url_on_update] : [false, factory_obj.redirection_url(factory_obj.pending, false)]
+          return return_type
+        # This wont work!
+        # elsif !factory_obj.valid?
+        #   map_errors_for(factory_obj, onto: form)
+        #   return_type = form.profile_id.present? ? [false, factory_obj.redirection_url_on_update] : [false, factory_obj.redirection_url(factory_obj.pending, false)]
+        #   return return_type
+        end
+        return_type = form.profile_id.present? ? [true, factory_obj.redirection_url_on_update] : [true, factory_obj.redirection_url(factory_obj.pending, true)]
+        return return_type
+      end
+
+      def map_errors_for(factory_obj, onto:)
+        factory_obj.errors.each do |att, err|
+          onto.errors.add(map_model_error_attribute(att), err)
+        end
+      end
+
+      def map_model_error_attribute(model_attribute_name)
+        model_attribute_name
       end
 
       def pluck_profile(organization)
