@@ -76,13 +76,11 @@ module BenefitSponsors
 
       def family_index
         @q = params.permit(:q)[:q]
-        id = params.permit(:id)[:id]
-        page = params.permit([:page])[:page]
 
         if current_user.has_broker_role?
           find_broker_agency_profile(current_user.person.broker_role.broker_agency_profile_id)
         elsif current_user.has_hbx_staff_role?
-          find_broker_agency_profile(BSON::ObjectId.from_string(id))
+          find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
         else
           redirect_to broker_portal_profiles_broker_agencies_broker_agency_profiles_path
           return
