@@ -43,11 +43,9 @@ class InsuredEligibleForBenefitRule
     if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
-        if @market_kind == "shop"
-          if !("#{element}" == "active_consumer")
-            if self.public_send("is_#{element}_satisfied?")
-              true && eligible
-            end
+        if @market_kind == "shop" && !("#{element}" == "active_consumer")
+          if self.public_send("is_#{element}_satisfied?")
+            true && eligible
           end
         elsif self.public_send("is_#{element}_satisfied?")
           true && eligible
