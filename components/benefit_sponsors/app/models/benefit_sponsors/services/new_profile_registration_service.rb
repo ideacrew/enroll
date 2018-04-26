@@ -5,6 +5,16 @@ module BenefitSponsors
       attr_reader :organization, :profile, :representative
       attr_accessor :profile_type, :profile_id, :factory_class
 
+      def self.for_broker_agency_portal(user)
+        if user.has_broker_agency_staff_role?
+          @id = user.person.broker_agency_staff_roles.first.broker_agency_profile_id
+        elsif user.has_broker_role?
+          @id = user.person.broker_role.broker_agency_profile_id.to_s
+        end
+
+        return @id
+      end
+
       def initialize(attrs={})
         @profile_id = attrs[:profile_id]
         @factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
@@ -123,7 +133,29 @@ module BenefitSponsors
       end
 
       def store!(form)
-        Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
+        factory_obj = Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
+        if factory_obj.errors.present?
+          map_errors_for(factory_obj, onto: form)
+          return_type = form.profile_id.present? ? [false, factory_obj.redirection_url_on_update] : [false, factory_obj.redirection_url(factory_obj.pending, false)]
+          return return_type
+        # This wont work!
+        # elsif !factory_obj.valid?
+        #   map_errors_for(factory_obj, onto: form)
+        #   return_type = form.profile_id.present? ? [false, factory_obj.redirection_url_on_update] : [false, factory_obj.redirection_url(factory_obj.pending, false)]
+        #   return return_type
+        end
+        return_type = form.profile_id.present? ? [true, factory_obj.redirection_url_on_update] : [true, factory_obj.redirection_url(factory_obj.pending, true)]
+        return return_type
+      end
+
+      def map_errors_for(factory_obj, onto:)
+        factory_obj.errors.each do |att, err|
+          onto.errors.add(map_model_error_attribute(att), err)
+        end
+      end
+
+      def map_model_error_attribute(model_attribute_name)
+        model_attribute_name
       end
 
       def pluck_profile(organization)

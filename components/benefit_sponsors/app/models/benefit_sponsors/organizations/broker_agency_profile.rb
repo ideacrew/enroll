@@ -96,8 +96,8 @@ module BenefitSponsors
       class << self
 
         def find(id)
-          organizations = Organizations::GeneralOrganization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
-          organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+          organizations = BenefitSponsors::Organizations::GeneralOrganization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
+          organizations.size > 0 ? organizations.first.profiles.where(_type: /.*BrokerAgencyProfile$/, _id: id ).first: nil
         end
 
       end
