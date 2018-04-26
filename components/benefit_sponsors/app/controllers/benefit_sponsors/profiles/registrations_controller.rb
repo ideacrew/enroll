@@ -25,7 +25,8 @@ module BenefitSponsors
         result_url = self.send(result_url)
         if saved
           if is_employer_profile?
-            create_sso_account(current_user, current_user.person, 15, "employer") do
+            person = current_person
+            create_sso_account(current_user, current_person, 15, "employer") do
             end
           else
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
@@ -112,6 +113,11 @@ module BenefitSponsors
 
     def organization_params
       params[:agency][:organization].permit!
+    end
+
+    def current_person
+      current_user.reload # devise current user not loading changes
+      current_user.person
     end
 
     #checks if person is approved by employer for staff role

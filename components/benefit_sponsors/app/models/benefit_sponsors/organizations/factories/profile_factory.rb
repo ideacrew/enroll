@@ -145,7 +145,7 @@ module BenefitSponsors
           person.broker_role = ::BrokerRole.new({
             :provider_kind => 'broker',
             :npn => self.npn,
-            :broker_agency_profile_id => profile.id,
+            :broker_agency_profile_id => profile.id, # this should be new profile id
             :market_kind => market_kind
           })
 
@@ -221,6 +221,7 @@ module BenefitSponsors
                       build_sponsor_profile(attrs)
                     end
           profile.office_locations << build_office_locations if profile.office_locations.empty?
+          self.profile_id = profile.id
           profile
         end
 
@@ -343,8 +344,8 @@ module BenefitSponsors
           if is_broker_profile?
             :broker_new_registration_url
           elsif is_employer_profile?
-            return :sponsor_show_pending_registration_url if is_pending
-            return :sponsor_home_registration_url if is_saved
+            return "sponsor_show_pending_registration_url@#{profile_id}" if is_pending
+            return "sponsor_home_registration_url@#{profile_id}" if is_saved
             :sponsor_new_registration_url
           end
         end

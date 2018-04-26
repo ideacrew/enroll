@@ -1,8 +1,10 @@
 module BenefitSponsors
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
+    include Pundit
 
     before_filter :require_login, unless: :authentication_not_required?
+    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
     def self.current_site
       if BenefitSponsors::Site.by_site_key(:dc).present?
@@ -54,6 +56,33 @@ module BenefitSponsors
       end
     end
 
+    def create_sso_account(user, personish, timeout, account_role = "individual")
+      if !user.idp_verified?
+        IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
+        session[:person_id] = personish.id
+        session.delete("stashed_password")
+        user.switch_to_idp!
+      end
+      #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
+      session[:person_id] = personish.id if current_user.try(:person).try(:agent?)
+      yield
+    end
 
+    def stashed_user_password
+      session["stashed_password"]
+    end
+
+    private
+
+    def user_not_authorized(exception)
+      policy_name = exception.policy.class.to_s.underscore
+
+      flash[:error] = "Access not allowed for #{exception.query}, (Pundit policy)"
+      respond_to do |format|
+        format.json { render nothing: true, status: :forbidden }
+        format.html { redirect_to(request.referrer || main_app.root_path)}
+        format.js   { render nothing: true, status: :forbidden }
+      end
+    end
   end
 end
