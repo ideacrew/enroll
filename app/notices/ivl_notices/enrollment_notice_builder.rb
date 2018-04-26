@@ -172,8 +172,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def document_due_date(person, verification_type)
-    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type.type_name).sort_by(&:created_at).last
-    special_verification.present? ? special_verification.due_date : nil
+    person.consumer_role.special_verifications.by_name(verification_type).first.due_date
   end
 
   def phone_number(legal_name)

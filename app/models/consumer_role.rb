@@ -222,7 +222,7 @@ class ConsumerRole
 
   #use this method to check what verification types needs to be included to the notices
   def outstanding_verification_types
-    self.person.verification_types.find_all do |type|
+    verification_types.find_all do |type|
       type.is_type_outstanding?
     end
   end

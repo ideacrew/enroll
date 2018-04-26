@@ -132,9 +132,8 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
 
   def update_individual_due_date(person, date)
     person.consumer_role.outstanding_verification_types.each do |verification_type|
-      unless person.consumer_role.special_verifications.where(:"verification_type" => verification_type.type_name).present?
-        special_verification = SpecialVerification.new(due_date: (date + Settings.aca.individual_market.verification_due.days), verification_type: verification_type.type_name, type: "notice")
-        person.consumer_role.special_verifications << special_verification
+      unless verification_type.due_date
+        verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
         person.consumer_role.save!
       end
     end
@@ -185,8 +184,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def document_due_date(person, verification_type)
-    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
-    special_verification.present? ? special_verification.due_date : nil
+    person.consumer_role.verification_types.by_name(verification_type).first.due_date
   end
 
   def phone_number(legal_name)

@@ -451,7 +451,7 @@ class Person
   end
 
   def add_new_verification_type(new_type)
-    default_status = (new_type == "DC Residency" && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : nil
+    default_status = (new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : nil
     verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status )
   end
 
