@@ -1,5 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
+require 'mongoid-rspec'
 ENV['RAILS_ENV'] ||= 'test'
 
 # Prevent database truncation if the environment is production
