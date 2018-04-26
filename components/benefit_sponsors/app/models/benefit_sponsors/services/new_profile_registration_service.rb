@@ -133,6 +133,49 @@ module BenefitSponsors
           organization.profiles.where(_type: /EmployerProfile/).first
         end
       end
+
+      # definitions for pundit policy
+      
+      def is_benefit_sponsor_already_registered?(user, form)
+        if user.person.present? && user.person.has_active_employer_staff_role?
+          # this is should be new employer profile id
+          form.profile_id = user.person.active_employer_staff_roles.first.employer_profile_id.to_s
+          return false
+        end
+        true
+      end
+
+      def is_broker_agency_registered?(user, form)
+        if user.present? && (user.has_broker_agency_staff_role? || user.has_broker_role?)
+          # this is should be new broker profile id
+          form.profile_id = (user.person.broker_agency_staff_roles.first.broker_agency_profile_id || user.person.broker_role.broker_agency_profile_id.to_s)
+          return false
+        end
+        true
+      end
+
+      def is_broker_for_employer?(user, form)
+        person = user.person
+        return false unless person.broker_role || person.broker_agency_staff_roles.present?
+        # TODO - check ER selected this broker or not
+        true
+      end
+
+      def is_general_agency_staff_for_employer?(user, form)
+        return false unless user.person.general_agency_staff_roles.present?
+        # TODO - check ER has this GA or not
+        true
+      end
+
+      def has_broker_role_for_profile?(user, form)
+        # TODO
+        true
+      end
+
+      def is_staff_for_agency?(user, form)
+        # TODO
+        true
+      end
     end
   end
 end

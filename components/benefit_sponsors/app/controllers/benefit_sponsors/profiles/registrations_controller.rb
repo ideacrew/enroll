@@ -6,11 +6,14 @@ module BenefitSponsors
     include Concerns::ProfileRegistration
     include Pundit
 
-    before_action :check_employer_staff_role, only: [:new]
+    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
+    before_action :check_logged_in?, only: [:new]
 
     def new
       @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type: profile_type)
       authorize @agency
+      authorize @agency, :redirect_home?
       respond_to do |format|
         format.html
         format.js
@@ -123,7 +126,18 @@ module BenefitSponsors
     #checks if person is approved by employer for staff role
     #Redirects to home page of employer profile if approved
     #person with pending/denied approval will be redirected to new registration page
-    def check_employer_staff_role
+    def check_logged_in?
+      if is_employer_profile?
+        redirect_to main_app.root_path if current_user.blank?
+      end
+    end
+
+    def user_not_authorized(exception)
+      if exception.query == :redirect_home?
+        redirect_to self.send(:agency_home_url, exception.record.profile_id)
+        return
+      end
+      super
     end
   end
 end
