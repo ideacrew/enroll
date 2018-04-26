@@ -1,7 +1,5 @@
 require 'rails_helper'
-Dir[Rails.root.join("components/benefit_sponsors/spec/factories/*.rb")].each do |f|
-  require f
-end
+
 module BenefitSponsors
   RSpec.describe Profiles::RegistrationsController, type: :controller do
     
