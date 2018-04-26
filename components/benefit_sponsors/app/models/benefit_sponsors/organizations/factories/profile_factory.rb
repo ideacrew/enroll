@@ -45,8 +45,7 @@ module BenefitSponsors
             factory_obj.errors.add(:organization, organization.errors.full_messages)
             false
           end
-          return self
-          #return updated, factory_obj.redirection_url_on_update
+          return factory_obj
         end
 
         def update_representative(factory_obj, attributes)
@@ -236,6 +235,7 @@ module BenefitSponsors
 
         def build_broker_profile(attrs = {})
           Organizations::BrokerAgencyProfile.new(attrs)
+
         end
 
         def build_sponsor_profile(attrs = {})
