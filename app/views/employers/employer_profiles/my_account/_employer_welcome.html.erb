@@ -18,6 +18,7 @@
     </div>
   <%end%>
 
+  <% unless @employer_profile.broker_agency_profile.present?  %>
   <div class="left-icon-section section">
     <div class="row">
       <div class="col-md-1">
@@ -43,6 +44,7 @@
       </div>
     </div>
   </div>
+  <% end %>
 
   <div class="left-icon-section section">
     <div class="row">
@@ -107,7 +109,6 @@
         </div>
       <%end%>
     </div>
-
   </div>
 
 </div>
