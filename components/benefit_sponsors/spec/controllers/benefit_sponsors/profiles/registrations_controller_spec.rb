@@ -2,12 +2,17 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe Profiles::RegistrationsController, type: :controller do
-    
+
     routes { BenefitSponsors::Engine.routes }
-    
-    let(:user) { FactoryGirl.create :user}
+
     let(:agency_class) { BenefitSponsors::Organizations::Forms::RegistrationForm }
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
+    let(:person) { FactoryGirl.create(:person) }
+    let(:edit_user) { FactoryGirl.create(:user, :person => person)}
+    let(:user) { FactoryGirl.create(:user) }
+    let(:update_user) { edit_user }
+    let(:benefit_sponsor_user) { user }
+    let(:broker_agency_user) { nil }
 
     let(:phone_attributes) { 
       {
@@ -91,7 +96,9 @@ module BenefitSponsors
 
     shared_examples_for "initialize registration form" do |action, params, profile_type|
       before do
+        sign_in self.send("#{profile_type}_user")
         if params[:id].present?
+          sign_in edit_user
           params[:id] = self.send(profile_type).profiles.first.id.to_s
         end
 
@@ -114,6 +121,7 @@ module BenefitSponsors
       shared_examples_for "initialize profile for new" do |profile_type|
 
         before do
+          sign_in self.send("#{profile_type}_user")
           get :new, profile_type: profile_type
         end
 
@@ -164,7 +172,7 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
-            sign_in user
+            sign_in self.send("#{profile_type}_user")
             post :create, :agency => self.send("#{profile_type}_params")
           end
 
@@ -233,6 +241,7 @@ module BenefitSponsors
       shared_examples_for "initialize profile for edit" do |profile_type|
 
         before do
+          sign_in edit_user
           @id = self.send(profile_type).profiles.first.id.to_s
           get :edit, id: @id
         end
@@ -315,7 +324,7 @@ module BenefitSponsors
 
           before :each do
             sanitize_attributes(profile_type)
-            sign_in user
+            sign_in update_user
             put :update, :agency => self.send("#{profile_type}_params"), :id => self.send("#{profile_type}_params")[:id]
           end
 
@@ -346,7 +355,7 @@ module BenefitSponsors
         shared_examples_for "fail store profile for update if params invalid" do |profile_type|
 
           before do
-            sign_in user
+            sign_in update_user
             sanitize_attributes(profile_type)
             address_attributes.merge!({
               kind: nil  
