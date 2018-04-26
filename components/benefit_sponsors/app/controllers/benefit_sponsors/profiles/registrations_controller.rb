@@ -1,5 +1,3 @@
-require_dependency "benefit_sponsors/application_controller"
-
 module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
 

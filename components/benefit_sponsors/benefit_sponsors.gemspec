@@ -29,10 +29,12 @@ Gem::Specification.new do |s|
   s.add_dependency 'money-rails', '~> 1.3.0'
   s.add_dependency 'virtus', '~> 1.0.5'
   s.add_dependency 'active_model_serializers'
+  s.add_dependency 'devise', '~> 3.4.1'
 
   s.test_files = Dir["spec/**/*"]
 
   s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "mongoid-rspec"
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'capybara'

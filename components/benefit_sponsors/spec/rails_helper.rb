@@ -1,13 +1,22 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
-require 'mongoid-rspec'
 ENV['RAILS_ENV'] ||= 'test'
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'mongoid-rspec'
+require 'shoulda/matchers'
+require 'database_cleaner'
+require 'capybara/rails'
+require 'capybara/rspec'
 
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+  end
+end
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -55,7 +64,12 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+#  config.include ModelMatcherHelpers, :type => :model
+  config.include Mongoid::Matchers, type: :model
+  config.include Devise::TestHelpers, :type => :controller
+  config.include Devise::TestHelpers, :type => :view
   config.include FactoryGirl::Syntax::Methods
+  config.include Capybara::DSL
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
