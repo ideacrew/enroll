@@ -61,15 +61,30 @@ var EmployerProfile = ( function( window, undefined ) {
     edit_all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
     editselectedplan = $('input.ref-plan');
-  
+
     var benefit_fields = $('.offerings .benefits-fields');
     if ($('.composite-offerings').is(':visible')) {
       benefit_fields = $('.composite-offerings .benefits-fields');
       editbgfamilypremiums = benefit_fields.find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
       editbgemployeeonlypremiums = benefit_fields.find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    } else {
+        inputSpouceFieldset = $('.benefits-fields').find('input[value=spouse]').closest('fieldset')
+        bgSpousePremiums = $(inputSpouceFieldset).find('input.hidden-param.premium-storage-input');
+        spouseCheckbox = $(inputSpouceFieldset).find('input[type=checkbox]');
+
+        inputDomesticPartnerFieldset = $('.benefits-fields').find('input[value=domestic_partner]').closest('fieldset')
+        bgDomesticPartnerPremiums = $(inputDomesticPartnerFieldset).find('input.hidden-param.premium-storage-input');
+        domesticPartnerCheckbox = $(inputDomesticPartnerFieldset).find('input[type=checkbox]');
+
+        inputChildUnder26Fieldset = $('.benefits-fields').find('input[value=child_under_26]').closest('fieldset')
+        bgChildUnder26Premiums = $(inputChildUnder26Fieldset).find('input.hidden-param.premium-storage-input');
+        childUnder26Checkbox = $(inputChildUnder26Fieldset).find('input[type=checkbox]');
     }
 
-    var editvalidatedbgfamilypremiums = false;
+        var editvalidatedbgfamilypremiums = false;
+        var editValidatedbgSpousePremiums = false;
+        var editValidatedbgDomesticPartnerPremiums = false;
+        var editValidatedbgChildUnder26Premiums = false;
 
     editbgtitles.each(function() {
         editplantitle = $(this).val();
@@ -100,6 +115,9 @@ var EmployerProfile = ( function( window, undefined ) {
     if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       editvalidatedbgemployeepremiums = true;
       editvalidatedbgfamilypremiums = true;
+      editValidatedbgSpousePremiums = true;
+      editValidatedbgDomesticPartnerPremiums = true;
+      editValidatedbgChildUnder26Premiums = true;
       editvalidated = true;
     } else {
       editbgemployeepremiums.each(function() {
@@ -130,7 +148,58 @@ var EmployerProfile = ( function( window, undefined ) {
               return false;
             }
           });
+            editValidatedbgSpousePremiums = true;
+            editValidatedbgDomesticPartnerPremiums = true;
+            editValidatedbgChildUnder26Premiums = true;
         } else {
+            if ($(spouseCheckbox).is(':checked')) {
+                bgSpousePremiums.each(function() {
+                    if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                        editValidatedbgSpousePremiums = true;
+                        editvalidated = true;
+                    } else {
+                        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Spouse Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                        editValidatedbgSpousePremiums = false;
+                        editvalidated = false;
+                        return false;
+                    }
+                });
+            } else {
+                editValidatedbgSpousePremiums = true;
+            }
+
+            if ($(domesticPartnerCheckbox).is(':checked')) {
+                bgDomesticPartnerPremiums.each(function() {
+                    if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                        editValidatedbgDomesticPartnerPremiums = true;
+                        editvalidated = true;
+                    } else {
+                        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Domestic Partner Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                        editValidatedbgDomesticPartnerPremiums = false;
+                        editvalidated = false;
+                        return false;
+                    }
+                });
+            } else {
+                editValidatedbgDomesticPartnerPremiums = true;
+            }
+
+            if ($(childUnder26Checkbox).is(':checked')) {
+                bgChildUnder26Premiums.each(function() {
+                    if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                        editValidatedbgChildUnder26Premiums = true;
+                        editvalidated = true;
+                    } else {
+                        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Child Under 26 Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                        editValidatedbgChildUnder26Premiums = false;
+                        editvalidated = false;
+                        return false;
+                    }
+                });
+            } else {
+                editValidatedbgChildUnder26Premiums = true;
+            }
+
           if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-fs-plan').length ) {
           } else {
             if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
@@ -271,7 +340,7 @@ var EmployerProfile = ( function( window, undefined ) {
     }
     });
 
-    if ( editvalidatedbgtitles && editvalidatedbgemployeepremiums && editvalidatedreferenceplanselections && edit_validated_all_premiums && editvalidatedbgfamilypremiums) {
+      if ( editvalidatedbgtitles && editvalidatedbgemployeepremiums && editvalidatedreferenceplanselections && edit_validated_all_premiums && editvalidatedbgfamilypremiums && editValidatedbgSpousePremiums && editValidatedbgDomesticPartnerPremiums && editValidatedbgChildUnder26Premiums) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
         $('.interaction-click-control-save-plan-year').removeAttr('disabled');
@@ -288,12 +357,27 @@ var EmployerProfile = ( function( window, undefined ) {
     var minimumEmployerEmployeeContributionPct = $("input#employerMinEmployeeContribution").data('value');
     var minimumEmployerFamilyContributionPct = $("input#employerMinFamilyContribution").data('value');
     var validatedbgfamilypremiums = false;
+    var validatedbgSpousePremiums = false;
+    var validatedbgDomesticPartnerPremiums = false;
+    var validatedbgChildUnder26Premiums = false;
 
     bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
 
     bgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     bgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+
+    inputSpouceFieldset = $('.benefits-fields').find('input[value=spouse]').closest('fieldset')
+    bgSpousePremiums = $(inputSpouceFieldset).find('input.hidden-param.premium-storage-input');
+    spouseCheckbox = $(inputSpouceFieldset).find('input[type=checkbox]');
+
+    inputDomesticPartnerFieldset = $('.benefits-fields').find('input[value=domestic_partner]').closest('fieldset')
+    bgDomesticPartnerPremiums = $(inputDomesticPartnerFieldset).find('input.hidden-param.premium-storage-input');
+    domesticPartnerCheckbox = $(inputDomesticPartnerFieldset).find('input[type=checkbox]');
+
+    inputChildUnder26Fieldset = $('.benefits-fields').find('input[value=child_under_26]').closest('fieldset')
+    bgChildUnder26Premiums = $(inputChildUnder26Fieldset).find('input.hidden-param.premium-storage-input');
+    childUnder26Checkbox = $(inputChildUnder26Fieldset).find('input[type=checkbox]');
 
     all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
@@ -326,6 +410,9 @@ var EmployerProfile = ( function( window, undefined ) {
     if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       validatedbgemployeepremiums = true;
       validatedbgfamilypremiums = true;
+      validatedbgSpousePremiums = true;
+      validatedbgDomesticPartnerPremiums = true;
+      validatedbgChildUnder26Premiums = true;
       validated = true;
     } else {
       bgemployeepremiums.each(function() {
@@ -357,8 +444,60 @@ var EmployerProfile = ( function( window, undefined ) {
               return false;
             }
           });
+            validatedbgSpousePremiums = true;
+            validatedbgDomesticPartnerPremiums = true;
+            validatedbgChildUnder26Premiums = true;
         } else {
-          if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+
+            if ($(spouseCheckbox).is(':checked')) {
+                bgSpousePremiums.each(function() {
+                    if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                        validatedbgSpousePremiums = true;
+                        validated = true;
+                    } else {
+                        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Spouse Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                        validatedbgSpousePremiums = false;
+                        validated = false;
+                        return false;
+                    }
+                });
+            } else {
+                validatedbgSpousePremiums = true;
+            }
+
+            if ($(domesticPartnerCheckbox).is(':checked')) {
+                bgDomesticPartnerPremiums.each(function() {
+                    if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                        validatedbgDomesticPartnerPremiums = true;
+                        validated = true;
+                    } else {
+                        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Domestic Partner Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                        validatedbgDomesticPartnerPremiums = false;
+                        validated = false;
+                        return false;
+                    }
+                });
+            } else {
+                validatedbgDomesticPartnerPremiums = true;
+            }
+
+            if ($(childUnder26Checkbox).is(':checked')) {
+                bgChildUnder26Premiums.each(function() {
+                    if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                        validatedbgChildUnder26Premiums = true;
+                        validated = true;
+                    } else {
+                        $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Child Under 26 Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                        validatedbgChildUnder26Premiums = false;
+                        validated = false;
+                        return false;
+                    }
+                });
+            } else {
+                validatedbgChildUnder26Premiums = true;
+            }
+
+            if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
             validatedbgemployeepremiums = true;
             validatedbgfamilypremiums = true
             validated = true;
@@ -405,7 +544,7 @@ var EmployerProfile = ( function( window, undefined ) {
       });
     }
 
-    if (validatedbgtitles && validatedbgemployeepremiums && validatedbgfamilypremiums && validatedreferenceplanselections && validated_all_premiums) {
+      if (validatedbgtitles && validatedbgemployeepremiums && validatedbgfamilypremiums && validatedreferenceplanselections && validated_all_premiums && validatedbgSpousePremiums && validatedbgDomesticPartnerPremiums && validatedbgChildUnder26Premiums) {
         $('.interaction-click-control-create-plan-year').removeClass('disabled');
         $('.interaction-click-control-save-plan-year').removeAttr('disabled');
 
