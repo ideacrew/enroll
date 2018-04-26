@@ -14,26 +14,9 @@ module BenefitSponsors
     attr_reader :coverage_start_on
 
     def initialize(group_id = nil)
-      @members                    = []
-
-      @group_id                   = group_id
-      @coverage_start_on          = nil
-      @product                    = nil
-      @product_cost_total         = 0.00
-
-      @contribution_model_kind    = nil
-      @pricing_model_kind         = nil
-      @sponsor_contribution_total = 0.00
-
-      # 123: {
-      #   id: 123,
-      #   converage_eligibility_on: 
-      #   product_price: 120.00,
-      #   sponsor_contribution: 50.00,
-      # }
-
-      @previous_product           = nil 
-      @member_coverage_eligibility_date
+      @members          = []
+      @group_id         = group_id
+      @group_enrollment = nil
     end
 
     def primary_member
