@@ -2,6 +2,9 @@ class HbxEnrollmentMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include BelongsToFamilyMember
+  include Insured::GroupSelectionHelper
+  include Insured::EmployeeRolesHelper
+  include ApplicationHelper
 
   embedded_in :hbx_enrollment
 
@@ -20,6 +23,7 @@ class HbxEnrollmentMember
     :coverage_start_on
 
   validate :check_primary_applicant_selected_during_enrollment
+  validate :enrolling_members
 
   validate :end_date_gt_start_date
   delegate :ivl_coverage_selected, to: :family_member
@@ -113,6 +117,16 @@ class HbxEnrollmentMember
     return true #FixMe
     if self.hbx_enrollment.subscriber.nil?
       self.errors.add(:is_subscriber, "You must select the primary applicant to enroll in the healthcare plan.")
+    end
+  end
+
+  def enrolling_members
+    return true unless self.hbx_enrollment.employee_role.present?
+    health_offered_relationship_benefits, dental_offered_relationship_benefits =  shop_health_and_dental_relationship_benfits(self.hbx_enrollment.employee_role,self.hbx_enrollment.benefit_group)
+    if self.hbx_enrollment.coverage_kind == "health"
+      self.errors.add(:applicant_id, "Applicant not allowed to enroll") unless coverage_relationship_check(health_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
+    else
+      self.errors.add(:applicant_id, "Applicant not allowed to enroll") unless coverage_relationship_check(dental_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
     end
   end
 end
