@@ -1,10 +1,16 @@
 module BenefitSponsors
   class Members::MemberRoster
+    include Enumerable
 
     attr_reader :member_groups
 
     def initialize
       @member_groups = []
+      @rate_schedule_date = nil
+    end
+
+    def each(&block)
+      @member_groups.each { |member_group| block.call(member_group) }
     end
 
     def add_member_group(new_member_group)

@@ -1,12 +1,39 @@
 # A collection of members, typically a family, who operate as a unit for purposes of benefit coverage
 module BenefitSponsors
   class Members::MemberGroup
+    include Enumerable
 
     attr_reader :members
 
+    # Return the date on which the rate schedule is applicable.
+    # @return [Date] the rate schedule date
+    attr_reader :rate_schedule_date
+
+    # The coverage start date.
+    # @return [Date] the coverage start date
+    attr_reader :coverage_start_on
+
     def initialize(group_id = nil)
-      @group_id = group_id
-      @members  = []
+      @members                    = []
+
+      @group_id                   = group_id
+      @coverage_start_on          = nil
+      @product                    = nil
+      @product_cost_total         = 0.00
+
+      @contribution_model_kind    = nil
+      @pricing_model_kind         = nil
+      @sponsor_contribution_total = 0.00
+
+      # 123: {
+      #   id: 123,
+      #   converage_eligibility_on: 
+      #   product_price: 120.00,
+      #   sponsor_contribution: 50.00,
+      # }
+
+      @previous_product           = nil 
+      @member_coverage_eligibility_date
     end
 
     def primary_member

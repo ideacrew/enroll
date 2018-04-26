@@ -7,13 +7,13 @@ module BenefitSponsors
       benefit_application
     end
 
-    # Must have contiguous coverage
+    # Must have uninterrupted coverage between application periods
     def renew_benefit_application(benefit_application)
 
       renewal_benefit_application
     end
 
-    # Must have contiguous coverage
+    # Must have uninterrupted coverage between periods
     def reinstate_benefit_application(benefit_application)
 
       benefit_application
