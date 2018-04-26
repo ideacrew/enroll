@@ -52,19 +52,15 @@ module BenefitSponsors
       @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(registration_params)
       authorize @agency
       sanitize_office_locations_params
-      if can_update_profile? # pundit policy
-        updated, result_url = @agency.update
-        result_url = self.send(result_url)
-        if updated
-          flash[:notice] = 'Employer successfully Updated.' if is_employer_profile?
-          flash[:notice] = 'Broker Agency Profile successfully Updated.' if is_broker_profile?
-        else
-          org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
-
-          flash[:error] = "Employer information not saved. #{org_error_msg}."
-        end
+      updated, result_url = @agency.update
+      result_url = self.send(result_url)
+      if updated
+        flash[:notice] = 'Employer successfully Updated.' if is_employer_profile?
+        flash[:notice] = 'Broker Agency Profile successfully Updated.' if is_broker_profile?
       else
-        flash[:error] = 'You do not have permissions to update the details'
+        org_error_msg = @agency.errors.full_messages.join(",").humanize if @agency.errors.present?
+
+        flash[:error] = "Employer information not saved. #{org_error_msg}."
       end
       redirect_to result_url
     end
@@ -73,11 +69,6 @@ module BenefitSponsors
 
     def profile_type
       @profile_type = params[:profile_type] || params[:agency][:profile_type] || @agency.profile_type
-    end
-
-    def can_update_profile?
-      return true # TODO
-      (current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)) || current_user.person.agent?
     end
 
     def default_url
@@ -123,9 +114,6 @@ module BenefitSponsors
       current_user.person
     end
 
-    #checks if person is approved by employer for staff role
-    #Redirects to home page of employer profile if approved
-    #person with pending/denied approval will be redirected to new registration page
     def check_logged_in?
       if is_employer_profile?
         redirect_to main_app.root_path if current_user.blank?
