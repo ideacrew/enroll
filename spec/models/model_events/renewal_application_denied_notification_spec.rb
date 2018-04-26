@@ -26,6 +26,9 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
     end
   }
 
+  let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer.id)}
+  let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
+
   describe "ModelEvent" do
 
     before :each do

@@ -203,6 +203,24 @@ $(function () {
     }
   });
 
+  $(document).on('submit', '.qle-detail-for-existing', function(e) {
+    if($('#effective_on_option').val() == ''){
+      $('#qle_effective_on_kind_alert').removeClass('hidden');
+      e.preventDefault()
+    }else{
+      $('#qle_effective_on_kind_alert').addClass('hidden');
+    }
+  });
+
+  $(document).on('submit', '.qle-detail-for-existing-kind', function(e) {
+    if($('#qle_date').val() == ''){
+      $('#qle_effective_on_kind_alert-4').removeClass('hidden');
+      e.preventDefault()
+    }else{
+      $('#qle_effective_on_kind_alert-4').addClass('hidden');
+    }
+  });
+
   $(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
     if(this.checked) {
       $('#outside-open-enrollment').modal('show');

@@ -8,6 +8,8 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', db
   let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft') }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2)}
+  let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer.id)}
+  let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
 
   describe "ModelEvent" do
     context "when renewal employer 2 days prior to soft dead line" do
