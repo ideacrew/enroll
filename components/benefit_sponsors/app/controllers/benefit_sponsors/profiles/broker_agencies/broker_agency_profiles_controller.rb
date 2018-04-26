@@ -57,7 +57,7 @@ module BenefitSponsors
           return
         end
 
-        query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
+        query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
         @total_records = query.total_count
         @records_filtered = query.filtered_count
