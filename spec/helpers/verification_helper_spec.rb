@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe VerificationHelper, :type => :helper do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:type) { person.consumer_role.verification_types.first }
   before :each do
     assign(:person, person)
   end
@@ -162,6 +163,40 @@ RSpec.describe VerificationHelper, :type => :helper do
 
       expect(helper.get_person_v_type_status(persons)).to eq([status, status])
     end
+  end
+
+  describe "#verification_type_class" do
+    shared_examples_for "verification type css_class method" do |status, css_class|
+      it "returns correct class" do
+        expect(helper.verification_type_class(status)).to eq css_class
+      end
+    end
+    it_behaves_like "verification type css_class method", "verified", "success"
+    it_behaves_like "verification type css_class method", "review", "warning"
+    it_behaves_like "verification type css_class method", "outstanding", "danger"
+    it_behaves_like "verification type css_class method", "curam", "default"
+    it_behaves_like "verification type css_class method", "attested", "default"
+    it_behaves_like "verification type css_class method", "valid", "success"
+    it_behaves_like "verification type css_class method", "pending", "info"
+    it_behaves_like "verification type css_class method", "expired", "default"
+  end
+
+  describe "#build_admin_actions_list" do
+    shared_examples_for "build_admin_actions_list method" do |action, no_action, aasm_state, validation_status|
+      before do
+        person.consumer_role.aasm_state = aasm_state
+        type.validation_status = validation_status
+      end
+      it "list includes #{action}" do
+        expect(helper.build_admin_actions_list(type, person)).to include action
+      end
+      it "list not includes #{no_action}" do
+        expect(helper.build_admin_actions_list(type, person)).not_to include no_action
+      end
+    end
+    it_behaves_like "build_admin_actions_list method", "Verify", "Call Hub", "unverified", "any"
+    it_behaves_like "build_admin_actions_list method", "Reject", "Call Hub", "unverified", "any"
+
   end
 
   describe "#documents_list" do
