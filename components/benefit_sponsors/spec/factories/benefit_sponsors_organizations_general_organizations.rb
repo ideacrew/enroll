@@ -36,6 +36,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_broker_agency_profile do
+      after :build do |organization, evaluator|
+        organization.profiles << build(:benefit_sponsors_organizations_broker_agency_profile)
+      end
+    end
+
     trait :with_hbx_profile do
       after :build do |organization, evaluator|
         organization.profiles << build(:benefit_sponsors_organizations_hbx_profile)

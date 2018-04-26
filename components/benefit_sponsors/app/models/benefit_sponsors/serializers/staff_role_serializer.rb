@@ -1,12 +1,16 @@
 module BenefitSponsors
   module Serializers
     class StaffRoleSerializer < ActiveModel::Serializer
-      attributes :first_name, :last_name, :email, :dob, :status, :phone
+      attributes :first_name, :last_name, :email, :dob, :status, :phone, :person_id
 
       attribute :npn, if: :is_broker_profile?
 
       def email
         object.work_email_or_best
+      end
+
+      def person_id
+        object.id
       end
 
       def phone

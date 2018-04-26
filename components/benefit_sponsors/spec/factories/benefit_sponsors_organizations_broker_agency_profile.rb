@@ -1,9 +1,9 @@
 FactoryGirl.define do
-  factory :benefit_sponsors_organizations_aca_shop_dc_employer_profile, class: 'BenefitSponsors::Organizations::AcaShopDcEmployerProfile' do
-    entity_kind :c_corporation
+  factory :benefit_sponsors_organizations_broker_agency_profile, class: 'BenefitSponsors::Organizations::BrokerAgencyProfile' do
+    entity_kind :s_corporation
 
-    is_benefit_sponsorship_eligible true
-
+    market_kind :individual
+    corporate_npn "0989898981"
     transient do
       office_locations_count 1
     end

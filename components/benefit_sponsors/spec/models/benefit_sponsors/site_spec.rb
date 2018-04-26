@@ -161,7 +161,7 @@ module BenefitSponsors
       let!(:loony_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
       let!(:acme_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
 
-      let(:employer_profile)    { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile, office_locations: office_locations) }
+      let(:employer_profile)    { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
 
       # let(:hbx_profile)         { BenefitSponsors::Organizations::HbxProfile.new(office_locations: office_locations) }
       let(:hbx_profile)       { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }

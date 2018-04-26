@@ -16,8 +16,8 @@ module BenefitSponsors
         profiles_employers_employer_profile_show_pending(@agency.organization.employer_profile.id)
       end
 
-      def sponsor_home_registration_url
-        profiles_employers_employer_profile_path(@agency.organization.employer_profile.id, tab: 'home')
+      def sponsor_home_registration_url(profile_id)
+        profiles_employers_employer_profile_path(profile_id, tab: 'home')
       end
 
       def agency_edit_registration_url
@@ -25,6 +25,15 @@ module BenefitSponsors
       end
 
       def broker_show_registration_url
+        profiles_broker_agencies_broker_agency_profile_path(@agency.organization.profile.id)
+      end
+
+      def method_missing(name, *args, &block)
+        if name.to_s.match(/@/)
+          method_name, attribute = name.to_s.split("@")
+          return self.send(method_name, attribute)
+        end
+        super
       end
     end
   end

@@ -11,11 +11,13 @@ module BenefitSponsors
       attribute :is_benefit_sponsorship_eligible, String
       attribute :corporate_npn, String
       attribute :languages_spoken, String
-      attribute :working_hours, String
+      attribute :working_hours, Boolean
       attribute :accept_new_clients, Boolean
       attribute :home_page, String
       attribute :contact_method, String
       attribute :entity_kind_options, Array
+      attribute :market_kind_options, Hash
+      attribute :language_options, Array
       attribute :contact_method_options, Array
       attribute :profile_type, String
 

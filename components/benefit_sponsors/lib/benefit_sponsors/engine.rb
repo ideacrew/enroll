@@ -1,4 +1,5 @@
 require 'active_model_serializers'
+require 'effective_datatables'
 module BenefitSponsors
   class Engine < ::Rails::Engine
     isolate_namespace BenefitSponsors

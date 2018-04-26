@@ -39,12 +39,13 @@ module BenefitSponsors
         def self.call(attributes)
           factory_obj = new(attributes)
           factory_obj.current_user = current_user(attributes[:current_user_id])
-          factory_obj.profile_id.present? ? update!(factory_obj, attributes[:organization]) : persist!(factory_obj, attributes[:organization])
+          factory_obj.profile_id.present? ? update!(factory_obj, attributes) : persist!(factory_obj, attributes)
         end
 
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
-          organization.assign_attributes(attributes)
+          organization.assign_attributes(attributes[:organization])
+          factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes]
           updated = if organization.valid?
             organization.save!
           else
@@ -55,8 +56,15 @@ module BenefitSponsors
           return updated, factory_obj.redirection_url_on_update
         end
 
+        def update_representative(factory_obj, attributes)
+          if is_broker_profile?
+            person = Person.find(attributes[:person_id])
+            person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
+          end
+        end
+
         def self.persist!(factory_obj, attributes)
-          factory_obj.save(attributes)
+          factory_obj.save(attributes[:organization])
         end
 
         def self.build(attrs)
@@ -137,7 +145,7 @@ module BenefitSponsors
           person.broker_role = ::BrokerRole.new({
             :provider_kind => 'broker',
             :npn => self.npn,
-            :broker_agency_profile_id => profile.id,
+            :broker_agency_profile_id => profile.id, # this should be new profile id
             :market_kind => market_kind
           })
 
@@ -145,6 +153,7 @@ module BenefitSponsors
             self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
           end
           person.save!
+          profile.update_attributes!(primary_broker_role_id: person.broker_role.id)
           trigger_broker_application_confirmation_email
         end
 
@@ -212,6 +221,7 @@ module BenefitSponsors
                       build_sponsor_profile(attrs)
                     end
           profile.office_locations << build_office_locations if profile.office_locations.empty?
+          self.profile_id = profile.id
           profile
         end
 
@@ -334,8 +344,8 @@ module BenefitSponsors
           if is_broker_profile?
             :broker_new_registration_url
           elsif is_employer_profile?
-            return :sponsor_show_pending_registration_url if is_pending
-            return :sponsor_home_registration_url if is_saved
+            return "sponsor_show_pending_registration_url@#{profile_id}" if is_pending
+            return "sponsor_home_registration_url@#{profile_id}" if is_saved
             :sponsor_new_registration_url
           end
         end

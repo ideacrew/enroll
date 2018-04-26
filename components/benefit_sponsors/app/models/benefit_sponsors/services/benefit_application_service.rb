@@ -45,12 +45,12 @@ module BenefitSponsors
         @benefit_sponsorship ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(form.benefit_sponsorship_id)
       end
 
-      def attributes_to_form_params
-        {
-          start_on: benefit_application.effective_period.min,
-          end_on: benefit_application.effective_period.max,
-          open_enrollment_start_on: benefit_application.open_enrollment_period.min,
-          open_enrollment_end_on: benefit_application.open_enrollment_period.max,
+      def attributes_to_form_params(benefit_application,form)
+        form.attributes = {
+          start_on: format_date_to_string(benefit_application.effective_period.min),
+          end_on: format_date_to_string(benefit_application.effective_period.max),
+          open_enrollment_start_on: format_date_to_string(benefit_application.open_enrollment_period.min),
+          open_enrollment_end_on: format_date_to_string(benefit_application.open_enrollment_period.max),
           fte_count: benefit_application.fte_count,
           pte_count: benefit_application.pte_count,
           msp_count: benefit_application.msp_count
@@ -59,16 +59,20 @@ module BenefitSponsors
 
       def form_params_to_attributes(form)
         {
-          effective_period: (date_format(form.start_on)..date_format(form.end_on)),
-          open_enrollment_period: (date_format(form.open_enrollment_start_on)..date_format(form.open_enrollment_end_on)),
+          effective_period: (format_string_to_date(form.start_on)..format_string_to_date(form.end_on)),
+          open_enrollment_period: (format_string_to_date(form.open_enrollment_start_on)..format_string_to_date(form.open_enrollment_end_on)),
           fte_count: form.fte_count,
           pte_count: form.pte_count,
           msp_count: form.msp_count
         }
       end
 
-      def date_format(date)
+      def format_string_to_date(date)
         Date.strptime(date, "%m/%d/%Y")
+      end
+
+      def format_date_to_string(date)
+        date.to_date.to_s
       end
 
       def store(form, benefit_application)
