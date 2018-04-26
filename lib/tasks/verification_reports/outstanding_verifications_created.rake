@@ -132,8 +132,9 @@ namespace :reports do
 
       collect_rows = []
       people.each do |person|
-        workflow_transitions(person).each do |transition|
-          case transition.event
+        if workflow_transitions(person).any?
+          workflow_transitions(person).each do |transition|
+            case transition.event
             when "ssn_invalid!"
               types = person.verification_types - ['DC Residency', 'American Indian Status']
             when "ssn_valid_citizenship_invalid!"
@@ -144,21 +145,22 @@ namespace :reports do
               types = ["DC Residency"]
             when "reject!"
               types = [get_rejected_type(person)]
-          end
+            end
 
-          types.each do |type|
-            collect_rows << [
-                subscriber_id(person),
-                person.hbx_id,
-                person.first_name,
-                person.last_name,
-                type,
-                transition.transition_at,
-                "outstanding",
-                due_date_for_type(person, type, transition).to_date,
-                ivl_enrollment(person),
-                shop_enrollment(person)
-            ]
+            types.each do |type|
+              collect_rows << [
+                  subscriber_id(person),
+                  person.hbx_id,
+                  person.first_name,
+                  person.last_name,
+                  type,
+                  transition.transition_at,
+                  "outstanding",
+                  due_date_for_type(person, type, transition).to_date,
+                  ivl_enrollment(person),
+                  shop_enrollment(person)
+              ]
+            end
           end
         end
       end
