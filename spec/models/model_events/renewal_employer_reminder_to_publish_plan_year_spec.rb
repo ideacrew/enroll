@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
+describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', :dbclean => :after_each do
 
   let(:model_event) { "renewal_plan_year_publish_dead_line" }
   let(:notice_event) { "renewal_plan_year_publish_dead_line" }
