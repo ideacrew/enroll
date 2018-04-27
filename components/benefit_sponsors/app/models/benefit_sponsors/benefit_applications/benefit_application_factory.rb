@@ -9,7 +9,8 @@ module BenefitSponsors
       end
 
       def self.validate(benefit_application)
-        #TODO: Check validations
+        # TODO: Add validations
+        # Validate open enrollment period
         true
       end
 
@@ -20,10 +21,12 @@ module BenefitSponsors
       end
 
       def initialize_benefit_application
-        benefit_market = benefit_sponsorship.benefit_market
-        site_key = benefit_market.site_urn
-        klass_name  = [benefit_market.kind.to_s.camelcase, site_key.to_s.camelcase, "BenefitApplication"].join('')
-        @benefit_application = [parent_namespace_for(self.class), klass_name].join("::").constantize.new
+        # benefit_market = benefit_sponsorship.benefit_market
+        # site_key = benefit_market.site_urn
+        # klass_name  = [benefit_market.kind.to_s.camelcase, site_key.to_s.camelcase, "BenefitApplication"].join('')
+        # @benefit_application = [parent_namespace_for(self.class), klass_name].join("::").constantize.new
+
+        @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.new
         @benefit_application.benefit_sponsorship = benefit_sponsorship
       end
 

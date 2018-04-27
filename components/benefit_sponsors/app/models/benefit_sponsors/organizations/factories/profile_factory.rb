@@ -13,22 +13,6 @@ module BenefitSponsors
 
         delegate :is_employer_profile?, :is_broker_profile?, to: :class
 
-        validate :office_location_kinds
-
-        def office_location_kinds
-          location_groups = organization.profiles.map(&:office_locations)
-          location_groups.each do |locations|
-            location_kinds = locations.flat_map(&:address).flat_map(&:kind)
-            if location_kinds.count('primary').zero?
-              self.errors.add(:office_locations, "must select one primary address")
-            elsif location_kinds.count('primary') > 1
-              self.errors.add(:office_locations, "can't have multiple primary addresses")
-            elsif location_kinds.count('mailing') > 1
-              self.errors.add(:office_locations, "can't have more than one mailing address")
-            end
-          end
-        end
-
         def self.call(attributes)
           factory_obj = new(attributes)
           factory_obj.current_user = current_user(attributes[:current_user_id])
@@ -108,19 +92,15 @@ module BenefitSponsors
         def save(attributes)
           return self unless match_or_create_person
           existing_org = get_existing_organization
-          return self if failed_validity?(existing_org)
+          return self if organization_validity_failed?(existing_org)
           self.organization = init_profile_organization(existing_org, attributes)
-          return self if npn_already_taken?(npn)
+          return self if broker_agency_profile_validity_failed?
+          unless self.valid?
+            errors.add(:organization, self.errors.full_messages.join(', '))
+            return self
+          end
           return self unless persist_agency!
           self
-        end
-
-        def npn_already_taken?(npn)
-          if Person.where("broker_role.npn" => npn).any?
-            errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
-            return true
-          end
-          return false
         end
 
         def persist_agency!
@@ -263,14 +243,6 @@ module BenefitSponsors
           })
         end
 
-        def get_person(person_id)
-          Person.find(person_id)
-        end
-
-        def get_organization
-          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
-        end
-
         def organization_attributes(attrs = {})
           attrs.except(:profiles_attributes).merge({
             site: site,
@@ -288,7 +260,6 @@ module BenefitSponsors
         end
 
         def match_or_create_person
-
           matched_people = get_matched_people
 
           if matched_people.count > 1
@@ -313,7 +284,7 @@ module BenefitSponsors
           person.save!
         end
 
-        def failed_validity?(org)
+        def organization_validity_failed?(org)
           issuer_requesting_sponsor_benefits?(org) || broker_profile_already_registered?(org) || person.errors.present?
         end
 
@@ -360,8 +331,8 @@ module BenefitSponsors
           end
         end
 
-        def trigger_broker_application_confirmation_email
-          ::UserMailer.broker_application_confirmation(person).deliver_now
+        def get_organization
+          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         protected
@@ -382,36 +353,12 @@ module BenefitSponsors
           profile_type == "benefit_sponsor"
         end
 
-        def regex_for(str)
-          clean_string = Regexp.escape(str.strip)
-          /^#{clean_string}$/i
-        end
-
         def add_person_contact_info
           if is_broker_profile?
             person.add_work_email(email)
           elsif is_employer_profile?
             person.contact_info(email, area_code, number, extension) if email
           end
-        end
-
-        def get_matched_people
-          if is_employer_profile? || is_broker_profile?
-            Person.where(
-              first_name: regex_for(first_name),
-              last_name: regex_for(last_name),
-              dob: dob
-              )
-          else
-            Person.where(
-              first_name: regex_for(first_name),
-              last_name: regex_for(last_name)
-            )
-          end
-        end
-
-        def get_existing_organization
-          Organization.where(:fein => fein).first
         end
 
         def self.current_user(user_id)
@@ -443,6 +390,72 @@ module BenefitSponsors
               }
             })
           end
+        end
+
+        private
+
+        def get_existing_organization
+          Organization.where(:fein => fein).first
+        end
+
+        def get_matched_people
+          if is_employer_profile? || is_broker_profile?
+            Person.where(
+              first_name: regex_for(first_name),
+              last_name: regex_for(last_name),
+              dob: dob
+              )
+          else
+            Person.where(
+              first_name: regex_for(first_name),
+              last_name: regex_for(last_name)
+            )
+          end
+        end
+
+        def get_person(person_id)
+          Person.find(person_id)
+        end
+
+        def trigger_broker_application_confirmation_email
+          ::UserMailer.broker_application_confirmation(person).deliver_now
+        end
+
+        def regex_for(str)
+          clean_string = Regexp.escape(str.strip)
+          /^#{clean_string}$/i
+        end
+
+        def broker_agency_profile_validity_failed?
+          npn_already_taken?(npn) || !valid_office_location_kinds?
+        end
+
+        def npn_already_taken?(npn)
+          if is_broker_profile?
+            if Person.where("broker_role.npn" => npn).any?
+              errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
+              return true
+            end
+          end
+          return false
+        end
+
+        def valid_office_location_kinds?
+          location_groups = organization.profiles.map(&:office_locations)
+          location_groups.each do |locations|
+            location_kinds = locations.flat_map(&:address).flat_map(&:kind)
+            if location_kinds.count('primary').zero?
+              self.errors.add(:office_locations, "must select one primary address")
+              return false
+            elsif location_kinds.count('primary') > 1
+              self.errors.add(:office_locations, "can't have multiple primary addresses")
+              return false
+            elsif location_kinds.count('mailing') > 1
+              self.errors.add(:office_locations, "can't have more than one mailing address")
+              return false
+            end
+          end
+          return true
         end
       end
     end

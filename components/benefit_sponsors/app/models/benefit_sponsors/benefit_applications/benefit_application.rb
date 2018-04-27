@@ -50,6 +50,20 @@ module BenefitSponsors
       field :enrolled_summary, type: Integer, default: 0
       field :waived_summary, type: Integer, default: 0
 
+      # Sponsor self-reported number of full-time employees
+      field :fte_count, type: Integer, default: 0
+
+      # Sponsor self-reported number of part-time employess
+      field :pte_count, type: Integer, default: 0
+
+      # Sponsor self-reported number of Medicare Second Payers
+      field :msp_count, type: Integer, default: 0
+
+      # # SIC code, Rating Area, Service Area frozen when the plan year is published,
+      field :recorded_sic_code,            type: String
+      field :recorded_rating_area_id,      type: BSON::ObjectId
+      field :recorded_service_area_id,     type: BSON::ObjectId
+
       belongs_to  :benefit_sponsorship, 
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
@@ -391,7 +405,7 @@ module BenefitSponsors
       class << self
         def find(id)
           application = nil
-          BenefitSponsors::Organizations::GeneralOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
+          BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
             sponsorships = pdo.try(:benefit_sponsorships) || []
             sponsorships.each do |sponsorship|
               application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
@@ -400,7 +414,6 @@ module BenefitSponsors
           end
           application
         end
-
       end
 
 

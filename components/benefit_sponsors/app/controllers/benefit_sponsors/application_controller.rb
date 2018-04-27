@@ -85,7 +85,7 @@ module BenefitSponsors
         user.switch_to_idp!
       end
       #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
-      session[:person_id] = personish.id if current_user.try(:person).try(:agent?)
+      session[:person_id] = personish.id if user.person && user.person.agent?
       yield
     end
 

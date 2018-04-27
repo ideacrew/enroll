@@ -152,6 +152,11 @@ module BenefitSponsors
         self.profiles.where(_type: /.*IssuerProfile$/).present?
       end
 
+      def active_benefit_sponsorship
+        #TODO pull the correct benefit sponsorship
+        benefit_sponsorships.first
+      end
+
 
       class << self
 

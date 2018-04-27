@@ -33,10 +33,11 @@ module BenefitSponsors
       field :effective_begin_on,  type: Date
       field :effective_end_on,    type: Date
 
-
       field :source_kind,   type: String, default: :self_serve
       field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
 
+      field :rating_area_id,      type: BSON::ObjectId
+      field :service_area_id,     type: BSON::ObjectId
 
       # This sponsorship's workflow status
       field :aasm_state,    type: String, default: :applicant do
@@ -44,8 +45,6 @@ module BenefitSponsors
       end
 
       delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
-      delegate :rating_area,  :rating_area=,  to: :profile, allow_nil: true
-
 
       belongs_to  :organization, 
                   inverse_of: :benefit_sponorships, 
@@ -99,7 +98,6 @@ module BenefitSponsors
         @profile = profile
       end
 
-
       # TODO: add find_by_benefit_sponsorhip scope to CensusEmployee
       def census_employees
         return @census_employees if is_defined?(@census_employees)
@@ -112,6 +110,21 @@ module BenefitSponsors
         @roster_size = census_employees.active.size
       end
 
+      def benefit_sponsor_catalog_for(effective_date)
+        return [] if benefit_market.blank?
+        benefit_market.benefit_sponsor_catalog_for(service_areas, effective_date)
+      end
+
+      def rating_area=(new_rating_area)
+        write_attribute(:rating_area_id, new_rating_area._id)
+        @rating_area = new_rating_area
+      end
+
+      def rating_area
+        return unless rating_area_id.present?
+        return @rating_area if defined? @rating_area
+        @rating_area = BenefitSponsors::Locations::RatingArea.find(rating_area_id)
+      end
 
       # Workflow for self service
       aasm do
@@ -135,7 +148,21 @@ module BenefitSponsors
 
       end
 
+      def find_benefit_application(id)
+        benefit_applications.find(BSON::ObjectId.from_string(id))
+      end
+
+      def active_broker_agency_account
+        #TODO pick the correct broker_agency_account
+        broker_agency_accounts.first
+      end
+
       class << self
+        def find(id)
+          organization = BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          organization.benefit_sponsorships.find(id)
+        end
+
         def find_broker_for_sponsorship(id)
           organization = nil
           Organizations::PlanDesignOrganization.all.each do |pdo|
