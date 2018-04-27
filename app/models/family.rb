@@ -1072,6 +1072,14 @@ class Family
     end
   end
 
+  def has_active_consumer_family_members
+    self.active_family_members.collect { |member| member if member.person.is_consumer_role_active? }
+  end
+
+  def has_active_resident_family_members
+    self.active_family_members.collect { |member| member if member.person.is_resident_role_active? }
+  end
+
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
   end

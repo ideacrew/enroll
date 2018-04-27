@@ -215,4 +215,13 @@ module VerificationHelper
     raw_request = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
     raw_request ? Nokogiri::XML(raw_request.first.body) : "no response record"
   end
+
+  def has_active_consumer_dependent?(person,dependent)
+    !person.has_active_employee_role? && (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_consumer_role_active?)
+  end
+
+  def has_active_resident_dependent?(person,dependent)
+    (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
+  end
+
 end
