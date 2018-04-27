@@ -152,6 +152,11 @@ module BenefitSponsors
         benefit_applications.find(BSON::ObjectId.from_string(id))
       end
 
+      def active_broker_agency_account
+        #TODO pick the correct broker_agency_account
+        broker_agency_accounts.first
+      end
+
       class << self
         def find(id)
           organization = BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
