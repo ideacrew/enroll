@@ -36,8 +36,8 @@ module BenefitSponsors
     describe "GET new", dbclean: :after_each do
 
       it "should initialize the form" do
-        expect(form_class).to receive(:for_new).and_return(form_class)
         sign_in_and_do_new
+        expect(assigns(:benefit_application_form).class).to eq form_class
       end
 
       it "should be a success" do
