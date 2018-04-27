@@ -331,6 +331,10 @@ module BenefitSponsors
           end
         end
 
+        def get_organization
+          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+        end
+
         protected
 
         def site
@@ -411,10 +415,6 @@ module BenefitSponsors
 
         def get_person(person_id)
           Person.find(person_id)
-        end
-
-        def get_organization
-          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         def trigger_broker_application_confirmation_email
