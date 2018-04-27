@@ -1,3 +1,7 @@
+Given /^application has plan years$/ do
+  pending if Date.today.day <= Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days or Date.today > 15
+end
+
 Then(/^.+ should see a welcome page with successful sign in message$/) do
   Watir::Wait.until(30) { @browser.text.include?(/Signed in successfully./) }
   screenshot("employer_portal_sign_in_welcome")
