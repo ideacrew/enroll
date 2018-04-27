@@ -108,17 +108,27 @@ module BenefitSponsors
         def save(attributes)
           return self unless match_or_create_person
           existing_org = get_existing_organization
-          return self if failed_validity?(existing_org)
+          return self if organization_validity_failed?(existing_org)
           self.organization = init_profile_organization(existing_org, attributes)
-          return self if npn_already_taken?(npn)
+          return self if broker_agency_profile_validity_failed?(existing_org)
+          unless self.valid?
+            errors.add(:organization, self.errors.full_messages.join(', '))
+            return self
+          end
           return self unless persist_agency!
           self
         end
 
+        def broker_agency_profile_validity_failed?(existing_org)
+          npn_already_taken?(npn) #|| valid_office_location_kinds
+        end
+
         def npn_already_taken?(npn)
-          if Person.where("broker_role.npn" => npn).any?
-            errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
-            return true
+          if is_broker_profile?
+            if Person.where("broker_role.npn" => npn).any?
+              errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
+              return true
+            end
           end
           return false
         end
@@ -313,7 +323,7 @@ module BenefitSponsors
           person.save!
         end
 
-        def failed_validity?(org)
+        def organization_validity_failed?(org)
           issuer_requesting_sponsor_benefits?(org) || broker_profile_already_registered?(org) || person.errors.present?
         end
 

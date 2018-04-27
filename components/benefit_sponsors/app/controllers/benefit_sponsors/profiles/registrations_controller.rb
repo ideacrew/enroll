@@ -38,6 +38,7 @@ module BenefitSponsors
       rescue Exception => e
         flash[:error] = e.message
       end
+
       redirect_to default_url , :flash => { :error => @agency.errors.full_messages }
     end
 
