@@ -50,6 +50,20 @@ module BenefitSponsors
       field :enrolled_summary, type: Integer, default: 0
       field :waived_summary, type: Integer, default: 0
 
+      # Sponsor self-reported number of full-time employees
+      field :fte_count, type: Integer, default: 0
+
+      # Sponsor self-reported number of part-time employess
+      field :pte_count, type: Integer, default: 0
+
+      # Sponsor self-reported number of Medicare Second Payers
+      field :msp_count, type: Integer, default: 0
+
+      # # SIC code, Rating Area, Service Area frozen when the plan year is published,
+      field :recorded_sic_code,            type: String
+      field :recorded_rating_area_id,      type: BSON::ObjectId
+      field :recorded_service_area_id,     type: BSON::ObjectId
+
       belongs_to  :benefit_sponsorship, 
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 

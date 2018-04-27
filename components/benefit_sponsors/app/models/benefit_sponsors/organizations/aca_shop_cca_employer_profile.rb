@@ -5,25 +5,11 @@ module BenefitSponsors
       # include Concerns::EmployerProfileConcern
 
       field :sic_code,                type: String
-      field :rating_area_id,          type: BSON::ObjectId
 
       embeds_one  :employer_attestation
 
       # TODO use SIC code validation
-      validates_presence_of :sic_code, :rating_area_id
-
-
-      def rating_area=(new_rating_area)
-        write_attribute(:rating_area_id, new_rating_area._id)
-        @rating_area = new_rating_area
-      end
-
-      def rating_area
-        return unless rating_area_id.present?
-        return @rating_area if defined? @rating_area
-        @rating_area = BenefitSponsors::Locations::RatingArea.find(rating_area_id)
-      end
-
+      validates_presence_of :sic_code
 
       # TODO move all this into builder
 

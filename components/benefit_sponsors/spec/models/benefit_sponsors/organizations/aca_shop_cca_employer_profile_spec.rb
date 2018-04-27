@@ -32,8 +32,7 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        sic_code: sic_code,
-        rating_area: rating_area,
+        sic_code: sic_code
       }
     end
 
@@ -48,14 +47,14 @@ module BenefitSponsors
         end
       end
 
-      context "with no rating_area" do
-        subject { described_class.new(params.except(:rating_area)) }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-        end
-      end
+      # TODO: move this spec to appropriate model
+      # context "with no rating_area" do
+      #   subject { described_class.new(params.except(:rating_area)) }
+      #   it "should not be valid" do
+      #     subject.validate
+      #     expect(subject).to_not be_valid
+      #   end
+      # end
 
       context "with all required arguments" do
         subject { described_class.new(params) }
@@ -81,7 +80,6 @@ module BenefitSponsors
           end
 
           it "should save and be findable" do
-            # binding.pry
             expect(site.save!).to eq true
             expect(organization.save!).to eq true
 
@@ -138,13 +136,11 @@ module BenefitSponsors
       let!(:tyrell_profile)                { described_class.new(
                                                 office_locations: office_locations,
                                                 sic_code:         sic_code,
-                                                rating_area:      rating_area,
                                             )}
 
       let!(:wallace_profile)               { described_class.new(
                                                 office_locations: office_locations,
                                                 sic_code: sic_code,
-                                                rating_area: rating_area,
                                             )}
 
       before { 

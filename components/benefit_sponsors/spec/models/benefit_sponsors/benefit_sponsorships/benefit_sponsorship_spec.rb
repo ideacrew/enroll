@@ -144,37 +144,38 @@ module BenefitSponsors
         end
       end
 
-      context "using rating_area helper method" do
-        let(:rating_area)                   { ::BenefitMarkets::Locations::RatingArea.new }
-        let(:profile_with_rating_area)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(rating_area: rating_area ) }
-        let(:profile_with_nil_rating_area)  { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new }
-        let(:profile_without_rating_area)   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
+      # TODO: Before deleting this make sure you move this spec to appropriate model
+      # context "using rating_area helper method" do
+      #   let(:rating_area)                   { ::BenefitMarkets::Locations::RatingArea.new }
+      #   let(:profile_with_rating_area)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(rating_area: rating_area ) }
+      #   let(:profile_with_nil_rating_area)  { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new }
+      #   let(:profile_without_rating_area)   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
 
-        context "on profile without attribute defined" do
-          subject { described_class.new(profile: profile_without_rating_area) }
+      #   context "on profile without attribute defined" do
+      #     subject { described_class.new(profile: profile_without_rating_area) }
 
-          it "should not return value" do
-            expect(subject.rating_area).to be_nil
-          end
-        end
+      #     it "should not return value" do
+      #       expect(subject.rating_area).to be_nil
+      #     end
+      #   end
 
-        context "on profile with attribute defined but not set" do
-          subject { described_class.new(profile: profile_with_nil_rating_area) }
+      #   context "on profile with attribute defined but not set" do
+      #     subject { described_class.new(profile: profile_with_nil_rating_area) }
 
-          it "should return correct value" do
-            expect(subject.rating_area).to be_nil
-          end
-        end
+      #     it "should return correct value" do
+      #       expect(subject.rating_area).to be_nil
+      #     end
+      #   end
 
-        context "on profile with attribute defined" do
-          subject { described_class.new(profile: profile_with_rating_area) }
+      #   context "on profile with attribute defined" do
+      #     subject { described_class.new(profile: profile_with_rating_area) }
 
-          it "should return correct value" do
-            expect(subject.rating_area).to eq rating_area
-          end
-        end
+      #     it "should return correct value" do
+      #       expect(subject.rating_area).to eq rating_area
+      #     end
+      #   end
 
-      end
+      # end
     end
   end
 end
