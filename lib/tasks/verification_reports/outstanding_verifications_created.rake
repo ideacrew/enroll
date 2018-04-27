@@ -60,7 +60,8 @@ namespace :reports do
       if person.primary_family
         person.hbx_id
       else
-        person.families.map(&:primary_family_member).select{|member| member.person.consumer_role.present?}.first.hbx_id || person.hbx_id
+        primary = person.families.map(&:primary_family_member).select{|member| member.person.consumer_role.present?}.first || person.families.map(&:primary_family_member).first
+        primary ? primary.hbx_id : person.hbx_id
       end
     end
 
