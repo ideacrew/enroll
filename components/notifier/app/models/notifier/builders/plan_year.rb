@@ -31,6 +31,11 @@ module Notifier
       end
     end
 
+    def plan_year_current_py_plus_60_days
+      if current_plan_year.present?
+        merge_model.plan_year.current_py_plus_60_days = format_date(current_plan_year.end_on + 60.days)
+      end
+    end
     def plan_year_current_py_oe_end_date
       if current_plan_year.present?
         merge_model.plan_year.current_py_oe_end_date = format_date(current_plan_year.open_enrollment_end_on)

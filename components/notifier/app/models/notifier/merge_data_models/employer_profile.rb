@@ -11,6 +11,7 @@ module Notifier
     attribute :last_name, String
     # attribute :primary_identifier, String
     # attribute :mpi_indicator, String
+    attribute :email, String
     attribute :application_date, String
     attribute :invoice_month, String
     attribute :employer_name, String
@@ -27,6 +28,7 @@ module Notifier
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         first_name: 'John',
         last_name: 'Whitmore',
+        email: 'johnwhitmore@gmail.com',
         application_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         invoice_month: TimeKeeper.date_of_record.next_month.strftime('%B'),
         employer_name: 'North America Football Federation'
@@ -50,6 +52,14 @@ module Notifier
 
     def broker_present?
       self.broker.present?
+    end
+
+    def shop?
+      true
+    end
+
+    def employee_notice?
+      false
     end
   end
 end

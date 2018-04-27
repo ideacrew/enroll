@@ -35,6 +35,7 @@ class GeneralAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  embeds_many :documents, as: :documentable
   has_many :general_agency_contacts, class_name: "Person", inverse_of: :general_agency_contact
   accepts_nested_attributes_for :general_agency_contacts, reject_if: :all_blank, allow_destroy: true
 

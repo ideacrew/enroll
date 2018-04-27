@@ -1,6 +1,7 @@
 module Notifier
   module NoticeBuilder
     include Config::SiteConcern
+    include ApplicationHelper
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
@@ -71,7 +72,7 @@ module Notifier
     end
 
     def pdf_options
-      {
+      options = {
         margin:  {
           top: 15,
           bottom: 28,
@@ -91,6 +92,16 @@ module Notifier
             }),
           }
       }
+      #TODO: Add footer partial
+      if dc_exchange?
+        options.merge!({footer: {
+          content: ApplicationController.new.render_to_string({
+            template: "notifier/notice_kinds/footer.html.erb",
+            layout: false,
+            locals: {notice: self}
+          })
+        }})
+      end
     end
 
     def notice_path
@@ -106,11 +117,11 @@ module Notifier
     end
 
     def non_discrimination_attachment
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_non_discrimination_attachment)]
     end
 
     def attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address)]
     end
 
     def join_pdfs(pdfs)
@@ -203,7 +214,7 @@ module Notifier
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
-      receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+      receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end

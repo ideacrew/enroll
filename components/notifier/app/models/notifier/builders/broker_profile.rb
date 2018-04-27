@@ -33,6 +33,11 @@ module Notifier
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
     end
 
+    def email
+      merge_model.email = broker_role.email_address
+    end
+
+
     def first_name
       merge_model.first_name = broker_role.person.first_name
     end
