@@ -13,7 +13,6 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
 
   context "with hbx_enrollments" do
     if aca_state_abbreviation == "DC"
-
       before :each do
         assign :person, person
         assign :employee_role, employee_role
@@ -29,11 +28,10 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
         render "insured/families/shop_for_plans_widget"
       end
 
-        it 'should have title' do
-          expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
-        end
+      it 'should have title' do
+        expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
       end
-
+      
       it "should have image" do
         expect(rendered).to have_selector("img")
         expect(rendered).to match /shop_for_plan/
@@ -128,6 +126,4 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       expect(rendered).not_to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
     end
   end
-
-
 end
