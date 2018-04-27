@@ -1,9 +1,7 @@
 module BenefitMarkets
-  class Policies::Policy
+  class MarketPolicies::MarketPolicy
     include Mongoid::Document
     include Mongoid::Timestamps
-
-
 
   end
 end

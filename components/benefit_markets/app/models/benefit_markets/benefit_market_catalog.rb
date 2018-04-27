@@ -34,10 +34,10 @@ module BenefitMarkets
     belongs_to  :benefit_market,
                 class_name: "BenefitMarkets::BenefitMarket"
 
-    embeds_one  :sponsor_eligibility_policy,  
-                class_name: "BenefitMarkets::SponsorEligibilityPolicy"
-    embeds_one  :member_eligibility_policy,
-                class_name: "BenefitMarkets::MemberEligibilityPolicy"
+    embeds_one  :sponsor_market_policy,  
+                class_name: "BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
+    embeds_one  :member_market_policy,
+                class_name: "BenefitMarkets::MarketPolicies::MemberMarketPolicy"
 
     # has_many    :benefit_applications,
     #             class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"

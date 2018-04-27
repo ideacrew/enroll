@@ -1,6 +1,6 @@
 module BenefitMarkets
-  class Policies::MemberProductPackagePolicy < Policies::Policy
-
+  class MarketPolicies::MemberMarketPolicy < MarketPolicies::MarketPolicy
+    
     # DC Individual
     # age-off 26, 65
     # catastrophic plans - enrollment group must be < 30

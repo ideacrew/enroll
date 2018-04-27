@@ -6,8 +6,10 @@ module BenefitMarkets
     field :effective_date,    type: Date 
     field :probation_period_options, type: Array, default: []
 
-    embeds_many :eligibilities
-    embeds_many :product_packages
+    embeds_many :policies,
+                class_name: "BenefitMarket::Policies::Policy"
+    embeds_many :product_packages,
+                class_name: "Products::ProductPackage"
 
   end
 end
