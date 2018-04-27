@@ -1,6 +1,6 @@
-// Visit The Stimulus Handbook for more details 
+// Visit The Stimulus Handbook for more details
 // https://stimulusjs.org/handbook/introduction
-// 
+//
 // This example controller works with specially annotated HTML like:
 //
 // <div data-controller="hello">
@@ -10,12 +10,12 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = [ "officeLocations", "primaryAddress" ]
+  static targets = [ "officeLocations", "officeLocation" ]
 
   addLocation() {
     //clone new location node, unhide remove button, modify name attribute
-    var newLocation = document.importNode(this.primaryAddressTarget, true)
-    newLocation.querySelector('.js-remove').classList.remove('d-none')
+    var newLocation = document.importNode(this.officeLocationTarget, true)
+    newLocation.querySelector('.js-non-primary').classList.remove('d-none')
     newLocation.querySelectorAll('input').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${Date.now()}]`)
       input.setAttribute('name', name)
@@ -27,6 +27,6 @@ export default class extends Controller {
 
   removeLocation(event) {
     //remove itself
-    event.target.closest('.personal-info-row').remove()
+    event.target.closest('.js-office-location').remove()
   }
 }

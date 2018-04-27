@@ -1,4 +1,4 @@
-<%= form_for @site, as: :site, url: { action: 'create' }, html: { data: { controller: "site" }, class: "needs-validation", id:'broker_registration_form', novalidate:true } do |f| %>
+<%= form_for @site, as: :site, url: site_path, html: { data: { controller: "site" }, class: "needs-validation", id:'broker_registration_form', novalidate:true } do |f| %>
   <div class="form-group">
     <label for="inputSiteKey">Site Key</label>
     <%= f.text_field :site_key, required:'true', id:'inputSiteKey', class:'form-control'%>
@@ -8,35 +8,70 @@
     <%= f.text_field :short_name, id:'inputShortName', class:'form-control'%>
     <label for="inputByLine">By Line</label>
     <%= f.text_field :byline, id:'inputShByLine', class:'form-control'%>
+    <label for="inputDomainName">Domain Name</label>
+    <%= f.text_field :domain_name, id:'inputDomainName', class:'form-control'%>
   </div>
 
-  <%= f.fields_for :owner_organization, @site.owner_organization || BenefitSponsors::Organizations::ExemptOrganization.new do |organization_fields| %>
+  <%= f.fields_for :owner_organization, @site.owner_organization do |organization_fields| %>
     <div class="form-group">
       <label for="inputLegalName">Organization Legal Name</label>
       <%= organization_fields.text_field :legal_name, id: 'inputLegalName', class: 'form-control' %>
     </div>
 
-    <%= organization_fields.fields_for :office_locations, organization_fields.object.primary_office_location || organization_fields.object.office_locations.build do |office_fields| %>
-      <%= office_fields.hidden_field :is_primary, value: true %>
-
-      <!-- <%= office_fields.fields_for :phone, office_fields.object.phone || BenefitSponsors::Locations::Phone.new do |phone_fields| %>
-        <%= phone_fields.hidden_field :kind, value: 'main' %>
-
-        <label for="inputPhoneAreaCode">Phone</label>
-        <%= phone_fields.text_field :area_code, id: 'inputAreaCode', class: 'form-control' %>
-        <%= phone_fields.text_field :number, id: 'inputPhoneNumber', class: 'form-control' %>
-      <% end %> -->
-
+    <%= organization_fields.fields_for :profile, organization_fields.object.profile do |profile_fields| %>
       <div data-target="site.officeLocations">
-        <%= office_fields.fields_for :address, office_fields.object.address || BenefitSponsors::Locations::Address.new do |address_fields| %>
-          <%= address_fields.hidden_field :kind, value: 'primary' %>
+        <%= profile_fields.fields_for :office_locations, profile_fields.object.office_locations do |office_fields| %>
+          <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
 
-          <%= render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields } %>
-        <% end %>
-      </div>
+          <% if office_fields.object.is_primary? %>
+            <div data-target="site.officeLocation" class="js-office-location">
+              <div class="row row-form-wrapper no-buffer d-none js-non-primary">
+          <% else %>
+            <div class="js-office-location">
+              <div class="row row-form-wrapper no-buffer js-non-primary">
+          <% end %>
+              <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+              </div>
 
-      <a class="btn btn-sm btn-outline-primary" data-action="click->site#addLocation">Add another location</a>
-    <% end %>
+              <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+                <div class="form-group form-group-lg">
+                  <div class="row" style="margin: 0;">
+                    <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                    <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group no-pd">
+                <a class="btn btn-sm btn-outline-primary" data-action="click->site#removeLocation">Remove</a>
+              </div>
+            </div>
+
+            <% if office_fields.object.is_primary? %>
+              <label class="js-remove">Primary Address</label>
+            <% end %>
+
+            <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
+              <%= phone_fields.hidden_field :kind, value: 'main' %>
+
+              <label for="inputPhoneAreaCode">Phone</label>
+              <div class="input-group">
+                <%= phone_fields.text_field :area_code, class: 'form-control' %>
+                <%= phone_fields.text_field :number, class: 'form-control' %>
+              </div>
+            <% end %>
+
+            <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
+              <%= address_fields.hidden_field :kind, value: 'primary' %>
+
+              <%= render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields } %>
+            <% end %>
+          </div>
+
+        <% end %> <!--- profile_fields --->
+        </div>
+        <a class="btn btn-sm btn-outline-primary" data-action="click->site#addLocation">Add another location</a>
+    <% end %> <!--- organization_fields --->
   <% end %>
 
   <%= link_to 'Back', sites_path, class:'btn btn-default' %><%= f.submit class:'btn btn-primary' %>

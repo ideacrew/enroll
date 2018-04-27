@@ -9,6 +9,7 @@
       <th scope="col">By Line</th>
       <th scope="col">Domain Name</th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -19,7 +20,8 @@
         <td><%= site.short_name %></td>
         <td><%= site.byline %></td>
         <td><%= site.domain_name %></td>
-        <td><%= link_to 'Edit Site', edit_site_path(site) %></td>
+        <td><%= link_to 'Edit', edit_site_path(site) %></td>
+        <td><%= link_to 'Destroy', site_path(site), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

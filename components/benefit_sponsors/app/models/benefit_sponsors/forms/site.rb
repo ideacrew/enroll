@@ -1,47 +1,101 @@
 module BenefitSponsors
   module Forms
     class Site
+      extend  ActiveModel::Naming
+
+      include ActiveModel::Conversion
       include ActiveModel::Model
       include ActiveModel::Validations
 
-      attr_accessor :id, :site_key, :long_name, :short_name, :byline, :copyright_period_start, :site_organizations_count, :updated_at, :created_at
+      include Virtus.model
 
-      validates :short_name, presence: true, :allow_blank => false
-      validates :long_name, presence: true, :allow_blank => false
+      attribute :id, String
+      attribute :site_key, String
+      attribute :long_name, String
+      attribute :short_name, String
+      attribute :domain_name, String
+      attribute :byline, String
+      attribute :copyright_period_start, String
+      attribute :site_organizations_count, String
+      attribute :owner_organization, BenefitSponsors::Forms::ExemptOrganization
 
-      def initialize(user, attributes={})
-        @user = user
-        assign_wrapper_attributes attributes
+      # Create a form for the 'new' action.
+      # Note that usually this method may have few parameters
+      #   other than current user.
+      # @return [SiteForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
+      def self.for_new
+        new service.attributes_to_form_params(service.build)
       end
 
-      def assign_wrapper_attributes(attributes = {}, options={})
-        if self.id = attributes.delete(:id)
-          #find model with factory, set attributes with model.attributes
-          assign_wrapper_attributes BenefitSponsors::SiteFactory.find(@user, id).attributes.except("_id"), protect: true
-        end
+      # Create a form for the 'create' action, populated with the provided
+      #   parameters from the controller.
+      # @param params [Hash] the params for :site from the controller
+      # @return [SiteForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
+      def self.for_create(params)
+        new params
+      end
 
-         attributes.each_pair do |k, v|
-          self.send("#{k}=", v) unless self.send(k) && options[:protect]
-        end
+      # Find the existing form corresponding to the given ID.
+      # @param id [Object] an opaque ID from the controller parameters
+      # @return [SiteForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
+      def self.for_edit(id)
+        new find_for(id)
+      end
+
+      # Find the 'update' form corresponding to the given ID.
+      # @param id [Object] an opaque ID from the controller parameters
+      # @return [SiteForm] an instance of the form populated with
+      #   the backing attributes resolved by the service.
+      def self.for_update(id)
+        new find_for(id)
+      end
+
+      def self.find_for(id)
+        params_form = new(id: id)
+        form = service.load_form_params_from_resource(params_form)
+        service.load_form_params_from_resource(params_form)
+      end
+
+      def self.service
+        @service ||= BenefitSponsors::Services::SiteService.new
+      end
+
+      def service
+        @service ||= BenefitSponsors::Services::SiteService.new
       end
 
       def save
-        return false unless self.valid?
-        BenefitSponsors::SiteFactory.call(self).persist
+        persist
       end
 
-      def attributes
-        { site_key: site_key,
-          long_name: long_name,
-          short_name: short_name,
-          byline: byline }
+      def update_attributes(params)
+        self.attributes = params
+        service.update(self)
       end
 
-      private
-      def assign_attributes(atts = {})
-        atts.each_pair do |k, v|
-          self.send("#{k}=".to_sym, v)
+      def persist
+        return false unless valid?
+        service.save(self)
+      end
+
+      # Forms cannot be persisted
+      def persisted?
+        self.id.present?
+      end
+
+      def forms_site_path
+        if self.id.present?
+          site_path(id: self.id)
+        else
+          new_site_path
         end
+      end
+
+      def owner_organization_attributes=(owner_organization)
+        self.owner_organization = BenefitSponsors::Forms::ExemptOrganization.new(owner_organization)
       end
     end
   end
