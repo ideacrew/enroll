@@ -23,7 +23,7 @@ FactoryGirl.define do
      # we have to update the factory create instead of build
     before(:create) do |sponser_ship, evaluator|
       sponser_ship.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization)
-      sponser_ship.benefit_market = ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "DC Health SHOP")
+      sponser_ship.benefit_market = ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "DC Health SHOP", site_urn: :dc)
       sponser_ship.profile = FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile)
     end
   end

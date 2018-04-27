@@ -20,10 +20,10 @@ module BenefitSponsors
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.require(:id))
       end
 
-      def update        
+      def update    
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.require(:id))
         if @benefit_application_form.update_attributes(application_params)
-          redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.service.benefit_sponsorship, @benefit_application_form.show_page_model)
+          redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model)
         else
           flash[:error] = error_messages(@benefit_application_form)
           render :edit
