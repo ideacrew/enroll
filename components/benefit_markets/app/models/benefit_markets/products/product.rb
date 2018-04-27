@@ -1,4 +1,17 @@
 # Support product import from SERFF, CSV templates, etc
+
+## Product premium periods
+# DC & MA SHOP Health: Q1, Q2, Q3, Q4
+# DC Dental: annual
+# GIC Medicare: Jan-June, July-Dec
+# DC & MA IVL: annual
+
+# Effective dates during which sponsor may purchase this product at this price
+## DC SHOP Health   - annual product changes & quarterly rate changes
+## CCA SHOP Health  - annual product changes & quarterly rate changes
+## DC IVL Health    - annual product & rate changes
+## Medicare         - annual product & semiannual rate changes
+
 module BenefitMarkets
   module Products
     class Product
@@ -18,8 +31,6 @@ module BenefitMarkets
 
       belongs_to  :issuer
 
-      index({ hbx_id: 1, title: 1 })
-
       embeds_many :premium_tables,
                   class_name: "Products::PremiumTable"
 
@@ -31,6 +42,10 @@ module BenefitMarkets
       validates :market,
                 presence: true,
                 inclusion: {in: BENEFIT_MARKET_KINDS, message: "%{value} is not a valid benefit market kind"}
+
+
+      index({ hbx_id: 1, title: 1 })
+
 
     end
   end
