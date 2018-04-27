@@ -34,7 +34,8 @@
         <%= mail_to active_broker.email.address, active_broker.email.address %>
       </div>
       <% else %>
-      <%= link_to 'Add Broker', employers_employer_profile_path(@employer_profile.id, :tab=>'brokers'), "aria-expanded" => "true", class: "btn btn-default center-block" %>
+      <!-- TODO render this from components-->
+      <%= link_to 'Add Broker', main_app.employers_employer_profile_path(@employer_profile.id, :tab=>'brokers'), "aria-expanded" => "true", class: "btn btn-default center-block" %>
       <small>
         <%= link_to "What is a Broker?", '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
       </small>
