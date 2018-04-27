@@ -9,6 +9,7 @@ require 'webmock/rspec'
 WebMock.allow_net_connect!
 
 require 'kaminari'
+require File.expand_path('app/models/services/checkbook_services')
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -68,6 +69,7 @@ RSpec.configure do |config|
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
   config.include FederalHolidaysHelper
+  config.include Config::AcaModelConcern
 
   config.infer_spec_type_from_file_location!
 

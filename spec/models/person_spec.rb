@@ -463,6 +463,7 @@ describe Person, :dbclean => :after_each do
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
+      @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
 
 #    after(:all) do
@@ -520,6 +521,16 @@ describe Person, :dbclean => :after_each do
     it 'ssn present, dob present, first_name, last_name present and person inactive' do
       @p4.update_attributes(is_active:false)
       expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
+    end
+
+    it 'returns person records only where is_active == true' do
+      expect(@p2.is_active).to eq true
+      expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
+    end
+
+    it 'should not match person record if is_active == false' do
+      expect(@p5.is_active).to eq false
+      expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).to be_empty
     end
   end
 
@@ -733,34 +744,35 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "does not allow two people with the same user ID to be saved" do
+  describe "does not allow two people with the same user ID to be saved", dbclean: :around_each do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
-        def drop_user_id_index_in_db
-          Person.collection.indexes.each do |spec|
-            if spec["key"].keys.include?("user_id")
-              if spec["unique"] && spec["sparse"]
-                Person.collection.indexes.drop_one(spec["key"])
-              end
-            end
+
+    def drop_user_id_index_in_db
+      Person.collection.indexes.each do |spec|
+        if spec["key"].keys.include?("user_id")
+          if spec["unique"] && spec["sparse"]
+            Person.collection.indexes.drop_one(spec["key"])
           end
         end
+      end
+    end
 
-        def create_user_id_uniqueness_index
-          Person.index_specifications.each do |spec|
-            if spec.options[:unique] && spec.options[:sparse]
-              if spec.key.keys.include?(:user_id)
-                key, options = spec.key, spec.options
-                Person.collection.indexes.create_one(key, options)
-              end
-            end
+    def create_user_id_uniqueness_index
+      Person.index_specifications.each do |spec|
+        if spec.options[:unique] && spec.options[:sparse]
+          if spec.key.keys.include?(:user_id)
+            key, options = spec.key, spec.options
+            Person.collection.indexes.create_one(key, options)
           end
         end
+      end
+    end
 
-        before :each do
-          drop_user_id_index_in_db
-          create_user_id_uniqueness_index
-        end
+    before :each do
+      drop_user_id_index_in_db
+      create_user_id_uniqueness_index
+    end
 
     it "should let fail to save" do
       user_id = BSON::ObjectId.new
@@ -1012,56 +1024,28 @@ describe Person, :dbclean => :after_each do
       end
     end
 
-    describe "19 plus y.o." do
-      context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
-      end
-
-      context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
-      end
-
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
-      end
-
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
-      end
-
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
-      end
-
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
-      end
+    context "SSN + Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
     end
-    describe "less then 19y.o." do
-      context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true, nil, 18
-      end
 
-      context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false, nil, 16
-      end
+    context "SSN + Immigrant" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+    end
 
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native", 5
-      end
+    context "SSN + Native Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
+    end
 
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true, nil, 13
-      end
+    context "Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
+    end
 
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false, nil, 14
-      end
+    context "Immigrant with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
+    end
 
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native", 15
-      end
-
+    context "Native Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
     end
   end
 

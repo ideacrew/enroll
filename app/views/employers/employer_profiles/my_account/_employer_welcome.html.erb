@@ -4,18 +4,21 @@
       It's time to set up your Health Benefits Program. You can either get help from a Broker, or set up your Health Benefits Program yourself. Choose the path that's right for you.
     </p>
   </div>
-  
-  <div class="left-icon-section section">
-    <div class="row">
-      <div class="col-md-offset-1 col-md-11">
-        <h3>Important Documents Needed</h3>
-        <p class="twenty">
-          After you complete your application, you will need to submit proof of your eligibility to shop as a small business through the Health Connector. You will need to submit this proof before you are able to shop for a plan. Please review our list of documents that can be used as proof and make sure that you have the right documentation available.
-        </p>
+
+  <%if employer_attestation_is_enabled? %>
+    <div class="left-icon-section section">
+      <div class="row">
+        <div class="col-md-offset-1 col-md-11">
+          <h3><%=l10n("employers.employer_profiles.my_account.important_documents_needed")%></h3>
+          <p class="twenty">
+            <%=l10n("employers.employer_profiles.my_account.eligibility_documents_needed")%>
+          </p>
+        </div>
       </div>
     </div>
-  </div>
+  <%end%>
 
+  <% unless @employer_profile.broker_agency_profile.present?  %>
   <div class="left-icon-section section">
     <div class="row">
       <div class="col-md-1">
@@ -41,6 +44,7 @@
       </div>
     </div>
   </div>
+  <% end %>
 
   <div class="left-icon-section section">
     <div class="row">
@@ -73,21 +77,38 @@
       <div class="col-xs-1">
         <i class="fa fa-flag fa-2x"></i>
       </div>
+
       <div class="col-xs-9">
         <span>
           <strong>Important:
           </strong>You'll want to enter your employee roster first before selecting your Benefits so that you'll be able to see cost data when you select your Benefits.
         </span>
-        <div class="icon-left-download">
-          <%= link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do %>
-            <i class="fa fa-download">
-            </i>
-            Download Step-by-Step Instructions for New Employers
+        <% if individual_market_is_enabled? %>
+          <div class="icon-left-download">
+            <%= link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank' do %>
+              <i class="fa fa-download">
+              </i>
+              Download Step-by-Step Instructions for New Employers
+            <% end %>
+          </div>
+        <%else%>
+          <div class="icon-left-download">
+            <%= link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do %>
+              <i class="fa fa-download">
+              </i>
+              Download Step-by-Step Instructions for New Employers
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <%if individual_market_is_enabled? %>
+        <div class="col-xs-2 pdf-image full-width">
+          <%= link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank' do %>
+          <%= image_tag('images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right') %>
           <% end %>
         </div>
-      </div>
+      <%end%>
     </div>
-
-
   </div>
+
 </div>

@@ -50,9 +50,12 @@ Rails.application.configure do
     :host => "127.0.0.1",
     :port => 3000
   }
-  
-  #Queue adapter 
-  config.active_job.queue_adapter = :test 
+
+  #Environment URL stub
+  config.checkbook_services_base_url = Settings.checkbook_services.base_url
+
+  #Queue adapter
+  config.active_job.queue_adapter = :test
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

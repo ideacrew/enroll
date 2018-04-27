@@ -24,7 +24,30 @@
             end
 
             }, :sortable => false, :filter => false
-          table_column :broker, :label => 'Broker', :proc => Proc.new { |row| broker_name(row) }, :sortable => false, :filter => false
+
+          table_column :broker, :label => 'Broker', :proc => Proc.new { |row|
+              if general_agency_enabled?
+                 person_record = row.broker_agency_profile.primary_broker_role.person
+                 redirect_path = main_app.edit_broker_agencies_profile_applicant_path(row.broker_agency_profile, person_record)
+                 link_to row.broker_agency_profile.primary_broker_role.person.full_name, redirect_path
+              else
+                 broker_name(row)
+               end
+            }, :sortable => false, :filter => false
+          
+          if attributes["general_agency_is_enabled"]
+              table_column :general_agency, :label => "General Agency", :proc => Proc.new { |row| 
+              if row.general_agency_profile
+                 general_agency_profiles = row.general_agency_profile
+                 broker_agency_profile = row.broker_agency_profile
+                 ga_legal_name = general_agency_profiles.legal_name
+                 clear_assign_path =  raw('<br>') + link_to( "#{l10n('clear_assignment')}", main_app.clear_assign_for_employer_broker_agencies_profile_path(id: broker_agency_profile.id, employer_id: row.employer_profile.id), method: :post, remote: true, data: {  confirm: l10n("broker_agencies.profiles.remove_general_agency_assignment") })
+                 general_agency = ga_legal_name + clear_assign_path if ga_legal_name
+              end
+            }, :sortable => false, :filter => false
+
+           end
+
           table_column :actions, :width => '50px', :proc => Proc.new { |row|
             dropdown = [
              # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'

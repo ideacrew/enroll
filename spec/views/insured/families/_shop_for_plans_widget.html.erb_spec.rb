@@ -12,36 +12,39 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
 
 
   context "with hbx_enrollments" do
-    before :each do
-      assign :person, person
-      assign :employee_role, employee_role
-      assign :hbx_enrollments, hbx_enrollments
-      assign :family, family
-      sign_in(current_user)
-      allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
-      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-      allow(current_user).to receive(:has_employee_role?).and_return(true)
-      allow(person).to receive(:active_employee_roles).and_return([employee_role])
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      #allow(view).to receive(:has_active_sep?).and_return(false)
-      render "insured/families/shop_for_plans_widget"
-    end
+    if aca_state_abbreviation == "DC"
 
-    it 'should have title' do
-      expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
-    end
+      before :each do
+        assign :person, person
+        assign :employee_role, employee_role
+        assign :hbx_enrollments, hbx_enrollments
+        assign :family, family
+        sign_in(current_user)
+        allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
+        allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+        allow(current_user).to receive(:has_employee_role?).and_return(true)
+        allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+        #allow(view).to receive(:has_active_sep?).and_return(false)
+        render "insured/families/shop_for_plans_widget"
+      end
 
-    it "should have image" do
-      expect(rendered).to have_selector("img")
-      expect(rendered).to match /shop_for_plan/
-    end
+        it 'should have title' do
+          expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
+        end
+      end
 
-    it "should have link with change_plan" do
-      expect(rendered).to have_selector("input[type=submit][value='Shop for Plans']")
-      expect(rendered).to have_selector('strong', text: 'Shop for health and dental plans')
-      expect(rendered).to have_selector("a[href='/insured/group_selections/new?change_plan=change_plan&employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
-    end
+      it "should have image" do
+        expect(rendered).to have_selector("img")
+        expect(rendered).to match /shop_for_plan/
+      end
 
+      it "should have link with change_plan" do
+        expect(rendered).to have_selector("input[type=submit][value='Shop for Plans']")
+        expect(rendered).to have_selector('strong', text: 'Shop for health and dental plans')
+        expect(rendered).to have_selector("a[href='/insured/group_selections/new?change_plan=change_plan&employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
+      end
+    end
   end
 
   context "without hbx_enrollments" do
@@ -75,6 +78,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       sign_in(current_user)
+    end
+
+    context "during non-open enrollment period" do
+      before :each do
+        allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        @employee_role = employee_role
+        allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      end
+
+      it "should not have the text 'You are not under open enrollment period.'" do
+        render "insured/families/shop_for_plans_widget"
+        expect(rendered).not_to have_content "You are not under open enrollment period."
+      end
     end
 
     it "should have the updated description with link to 'enroll today' text" do

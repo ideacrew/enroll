@@ -26,5 +26,9 @@ module PdfTemplates
     attribute :dependent_dob, Date
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
+    attribute :employee_fullname, String
+    attribute :dependents, String
+    attribute :dependents_count, String
+    attribute :enrolled_count, String
   end
 end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
+describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', :dbclean => :after_each do
 
   let(:model_event) { "renewal_plan_year_publish_dead_line" }
   let(:notice_event) { "renewal_plan_year_publish_dead_line" }
@@ -11,6 +11,8 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
   let!(:organization) { FactoryGirl.create(:organization, employer_profile: employer) }
+  let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer.id)}
+  let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
 
   let!(:date_mock_object) { double("Date", day: 13)}
   describe "ModelEvent" do
