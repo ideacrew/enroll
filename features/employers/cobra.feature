@@ -1,6 +1,6 @@
+@attestation_disabled
 Feature: COBRA basic
   Scenario: An Employer is new to the Exchange and needs to enter COBRA enrollees
-    Given application has plan years
     Given shop health plans exist for both last and this year
     Given Employer has not signed up as an HBX user
     Given vertical and horizontal plan choices are offered
