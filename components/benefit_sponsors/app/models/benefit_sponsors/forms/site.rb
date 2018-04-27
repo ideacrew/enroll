@@ -25,7 +25,7 @@ module BenefitSponsors
       # @return [SiteForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
       def self.for_new
-        new service.attributes_to_form_params(service.build)
+        service.attributes_to_form_params(service.build, new)
       end
 
       # Create a form for the 'create' action, populated with the provided
@@ -84,14 +84,6 @@ module BenefitSponsors
       # Forms cannot be persisted
       def persisted?
         self.id.present?
-      end
-
-      def forms_site_path
-        if self.id.present?
-          site_path(id: self.id)
-        else
-          new_site_path
-        end
       end
 
       def owner_organization_attributes=(owner_organization)
