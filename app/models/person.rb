@@ -570,6 +570,14 @@ class Person
     return false
   end
 
+  def has_active_consumer_member?
+    if self.primary_family.present?
+      active_consumer_member = self.primary_family.active_family_members.detect { |member| member.person.is_consumer_role_active? }
+      return true if active_consumer_member.present?
+    end
+    return false
+  end
+
   def can_report_shop_qle?
     employee_roles.first.census_employee.qle_30_day_eligible?
   end

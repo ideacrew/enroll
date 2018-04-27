@@ -294,7 +294,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       it "returns array with benefit_eligibility_element_group fields" do
         array = ["_id", "market_places", "enrollment_periods", "family_relationships",
                  "benefit_categories", "incarceration_status", "age_range", "citizenship_status",
-                 "residency_status", "ethnicity", "cost_sharing", "lawful_presence_status"]
+                 "residency_status", "ethnicity", "cost_sharing", "lawful_presence_status", "active_individual_role"]
         expect(benefit_package.benefit_eligibility_element_group.class.fields.keys).to eq array
       end
 
@@ -302,6 +302,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
         allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
+        allow(rule).to receive(:is_active_individual_role_satisfied?).and_return(true)
         consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [true, []]
       end
@@ -345,6 +346,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
         allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
+        allow(rule).to receive(:is_active_individual_role_satisfied?).and_return(true)
         consumer_role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         error_msg = (Settings.aca.individual_market.verification_outstanding_window.days == 0) ? [] : [["eligibility failed on lawful_presence_status"]]

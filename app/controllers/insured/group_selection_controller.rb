@@ -4,6 +4,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :set_vars_for_market, only: [:new]
+  before_action :convert_individual_members_to_resident, only: [:create]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
@@ -43,6 +44,7 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
+
     hbx_enrollment = build_hbx_enrollment
     if (keep_existing_plan && @hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
@@ -192,7 +194,13 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     if @hbx_enrollment.present? && @change_plan == "change_plan"
-      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
       @mc_coverage_kind = @hbx_enrollment.coverage_kind
     end
   end
@@ -205,4 +213,54 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
   end
+
+  # This method converts active consumers to residents for a household with a family with family member who has a transition to converall
+  def convert_individual_members_to_resident
+    # no need to do anything if shopping in IVL
+    if (params[:market_kind] == "coverall")
+      family = @person.primary_family
+      family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
+        BSON::ObjectId.from_string(family_member_id)
+      end
+      family_member_ids.each do |fm|
+        person = FamilyMember.find(fm).person
+        # Need to create new invididual market transition instance and resident role if none
+        if person.is_consumer_role_active?
+          # Need to terminate current individual market transition and create new one
+          current_transition = person.current_individual_market_transition
+          current_transition.update_attributes!(effective_ending_on: TimeKeeper.date_of_record)
+          # create resident role if it doesn't exist
+          if person.resident_role.nil?
+            #check for primary_person
+            family.build_resident_role(FamilyMember.find(fm), get_values_to_generate_resident_role(person))
+            if (person.id == @person.id)
+              # need to reload db
+              person = Person.find(person.id)
+              person.resident_role.update_attributes!(is_applicant: true)
+            end
+          else
+            transition = IndividualMarketTransition.new
+            transition.role_type = "resident"
+            transition.submitted_at = TimeKeeper.datetime_of_record
+            transition.reason_code = "generating_resident_role"
+            transition.effective_starting_on = TimeKeeper.datetime_of_record
+            person.individual_market_transitions << transition
+            person.save!
+          end
+        end
+      end
+    end
+  end
+
+  def get_values_to_generate_resident_role(person)
+    options = {}
+    options[:is_applicant] = person.consumer_role.is_applicant
+    options[:bookmark_url] = person.consumer_role.bookmark_url
+    options[:is_state_resident] = person.consumer_role.is_state_resident
+    options[:residency_determined_at] = person.consumer_role.residency_determined_at
+    options[:contact_method] = person.consumer_role.contact_method
+    options[:language_preference] = person.consumer_role.language_preference
+    options
+  end
+
 end

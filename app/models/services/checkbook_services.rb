@@ -62,7 +62,6 @@ module Services
       def filter_value
         case @hbx_enrollment.benefit_group.plan_option_kind
         when "single_plan"
-          # binding.pry
           # @hbx_enrollment.benefit_group.reference_plan_id.to_s
           @hbx_enrollment.benefit_group.reference_plan.hios_id.to_s
         when "metal_level"

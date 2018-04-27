@@ -316,6 +316,16 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET verification" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:user){ FactoryGirl.create(:user, person: person) }
+    let(:family_member) { FamilyMember.new(:person => person) }
+
+    before :each do
+      allow(person).to receive(:primary_family).and_return (family)
+      allow(family). to receive(:has_active_consumer_family_members). and_return([family_member])
+      allow(person).to receive(:is_consumer_role_active?).and_return true
+    end
 
     it "should be success" do
       get :verification
@@ -330,7 +340,7 @@ RSpec.describe Insured::FamiliesController do
     it "assign variables" do
       get :verification
       expect(assigns(:family_members)).to be_an_instance_of(Array)
-      expect(assigns(:family_members)).to eq(family_members)
+      expect(assigns(:family_members)).to eq([family_member])
     end
   end
 

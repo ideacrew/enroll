@@ -9,7 +9,7 @@
     </span>
   </div>
   <div class="documents-tab">
-    <% if @person && @person.consumer_role %>
+    <% if @person && @family_members.present? %>
        <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
         <%= render 'insured/families/verification/verification' %>
     <% end %>
