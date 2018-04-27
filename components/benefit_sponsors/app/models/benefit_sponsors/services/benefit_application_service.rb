@@ -37,12 +37,14 @@ module BenefitSponsors
       end
     
       # TODO: Test this query for benefit applications cca/dc
+      # TODO: Change it back to find once find method on BenefitApplication is fixed.
       def find_model_by_id(id)
-        BenefitSponsors::BenefitApplications::BenefitApplication.find(id)
+        BenefitSponsors::BenefitApplications::BenefitApplication.where(id: id).first
       end
 
+      # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
       def find_benefit_sponsorship(form)
-        @benefit_sponsorship ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(form.benefit_sponsorship_id)
+        @benefit_sponsorship ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: form.benefit_sponsorship_id).first
       end
 
       def attributes_to_form_params(benefit_application,form)

@@ -1,7 +1,7 @@
 <% profile_type = @agency.organization.profile.profile_type %>
 <% if is_broker_profile?(profile_type) %>
   <%= render 'shared/error_messages', :object => @agency %>
-  <%= render 'benefit_sponsors/shared/profiles/broker_agency/menu', :active_tab => "home-tab" %>
+  <%= render partial: 'benefit_sponsors/shared/profiles/broker_agency/menu', :locals => { :broker_profile_id => @agency.organization.profile.id, :active_tab => "home-tab" } %>
   <%= form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f| %>
     <%= render "benefit_sponsors/profiles/registrations/broker_agency_form", f: f %>
   <% end %>

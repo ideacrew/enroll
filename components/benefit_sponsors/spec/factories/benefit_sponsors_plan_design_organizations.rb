@@ -19,10 +19,6 @@ FactoryGirl.define do
         :allow_special => false, :exactly => 9)
     end
 
-    office_locations do
-      [ build(:benefit_sponsors_office_location, :primary) ]
-    end
-
     trait :with_profile do
       after(:create) do |organization, evaluator|
         create(:plan_design_proposal, :with_profile, plan_design_organization: organization)
