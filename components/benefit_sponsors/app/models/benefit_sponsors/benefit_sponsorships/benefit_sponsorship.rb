@@ -148,7 +148,16 @@ module BenefitSponsors
 
       end
 
+      def find_benefit_application(id)
+        benefit_applications.find(BSON::ObjectId.from_string(id))
+      end
+
       class << self
+        def find(id)
+          organization = BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
+          organization.benefit_sponsorships.find(id)
+        end
+
         def find_broker_for_sponsorship(id)
           organization = nil
           Organizations::PlanDesignOrganization.all.each do |pdo|

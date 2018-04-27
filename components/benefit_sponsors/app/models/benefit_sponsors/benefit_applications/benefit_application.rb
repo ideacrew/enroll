@@ -405,7 +405,7 @@ module BenefitSponsors
       class << self
         def find(id)
           application = nil
-          BenefitSponsors::Organizations::GeneralOrganization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
+          BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
             sponsorships = pdo.try(:benefit_sponsorships) || []
             sponsorships.each do |sponsorship|
               application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
@@ -414,7 +414,6 @@ module BenefitSponsors
           end
           application
         end
-
       end
 
 
