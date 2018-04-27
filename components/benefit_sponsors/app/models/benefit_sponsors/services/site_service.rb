@@ -26,6 +26,7 @@ module BenefitSponsors
             profiles: [{
               office_locations: form.owner_organization.profile.office_locations.map do |location|
                 {
+                  is_primary: location.is_primary,
                   phone: location.phone.attributes.slice(:kind, :area_code, :number, :extension),
                   address: location.address.attributes.slice(:kind, :address_1, :address_2, :city, :state, :zip),
                 }
@@ -49,6 +50,7 @@ module BenefitSponsors
             profile: {
               office_locations: site.owner_organization.profiles.first.office_locations.map do |location|
                 {
+                  is_primary: location.is_primary,
                   phone: location.phone.attributes,
                   address: location.address.attributes
                 }

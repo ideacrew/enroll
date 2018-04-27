@@ -47,7 +47,9 @@
           </div>
 
           <% if office_fields.object.is_primary? %>
-            <label class="js-remove">Primary Address</label>
+            <div class="js-remove row">
+              <label>Primary Address</label>
+            </div>
           <% end %>
 
           <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
