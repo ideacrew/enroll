@@ -2,8 +2,6 @@ module BenefitSponsors
   module Organizations
     class Forms::RegistrationForm
       include ActiveModel::Validations
-      #extend  ActiveModel::Naming
-      #include ActiveModel::Conversion
       include Virtus.model
 
       attribute :current_user_id, String
@@ -75,7 +73,6 @@ module BenefitSponsors
         service({profile_id: profile_id}).store!(self)
       end
 
-      # TODO : Refactor validating sub-documents.
       def registration_form
         validate_staff_role
         validate_form(self.organization)
