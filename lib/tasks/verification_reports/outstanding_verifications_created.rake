@@ -145,6 +145,8 @@ namespace :reports do
               types = ["DC Residency"]
             when "reject!"
               types = [get_rejected_type(person)]
+            when "coverage_purchased!"
+              types = person.verification_types - ['DC Residency', 'American Indian Status']
             end
 
             types.each do |type|
