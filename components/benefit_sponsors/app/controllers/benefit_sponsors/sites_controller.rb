@@ -1,6 +1,8 @@
 module BenefitSponsors
   # Sites Controller
   class SitesController < ApplicationController
+    layout 'benefit_sponsors/application'
+
     def index
       @sites = BenefitSponsors::Site.all
     end
