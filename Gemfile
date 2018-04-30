@@ -83,6 +83,7 @@ end
 
 group :development do
   gem 'parallel_tests'
+  gem 'knapsack'
   gem 'web-console', '2.3.0'
 end
 
@@ -127,4 +128,3 @@ group :production do
   gem 'newrelic_rpm'
   gem 'unicorn', '~> 4.8.3'
 end
-

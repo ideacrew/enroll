@@ -1,18 +1,19 @@
-{
-  "language": "ruby",
-  "cache": "bundler",
-  "bundler_args": "--without production",
-  "before_script": [
-    "rm -rf ./spec/vocabularies"
-  ],
-  "script": [
-    "bundle exec rake parallel:test",
-    "bundle exec cucumber"
-  ],
-  "os": "linux",
-  "services": [
-    "mongodb"
-  ],
-  "group": "stable",
-  "dist": "trusty"
-}
+---
+before_script:
+  - "rm -rf ./spec/vocabularies"
+bundler_args: "--without production"
+cache: bundler
+dist: trusty
+group: stable
+language: ruby
+os: linux
+script:
+  - "bundle exec rake knapsack:rspec"
+services:
+  - mongodb
+env:
+  global:
+    - CI_NODE_TOTAL=2
+  matrix:
+    - CI_NODE_INDEX=0
+    - CI_NODE_INDEX=1
