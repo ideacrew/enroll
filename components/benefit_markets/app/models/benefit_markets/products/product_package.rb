@@ -39,7 +39,7 @@ module BenefitMarkets
         validate :has_products
 
 
-        def is_available_for(effective_date)
+        def is_available_for?(service_area, effective_date)
           #implement by subclasses
         end
 
