@@ -1,0 +1,95 @@
+<%= form_for @benefit_market, url: { action: 'new'}, html: { data: { controller: 'benefit-market--form' } } do |f| %>
+  <div class="form-group">
+    <label for="inputSite">Site</label>
+    <%= f.text_field :site_urn, required:'true', class:'form-control'%>
+    <label for="inputKind">Kind</label>
+    <%= f.text_field :kind, class:'form-control'%>
+    <label for="inputTittle">Tittle</label>
+    <%= f.text_field :title, class:'form-control'%>
+    <label for="inputDescription">Description</label>
+    <%= f.text_field :description, class:'form-control'%>
+  </div>
+
+  <a data-action="click->benefit-market--form#clickTest">Test</a>
+
+  <h4>Please select benefit market kind</h4>
+  <%= select_tag "benefit_market_kind", options_for_select('ACA Individual' => 'acaIndividual', 'ACA Shop' => 'acaShop'), data: { action: 'change->benefit-market--form#configurationChange' } %>
+  <div data-target="benefit-market--form.acaIndividual">
+    <%= f.fields_for :configuration, BenefitMarkets::AcaIndividualConfiguration.new do |configuration_fields| %>
+      <label for="inputEnrollmentDueOn">monthly enrollment due on</label>
+      <%= configuration_fields.text_field :mm_enr_due_on, required:'true', class:'form-control'%>
+      <label for="inputVerificationOutstanding">verification outstanding window days</label>
+      <%= configuration_fields.text_field :vr_os_window, required:'true', class:'form-control'%>
+      <label for="inputVerificationDue">verification due days</label>
+      <%= configuration_fields.text_field :vr_due, required:'true', class:'form-control'%>
+      <label for="inputEnrollmentStartOn">open enrollment start on</label>
+      <%= configuration_fields.date_field :open_enrl_start_on, required:'true', class:'form-control'%>
+      <label for="inputOpenEnrollmentEndOn">open enrollment end on</label>
+      <%= configuration_fields.date_field :open_enrl_end_on, required:'true', class:'form-control'%>
+    <% end %> <!-- configration_fields -->
+  </div>
+
+  <div data-target="benefit-market--form.acaShop" class="d-none">
+    <%= f.fields_for :configuration, BenefitMarkets::AcaShopConfiguration.new do |configuration_fields| %>
+      <label for="inputSiteKey">employee count max</label>
+      <%= configuration_fields.text_field :ee_ct_max, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">employee participation ratio min</label>
+      <%= configuration_fields.text_field :ee_ratio_min, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">employee non owner count min</label>
+      <%= configuration_fields.text_field :ee_non_owner_ct_min, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">employer contribution pct min</label>
+      <%= configuration_fields.text_field :er_contrib_pct_min, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">binder payment due day of month</label>
+      <%= configuration_fields.text_field :binder_due_dom, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">earliest enroll prior effective on days</label>
+      <%= configuration_fields.text_field :erlst_e_prior_eod, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">latest enroll after effective on days</label>
+      <%= configuration_fields.text_field :ltst_e_aft_eod, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">latest enroll after ee roster correction on days</label>
+      <%= configuration_fields.text_field :ltst_e_aft_ee_roster_cod, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">retroactive coverage termination max days</label>
+      <%= configuration_fields.text_field :retroactve_covg_term_max_dys, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">benefit period min year</label>
+      <%= configuration_fields.text_field :ben_per_min_year, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">benefit period max year</label>
+      <%= configuration_fields.text_field :ben_per_max_year, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">open enrollment start on montly</label>
+      <%= configuration_fields.text_field :oe_start_month, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">open enrollment end on montly</label>
+      <%= configuration_fields.text_field :oe_end_month, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">open enrollment days min</label>
+      <%= configuration_fields.text_field :oe_min_dys, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">open enrollment grace period length days min</label>
+      <%= configuration_fields.text_field :oe_grce_min_dys, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">open enrollment adv days min</label>
+      <%= configuration_fields.text_field :oe_min_adv_dys, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">open enrollment months max</label>
+      <%= configuration_fields.text_field :oe_max_months, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">cobra enrollment period month</label>
+      <%= configuration_fields.text_field :cobra_epm, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">group file new enrollment transmit on</label>
+      <%= configuration_fields.text_field :gf_new_enrollment_trans, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">group file update transmit day of week</label>
+      <%= configuration_fields.text_field :gf_update_trans_dow, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">use simple employer calculation model</label>
+      <%= configuration_fields.text_field :use_simple_er_cal_model, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">offerings_constrained_to_service_areas</label>
+      <%= configuration_fields.text_field :offerings_constrained_to_service_areas, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">transmit employers immediately</label>
+      <%= configuration_fields.text_field :trans_er_immed, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">transmit scheduled employers</label>
+      <%= configuration_fields.text_field :trans_scheduled_er, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">employer transmission day of month</label>
+      <%= configuration_fields.text_field :er_transmission_dom, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">enforce employer attestation</label>
+      <%= configuration_fields.text_field :enforce_er_attest, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">standard industrial classification</label>
+      <%= configuration_fields.text_field :stan_indus_class, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">carrier filters enabled</label>
+      <%= configuration_fields.text_field :carrier_filters_enabled, required:'true', class:'form-control'%>
+      <label for="inputSiteKey">rating areas</label>
+      <%= configuration_fields.text_field :rating_areas, required:'true', class:'form-control'%>
+    <% end %> <!-- configration_fields -->
+  </div>
+  <%= submit_tag "Submit", class:'btn btn-primary' %>
+<% end %>

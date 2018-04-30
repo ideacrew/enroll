@@ -1,7 +1,6 @@
 module BenefitMarkets
-  class BenefitMarketsController < ::BenefitMarkets::ApplicationController
+  class BenefitMarketsController < ApplicationController
     include Pundit
-
   	before_filter :set_site_id, only: [:index]
 
   	def index
@@ -9,8 +8,9 @@ module BenefitMarkets
   	end
 
     def new
-      @benefit_market = ::BenefitMarkets::BenefitMarketForm.for_new(params.require(:benefit_market_kind))
-      authorize @benefit_market
+      @benefit_market = BenefitMarkets::BenefitMarket.new
+      #@benefit_market = ::BenefitMarkets::BenefitMarketForm.for_new(params.require(:benefit_market_kind)) if params(:benefit_market_kind)
+      #authorize @benefit_market
     end
 
     def create
@@ -44,13 +44,10 @@ module BenefitMarkets
     end
 
     private
-=======
-  	private
->>>>>>> Refs 23321 Modified Routes and view
 
-  	def set_site_id
+    def set_site_id
       @site_id = params[:site_id]
-  	end
+    end
 
     def market_params
       params.require(:benefit_market).permit(
