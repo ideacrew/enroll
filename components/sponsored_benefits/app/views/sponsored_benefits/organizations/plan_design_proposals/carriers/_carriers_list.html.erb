@@ -19,11 +19,11 @@
   </div>
   <% end %>
 <% else %>
-  <% reference_plans = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
+  <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>
-      <% reference_plans = reference_plans_for_metal_level - ['dental'] %>
+      <% metal_levels = enabled_metal_levels_for_single_carrier - ['dental'] %>
   <% end %>
-  <% reference_plans.each do |kind| %>
+  <% metal_levels.each do |kind| %>
     <div class="col-xs-3 metals">
       <div class="col-xs-12 row">
         <%= link_to organizations_plan_design_organization_plans_path(@plan_design_organization,
