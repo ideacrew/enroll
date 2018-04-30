@@ -1,7 +1,7 @@
-require 'rails_helper'
+require "rails_helper"
 
 module BenefitMarkets
-	RSpec.describe Products::ActuarialFactors::SicActuarialFactor do
+	RSpec.describe Products::ActuarialFactors::CompositeRatingTierActuarialFactor do
 		let(:validation_errors) {
 			subject.valid?
 			subject.errors
@@ -20,7 +20,7 @@ module BenefitMarkets
 		end
 	end
 
-	RSpec.describe Products::ActuarialFactors::SicActuarialFactor, "given
+	RSpec.describe Products::ActuarialFactors::CompositeRatingTierActuarialFactor, "given
 - a carrier profile
 - an active year
 - a default factor value
@@ -32,7 +32,7 @@ module BenefitMarkets
 		let(:active_year) { 2015 }
 
 		subject do
-			Products::ActuarialFactors::SicActuarialFactor.new({
+			Products::ActuarialFactors::CompositeRatingTierActuarialFactor.new({
 				:default_factor_value => default_factor_value,
 				:active_year => active_year,
 				:carrier_profile_id => carrier_profile_id
@@ -49,12 +49,12 @@ module BenefitMarkets
 
 	end
 
-	RSpec.describe Products::ActuarialFactors::SicActuarialFactor, "given
+	RSpec.describe Products::ActuarialFactors::CompositeRatingTierActuarialFactor, "given
 - a rating factor entry with key 'abc' and value '1.345'
 	" do
 
 		subject do
-			Products::ActuarialFactors::SicActuarialFactor.new({
+			Products::ActuarialFactors::CompositeRatingTierActuarialFactor.new({
 				:actuarial_factor_entries => [
 					Products::ActuarialFactors::ActuarialFactorEntry.new({
 						:factor_key => 'abc',

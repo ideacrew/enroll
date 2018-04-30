@@ -20,13 +20,12 @@ plan_active_year = benefit_market_catalog.application_period.first.year
 
 ["bronze", "silver", "gold", "platinum"].each do |ml|
   if Plan.where(:metal_level => ml, :market => "shop", :coverage_kind => "health", :active_year => plan_active_year).any?
-    ::BenefitMarkets::Products::HealthProducts::MetalLevelHealthProductPackage.create!({
+    benefit_market_catalog.product_packages << ::BenefitMarkets::Products::HealthProducts::MetalLevelHealthProductPackage.new({
       :metal_level => ml,
       :title => "DC Health #{ml.capitalize} Metal Level",
       :contribution_model_id => dc_contribution_model.id,
-      :pricing_model_id => dc_pricing_model.id,
-      :benefit_catalog => benefit_market_catalog
-    })
+      :pricing_model_id => dc_pricing_model.id
+      })
   end
 end
 
@@ -34,30 +33,27 @@ end
 Organization.where(carrier_profile: {"$ne" => nil}).each do |org|
   carrier_profile = org.carrier_profile
   if Plan.where(:carrier_profile_id => carrier_profile.id, :market => "shop", :coverage_kind => "health", :active_year => plan_active_year).any?
-    ::BenefitMarkets::Products::HealthProducts::IssuerHealthProductPackage.create!({
+    benefit_market_catalog.product_packages << ::BenefitMarkets::Products::HealthProducts::IssuerHealthProductPackage.new({
       :issuer_id => carrier_profile.id,
       :title => "DC Health #{carrier_profile.legal_name} Issuer",
       :contribution_model_id => dc_contribution_model.id,
-      :pricing_model_id => dc_pricing_model.id,
-      :benefit_catalog => benefit_market_catalog
+      :pricing_model_id => dc_pricing_model.id
     })
   end
 end
 
 if Plan.where(:market => "shop", :coverage_kind => "health", :active_year => plan_active_year).any?
-  ::BenefitMarkets::Products::HealthProducts::SingleProductHealthProductPackage.create!({
+  benefit_market_catalog.product_packages << ::BenefitMarkets::Products::HealthProducts::SingleProductHealthProductPackage.new({
     :title => "DC Health Single Product",
     :contribution_model_id => dc_contribution_model.id,
-    :pricing_model_id => dc_pricing_model.id,
-    :benefit_catalog => benefit_market_catalog
+    :pricing_model_id => dc_pricing_model.id
   })
 end
 
 if Plan.where(:market => "shop", :coverage_kind => "dental", :active_year => plan_active_year).any?
-  ::BenefitMarkets::Products::DentalProducts::AnyDentalProductPackage.create!({
+  benefit_market_catalog.product_packages << ::BenefitMarkets::Products::DentalProducts::AnyDentalProductPackage.new({
     :title => "DC Dental Any Product",
     :contribution_model_id => dc_contribution_model.id,
-    :pricing_model_id => dc_pricing_model.id,
-    :benefit_catalog => benefit_market_catalog
+    :pricing_model_id => dc_pricing_model.id
   })
 end
