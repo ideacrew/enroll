@@ -286,8 +286,6 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kgio (2.11.0)
-    knapsack (1.16.0)
-      rake
     language_list (1.1.0)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -641,7 +639,6 @@ DEPENDENCIES
   jquery-turbolinks
   jquery-ui-rails
   kaminari (= 0.17.0)
-  knapsack
   language_list (~> 1.1.0)
   less-rails-bootstrap (~> 3.3.1.0)
   mail (= 2.6.3)
