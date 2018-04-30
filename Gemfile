@@ -82,7 +82,6 @@ group :doc do
 end
 
 group :development do
-  gem 'parallel_tests'
   gem 'web-console', '2.3.0'
 end
 
@@ -93,6 +92,7 @@ group :development, :test do
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
+  gem 'parallel_tests'
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rails'
