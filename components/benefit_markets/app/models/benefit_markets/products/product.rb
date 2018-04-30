@@ -46,7 +46,7 @@ module BenefitMarkets
 
 
       index({ hbx_id: 1 })
-      index({ benefit_market_kind: 1, product_kind: 1, "application_period.min": 1, "application_period.max": 1 })
+      index({ benefit_market_kind: 1, "application_period.min": 1, "application_period.max": 1 })
 
 
       scope :aca_shop_market,       ->{ where(benefit_market_kind: :aca_shop) }

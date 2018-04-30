@@ -57,22 +57,20 @@ module BenefitMarkets
       }
     end
 
-
-
     context "A new HealthProduct instance" do
 
-      context "that's missing required params" do
+      context "with no arguments" do
+        subject { described_class.new }
 
-        context "with no arguments" do
-          subject { described_class.new }
-
-          it "should not be valid" do
-            subject.validate
-            expect(subject).to_not be_valid
-          end
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
         end
+      end
 
-        context "without hios_id" do
+      context "without required params" do
+
+        context "that's missing hios_id" do
           subject { described_class.new(params.except(:hios_id)) }
 
           it "should be invalid" do
@@ -82,20 +80,60 @@ module BenefitMarkets
           end
         end
 
+        context "that's missing hios_id" do
+          subject { described_class.new(params.except(:hios_id)) }
 
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:hios_id]).to include("can't be blank")
+          end
+        end
+
+        context "that's missing health_plan_kind" do
+          subject { described_class.new(params.except(:health_plan_kind)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:health_plan_kind]).to include("can't be blank")
+          end
+        end
       end
 
       context "with invalid params" do
-        let(:invalid_year)                { TimeKeeper.date_of_record.year + 4  }
-        let(:invalid_application_period)  { Date.new(invalid_year, 1, 1)..Date.new(invalid_year, 12, 31) }
-        let(:invalid_metal_level_kind)    { :copper }
+        context "and benefit_market_kind is invalid" do
+          let(:invalid_metal_level_kind)  { :copper }
 
+          subject { described_class.new(params.except(:metal_level_kind).merge({metal_level_kind: invalid_metal_level_kind})) }
 
-        it "should be invalid"
+          it "should not be valid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:metal_level_kind]).to include("#{invalid_metal_level_kind} is not a valid metal level kind")
+          end
+        end
+
+        context "and ehb is invalid" do
+          let(:invalid_ehb)  { 0.0 }
+
+          subject { described_class.new(params.except(:ehb).merge({ehb: invalid_ehb})) }
+
+          it "should not be valid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:ehb]).to include("must be greater than 0.0")
+          end
+        end
       end
 
       context "with all valid params" do
-        it "should be valid"
+        subject { described_class.new(params) }
+
+        it "should be valid" do
+          subject.validate
+          expect(subject).to be_valid
+        end
       end
 
     end

@@ -14,6 +14,7 @@ module BenefitMarkets
     let(:params) do 
         {
           benefit_market_kind: benefit_market_kind,
+          application_period: application_period,
           hbx_id: hbx_id,
           issuer_profile_urn: issuer_profile_urn,
           title: title,
@@ -23,20 +24,17 @@ module BenefitMarkets
 
     context "A new HealthProduct instance" do
 
-      context "that's missing required params" do
+      context "with no arguments" do
+        subject { described_class.new }
 
-        context "with no arguments" do
-          # binding.pry
-          subject { described_class.new }
-
-          it "should not be valid" do
-            subject.validate
-            expect(subject).to_not be_valid
-          end
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
         end
+      end
 
-
-        context "without benefit_market_kind" do
+      context "without required params" do
+        context "that's missing a benefit_market_kind" do
           subject { described_class.new(params.except(:benefit_market_kind)) }
 
           it "it should be invalid" do
@@ -46,7 +44,7 @@ module BenefitMarkets
           end
         end
 
-        context "without application_period" do
+        context "that's missing an application_period" do
           subject { described_class.new(params.except(:application_period)) }
 
           it "should be invalid" do
@@ -56,8 +54,50 @@ module BenefitMarkets
           end
         end
 
+        context "that's missing an hbx_id" do
+          subject { described_class.new(params.except(:hbx_id)) }
 
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:hbx_id]).to include("can't be blank")
+          end
+        end
+
+        context "that's missing a title" do
+          subject { described_class.new(params.except(:title)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:title]).to include("can't be blank")
+          end
+        end
       end
+
+      context "with invalid arguments" do
+        context "and benefit_market_kind is invalid" do
+          let(:invalid_benefit_market_kind)  { :flea_market }
+
+          subject { described_class.new(params.except(:benefit_market_kind).merge({benefit_market_kind: invalid_benefit_market_kind})) }
+
+          it "should not be valid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:benefit_market_kind]).to include("#{invalid_benefit_market_kind} is not a valid benefit market kind")
+          end
+        end
+      end
+
+      context "with all valid params" do
+        subject { described_class.new(params) }
+
+        it "should be valid" do
+          subject.validate
+          expect(subject).to be_valid
+        end
+      end
+
     end
 
     context "An open file in SERFF template format" do
