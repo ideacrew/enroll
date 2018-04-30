@@ -6,6 +6,8 @@ module BenefitMarkets
 
     embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::AcaShopInitialApplicationConfiguration",
       autobuild: true
+    embeds_one :renewal_application_configuration,  class_name: "BenefitMarkets::AcaShopRenewalApplicationConfiguration",
+      autobuild: true
 
     field :ee_ct_max,           as: :employee_count_max, type: Integer, default: 50
     field :ee_ratio_min,        as: :employee_participation_ratio_min, type: Float, default: 0.666

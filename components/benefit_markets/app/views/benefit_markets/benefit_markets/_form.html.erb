@@ -15,7 +15,7 @@
   <h4>Please select benefit market kind</h4>
   <%= select_tag "benefit_market_kind", options_for_select('ACA Individual' => 'acaIndividual', 'ACA Shop' => 'acaShop'), data: { action: 'change->benefit-market--form#configurationChange' } %>
   <div data-target="benefit-market--form.acaIndividual">
-    <%= f.fields_for :configuration, BenefitMarkets::AcaIndividualConfiguration.new do |configuration_fields| %>
+    <%= f.fields_for :configuration, @benefit_market.aca_individual_configuration do |configuration_fields| %>
       <label for="inputEnrollmentDueOn">monthly enrollment due on</label>
       <%= configuration_fields.text_field :mm_enr_due_on, id: 'inputEnrollmentDueOn', required:'true', class:'form-control'%>
       <label for="inputVerificationOutstanding">verification outstanding window days</label>
@@ -26,11 +26,14 @@
       <%= configuration_fields.date_field :open_enrl_start_on, id: 'inputEnrollmentStartOn', required:'true', class:'form-control'%>
       <label for="inputOpenEnrollmentEndOn">open enrollment end on</label>
       <%= configuration_fields.date_field :open_enrl_end_on, id: 'inputOpenEnrollmentEndOn', required:'true', class:'form-control'%>
+      <%= configuration_fields.fields_for :initial_application_configuration, configuration_fields.object.initial_application_configuration do |initial_application_fields| %>
+        <%= initial_application_fields.text_field :pub_due_dom %>
+      <% end %> <!-- initial_application_fields -->
     <% end %> <!-- configration_fields -->
   </div>
 
   <div data-target="benefit-market--form.acaShop" class="d-none">
-    <%= f.fields_for :configuration, BenefitMarkets::AcaShopConfiguration.new do |configuration_fields| %>
+    <%= f.fields_for :configuration, @benefit_market.aca_shop_configuration do |configuration_fields| %>
       <label for="inputEmployeeCountMax">employee count max</label>
       <%= configuration_fields.text_field :ee_ct_max, id: 'inputEmployeeCountMax', required:'true', class:'form-control'%>
       <label for="inputEEParticipationRatio">employee participation ratio min</label>

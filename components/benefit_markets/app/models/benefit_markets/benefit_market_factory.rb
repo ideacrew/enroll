@@ -1,58 +1,24 @@
 module BenefitMarkets
-    class BenefitMarketFactory
-      attr_reader :benefit_market_kind
-      
-      def initialize(bo_kind)
-        @benefit_market_kind = bo_kind
-      end
+  class BenefitMarketFactory
+    def self.build
+      benefit_market = BenefitMarkets::BenefitMarket.new
+      aca_shop_configuration = BenefitMarkets::AcaShopConfiguration.new initial_application_configuration: BenefitMarkets::AcaShopInitialApplicationConfiguration.new,
+        renewal_application_configuration: BenefitMarkets::AcaShopRenewalApplicationConfiguration.new
+      aca_individual_configuration = BenefitMarkets::AcaIndividualConfiguration.new initial_application_configuration: BenefitMarkets::AcaIndividualInitialApplicationConfiguration.new
+      [benefit_market, aca_shop_configuration, aca_individual_configuration]
+    end
 
-      def allowed_benefit_market_kinds
-        ::BenefitMarkets::BenefitMarket::BENEFIT_MARKET_KINDS.map(&:to_s)
-      end
+    def self.call(benifit_market_key:)
+      BenefitMarkets::BenefitMarket.new benifit_market_key: benifit_market_key,
+        long_name: long_name,
+        short_name: short_name,
+        byline: byline,
+        domain_name: domain_name,
+        owner_organization: owner_organization
+    end
 
-      def select_model_subclass
-        ::BenefitMarkets::BenefitMarket.subclass_for(benefit_market_kind)
-      end
-
-      def build_shared_params(title)
-        {
-          title: title
-        }
-      end
-
-      def build_benefit_market(title)
-        select_model_subclass.new(
-          build_shared_params(title)
-        )
-      end
-
-      def build_issuer_benefit_market(title)
-        select_model_subclass.new(
-          build_shared_params(title).merge({
-            issuer_id: issuer_id
-          })
-        )
-      end
-
-      def persist(factory_object, e_reporter = nil)
-        error_reporter = e_reporter.nil? ? factory_object : e_reporter
-        return false unless validate(factory_object, error_reporter)
-        factory_object.save.tap do |s_result|
-          unless s_result
-            factory_object.errors.each do |k, err|
-              error_reporter.errors.add(k, err)
-            end
-          end
-        end
-      end
-
-      protected
-
-      def validate(benefit_market, error_reporter)
-        [
-
-        ]
-      end
+    def self.validate(benifit_market)
+      benifit_market.valid?
     end
   end
 end

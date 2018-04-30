@@ -1,46 +1,46 @@
 module BenefitMarkets
   class BenefitMarketsController < ApplicationController
-    include Pundit
-  	before_filter :set_site_id, only: [:index]
+    layout 'benefit_markets/application'
 
-  	def index
-      @benifit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)
-  	end
+    def index
+      @sites = BenefitSponsors::Site.all
+    end
 
     def new
-      @benefit_market = BenefitMarkets::BenefitMarket.new
-      #@benefit_market = ::BenefitMarkets::BenefitMarketForm.for_new(params.require(:benefit_market_kind)) if params(:benefit_market_kind)
-      #authorize @benefit_market
+      @benefit_market = ::BenefitMarkets::Forms::BenefitMarket.for_new
     end
 
     def create
-      @benefit_market = ::BenefitMarkets::BenefitMarketForm.for_create(market_params)
-      authorize @benefit_market
-      if @benefit_market.save
-        redirect_to benefit_markets_url(@benefit_market.show_page_model)
+      # pundit can I do this here
+      @benifit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benifit_market]
+
+      if @benifit_market.save
+        redirect_to benifit_markets_path
       else
-        render "new"
+        render 'new'
       end
     end
 
     def edit
-      @benefit_market = ::BenefitMarkets::BenefitMarketForm.for_edit(params.require(:id))
-      authorize @benefit_market
+      @benifit_market = BenefitMarkets::Forms::BenefitMarket.for_edit params[:id]
     end
 
     def update
-      @benefit_market = ::BenefitMarkets::BenefitMarketForm.for_update(params.require(:id))
-      authorize @benefit_market
-      if @benefit_market.update_attributes(market_params)
-        redirect_to benefit_markets_url(@benefit_market.show_page_model)
+      @benifit_market = BenefitMarkets::Forms::BenefitMarket.for_update params[:id]
+
+      if @benifit_market.update_attributes params[:benifit_market]
+        redirect_to benifit_markets_path
       else
-        render "edit"
+        render 'edit'
       end
     end
 
-    def show
-      @benefit_market = ::BenefitMarkets::BenefitMarket.find(params.require(:id))
-      authorize @benefit_market
+    def destroy
+      @benifit_market = BenefitMarkets::BenefitMarket.find params[:id]
+      @benifit_market.owner_organization.destroy
+      @benifit_market.destroy
+
+      redirect_to benifit_markets_path
     end
 
     private
@@ -56,6 +56,11 @@ module BenefitMarkets
         :title,
         :description
       )
+    end
+
+    def find_hbx_admin_user
+      fail NotAuthorizedError unless current_user.has_hbx_staff_role?
+      # redirect_to root_url
     end
   end
 end
