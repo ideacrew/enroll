@@ -52,6 +52,11 @@ module BenefitMarkets
       index({ "active_period.min": 1, "active_period.max": 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
       index({ csr_variant_id: 1}, {sparse: true})
 
+
+      # TODO Create queries
+      scope :premium_table_covers,    ->(effective_date, rating_area){  }
+
+
       validates :plan_kind,
                 presence: true,
                 inclusion: {in: PLAN_KIND_MAP.keys, message: "%{value} is not a valid product kind"}

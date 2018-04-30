@@ -25,18 +25,24 @@ module BenefitMarkets
 
         field :hbx_id,                  type: String
         field :title,                   type: String
-        field :contribution_model_id, type: BSON::ObjectId
-        field :pricing_model_id, type: BSON::ObjectId
-        field :product_multiplicity, type: Symbol, default: ->() { default_product_multiplicity }
+        field :contribution_model_id,   type: BSON::ObjectId
+        field :pricing_model_id,        type: BSON::ObjectId
+        field :product_multiplicity,    type: Symbol, default: ->() { default_product_multiplicity }
 
         belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
         belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
 
-        belongs_to  :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
+        embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
         validates_presence_of :title, :allow_blank => false
         validates_presence_of :benefit_catalog_id, :allow_blank => false
         validate :has_products
+
+
+        def is_available_for(effective_date)
+          #implement by subclasses
+        end
+
 
         def default_product_multiplicity 
           :multiple

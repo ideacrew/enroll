@@ -1,9 +1,5 @@
 module BenefitMarkets
-  class Policies::Policy
+  class MarketPolicies::MemberEligibleRule
     include Mongoid::Document
-    include Mongoid::Timestamps
-
-
-
   end
 end

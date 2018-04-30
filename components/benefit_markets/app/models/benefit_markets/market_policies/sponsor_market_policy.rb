@@ -1,5 +1,5 @@
 module BenefitMarkets
-  class Policies::SponsorProductPackagePolicy < Policies::Policy
+  class MarketPolicies::SponsorMarketPolicy < MarketPolicies::MarketPolicy
 
     # Count of primary members necessary for sponsor eligibility
     field :roster_size_rule,              type: Range,    default: 0..0
@@ -20,7 +20,6 @@ module BenefitMarkets
       # ACA SHOP: roster member non-owner > 0
       rostered_non_owner_size = 1
     end
-
 
   end
 end
