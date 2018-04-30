@@ -5,7 +5,3 @@ Rails.application.load_tasks
 
 require 'resque/tasks'
 task 'resque:setup' => :environment
-
-require 'rspec/core/rake_task'
-task :default => :spec
-RSpec::Core::RakeTask.new
