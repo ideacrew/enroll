@@ -21,7 +21,7 @@ module BenefitMarkets
     end
 
     describe "which covers the entire administrative area" do
-      subject { Locations::RatingArea.new(covered_state_codes: ["MA"]) }
+      subject { Locations::RatingArea.new(covered_states: ["MA"]) }
 
       before :each do
         subject.valid?

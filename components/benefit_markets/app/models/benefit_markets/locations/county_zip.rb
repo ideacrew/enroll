@@ -9,6 +9,7 @@ module BenefitMarket
       field :county_name, type: String
       field :county_code, type: String
       field :zip, type: String
+      field :state, type: String
       field :state_code, type: String
     end
   end
