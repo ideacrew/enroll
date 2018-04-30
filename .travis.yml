@@ -8,13 +8,6 @@ group: stable
 language: ruby
 os: linux
 script:
-  - "bundle exec rake knapsack:rspec"
-  - "bundle exec rake knapsack:cucumber"
+  - "bundle exec rspec"
 services:
   - mongodb
-env:
-  global:
-    - CI_NODE_TOTAL=2
-  matrix:
-    - CI_NODE_INDEX=0
-    - CI_NODE_INDEX=1
