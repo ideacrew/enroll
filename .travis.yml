@@ -1,0 +1,19 @@
+{
+  "language": "ruby",
+  "before_script": [
+    "rm -rf ./spec/vocabularies",
+    "rm -rf ./coverage",
+    "rm -rf ./doc",
+    "rm -rf ./.yardoc"
+  ],
+  "script": [
+    "bundle exec rake",
+    "bundle exec cucumber"
+  ],
+  "os": "linux",
+  "services": [
+    "mongodb"
+  ],
+  "group": "stable",
+  "dist": "trusty"
+}
