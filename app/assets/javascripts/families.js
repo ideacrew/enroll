@@ -1,5 +1,5 @@
 
-function enbleTransition() {
+function enableTransition() {
 
   $('#tansition_family_submit').addClass("disabled");
 
