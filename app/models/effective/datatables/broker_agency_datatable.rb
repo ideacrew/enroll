@@ -30,7 +30,11 @@ module Effective
       def collection
         return @broker_agency_profiles_collection if defined? @broker_agency_profiles_collection
 
+        # Query From New Model
         @broker_agency_profiles_collection = BenefitSponsors::Organizations::Organization.broker_agency_profiles.order_by([:legal_name])
+
+        # Query from Old Model
+        #@broker_agency_profiles_collection = Organization.exists(broker_agency_profile: true).order_by([:legal_name])
 
       end
 
