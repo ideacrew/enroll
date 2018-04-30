@@ -478,9 +478,11 @@ class Plan
 
   class << self
 
-    def has_rates_for_all_carriers?(date=nil)
-      date = (date || PlanYear.calculate_start_on_dates[0]).beginning_of_quarter
+    def has_rates_for_all_carriers?(start_on_date=nil)
+      date = start_on_date || PlanYear.calculate_start_on_dates[0]
+      return false if date.blank?
 
+      date = date.beginning_of_quarter
       carrier_count = Plan.where(active_year: date.year).pluck(:carrier_profile_id).uniq.size
       result = Plan.collection.aggregate([
         {"$match" => {"active_year" => date.year}},
