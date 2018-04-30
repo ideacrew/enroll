@@ -24,8 +24,26 @@ class Admin::Aptc < ApplicationController
         aptc_applied_vals_for_enrollment = build_aptc_applied_values_for_enrollment(year, family, hbx, applied_aptc_array)
         total_aptc_applied_vals_for_household  = total_aptc_applied_vals_for_household.merge(aptc_applied_vals_for_enrollment) { |k, a_value, b_value| a_value.to_f + b_value.to_f } # Adding values of two similar hashes.
       end
-      #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
-      max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f >= b_value.to_f ? (a_value.to_f - b_value.to_f) : a_value.to_f - b_value.to_f) }
+      previous_available_aptc_hash = {}
+      current_available_aptc_hash = {}
+      if max_aptc.present?
+        max_aptc_vals.each do |key, value|
+          if value.to_f == max_aptc
+            current_available_aptc_hash[key] = value
+          elsif value.to_i > 0
+            previous_available_aptc_hash[key] = value
+          end
+        end
+        previous_available_aptc_value = previous_available_aptc_hash.values.first.to_f * previous_available_aptc_hash.count
+        current_available_aptc_value = current_available_aptc_hash.values.first.to_f * 12
+        available_aptc_value = (current_available_aptc_value - previous_available_aptc_value) / current_available_aptc_hash.count
+        max_aptc_vals.each do |key, value|
+          max_aptc_vals[key] = '%.2f' % available_aptc_value if value.to_f == max_aptc
+        end
+      else
+        #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
+        max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f >= b_value.to_f ? (a_value.to_f - b_value.to_f) : a_value.to_f - b_value.to_f) }
+      end
     end
 
     # def negative_aptc(k, a_value, b_value, total_aptc_applied_vals_for_household, hbxs)
