@@ -6,7 +6,7 @@ cache: bundler
 language: ruby
 os: linux
 script:
-  - "bundle exec rake parallel:spec[4]"
+  - "bundle exec rake parallel:spec[2]"
   - "bundle exec cucumber"
 services:
   - mongodb
