@@ -82,6 +82,7 @@ group :doc do
 end
 
 group :development do
+  gem 'knapsack'
   gem 'parallel_tests'
   gem 'web-console', '2.3.0'
 end
