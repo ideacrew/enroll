@@ -83,7 +83,6 @@ end
 
 group :development do
   gem 'parallel_tests'
-  gem 'knapsack'
   gem 'web-console', '2.3.0'
 end
 
