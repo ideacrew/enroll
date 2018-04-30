@@ -6,7 +6,7 @@
     "rm -rf ./spec/vocabularies"
   ],
   "script": [
-    "bundle exec rake parallel:spec[2]",
+    "bundle exec rake parallel:test",
     "bundle exec cucumber"
   ],
   "os": "linux",
