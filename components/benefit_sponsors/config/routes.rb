@@ -15,6 +15,7 @@ BenefitSponsors::Engine.routes.draw do
           get :assign
           post :update_assign
           post :family_datatable
+          get :inbox
         end
       end
       resources :broker_applicants
@@ -23,8 +24,18 @@ BenefitSponsors::Engine.routes.draw do
     namespace :employers do
       resources :employer_profiles, only: [:show] do
         get :show_pending
+
+        member do
+          get :inbox
+        end
       end
       resources :employer_staff_roles
+    end
+  end
+
+  namespace :inboxes do
+    resources :messages, only: [:show, :destroy] do
+      get :msg_to_portal
     end
   end
 

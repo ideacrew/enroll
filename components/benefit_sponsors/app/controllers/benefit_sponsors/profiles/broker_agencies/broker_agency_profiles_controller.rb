@@ -28,6 +28,7 @@ module BenefitSponsors
       def show
         set_flash_by_announcement
         @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+        @provider = current_user.person
       end
 
       def staff_index
@@ -92,12 +93,27 @@ module BenefitSponsors
       end
 
       def messages
+        @sent_box = true
+        @provider = current_user.person
+        respond_to do |format|
+          format.js {}
+        end
       end
+
 
       def agency_messages
       end
 
       def inbox
+        @sent_box = true
+        id = params["id"]||params['profile_id']
+        @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(id))
+        @folder = (params[:folder] || 'Inbox').capitalize
+        if current_user.person._id.to_s == id
+          @provider = current_user.person
+        else
+          @provider = @broker_agency_provider
+        end
       end
 
       # def redirect_to_show(broker_agency_profile_id)
@@ -108,7 +124,8 @@ module BenefitSponsors
 
       def find_broker_agency_profile(broker_agency_profile_id = nil)
         id = broker_agency_profile_id || BSON::ObjectId(params[:id])
-        @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first.broker_agency_profile
+        organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
+        @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
         authorize @broker_agency_profile, :access_to_broker_agency_profile?
       end
 

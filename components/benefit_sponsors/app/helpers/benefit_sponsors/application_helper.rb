@@ -1,6 +1,6 @@
 module BenefitSponsors
   module ApplicationHelper
-    
+
     def bootstrap_class_for flash_type
       case flash_type
         when "notice"
@@ -16,9 +16,9 @@ module BenefitSponsors
 
     def flash_messages(opts = {})
       flash.each do |msg_type, message|
-        concat(content_tag(:div, message, class: "alert #{bootstrap_class_for(msg_type)} alert-dismissible fade show") do 
+        concat(content_tag(:div, message, class: "alert #{bootstrap_class_for(msg_type)} alert-dismissible fade show") do
           concat content_tag(:button, 'x', class: "close", data: { dismiss: 'alert' })
-          concat message 
+          concat message
         end)
       end
       nil
@@ -59,5 +59,29 @@ module BenefitSponsors
       end
       rendered.join('').html_safe
     end
+
+    def retrieve_show(provider, message)
+      inboxes_message_path(provider, message_id: message.id)
+    end
+
+    def find_and_sort_inbox_messages(provider, folder)
+      provider.inbox.messages.select {|m| folder == (m.folder.try(:capitalize) || 'Inbox')}.sort_by(&:created_at).reverse
+    end
+
+    def retrieve_inbox(provider, folder: 'inbox')
+      broker_agency_mailbox = inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
+      return broker_agency_mailbox if provider.try(:broker_role)
+      case (provider.model_name.name.split('::').last)
+        when "AcaShopDcEmployerProfile"
+          inbox_profiles_employers_employer_profile_path(id: provider.id.to_s, folder: folder)
+        when "HbxProfile"
+          #TODO fix it for HBX profile
+        when "BrokerAgencyProfile"
+          inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
+        when "GeneralAgencyProfile"
+          #TODO FIX IT for GA
+      end
+    end
+
   end
 end
