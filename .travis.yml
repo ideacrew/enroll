@@ -1,0 +1,12 @@
+---
+before_script:
+  - "rm -rf ./spec/vocabularies"
+bundler_args: "--without production"
+cache: bundler
+language: ruby
+os: linux
+script:
+  - "bundle exec rake parallel:spec[4]"
+  - "bundle exec cucumber"
+services:
+  - mongodb

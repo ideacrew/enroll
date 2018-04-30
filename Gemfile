@@ -82,11 +82,11 @@ group :doc do
 end
 
 group :development do
-  gem 'parallel_tests'
   gem 'web-console', '2.3.0'
 end
 
 group :development, :test do
+  gem 'parallel_tests'
   gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
