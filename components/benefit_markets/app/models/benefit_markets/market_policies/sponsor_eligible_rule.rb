@@ -1,5 +1,5 @@
 module BenefitMarkets
-  class Products::EligibilityPolicies::EligibilityPolicy
+  class MarketPolicies::SponsorEligibleRule
     include Mongoid::Document
   end
 end

@@ -44,20 +44,18 @@ module BenefitSponsors
         filtered_scope.count
       end
 
-      def census_employee_ids
-        @census_member_ids ||= CensusMember.collection.aggregate([
-          { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
-          { "$group" => {"_id" => "$_id"}}
-        ]).map { |rec| rec["_id"] }
-      end
-
       def employee_person_ids
-        @employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => census_employee_ids}).pluck(:_id)
-      end
+        # TODO:  Revisit when CensusEmployee an BenefitSponsorship relationships are completed.
+        benefit_sponsorships_ids ||= BenefitSponsors::Organizations::Organization.employer_profiles.collection.aggregate([
+          { "$match" => { :'benefit_sponsorships.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: @broker_agency_profile_id } } } },
+          { "$group" => { "_id" => "$benefit_sponsorships._id" }}
+        ]).map { |rec| rec["_id"] }
 
-      def employer_ids
-        organizations = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"benefit_sponsorships.profile_id" => BSON::ObjectId(@broker_agency_profile_id))
-        @employer_ids = organizations.map(&:employer_profile).flat_map(&:_id).flatten.compact
+        census_employee_ids = benefit_sponsorships_ids.inject([]) do |arr, benefit_sponsorships_id|
+          arr + BenefitSponsors::CensusMembers::CensusEmployee.find_by_benefit_sponsorship(benefit_sponsorships_id).id
+        end
+
+        employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => census_employee_ids}).pluck(:_id)
       end
     end
   end

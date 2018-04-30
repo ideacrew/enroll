@@ -14,7 +14,9 @@ module BenefitMarkets
     embeds_one  :member_eligibility_policy,
                 class_name: "BenefitMarkets::MemberEligibilityPolicy"
 
-    embeds_many :product_packages
-
+    embeds_many :policies,
+                class_name: "BenefitMarket::Policies::Policy"
+    embeds_many :product_packages,
+                class_name: "Products::ProductPackage"
   end
 end

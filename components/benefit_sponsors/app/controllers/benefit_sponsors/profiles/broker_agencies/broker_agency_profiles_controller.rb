@@ -58,11 +58,9 @@ module BenefitSponsors
         end
 
         query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
-
         @total_records = query.total_count
         @records_filtered = query.filtered_count
         @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
-
         primary_member_ids = @families.map do |fam|
           fam.primary_family_member.person_id
         end
@@ -94,6 +92,7 @@ module BenefitSponsors
       def employers
       end
 
+      #TODO Implement when we move GeneralAgencyProfile in Engine.
       def general_agency_index
       end
 
@@ -103,7 +102,6 @@ module BenefitSponsors
       def employer_datatable
       end
 
-      #TODO We may have to look into this once we implement GeneralAgencyProfile in Engine.
       def assign
       end
 
@@ -134,36 +132,6 @@ module BenefitSponsors
 
       private
 
-      def broker_profile_params
-        params.require(:organization).permit(
-          :legal_name,
-          :dba,
-          :home_page,
-          :office_locations_attributes => [
-            :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
-            :phone_attributes => [:kind, :area_code, :number, :extension],
-            :email_attributes => [:kind, :address]
-          ]
-        )
-      end
-
-      def languages_spoken_params
-        params.require(:organization).permit(
-          :languages_spoken => []
-        )
-      end
-
-      def person_profile_params
-        params.require(:organization).permit(:first_name, :last_name, :dob)
-      end
-
-      def sanitize_broker_profile_params
-        params[:organization][:office_locations_attributes].each do |key, location|
-          params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-          location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
-        end
-      end
-
       def find_hbx_profile
         @profile = current_user.person.hbx_staff_role.hbx_profile
       end
@@ -172,9 +140,6 @@ module BenefitSponsors
         id = broker_agency_profile_id || BSON::ObjectId(params[:id])
         @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first.broker_agency_profile
         # authorize @broker_agency_profile, :access_to_broker_agency_profile?
-      end
-
-      def find_hbx_profile
       end
 
       def check_admin_staff_role
@@ -212,22 +177,6 @@ module BenefitSponsors
       end
 
       def check_general_agency_profile_permissions_set_default
-      end
-
-      def update_broker_phone(office_location, person)
-        phone = office_location.phone
-        broker_main_phone = person.phones.where(kind: "phone main").first
-        if broker_main_phone.present?
-          broker_main_phone.update_attributes!(
-            kind: phone.kind,
-            country_code: phone.country_code,
-            area_code: phone.area_code,
-            number: phone.number,
-            extension: phone.extension,
-            full_phone_number: phone.full_phone_number
-          )
-        end
-        person.save!
       end
     end
   end
