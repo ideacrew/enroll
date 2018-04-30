@@ -1,13 +1,13 @@
 ---
 before_script:
   - "rm -rf ./spec/vocabularies"
-bundler_args: "--without production"
-cache: bundler
-dist: trusty
-group: stable
+#bundler_args: "--without production"
+#cache: bundler
+#dist: trusty
+#group: stable
 language: ruby
 os: linux
 script:
-  - "bundle exec rspec"
+  - "bundle exec rake parallel:spec[2]"
 services:
   - mongodb
