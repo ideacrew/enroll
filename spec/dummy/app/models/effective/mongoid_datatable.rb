@@ -1,2 +1,0 @@
-class Effective::MongoidDatatable
-end
