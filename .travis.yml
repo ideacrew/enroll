@@ -1,7 +1,7 @@
 {
   "language": "ruby",
   "cache": "bundler",
-  "bundler_args": "--with development,test",
+  "bundler_args": "--without production",
   "before_script": [
     "rm -rf ./spec/vocabularies"
   ],
