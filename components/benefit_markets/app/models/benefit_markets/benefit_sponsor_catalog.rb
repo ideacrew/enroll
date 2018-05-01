@@ -10,10 +10,10 @@ module BenefitMarkets
     field :service_area_id
 
     embeds_one  :sponsor_market_policy,  
-                class_name: "BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
+                class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
     embeds_one  :member_market_policy,
-                class_name: "BenefitMarkets::MarketPolicies::MemberMarketPolicy"
+                class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
     embeds_many :product_packages,
-                class_name: "Products::ProductPackage"
+                class_name: "::BenefitMarkets::Products::ProductPackage"
   end
 end
