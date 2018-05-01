@@ -1,4 +1,4 @@
-<%= form_for @benefit_market, url: { action: 'new'}, html: { data: { controller: 'benefit-market--form' } } do |f| %>
+
   <div class="form-group">
     <label for="inputSite">Site</label>
     <%= f.text_field :site_urn, required:'true', class:'form-control'%>
@@ -10,21 +10,19 @@
     <%= f.text_field :description, class:'form-control'%>
   </div>
 
-  <a data-action="click->benefit-market--form#clickTest">Test</a>
-
   <h4>Please select benefit market kind</h4>
   <%= select_tag "benefit_market_kind", options_for_select('ACA Individual' => 'acaIndividual', 'ACA Shop' => 'acaShop'), data: { action: 'change->benefit-market--form#configurationChange' } %>
   <div data-target="benefit-market--form.acaIndividual">
     <%= f.fields_for :configuration, @benefit_market.aca_individual_configuration do |configuration_fields| %>
-      <label for="inputEnrollmentDueOn">monthly enrollment due on</label>
+      <label for="inputEnrollmentDueOn">Monthly Enrollment Due On</label>
       <%= configuration_fields.text_field :mm_enr_due_on, id: 'inputEnrollmentDueOn', required:'true', class:'form-control'%>
-      <label for="inputVerificationOutstanding">verification outstanding window days</label>
+      <label for="inputVerificationOutstanding">Verification Outstanding Window Days</label>
       <%= configuration_fields.text_field :vr_os_window, id: 'inputVerificationOutstanding', required:'true', class:'form-control'%>
-      <label for="inputVerificationDue">verification due days</label>
+      <label for="inputVerificationDue">Verification Due Days</label>
       <%= configuration_fields.text_field :vr_due, id: 'inputVerificationDue', required:'true', class:'form-control'%>
-      <label for="inputEnrollmentStartOn">open enrollment start on</label>
+      <label for="inputEnrollmentStartOn">Open Enrollment Start On</label>
       <%= configuration_fields.date_field :open_enrl_start_on, id: 'inputEnrollmentStartOn', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentEndOn">open enrollment end on</label>
+      <label for="inputOpenEnrollmentEndOn">Open Enrollment End On</label>
       <%= configuration_fields.date_field :open_enrl_end_on, id: 'inputOpenEnrollmentEndOn', required:'true', class:'form-control'%>
       <%= configuration_fields.fields_for :initial_application_configuration, configuration_fields.object.initial_application_configuration do |initial_application_fields| %>
         <%= initial_application_fields.text_field :pub_due_dom %>
@@ -34,65 +32,63 @@
 
   <div data-target="benefit-market--form.acaShop" class="d-none">
     <%= f.fields_for :configuration, @benefit_market.aca_shop_configuration do |configuration_fields| %>
-      <label for="inputEmployeeCountMax">employee count max</label>
+      <label for="inputEmployeeCountMax">Employee Count Maximum</label>
       <%= configuration_fields.text_field :ee_ct_max, id: 'inputEmployeeCountMax', required:'true', class:'form-control'%>
-      <label for="inputEEParticipationRatio">employee participation ratio min</label>
+      <label for="inputEEParticipationRatio">Employee Participation Ratio Min</label>
       <%= configuration_fields.text_field :ee_ratio_min, id: 'inputEEParticipationRatio', required:'true', class:'form-control'%>
-      <label for="inputEmployeeNonOwnerCountMin">employee non owner count min</label>
-      <%= configuration_fields.text_field :ee_non_owner_ct_min, id: 'inputEmployeeNonOwnerCountMin', required:'true', class:'form-control'%>
-      <label for="inputEmployereContribution">employer contribution pct min</label>
+      <label for="inputEmployeeNonOwnerCountMin">Employee Non Owner Count Min</label>
+      <%= configuration_fields.text_field :ee_non_owner_ct_min, id: 'inputEmployeeNonOwnerCountMin', required:'true', class:'form-control', :style => "width:400px;"%>
+      <label for="inputEmployereContribution">Employer Contribution Percentaget Min</label>
       <%= configuration_fields.text_field :er_contrib_pct_min, id: 'inputEmployereContribution', required:'true', class:'form-control'%>
-      <label for="inputBinderPaymentDueDate">binder payment due day of month</label>
+      <label for="inputBinderPaymentDueDate">Binder Payment Due Day Of Month</label>
       <%= configuration_fields.text_field :binder_due_dom, id: 'inputBinderPaymentDueDate', required:'true', class:'form-control'%>
-      <label for="inputEarliestEnroll">earliest enroll prior effective on days</label>
+      <label for="inputEarliestEnroll">Earliest Enroll Prior Effective On Days</label>
       <%= configuration_fields.text_field :erlst_e_prior_eod, id: 'inputEarliestEnroll', required:'true', class:'form-control'%>
-      <label for="inputLAtestEnroll">latest enroll after effective on days</label>
+      <label for="inputLAtestEnroll">Latest Enroll After Effective On Days</label>
       <%= configuration_fields.text_field :ltst_e_aft_eod, id: 'inputLAtestEnroll', required:'true', class:'form-control'%>
-      <label for="inputlatestEnrollEE">latest enroll after ee roster correction on days</label>
+      <label for="inputlatestEnrollEE">Latest Enroll After EE Roster Correction On Days</label>
       <%= configuration_fields.text_field :ltst_e_aft_ee_roster_cod, id: 'inputlatestEnrollEE', required:'true', class:'form-control'%>
-      <label for="inputRetroActiveCoverage">retroactive coverage termination max days</label>
+      <label for="inputRetroActiveCoverage">Retroactive Coverage Termination Max Days</label>
       <%= configuration_fields.text_field :retroactve_covg_term_max_dys, id: 'inputRetroActiveCoverage', required:'true', class:'form-control'%>
-      <label for="inputBenefitPeriodMinYear">benefit period min year</label>
+      <label for="inputBenefitPeriodMinYear">Benefit Period Min Year</label>
       <%= configuration_fields.text_field :ben_per_min_year, id: 'inputBenefitPeriodMinYear', required:'true', class:'form-control'%>
-      <label for="inputBenefitPeriodManYear">benefit period max year</label>
+      <label for="inputBenefitPeriodManYear">Benefit Period Max Year</label>
       <%= configuration_fields.text_field :ben_per_max_year, id: 'inputBenefitPeriodManYear', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentStartMonthly">open enrollment start on montly</label>
+      <label for="inputOpenEnrollmentStartMonthly">Open Enrollment Start On Montly</label>
       <%= configuration_fields.text_field :oe_start_month, id: 'inputOpenEnrollmentStartMonthly', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentEndMonthly">open enrollment end on montly</label>
+      <label for="inputOpenEnrollmentEndMonthly">Open Enrollment End On Montly</label>
       <%= configuration_fields.text_field :oe_end_month, id:'inputOpenEnrollmentEndMonthly', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentDaysMin">open enrollment days min</label>
+      <label for="inputOpenEnrollmentDaysMin">Open Enrollment Days Min</label>
       <%= configuration_fields.text_field :oe_min_dys, id: 'inputOpenEnrollmentDaysMin', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentGracePeriod">open enrollment grace period length days min</label>
+      <label for="inputOpenEnrollmentGracePeriod">Open Enrollment Grace Period Length Days Min</label>
       <%= configuration_fields.text_field :oe_grce_min_dys, id:'inputOpenEnrollmentGracePeriod', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentAdvDays">open enrollment adv days min</label>
+      <label for="inputOpenEnrollmentAdvDays">Open Enrollment Adv Days Min</label>
       <%= configuration_fields.text_field :oe_min_adv_dys, id: 'inputOpenEnrollmentAdvDays', required:'true', class:'form-control'%>
-      <label for="inputOpenEnrollmentMonthsMAx">open enrollment months max</label>
+      <label for="inputOpenEnrollmentMonthsMAx">Open Enrollment Months Max</label>
       <%= configuration_fields.text_field :oe_max_months, id: 'inputOpenEnrollmentMonthsMAx', required:'true', class:'form-control'%>
-      <label for="inputCobraEnrollments">cobra enrollment period month</label>
+      <label for="inputCobraEnrollments">Cobra Enrollment Period Month</label>
       <%= configuration_fields.text_field :cobra_epm, id: 'inputCobraEnrollments', required:'true', class:'form-control'%>
-      <label for="inputGroupFileNewEnrollment">group file new enrollment transmit on</label>
+      <label for="inputGroupFileNewEnrollment">Group File New Enrollment Transmit on</label>
       <%= configuration_fields.text_field :gf_new_enrollment_trans, id: 'inputGroupFileNewEnrollment', required:'true', class:'form-control'%>
-      <label for="inputUpdateTransmitDay">group file update transmit day of week</label>
-      <%= configuration_fields.text_field :gf_update_trans_dow, id: 'inputUpdateTransmitDay', required:'true', class:'form-control'%>
-      <label for="inputERCalModel">use simple employer calculation model</label>
-      <%= configuration_fields.text_field :use_simple_er_cal_model, id: 'inputERCalModel', required:'true', class:'form-control'%>
-      <label for="inputOfferingsServiceArea">offerings_constrained_to_service_areas</label>
-      <%= configuration_fields.text_field :offerings_constrained_to_service_areas, id: 'inputOfferingsServiceArea', required:'true', class:'form-control'%>
-      <label for="inputTransmitERImmediatly">transmit employers immediately</label>
-      <%= configuration_fields.text_field :trans_er_immed, id: 'inputTransmitERImmediatly', required:'true', class:'form-control'%>
-      <label for="inputTransmitScheduledER">transmit scheduled employers</label>
-      <%= configuration_fields.text_field :trans_scheduled_er, id: 'inputTransmitScheduledER', required:'true', class:'form-control'%>
-      <label for="inputERTransmissionDayOfMonth">employer transmission day of month</label>
+      <label for="inputUpdateTransmitDay">Group File Update Transmit Day Of Week</label>
+      <%= configuration_fields.select :gf_update_trans_dow, ["Monday", "Tuesday", "Friday"], selected: "Friday",id: 'inputUpdateTransmitDay', required:'true', class:'form-control' %><br/>
+      <label for="inputERCalModel">Use Simple Employer Ealculation Model</label>
+      <%= configuration_fields.check_box :use_simple_er_cal_model, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputOfferingsServiceArea">Offerings Constrained To Service Areas</label>
+      <%= configuration_fields.check_box :offerings_constrained_to_service_areas, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputTransmitERImmediatly">Transmit Employers Immediately</label>
+      <%= configuration_fields.check_box :trans_er_immed, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputTransmitScheduledER">Transmit Scheduled Employers</label>
+      <%= configuration_fields.check_box :trans_scheduled_er, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputERTransmissionDayOfMonth">Employer Transmission Day Of Month</label>
       <%= configuration_fields.text_field :er_transmission_dom, id: 'inputERTransmissionDayOfMonth', required:'true', class:'form-control'%>
-      <label for="inputEnforceEmployerAttestation">enforce employer attestation</label>
-      <%= configuration_fields.text_field :enforce_er_attest, id: 'inputEnforceEmployerAttestation', required:'true', class:'form-control'%>
-      <label for="inputSIC">standard industrial classification</label>
-      <%= configuration_fields.text_field :stan_indus_class, id: 'SIC', required:'true', class:'form-control'%>
-      <label for="inputCarriersFiltersEnabled">carrier filters enabled</label>
-      <%= configuration_fields.text_field :carrier_filters_enabled, id: 'inputCarriersFiltersEnabled', required:'true', class:'form-control'%>
-      <label for="inputRatingArea">rating areas</label>
+      <label for="inputEnforceEmployerAttestation">Enforce Employer Attestation</label>
+      <%= configuration_fields.check_box :enforce_er_attest, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputSIC">Standard Industrial Classification</label>
+      <%= configuration_fields.check_box :stan_indus_class, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputCarriersFiltersEnabled">Carrier Filters Enabled</label>
+      <%= configuration_fields.check_box :carrier_filters_enabled, { class: 'form-control' }, 'true', 'false' %>
+      <label for="inputRatingArea">Rating Areas</label>
       <%= configuration_fields.text_field :rating_areas, id: 'RatingArea', required:'true', class:'form-control'%>
     <% end %> <!-- configration_fields -->
   </div>
-  <%= submit_tag "Submit", class:'btn btn-primary' %>
-<% end %>

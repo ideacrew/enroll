@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = [ "acaIndividual", "acaShop" ]
   
   configurationChange(event) {
-  	console.log('test')
   	Array.prototype.forEach.call(event.currentTarget.options, (option) => {
       this[`${option.value}Target`].classList.add('d-none');
   	})
