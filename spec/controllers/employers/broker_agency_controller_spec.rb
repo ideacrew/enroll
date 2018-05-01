@@ -123,11 +123,14 @@ RSpec.describe Employers::BrokerAgencyController do
         sign_in(@user)
       end
 
-      it "should trigger notice" do
+      it 'should trigger broker_hired_notice_to_broker notice' do
+        expect(controller).to receive(:trigger_notice_observer).with(@broker_role2, @employer_profile,"broker_hired_notice_to_broker")
         expect_any_instance_of(EmployerProfile).to receive(:trigger_shop_notices).with("broker_hired_confirmation_to_employer")
+        expect(controller).to receive(:trigger_notice_observer).with(@broker_role2.broker_agency_profile, @employer_profile,"broker_agency_hired_confirmation")      
         post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
     end
+
 
     context 'with out search string - WITHOUT modify_employer permission' do
       before(:each) do
@@ -138,18 +141,6 @@ RSpec.describe Employers::BrokerAgencyController do
 
       it "should be a success" do
         expect(flash[:error]).to match(/Access not allowed/)
-      end
-    end
-
-    context 'broker-agency hired confirmation notice to broker agency' do
-      before(:each) do
-        allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
-        sign_in(@user)
-      end
-
-      it "should trigger the notice" do
-        expect(controller).to receive(:trigger_notice_observer).once.ordered.with(@broker_role2.broker_agency_profile, @employer_profile,"broker_agency_hired_confirmation")
-        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
     end
 
@@ -241,7 +232,6 @@ RSpec.describe Employers::BrokerAgencyController do
 
       end
     end
-
   end
 
   describe ".create for invalid plan year" do
@@ -265,7 +255,6 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
-
     end
 
     # it "should send notice to employer, broker and agency" do
