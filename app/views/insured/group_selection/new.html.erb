@@ -50,6 +50,31 @@
                       <% end %>
                     </label>
                   </div>
+                  <div class="modal fade" id="WarningOnCoverAllSelection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="myModalLabel">Some people are eligible for DC Health Link</h4>
+                        </div>
+                        <div class="modal-body">
+                          This group includes people who are eligible to enroll in a plan through DC Health Link. If you choose to enroll these people in a plan through Cover All DC, they will:
+                          <ul>
+                            <li>
+                              not get a Form 1095-A at tax time.
+                            </li>
+                            <li>
+                              not qualify for cost savings like the advance premium tax credit.
+                            </li>
+                          </ul>
+                          <strong>You can enroll these people in the same plan through DC Health Link separately.</strong>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 <% end %>
               </div>
             </div>
