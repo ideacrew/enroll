@@ -8,7 +8,7 @@ class VerificationType
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
 
   VALIDATION_STATES = %w(na pending review outstanding verified attested expired)
-  UNVERIFIED_TYPES = %w(pending review outstanding expired)
+  DUE_DATE_STATES = %w(review outstanding expired)
 
   field :type_name, type: String
   field :validation_status, type: String

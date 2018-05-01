@@ -40,7 +40,7 @@
                   </div>
 
                   <div class="v-type-due-date col-md-3">
-                    <% if VerificationType::UNVERIFIED_TYPES.include? verif_type.validation_status %>
+                    <% if VerificationType::DUE_DATE_STATES.include? verif_type.validation_status %>
                       <span class="text-danger"><%= l10n('due_date') %></span>
                       <%= verif_type.due_date || TimeKeeper.date_of_record + 95.days %>
                     <% end %>
