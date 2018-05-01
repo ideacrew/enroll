@@ -28,6 +28,28 @@ module BenefitSponsors
         dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
       end
 
+      def is_start_on_valid?(start_on)
+        check_start_on(start_on)[:result] == "okay"
+      end
+
+      # Responsible for calculating all the possible dataes
+      def start_on_options_with_schedule
+        possible_dates = Hash.new
+        calculate_start_on_dates.each do |date|
+          next unless is_start_on_valid?(date)
+          possible_dates[date] = open_enrollment_dates(date).merge(enrollment_schedule(date))
+        end
+        possible_dates
+      end
+
+      def open_enrollment_dates(start_on)
+        calculate_open_enrollment_date(start_on)
+      end
+
+      def enrollment_schedule(start_on)
+        shop_enrollment_timetable(start_on)
+      end
+
       def enrollment_timetable_by_effective_date(effective_date)
         effective_date            = effective_date.to_date.beginning_of_month
         effective_period          = effective_date..(effective_date + 1.year - 1.day)

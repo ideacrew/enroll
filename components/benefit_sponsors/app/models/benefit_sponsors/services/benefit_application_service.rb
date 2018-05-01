@@ -13,8 +13,8 @@ module BenefitSponsors
       end
 
       def load_form_metadata(form)
-        # form.start_on_options = calculate_start_on_options
-        form.start_on_options = start_on_options_with_schedule
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        form.start_on_options = schedular.start_on_options_with_schedule
       end
 
       def load_form_params_from_resource(form)
@@ -157,37 +157,6 @@ module BenefitSponsors
         model_attribute_name
       end
 
-      # def calculate_start_on_options
-      #   scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-      # end
-
-      def is_start_on_valid?(start_on)
-        scheduler.check_start_on(start_on)[:result] == "ok"
-      end
-
-      # Responsible for calculating all the possible dataes
-      def start_on_options_with_schedule
-        possible_dates = Hash.new
-        scheduler.calculate_start_on_dates.each do |date|
-          next unless is_start_on_valid?(date)
-          possible_dates[date] = open_enrollment_dates(date).merge(enrollment_schedule(date))
-        end
-        possible_dates
-      end
-
-      def open_enrollment_dates(start_on)
-        scheduler.calculate_open_enrollment_date(start_on)
-      end
-
-      def enrollment_schedule(start_on)
-        scheduler.shop_enrollment_timetable(start_on)
-      end
-
-      def scheduler
-        return @scheduler if defined? @scheduler
-        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      end
-
       private
 
       def get_application_errors_for_revert(benefit_application, form)
@@ -197,7 +166,7 @@ module BenefitSponsors
         end
         return [false, benefit_application]
       end
-
+      
     end
   end
 end
