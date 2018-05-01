@@ -8,7 +8,7 @@
   </div>
 
   <h4>Please select benefit market kind</h4>
-  <%= f.select :kind, options_for_select('ACA Individual' => 'aca_individual', 'ACA Shop' => 'aca_shop'), data: { action: 'change->benefit-market--form#configurationChange' } %>
+  <%= f.select :kind, options_for_select({'ACA Individual' => 'aca_individual', 'ACA Shop' => 'aca_shop'}, @benefit_market.kind), {}, data: { target: 'benefit-market--form.select', action: 'change->benefit-market--form#configurationChange' } %>
   <div data-target="benefit-market--form.aca_individual">
     <%= f.fields_for :aca_individual_configuration, @benefit_market.aca_individual_configuration do |configuration_fields| %>
       <label for="inputEnrollmentDueOn">monthly enrollment due on</label>
@@ -99,6 +99,8 @@
       <label for="inputRatingArea">Rating Areas</label>
       <%= configuration_fields.text_field :rating_areas, id: 'RatingArea', required:'true', class:'form-control'%>
 
+      <br>
+      <h5> Initial Application</h5>
       <%= configuration_fields.fields_for :initial_application_configuration, configuration_fields.object.initial_application_configuration do |initial_application_fields| %>
         <label for="inputPublishDueDayOfMonth">Publish Due Day Of Month</label>
         <%= initial_application_fields.text_field :pub_due_dom, id: 'inputPublishDueDayOfMonth', required:'true', class:'form-control'%>
@@ -111,5 +113,21 @@
         <label for="inputIneligiblePeriodAfterApplicationDenialDays">Ineligible Period After Application Denial Days</label>
         <%= initial_application_fields.text_field :inelig_per_aft_app_denial_dys, id: 'inputIneligiblePeriodAfterApplicationDenialDays', required:'true', class:'form-control'%>
       <% end %> <!-- initial_application_fields -->
+      <br>
+      <h5> Renewal Application</h5>
+      <%= configuration_fields.fields_for :renewal_application_configuration, configuration_fields.object.renewal_application_configuration do |renewal_application_fields| %>
+        <label for="inputEarliestStartPriorToEffectiveOnMonths">Earliest Start Prior To Effective On Months</label>
+        <%= renewal_application_fields.text_field :erlst_strt_prior_eff_months, id: 'inputEarliestStartPriorToEffectiveOnMonths', required:'true', class:'form-control'%>
+        <label for="inputMonthlyOpenEnrollmentEndOn">Monthly Open Enrollment End On</label>
+        <%= renewal_application_fields.text_field :montly_oe_end, id: 'inputMonthlyOpenEnrollmentEndOn', required:'true', class:'form-control'%>
+        <label for="inputPublishDueDayOfMonth">Publish Due Day Of Month</label>
+        <%= renewal_application_fields.text_field :pub_due_dom, id: 'inputPublishDueDayOfMonth', required:'true', class:'form-control'%>
+        <label for="inputForcePublishDayOfMonth">Force Publish Day Of Month</label>
+        <%= renewal_application_fields.text_field :force_pub_dom, id: 'inputForcePublishDayOfMonth', required:'true', class:'form-control'%>
+        <label for="inputOpenEnrollmentDaysMin">Open Enrollment Days Min</label>
+        <%= renewal_application_fields.text_field :oe_min_dys, id: 'inputOpenEnrollmentDaysMin', required:'true', class:'form-control'%>
+        <label for="inputQuietPeriodEndOn">Quiet Period End On</label>
+        <%= renewal_application_fields.text_field :quiet_per_end, id: 'inputQuietPeriodEndOn', required:'true', class:'form-control'%>
+      <% end %> <!-- renewal_application_fields -->
     <% end %> <!-- configration_fields -->
   </div>

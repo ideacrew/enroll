@@ -8,12 +8,12 @@ module BenefitMarkets
       include ActiveModel::Validations
       include Virtus.model
 
-      attribute :mm_enr_due_on, Integer
-      attribute :vr_os_window, Integer
-      attribute :vr_due, Integer
-      attribute :open_enrl_start_on, Date
-      attribute :open_enrl_end_on, Date
-
+      attribute :erlst_strt_prior_eff_months, Integer
+      attribute :montly_oe_end, Integer
+      attribute :pub_due_dom, Integer
+      attribute :force_pub_dom, Integer
+      attribute :oe_min_dys, Integer
+      attribute :quiet_per_end, Integer
     end
   end
 end

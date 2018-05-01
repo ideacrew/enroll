@@ -32,7 +32,7 @@ module BenefitMarkets
                     trans_er_immed:,
                     trans_scheduled_er:,
                     use_simple_er_cal_model:)
-        BenefitMarkets::Factories::AcaShopConfiguration.new ben_per_max_year: ben_per_max_year,
+        BenefitMarkets::Configurations::AcaShopConfiguration.new ben_per_max_year: ben_per_max_year,
           ben_per_min_year: ben_per_min_year,
           binder_due_dom: binder_due_dom,
           carrier_filters_enabled: carrier_filters_enabled,

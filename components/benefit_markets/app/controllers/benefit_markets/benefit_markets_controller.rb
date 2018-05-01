@@ -13,10 +13,10 @@ module BenefitMarkets
 
     def create
       # pundit can I do this here
-      @benifit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benifit_market]
+      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benefit_market]
 
-      if @benifit_market.save
-        redirect_to benifit_markets_path
+      if @benefit_market.save
+        redirect_to benefit_markets_path
       else
         render 'new'
       end
@@ -27,21 +27,21 @@ module BenefitMarkets
     end
 
     def update
-      @benifit_market = BenefitMarkets::Forms::BenefitMarket.for_update params[:id]
+      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_update params[:id]
 
-      if @benifit_market.update_attributes params[:benifit_market]
-        redirect_to benifit_markets_path
+      if @benefit_market.update_attributes params[:benefit_market]
+        redirect_to benefit_markets_path
       else
         render 'edit'
       end
     end
 
     def destroy
-      @benifit_market = BenefitMarkets::BenefitMarket.find params[:id]
-      @benifit_market.owner_organization.destroy
-      @benifit_market.destroy
+      @benefit_market = BenefitMarkets::BenefitMarket.find params[:id]
+      @benefit_market.owner_organization.destroy
+      @benefit_market.destroy
 
-      redirect_to benifit_markets_path
+      redirect_to benefit_markets_path
     end
 
     private
