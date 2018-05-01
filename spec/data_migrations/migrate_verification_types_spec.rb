@@ -43,6 +43,7 @@ describe MigrateVerificationTypes, dbclean: :after_each do
   describe "vlp documents migration" do
     before do
       person.consumer_role.vlp_documents.first.verification_type = "Citizenship"
+      person.save!
       subject.migrate
       person.reload
     end

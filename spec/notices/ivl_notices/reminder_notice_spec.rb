@@ -23,7 +23,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   }}
   let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship', due_date: TimeKeeper.date_of_record)}
   let (:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number', due_date: TimeKeeper.date_of_record)}
-  let(:immigration_type) { FactoryGirl.build(:verification_type, type_name: 'Immigration type', due_date: TimeKeeper.date_of_record) }
+  let(:immigration_type) { FactoryGirl.build(:verification_type, type_name: 'Immigration status', due_date: TimeKeeper.date_of_record) }
 
 
   describe "New" do
@@ -137,6 +137,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
     context "immigration" do
 
       it "should have immigration pdf template" do
+        person.verification_types.by_name(immigration_type.type_name).first.update_attributes(inactive: nil)
         @reminder_notice.build
         expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy
       end
@@ -163,6 +164,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
     context "both citizenship and immigration" do
       it "should return immigration pdf template and  citizenship pdf template" do
         person.consumer_role.update_attributes!(citizen_status: "us_citizen")
+        person.verification_types.by_name(immigration_type.type_name).first.update_attributes(inactive: nil)
         @reminder_notice.build
         expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
         expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy

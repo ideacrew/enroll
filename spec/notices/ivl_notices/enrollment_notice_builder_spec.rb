@@ -22,7 +22,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
   let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship')}
   let (:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number')}
-  let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship')}
+
 
   describe "New" do
     before do
@@ -82,12 +82,13 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
     context "when special verification already exists" do
+      let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship', due_date: Date.new(2017,5,5), due_date_type: 'notice')}
       it "should not update the due date" do
-        special_verification = SpecialVerification.new(due_date: Date.new(2017,5,5), verification_type: "Citizenship", type: "notice")
-        person.consumer_role.special_verifications << special_verification
-        person.consumer_role.save!
+        person.consumer_role.verification_types.by_name('Citizenship').first.due_date = citizenship_type.due_date
+        person.consumer_role.verification_types.by_name('Citizenship').first.due_date_type = citizenship_type.due_date_type
+        person.save!
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, citizenship_type)).to eq special_verification.due_date
+        expect(@eligibility_notice.document_due_date(person, citizenship_type)).to eq citizenship_type.due_date
       end
     end
     context "when special verification does not exist" do
