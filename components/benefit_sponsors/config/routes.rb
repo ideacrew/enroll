@@ -36,8 +36,11 @@ BenefitSponsors::Engine.routes.draw do
     end
   end
 
-  resources :benefit_sponsorships, only: [] do
+  resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
+      post 'revert'
+      post 'publish'
+      post 'force_publish'
 
       resources :benefit_packages do
         resources :sponsored_benefits, only: :new

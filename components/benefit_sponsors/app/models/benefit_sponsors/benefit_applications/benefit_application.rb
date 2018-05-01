@@ -90,7 +90,7 @@ module BenefitSponsors
       scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
       scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
       
-      scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
+      scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
         where(
           "$and" => [
             {:aasm_state.in => PUBLISHED },
@@ -144,6 +144,14 @@ module BenefitSponsors
         effective_period.end
       end
 
+      def open_enrollment_start_on
+        open_enrollment_period.min
+      end
+
+      def open_enrollment_end_on
+        open_enrollment_period.max
+      end
+
       def effective_date
         effective_period.begin unless effective_period.blank?
       end
@@ -173,7 +181,13 @@ module BenefitSponsors
       end
 
       def overlapping_published_plan_years
-        employer_profile.plan_years.published_plan_years_within_date_range(start_on, end_on)
+        benefit_sponsorship.benefit_applications.published_benefit_applications_within_date_range(start_on, end_on)
+      end
+
+      def overlapping_published_plan_year?
+        self.benefit_sponsorship.benefit_applications.published_or_renewing_published.any? do |benefit_application|
+          benefit_application.effective_period.cover?(self.start_on) && (benefit_application != self)
+        end
       end
 
       ## Stub for BQT
@@ -208,12 +222,12 @@ module BenefitSponsors
       end
 
       def minimum_employer_contribution
-        unless benefit_groups.size == 0
-          benefit_groups.map do |benefit_group|
-            if benefit_group.sole_source?
+        unless benefit_packages.size == 0
+          benefit_packages.map do |benefit_package|
+            if benefit_package.sole_source?
               OpenStruct.new(:premium_pct => 100)
             else
-              benefit_group.relationship_benefits.select do |relationship_benefit|
+              benefit_package.relationship_benefits.select do |relationship_benefit|
                 relationship_benefit.relationship == "employee"
               end.min_by do |relationship_benefit|
                 relationship_benefit.premium_pct
@@ -416,19 +430,29 @@ module BenefitSponsors
         end
       end
 
-
-
       def due_date_for_publish
-        if employer_profile.plan_years.renewing.any?
+        if benefit_sponsorship.benefit_applications.renewing.any?
           Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
         else
           Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
         end
       end
 
+      def is_application_eligible?
+        application_eligibility_warnings.blank?
+      end
+
       def is_publish_date_valid?
         event_name = aasm.current_event.to_s.gsub(/!/, '')
         event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
+      end
+
+      def assigned_census_employees
+        benefit_packages.flat_map(){ |benefit_package| benefit_package.census_employees.active }
+      end
+
+      def assigned_census_employees_without_owner
+        benefit_packages.flat_map(){ |benefit_package| benefit_package.census_employees.active.non_business_owner }
       end
 
       def open_enrollment_date_errors
@@ -461,24 +485,24 @@ module BenefitSponsors
           log_message(errors){{open_enrollment_period: "Open Enrollment period is longer than maximum (#{Settings.aca.shop_market.open_enrollment.maximum_length.months} months)"}}
         end
 
-        if benefit_groups.any?{|bg| bg.reference_plan_id.blank? }
-          log_message(errors){{benefit_groups: "Reference plans have not been selected for benefit groups. Please edit the plan year and select reference plans."}}
+        if benefit_packages.any?{|bg| bg.reference_plan_id.blank? }
+          log_message(errors){{benefit_packages: "Reference plans have not been selected for benefit packages. Please edit the benefit application and select reference plans."}}
         end
 
-        if benefit_groups.blank?
-          log_message(errors) {{benefit_groups: "You must create at least one benefit group to publish a plan year"}}
+        if benefit_packages.blank?
+          log_message(errors) {{benefit_packages: "You must create at least one benefit package to publish a plan year"}}
         end
 
-        if employer_profile.census_employees.active.to_set != assigned_census_employees.to_set
-          log_message(errors) {{benefit_groups: "Every employee must be assigned to a benefit group defined for the published plan year"}}
-        end
+        # if benefit_sponsorship.census_employees.active.to_set != assigned_census_employees.to_set
+        #   log_message(errors) {{benefit_packages: "Every employee must be assigned to a benefit package defined for the published plan year"}}
+        # end
 
-        if employer_profile.ineligible?
-          log_message(errors) {{employer_profile:  "This employer is ineligible to enroll for coverage at this time"}}
+        if benefit_sponsorship.ineligible?
+          log_message(errors) {{benefit_sponsorship:  "This employer is ineligible to enroll for coverage at this time"}}
         end
 
         if overlapping_published_plan_year?
-          log_message(errors) {{ publish: "You may only have one published plan year at a time" }}
+          log_message(errors) {{ publish: "You may only have one published benefit application at a time" }}
         end
 
         if !is_publish_date_valid?
@@ -492,7 +516,7 @@ module BenefitSponsors
       def application_eligibility_warnings
         warnings = {}
 
-        unless employer_profile.is_primary_office_local?
+        unless benefit_sponsorship.profile.is_primary_office_local?
           warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
         end
 
@@ -509,7 +533,7 @@ module BenefitSponsors
         # Exclude Jan 1 effective date from certain checks
         unless effective_date.yday == 1
           # Employer contribution toward employee premium must meet minimum
-          if benefit_groups.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+          if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
             warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
           end
         end
@@ -567,6 +591,13 @@ module BenefitSponsors
             errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
           end
         end
+      end
+
+      private
+
+      def log_message(errors)
+        msg = yield.first
+        (errors[msg[0]] ||= []) << msg[1]
       end
     end
   end
