@@ -64,7 +64,8 @@ FactoryGirl.define do
       end
 
       after(:create) do |plan, evaluator|
-        if plan.active_year.to_i == PlanYear.calculate_start_on_dates[0].year.to_i
+        start_on_date = PlanYear.calculate_start_on_dates[0]
+        if start_on_date.present? && plan.active_year.to_i == start_on_date.year.to_i
           start_on = PlanYear.calculate_start_on_dates[0].beginning_of_quarter
           end_on = start_on.end_of_quarter
         else
