@@ -27,8 +27,10 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
     end
 
-    it 'should have title' do
-      expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
+    if aca_state_abbreviation == "DC"
+      it 'should have title' do
+        expect(rendered).to have_selector('strong', "Browse Health and Dental plans from carriers in the DC Health Exchange")
+      end
     end
 
     it "should have image" do
