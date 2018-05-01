@@ -10,13 +10,14 @@ module BenefitMarkets
         include Mongoid::Document
         include Mongoid::Timestamps
 
+
         BENEFIT_PACKAGE_MAPPINGS = {
-          :any_dental => ["dental", "any"],
-          :single_product_health => ["health", "single_product"],
-          :single_product_dental => ["dental", "single_product"],
-          :issuer_health => ["health", "issuer"],
-          :metal_level_health => ["health", "metal_level"],
-          :composite_health => ["health", "composite"]
+          :any_dental             => [:dental, :any],
+          :single_product_health  => [:health, :single_product],
+          :single_product_dental  => [:dental, :single_product],
+          :issuer_health          => [:health, :issuer],
+          :metal_level_health     => [:health, :metal_level],
+          :composite_health       => [:health, :composite]
         }
 
         BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
@@ -35,11 +36,11 @@ module BenefitMarkets
         embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
         validates_presence_of :title, :allow_blank => false
-        validates_presence_of :benefit_catalog_id, :allow_blank => false
+        # validates_presence_of :benefit_catalog_id, :allow_blank => false
         validate :has_products
 
 
-        def is_available_for(effective_date)
+        def is_available_for?(service_area, effective_date)
           #implement by subclasses
         end
 
@@ -54,7 +55,7 @@ module BenefitMarkets
         end
 
         def has_products
-          return true if benefit_catalog_id.blank?
+          return true if benefit_catalog.blank?
           if self.all_products.empty?
             self.errors.add(:base, "the package would have no products")
             false

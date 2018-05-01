@@ -62,8 +62,8 @@ module BenefitMarkets
       end
 
       def product_namespace
-        local_namespace   = parent_namespace_for(self.class)
-        parent_namespace_for(local_namespace) + "::Products"
+        local_namespace   = self.class.to_s.deconstantize
+        local_namespace.deconstantize + "::Products"
       end
 
       def contribution_model_namespace

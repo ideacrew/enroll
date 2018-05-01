@@ -90,7 +90,7 @@ module BenefitMarkets
 
     # All ProductPackages that Sponsor is eligible to offer to members
     def product_packages_for(service_area, effective_date)
-      product_packages.collect{|product_package| product_package.available_for?(effective_date) }
+      product_packages.collect{|product_package| product_package.is_available_for?(service_area, effective_date) }
     end
 
     def issuers_for(benefit_application)

@@ -51,8 +51,8 @@ module BenefitSponsors
       end
 
       def product_namespace
-        local_namespace = parent_namespace_for(self.class)
-        parent_namespace_for(local_namespace) + "::Products"
+        local_namespace = self.class.to_s.deconstantize
+        local_namespace.deconstantize + "::Products"
       end
 
       def validate_product_kind!(product_kind)
