@@ -2,21 +2,15 @@
 module BenefitSponsors
   class Members::MemberGroup
     include Enumerable
+    include ActiveModel::Model
 
-    attr_reader :members
+    attr_accessor :members, :group_id, :group_enrollment
 
-    # Return the date on which the rate schedule is applicable.
-    # @return [Date] the rate schedule date
-    attr_reader :rate_schedule_date
-
-    # The coverage start date.
-    # @return [Date] the coverage start date
-    attr_reader :coverage_start_on
-
-    def initialize(group_id = nil)
+    def initialize(opts = {})
       @members          = []
-      @group_id         = group_id
+      @group_id         = nil
       @group_enrollment = nil
+      super(opts)
     end
 
     def primary_member
