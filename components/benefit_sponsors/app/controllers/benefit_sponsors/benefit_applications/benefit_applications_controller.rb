@@ -5,12 +5,12 @@ module BenefitSponsors
 
       def new
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.require(:benefit_sponsorship_id))
-        authorize @benefit_application_form
+        authorize @benefit_application_form, :updateable?
       end
 
       def create
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(application_params)
-        authorize @benefit_application_form
+        authorize @benefit_application_form, :updateable?
         if @benefit_application_form.save
           redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, @benefit_application_form.show_page_model)
         else
@@ -21,12 +21,12 @@ module BenefitSponsors
 
       def edit
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.require(:id))
-        authorize @benefit_application_form
+        authorize @benefit_application_form, :updateable?
       end
 
       def update    
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.require(:id))
-        authorize @benefit_application_form
+        authorize @benefit_application_form, :updateable?
         if @benefit_application_form.update_attributes(application_params)
           redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model)
         else
