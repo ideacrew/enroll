@@ -5,7 +5,7 @@ module BenefitMarkets
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :configuration, class_name: "BenefitMarkets::AcaShopConfiguration"
+      embedded_in :configuration, class_name: "BenefitMarkets::Configurations::AcaShopConfiguration"
 
       field :pub_due_dom, as: :publish_due_day_of_month, type: Integer, default: 5
       field :erlst_strt_prior_eff_months, as: :earliest_start_prior_to_effective_on_months, type: Integer, default: -3
