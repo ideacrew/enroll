@@ -14,8 +14,6 @@ class HbxStaffRole
 
   accepts_nested_attributes_for :person
 
-  validates_presence_of :hbx_profile_id
-
   alias_method :is_active?, :is_active
   #subrole is for documentation. should be redundant with permission_id
   field :subrole, type: String, default: ""

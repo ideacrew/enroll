@@ -4,31 +4,15 @@ module BenefitMarkets
     # which must be satisfied by objects returned by any implementation of
     # Roster's #each method.
     class RosterEntry
-      # The member id of the primary.
-      def member_id
+      # The members.
+      # @return [Array<RosterMember>]
+      def members
         raise NotImplementedError.new("This is a documentation only interface.")
       end
       
-      # Relationship to the primary.  Will typically be "self".
-      # @return [Symbol] the relationship
-      def relationship
-        raise NotImplementedError.new("This is a documentation only interface.")
-      end
-      
-      # Provide the primary's date of birth.
-      def dob
-        raise NotImplementedError.new("This is a documentation only interface.")
-      end
-
-      # Return the dependents of this entry.
-      # @return [Array<RosterDependent>] the collection of dependents
-      def dependents
-        raise NotImplementedError.new("This is a documentation only interface.")
-      end
-      
-      # Return if the member is disabled.
-      # @return [Boolean] is the member is disabled
-      def is_disabled?
+      # If applicable, the enrollment/coverage data for this group.
+      # @return [RosterGroupEnrollment]
+      def group_enrollment
         raise NotImplementedError.new("This is a documentation only interface.")
       end
     end

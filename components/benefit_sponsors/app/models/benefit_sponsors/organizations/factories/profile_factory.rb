@@ -146,7 +146,7 @@ module BenefitSponsors
           else
             pending = existing_company && Person.staff_for_employer(profile).detect{|person|person.user_id}
             role_state = pending ? 'is_applicant' : 'is_active' 
-            person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
+            person.employer_staff_roles << EmployerStaffRole.new(person: person, :benefit_sponsor_employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
           end
           self.pending = pending
           current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
@@ -383,9 +383,9 @@ module BenefitSponsors
           if is_broker_profile?
             Person.where(:"broker_role.broker_agency_profile_id" => BSON::ObjectId.from_string(profile_id))
           elsif is_employer_profile?
-            Person.where(:benefit_sponsors_employer_staff_roles => {
+            Person.where(:employer_staff_roles => {
               '$elemMatch' => {
-                employer_profile_id: profile_id,
+                :benefit_sponsor_employer_profile_id => BSON::ObjectId(profile_id),
                 :aasm_state.ne => :is_closed
               }
             })

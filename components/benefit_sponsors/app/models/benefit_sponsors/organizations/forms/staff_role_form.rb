@@ -15,6 +15,7 @@ module BenefitSponsors
       attribute :area_code, String
       attribute :number, String
       attribute :extension, String
+      attribute :profile_id, String
 
       attribute :profile_type, String
 
@@ -51,6 +52,65 @@ module BenefitSponsors
 
       def is_employer_profile?
         profile_type == "benefit_sponsor"
+      end
+
+      # for new
+      def self.for_new
+        self.new
+      end
+
+      # for create
+      def self.for_create(attrs)
+        new(attrs)
+      end
+
+      def save
+        persist!
+      end
+
+      def persist!
+        return false unless valid?
+        service.add_profile_representative!(self)
+      end
+
+      # for approve
+      def self.for_approve(attrs)
+        new(attrs)
+      end
+
+      def approve
+        approve!
+      end
+
+      def approve!
+        return false unless valid?
+        service({profile_id: profile_id}).approve_profile_representative!(self)
+      end
+
+      # for destroy
+      def self.for_destroy(attrs)
+        new(attrs)
+      end
+
+      def destroy
+        destroy!
+      end
+
+      def destroy!
+        return false unless valid?
+        service({profile_id: profile_id}).deactivate_profile_representative!(self)
+      end
+
+
+      protected
+
+      def self.resolve_service(attrs ={})
+        Services::StaffRoleService.new(attrs)
+      end
+
+      def service(attrs={})
+        return @service if defined?(@service)
+        @service = self.class.resolve_service
       end
     end
   end
