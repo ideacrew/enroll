@@ -12,7 +12,7 @@
     <li <%= menu_tab_class(active_tab, "brokers") %>>
       <%= link_to 'Brokers', profiles_employers_employer_profile_path(profile.id, :tab=>'brokers'), "aria-expanded" => "true" %>
     </li>
-    <% if display_families_tab(current_user) %>
+    <% if display_families_tab(current_user, profile.id) %>
       <li <%= menu_tab_class(active_tab, "families") %>>
         <%= link_to 'Families', profiles_employers_employer_profile_path(profile.id, :tab=>'families'), "aria-expanded" => "true" %>
       </li>
