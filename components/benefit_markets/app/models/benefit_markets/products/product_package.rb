@@ -10,13 +10,14 @@ module BenefitMarkets
         include Mongoid::Document
         include Mongoid::Timestamps
 
+
         BENEFIT_PACKAGE_MAPPINGS = {
-          :any_dental => ["dental", "any"],
-          :single_product_health => ["health", "single_product"],
-          :single_product_dental => ["dental", "single_product"],
-          :issuer_health => ["health", "issuer"],
-          :metal_level_health => ["health", "metal_level"],
-          :composite_health => ["health", "composite"]
+          :any_dental             => [:dental, :any],
+          :single_product_health  => [:health, :single_product],
+          :single_product_dental  => [:dental, :single_product],
+          :issuer_health          => [:health, :issuer],
+          :metal_level_health     => [:health, :metal_level],
+          :composite_health       => [:health, :composite]
         }
 
         BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
