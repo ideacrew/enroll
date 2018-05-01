@@ -42,6 +42,7 @@ module BenefitMarkets
 
         def is_available_for?(service_area, effective_date)
           #implement by subclasses
+          true
         end
 
 

@@ -14,7 +14,7 @@ module BenefitSponsors
       end
 
       def broker_agency_profile
-        organization.active_benefit_sponsorship.active_broker_agency_account.broker_agency_profile
+        organization.active_benefit_sponsorship.present? ? organization.active_benefit_sponsorship.active_broker_agency_account.broker_agency_profile : nil
       end
 
       def active_broker
