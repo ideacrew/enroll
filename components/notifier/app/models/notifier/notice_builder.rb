@@ -9,7 +9,7 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))? resource.person : resource
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
     end
 
     def construct_notice_object
