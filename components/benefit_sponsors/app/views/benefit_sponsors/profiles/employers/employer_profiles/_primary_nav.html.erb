@@ -28,7 +28,7 @@
       <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
       Messages
       <!-- TODO fix this when implementing Inboxes -->
-      <!-- <span class="badge message-unread"><%= profile.inbox.unread_messages.try(:count) || 0 %></span> -->
+      <!-- <span class="badge message-unread"><%#= profile.inbox.unread_messages.try(:count) || 0 %></span> -->
 
       <% end %>
       <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do  %>
@@ -40,7 +40,7 @@
   </ul>
   <div class="module my-account-widget panel panel-default">
     <div class="panel-heading">
-      <h4><%= profile.organization.legal_name %></h4>
+      <h4><%= organization.legal_name %></h4>
       <%= link_to 'Update Business Info', edit_profiles_registration_path(profile.id, :tab=>'profile', add_staff: 'no') %>
       <br/>
       <!-- TODO fix this when implementing Pundit -->
@@ -50,7 +50,8 @@
     </div>
     <div class="panel-body">
       <%= link_to profiles_employers_employer_profile_path(profile.id, :tab=>'employees') do %>
-      <div>My Employees: <span><%= profile.census_employees.active.count %></span></div>
+      <!-- TODO fix this when implementing relationship b/w census_employee and employer_profile-->
+      <div>My Employees: <span><%#= profile.census_employees.active.count %></span></div>
       <% end %>
     </div>
   </div>

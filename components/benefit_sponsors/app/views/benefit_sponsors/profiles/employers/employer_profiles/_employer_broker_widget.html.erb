@@ -1,5 +1,6 @@
 <% broker_and_agency_present = true if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
-<div class="panel panel-default module employer-broker-widget <%= pundit_class EmployerProfile, :updateable? %>">
+<!-- TODO fix this during pundit implementation-->
+<div class="panel panel-default module employer-broker-widget <%#= pundit_class EmployerProfile, :updateable? %>">
   <div class="panel-heading">
     <h3 class="panel-title">
       <strong>

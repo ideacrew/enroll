@@ -35,15 +35,11 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::BenefitMarket"
 
     embeds_one  :sponsor_market_policy,  
-                class_name: "BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
+                class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
     embeds_one  :member_market_policy,
-                class_name: "BenefitMarkets::MarketPolicies::MemberMarketPolicy"
-
-    # has_many    :benefit_applications,
-    #             class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
-
-    embeds_many   :product_packages,
-                  class_name: "BenefitMarkets::Products::ProductPackage"
+                class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
+    embeds_many :product_packages,
+                class_name: "::BenefitMarkets::Products::ProductPackage"
 
     # Entire geography covered by under this catalog
     has_and_belongs_to_many  :service_areas,  
@@ -90,7 +86,7 @@ module BenefitMarkets
 
     # All ProductPackages that Sponsor is eligible to offer to members
     def product_packages_for(service_area, effective_date)
-      product_packages.collect{|product_package| product_package.is_available_for?(service_area, effective_date) }
+      product_packages.select{|product_package| product_package.is_available_for?(service_area, effective_date) }
     end
 
     def issuers_for(benefit_application)

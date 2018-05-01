@@ -7,8 +7,8 @@ module BenefitSponsors
 
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
     let(:user) { FactoryGirl.create :user}
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :dc) }
-    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog, :dc) }
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_organization_dc_profile, benefit_market: site.benefit_markets[0]) }
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -37,6 +37,7 @@ module BenefitSponsors
 
       it "should initialize the form" do
         sign_in_and_do_new
+        binding.pry
         expect(assigns(:benefit_application_form).class).to eq form_class
       end
 
