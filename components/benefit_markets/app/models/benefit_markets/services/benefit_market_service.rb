@@ -2,7 +2,7 @@ module BenefitMarkets
   module Services
     class BenefitMarketService
       def initialize(params = {})
-        @factory_class = BenefitMarkets::BenefitMarketFactory
+        @factory_class = BenefitMarkets::Factories::BenefitMarket
         @params = params
       end
 
@@ -11,28 +11,22 @@ module BenefitMarkets
       end
 
       def store!(form)
-        BenefitMarkets::BenefitMarketFactory.call(form_attributes_to_params(form))
+        BenefitMarkets::Factories::BenefitMarket.call(form_attributes_to_params(form))
       end
 
       def form_params_to_attributes(form, benefit_market)
         model_attributes = {
-          benefit_market_key: form.benefit_market_key,
-          byline: form.byline,
-          long_name: form.long_name,
-          short_name: form.short_name,
-          domain_name: form.domain_name,
-          owner_organization: {
-            legal_name: form.owner_organization.legal_name,
-            profiles: [{
-              office_locations: form.owner_organization.profile.office_locations.map do |location|
-                {
-                  is_primary: location.is_primary,
-                  phone: location.phone.attributes.slice(:kind, :area_code, :number, :extension),
-                  address: location.address.attributes.slice(:kind, :address_1, :address_2, :city, :state, :zip),
-                }
-              end
-            }]
-          }
+          description: description,
+          kind: kind,
+          site_urn: site_urn,
+          title: title
+          aca_individual_configuration: individual_configuration.attributes.merge({
+            initial_application_configuration: individual_configuration.initial_application_configuration.attributes
+          }),
+          aca_shop_configuration: shop_configuration.attributes.merge({
+            initial_application_configuration: shop_configuration.initial_application_configuration.attributes,
+            renewal_application_configuration: shop_configuration.renewal_application_configuration.attributes
+          })
         }
         benefit_market.assign_attributes(model_attributes)
       end
@@ -80,23 +74,19 @@ module BenefitMarkets
       end
 
       def save(form)
-        office_locations = form.owner_organization.profile.office_locations.map do |office_location|
-          BenefitMarkets::Locations::Factories::OfficeLocation.call is_primary: office_location.is_primary,
-            phone_attributes: office_location.phone.attributes,
-            address_attributes: office_location.address.attributes
+        if form.kind == "aca_shop"
+          configuration = BenefitMarkets::Factories::AcaShopConfiguration
+        elsif form.kind == "aca_individual"
+          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration
         end
-        profile = BenefitMarkets::Organizations::Factories::HbxProfile.call(office_locations)
-        owner_organization = BenefitMarkets::Organizations::Factories::OwnerOrganization.call(legal_name: form.owner_organization.legal_name, profile: profile)
-        profile.organization = owner_organization
-        benefit_market = BenefitMarkets::BenefitMarketFactory.call benefit_market_key: form.benefit_market_key,
-          long_name: form.long_name,
-          short_name: form.short_name,
-          domain_name: form.domain_name,
-          owner_organization: owner_organization
+        benefit_market = BenefitMarkets::Factories::BenefitMarket.call description: description,
+          kind: kind,
+          site_urn: site_urn,
+          title: title
 
         owner_organization.benefit_market = benefit_market
 
-        valid_according_to_factory = BenefitMarkets::BenefitMarketFactory.validate(benefit_market)
+        valid_according_to_factory = BenefitMarkets::Factories::BenefitMarket.validate(benefit_market)
         unless valid_according_to_factory
           map_errors_for(benefit_market, onto: form)
           return [false, nil]
