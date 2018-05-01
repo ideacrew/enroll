@@ -12,7 +12,7 @@ module BenefitSponsors
         end
 
         def index?
-          return current_user.has_hbx_staff_role? || current_user.has_csr_role?
+          return user.has_hbx_staff_role? || user.has_csr_role?
         end
       end
     end

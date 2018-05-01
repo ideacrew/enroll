@@ -36,7 +36,7 @@ module BenefitMarkets
         embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
         validates_presence_of :title, :allow_blank => false
-        validates_presence_of :benefit_catalog_id, :allow_blank => false
+        # validates_presence_of :benefit_catalog_id, :allow_blank => false
         validate :has_products
 
 
@@ -55,7 +55,7 @@ module BenefitMarkets
         end
 
         def has_products
-          return true if benefit_catalog_id.blank?
+          return true if benefit_catalog.blank?
           if self.all_products.empty?
             self.errors.add(:base, "the package would have no products")
             false
