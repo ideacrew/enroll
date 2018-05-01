@@ -28,6 +28,53 @@ module BenefitSponsors
         benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
         store(form, benefit_application)
       end
+
+      def revert(form)
+        benefit_application = find_model_by_id(form.id)
+        if benefit_application.may_revert_renewal?
+          if benefit_application.revert_renewal!
+            return [true, benefit_application]
+          else
+            get_application_errors_for_revert(benefit_application, form)
+          end
+        elsif benefit_application.may_revert_application?
+          if benefit_application.revert_application!
+            return [true, benefit_application]
+          else
+            get_application_errors_for_revert(benefit_application, form)
+          end
+        end
+      end
+
+      def force_publish(form)
+        benefit_application = find_model_by_id(form.id)
+        benefit_application.force_publish!
+        [true, benefit_application]
+      end
+
+      def publish(form)
+        benefit_application = find_model_by_id(form.id)
+        if benefit_application.may_publish? && !benefit_application.is_application_eligible?
+          benefit_application.application_eligibility_warnings.each do |k, v|
+            form.errors.add(k, v)
+          end
+          return [false, benefit_application]
+        else
+          benefit_application.publish! if benefit_application.may_publish?
+          if (benefit_application.published? || benefit_application.enrolling? || benefit_application.renewing_published? || benefit_application.renewing_enrolling?)
+            unless benefit_application.assigned_census_employees_without_owner.present?
+              form.errors.add(:base, "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?")
+            end
+            return [true, benefit_application]
+          else
+            errors = benefit_application.application_errors.merge(benefit_application.open_enrollment_date_errors)
+            errors.each do |k, v|
+              form.errors.add(k, v)
+            end
+            return [false, benefit_application]
+          end
+        end
+      end
      
       def update(form) 
         benefit_application = find_model_by_id(form.id)
@@ -115,7 +162,7 @@ module BenefitSponsors
       # end
 
       def is_start_on_valid?(start_on)
-        scheduler.check_start_on(start_on)[:result] == "okay"
+        scheduler.check_start_on(start_on)[:result] == "ok"
       end
 
       # Responsible for calculating all the possible dataes
@@ -140,6 +187,17 @@ module BenefitSponsors
         return @scheduler if defined? @scheduler
         @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       end
+
+      private
+
+      def get_application_errors_for_revert(benefit_application, form)
+        errors = benefit_application.errors.full_messages.merge(benefit_application.application_errors)
+        errors.each do |k, v|
+          form.errors.add(k, v)
+        end
+        return [false, benefit_application]
+      end
+
     end
   end
 end
