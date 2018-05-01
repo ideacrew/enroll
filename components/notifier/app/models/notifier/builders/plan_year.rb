@@ -127,6 +127,21 @@ module Notifier
       end
     end
 
+    def plan_year_warnings
+      plan_year_warnings = []
+      if current_plan_year.present?
+        current_plan_year.application_eligibility_warnings.each do |k, _|
+          case k.to_s
+          when "fte_count"
+            plan_year_warnings << "Full Time Equivalent must be 1-50"
+          when "primary_office_location"
+            plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
+          end
+        end
+      end
+      merge_model.plan_year.warnings = plan_year_warnings.join(', ')
+    end
+
     def load_plan_year
       plan_year = nil
 

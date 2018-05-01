@@ -69,6 +69,7 @@ RSpec.configure do |config|
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
   config.include FederalHolidaysHelper
+  config.include Config::AcaModelConcern
 
   config.infer_spec_type_from_file_location!
 

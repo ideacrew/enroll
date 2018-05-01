@@ -22,6 +22,10 @@ module Notifier
     def append_contact_details
       first_name
       last_name
+      addresses
+    end
+
+    def addresses
       office_address = employer_profile.organization.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({

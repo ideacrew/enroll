@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
-  include Config::AcaModelConcern
 
   it { should validate_presence_of :market_kind }
   it { should delegate_method(:hbx_id).to :organization }
@@ -234,23 +233,23 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
     end
   end
 
-  describe "general agency notice trigger", type: :model, dbclean: :after_all do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+  if general_agency_enabled?
+    describe "general agency notice trigger", type: :model, dbclean: :after_all do
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
 
-    it "should trigger general_agency_hired_notice job in queue" do
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      general_agency_profile.general_agency_hired_notice(employer_profile)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
+      it "should trigger general_agency_hired_notice job in queue" do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        general_agency_profile.general_agency_hired_notice(employer_profile)
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
 
-      if general_agency_enabled?
-        expect(queued_job[:args]).not_to be_empty
-        expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
-        expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
-        expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
+          expect(queued_job[:args]).not_to be_empty
+          expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
+          expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+          expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
       end
     end
   end
