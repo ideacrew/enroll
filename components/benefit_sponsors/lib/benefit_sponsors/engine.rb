@@ -3,6 +3,7 @@ require 'effective_datatables'
 require 'virtus'
 require 'devise'
 require 'pundit'
+require 'language_list'
 
 module BenefitSponsors
   class Engine < ::Rails::Engine

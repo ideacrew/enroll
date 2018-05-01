@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Profiles::RegistrationsController, type: :controller do
+  RSpec.describe Profiles::RegistrationsController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
 
@@ -96,7 +96,8 @@ module BenefitSponsors
 
     shared_examples_for "initialize registration form" do |action, params, profile_type|
       before do
-        sign_in self.send("#{profile_type}_user")
+        user = self.send("#{profile_type}_user")
+        sign_in user if user
         if params[:id].present?
           sign_in edit_user
           params[:id] = self.send(profile_type).profiles.first.id.to_s
@@ -121,7 +122,8 @@ module BenefitSponsors
       shared_examples_for "initialize profile for new" do |profile_type|
 
         before do
-          sign_in self.send("#{profile_type}_user")
+          user = self.send("#{profile_type}_user")
+          sign_in user if user
           get :new, profile_type: profile_type
         end
 
@@ -172,7 +174,8 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
-            sign_in self.send("#{profile_type}_user")
+            user = self.send("#{profile_type}_user")
+            sign_in user if user
             post :create, :agency => self.send("#{profile_type}_params")
           end
 

@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'virtus', '~> 1.0.5'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'devise', '~> 3.4.1'
+  s.add_dependency 'language_list', '~> 1.1.0'
 
   s.test_files = Dir["spec/**/*"]
 

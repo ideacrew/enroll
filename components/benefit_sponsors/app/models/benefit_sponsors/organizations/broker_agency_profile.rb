@@ -26,7 +26,7 @@ module BenefitSponsors
 
       field :home_page, type: String
 
-      embeds_many :documents, as: :documentable
+      # embeds_many :documents, as: :documentable
       accepts_nested_attributes_for :inbox
 
       has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact

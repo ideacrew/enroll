@@ -11,6 +11,7 @@ require 'shoulda/matchers'
 require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
+require 'slim'
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
