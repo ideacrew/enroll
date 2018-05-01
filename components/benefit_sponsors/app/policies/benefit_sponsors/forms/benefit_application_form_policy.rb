@@ -8,21 +8,14 @@ module BenefitSponsors
         @service = BenefitSponsors::Services::BenefitApplicationService.new
       end
 
-      #TODO
-      def new?
-        true
+      def updateable?
+        return true unless role = user.person && user.person.hbx_staff_role
+        role.permission.modify_employer
       end
 
-      def create?
-        true
-      end
-
-      def edit?
-        true
-      end
-
-      def update?
-        true
+      def revert_application?
+        return true unless role = user.person && user.person.hbx_staff_role
+        role.permission.revert_application
       end
     end
   end

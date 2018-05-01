@@ -53,6 +53,14 @@ module BenefitSponsors
       #   @benefit_sponsorship = benefit_sponsorship
       # end
 
+      def primary_office_location
+        office_locations.detect(&:is_primary?)
+      end
+
+      def is_primary_office_local?
+        primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
+      end
+
       def add_benefit_sponsorship
         return unless is_benefit_sponsorship_eligible?
         organization.sponsor_benefits_for(self)

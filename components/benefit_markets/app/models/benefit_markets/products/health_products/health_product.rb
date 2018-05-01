@@ -51,7 +51,10 @@ module BenefitMarkets
                     class_name: "BenefitMarkets::Locations::RatingArea"
 
 
-        validates_presence_of :hios_id
+        validates_presence_of :hios_id, :health_plan_kind, :ehb
+
+        validates_numericality_of :ehb, greater_than: 0.0, less_than: 1.0, allow_nil: false
+
 
         index({ hios_id: 1, "active_period.min": 1, "active_period.max": 1, name: 1 })
         index({ "active_period.min": 1, "active_period.max": 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
