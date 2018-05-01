@@ -32,14 +32,14 @@ module BenefitMarkets
         belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
         belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
 
-        belongs_to  :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
+        embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
         validates_presence_of :title, :allow_blank => false
         validates_presence_of :benefit_catalog_id, :allow_blank => false
         validate :has_products
 
 
-        def is_available_for(effective_date)
+        def is_available_for?(service_area, effective_date)
           #implement by subclasses
         end
 

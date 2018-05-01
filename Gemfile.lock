@@ -1,4 +1,16 @@
 GIT
+  remote: https://github.com/adacosta/mongoid_rails_migrations.git
+  revision: dd3f9c6d52cf11f666903aa24a07a1c01549f007
+  branch: master
+  specs:
+    mongoid_rails_migrations (1.1.0)
+      activesupport (>= 4.2.0)
+      bundler (>= 1.0.0)
+      mongoid (>= 4.0.0)
+      rails (>= 4.2.0)
+      railties (>= 4.2.0)
+
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: a0248fd948e1a3c1d2faaf0abf5077a2b1db9203
   branch: 1.0.0
@@ -710,6 +722,7 @@ DEPENDENCIES
   mongoid-history
   mongoid-rspec (= 3.0.0)
   mongoid-versioning
+  mongoid_rails_migrations!
   mongoid_userstamp
   newrelic_rpm
   nokogiri (= 1.6.7.2)

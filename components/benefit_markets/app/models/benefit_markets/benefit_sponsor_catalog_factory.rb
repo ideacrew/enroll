@@ -13,7 +13,7 @@ module BenefitMarkets
       @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.new
 
       add_probation_period_options
-      add_eligibilities
+      add_eligibility_policies
       add_product_packages
     end
 
@@ -26,7 +26,7 @@ module BenefitMarkets
     end
     
     def add_product_packages
-      @benefit_sponsor_catalog.product_packages = benefit_catalog.product_packages_for(service_area)
+      @benefit_sponsor_catalog.product_packages = benefit_catalog.product_packages_for(service_area, effective_date)
     end
 
     def benefit_sponsor_catalog
