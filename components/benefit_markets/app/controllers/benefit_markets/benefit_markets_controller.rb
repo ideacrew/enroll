@@ -1,9 +1,10 @@
 module BenefitMarkets
   class BenefitMarketsController < ApplicationController
     layout 'benefit_markets/application'
+    before_filter :set_site_id
 
     def index
-      @sites = BenefitSponsors::Site.all
+      @benefit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)
     end
 
     def new
@@ -22,7 +23,7 @@ module BenefitMarkets
     end
 
     def edit
-      @benifit_market = BenefitMarkets::Forms::BenefitMarket.for_edit params[:id]
+      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_edit params[:id]
     end
 
     def update

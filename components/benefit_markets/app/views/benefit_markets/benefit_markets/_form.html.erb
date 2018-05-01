@@ -2,8 +2,6 @@
   <div class="form-group">
     <label for="inputSite">Site</label>
     <%= f.text_field :site_urn, required:'true', class:'form-control'%>
-    <label for="inputKind">Kind</label>
-    <%= f.text_field :kind, class:'form-control'%>
     <label for="inputTittle">Tittle</label>
     <%= f.text_field :title, class:'form-control'%>
     <label for="inputDescription">Description</label>
@@ -11,8 +9,8 @@
   </div>
 
   <h4>Please select benefit market kind</h4>
-  <%= select_tag "benefit_market_kind", options_for_select('ACA Individual' => 'acaIndividual', 'ACA Shop' => 'acaShop'), data: { action: 'change->benefit-market--form#configurationChange' } %>
-  <div data-target="benefit-market--form.acaIndividual">
+  <%= select_tag "benefit_market_kind", options_for_select({'ACA Individual' => 'aca_individual', 'ACA Shop' => 'aca_shop'}, @benefit_market.kind), data: { target: 'benefit-market--form.select', action: 'change->benefit-market--form#configurationChange' } %>
+  <div data-target="benefit-market--form.aca_individual">
     <%= f.fields_for :configuration, @benefit_market.aca_individual_configuration do |configuration_fields| %>
       <label for="inputEnrollmentDueOn">Monthly Enrollment Due On</label>
       <%= configuration_fields.text_field :mm_enr_due_on, id: 'inputEnrollmentDueOn', required:'true', class:'form-control'%>
@@ -30,7 +28,7 @@
     <% end %> <!-- configration_fields -->
   </div>
 
-  <div data-target="benefit-market--form.acaShop" class="d-none">
+  <div data-target="benefit-market--form.aca_shop" class="d-none">
     <%= f.fields_for :configuration, @benefit_market.aca_shop_configuration do |configuration_fields| %>
       <label for="inputEmployeeCountMax">Employee Count Maximum</label>
       <%= configuration_fields.text_field :ee_ct_max, id: 'inputEmployeeCountMax', required:'true', class:'form-control'%>

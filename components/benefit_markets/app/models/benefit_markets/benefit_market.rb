@@ -5,7 +5,6 @@ module BenefitMarkets
   class BenefitMarket
     include Mongoid::Document
     include Mongoid::Timestamps
-    include BenefitMarkets
 
     attr_reader :contact_center_profile
 
@@ -19,7 +18,7 @@ module BenefitMarkets
     has_many    :benefit_market_catalogs,      
                 class_name: "BenefitMarkets::BenefitMarketCatalog"
 
-    # embeds_one :configuration,  as: :configurable, class_name: "BenefitMarkets::Configuration"
+    embeds_one :configuration, class_name: "BenefitMarkets::Configurations::Configuration"
     embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
                                         autobuild: true
 
@@ -30,16 +29,6 @@ module BenefitMarkets
       allow_nil:  false
 
     index({ kind:  1 })
-
-    # Mongoid initializes associations after setting attributes. It's necessary to autobuild the
-    # configuration file and subsequently change following initialization, if necessary
-    # before_validation :reset_configuration_attributes, if: :kind_changed?
-
-    def kind=(new_kind)
-      return unless BenefitMarkets::BENEFIT_MARKET_KINDS.include?(new_kind)
-      super(new_kind)
-      # reset_configuration_attributes
-    end
 
     # BenefitMarketCatalogs may not overlap application_periods
     def add_benefit_market_catalog(new_benefit_market_catalog)
@@ -113,7 +102,7 @@ module BenefitMarkets
     # Configuration setting model is automatically associated based on "kind" attribute value
     def configuration_class_name
       config_klass = "#{kind.to_s}_configuration".camelcase
-      namespace_for(self.class) + "::#{config_klass}"
+      namespace_for(self.class) + "::BenefitMarkets::Configurations::#{config_klass}"
     end
 
     # Isolate the namespace portion of the passed class

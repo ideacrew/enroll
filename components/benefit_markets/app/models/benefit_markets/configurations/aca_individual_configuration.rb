@@ -1,9 +1,6 @@
 module BenefitMarkets
   class AcaIndividualConfiguration < Configuration
-    include Mongoid::Document
-    include Mongoid::Timestamps
-    embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::AcaIndividualInitialApplicationConfiguration",
-      autobuild: true
+    embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::AcaIndividualInitialApplicationConfiguration"
 
     field :mm_enr_due_on,        as: :monthly_enrollment_due_on, type: Integer, default: 15
     field :vr_os_window,         as: :verification_outstanding_window_days, type: Integer, default: 0

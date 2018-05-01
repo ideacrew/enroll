@@ -38,7 +38,6 @@ module BenefitMarkets
       end
 
       def attributes_to_form_params(benefit_market, shop_configuration, individual_configuration, form)
-        puts shop_configuration.attributes.inspect
         form.attributes = benefit_market.attributes.merge({
           aca_individual_configuration: individual_configuration.attributes.merge({
             initial_application_configuration: individual_configuration.initial_application_configuration.attributes
@@ -61,7 +60,13 @@ module BenefitMarkets
       # @return [Object] A form object containing the loaded parameters.
       def load_form_params_from_resource(form)
         benefit_market = find_model_by_id(form.id)
-        attributes_to_form_params(benefit_market, form)
+        shop_configuration, individual_configuration = if benefit_market.kind == 'aca_shop'
+          [ benefit_market.configuration, ::BenefitMarkets::Configurations::AcaIndividualConfiguration.new ]
+        else
+          [ ::BenefitMarkets::Configurations::AcaShopConfiguration.new, benefit_market.configuration ]
+        end
+
+        attributes_to_form_params(benefit_market, shop_configuration, individual_configuration, form)
       end
 
       def find_model_by_id(id)

@@ -16,8 +16,6 @@ module BenefitMarkets
       attribute :aca_individual_configuration, BenefitMarkets::Forms::AcaIndividualConfiguration
       attribute :aca_shop_configuration, BenefitMarkets::Forms::AcaShopConfiguration
 
-
-
       # Create a form for the 'new' action.
       # Note that usually this method may have few parameters
       #   other than current user.
@@ -54,7 +52,6 @@ module BenefitMarkets
 
       def self.find_for(id)
         params_form = new(id: id)
-        form = service.load_form_params_from_resource(params_form)
         service.load_form_params_from_resource(params_form)
       end
 

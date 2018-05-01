@@ -1,7 +1,11 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = [ "acaIndividual", "acaShop" ]
+  static targets = [ "aca_individual", "aca_shop", "select" ]
+
+  initialize() {
+  	this.configurationChange({ currentTarget: this.selectTarget })
+  }
   
   configurationChange(event) {
   	Array.prototype.forEach.call(event.currentTarget.options, (option) => {

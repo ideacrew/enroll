@@ -1,0 +1,12 @@
+<h2>Edit Benefit Market</h2>
+
+<%= form_for @benefit_market, as: :benefit_market, url: { action: 'edit'}, html: { novalidate: true, data: { controller: 'benefit-market--form' } } do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+  
+	<div class="row">
+	    <%= f.submit 'Update', class:'btn btn-primary' %>
+
+	    <%= link_to 'Back', benefit_market_path, class:'btn btn-default' %>
+	</div>
+
+<% end %>
