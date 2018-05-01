@@ -37,7 +37,6 @@ module BenefitSponsors
 
       it "should initialize the form" do
         sign_in_and_do_new
-        binding.pry
         expect(assigns(:benefit_application_form).class).to eq form_class
       end
 
