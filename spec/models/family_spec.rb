@@ -1522,11 +1522,11 @@ describe Family, '#is_document_not_verified' do
 
     context "when user is admin" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_hbx_staff_role)}
-      it 'returns true when consumer is fully verified and admin' do
+      it 'returns false when consumer is fully verified and admin' do
         expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
       end
 
-      it 'returns false when consumer is not verified and admin' do
+      it 'returns true when consumer is not verified and admin' do
         person.consumer_role.update_attributes(aasm_state: "unverified")
         expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
       end
@@ -1534,7 +1534,7 @@ describe Family, '#is_document_not_verified' do
 
     context 'when user is not admin' do
       it 'returns false when consumer is fully verified and not an admin' do
-        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
       end
     end
   end
@@ -1555,5 +1555,25 @@ describe "has_valid_e_case_id" do
   it "returns false as it don't have a valid e_case_id" do
     family1000.update_attributes!(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
     expect(family1000.has_valid_e_case_id?).to be_truthy
+  end
+end
+
+describe "active dependents" do
+  let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person3) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryGirl.create(:household, family: family) }
+  let!(:family_member1) { FactoryGirl.create(:family_member, family: family,person: person2) }
+  let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: person3) }
+
+  it 'should return 2 active dependents when all the family member are active' do
+    allow(family_member2).to receive(:is_active).and_return(true)
+    expect(family.active_dependents.count).to eq 2
+  end
+
+  it 'should return 1 active dependent when one of the family member is inactive' do
+    allow(family_member2).to receive(:is_active).and_return(false)
+    expect(family.active_dependents.count).to eq 1
   end
 end

@@ -24,8 +24,10 @@ describe CloneConsumerRole do
       expect(person1.consumer_role).not_to eq nil
       expect(person2.consumer_role).to eq nil
       subject.migrate
-      expect(Person.first.consumer_role).not_to eq nil
-      expect(Person.last.consumer_role).not_to eq nil
+      person1.reload
+      person2.reload
+      expect(person1.consumer_role).not_to eq nil
+      expect(person2.consumer_role).not_to eq nil
     end
   end
 
