@@ -9,6 +9,7 @@ module BenefitMarkets
       include Virtus.model
 
       attribute :id, String
+      attribute :site_id, String
       attribute :site_urn, String
       attribute :kind, String
       attribute :title, String

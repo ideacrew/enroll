@@ -13,10 +13,10 @@ module BenefitMarkets
 
     def create
       # pundit can I do this here
-      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benefit_market]
+      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benefit_market].merge(site_id: @site_id)
 
       if @benefit_market.save
-        redirect_to benefit_markets_path
+        redirect_to site_benefit_markets_path(site_id: @site_id)
       else
         render 'new'
       end
@@ -30,7 +30,7 @@ module BenefitMarkets
       @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_update params[:id]
 
       if @benefit_market.update_attributes params[:benefit_market]
-        redirect_to benefit_markets_path
+        redirect_to site_benefit_markets_path(site_id: @benefit_market.site_id)
       else
         render 'edit'
       end

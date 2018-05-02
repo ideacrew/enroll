@@ -36,7 +36,6 @@ module BenefitMarkets
         catalog.application_period.cover?(new_benefit_market_catalog.application_period.min) ||
         catalog.application_period.cover?(new_benefit_market_catalog.application_period.max)
       end
-      # binding.pry
       benefit_market_catalogs << new_benefit_market_catalog unless application_period_is_covered
     end
 

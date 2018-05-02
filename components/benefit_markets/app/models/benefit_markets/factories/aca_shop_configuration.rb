@@ -1,6 +1,13 @@
 module BenefitMarkets
   module Factories
     class AcaShopConfiguration
+      def self.build
+        BenefitMarkets::Configurations::AcaShopConfiguration.new( 
+          initial_application_configuration: BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration.new,
+          renewal_application_configuration: BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration.new
+        )
+      end
+      
       def self.call(ben_per_max_year:, 
                     ben_per_min_year:,
                     binder_due_dom:,

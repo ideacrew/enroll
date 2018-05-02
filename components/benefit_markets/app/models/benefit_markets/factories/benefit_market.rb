@@ -3,15 +3,14 @@ module BenefitMarkets
     class BenefitMarket
       def self.build
         benefit_market = BenefitMarkets::BenefitMarket.new
-        aca_shop_configuration = BenefitMarkets::Configurations::AcaShopConfiguration.new initial_application_configuration: BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration.new,
-          renewal_application_configuration: BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration.new
-        aca_individual_configuration = BenefitMarkets::Configurations::AcaIndividualConfiguration.new initial_application_configuration: BenefitMarkets::Configurations::AcaIndividualInitialApplicationConfiguration.new
+        aca_shop_configuration = BenefitMarkets::Factories::AcaShopConfiguration.build
+        aca_individual_configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.build
         [benefit_market, aca_shop_configuration, aca_individual_configuration]
       end
 
-      def self.call(description:, id:, kind:, site_urn:, title:, configuration:)
+      def self.call(description:, kind:, site_urn:, title:, configuration:, site_id:)
         BenefitMarkets::BenefitMarket.new description: description, 
-          id: id,
+          site_id: site_id,
           kind: kind,
           site_urn: site_urn,
           title: title,

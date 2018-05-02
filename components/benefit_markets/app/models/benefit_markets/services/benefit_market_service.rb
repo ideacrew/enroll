@@ -15,18 +15,24 @@ module BenefitMarkets
       end
 
       def form_params_to_attributes(form, benefit_market)
-        model_attributes = {
-          description: description,
-          kind: kind,
-          site_urn: site_urn,
-          title: title,
-          aca_individual_configuration: form.aca_individual_configuration.attributes.merge({
-            initial_application_configuration: form.aca_individual_configuration.initial_application_configuration.attributes
-          }),
-          aca_shop_configuration: form.aca_shop_configuration.attributes.merge({
+        configuration = case form.kind
+        when 'aca_shop'
+          BenefitMarkets::Factories::AcaShopConfiguration.call form.aca_shop_configuration.attributes.merge({
             initial_application_configuration: form.aca_shop_configuration.initial_application_configuration.attributes,
             renewal_application_configuration: form.aca_shop_configuration.renewal_application_configuration.attributes
           })
+        when 'aca_individual'
+          BenefitMarkets::Factories::AcaIndividualConfiguration.call form.aca_individual_configuration.attributes.merge({
+            initial_application_configuration: form.aca_individual_configuration.initial_application_configuration.attributes
+          })
+        end
+
+        model_attributes = {
+          description: form.description,
+          kind: form.kind,
+          site_urn: form.site_urn,
+          title: form.title,
+          configuration: configuration
         }
         benefit_market.assign_attributes(model_attributes)
       end
@@ -54,10 +60,10 @@ module BenefitMarkets
       # @return [Object] A form object containing the loaded parameters.
       def load_form_params_from_resource(form)
         benefit_market = find_model_by_id(form.id)
-        shop_configuration, individual_configuration = if benefit_market.kind == 'aca_shop'
-          [ benefit_market.configuration, ::BenefitMarkets::Configurations::AcaIndividualConfiguration.new ]
+        shop_configuration, individual_configuration = if benefit_market.kind.to_s == 'aca_shop'
+          [ benefit_market.configuration, ::BenefitMarkets::Factories::AcaIndividualConfiguration.build ]
         else
-          [ ::BenefitMarkets::Configurations::AcaShopConfiguration.new, benefit_market.configuration ]
+          [ ::BenefitMarkets::Factories::AcaShopConfiguration.build, benefit_market.configuration ]
         end
 
         attributes_to_form_params(benefit_market, shop_configuration, individual_configuration, form)
@@ -88,10 +94,11 @@ module BenefitMarkets
             )
         end
 
-        benefit_market = BenefitMarkets::Factories::BenefitMarket.call description: description,
-          kind: kind,
-          site_urn: site_urn,
-          title: title,
+        benefit_market = BenefitMarkets::Factories::BenefitMarket.call description: form.description,
+          site_id: form.site_id,
+          kind: form.kind,
+          site_urn: form.site_urn,
+          title: form.title,
           configuration: configuration
 
         valid_according_to_factory = BenefitMarkets::Factories::BenefitMarket.validate(benefit_market)

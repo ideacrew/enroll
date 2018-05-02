@@ -1,6 +1,6 @@
 module BenefitMarkets
   module Configurations
-    class AcaIndividualConfiguration < Configuration
+    class AcaIndividualConfiguration < BenefitMarkets::Configurations::Configuration
       embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::Configurations::AcaIndividualInitialApplicationConfiguration"
 
       field :mm_enr_due_on,        as: :monthly_enrollment_due_on, type: Integer, default: 15
