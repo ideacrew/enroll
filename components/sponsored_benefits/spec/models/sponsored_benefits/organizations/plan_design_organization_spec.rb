@@ -4,7 +4,7 @@ module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
 
     describe "#expire proposals for non Prospect Employer" do
-      let!(:organization) { create(:plan_design_organization,
+      let(:organization) { create(:sponsored_benefits_plan_design_organization,
                               sponsor_profile_id: "1234",
                               owner_profile_id: "5678",
                               legal_name: "ABC Company",
@@ -38,7 +38,7 @@ module SponsoredBenefits
     end
 
     describe "#expire proposals for Prospect" do
-      let!(:organization) { create(:plan_design_organization,
+      let!(:organization) { create(:sponsored_benefits_plan_design_organization,
                         sponsor_profile_id: nil,
                         owner_profile_id: "5678",
                         legal_name: "ABC Company",
@@ -63,7 +63,7 @@ module SponsoredBenefits
       let(:census_employees) { double(non_terminated: [])}
       let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
  
-      let!(:plan_design_organization) { create(:plan_design_organization, 
+      let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
         owner_profile_id: "5678",
         legal_name: "ABC Company",
         sic_code: "0345" ) 
@@ -135,7 +135,7 @@ module SponsoredBenefits
       end
 
       describe ".general_agency_profile" do
-        let!(:plan_design_organization) { create(:plan_design_organization,
+        let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
                                             sponsor_profile_id: nil,
                                             owner_profile_id: "89769",
                                             legal_name: "ABC Company",

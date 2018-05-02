@@ -88,11 +88,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
-    context ">100 census employees" do
-      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+    context ">200 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 201, employer_profile: employer_profile) }
+      context "greater than 200 employees " do
+        context "active employees count greater than 200" do
+          it "does not display if active census employees > 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+          end
+        end
 
-      it "does not display" do
-        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+        context "active employees count greater than 200" do
+
+          before do
+            employees.take(5).each do |census_employee|
+              census_employee.terminate_employee_role!
+            end
+          end
+
+          it "should display progress bar if active census employees < 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
+          end
+        end
       end
     end
 
@@ -209,7 +225,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum).to eq 4
     end
   end
 
@@ -436,6 +452,56 @@ end
       expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
       expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
       expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
+    end
+  end
+
+
+  describe "convert_to_bool" do
+    let(:val1) {true }
+    let(:val2) {false }
+    let(:val3) {"true" }
+    let(:val4) {"false" }
+    let(:val5) {0 }
+    let(:val6) {1 }
+    let(:val7) {"0" }
+    let(:val8) {"1" }
+    let(:val9) {"khsdbfkjs" }
+
+
+    it "should be true when true is passed" do
+      expect(helper.convert_to_bool(val1)).to eq true
+    end
+
+    it "should be false when false is passed" do
+      expect(helper.convert_to_bool(val2)).to eq false
+    end
+
+    it "should be true when string 'true' is passed" do
+      expect(helper.convert_to_bool(val3)).to eq true
+    end
+
+    it "should be false when string 'false' is passed" do
+      expect(helper.convert_to_bool(val4)).to eq false
+    end
+
+    it "should be false when int 0 is passed" do
+      expect(helper.convert_to_bool(val5)).to eq false
+    end
+
+    it "should be true when int 1 is passed" do
+      expect(helper.convert_to_bool(val6)).to eq true
+    end
+
+    it "should be false when string '0' is passed" do
+      expect(helper.convert_to_bool(val7)).to eq false
+    end
+
+    it "should be true when string '1' is passed" do
+      expect(helper.convert_to_bool(val8)).to eq true
+    end
+
+    it "should raise error when non boolean values are passed" do
+      expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
     end
   end
 end

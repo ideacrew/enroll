@@ -1,6 +1,9 @@
 require 'csv'
- # This is a report that generated for business validation.
- # The task to run is RAILS_ENV=production bundle exec rake reports:families_with_invalid_shop_plan
+  # This is a report that generated for business validation.
+  # IF you only need a report of families with Enrolled/Renewed enrollments with specific plans
+      # RAILS_ENV=production bundle exec rake reports:families_with_invalid_shop_plan is_changing_network=false invalid_plan_ids="5a01e43cc324df2127016710","5a01e428c324df212700fee3","5a01e43ec324df2127016ebd"
+  # The following rake will also change the network type along with report.
+      # RAILS_ENV=production bundle exec rake reports:families_with_invalid_shop_plan is_changing_network=true invalid_plan_ids="5a01e43cc324df2127016710","5a01e428c324df212700fee3","5a01e43ec324df2127016ebd"
 namespace :reports do
  
   desc "List of families having invalid shop plan"
@@ -15,11 +18,12 @@ namespace :reports do
       ENROLLMENT_APPLICANT_LAST_NAME
       ENROLLMENT_APPLICANT_HBX_ID
       ENROLLMENT_APPLICANT_STATE
+      ENROLLMENT_APPLICANT_MAILING_ADDRESS
       ENROLLMENT_EMPLOYER_NAME
       ENROLLMENT_EMPLOYER_PLAN_YEAR_START_ON
-      ER FEIN
+      ER_FEIN
     )
-    invalid_plan_ids = [BSON::ObjectId('59f72ce1faca145fb8001c52'), BSON::ObjectId('59f72ce1faca145fb8001ccf'), BSON::ObjectId('59f72ce1faca145fb8001a5e')]
+    invalid_plan_ids = ENV["invalid_plan_ids"].split(",").inject([]) { |invalid_plan_ids, id| invalid_plan_ids << BSON::ObjectId.from_string(id) }
 
     file_name = "#{Rails.root}/public/families_with_invalid_shop_plan.csv"
 
@@ -57,6 +61,7 @@ namespace :reports do
               person.last_name,
               person.hbx_id,
               employment_status(person, enrollment.employee_role_id),
+              person.mailing_address,
               plan_year.employer_profile.parent.legal_name,
               plan_year.start_on,
               plan_year.employer_profile.parent.fein
@@ -66,10 +71,12 @@ namespace :reports do
       puts "*********** Finished generating Report ***********************"
     end
 
-    invalid_plan_ids.each do |plan_id|
-      plan = Plan.find(plan_id)
-      plan.update_attributes!(nationwide: false, dc_in_network: true)
-      puts "Changing Network Field Value from Nationwide to DC Metro for #{plan.hios_id}"
+    if ENV["is_changing_network"] == "true"
+      invalid_plan_ids.each do |plan_id|
+        plan = Plan.find(plan_id)
+        plan.update_attributes!(nationwide: false, dc_in_network: true)
+        puts "Changing Network Field Value from Nationwide to DC Metro for #{plan.hios_id}"
+      end
     end
   end
 end

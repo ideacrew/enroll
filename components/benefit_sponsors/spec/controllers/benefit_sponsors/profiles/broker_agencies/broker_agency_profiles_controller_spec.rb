@@ -7,9 +7,18 @@ module BenefitSponsors
 
     let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
-    let!(:person01) { FactoryGirl.create(:person) }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, :broker_with_person, person: person01 ) }
-    let(:bap_id) { user_with_broker_role.person.broker_agency_staff_roles.first.broker_agency_profile_id }
+    let!(:person01) { FactoryGirl.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person01 ) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile) }
+    let!(:organization_with_hbx_profile) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_hbx_profile) }
+    let(:bap_id) { organization.broker_agency_profile.id }
+
+    before :each do
+      person01.broker_role.update_attributes!(broker_agency_profile_id: organization.broker_agency_profile.id)
+      allow(organization.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
+      user_with_hbx_staff_role.person.hbx_staff_role.save!
+    end
 
     describe "for broker_agency_profile's index" do
       context "index for user with admin_role(on successful pundit)" do
@@ -43,6 +52,8 @@ module BenefitSponsors
       end
 
       context "index for user with broker_agency_staff_role(on failed pundit)" do
+        let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
+
         before :each do
           user_with_broker_role.roles << "broker_agency_staff"
           user_with_broker_role.save!
@@ -95,8 +106,6 @@ module BenefitSponsors
     describe "for broker_agency_profile's family_index" do
       context "with a valid user and with broker_agency_profile_id(on successful pundit)" do
         before :each do
-          user_with_hbx_staff_role.person.build_hbx_staff_role
-          user_with_hbx_staff_role.person.hbx_staff_role.save!
           sign_in(user_with_hbx_staff_role)
           xhr :get, :family_index, id: bap_id
         end
@@ -126,6 +135,10 @@ module BenefitSponsors
           expect(response).not_to have_http_status(:success)
         end
       end
+    end
+
+    describe "for broker_agency_profile's family_datatable" do
+      # TODO, once the controller's action is fully complete
     end
   end
 end

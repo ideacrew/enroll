@@ -13,8 +13,8 @@ module BenefitSponsors
       end
 
       def load_form_metadata(form)
-        # form.start_on_options = calculate_start_on_options
-        form.start_on_options = start_on_options_with_schedule
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        form.start_on_options = schedular.start_on_options_with_schedule
       end
 
       def load_form_params_from_resource(form)
@@ -44,6 +44,8 @@ module BenefitSponsors
             get_application_errors_for_revert(benefit_application, form)
           end
         end
+        form.errors.add(:base, "Benefit Application is not eligible to revert")
+        [false, benefit_application]
       end
 
       def force_publish(form)
@@ -91,7 +93,8 @@ module BenefitSponsors
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
       def find_benefit_sponsorship(form)
-        @benefit_sponsorship ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: form.benefit_sponsorship_id).first
+        return @benefit_sponsorship if defined? @benefit_sponsorship
+        @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: form.benefit_sponsorship_id).first
       end
 
       def attributes_to_form_params(benefit_application,form)
@@ -116,8 +119,13 @@ module BenefitSponsors
         }
       end
 
+      #TODO: FIX date format
       def format_string_to_date(date)
-        Date.strptime(date, "%m/%d/%Y")
+        if date.split('/').first.size == 2
+          Date.strptime(date,"%m/%d/%Y")
+        elsif date.split('-').first.size == 4
+          Date.strptime(date,"%Y-%m-%d")
+        end
       end
 
       def format_date_to_string(date)
@@ -127,7 +135,8 @@ module BenefitSponsors
       def store(form, benefit_application)
         valid_according_to_factory = benefit_application_factory.validate(benefit_application)
         if valid_according_to_factory
-          benefit_application.benefit_sponsor_catalog = benefit_sponsor_catalog_for(benefit_application)
+          benefit_sponsorship = benefit_application.benefit_sponsorship || find_benefit_sponsorship(form)
+          benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
@@ -146,46 +155,10 @@ module BenefitSponsors
         end
       end
 
-      def benefit_sponsor_catalog_for(benefit_application)
-        sponsorship = benefit_application.benefit_sponsorship
-        sponsorship.benefit_market.benefit_sponsor_catalogs_for([], benefit_application.effective_period.begin)
-      end
-
       # We can cheat here because our form and our model are so
       # close together - normally this will be more complex
       def map_model_error_attribute(model_attribute_name)
         model_attribute_name
-      end
-
-      # def calculate_start_on_options
-      #   scheduler.calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
-      # end
-
-      def is_start_on_valid?(start_on)
-        scheduler.check_start_on(start_on)[:result] == "ok"
-      end
-
-      # Responsible for calculating all the possible dataes
-      def start_on_options_with_schedule
-        possible_dates = Hash.new
-        scheduler.calculate_start_on_dates.each do |date|
-          next unless is_start_on_valid?(date)
-          possible_dates[date] = open_enrollment_dates(date).merge(enrollment_schedule(date))
-        end
-        possible_dates
-      end
-
-      def open_enrollment_dates(start_on)
-        scheduler.calculate_open_enrollment_date(start_on)
-      end
-
-      def enrollment_schedule(start_on)
-        scheduler.shop_enrollment_timetable(start_on)
-      end
-
-      def scheduler
-        return @scheduler if defined? @scheduler
-        @scheduler = ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       end
 
       private
@@ -197,7 +170,7 @@ module BenefitSponsors
         end
         return [false, benefit_application]
       end
-
+      
     end
   end
 end
