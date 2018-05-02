@@ -1,6 +1,6 @@
 <h2>Edit Benefit Market</h2>
 
-<%= form_for @benefit_market, as: :benefit_market, url: { action: 'edit'}, html: { novalidate: true, data: { controller: 'benefit-market--form' } } do |f| %>
+<%= form_for @benefit_market, as: :benefit_market, url: { action: 'update'}, html: { novalidate: true, data: { controller: 'benefit-market--form' } } do |f| %>
   <%= render partial: 'form', locals: { f: f } %>
   
 	<div class="row">

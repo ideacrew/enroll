@@ -8,7 +8,7 @@
   </div>
 
   <h4>Please select benefit market kind</h4>
-  <%= f.select :kind, options_for_select({'ACA Individual' => 'aca_individual', 'ACA Shop' => 'aca_shop'}, @benefit_market.kind), {}, data: { target: 'benefit-market--form.select', action: 'change->benefit-market--form#configurationChange' } %>
+  <%= f.select :kind, options_for_select({'ACA Individual' => 'aca_individual', 'ACA Shop' => 'aca_shop'}, @benefit_market.kind), { novalidate: true }, data: { target: 'benefit-market--form.select', action: 'change->benefit-market--form#configurationChange' } %>
   <div data-target="benefit-market--form.aca_individual">
     <%= f.fields_for :aca_individual_configuration, @benefit_market.aca_individual_configuration do |configuration_fields| %>
       <label for="inputEnrollmentDueOn">monthly enrollment due on</label>
