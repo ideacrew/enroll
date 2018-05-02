@@ -38,13 +38,21 @@ module SponsoredBenefits
       let(:plan_design_organization)  { SponsoredBenefits::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
       let(:plan_design_proposal)      { SponsoredBenefits::Organizations::PlanDesignProposal.new(title: "New Proposal") }
       let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
+      let(:relationship_benefits) do
+          [
+            ::RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+            ::RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+            ::RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
+          ]
+        end
+      let(:plan) {::Plan.create}
 
       before(:each) do
         plan_design_organization.plan_design_proposals << [plan_design_proposal]
         plan_design_proposal.profile = profile
         profile.benefit_sponsorships = [benefit_sponsorship]
         benefit_sponsorship.benefit_applications = [benefit_application]
-        benefit_application.benefit_groups.build
+        benefit_application.benefit_groups.build(relationship_benefits: relationship_benefits, reference_plan_id: plan.id, plan_option_kind: "single_plan", elected_plan_ids: [plan.id])
         plan_design_organization.save
       end
 

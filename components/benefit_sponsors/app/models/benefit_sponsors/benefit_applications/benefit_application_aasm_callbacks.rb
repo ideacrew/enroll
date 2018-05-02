@@ -18,9 +18,10 @@ module BenefitSponsors
         application_eligibility_warnings.blank?
       end
 
+      #TODO: FIX
       def revert_employer_profile_application
-        employer_profile.revert_application! if employer_profile.may_revert_application?
-        record_transition
+        # employer_profile.revert_application! if employer_profile.may_revert_application?
+        # record_transition
       end
 
       def adjust_open_enrollment_date
@@ -48,10 +49,11 @@ module BenefitSponsors
         end
       end
 
+      # TODO: FIX
       def cancel_enrollments
-        self.hbx_enrollments.each do |enrollment|
-          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-        end
+        # self.hbx_enrollments.each do |enrollment|
+        #   enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+        # end
       end
 
       def trigger_passive_renewals

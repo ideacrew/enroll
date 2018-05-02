@@ -62,7 +62,7 @@ FactoryGirl.define do
     roles ["broker"]
 
     transient do
-      organization { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile) }
+      organization {}
     end
 
     after :create do |user, evaluator|

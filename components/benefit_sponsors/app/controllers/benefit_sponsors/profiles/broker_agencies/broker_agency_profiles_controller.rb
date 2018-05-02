@@ -33,7 +33,7 @@ module BenefitSponsors
       def staff_index
       end
 
-      # TODO need to revisit for cases around SHOP broker agencies
+      # TODO need to refactor for cases around SHOP broker agencies
       def family_datatable
         authorize self
         find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))

@@ -39,10 +39,11 @@ module BenefitSponsors
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.publish
-          flash[:notice] = "Plan Year successfully published."
+          flash[:notice] = "Benefit Application successfully published."
+          flash[:error] = error_messages(@benefit_application_form)
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         else
-          flash[:error] = error_messages(@benefit_application_form)
+          flash[:error] = "Benefit Application failed to publish. #{error_messages(@benefit_application_form)}"
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         end
       end

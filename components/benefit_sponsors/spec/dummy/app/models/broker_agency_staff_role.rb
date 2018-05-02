@@ -6,4 +6,6 @@ class BrokerAgencyStaffRole
   field :reason, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
 
+  validates_presence_of :broker_agency_profile_id
+
 end

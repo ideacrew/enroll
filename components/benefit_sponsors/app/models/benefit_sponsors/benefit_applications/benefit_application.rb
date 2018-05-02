@@ -221,10 +221,11 @@ module BenefitSponsors
         "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
       end
 
+      # TODO: Fix this method
       def minimum_employer_contribution
         unless benefit_packages.size == 0
           benefit_packages.map do |benefit_package|
-            if benefit_package.sole_source?
+            if benefit_package#.sole_source?
               OpenStruct.new(:premium_pct => 100)
             else
               benefit_package.relationship_benefits.select do |relationship_benefit|
@@ -258,7 +259,7 @@ module BenefitSponsors
 
         state :publish_pending      # Plan application as submitted has warnings
         state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
-        state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+        state :published#,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
         state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
         state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
@@ -313,8 +314,8 @@ module BenefitSponsors
         # Submit plan year application
         event :publish do
           transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
-          transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
-          transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
+          transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
+          transitions from: :draft, to: :published, :guard => :is_application_eligible?#, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
           transitions from: :draft, to: :publish_pending
 
           transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
@@ -334,9 +335,9 @@ module BenefitSponsors
           transitions from: :publish_pending, to: :published_invalid
 
           transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
-          transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :zero_employees_on_roster]
-          transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => :zero_employees_on_roster
-          transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
+          transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?]#, :after => [:accept_application, :zero_employees_on_roster]
+          transitions from: :draft, to: :published, :guard => :is_application_eligible?#, :after => :zero_employees_on_roster
+          transitions from: :draft, to: :publish_pending#, :after => :initial_employer_denial_notice
 
           transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
           transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
@@ -451,8 +452,9 @@ module BenefitSponsors
         benefit_packages.flat_map(){ |benefit_package| benefit_package.census_employees.active }
       end
 
+      #TODO: FIX this
       def assigned_census_employees_without_owner
-        benefit_packages.flat_map(){ |benefit_package| benefit_package.census_employees.active.non_business_owner }
+        benefit_packages#.flat_map(){ |benefit_package| benefit_package.census_employees.active.non_business_owner }
       end
 
       def open_enrollment_date_errors
@@ -485,9 +487,9 @@ module BenefitSponsors
           log_message(errors){{open_enrollment_period: "Open Enrollment period is longer than maximum (#{Settings.aca.shop_market.open_enrollment.maximum_length.months} months)"}}
         end
 
-        if benefit_packages.any?{|bg| bg.reference_plan_id.blank? }
-          log_message(errors){{benefit_packages: "Reference plans have not been selected for benefit packages. Please edit the benefit application and select reference plans."}}
-        end
+        # if benefit_packages.any?{|bg| bg.reference_plan_id.blank? }
+        #   log_message(errors){{benefit_packages: "Reference plans have not been selected for benefit packages. Please edit the benefit application and select reference plans."}}
+        # end
 
         if benefit_packages.blank?
           log_message(errors) {{benefit_packages: "You must create at least one benefit package to publish a plan year"}}
@@ -515,7 +517,6 @@ module BenefitSponsors
       # Check plan year application for regulatory compliance
       def application_eligibility_warnings
         warnings = {}
-
         unless benefit_sponsorship.profile.is_primary_office_local?
           warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
         end
@@ -533,9 +534,10 @@ module BenefitSponsors
         # Exclude Jan 1 effective date from certain checks
         unless effective_date.yday == 1
           # Employer contribution toward employee premium must meet minimum
-          if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
-            warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
-          end
+          # TODO: FIX this once minimum_employer_contribution is fixed
+          # if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+            # warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
+          # end
         end
 
         warnings

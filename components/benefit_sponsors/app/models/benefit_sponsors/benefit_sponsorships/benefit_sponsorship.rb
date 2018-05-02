@@ -61,10 +61,10 @@ module BenefitSponsors
       has_many    :service_areas, 
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
-      embeds_many :broker_agency_accounts, 
+      embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
                   validate: true
 
-      embeds_many :general_agency_accounts, 
+      embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
                   validate: true
 
       has_many    :documents,
@@ -112,7 +112,7 @@ module BenefitSponsors
 
       def benefit_sponsor_catalog_for(effective_date)
         return [] if benefit_market.blank?
-        benefit_market.benefit_sponsor_catalog_for(service_areas, effective_date)
+        benefit_market.benefit_sponsor_catalog_for([], effective_date)
       end
 
       def rating_area=(new_rating_area)
