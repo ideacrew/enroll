@@ -68,6 +68,10 @@ module BenefitSponsors
       def contact_methods
         CONTACT_METHODS
       end
+
+      def policy_class
+        "BenefitSponsors::EmployerProfilePolicy"
+      end
     end
   end
 end

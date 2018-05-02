@@ -22,7 +22,9 @@ BenefitSponsors::Engine.routes.draw do
 
     namespace :employers do
       resources :employer_profiles, only: [:show] do
-        get :show_pending
+        collection do
+          get :show_pending
+        end
       end
       resources :employer_staff_roles do
         member do
