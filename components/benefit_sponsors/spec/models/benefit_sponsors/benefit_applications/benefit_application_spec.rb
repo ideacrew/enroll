@@ -105,10 +105,14 @@ module BenefitSponsors
 
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
-      let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
+      let(:begin_day)           { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
       let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.days }
+
+      def standard_begin_day
+        (begin_day > 0) ? begin_day : 1
+      end
 
       it "should return the day of month deadline for an open enrollment standard period to begin" do
         expect(subject.open_enrollment_minimum_begin_day_of_month).to eq standard_begin_day
@@ -193,8 +197,10 @@ module BenefitSponsors
         let(:effective_date)                  { TimeKeeper.date_of_record.next_month.end_of_month + 1.day }
 
         let(:prior_month)                     { effective_date - 1.month }
-        let(:late_open_enrollment_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
+
+        let(:begin_day)                        { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                                 Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
+
         let(:open_enrollment_end_day)         { Settings.aca.shop_market.open_enrollment.monthly_end_on }
         let(:open_enrollment_end_on)          { Date.new(prior_month.year, prior_month.month, open_enrollment_end_day) }
 
@@ -214,6 +220,9 @@ module BenefitSponsors
                                                     binder_payment_due_on:          binder_payment_due_on
                                                 }
                                               }
+        def late_open_enrollment_begin_day
+          (begin_day > 0) ? begin_day : 1
+        end
 
         it "should provide a valid an enrollment timetabe hash for that effective date" do
           expect(subject.enrollment_timetable_by_effective_date(effective_date)).to eq valid_timetable
