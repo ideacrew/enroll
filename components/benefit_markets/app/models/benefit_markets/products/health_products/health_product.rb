@@ -26,8 +26,9 @@ module BenefitMarkets
         field :metal_level_kind,        type: Symbol  
 
         # Essential Health Benefit (EHB) percentage
-        field :ehb,                     type: Float,    default: 0.0
-        field :is_standard_plan,        type: Boolean,  default: false
+        field :ehb,                         type: Float,    default: 0.0
+        field :is_standard_plan,            type: Boolean,  default: false
+        field :is_reference_plan_eligible,  type: Boolean,  default: false
 
         field :provider_directory_url,  type: String
         field :rx_formulary_url,        type: String
@@ -78,7 +79,7 @@ module BenefitMarkets
 
 
         # TODO Create queries
-        scope :premium_table_covers,    ->(effective_date, rating_area){  }
+        scope :premium_table_cover, ->(effective_date, rating_area){  }
 
 
         validates :health_plan_kind,
@@ -91,10 +92,23 @@ module BenefitMarkets
 
 
         alias_method :is_standard_plan?, :is_standard_plan
+        alias_method :is_reference_plan_eligible?, :is_reference_plan_eligible
 
 
 
         def valid_premiums_for(effective_date)
+        end
+
+
+        # TODO
+        # Add premium table, covering extended time period, to existing product.  Used for products that
+        # have periodic rate changes, such as ACA SHOP products that are updated quarterly.  
+        # 
+        def append_premium_table(new_premium_table)
+          raise InvalidPeriodError unless application_period.cover?(new_premium_table)
+        end
+
+        def update_premium_table(updated_premium_table)
         end
 
       end
