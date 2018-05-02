@@ -26,10 +26,8 @@
     <%# unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
       <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
-      Messages
-      <!-- TODO fix this when implementing Inboxes -->
-      <!-- <span class="badge message-unread"><%#= profile.inbox.unread_messages.try(:count) || 0 %></span> -->
-
+        Messages
+        <span class="badge message-unread"><%= profile.inbox.unread_messages.try(:count) || 0 %></span>
       <% end %>
       <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do  %>
       <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
