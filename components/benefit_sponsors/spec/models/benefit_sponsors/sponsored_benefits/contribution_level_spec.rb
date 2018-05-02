@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe SponsoredBenefits::ContributionLevel do
+  RSpec.describe ::BenefitSponsors::SponsoredBenefits::ContributionLevel do
     describe "given nothing" do
       it "requires a display name" do
         subject.valid?
