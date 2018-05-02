@@ -1204,12 +1204,6 @@ class EmployerProfile
     employer_attestation.present? && employer_attestation.is_eligible?
   end
 
-  def validate_and_send_denial_notice
-    if !is_primary_office_local? || !(is_zip_outside?)
-      self.trigger_notices('initial_employer_denial')
-    end
-  end
-
   def terminate(termination_date)
     plan_year = published_plan_year
     if plan_year.present?

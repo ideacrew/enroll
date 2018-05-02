@@ -127,7 +127,6 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         sign_in user
         allow(EmployerProfile).to receive(:find).and_return(employer_profile)
         allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
-        allow(employer_profile).to receive(:validate_and_send_denial_notice).and_return("")
         allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
         allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
       end
