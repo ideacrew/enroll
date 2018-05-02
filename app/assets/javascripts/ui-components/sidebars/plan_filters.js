@@ -25,3 +25,24 @@ function premuimFromAmount(element) {
 function premiumToAmount(element) {
   console.log("Premium To Amount ",element.value)
 }
+
+function deductibleFromAmount(element) {
+  console.log("Deductible from Amount ",element.value)
+}
+
+function deductibleToAmount(element) {
+  console.log("Deductible to Amount ",element.value)
+}
+
+function clearAll() {
+  // Clears all inputs within #filter-sidebar only
+  var inputs = document.querySelectorAll("#filter-sidebar input");
+  
+  for(var i = 0; i < inputs.length; i++) {
+      inputs[i].checked = false;
+      inputs[i].value = "";
+  }
+  
+  var select = document.querySelectorAll("#filter-sidebar select");
+
+}

@@ -74,8 +74,14 @@
       .filter-input-block
         input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value='0' onblur="premuimFromAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
         small To
-        input.plan-metal-deductible-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_deductible || 5000}" value="#{@max_deductible || 5000}" onblur="premiumToAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
-        = hidden_field_tag :max_deductible, (@max_deductible || 5000)
+        input.plan-metal-premium-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_total_employee_cost || 2000}" value="#{@max_total_employee_cost || 2000}" onblur="premiumToAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+        = hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000)
+      h5
+        strong = l10n("deductible_amount")
+      .filter-input-block
+        input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+        small To
+        input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')" value='#{@max_deductible || 5000}'
     - if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual"
       .aptc
         hr
@@ -95,6 +101,16 @@
                     input type="text" id='elected_aptc' value="#{number_with_precision(@elected_aptc, precision: 2)}" onchange="setMinMax(this, #{@max_aptc})"
       = hidden_field_tag :max_aptc, @max_aptc
       = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
+      form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)"
+      input name='elected_pct' type="range" min='0' max='1' value="0.85" step='0.05'
+        span
+          output name="pct" 85 %
+    .checkbox-filter-wrapper
+      .form-inline.search-apply-wrapper
+        a.btn.btn-primary.apply-btn.mz href="javascript:void(0)"
+          = l10n("apply")
+        a.btn.btn-default onclick="clearAll()"
+          = l10n("reset")
 
     
           
