@@ -18,6 +18,7 @@ module Services
 
       def generate_url
         return @url if is_congress
+        return Settings.checkbook_services.congress_url if Rails.env.test?
         begin
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,

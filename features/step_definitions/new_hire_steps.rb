@@ -76,7 +76,6 @@ When(/(.*) clicks \"Shop for Plans\" on my account page/) do |named_person|
 end
 
 When(/(.*) clicks continue on the group selection page/) do |named_person|
-  allow(HTTParty).to receive(:post).and_return double("Response", parsed_response: {"URL" => "uri"})
   wait_for_ajax(2,2)
   if find_all('.interaction-click-control-continue', wait: 10).any?
     find('.interaction-click-control-continue').click
@@ -117,7 +116,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
 
-  expect(all('.hbx-enrollment-panel').select{|panel| 
+  expect(all('.hbx-enrollment-panel').select{|panel|
     panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   }.present?).to be_truthy
 
