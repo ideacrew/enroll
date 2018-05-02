@@ -7,10 +7,16 @@ function enableTransition() {
     $('#tansition_family_submit').removeClass('disabled');
   }
 
+  function disableSubmit(form){
+    $('#tansition_family_submit').addClass('disabled');
+  }
+
   $('input[type=text], input[type=checkbox]').on('keyup change', function(){
     var form = $(this).closest('form').find('.transition_form_row');
     if (validateForm(form)){
       enableSubmit(form)
+    }else{
+      disableSubmit(form)
     }
   });
 
