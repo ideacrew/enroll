@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Services::BenefitApplicationService, type: :model, :dbclean => :after_each do
+  RSpec.describe ::BenefitSponsors::Services::BenefitApplicationService, type: :model, :dbclean => :after_each do
 
     describe "constructor" do
       let(:benefit_sponser_ship) { double("BenefitSponsorship", {

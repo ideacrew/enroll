@@ -13,7 +13,7 @@ module BenefitSponsors
       end
 
       def sponsor_show_pending_registration_url
-        profiles_employers_employer_profile_show_pending(@agency.organization.employer_profile.id)
+        profiles_employers_employer_profile_show_pending
       end
 
       def sponsor_home_registration_url(profile_id)

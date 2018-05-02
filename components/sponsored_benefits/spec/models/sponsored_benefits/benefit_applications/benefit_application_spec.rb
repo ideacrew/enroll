@@ -144,10 +144,15 @@ module SponsoredBenefits
 
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplication }
-      let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
+      let(:begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
+
       let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.days }
+
+      def standard_begin_day
+        (begin_day > 0) ? begin_day : 1
+      end
 
       it "should return the day of month deadline for an open enrollment standard period to begin" do
         expect(subject.open_enrollment_minimum_begin_day_of_month).to eq standard_begin_day
