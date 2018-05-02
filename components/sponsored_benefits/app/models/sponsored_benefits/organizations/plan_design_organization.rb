@@ -33,7 +33,8 @@ module SponsoredBenefits
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
 
-      validates_presence_of   :legal_name, :sic_code, :has_active_broker_relationship
+      validates_presence_of   :legal_name, :has_active_broker_relationship
+      validates_presence_of :sic_code, if: :sic_code_exists_for_employer?
       validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
       validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
 
@@ -68,6 +69,11 @@ module SponsoredBenefits
 
       def broker_agency_profile
         ::BrokerAgencyProfile.find(owner_profile_id)
+      end
+
+      def general_agency_profile
+        org = Organization.by_broker_agency_profile(broker_agency_profile.id).first
+        org.try(:employer_profile).try(:active_general_agency_account)
       end
 
       # TODO Move this method to BenefitMarket Model
@@ -124,6 +130,10 @@ module SponsoredBenefits
         builder.census_employees.each{|ce| ce.save}
         builder.add_proposal_state(new_proposal_state)
         builder.plan_design_proposal
+      end
+
+      def sic_code_exists_for_employer?
+        Settings.aca.employer_has_sic_field
       end
 
       class << self

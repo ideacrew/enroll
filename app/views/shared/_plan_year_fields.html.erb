@@ -1,5 +1,5 @@
 <p class="twenty">When would you like your coverage to start?
-<small> (in the next 2 months) <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers can begin shopping for coverage on <%= site_short_name %> up to 2 months prior to the desired coverage effective date."></i></small></p>
+<small> (in the next <%= aca_shop_market_coverage_start_period %>) <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers can begin shopping for coverage on <%= site_short_name %> up to <%= Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs %> months prior to the desired coverage effective date."></i></small></p>
 <div class="row">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="row row-form-wrapper no-buffer">

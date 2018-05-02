@@ -3,6 +3,7 @@ module Notifier
     include ActionView::Helpers::NumberHelper
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
+    include Notifier::Builders::Enrollment
 
     attr_accessor :employee_role, :merge_model, :payload, :qle_title, :qle_event_on, :qle_reporting_deadline
 
@@ -47,34 +48,6 @@ module Notifier
 
     def employer_name
       merge_model.employer_name = employee_role.employer_profile.legal_name
-    end
-
-    def enrollment
-      return @enrollment if defined? @enrollment
-      if payload['event_object_kind'].constantize == HbxEnrollment
-        @enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.find(payload['event_object_id'])
-      end
-    end
-
-    def enrollment_coverage_start_on
-       return if enrollment.blank?
-       merge_model.enrollment.coverage_start_on = format_date(enrollment.effective_on)
-    end
-
-    def enrollment_plan_name
-      if enrollment.present?
-        merge_model.enrollment.plan_name = enrollment.plan.name
-      end
-    end
-
-    def enrollment_employee_responsible_amount
-      return if enrollment.blank?
-      merge_model.enrollment.employee_responsible_amount = number_to_currency(enrollment.total_employee_cost, precision: 2)
-    end
-
-    def enrollment_employer_responsible_amount
-      return if enrollment.blank?
-      merge_model.enrollment.employer_responsible_amount = number_to_currency(enrollment.total_employer_contribution, precision: 2)
     end
 
     def census_employee

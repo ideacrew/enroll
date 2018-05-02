@@ -2,6 +2,7 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
+
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -93,6 +94,7 @@ class Insured::FamiliesController < FamiliesController
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
+
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -136,6 +138,7 @@ class Insured::FamiliesController < FamiliesController
       end_date = today + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
+      @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
@@ -151,6 +154,8 @@ class Insured::FamiliesController < FamiliesController
       plan_year = @person.active_employee_roles.first.employer_profile.active_plan_year
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       trigger_notice_observer(@person.active_employee_roles.first, plan_year, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
+    elsif is_ee_sep_request_accepted?
+      ee_sep_request_accepted_notice
     end
   end
 
@@ -238,6 +243,30 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def sep_request_denial_notice
+    # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice", qle_reported_date: @qle_date.to_s, qle_id: @qle.id.to_s)
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.hbx_id}")
+    end
+  end
+
+  def is_ee_sep_request_accepted?
+    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
+  end
+
+  def ee_sep_request_accepted_notice
+    employee_role = @person.active_employee_roles.first
+    if employee_role.present? && employee_role.census_employee.present?
+      begin
+        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
+      rescue Exception => e
+        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
+      end
+    end
+  end
+
   private
 
   def updateable?
@@ -289,13 +318,13 @@ class Insured::FamiliesController < FamiliesController
     else
       if @person.active_employee_roles.present?
          if current_user.has_hbx_staff_role?
-           @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
+           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
          else
            @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
          end
        else @person.consumer_role.present?
          if current_user.has_hbx_staff_role?
-           @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
+           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
          else
            @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
          end

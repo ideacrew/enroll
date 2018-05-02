@@ -1,6 +1,7 @@
 module Effective
   module Datatables
     class EmployerDatatable < Effective::MongoidDatatable
+      include Config::AcaModelConcern
       datatable do
 
         bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
@@ -16,7 +17,7 @@ module Effective
         #table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :sortable => false, :filter => false
-        table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(@employer_profile) }, :filter => false
+#        table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(@employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
             @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
@@ -34,20 +35,32 @@ module Effective
           @latest_plan_year.try(:start_on)
           }, :filter => false, :sortable => true
         table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
-        table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
-        table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
-          [@latest_plan_year.try(:enrolled_summary), @latest_plan_year.try(:waived_summary)].compact.join("/")
-          }, :filter => false, :sortable => false
+        # table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
+        # table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
+        #   [@latest_plan_year.try(:enrolled_summary), @latest_plan_year.try(:waived_summary)].compact.join("/")
+        #   }, :filter => false, :sortable => false
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
-        table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row| row.employer_profile.employer_attestation.aasm_state.titleize if row.employer_profile.employer_attestation }, :filter => false, :sortable => false
+        if employer_attestation_is_enabled?
+          table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row| row.employer_profile.employer_attestation.aasm_state.titleize if row.employer_profile.employer_attestation }, :filter => false, :sortable => false
+        end
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
-           ['Attestation', edit_employers_employer_attestation_path(id: row.employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'],
-           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
           ]
+          if individual_market_is_enabled?
+            people_id = Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id)
+            dropdown.insert(2,['View Username and Email', get_user_info_exchanges_hbx_profiles_path(
+              people_id: people_id,
+              employers_action_id: "employer_actions_#{@employer_profile.id}"
+              ), !people_id.empty? && pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'])
+          end
+
+          if employer_attestation_is_enabled?
+            dropdown.insert(2,['Attestation', edit_employers_employer_attestation_path(id: row.employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+          end
+
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
         }, :filter => false, :sortable => false
 
@@ -159,11 +172,13 @@ module Effective
            {scope:'employer_profiles_applicants', label: 'Applicants'},
            {scope:'employer_profiles_enrolling', label: 'Enrolling', subfilter: :enrolling},
            {scope:'employer_profiles_enrolled', label: 'Enrolled', subfilter: :enrolled},
-           {scope:'employer_attestations', label: 'Employer Attestations', subfilter: :attestations},
          ],
         top_scope: :employers
         }
-
+        if employer_attestation_is_enabled?
+          filters[:employers] << {scope:'employer_attestations', label: 'Employer Attestations', subfilter: :attestations}
+        end
+        filters
       end
     end
   end

@@ -9,7 +9,7 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))? resource.person : resource
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
     end
 
     def construct_notice_object
@@ -154,6 +154,14 @@ module Notifier
     # @param recipient is a Person object
     def send_generic_notice_alert
       UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
+    end
+
+    def send_generic_notice_alert_to_broker
+      if resource.is_a?(EmployerProfile) && resource.broker_agency_profile.present?
+        broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+        broker_email = resource.broker_agency_profile.primary_broker_role.email_address
+        UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+      end
     end
 
     def store_paper_notice
