@@ -16,7 +16,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def late_rates_check
     date = params[:start_on_date].present? ? params[:start_on_date].split("/") : nil
-    formatted_date = date.present? ? (Date.new(date[2].to_i,date[0].to_i,date[1].to_i)) : nil
+    formatted_date = (date.present? && date.first != "undefined") ? (Date.new(date[2].to_i,date[0].to_i,date[1].to_i)) : nil
     render json: Plan.has_rates_for_all_carriers?(formatted_date)
   end
 

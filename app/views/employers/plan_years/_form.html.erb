@@ -85,8 +85,8 @@
     $(document).ready(function() {
       setTimeout(function() {
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
-        var date = $('#plan_year_start_on').val();
-        plansForDate(date);
+        var date = $('#plan_year_start_on').val().split("-");
+        plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
       },50);
     });
   <% end %>
