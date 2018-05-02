@@ -44,6 +44,8 @@ module BenefitSponsors
             get_application_errors_for_revert(benefit_application, form)
           end
         end
+        form.errors.add(:base, "Benefit Application is not eligible to revert")
+        [false, benefit_application]
       end
 
       def force_publish(form)
