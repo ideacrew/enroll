@@ -4,7 +4,6 @@ module BenefitMarkets
   RSpec.describe Products::HealthProducts::HealthProduct, type: :model do
 
     let(:this_year)               { TimeKeeper.date_of_record.year }
-    # let(:this_year)               { BenefitMarkets.time_keeper_class.constantize.date_of_record.year }
     let(:benefit_market_kind)     { :aca_shop }
     let(:application_period)      { Date.new(this_year, 1, 1)..Date.new(this_year, 12, 31) }
 
@@ -81,16 +80,6 @@ module BenefitMarkets
       end
 
       context "without required params" do
-
-        context "that's missing hios_id" do
-          subject { described_class.new(params.except(:hios_id)) }
-
-          it "should be invalid" do
-            subject.validate
-            expect(subject).to_not be_valid
-            expect(subject.errors[:hios_id]).to include("can't be blank")
-          end
-        end
 
         context "that's missing hios_id" do
           subject { described_class.new(params.except(:hios_id)) }
