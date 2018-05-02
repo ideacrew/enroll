@@ -17,16 +17,17 @@ module SponsoredBenefits
     let(:employer) { double(:employer, id: "11111", name: 'ABC Company', sic_code: '0197') }
     let(:broker) { double(:broker, id: 2) }
     let(:broker_role) { double(:broker_role, id: 3) }
-    let(:broker_agency_profile_id) { "216735" }
+
+    let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
     let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
                                     legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization) }
     let(:old_broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
-    let!(:plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: employer.id,
+    let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: employer.id,
                                                                         owner_profile_id: broker_agency_profile_id,
                                                                         legal_name: employer.name,
                                                                         sic_code: employer.sic_code ) }
 
-    let!(:prospect_plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: nil,
+    let!(:prospect_plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: nil,
                                                                     owner_profile_id: broker_agency_profile_id,
                                                                     legal_name: employer.name,
                                                                     sic_code: employer.sic_code ) }
@@ -95,7 +96,7 @@ module SponsoredBenefits
           end
 
           it "returns a success response" do
-            get :new, { plan_design_organization_id: prospect_plan_design_organization.id }, valid_session
+            get :new, { plan_design_organization_id: prospect_plan_design_organization.id, broker_agency_id:  broker_agency_profile.id}, valid_session
             expect(response).to be_success
           end
         end
@@ -122,7 +123,7 @@ module SponsoredBenefits
       USER_ROLES.each do |role|
         context "for user #{role}" do
           before do
-            allow(BrokerAgencyProfile).to receive(:find).with(broker_agency_profile.id).and_return(broker_agency_profile)
+            allow(BrokerAgencyProfile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
             allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:find_or_initialize_by).with(:fein).and_return("223232323")
             allow(active_user).to receive(:has_hbx_staff_role?).and_return( role == :with_hbx_staff_role ? true : false)
           end
@@ -164,7 +165,7 @@ module SponsoredBenefits
       USER_ROLES.each do |role|
         context "for user #{role}" do
           before do
-            allow(BrokerAgencyProfile).to receive(:find).with(broker_agency_profile.id).and_return(broker_agency_profile)
+            allow(BrokerAgencyProfile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
             allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:find_or_initialize_by).with(:fein).and_return("223232323")
             allow(subject).to receive(:get_sic_codes).and_return(sic_codes)
             allow(active_user).to receive(:has_hbx_staff_role?).and_return( role == :with_hbx_staff_role ? true : false)
@@ -232,14 +233,14 @@ module SponsoredBenefits
     describe "DELETE #destroy" do
       USER_ROLES.each do |role|
         context "for user #{role}" do
-          let(:broker_agency_profile) { double(id: "12345") }
+          let(:broker_agency_profile) { double(id: "5ac4cb58be0a6c3ef400009b") }
 
           before do
-            allow(BrokerAgencyProfile).to receive(:find).with(broker_agency_profile.id).and_return(broker_agency_profile)
+            allow(BrokerAgencyProfile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
           end
 
           context "when attempting to delete plan design organizations without existing quotes" do
-            let!(:prospect_plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: nil, owner_profile_id: broker_agency_profile.id,
+            let!(:prospect_plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: nil, owner_profile_id: broker_agency_profile.id,
                                                                                 legal_name: 'ABC Company', sic_code: '0197' ) }
 
             it "destroys the requested prospect_plan_design_organization" do
@@ -255,7 +256,7 @@ module SponsoredBenefits
           end
 
           context "when attempting to delete plan design organizations with existing quotes" do
-            let!(:prospect_plan_design_organization) { create(:plan_design_organization, sponsor_profile_id: '1', owner_profile_id: '12345',
+            let!(:prospect_plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: '1', owner_profile_id: '5ac4cb58be0a6c3ef400009b',
                                                       plan_design_proposals: [ plan_design_proposal ], sic_code: '0197' ) }
             let(:plan_design_proposal) { build(:plan_design_proposal) }
 
