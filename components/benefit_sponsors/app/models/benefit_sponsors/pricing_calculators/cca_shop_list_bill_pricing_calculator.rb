@@ -1,26 +1,11 @@
 module BenefitSponsors
   module PricingCalculators
     class CcaShopListBillPricingCalculator < PricingCalculator
-      PriceResult = Struct.new(:total_price, :member_pricing)
-      PricedEntry = Struct.new(
-       :roster_coverage,
-       :relationship,
-       :dob,
-       :member_id,
-       :dependents,
-       :roster_entry_pricing,
-       :disabled
-      ) do
-        def is_disabled?
-          disabled
-        end
-      end
-
       class CalculatorState
         attr_reader :total
         attr_reader :member_totals
 
-        def initialize(p_calculator, product, p_model, p_unit_map, r_coverage, gs_factor, sc_factor)
+        def initialize(p_calculator, product, p_model, p_unit_map, r_coverage, c_eligibility_dates, gs_factor, sc_factor)
           @pricing_calculator = p_calculator
           @pricing_unit_map = p_unit_map
           @pricing_model = p_model
@@ -28,9 +13,9 @@ module BenefitSponsors
           @total = 0.00
           @member_totals = Hash.new
           @rate_schedule_date = r_coverage.rate_schedule_date
-          @eligibility_dates = r_coverage.coverage_eligibility_dates
-          @previous_product = r_coverage.previous_eligibility_product
-          @coverage_start_date = r_coverage.coverage_start_date
+          @eligibility_dates = c_eligibility_dates
+          @previous_product = r_coverage.previous_product
+          @coverage_start_date = r_coverage.coverage_start_on
           @rating_area = r_coverage.rating_area
           @product = product
           @group_size_factor = gs_factor
@@ -39,7 +24,8 @@ module BenefitSponsors
 
         def add(member)
           coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
-          rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, rm.is_disabled?)
+          relationship = member.is_primary_member? ? "self" : member.relationship
+          rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
@@ -54,7 +40,7 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          @member_totals[member.member_id] = BigDecimal.new((member_price * @group_size_factor * @sic_code_Factor).to_s).round(2)
+          @member_totals[member.member_id] = BigDecimal.new((member_price * @group_size_factor * @sic_code_factor).to_s).round(2)
           @total = BigDecimal.new((@total + member_price).to_s).round(2)
           self
         end
@@ -64,37 +50,32 @@ module BenefitSponsors
         @pricing_unit_map = {}
       end
 
-      # TODO: how do I get in the place I can pull the group size and 
       def calculate_price_for(pricing_model, benefit_roster_entry, sponsor_contribution)
         pricing_unit_map = pricing_unit_map_for(pricing_model)
         roster_entry = benefit_roster_entry
-        roster_coverage = benefit_roster_entry.roster_coverage
-        members_list = [roster_entry] + roster_entry.dependents
+        roster_coverage = benefit_roster_entry.group_enrollment
         age_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
-        sorted_members = members_list.sort_by do |rm|
-          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_date, roster_coverage.coverage_eligibility_dates, roster_coverage.previous_eligibility_product)
+        product = roster_coverage.product
+        coverage_eligibility_dates = {}
+        roster_coverage.member_enrollments.each do |m_en|
+          coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
+        end
+        sorted_members = roster_entry.members.sort_by do |rm|
+          coverage_age = age_calculator.calc_coverage_age_for(rm, product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
         # CCA policy decision: in non-composite group size is always treated as 1
         gs_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_group_size_factor(product, 1)
         sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sponsor_contribution.sic_code)
-        calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, gs_factor, sc_factor)
+        calc_state = CalculatorState.new(age_calculator, product, pricing_model, pricing_unit_map, roster_coverage, coverage_eligibility_dates, gs_factor, sc_factor)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end
-        roster_entry_pricing = PriceResult.new(
-          calc_results.total,
-          calc_results.member_totals
-        )
-        PricedEntry.new(
-          roster_coverage,
-          benefit_roster_entry.relationship,
-          benefit_roster_entry.dob,
-          benefit_roster_entry.member_id,
-          benefit_roster_entry.dependents,
-          roster_entry_pricing,
-          benefit_roster_entry.is_disabled?
-        )
+        benefit_roster_entry.group_enrollment.member_enrollments.each do |m_en|
+          m_en.product_price = calc_results.member_totals[m_en.member_id]
+        end
+        benefit_roster_entry.group_enrollment.product_cost_total = calc_results.total
+        benefit_roster_entry
       end
 
       def pricing_unit_map_for(pricing_model)
