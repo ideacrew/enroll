@@ -127,7 +127,7 @@ module BenefitSponsors
       def staff_role_params(staff_roles)
         return [{}] if staff_roles.blank?
         [staff_roles].flatten.inject([]) do |result, role|
-          result << Serializers::StaffRoleSerializer.new(role).to_hash
+          result << Serializers::StaffRoleSerializer.new(role, profile_id:profile_id, profile_type: profile_type).to_hash
           result
         end
       end

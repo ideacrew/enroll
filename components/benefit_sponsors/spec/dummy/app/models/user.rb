@@ -126,6 +126,18 @@ class User
     has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
   end
 
+  def has_csr_role?
+    has_role?(:csr)
+  end
+
+  def has_broker_agency_staff_role?
+    has_role?(:broker_agency_staff)
+  end
+
+  def has_broker_role?
+    has_role?(:broker)
+  end
+
   def has_role?(role_sym)
     return false if self.person_id.blank?
     roles.any? { |r| r == role_sym.to_s }

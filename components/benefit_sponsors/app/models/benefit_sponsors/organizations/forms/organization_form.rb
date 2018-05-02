@@ -40,12 +40,10 @@ module BenefitSponsors
         self.profile=(profile_params)
       end
 
-      def is_broker_profile?
-        profile_type == "broker_agency"
-      end
-
-      def is_employer_profile?
-        profile_type == "benefit_sponsor"
+      def profile=(val)
+        result = super val
+        result.parent = self
+        result
       end
     end
   end

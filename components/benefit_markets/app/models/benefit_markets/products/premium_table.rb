@@ -6,20 +6,15 @@ module BenefitMarkets
     embedded_in :product,
                 class_name: "Products::Product"
 
-    field :age,                 type: Integer
-    field :effective_period,    type: Range
-    field :cost,                type: Float
+    field :effective_period,  type: Range
 
+    belongs_to  :rating_area,
+                class_name: "BenefitMarkets::Locations::RatingArea"
 
+    embeds_many :premium_tuples,
+                class_name: "BenefitMarkets::Products::PremiumTuple"
 
-    validates_presence_of :age, :start_on, :end_on, :cost
-
-
-    # TODO: Test that cover includes begin and end date
-    def cover?(effective_date)
-    end
-
-
+    validates_presence_of :effective_period, :rating_area
 
   end
 end

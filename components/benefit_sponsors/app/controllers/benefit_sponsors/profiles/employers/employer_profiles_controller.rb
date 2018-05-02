@@ -2,9 +2,8 @@ module BenefitSponsors
   module Profiles
     class Employers::EmployerProfilesController < ApplicationController
       include BenefitSponsors::Employers::EmployerHelper
-      before_action :get_site_key
-      before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                           :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
+
+      before_action :find_employer, only: [:show]
 
       #New person registered with existing organization and approval request submitted to employer
       def show_pending
@@ -47,10 +46,6 @@ module BenefitSponsors
       end
 
       private
-
-      def get_site_key
-        @site_key = self.class.superclass.current_site.site_key
-      end
 
       def find_employer
         id_params = params.permit(:id, :employer_profile_id)

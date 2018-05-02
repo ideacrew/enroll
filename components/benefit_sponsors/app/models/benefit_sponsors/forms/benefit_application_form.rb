@@ -59,8 +59,33 @@ module BenefitSponsors
         form
       end
 
+      def self.fetch(id)
+        form = self.new(id: id)
+        form
+      end
+
       def persisted?
         id.present?
+      end
+
+      def publish
+        save_result, persisted_object = service.publish(self)
+        @show_page_model = persisted_object
+        return false unless save_result
+        true
+      end
+
+      def force_publish
+        save_result, persisted_object = service.force_publish(self)
+        @show_page_model = persisted_object
+        true
+      end
+
+      def revert
+        save_result, persisted_object = service.revert(self)
+        @show_page_model = persisted_object
+        return false unless save_result
+        true
       end
 
       def persist(update: false)

@@ -1,8 +1,8 @@
 module BenefitSponsors
   module Profiles
     class BrokerAgencies::BrokerAgencyProfilesController < ApplicationController
-      include Acapi::Notifiers
-      include DataTablesAdapter
+      # include Acapi::Notifiers
+      # include DataTablesAdapter
       include Concerns::ProfileRegistration
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -12,7 +12,7 @@ module BenefitSponsors
       # before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
       # before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
-      layout 'single_column'
+      # layout 'single_column'
 
       EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
         "2"     => "legal_name",
@@ -33,6 +33,7 @@ module BenefitSponsors
       def staff_index
       end
 
+      # TODO need to refactor for cases around SHOP broker agencies
       def family_datatable
         authorize self
         find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))

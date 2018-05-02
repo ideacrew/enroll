@@ -6,13 +6,13 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     let(:broker_double) { double(id: '12345') }
     let(:current_person) { double(:current_person) }
-    let(:broker_role) { double(:broker_role, broker_agency_profile_id: '12345') }
+    let(:broker_role) { double(:broker_role, broker_agency_profile_id: '5ac4cb58be0a6c3ef400009b') }
     let(:datatable) { double(:datatable) }
     let(:sponsor) { double(:sponsor, id: '555', sic_code: '1111') }
     let(:active_user) { double(:has_hbx_staff_role? => false) }
 
     let!(:plan_design_organization) { 
-      create(:plan_design_organization, sponsor_profile_id: sponsor.id, owner_profile_id: '12345', plan_design_proposals: [ plan_design_proposal ], sic_code: sponsor.sic_code ) 
+      create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: sponsor.id, owner_profile_id: '5ac4cb58be0a6c3ef400009b', plan_design_proposals: [ plan_design_proposal ], sic_code: sponsor.sic_code )
     }
 
     let!(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }

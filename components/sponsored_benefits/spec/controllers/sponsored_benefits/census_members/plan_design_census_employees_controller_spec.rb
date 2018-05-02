@@ -33,8 +33,8 @@ module SponsoredBenefits
     let(:current_person) { double(:current_person) }
     let(:broker) { double(:broker, id: 2) }
     let(:broker_role) { double(:broker_role, id: 3) }
-    let(:broker_agency_profile_id) { "216735" }
-    let!(:organization) { create(:plan_design_organization, :with_profile, sic_code: '0197') }
+    let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
+    let!(:organization) { create(:sponsored_benefits_plan_design_organization, :with_profile, sic_code: '0197') }
 
     let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
                                     legal_name: "ba-name", dba: "alternate", is_active: true, organization: organization) }

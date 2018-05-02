@@ -36,8 +36,8 @@ module BenefitMarkets
                   class_name: "BenefitMarkets::Products::PremiumTable"
 
 
-      validates_presence_of :hbx_id, :benefit_market_kind, :application_period, :title
-                            # :issuer_urn, :premium_tables
+      validates_presence_of :hbx_id, :benefit_market_kind, :application_period, :title,
+                            :issuer_profile_urn, :premium_tables
 
 
       validates :benefit_market_kind,
@@ -46,8 +46,11 @@ module BenefitMarkets
 
 
       index({ hbx_id: 1 })
-      index({ benefit_market_kind: 1, "application_period.min": 1, "application_period.max": 1 })
-
+      index({ benefit_market_kind: 1, "application_period.min" => 1, "application_period.max" => 1 })
+      index({ "premium_tables.rating_area" => 1, 
+              "premium_tables.effective_period.min" => 1, 
+              "premium_tables.effective_period.max" => 1 },
+              {name: "premium_tables"})
 
       scope :aca_shop_market,       ->{ where(benefit_market_kind: :aca_shop) }
       scope :aca_individual_market, ->{ where(benefit_market_kind: :aca_individual) }
@@ -60,7 +63,6 @@ module BenefitMarkets
         # return unless issuer_profile_urn.present?
         IssuerStub.new
       end
-
     end
 
     class IssuerStub

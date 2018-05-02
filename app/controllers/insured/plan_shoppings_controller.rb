@@ -168,6 +168,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
+    @metal_levels = %w[platinum gold silver bronze catastrophic]
+    @plan_types = %w[HMO PPO POS]
+    @networks = %w[nationwide DC-Metro]
   end
 
   def set_elected_aptc

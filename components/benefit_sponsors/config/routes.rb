@@ -24,7 +24,11 @@ BenefitSponsors::Engine.routes.draw do
       resources :employer_profiles, only: [:show] do
         get :show_pending
       end
-      resources :employer_staff_roles
+      resources :employer_staff_roles do
+        member do
+          get :approve
+        end
+      end
     end
   end
 
