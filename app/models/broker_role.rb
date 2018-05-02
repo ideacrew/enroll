@@ -30,6 +30,7 @@ class BrokerRole
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
   field :reason, type: String
 
@@ -95,21 +96,21 @@ class BrokerRole
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.nil?
-      self.broker_agency_profile_id = nil
+      self.benefit_sponsors_broker_agency_profile_id = nil
     else
-      raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
-      self.broker_agency_profile_id = new_broker_agency._id
+      raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+      self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
       @broker_agency_profile = new_broker_agency
     end
   end
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => broker_agency_profile_id).first.broker_agency_profile if has_broker_agency_profile?
+    @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_broker_agency_profile_id).first.broker_agency_profile if has_broker_agency_profile?
   end
 
   def has_broker_agency_profile?
-    self.broker_agency_profile_id.present?
+    self.benefit_sponsors_broker_agency_profile_id.present?
   end
 
   def address=(new_address)
@@ -170,25 +171,25 @@ class BrokerRole
 
     def find_by_broker_agency_profile(broker_agency_profile)
       raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
-      # list_brokers(Person.where("broker_role.broker_agency_profile_id" => profile._id))
-      people = (Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id))
+      # list_brokers(Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => profile._id))
+      people = (Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id))
       people.collect(&:broker_role)
     end
 
     def find_candidates_by_broker_agency_profile(broker_agency_profile)
-      people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
+      people = Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)\
                             .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
       people.collect(&:broker_role)
     end
 
     def find_active_by_broker_agency_profile(broker_agency_profile)
-      people = Person.and(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id,
+      people = Person.and(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id,
                           :"broker_role.aasm_state"  => "active")
       people.collect(&:broker_role)
     end
 
     def find_inactive_by_broker_agency_profile(broker_agency_profile)
-      people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
+      people = Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)\
                             .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
       people.collect(&:broker_role)
     end
@@ -196,7 +197,7 @@ class BrokerRole
     def agency_ids_for_active_brokers
       Person.collection.raw_aggregate([
         {"$match" => {"broker_role.aasm_state" => "active"}},
-        {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+        {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
       ]).map do |record|
         record["_id"]
       end
@@ -211,7 +212,7 @@ class BrokerRole
 
       Person.collection.raw_aggregate([
         {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
-        {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+        {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
       ]).map do |record|
         record["_id"]
       end

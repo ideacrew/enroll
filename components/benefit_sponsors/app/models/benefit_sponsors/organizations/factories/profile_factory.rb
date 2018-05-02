@@ -126,7 +126,7 @@ module BenefitSponsors
           person.broker_role = ::BrokerRole.new({
             :provider_kind => 'broker',
             :npn => self.npn,
-            :broker_agency_profile_id => profile.id, # this should be new profile id
+            :benefit_sponsors_broker_agency_profile_id => profile.id, # this should be new profile id
             :market_kind => market_kind
           })
 
@@ -381,7 +381,7 @@ module BenefitSponsors
           return [Person.new] if profile_id.blank?
           self.profile_type = profile_type
           if is_broker_profile?
-            Person.where(:"broker_role.broker_agency_profile_id" => BSON::ObjectId.from_string(profile_id))
+            Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => BSON::ObjectId.from_string(profile_id))
           elsif is_employer_profile?
             Person.where(:employer_staff_roles => {
               '$elemMatch' => {

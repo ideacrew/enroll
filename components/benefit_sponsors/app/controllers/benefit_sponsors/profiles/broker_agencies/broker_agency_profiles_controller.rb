@@ -132,7 +132,7 @@ module BenefitSponsors
 
       def user_not_authorized(exception)
         if current_user.has_broker_agency_staff_role?
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
+          redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
         else
           redirect_to benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency)
         end
