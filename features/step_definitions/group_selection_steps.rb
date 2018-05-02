@@ -299,7 +299,7 @@ end
 
 When(/employee switched for (.*) benefits/) do |market_kind|
   if market_kind == "individual"
-    find(:xpath, '//*[@id="market_kinds"]/div/div[2]/label').click
+    find(:xpath, '//*[@id="market_kinds"]/div/div[3]/label').click
   else
     find(:xpath, '//*[@id="market_kinds"]/div/div[1]/label').click
   end
