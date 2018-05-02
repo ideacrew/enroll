@@ -1,8 +1,8 @@
 module BenefitSponsors
-  module BenefitApplications
+  module BenefitPackages
     class BenefitPackagesController < ApplicationController
 
-      before_action :load_benefit_sponsorship, :load_benefit_application, :find_product_package
+      # before_action :load_benefit_sponsorship, :load_benefit_application, :find_product_package
 
       # List all the benefit packages under benefit application
       def index
@@ -10,7 +10,7 @@ module BenefitSponsors
       end
 
       def new
-        @benefit_package = BenefitSponsors::Forms::BenefitPackage.new(@benefit_application)
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.permit(:benefit_sponsorship_id, :benefit_application_id))
       end
 
       def create
