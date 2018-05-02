@@ -29,7 +29,7 @@ module BenefitSponsors
       end
 
       def is_start_on_valid?(start_on)
-        check_start_on(start_on)[:result] == "okay"
+        check_start_on(start_on)[:result] == "ok"
       end
 
       # Responsible for calculating all the possible dataes

@@ -93,7 +93,8 @@ module BenefitSponsors
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
       def find_benefit_sponsorship(form)
-        @benefit_sponsorship ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: form.benefit_sponsorship_id).first
+        return @benefit_sponsorship if defined? @benefit_sponsorship
+        @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(id: form.benefit_sponsorship_id).first
       end
 
       def attributes_to_form_params(benefit_application,form)
@@ -129,7 +130,8 @@ module BenefitSponsors
       def store(form, benefit_application)
         valid_according_to_factory = benefit_application_factory.validate(benefit_application)
         if valid_according_to_factory
-          benefit_application.benefit_sponsor_catalog = benefit_sponsor_catalog_for(benefit_application)
+          benefit_sponsorship = benefit_application.benefit_sponsorship || find_benefit_sponsorship(form)
+          benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
@@ -146,11 +148,6 @@ module BenefitSponsors
         benefit_application.errors.each do |att, err|
           onto.errors.add(map_model_error_attribute(att), err)
         end
-      end
-
-      def benefit_sponsor_catalog_for(benefit_application)
-        sponsorship = benefit_application.benefit_sponsorship
-        sponsorship.benefit_market.benefit_sponsor_catalogs_for([], benefit_application.effective_period.begin)
       end
 
       # We can cheat here because our form and our model are so

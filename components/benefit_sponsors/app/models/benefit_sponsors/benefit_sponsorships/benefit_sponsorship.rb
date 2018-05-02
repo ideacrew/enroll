@@ -112,7 +112,7 @@ module BenefitSponsors
 
       def benefit_sponsor_catalog_for(effective_date)
         return [] if benefit_market.blank?
-        benefit_market.benefit_sponsor_catalog_for(service_areas, effective_date)
+        benefit_market.benefit_sponsor_catalog_for([], effective_date)
       end
 
       def rating_area=(new_rating_area)
