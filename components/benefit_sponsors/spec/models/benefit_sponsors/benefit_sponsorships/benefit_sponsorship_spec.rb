@@ -99,7 +99,7 @@ module BenefitSponsors
     end
 
     describe "Working around validating model factory" do
-      context "when benifit sponser has profile and organization" do
+      context "when benefit sponsor has profile and organization" do
         let(:benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
         let(:valid_build_benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
         let(:valid_create_benefit_sponsorships) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}

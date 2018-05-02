@@ -1,24 +1,28 @@
 module BenefitSponsors
   class Enrollments::GroupEnrollment
+    include ActiveModel::Model
 
-    attr_accessor :coverage_start_on, :product, :previous_product, :pricing_model_kind,
-                  :product_cost_total, :benefit_sponsor, :contribution_model_kind,
-                  :sponsor_contribution_total, :member_enrollments, :group_id
+    attr_accessor :coverage_start_on, :product, :previous_product,
+                  :product_cost_total, :benefit_sponsor,
+                  :sponsor_contribution_total, :member_enrollments, :group_id,
+                  :rating_area,
+                  :rate_schedule_date
 
-    def initialize
+    def initialize(opts = {})
       @group_id                   = nil
       @coverage_start_on          = nil
       @product                    = nil
       @previous_product           = nil 
 
-      @pricing_model_kind         = nil
       @product_cost_total         = 0.00
 
       @benefit_sponsor            = nil
-      @contribution_model_kind    = nil
       @sponsor_contribution_total = 0.00
 
       @member_enrollments         = []
+      @rate_schedule_date = nil
+      @rating_area = nil
+      super(opts)
     end
 
 

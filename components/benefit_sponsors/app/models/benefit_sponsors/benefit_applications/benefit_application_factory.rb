@@ -43,6 +43,7 @@ module BenefitSponsors
       end
 
       def assign_application_attributes(args)
+        return nil if args.blank?
         args.each_pair do |k, v|
           @benefit_application.send("#{k}=".to_sym, v)
         end

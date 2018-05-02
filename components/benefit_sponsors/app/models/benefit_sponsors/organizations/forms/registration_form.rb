@@ -19,6 +19,13 @@ module BenefitSponsors
         end
       end
 
+      def organization=(val)
+        result = super val
+        profile = result.profile
+        profile.profile_type = profile_type
+        result
+      end
+
       def persisted?
         if profile_id.present?
           return true

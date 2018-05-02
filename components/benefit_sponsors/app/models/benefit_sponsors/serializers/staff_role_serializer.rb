@@ -19,6 +19,9 @@ module BenefitSponsors
       end
 
       def status
+        if @instance_options[:profile_type] == "benefit_sponsor"
+          object.employer_staff_roles.detect{|staff_role| staff_role.benefit_sponsor_employer_profile_id.to_s == @instance_options[:profile_id]  &&['is_active','is_applicant'].include?("#{staff_role.aasm_state}")}.aasm_state
+        end
       end
 
       def dob

@@ -60,6 +60,7 @@ PATH
       active_model_serializers
       config
       devise (~> 3.4.1)
+      language_list (~> 1.1.0)
       money-rails (~> 1.3.0)
       mongoid (~> 5.0.1)
       pundit (~> 1.0.1)

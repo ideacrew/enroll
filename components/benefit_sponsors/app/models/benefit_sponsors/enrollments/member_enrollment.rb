@@ -1,14 +1,16 @@
 module BenefitSponsors
   class Enrollments::MemberEnrollment
+    include ActiveModel::Model
 
-    attr_accessor :member_id, :converage_eligibility_on, :product_price,
+    attr_accessor :member_id, :coverage_eligibility_on, :product_price,
                   :sponsor_contribution
 
-    def initialize
+    def initialize(opts = {})
       @member_id = nil
-      @converage_eligibility_on = nil
+      @coverage_eligiblity_on = nil
       @product_price            = 0.00
       @sponsor_contribution     = 0.00
+      super(opts)
     end
 
   end

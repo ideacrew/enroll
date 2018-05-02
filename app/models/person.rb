@@ -727,7 +727,7 @@ class Person
     def staff_for_employer(employer_profile)
       self.where(:employer_staff_roles => {
           '$elemMatch' => {
-              employer_profile_id: employer_profile.id,
+              benefit_sponsor_employer_profile_id: employer_profile.id,
               aasm_state: :is_active}
           }).to_a
     end
@@ -735,7 +735,7 @@ class Person
     def staff_for_employer_including_pending(employer_profile)
       self.where(:employer_staff_roles => {
         '$elemMatch' => {
-            employer_profile_id: employer_profile.id,
+            benefit_sponsor_employer_profile_id: employer_profile.id,
             :aasm_state.ne => :is_closed
         }
         })
@@ -750,7 +750,7 @@ class Person
       return false, 'Person count too high, please contact HBX Admin' if person.count > 1
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
-      employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role = EmployerStaffRole.create(person: person.first, benefit_sponsor_employer_profile_id: employer_profile._id)
       employer_staff_role.save
       return true, person.first
     end
@@ -766,7 +766,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s && !role.is_closed?}
+      if role = person.employer_staff_roles.detect{|role| role.benefit_sponsor_employer_profile_id.to_s == employer_profile_id.to_s && !role.is_closed?}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else

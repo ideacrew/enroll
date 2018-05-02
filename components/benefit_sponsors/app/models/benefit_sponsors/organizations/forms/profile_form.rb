@@ -20,10 +20,12 @@ module BenefitSponsors
       attribute :language_options, Array
       attribute :contact_method_options, Array
       attribute :profile_type, String
+      attribute :parent, Forms::OrganizationForm
 
       attribute :office_locations, Array[Forms::OfficeLocationForm]
 
       validates_presence_of :entity_kind
+      validates_presence_of :market_kind, if: :is_broker_profile?
 
       def persisted?
         false
@@ -31,6 +33,14 @@ module BenefitSponsors
 
       def office_locations_attributes=(locations_params)
         self.office_locations=(locations_params.values)
+      end
+
+      def is_broker_profile?
+        profile_type == "broker_agency"
+      end
+
+      def is_employer_profile?
+        profile_type == "benefit_sponsor"
       end
     end
   end
