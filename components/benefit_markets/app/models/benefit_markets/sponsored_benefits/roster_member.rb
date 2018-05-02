@@ -25,6 +25,12 @@ module BenefitMarkets
       def is_disabled?
         raise NotImplementedError.new("This is a documentation only interface.")
       end
+
+      # Return if the member is the primary.
+      # @return [Boolean] is this a primary member?
+      def is_primary_member?
+        raise NotImplementedError.new("This is a documentation only interface.")
+      end
     end
   end
 end

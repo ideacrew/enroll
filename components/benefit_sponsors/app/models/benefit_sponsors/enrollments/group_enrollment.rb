@@ -25,6 +25,12 @@ module BenefitSponsors
       super(opts)
     end
 
+    def remove_members_by_id!(member_id_list)
+      @member_enrollments = @member_enrollments.reject do |m_en|
+        member_id_list.include?(m_en.member_id)
+      end
+      self
+    end
 
   end
 end
