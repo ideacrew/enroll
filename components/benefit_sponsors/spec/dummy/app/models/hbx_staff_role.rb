@@ -9,6 +9,8 @@ class HbxStaffRole
   field :department, type: String, default: ""
   field :is_active, type: Boolean, default: true
 
+  validates_presence_of :hbx_profile_id
+
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
 
