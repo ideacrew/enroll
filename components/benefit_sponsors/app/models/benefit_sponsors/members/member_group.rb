@@ -2,26 +2,19 @@
 module BenefitSponsors
   class Members::MemberGroup
     include Enumerable
-    include ActiveModel::Model
 
     attr_accessor :group_id, :group_enrollment
     attr_reader :members
 
-    def initialize(opts = {})
-      @members          = []
-      @group_id         = nil
-      @group_enrollment = nil
-      @indexed_members = {}
-      super(opts)
+    def initialize(collection = [], group_id: nil, group_enrollment: nil)
+      self.members = collection
+      @group_id         = group_id
+      @group_enrollment = group_enrollment
     end
 
     def members=(member_list)
       @members = member_list
       @primary_member = @members.detect { |member| member.is_primary_member? }
-      @indexed_members = {}
-      member_list.each do |m|
-        @indexed_members[m.member_id] = m
-      end
     end
 
     def <<(new_member)
@@ -43,15 +36,26 @@ module BenefitSponsors
       @indexed_members[member_id]
     end
 
-    def remove_members_by_id!(member_id_list)
-      cleaned_members = @members.reject do |m|
-        member_id_list.include?(m.member_id)
-      end
-      self.members = cleaned_members
-      unless group_enrollment.nil?
-        group_enrollment.remove_members_by_id!(member_id_list)
-      end
-      self
+    def []=(index, member)
+      is_duplicate_role?(new_member)
+      @members[index] = member
+      self.members = @members
+    end
+
+    def drop_member(member, &blk)
+      members.delete(member)
+    end
+
+    def select!
+      keep, discard = @members.partition { |m| yield m }
+      self.members = keep
+      discard_member_enrollments(discard)
+    end
+
+    def reject!
+      discard, keep = @members.partition { |m| yield m }
+      self.members = keep
+      discard_member_enrollments(discard)
     end
 
     def each
@@ -61,6 +65,14 @@ module BenefitSponsors
     end
 
     private
+
+    def discard_member_enrollments(removed_members)
+      unless group_enrollment.nil?
+        if removed_members.any?
+          group_enrollment.remove_members_by_id!(removed_members.map(&:member_id))
+        end
+      end
+    end
 
     def has_primary_member?
       @members.detect { |member| member.is_primary_member? }

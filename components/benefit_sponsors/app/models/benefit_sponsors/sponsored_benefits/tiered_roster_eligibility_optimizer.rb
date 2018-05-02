@@ -134,7 +134,7 @@ module BenefitSponsors
           state.add(member)
         end
         state.finalize_results
-        covered_roster_entry.remove_members_by_id!(state.excluded_dependent_ids)
+        covered_roster_entry.reject! { |m| state.excluded_dependent_ids.include?(m.member_id) }
         covered_roster_entry
       end
 
