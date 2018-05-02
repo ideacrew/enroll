@@ -119,8 +119,13 @@ module BenefitSponsors
         }
       end
 
+      #TODO: FIX date format
       def format_string_to_date(date)
-        Date.strptime(date, "%m/%d/%Y")
+        if date.split('/').first.size == 2
+          Date.strptime(date,"%m/%d/%Y")
+        elsif date.split('-').first.size == 4
+          Date.strptime(date,"%Y-%m-%d")
+        end
       end
 
       def format_date_to_string(date)

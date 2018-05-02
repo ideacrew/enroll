@@ -507,6 +507,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+   hbx_id: 'D086',
+   title: 'Genaral Agency Fired',
+   description: "When a General Agency is terminated by an employer/broker, then General Agency receives termination notice",
+   resource_name: 'general_agent_profile',
+   event_name: 'general_agency_terminated',
+   notice_triggers: [
+     {
+       name: 'GA Fired',
+       notice_template: 'notices/general_agency_notices/general_agency_fired_notice',
+       notice_builder: 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
+       mpi_indicator: 'SHOP_D086',
+       notice_trigger_element_group: {
+         market_places: ['shop'],
+         primary_recipients: ["general_agency"],
+         primary_recipient_delivery_method: ["secure_message"],
+         secondary_recipients: []
+       }
+     }
+   ]
+ },
+
   {
     hbx_id: 'SHOP28',
     title: 'Second Reminder to publish Application',
@@ -613,7 +636,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP32',
+    hbx_id: 'SHOP_D020',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
     resource_name: 'employer',
@@ -623,7 +646,7 @@ shop_notice_triggers = [
         name: 'Initial Employer ineligible to obtain coverage.',
         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP32',
+        mpi_indicator: 'SHOP_D020',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -654,6 +677,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOP_D085',
+    title: 'Employer has hired you as a General agency',
+    description: ' GA is hired to a group, a notice is sent to the GAs agency mail inbox alerting them of the hire',
+    resource_name: 'general_agent_profile',
+    event_name: 'general_agency_hired_notice',
+    notice_triggers: [
+      {
+        name: 'General Agency hired notification',
+        notice_template: 'notices/shop_general_agency_notices/general_agency_hired_notice',
+        notice_builder: 'ShopGeneralAgencyNotices::GeneralAgencyHiredNotice',
+        mpi_indicator: 'SHOP_D085',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["general_agent_profile"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
       hbx_id: 'SHOP_D052',
       title: 'Confirmation - Broker Fired',
@@ -906,6 +952,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOP_D034',
+    title: 'Special Enrollment Period Approval',
+    description: 'SEP request by Employee accepted when an eligiblity determination is reached',
+    resource_name: 'employee_role',
+    event_name: 'ee_sep_request_accepted_notice',
+    notice_triggers: [
+      {
+        name: 'EE SEP Requested Accepted',
+        notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
+        notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
+        mpi_indicator: 'SHOP_D034',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  
   {
     hbx_id: 'SHOP_DAG043',
     title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
@@ -960,6 +1029,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
         notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
         mpi_indicator: 'SHOP_D092',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP_D093',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market - Excludes 1/1/2018 renewal EEs',
+    resource_name: 'employee_role',
+    event_name: 'dental_carriers_exiting_shop_notice_to_ee',
+    notice_triggers: [
+      {
+        name: 'Renewal EEs Dental Carriers are Exiting SHOP market notice - Excludes 1/1/2018 renewal EEs',
+        notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
+        notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
+        mpi_indicator: 'SHOP_D093',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -1463,6 +1553,28 @@ ivl_notice_triggers = [
         }
       }
     ]
+  },
+
+  {
+      hbx_id: 'IVL_BV',
+      title: 'You Must Submit Documents by the Deadline to Keep Your Insurance',
+      description: 'This is an Backlog Notice and is sent for people need to submit their documents',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_backlog_verification_notice_uqhp',
+      notice_triggers: [
+          {
+              name: 'Backlog Notice',
+              notice_template: 'notices/ivl/ivl_backlog_verification_notice_uqhp',
+              notice_builder: 'IvlNotices::IvlBacklogVerificationNoticeUqhp',
+              mpi_indicator: 'IVL_BV',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
   },
 ]
 
