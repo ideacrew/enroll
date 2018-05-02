@@ -8,7 +8,7 @@ module BenefitSponsors
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
       # before_action :find_broker_agency_profile, only: [:employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
-      before_action :set_current_person, only: [:staff_index, :broker_portal]
+      # before_action :set_current_person, only: [:staff_index]
       # before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
       # before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 

@@ -55,7 +55,6 @@ module BenefitSponsors
         let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
 
         before :each do
-          allow(user_with_broker_role.person).to receive_message_chain('broker_agency_staff_roles.first.broker_agency_profile_id').and_return(bap_id)
           user_with_broker_role.roles << "broker_agency_staff"
           user_with_broker_role.save!
           sign_in(user_with_broker_role)
