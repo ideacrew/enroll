@@ -13,4 +13,12 @@ class EmployerProfile
 
   def active_plan_year
   end
+
+  def is_converting?
+
+  end
+
+  def census_employees
+    []
+  end
 end

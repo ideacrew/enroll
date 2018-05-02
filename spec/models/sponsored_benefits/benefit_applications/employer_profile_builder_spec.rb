@@ -19,7 +19,8 @@ module SponsoredBenefits
 
     context "add_plan_year" do
 
-      let(:employer_profile)          { EmployerProfile.new }
+      let(:employer_profile)          { EmployerProfile.new(entity_kind:'governmental_employer') }
+      let!(:organization)              { Organization.create(employer_profile:employer_profile) }
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
@@ -61,7 +62,7 @@ module SponsoredBenefits
         plan_design_proposal.publish!
         builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(plan_design_proposal, employer_profile)
         expect(employer_profile.plan_years.present?).to eq false
-        expect(builder.add_plan_year).to eq true
+        builder.add_plan_year
         expect(employer_profile.plan_years.present?).to eq true
       end
     end

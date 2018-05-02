@@ -171,6 +171,7 @@ module SponsoredBenefits
         end
 
         def enrollment_timetable_by_effective_date(effective_date)
+
           effective_date            = effective_date.to_date.beginning_of_month
           effective_period          = effective_date..(effective_date + 1.year - 1.day)
           open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
@@ -224,12 +225,9 @@ module SponsoredBenefits
 
 
         def open_enrollment_period_by_effective_date(effective_date)
-          earliest_begin_date = effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
-          prior_month = effective_date - 1.month
-
-          begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
-          end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
-          begin_on..end_on
+          open_enrollment_start_on = [(effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months), TimeKeeper.date_of_record].max
+          open_enrollment_end_on   = ("#{effective_date.prev_month.year}-#{effective_date.prev_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
+          open_enrollment_start_on..open_enrollment_end_on
         end
 
 
