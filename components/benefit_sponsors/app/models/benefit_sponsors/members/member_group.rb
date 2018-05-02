@@ -4,39 +4,50 @@ module BenefitSponsors
     include Enumerable
     include ActiveModel::Model
 
-    attr_accessor :members, :group_id, :group_enrollment
+    attr_accessor :group_id, :group_enrollment
+    attr_reader :members
 
     def initialize(opts = {})
       @members          = []
       @group_id         = nil
       @group_enrollment = nil
+      @indexed_members = {}
       super(opts)
+    end
+
+    def members=(member_list)
+      @members = member_list
+      @primary_member = @members.detect { |member| member.is_primary_member? }
+      @indexed_members = {}
+      member_list.each do |m|
+        @indexed_members[m.member_id] = m
+      end
     end
 
     def primary_member
       @members.detect { |member| member.is_primary_member? }
     end
 
-    def add_member(new_member)
-      @members << new_member unless is_duplicate_role?(new_member)
+    def [](member_id)
+      @indexed_members[member_id]
     end
 
-    def drop_member(member)
-      @members.delete(member)
+    def remove_members_by_id!(member_id_list)
+      cleaned_members = @members.reject do |m|
+        member_id_list.include?(m.member_id)
+      end
+      self.members = cleaned_members
+      unless group_enrollment.nil?
+        group_enrollment.remove_members_by_id!(member_id_list)
+      end
+      self
     end
 
-    def <<(new_member)
-      add_member(new_member)
+    def each
+      @members.each do |m|
+        yield m
+      end
     end
-
-    def [](index)
-      @members = index.each { |new_member| add_member(new_member) unless is_duplicate_role?(new_member) }
-    end
-
-    def []=(index, new_member)
-      @members[index] = new_member unless is_duplicate_role?(new_member)
-    end
-
 
     private
 
