@@ -134,7 +134,7 @@ module BenefitSponsors
       end
 
       context "date of birth is in the future" do
-        let(:future_dob)  { Date.today + 1.day }
+        let(:future_dob)  { TimeKeeper.date_of_record + 1.day }
 
         it "should be invalid" do
           member.dob = future_dob
@@ -146,10 +146,10 @@ module BenefitSponsors
       end
 
       context "with a valid date of birth" do
-        let(:today)         { Date.today }
+        let(:today)         { TimeKeeper.date_of_record }
         let(:age_today)     { 36 }
         let(:age_tomorrow)  { age_today + 1 }
-        let(:date_of_birth) { 37.years.ago + 1.day }
+        let(:date_of_birth) { today - 37.years + 1.day }
 
         it "should correctly calculate the member's age" do
           member.dob = date_of_birth
