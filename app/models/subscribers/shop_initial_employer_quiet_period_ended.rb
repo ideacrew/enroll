@@ -14,7 +14,7 @@ module Subscribers
         effective_on_string = stringed_key_payload["effective_on"]
         effective_on = effective_on_string.blank? ? nil : (Date.strptime(effective_on_string, "%Y-%m-%d") rescue nil)
 
-        query_results = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ["coverage_selected"])
+        query_results = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ["coverage_selected", "coverage_enrolled"])
         query_results.each do |hbx_enrollment_id|
           notify("acapi.info.events.hbx_enrollment.coverage_selected", {
             :hbx_enrollment_id => hbx_enrollment_id,
