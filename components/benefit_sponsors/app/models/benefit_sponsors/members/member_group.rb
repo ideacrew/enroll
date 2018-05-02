@@ -24,6 +24,17 @@ module BenefitSponsors
       end
     end
 
+    def <<(new_member)
+      is_duplicate_role?(new_member)
+      new_members = members + [new_member]
+      self.members = new_members
+      self
+    end
+
+    def add_member(new_member)
+      self << new_member
+    end
+
     def primary_member
       @members.detect { |member| member.is_primary_member? }
     end
