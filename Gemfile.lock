@@ -71,6 +71,18 @@ PATH
       virtus (~> 1.0.5)
 
 PATH
+  remote: components/sponsored_benefits
+  specs:
+    sponsored_benefits (0.0.1)
+      aasm (~> 4.8.0)
+      config
+      mongoid (~> 5.0.1)
+      rails (~> 4.2.7.1)
+      roo (~> 2.1.0)
+      slim (= 3.0.8)
+      symmetric-encryption (~> 3.6.0)
+
+PATH
   remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
@@ -755,6 +767,7 @@ DEPENDENCIES
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
   slim-rails
+  sponsored_benefits!
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)

@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 #  mount Resque::Server, at: '/jobs'
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
   mount BenefitMarkets::Engine,       at: "/benefit_markets"
-#  mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
+  mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
