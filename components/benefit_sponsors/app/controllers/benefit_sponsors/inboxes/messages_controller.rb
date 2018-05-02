@@ -8,11 +8,9 @@ module BenefitSponsors
       before_action :find_organization ,only: [:msg_to_portal]
 
       def new
-        #TODO: fix it -- if needed
       end
 
       def create
-        #TODO: fix it -- if needed
       end
 
       def show
@@ -74,11 +72,9 @@ module BenefitSponsors
       end
 
       def set_inbox_and_assign_message
-        #TODO fix it when create action is implemented
       end
 
       def successful_save_path
-        #TODO fix it when create action is implemented
       end
     end
   end
