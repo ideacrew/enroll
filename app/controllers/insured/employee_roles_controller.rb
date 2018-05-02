@@ -88,7 +88,8 @@ class Insured::EmployeeRolesController < ApplicationController
       @family = @person.primary_family
       build_nested_models
     end
-    employee_eligible_notice(@employee_role.census_employee)
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster")
   end
 
   def update
@@ -106,6 +107,7 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         # set_employee_bookmark_url
+        # @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
         redirect_path = insured_family_members_path(employee_role_id: @employee_role.id)
         if @person.primary_family && @person.primary_family.active_household
           if @person.primary_family.active_household.hbx_enrollments.any?
@@ -221,13 +223,4 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
-
-  def employee_eligible_notice(census_employee)
-    begin
-      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_matches_employer_rooster")
-    rescue Exception => e
-      puts "Unable to send Employee Open Enrollment begin notice to #{census_employee.full_name}" unless Rails.env.test?
-    end
-  end
-
 end

@@ -43,6 +43,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     before(:each) do
       active_household.hbx_enrollments =[enrollment]
       active_household.save!
+      allow(ENV).to receive(:[]).with("state").and_return('')
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
     end
@@ -71,10 +72,21 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       end
     end
 
+    it "should update aasm_state of plan year to renewing_enrolling when OE closed and has valid enrollment but has no state specified" do
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_open_enrollment_closed?).and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:may_activate?).and_return(false)
+      census_employee.reload
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrolling"
+    end
+
     it "should update aasm_state of plan year to renewing_enrolled when OE closed and has valid enrollment" do
       allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
       allow_any_instance_of(PlanYear).to receive(:is_open_enrollment_closed?).and_return(true)
       allow_any_instance_of(PlanYear).to receive(:may_activate?).and_return(false)
+      allow(ENV).to receive(:[]).with("state").and_return('renewing_enrolled')
       census_employee.reload
       subject.migrate
       plan_year.reload
@@ -85,6 +97,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
       allow_any_instance_of(PlanYear).to receive(:is_open_enrollment_closed?).and_return(true)
       allow_any_instance_of(PlanYear).to receive(:can_be_activated?).and_return(true)
+      allow(ENV).to receive(:[]).with("state").and_return('renewing_enrolled')
       active_household.reload
       census_employee.reload
       subject.migrate

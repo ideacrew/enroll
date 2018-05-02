@@ -5,6 +5,8 @@ namespace :reports do
   namespace :shop do
     desc "All Brokers have had a claim URL sent to them upon Admin Approval"
     task :brokers_with_URL_from_admin_approval => :environment do
+      include Config::AcaHelper
+
       invitations=Invitation.where(role:"broker_role").all
       field_names  = %w(
           Broker_Agency_Legal_Name
@@ -17,8 +19,8 @@ namespace :reports do
         )
       processed_count = 0
 
-      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-      file_name = File.expand_path("#{Rails.root}/public/brokers_list_with_URL_from_admin_approval_#{time_stamp}.csv")
+      file_name = fetch_file_format('brokers_list_with_URL_from_admin_approval', 'BROKERSLISTWITHURLFROMADMINAPPROVAL')
+
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         invitations.each do |invitation|
@@ -39,8 +41,10 @@ namespace :reports do
           end
         end
       end
+
       pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
       pubber.publish URI.join("file://", file_name)
+
       puts "#{processed_count} Brokers to output file: #{file_name}"
     end
   end

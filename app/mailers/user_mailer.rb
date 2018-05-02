@@ -96,7 +96,7 @@ class UserMailer < ApplicationMailer
 
   def send_employee_ineligibility_notice(email, first_name)
     if email.present?
-      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Health Insurance", from: 'noreply@healthconnector.org'}) do |format|
+      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Health Insurance", from: '#{mail_address}'}) do |format|
         format.html {render "employee_ineligibility_notice", locals: {first_name: first_name}}
       end
     end
@@ -140,7 +140,7 @@ class UserMailer < ApplicationMailer
 
   def generic_notice_alert_to_ba(first_name, email, employer_name)
     if email.present?
-      message = mail({to: email, subject: "You have a new message from #{site_short_name}", from: 'noreply@healthconnector.org'}) do |format|
+      message = mail({to: email, subject: "You have a new message from #{site_short_name}", from: '#{mail_address}'}) do |format|
        format.html {render "generic_notice_alert_to_broker", locals: {first_name: first_name, employer_name: employer_name}}
       end
     end

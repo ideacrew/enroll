@@ -58,13 +58,13 @@ end
 
 Then (/^Admin should see Employer with (.*) status$/) do |state|
   wait_for_ajax
-  expect(find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[15]')).to have_content state
+  expect(find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[12]')).to have_content state
 end
 
 When (/^Admin clicks attestation action$/) do
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[16]/div').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[13]/div').click
   wait_for_ajax
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[16]/div/ul/li[3]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[13]/div/ul/li[3]/a').click
 end
 
 Then (/^Admin should see attestation document$/)do
@@ -170,7 +170,7 @@ And(/^.+ should be able to enter sole source plan year, benefits, relationship b
   find('.interaction-click-control-create-plan-year').trigger('click')
 end
 
-And(/^.+ should be able to enter plan year, benefits, relationship benefits for employer$/) do
+When(/^.+ try to create plan year with less than 33% contribution for spouse, domestic partner and child under 26$/) do
   enter_plan_year_info
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
@@ -179,6 +179,28 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   wait_for_ajax
   find('.reference-plans label').click
   wait_for_ajax
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 30
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 31
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 32
+
+  wait_for_ajax
+
+end
+
+Then (/^.+ can not create plan year$/) do
+  find('.interaction-click-control-create-plan-year').has_css?('.disabled')
+end
+
+And(/^.+ should be able to enter plan year, benefits, relationship benefits for employer$/) do
+  enter_plan_year_info
+
+  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  wait_for_ajax
+  find('.carriers-tab a').click
+  wait_for_ajax
+  find('.reference-plans label').click
+  wait_for_ajax(5,5)
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50

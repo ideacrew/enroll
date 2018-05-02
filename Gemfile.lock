@@ -92,6 +92,7 @@ PATH
       acapi
       mongoid (= 5.0.1)
       rails (>= 4.2.0)
+      rubyzip (>= 1.2.1)
       symmetric-encryption (~> 3.6.0)
       transport_gateway
 
@@ -438,7 +439,7 @@ GEM
     mongoid_userstamp (0.4.0)
       mongoid (>= 3.0.4)
     mono_logger (1.1.0)
-    multi_json (1.12.2)
+    multi_json (1.13.1)
     multi_test (0.1.2)
     multi_xml (0.6.0)
     net-scp (1.2.1)
@@ -486,8 +487,8 @@ GEM
     puma (3.11.2)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
-    rack (1.6.8)
-    rack-protection (1.5.3)
+    rack (1.6.9)
+    rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
