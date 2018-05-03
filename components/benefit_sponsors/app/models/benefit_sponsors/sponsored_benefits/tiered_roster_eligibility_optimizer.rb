@@ -52,15 +52,15 @@ module BenefitSponsors
 
         attr_reader :excluded_dependent_ids
 
-        def initialize(c_model, level_map, elig_dates, c_start, r_coverage, primary_id)
+        def initialize(c_model, level_map, elig_dates, c_start, c_product, c_previous_product, primary_id)
           @offered_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
           @eligibility_dates = elig_dates
           @coverage_start = c_start
           @level_map = level_map
           @contribution_model = c_model
           @relationship_totals = Hash.new(0)
-          @product = r_coverage.product
-          @previous_product = r_coverage.previous_eligibility_product
+          @product = c_product
+          @previous_product = c_previous_product
           @excluded_dependent_ids = []
           @member_rels = {}
           @member_dobs = {}
@@ -70,7 +70,8 @@ module BenefitSponsors
 
         def add(member)
           coverage_age = @offered_calculator.calc_coverage_age_for(member, @product, @coverage_start, @eligibility_dates, @previous_product)
-          rel_name = @contribution_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
+          relationship = member.is_primary_member? ? "self" : member.relationship
+          rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           if rel_name
             @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name] + 1
             @member_rels[member.member_id] = rel_name
@@ -123,21 +124,18 @@ module BenefitSponsors
       # corresponding levels and 'offered?' flag.
       def calculate_optimal_group_for(contribution_model, covered_roster_entry, sponsor_contribution)
         level_map = level_map_for(sponsor_contribution)
-        roster_coverage = covered_roster_entry.roster_coverage
-        state = OptimizerState.new(contribution_model, level_map, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, roster_coverage, covered_roster_entry.member_id)
-        member_list = [covered_roster_entry] + covered_roster_entry.dependents
-        member_list.each do |member|
+        roster_coverage = covered_roster_entry.group_enrollment
+        coverage_eligibility_dates = {}
+        roster_coverage.member_enrollments.each do |m_en|
+          coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
+        end
+        state = OptimizerState.new(contribution_model, level_map, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage.product, roster_coverage.previous_product, covered_roster_entry.primary_member.member_id)
+        covered_roster_entry.members.each do |member|
           state.add(member)
         end
         state.finalize_results
-        PricedEntry.new(
-          covered_roster_entry.roster_coverage,
-          covered_roster_entry.relationship,
-          covered_roster_entry.dob,
-          covered_roster_entry.member_id,
-          covered_roster_entry.dependents.reject { |dep| state.excluded_dependent_ids.include?(dep.member_id) } ,
-          covered_roster_entry.is_disabled?
-        )
+        covered_roster_entry.reject! { |m| state.excluded_dependent_ids.include?(m.member_id) }
+        covered_roster_entry
       end
 
       protected

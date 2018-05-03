@@ -10,6 +10,7 @@ module BenefitMarkets
     let(:issuer_profile_urn)  { "urn:openhbx:terms:v1:organization:name#safeco" }
     let(:title)               { "SafeCo Active Life $0 Deductable Premier" }
     let(:description)         { "Highest rated and highest value" }
+    let(:service_area)        { BenefitMarkets::Locations::ServiceArea.new }
 
     let(:rating_area)         { BenefitMarkets::Locations::RatingArea.new }
     let(:quarter_1)           { Date.new(this_year, 1, 1)..Date.new(this_year, 3, 31) }
@@ -22,17 +23,8 @@ module BenefitMarkets
                                   premium_tuples: [premium_q1_age_20, premium_q1_age_30, premium_q1_age_40],
                                 ) }
 
-    let(:quarter_2)           { Date.new(this_year, 4, 1)..Date.new(this_year, 6, 30) }
-    let(:premium_q2_age_20)   { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 202) }
-    let(:premium_q2_age_30)   { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 302) }
-    let(:premium_q2_age_40)   { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 402) }
-    let(:premium_table_q1)    { BenefitMarkets::Products::PremiumTable.new(
-                                  effective_period: quarter_2,
-                                  rating_area: rating_area,
-                                  premium_tuples: [premium_q2_age_20, premium_q2_age_30, premium_q2_age_40],
-                                ) }
-
     let(:premium_tables)      { [premium_table_q1] }
+
 
     let(:params) do
         {
@@ -42,11 +34,12 @@ module BenefitMarkets
           issuer_profile_urn:   issuer_profile_urn,
           title:                title,
           description:          description,
+          service_area:         service_area,
           premium_tables:       premium_tables,
         }
     end
 
-    context "A new HealthProduct instance" do
+    context "A new Product instance" do
 
       context "with no arguments" do
         subject { described_class.new }
@@ -75,6 +68,16 @@ module BenefitMarkets
             subject.validate
             expect(subject).to_not be_valid
             expect(subject.errors[:application_period]).to include("can't be blank")
+          end
+        end
+
+        context "that's missing an service_area" do
+          subject { described_class.new(params.except(:service_area)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:service_area]).to include("can't be blank")
           end
         end
 
@@ -123,6 +126,100 @@ module BenefitMarkets
       end
 
     end
+
+
+    context "Given a Product with out-of-date PremiumTables" do
+      let(:quarter_2)           { Date.new(this_year, 4, 1)..Date.new(this_year, 6, 30) }
+      let(:q1_effective_date)   { quarter_1.begin + 2.months }
+      let(:q2_effective_date)   { quarter_2.begin + 1.month }
+
+      subject { described_class.new(params) }
+
+      it "should have a premium_table for initial effective_period" do
+        expect(subject.premium_table_effective_on(q1_effective_date)).to eq premium_table_q1
+      end
+
+      it "should not have a premium table for new effective_period" do
+        expect(subject.premium_table_effective_on(q2_effective_date)).to eq nil
+      end
+
+      context "and a premium_table is added" do
+        let(:premium_q2_age_20)   { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 202) }
+        let(:premium_q2_age_30)   { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 302) }
+        let(:premium_q2_age_40)   { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 402) }
+        let(:premium_table_q2)    { BenefitMarkets::Products::PremiumTable.new(
+                                      effective_period: quarter_2,
+                                      rating_area: rating_area,
+                                      premium_tuples: [premium_q2_age_20, premium_q2_age_30, premium_q2_age_40],
+                                    ) }
+
+        before { subject.add_premium_table(premium_table_q2) }
+
+        it "should have a premium table for the new effective_period" do
+          expect(subject.premium_table_effective_on(q2_effective_date)).to eq premium_table_q2
+        end
+
+
+        context "and a premium_table already exists for the effective_period" do
+
+          it "should throw an error" do
+            expect{subject.add_premium_table(premium_table_q1)}.to raise_error("effective_period may not overlap existing premium_table")
+          end
+        end
+
+        context "and the premium_table effective_period isn't covered by the product application_period" do
+          let(:out_of_range_effective_period) { Date.new(this_year + 1, 1, 1)..Date.new(this_year + 1, 3, 31) }
+          let(:invalid_premium_table)         { BenefitMarkets::Products::PremiumTable.new(
+                                                  effective_period: out_of_range_effective_period,
+                                                  rating_area: rating_area,
+                                                  premium_tuples: [premium_q2_age_20, premium_q2_age_30, premium_q2_age_40],
+                                                ) }
+
+          it "should throw an error" do
+            expect{subject.add_premium_table(invalid_premium_table)}.to raise_error(BenefitMarkets::InvalidEffectivePeriodError)
+          end
+        end
+      end
+
+      context "and a premium_table is updated" do
+        let(:premium_q2_age_20)         { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 203) }
+        let(:premium_q2_age_30)         { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 303) }
+        let(:premium_q2_age_40)         { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 403) }
+        let(:updated_premium_table_q2)  { BenefitMarkets::Products::PremiumTable.new(
+                                            effective_period: quarter_2,
+                                            rating_area: rating_area,
+                                            premium_tuples: [premium_q2_age_20, premium_q2_age_30, premium_q2_age_40],
+                                          ) }        
+        let(:effective_date_q2)         { updated_premium_table_q2.effective_period.min }
+
+        it "should replace the existing premium_table" do
+          subject.update_premium_table(updated_premium_table_q2)          
+          expect(subject.premium_table_effective_on(effective_date_q2).premium_tuples).to include(premium_q2_age_30)
+        end
+
+        context "and a premium_table doesn't exist for the effective_period" do
+          let(:quarter_3)                 { Date.new(this_year, 7, 1)..Date.new(this_year, 9, 30) }
+          let(:premium_q3_age_20)         { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 204) }
+          let(:premium_q3_age_30)         { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 304) }
+          let(:premium_q3_age_40)         { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 404) }
+          let(:premium_table_q3)          { BenefitMarkets::Products::PremiumTable.new(
+                                              effective_period: quarter_3,
+                                              rating_area: rating_area,
+                                              premium_tuples: [premium_q3_age_20, premium_q3_age_30, premium_q3_age_40],
+                                            ) }        
+
+          let(:effective_date_q3)         { premium_table_q3.effective_period.min }
+
+          it "should add the updated premium_table" do
+            subject.update_premium_table(premium_table_q3)
+            expect(subject.premium_table_effective_on(effective_date_q3).premium_tuples).to include(premium_q3_age_30)
+          end
+        end
+      end
+
+    end
+
+
 
     context "An open file in SERFF template format" do
       context "and the contents are Qualified Health Plans" do

@@ -9,7 +9,7 @@ module BenefitSponsors
       end
 
       def build_base_scope
-        ivl_broker_agency_criteria = { broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: @broker_agency_profile_id, is_active: true}} }
+        ivl_broker_agency_criteria = { broker_agency_accounts: {:$elemMatch=> {benefit_sponsors_broker_agency_profile_id: @broker_agency_profile_id, is_active: true}} }
         shop_broker_agency_criteria = { "family_members.person_id" => {"$in" => employee_person_ids }}
         { "$or" => [
           ivl_broker_agency_criteria,
@@ -47,7 +47,7 @@ module BenefitSponsors
       def employee_person_ids
         # TODO:  Revisit when CensusEmployee an BenefitSponsorship relationships are completed.
         benefit_sponsorships_ids ||= BenefitSponsors::Organizations::Organization.employer_profiles.collection.aggregate([
-          { "$match" => { :'benefit_sponsorships.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: @broker_agency_profile_id } } } },
+          { "$match" => { :'benefit_sponsorships.broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: @broker_agency_profile_id } } } },
           { "$group" => { "_id" => "$benefit_sponsorships._id" }}
         ]).map { |rec| rec["_id"] }
 

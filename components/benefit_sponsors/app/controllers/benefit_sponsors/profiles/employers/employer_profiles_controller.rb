@@ -46,12 +46,17 @@ module BenefitSponsors
         end
       end
 
+      def inbox
+        @folder = params[:folder] || 'Inbox'
+        @sent_box = false
+      end
+
       private
 
       def find_employer
         id_params = params.permit(:id, :employer_profile_id)
         id = id_params[:id] || id_params[:employer_profile_id]
-        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
+        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
         @employer_profile = @organization.employer_profile
         render file: 'public/404.html', status: 404 if @employer_profile.blank?
       end

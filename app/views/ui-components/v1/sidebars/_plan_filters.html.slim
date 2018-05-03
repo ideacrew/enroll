@@ -16,7 +16,7 @@
           li
             checkbox
               label
-                input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level-filter="#{level}"
+                input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="#{level}"
                 label for="plan-metal-level-#{level}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info')}"
                   = l10n("#{level}")
@@ -30,7 +30,7 @@
           li
             checkbox
               label
-                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-category-filter="#{type}" onClick="filterPlanType(this)"
+                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)"
                 label for="checkbox-#{10+i}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.'"#{type}"'_title_info')}"
                   = l10n("#{type}")
@@ -44,7 +44,7 @@
           li
             checkbox
               label
-                input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-metal-network-filter="#{network}" onClick="filterPlanNetwork(this)"
+                input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)"
                 label for="checkbox-#{13+i}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
                   = l10n("#{network}")
@@ -72,16 +72,16 @@
         a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.premium_amount_title_info")}"
             span.glyphicon.glyphicon-info-sign.pl-1 aria-hidden="true"
       .filter-input-block
-        input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value='0' onblur="premuimFromAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+        input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value='0' onblur="premuimFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
         small To
-        input.plan-metal-premium-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_total_employee_cost || 2000}" value="#{@max_total_employee_cost || 2000}" onblur="premiumToAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+        input.plan-metal-premium-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_total_employee_cost || 2000}" value="#{@max_total_employee_cost || 2000}" onblur="premiumToAmount(this)" maxlength="10" oninput="toCurrency(this)"
         = hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000)
       h5
         strong = l10n("deductible_amount")
       .filter-input-block
-        input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')"
+        input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
         small To
-        input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')" value='#{@max_deductible || 5000}'
+        input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value='#{@max_deductible || 5000}'
     - if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual"
       .aptc
         hr
@@ -107,7 +107,7 @@
           output name="pct" 85 %
     .checkbox-filter-wrapper
       .form-inline.search-apply-wrapper
-        a.btn.btn-primary.apply-btn.mz href="javascript:void(0)"
+        a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()"
           = l10n("apply")
         a.btn.btn-default onclick="clearAll()"
           = l10n("reset")

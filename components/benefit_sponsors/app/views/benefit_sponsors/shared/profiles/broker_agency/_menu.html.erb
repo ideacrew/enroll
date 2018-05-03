@@ -3,14 +3,13 @@
     <div class="container">
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
         <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
-          <%#= link_to(profiles_broker_agencies_broker_agency_profile_path(@agency.profile_id), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+          <%= link_to(profiles_broker_agencies_broker_agency_profile_path(broker_profile_id), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("home")%></span>
             <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
-          <%# end %>
+          <% end %>
         </li>
         <li role="presentation" id="employers-tab" <%= menu_tab_class(active_tab, "employers-tab") %>>
-          <!--TODO: Activate link when we bring Sponsored Benefits Engine from BQT 1 -->
-          <%= link_to(sponsored_benefits.employers_organizations_broker_agency_profile_path(@broker_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
+          <%= link_to(sponsored_benefits.employers_organizations_broker_agency_profile_path(broker_profile_id), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("employers")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
@@ -23,10 +22,10 @@
         </li>
         <% if @staff_role %>
           <li role="presentation" id="brokers-tab" <%= menu_tab_class(active_tab, "brokers-tab").present? || "class=hide" %>>
-            <%#= link_to(broker_agencies_profile_applicants_path(@broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
+            <%= link_to(main_app.broker_agencies_profile_applicants_path(broker_profile_id), :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
               <span class="hidden-xs">Brokers</span>
               <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Brokers"></span>
-            <%# end %>
+            <% end %>
           </li>
           <!-- Hidden due to request in 18558
           <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>

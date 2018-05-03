@@ -144,10 +144,15 @@ module SponsoredBenefits
 
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplication }
-      let(:standard_begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
+      let(:begin_day)  { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
+
       let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.days }
+
+      def standard_begin_day
+        (begin_day > 0) ? begin_day : 1
+      end
 
       it "should return the day of month deadline for an open enrollment standard period to begin" do
         expect(subject.open_enrollment_minimum_begin_day_of_month).to eq standard_begin_day
@@ -219,8 +224,8 @@ module SponsoredBenefits
       context "and an effective date is passed to open enrollment period by effective date method" do
         let(:effective_date)                  { (TimeKeeper.date_of_record + 3.months).beginning_of_month }
         let(:prior_month)                     { effective_date - 1.month }
-        let(:valid_open_enrollment_begin_on)  { (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
-        let(:valid_open_enrollment_end_on)    { Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
+        let(:valid_open_enrollment_begin_on)  { [(effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months), TimeKeeper.date_of_record].max}
+        let(:valid_open_enrollment_end_on)    { ("#{effective_date.prev_month.year}-#{effective_date.prev_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date }
         let(:valid_open_enrollment_period)    { valid_open_enrollment_begin_on..valid_open_enrollment_end_on }
 
         it "should provide a valid open enrollment period for that effective date" do

@@ -4,7 +4,6 @@ module BenefitMarkets
   RSpec.describe Products::HealthProducts::HealthProduct, type: :model do
 
     let(:this_year)               { TimeKeeper.date_of_record.year }
-    # let(:this_year)               { BenefitMarkets.time_keeper_class.constantize.date_of_record.year }
     let(:benefit_market_kind)     { :aca_shop }
     let(:application_period)      { Date.new(this_year, 1, 1)..Date.new(this_year, 12, 31) }
 
@@ -12,6 +11,7 @@ module BenefitMarkets
     let(:issuer_profile_urn)      { "urn:openhbx:terms:v1:organization:name#safeco" }
     let(:title)                   { "SafeCo Active Life $0 Deductable Premier" }
     let(:description)             { "Highest rated and highest value" }
+    let(:service_area)            { BenefitMarkets::Locations::ServiceArea.new }
 
     let(:hios_id)                 { "86052DC0400001-01" }
     let(:hios_base_id)            { "86052DC0400001" }
@@ -25,35 +25,44 @@ module BenefitMarkets
     let(:rx_formulary_url)        { "http://example.com/formularies/1" }
 
     let(:sbc_document)            { Object.new }
-    let(:service_area)            { BenefitMarkets::Locations::ServiceArea.new }
-    let(:rating_areas)            { [BenefitMarkets::Locations::RatingArea.new, Locations::RatingArea.new] }
 
+    let(:rating_area)         { BenefitMarkets::Locations::RatingArea.new }
+    let(:quarter_1)           { Date.new(this_year, 1, 1)..Date.new(this_year, 3, 31) }
+    let(:premium_q1_age_20)   { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 201) }
+    let(:premium_q1_age_30)   { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 301) }
+    let(:premium_q1_age_40)   { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 401) }
+    let(:premium_table_q1)    { BenefitMarkets::Products::PremiumTable.new(
+                                  effective_period: quarter_1,
+                                  rating_area: rating_area,
+                                  premium_tuples: [premium_q1_age_20, premium_q1_age_30, premium_q1_age_40],
+                                ) }
+    let(:premium_tables)      { [premium_table_q1] }
 
 
     let(:params) do 
       {
-        benefit_market_kind: benefit_market_kind,
-        application_period: application_period,
-        hbx_id: hbx_id,
-        issuer_profile_urn: issuer_profile_urn,
-        title: title,
-        description: description,
+        benefit_market_kind:      benefit_market_kind,
+        application_period:       application_period,
+        hbx_id:                   hbx_id,
+        issuer_profile_urn:       issuer_profile_urn,
+        title:                    title,
+        description:              description,
+        service_area:             service_area,
+        premium_tables:           premium_tables,
 
-        hios_id: hios_id,
-        hios_base_id: hios_base_id,
-        csr_variant_id: csr_variant_id,
-        health_plan_kind: health_plan_kind,
-        metal_level_kind: metal_level_kind,
-        ehb: ehb,
-        is_standard_plan: is_standard_plan,
-        provider_directory_url: provider_directory_url,
+        hios_id:                  hios_id,
+        hios_base_id:             hios_base_id,
+        csr_variant_id:           csr_variant_id,
+        health_plan_kind:         health_plan_kind,
+        metal_level_kind:         metal_level_kind,
+        ehb:                      ehb,
+        is_standard_plan:         is_standard_plan,
+        provider_directory_url:   provider_directory_url,
         rx_formulary_url: rx_formulary_url,
 
         # renewal_product: renewal_product,
         # catastrophic_age_off_product: catastrophic_age_off_product,
         # sbc_document: sbc_document,
-        # service_area: service_area,
-        # rating_areas: rating_areas,
       }
     end
 
@@ -69,16 +78,6 @@ module BenefitMarkets
       end
 
       context "without required params" do
-
-        context "that's missing hios_id" do
-          subject { described_class.new(params.except(:hios_id)) }
-
-          it "should be invalid" do
-            subject.validate
-            expect(subject).to_not be_valid
-            expect(subject.errors[:hios_id]).to include("can't be blank")
-          end
-        end
 
         context "that's missing hios_id" do
           subject { described_class.new(params.except(:hios_id)) }

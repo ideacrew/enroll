@@ -11,8 +11,9 @@ module BenefitMarkets
       @benefit_market_catalog = benefit_market_catalog
       @service_area    = service_area
       @effective_date  = effective_date
-      @benefit_sponsor_catalog = ::BenefitMarkets::BenefitSponsorCatalog.new
 
+      @benefit_sponsor_catalog = ::BenefitMarkets::BenefitSponsorCatalog.new
+      @benefit_sponsor_catalog.effective_date = effective_date
       add_probation_period_kinds
       add_sponsor_market_policy
       add_member_market_policy

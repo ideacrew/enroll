@@ -12,5 +12,9 @@ module BenefitSponsors
     def validate_contribution_levels
       raise NotImplementedError.new("subclass responsibility")
     end
+
+    def sic_code
+      # Needs to return the most recent SIC CODE value recorded for this sponsorship
+    end
   end
 end

@@ -7,7 +7,7 @@ module BenefitSponsors
       elsif current_user.try(:has_hbx_staff_role?)
         link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
       elsif current_user.person.try(:broker_role)
-        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
+        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id), class: "portal"
       elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
       elsif current_user.person && current_user.person.active_employee_roles.any?
@@ -19,7 +19,7 @@ module BenefitSponsors
           "<a class='portal'>#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family</a>".html_safe
         end
       elsif current_user.try(:has_broker_agency_staff_role?)
-        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
+        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id), class: "portal"
       elsif current_user.try(:has_employer_staff_role?)
         link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.employer_profile_id, :tab=>'home'), class: "portal"
       elsif current_user.has_general_agency_staff_role?

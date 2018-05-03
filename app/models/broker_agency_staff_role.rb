@@ -8,11 +8,12 @@ class BrokerAgencyStaffRole
   field :aasm_state, type: String, default: "broker_agency_pending"
   field :reason, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   embeds_many :workflow_state_transitions, as: :transitional
 
-  associated_with_one :broker_agency_profile, :broker_agency_profile_id, "BrokerAgencyProfile"
+  associated_with_one :broker_agency_profile, :benefit_sponsors_broker_agency_profile_id, "BenefitSponsors::Organizations::BrokerAgencyProfile"
 
-  validates_presence_of :broker_agency_profile_id
+  validates_presence_of :benefit_sponsors_broker_agency_profile_id
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
 

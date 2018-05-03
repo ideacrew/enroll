@@ -37,7 +37,7 @@ module BenefitSponsors
           self.broker_agency_profile = organization.broker_agency_profile
           self.broker_agency_profile.primary_broker_role = person.broker_role
           self.broker_agency_profile.save!
-          person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
+          person.broker_role.update_attributes({ benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
           ::UserMailer.broker_application_confirmation(person).deliver_now
           true
         end

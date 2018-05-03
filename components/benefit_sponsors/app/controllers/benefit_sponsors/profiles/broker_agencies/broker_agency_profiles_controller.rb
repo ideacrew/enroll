@@ -2,17 +2,17 @@ module BenefitSponsors
   module Profiles
     class BrokerAgencies::BrokerAgencyProfilesController < ApplicationController
       # include Acapi::Notifiers
-      # include DataTablesAdapter
+      include DataTablesAdapter
       include Concerns::ProfileRegistration
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
       # before_action :find_broker_agency_profile, only: [:employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
-      before_action :set_current_person, only: [:staff_index, :broker_portal]
+      # before_action :set_current_person, only: [:staff_index]
       # before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
       # before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
-      # layout 'single_column'
+      layout 'single_column'
 
       EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
         "2"     => "legal_name",
@@ -28,6 +28,7 @@ module BenefitSponsors
       def show
         set_flash_by_announcement
         @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+        @provider = current_user.person
       end
 
       def staff_index
@@ -93,12 +94,27 @@ module BenefitSponsors
       end
 
       def messages
+        @sent_box = true
+        @provider = current_user.person
+        respond_to do |format|
+          format.js {}
+        end
       end
+
 
       def agency_messages
       end
 
       def inbox
+        @sent_box = true
+        id = params["id"]||params['profile_id']
+        @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(id))
+        @folder = (params[:folder] || 'Inbox').capitalize
+        if current_user.person._id.to_s == id
+          @provider = current_user.person
+        else
+          @provider = @broker_agency_provider
+        end
       end
 
       # def redirect_to_show(broker_agency_profile_id)
@@ -109,13 +125,14 @@ module BenefitSponsors
 
       def find_broker_agency_profile(broker_agency_profile_id = nil)
         id = broker_agency_profile_id || BSON::ObjectId(params[:id])
-        @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id).first.broker_agency_profile
+        organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
+        @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
         authorize @broker_agency_profile, :access_to_broker_agency_profile?
       end
 
       def user_not_authorized(exception)
         if current_user.has_broker_agency_staff_role?
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
+          redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
         else
           redirect_to benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency)
         end
