@@ -9,7 +9,7 @@ class RemoveInvalidCoverageHouseholdMember < MongoidMigrationTask
       ch = person.first.primary_family.active_household.coverage_households.where(:is_immediate_family => true).first
       coverage_household_member = ch.coverage_household_members.where(family_member_id: family_member_id).first
       if !coverage_household_member_id.nil? && coverage_household_member.present?
-        chm = ch.remove_coverage_household_member(coverage_household_member.id, family_member_id)
+        chm = ch.remove_coverage_household_member(coverage_household_member_id, family_member_id)
         puts "removed invalid coverage household member: #{coverage_household_member_id}" unless Rails.env.test?
       end
     rescue Exception => e
