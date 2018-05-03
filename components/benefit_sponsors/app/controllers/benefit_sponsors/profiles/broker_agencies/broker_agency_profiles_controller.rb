@@ -2,7 +2,7 @@ module BenefitSponsors
   module Profiles
     class BrokerAgencies::BrokerAgencyProfilesController < ApplicationController
       # include Acapi::Notifiers
-      # include DataTablesAdapter
+      include DataTablesAdapter
       include Concerns::ProfileRegistration
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
