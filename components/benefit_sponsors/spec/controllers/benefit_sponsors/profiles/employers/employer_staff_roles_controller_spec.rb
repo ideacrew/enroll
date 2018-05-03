@@ -149,8 +149,7 @@ module BenefitSponsors
           }
 
           before :each do
-            applicant_employer_staff_role.benefit_sponsor_employer_profile_id= nil
-            applicant_employer_staff_role.save(validate:false)
+            allow_any_instance_of(EmployerStaffRole).to receive(:save!).and_return(false)
             sign_in user
             get  :approve, staff_params
           end
