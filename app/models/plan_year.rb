@@ -946,7 +946,7 @@ class PlanYear
       transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
       transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
       transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => :record_sic_and_rating_area
-      transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
+      transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
@@ -1287,13 +1287,6 @@ class PlanYear
   def initial_employer_open_enrollment_begins
     return true if (benefit_groups.any?{|bg| bg.is_congress?})
     self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-  end
-
-  def initial_employer_denial_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-      self.employer_profile.trigger_notices("initial_employer_denial")
-    end
   end
 
   def finalize_composite_rates
