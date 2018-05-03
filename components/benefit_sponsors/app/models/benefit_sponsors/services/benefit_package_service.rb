@@ -14,7 +14,8 @@ module BenefitSponsors
       end
 
       def load_form_metadata(form)
-        form.catalog = BenefitSponsorCatalogDecorator.new(self.benefit_sponsor_catalog)
+        application  = find_benefit_application(form)
+        form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
       end
 
       def load_form_params_from_resource(form)
@@ -50,8 +51,8 @@ module BenefitSponsors
 
       def attributes_to_form_params(benefit_package, form)
         form.attributes = {
-          title: benefit_package.title
-          description: benefit_package.description
+          title: benefit_package.title,
+          description: benefit_package.description,
           probation_period_kind: benefit_package.probation_period_kind
         }
       end
