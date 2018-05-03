@@ -8,7 +8,7 @@ module BenefitSponsors
         end
 
         def family_datatable?
-          return user.has_hbx_staff_role? || user.has_broker_role?
+          family_index?
         end
 
         def index?

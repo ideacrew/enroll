@@ -88,7 +88,7 @@ module BenefitSponsors
 
     let(:sponsor_contribution) do
       instance_double(
-        "::BenefitSponsors::SponsoredBenefits::SponsorContribution",
+        ::BenefitSponsors::SponsoredBenefits::SponsorContribution,
         sic_code: "a sic code"
       )
     end
