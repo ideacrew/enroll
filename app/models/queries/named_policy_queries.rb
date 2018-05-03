@@ -14,7 +14,13 @@ module Queries
     def quiet_period_enrollment(hbx_id)   
       enrollment = HbxEnrollment.by_hbx_id(hbx_id)[0]
       plan_year = enrollment.benefit_group.plan_year
-      plan_year.enrollment_quiet_period.cover?(enrollment.submitted_at)
+
+      # Skip renewal enrollments that're purchased later than quiet period end date from shop monthly query.
+      if plan_year.has_renewal_history?
+        enrollment.submitted_at > plan_year.enrollment_quiet_period.end
+      else
+        plan_year.enrollment_quiet_period.cover?(enrollment.submitted_at)
+      end
     end
 
     def self.shop_quiet_period_enrollments(effective_on, enrollment_statuses)
@@ -36,6 +42,7 @@ module Queries
     
     def self.shop_monthly_enrollments(feins, effective_on)
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
+
       qs.query_families_with_active_enrollments
         .unwind_enrollments
         .query_active_enrollments
