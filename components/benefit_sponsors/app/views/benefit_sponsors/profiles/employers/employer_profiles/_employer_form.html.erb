@@ -66,13 +66,13 @@
               <%# TODO - see Main App %>
               <%= staff.status %>
               <% if staff.status == "is_applicant" %>
-                  <%=  link_to(approve_profiles_employers_employer_staff_role_path(profile_id: @agency.profile_id, person_id: staff.person_id), id: 'approve_' + staff.person_id.to_s) do %>
+                  <%=  link_to(approve_profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id)) do %>
                       approve
                   <% end %>
               <% end %>
             </td>
             <td>
-              <%= link_to(profiles_employers_employer_staff_role_path(profile_id: @agency.profile_id, person_id: staff.person_id), method: 'delete', id: 'delete_' + staff.person_id.to_s, data: {confirm: 'Delete this role?'}) do %>
+              <%= link_to(profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
                   <i class="fa fa-trash-o fa-2x role-trashcan"></i>
               <%end%>
             </td>
