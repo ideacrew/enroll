@@ -4,7 +4,7 @@ module BenefitSponsors
       extend  ActiveModel::Naming
       include ActiveModel::Conversion
       include ActiveModel::Validations
-      include Virtus
+      include Virtus.model
 
       # EmployerProfile
       # BrokerAgencyProfile
