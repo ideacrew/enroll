@@ -5,46 +5,53 @@
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
 module BenefitMarkets
-  module Products
-      class ProductPackage
+  module Products::ProductPackage
         include Mongoid::Document
         include Mongoid::Timestamps
 
+        embedded_in :benefit_market_catalog,
+                    class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
-        BENEFIT_PACKAGE_MAPPINGS = {
-          :any_dental             => [:dental, :any],
-          :single_product_health  => [:health, :single_product],
-          :single_product_dental  => [:dental, :single_product],
-          :issuer_health          => [:health, :issuer],
-          :metal_level_health     => [:health, :metal_level],
-          :composite_health       => [:health, :composite]
-        }
 
-        BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
-
-        field :reference, type: Symbol
-
+        field :key,                     type: Symbol
         field :hbx_id,                  type: String
         field :title,                   type: String
-        field :contribution_model_id,   type: BSON::ObjectId
-        field :pricing_model_id,        type: BSON::ObjectId
+        field :description,             type: String
+
         field :product_multiplicity,    type: Symbol, default: ->() { default_product_multiplicity }
 
-        belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
-        belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
+        embeds_many :products,
+                    class_name: "BenefitMarkets::Products::Product"
 
-        embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
+        embeds_one  :contribution_model, 
+                    class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
+
+        embeds_one  :pricing_model, 
+                    class_name: "::BenefitMarkets::PricingModels::PricingModel"
+
 
         validates_presence_of :title, :allow_blank => false
         # validates_presence_of :benefit_catalog_id, :allow_blank => false
         validate :has_products
 
+        # Intersection of product that match service area and effective dates
+        def products_available_for?(service_area, effective_date)
+          products_available_on(effective_date) & products_available_where(service_area)
+        end
+
+        def products_available_on(effective_date)
+          products.collect { |product| product.premium_table_effective_on(effective_date).present? }
+        end
+
+        def products_available_where(service_area)
+          products.collect { |product| product.service_area == service_area }
+        end
 
         def is_available_for?(service_area, effective_date)
+          # check the 
           #implement by subclasses
           true
         end
-
 
         def default_product_multiplicity 
           :multiple
@@ -71,7 +78,7 @@ module BenefitMarkets
         end
 
         def benefit_package_kind
-          raise NotImplementedError.new("subclass responsibility")
+          # Implement in subclass
         end
 
         def policy_class
@@ -79,4 +86,17 @@ module BenefitMarkets
         end
       end
     end
+
+        BENEFIT_PACKAGE_MAPPINGS = {
+          :any_dental             => [:dental, :any],
+          :single_product_health  => [:health, :single_product],
+          :single_product_dental  => [:dental, :single_product],
+          :issuer_health          => [:health, :issuer],
+          :metal_level_health     => [:health, :metal_level],
+          :composite_health       => [:health, :composite]
+        }
+
+        BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
+
+
 end
