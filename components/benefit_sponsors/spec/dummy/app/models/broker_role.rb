@@ -24,6 +24,7 @@ class BrokerRole
 
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
   field :reason, type: String
 
@@ -46,10 +47,10 @@ class BrokerRole
 
   def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.nil?
-      self.broker_agency_profile_id = nil
+      self.benefit_sponsors_broker_agency_profile_id = nil
     else
       raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
-      self.broker_agency_profile_id = new_broker_agency._id
+      self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
       @broker_agency_profile = new_broker_agency
     end
   end

@@ -1,19 +1,20 @@
 module BenefitSponsors
   module Profiles
     class Employers::EmployerProfilesController < ApplicationController
-      include BenefitSponsors::Employers::EmployerHelper
 
       before_action :find_employer, only: [:show]
 
       #New person registered with existing organization and approval request submitted to employer
       def show_pending
+        authorize [:benefit_sponsors, :employer_profile]
         respond_to do |format|
-          format.html {render "benefit_sponsors/profiles/employers/employer_profiles/show_pending.html.erb"}
+          format.html
           format.js
         end
       end
 
       def show
+        authorize @employer_profile
         @tab = params['tab']
         if params[:q] || params[:page] || params[:commit] || params[:status]
           # paginate_employees
@@ -38,11 +39,16 @@ module BenefitSponsors
 
               # set_flash_by_announcement if @tab == 'home'
               respond_to do |format|
-                format.html {render "benefit_sponsors/profiles/employers/employer_profiles/show.html.erb"}
+                format.html
                 format.js
               end
           end
         end
+      end
+
+      def inbox
+        @folder = params[:folder] || 'Inbox'
+        @sent_box = false
       end
 
       private
@@ -50,7 +56,7 @@ module BenefitSponsors
       def find_employer
         id_params = params.permit(:id, :employer_profile_id)
         id = id_params[:id] || id_params[:employer_profile_id]
-        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(params[:id])).first
+        @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
         @employer_profile = @organization.employer_profile
         render file: 'public/404.html', status: 404 if @employer_profile.blank?
       end

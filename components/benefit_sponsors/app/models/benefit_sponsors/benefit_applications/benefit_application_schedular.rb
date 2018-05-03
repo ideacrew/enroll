@@ -85,7 +85,12 @@ module BenefitSponsors
         end
 
         open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
-        open_enrollment_end_on_day - minimum_length
+        minimum_day = open_enrollment_end_on_day - minimum_length
+        if minimum_day > 0
+          minimum_day
+        else
+          1
+        end
       end
 
       def calculate_open_enrollment_date(start_on)

@@ -2,43 +2,73 @@
 module BenefitSponsors
   class Members::MemberGroup
     include Enumerable
-    include ActiveModel::Model
 
-    attr_accessor :members, :group_id, :group_enrollment
+    attr_accessor :group_id, :group_enrollment
+    attr_reader :members, :primary_member
 
-    def initialize(opts = {})
-      @members          = []
-      @group_id         = nil
-      @group_enrollment = nil
-      super(opts)
+    def initialize(collection = [], group_id: nil, group_enrollment: nil)
+      self.members = collection
+      @group_id         = group_id
+      @group_enrollment = group_enrollment
     end
 
-    def primary_member
-      @members.detect { |member| member.is_primary_member? }
-    end
-
-    def add_member(new_member)
-      @members << new_member unless is_duplicate_role?(new_member)
-    end
-
-    def drop_member(member)
-      @members.delete(member)
+    def members=(member_list)
+      @members = member_list
+      @primary_member = @members.detect { |member| member.is_primary_member? }
     end
 
     def <<(new_member)
-      add_member(new_member)
+      is_duplicate_role?(new_member)
+      new_members = members + [new_member]
+      self.members = new_members
+      self
     end
 
-    def [](index)
-      @members = index.each { |new_member| add_member(new_member) unless is_duplicate_role?(new_member) }
+    def add_member(new_member)
+      self << new_member
     end
 
-    def []=(index, new_member)
-      @members[index] = new_member unless is_duplicate_role?(new_member)
+    def [](member_id)
+      @indexed_members[member_id]
     end
 
+    def []=(index, member)
+      is_duplicate_role?(new_member)
+      @members[index] = member
+      self.members = @members
+    end
+
+    def drop_member(member, &blk)
+      members.delete(member)
+    end
+
+    def select!
+      keep, discard = @members.partition { |m| yield m }
+      self.members = keep
+      discard_member_enrollments(discard)
+    end
+
+    def reject!
+      discard, keep = @members.partition { |m| yield m }
+      self.members = keep
+      discard_member_enrollments(discard)
+    end
+
+    def each
+      @members.each do |m|
+        yield m
+      end
+    end
 
     private
+
+    def discard_member_enrollments(removed_members)
+      unless group_enrollment.nil?
+        if removed_members.any?
+          group_enrollment.remove_members_by_id!(removed_members.map(&:member_id))
+        end
+      end
+    end
 
     def has_primary_member?
       @members.detect { |member| member.is_primary_member? }

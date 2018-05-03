@@ -3,6 +3,8 @@ module BenefitSponsors
     protect_from_forgery with: :exception
     include Pundit
 
+    helper BenefitSponsors::Engine.helpers
+
     before_filter :require_login, unless: :authentication_not_required?
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
