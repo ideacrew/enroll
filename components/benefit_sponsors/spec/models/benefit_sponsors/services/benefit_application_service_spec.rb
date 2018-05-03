@@ -1,4 +1,7 @@
 require 'rails_helper'
+Dir[Rails.root.join("components/benefit_sponsors/spec/factories/benefit_sponsors_*.rb")].each do |f|
+  require f
+end
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::BenefitApplicationService, type: :model, :dbclean => :after_each do
@@ -65,13 +68,47 @@ module BenefitSponsors
     end
 
 
-    describe ".load_form_params_from_resource" do
-      # use factory for benefit application
-      it"should assign attributes to benefit application" do
-
-
+    describe ".load_form_metadata" do
+      let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new }
+      let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
+      it "should assign attributes of benefit application to form" do
+        subject.load_form_metadata(benefit_application_form)
+        expect(benefit_application_form.start_on_options).not_to be nil
       end
     end
+
+    describe ".load_form_params_from_resource" do
+      let(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
+      let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
+
+      it "should assign the form attributes from benefit application" do
+         form = subject.load_form_params_from_resource(benefit_application_form)
+         expect(form[:start_on]).to eq benefit_application.start_on.to_date.to_s
+         expect(form[:end_on]).to eq benefit_application.end_on.to_date.to_s
+         expect(form[:open_enrollment_start_on]).to eq benefit_application.open_enrollment_start_on.to_date.to_s
+         expect(form[:open_enrollment_end_on]).to eq benefit_application.open_enrollment_end_on.to_date.to_s
+         expect(form[:pte_count]).to eq benefit_application.pte_count
+         expect(form[:msp_count]).to eq benefit_application.msp_count
+      end
+    end
+
+    # describe ".publish" do
+    #   let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
+    #   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship: benefit_sponsorship) }
+    #   let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
+    #   let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
+    #
+    #   context "has to publish and " do
+    #     it "Should validate " do
+    #       allow(benefit_sponsorship.profile).to receive(:is_primary_office_local?).and_return true
+    #       subject.publish(benefit_application_form)
+    #
+    #
+    #     end
+    #   end
+    # end
 
   end
 end
