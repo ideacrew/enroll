@@ -10,7 +10,10 @@ module BenefitSponsors
       attribute :title, String
       attribute :description, String
       attribute :probation_period_kind, String
+      attribute :benefit_application_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
+      
+      attr_accessor :catalog
 
       # attr_accessor :benefit_application, :product_packages
       # validates :title, presence: true
@@ -24,28 +27,28 @@ module BenefitSponsors
 
       def self.for_new(benefit_application_id)
         form = self.new(:benefit_application_id => benefit_application_id)
-        service.load_default_form_params(form)
-        service.load_form_metadata(form)
+        form.service.load_default_form_params(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_create(params)
         form = self.new(params)
-        service.load_form_metadata(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_edit(id)
         form = self.new(id: id)
-        service.load_form_params_from_resource(form)
-        service.load_form_metadata(form)
+        form.service.load_form_params_from_resource(form)
+        form.service.load_form_metadata(form)
         form
       end
 
       def self.for_update(id)
         form = self.new(id: id)
-        service.load_form_params_from_resource(form)
-        service.load_form_metadata(form)
+        form.service.load_form_params_from_resource(form)
+        form.service.load_form_metadata(form)
         form
       end
 
@@ -54,6 +57,10 @@ module BenefitSponsors
         save_result, persisted_object = (update ? service.update(self) : service.save(self))
         return false unless save_result
         @show_page_model = persisted_object
+        true
+      end
+
+      def new_record?
         true
       end
 
