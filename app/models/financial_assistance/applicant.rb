@@ -64,7 +64,7 @@ class FinancialAssistance::Applicant
   field :is_active, type: Boolean, default: true
 
   field :has_fixed_address, type: Boolean, default: true
-  field :is_living_in_state, type: Boolean, default: true
+  field :is_living_in_state, type: Boolean, default: false
   field :is_temp_out_of_state, type: Boolean, default: false
 
   field :is_required_to_file_taxes, type: Boolean
