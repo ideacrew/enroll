@@ -6,8 +6,8 @@ module BenefitSponsors
 
       attribute :id, String
       attribute :is_primary, Boolean
-      attribute :address, Forms::AddressForm
-      attribute :phone, Forms::PhoneForm
+      attribute :address, AddressForm
+      attribute :phone, PhoneForm
 
       def persisted?
         false
