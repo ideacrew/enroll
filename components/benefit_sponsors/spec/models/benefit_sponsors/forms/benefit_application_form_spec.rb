@@ -50,17 +50,95 @@ module BenefitSponsors
       end
     end
 
-    # describe ".publish" do
-    #   let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-    #   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
-    #   let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
-    #   context "has to publish and" do
-    #     it "should check service application warnings if any" do
-    #
-    #     end
-    #   end
-    # end
+    describe ".publish" do
+      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
+      let!(:service_object) { double("BenefitApplicationService")}
+      context "has to publish and" do
+        it "should return true if service has no application errors" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:publish).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.publish).to be_truthy
+        end
 
+        it "should return false if service has application errors" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:publish).with(benefit_application_form).and_return([false, benefit_application])
+          expect(benefit_application_form.publish).to be_falsy
+        end
+      end
+    end
+
+    describe ".force_publish" do
+      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
+      let!(:service_object) { double("BenefitApplicationService")}
+      context "has to force publish and" do
+        it "should return true" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:force_publish).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.force_publish).to be_truthy
+        end
+      end
+    end
+
+    describe ".revert" do
+      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
+      let!(:service_object) { double("BenefitApplicationService")}
+      context "has to revert back and" do
+        it "should return true if benefit application has no errors" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:revert).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.revert).to be_truthy
+        end
+
+        it "should return false if benefit application has errors" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:revert).with(benefit_application_form).and_return([false, benefit_application])
+          expect(benefit_application_form.revert).to be_falsy
+        end
+      end
+    end
+
+
+    describe ".persist" do
+      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
+      let!(:service_object) { double("BenefitApplicationService")}
+      context "save request received" do
+        it "should save successfully if update request received false" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:save).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.persist(update: false)).to be_truthy
+        end
+
+        it "should return false if application has errors" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:save).with(benefit_application_form).and_return([false, benefit_application])
+          expect(benefit_application_form.persist(update: false)).to be_falsy
+        end
+      end
+
+      context "update request received" do
+        it "should update successfully if update request received true" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:update).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.persist(update: true)).to be_truthy
+        end
+
+        it "should return false if update request for application has errors" do
+          allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
+          allow(service_object).to receive(:update).with(benefit_application_form).and_return([false, benefit_application])
+          expect(benefit_application_form.persist(update: true)).to be_falsy
+        end
+      end
+
+    end
 
 
   end
