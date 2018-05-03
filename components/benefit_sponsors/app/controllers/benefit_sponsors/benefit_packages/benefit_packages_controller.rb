@@ -2,12 +2,8 @@ module BenefitSponsors
   module BenefitPackages
     class BenefitPackagesController < ApplicationController
 
-      # List all the benefit packages under benefit application
-      # def index
-      # end
-
       def new
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_sponsorship_id))
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
       end
 
       def create

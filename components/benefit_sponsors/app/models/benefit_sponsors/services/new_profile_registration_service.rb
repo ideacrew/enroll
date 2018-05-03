@@ -7,9 +7,9 @@ module BenefitSponsors
 
       def self.for_broker_agency_portal(user)
         if user.has_broker_agency_staff_role?
-          @id = user.person.broker_agency_staff_roles.first.broker_agency_profile_id
+          @id = user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id
         elsif user.has_broker_role?
-          @id = user.person.broker_role.broker_agency_profile_id.to_s
+          @id = user.person.broker_role.benefit_sponsors_broker_agency_profile_id.to_s
         end
 
         return @id
@@ -175,7 +175,7 @@ module BenefitSponsors
       def is_broker_agency_registered?(user, form)
         if user.present? && (user.has_broker_agency_staff_role? || user.has_broker_role?)
           # this is should be new broker profile id
-          form.profile_id = (user.person.broker_agency_staff_roles.first.broker_agency_profile_id || user.person.broker_role.broker_agency_profile_id.to_s)
+          form.profile_id = (user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id || user.person.broker_role.benefit_sponsors_broker_agency_profile_id.to_s)
           return false
         end
         true

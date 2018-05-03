@@ -1,131 +1,144 @@
-# require 'rails_helper'
+require 'rails_helper'
 
-# module BenefitSponsors
-#   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesController, type: :controller, dbclean: :after_each do
+module BenefitSponsors
+  RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesController, type: :controller, dbclean: :after_each do
 
-#     routes { BenefitSponsors::Engine.routes }
+    routes { BenefitSponsors::Engine.routes }
 
-#     let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
-#     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
-#     let!(:person01) { FactoryGirl.create(:person) }
-#     let!(:user_with_broker_role) { FactoryGirl.create(:user, :broker_with_person, person: person01 ) }
-#     let(:bap_id) { user_with_broker_role.person.broker_agency_staff_roles.first.broker_agency_profile_id }
+    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
+    let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person01) { FactoryGirl.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person01 ) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile) }
+    let!(:organization_with_hbx_profile) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_hbx_profile) }
+    let(:bap_id) { organization.broker_agency_profile.id }
 
-#     describe "for broker_agency_profile's index" do
-#       context "index for user with admin_role(on successful pundit)" do
-#         before :each do
-#           sign_in(user_with_hbx_staff_role)
-#           get :index
-#         end
+    before :each do
+      person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id)
+      allow(organization.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
+      user_with_hbx_staff_role.person.hbx_staff_role.save!
+    end
 
-#         it "should return http success" do
-#           expect(response).to have_http_status(:success)
-#         end
+    describe "for broker_agency_profile's index" do
+      context "index for user with admin_role(on successful pundit)" do
+        before :each do
+          sign_in(user_with_hbx_staff_role)
+          get :index
+        end
 
-#         it "should render the index template" do
-#           expect(response).to render_template("index")
-#         end
-#       end
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
 
-#       context "index for user with broker_role(on failed pundit)" do
-#         before :each do
-#           sign_in(user_with_broker_role)
-#           get :index
-#         end
+        it "should render the index template" do
+          expect(response).to render_template("index")
+        end
+      end
 
-#         it "should not return success http status" do
-#           expect(response).not_to have_http_status(:success)
-#         end
+      context "index for user with broker_role(on failed pundit)" do
+        before :each do
+          sign_in(user_with_broker_role)
+          get :index
+        end
 
-#         it "should rendirect to registration's new with broker_agency in params" do
-#           expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
-#         end
-#       end
+        it "should not return success http status" do
+          expect(response).not_to have_http_status(:success)
+        end
 
-#       context "index for user with broker_agency_staff_role(on failed pundit)" do
-#         before :each do
-#           user_with_broker_role.roles << "broker_agency_staff"
-#           user_with_broker_role.save!
-#           sign_in(user_with_broker_role)
-#           get :index
-#         end
+        it "should rendirect to registration's new with broker_agency in params" do
+          expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+        end
+      end
 
-#         it "should not return success http status" do
-#           expect(response).not_to have_http_status(:success)
-#         end
+      context "index for user with broker_agency_staff_role(on failed pundit)" do
+        let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
 
-#         it "should redirect to controller's show with broker_agency_profile's id" do
-#           expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id))
-#         end
-#       end
-#     end
+        before :each do
+          user_with_broker_role.roles << "broker_agency_staff"
+          user_with_broker_role.save!
+          sign_in(user_with_broker_role)
+          get :index
+        end
 
-#     describe "for broker_agency_profile's show" do
-#       context "for show with a broker_agency_profile_id and with a valid user" do
-#         before :each do
-#           sign_in(user_with_hbx_staff_role)
-#           allow(controller).to receive(:set_flash_by_announcement).and_return(true)
-#           get :show, id: bap_id
-#         end
+        it "should not return success http status" do
+          expect(response).not_to have_http_status(:success)
+        end
 
-#         it "should return http success" do
-#           expect(response).to have_http_status(:success)
-#         end
+        it "should redirect to controller's show with broker_agency_profile's id" do
+          expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id))
+        end
+      end
+    end
 
-#         it "should render the index template" do
-#           expect(response).to render_template("show")
-#         end
-#       end
+    describe "for broker_agency_profile's show" do
+      context "for show with a broker_agency_profile_id and with a valid user" do
+        before :each do
+          sign_in(user_with_hbx_staff_role)
+          allow(controller).to receive(:set_flash_by_announcement).and_return(true)
+          get :show, id: bap_id
+        end
 
-#       context "for show with a broker_agency_profile_id and without a user" do
-#         before :each do
-#           get :show, id: bap_id
-#         end
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
 
-#         it "should not return success http status" do
-#           expect(response).not_to have_http_status(:success)
-#         end
+        it "should render the index template" do
+          expect(response).to render_template("show")
+        end
+      end
 
-#         it "should redirect to the user's signup" do
-#           expect(response.location.include?('users/sign_up')).to be_truthy
-#         end
-#       end
-#     end
+      context "for show with a broker_agency_profile_id and without a user" do
+        before :each do
+          get :show, id: bap_id
+        end
 
-#     describe "for broker_agency_profile's family_index" do
-#       context "with a valid user and with broker_agency_profile_id(on successful pundit)" do
-#         before :each do
-#           user_with_hbx_staff_role.person.build_hbx_staff_role
-#           user_with_hbx_staff_role.person.hbx_staff_role.save!
-#           sign_in(user_with_hbx_staff_role)
-#           xhr :get, :family_index, id: bap_id
-#         end
+        it "should not return success http status" do
+          expect(response).not_to have_http_status(:success)
+        end
 
-#         it "should render family_index template" do
-#           expect(response).to render_template("benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_index")
-#         end
+        it "should redirect to the user's signup" do
+          expect(response.location.include?('users/sign_up')).to be_truthy
+        end
+      end
+    end
 
-#         it "should return http success" do
-#           expect(response).to have_http_status(:success)
-#         end
-#       end
+    describe "for broker_agency_profile's family_index" do
+      context "with a valid user and with broker_agency_profile_id(on successful pundit)" do
+        before :each do
+          sign_in(user_with_hbx_staff_role)
+          xhr :get, :family_index, id: bap_id
+        end
 
-#       context "with an invalid user and with broker_agency_profile_id(on falied pundit)" do
-#         let!(:user_without_person) { FactoryGirl.create(:user, :with_hbx_staff_role) }
+        it "should render family_index template" do
+          expect(response).to render_template("benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_index")
+        end
 
-#         before :each do
-#           sign_in(user_without_person)
-#           xhr :get, :family_index, id: bap_id
-#         end
+        it "should return http success" do
+          expect(response).to have_http_status(:success)
+        end
+      end
 
-#         it "should redirect to new of registration's controller for broker_agency" do
-#           expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
-#         end
+      context "with an invalid user and with broker_agency_profile_id(on falied pundit)" do
+        let!(:user_without_person) { FactoryGirl.create(:user, :with_hbx_staff_role) }
 
-#         it "should not return success http status" do
-#           expect(response).not_to have_http_status(:success)
-#         end
-#       end
-#     end
-#   end
-# end
+        before :each do
+          sign_in(user_without_person)
+          xhr :get, :family_index, id: bap_id
+        end
+
+        it "should redirect to new of registration's controller for broker_agency" do
+          expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+        end
+
+        it "should not return success http status" do
+          expect(response).not_to have_http_status(:success)
+        end
+      end
+    end
+
+    describe "for broker_agency_profile's family_datatable" do
+      # TODO, once the controller's action is fully complete
+    end
+  end
+end

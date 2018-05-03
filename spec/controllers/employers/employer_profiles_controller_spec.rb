@@ -259,6 +259,68 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
+  describe "GET show_profile" do
+    let(:user) do
+      double("user",
+             :person => person,
+             :last_portal_visited => "true",
+             :save => true,
+             :has_hbx_staff_role? => false,
+             :has_broker_role? => false,
+             :has_broker_agency_staff_role? => false,
+             :has_employer_staff_role? => true
+      )
+    end
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:employee_role) { person.employee_roles.first }
+    let(:benefit_group) { FactoryGirl.build(:benefit_group)}
+    let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
+    let(:employer_profile) { employee_role.employer_profile }
+    let(:policy) { double("policy") }
+
+    context 'When employee_roles not in EMPLOYMENT_ACTIVE_STATES then' do
+      before do
+        allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
+        allow(policy).to receive(:is_broker_for_employer?).and_return(false)
+        allow(policy).to receive(:authorize_show).and_return(true)
+        allow(user).to receive(:last_portal_visited=).and_return("true")
+        census_employee.update(aasm_state: 'employment_terminated')
+        employee_role.census_employee_id = census_employee.id
+        employee_role.save
+        employer_profile.plan_years = [plan_year]
+        sign_in(user)
+      end
+
+      it "should get empty list of active employee" do
+        xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show_profile")
+        expect(assigns(:employees)).to be_empty
+      end
+    end
+
+    context 'When employee_roles in EMPLOYMENT_ACTIVE_STATES then' do
+      before do
+        allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
+        allow(policy).to receive(:is_broker_for_employer?).and_return(false)
+        allow(policy).to receive(:authorize_show).and_return(true)
+        allow(user).to receive(:last_portal_visited=).and_return("true")
+        employee_role.census_employee_id = census_employee.id
+        employee_role.save
+        employer_profile.plan_years = [plan_year]
+        sign_in(user)
+      end
+
+      it "should get list of active employee" do
+        xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show_profile")
+        expect(assigns(:employees)).to eq([employee_role])
+      end
+    end
+  end
+
   describe "GET welcome" do
     let(:user) { double("user")}
     let(:person) { double("Person")}

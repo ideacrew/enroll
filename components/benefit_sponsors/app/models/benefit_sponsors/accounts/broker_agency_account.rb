@@ -16,13 +16,13 @@ module BenefitSponsors
       field :updated_by, type: String
 
       # Broker agency representing ER
-      field :broker_agency_profile_id, type: BSON::ObjectId
+      field :benefit_sponsors_broker_agency_profile_id, type: BSON::ObjectId
 
       # Broker writing_agent credited for enrollment and transmitted on 834
       field :writing_agent_id, type: BSON::ObjectId
       field :is_active, type: Boolean, default: true
 
-      validates_presence_of :start_on, :broker_agency_profile_id, :is_active
+      validates_presence_of :start_on, :benefit_sponsors_broker_agency_profile_id, :is_active
 
       default_scope -> {where(:is_active => true)}
 
@@ -30,17 +30,17 @@ module BenefitSponsors
       # belongs_to broker_agency_profile
       def broker_agency_profile=(new_broker_agency_profile)
         raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
-        self.broker_agency_profile_id = new_broker_agency_profile._id
+        self.benefit_sponsors_broker_agency_profile_id = new_broker_agency_profile._id
         @broker_agency_profile = new_broker_agency_profile
       end
 
       def broker_agency_profile
         return @broker_agency_profile if defined? @broker_agency_profile
-        @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(self.broker_agency_profile_id) unless self.broker_agency_profile_id.blank?
+        @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(self.benefit_sponsors_broker_agency_profile_id) unless self.benefit_sponsors_broker_agency_profile_id.blank?
       end
 
       def ba_name
-        Rails.cache.fetch("broker-agency-name-#{self.broker_agency_profile_id}", expires_in: 12.hour) do
+        Rails.cache.fetch("broker-agency-name-#{self.benefit_sponsors_broker_agency_profile_id}", expires_in: 12.hour) do
           legal_name
         end
       end

@@ -20,12 +20,26 @@ module BenefitSponsors
       # include Concerns::Observable
       include AASM
 
-      SOURCE_KINDS  = %w(self_serve conversion)
+      # Origination of this BenefitSponsorship instance in association
+      # with BenefitMarkets::APPLICATION_INTERVAL_KINDS
+      #   :self_serve               =>  sponsor independently joined HBX with initial effective date 
+      #                                 coinciding with standard benefit application interval
+      #   :conversion               =>  sponsor transferred to HBX with initial effective date 
+      #                                 immediately following benefit expiration in prior system
+      #   :mid_plan_year_conversion =>  sponsor transferred to HBX with effective date during active plan
+      #                                 year, before benefit expiration in prior system, and benefits are 
+      #                                 carried over to HBX
+      #   :reapplied                =>  sponsor, previously active on HBX, voluntarily terminated early
+      #                                 and sponsorship continued without interuption, or sponsor returned 
+      #                                 following time period gap in benefit coverage
+      #   :restored                 =>  sponsor, previously active on HBX, was involuntarily terminated
+      #                                 and sponsorship resumed according to HBX policy
+      ORIGIN_KINDS = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
 
 
-      field :hbx_id,            type: String
-      field :profile_id,        type: BSON::ObjectId
-      field :contact_method,    type: Symbol, default: :paper_and_electronic
+      field :hbx_id,              type: String
+      field :profile_id,          type: BSON::ObjectId
+      field :contact_method,      type: Symbol, default: :paper_and_electronic
 
       # Effective begin/end are the date period during which this benefit sponsorship is active.  
       # effective_begin_on is date with initial application coverage effectuates
@@ -33,8 +47,9 @@ module BenefitSponsors
       field :effective_begin_on,  type: Date
       field :effective_end_on,    type: Date
 
-      field :source_kind,   type: String, default: :self_serve
-      field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+      # Immutable value indicating origination of this BenefitSponsorship
+      field :origin_kind,         type: Symbol, default: :self_serve
+      field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
       field :rating_area_id,      type: BSON::ObjectId
       field :service_area_id,     type: BSON::ObjectId
@@ -61,10 +76,10 @@ module BenefitSponsors
       has_many    :service_areas, 
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
-      embeds_many :broker_agency_accounts, 
+      embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
                   validate: true
 
-      embeds_many :general_agency_accounts, 
+      embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
                   validate: true
 
       has_many    :documents,
@@ -78,8 +93,8 @@ module BenefitSponsors
         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
         allow_blank: false
 
-      validates :source_kind,
-        inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
+      validates :origin_kind,
+        inclusion: { in: ORIGIN_KINDS, message: "%{value} is not a valid origin kind" },
         allow_blank: false
 
 

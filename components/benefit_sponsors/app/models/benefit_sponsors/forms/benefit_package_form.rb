@@ -12,7 +12,7 @@ module BenefitSponsors
       attribute :probation_period_kind, String
       attribute :benefit_application_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
-      
+
       attr_accessor :catalog
 
       # attr_accessor :benefit_application, :product_packages

@@ -46,6 +46,7 @@ module BenefitSponsors
       end
 
       def self.for_edit(id)
+        # for edit why are we creating new
         form = self.new(id: id)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
@@ -53,6 +54,7 @@ module BenefitSponsors
       end
 
       def self.for_update(id)
+        # for update why are we creating new
         form = self.new(id: id)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
@@ -60,6 +62,7 @@ module BenefitSponsors
       end
 
       def self.fetch(id)
+        #why are we creating new insted of fetching
         form = self.new(id: id)
         form
       end

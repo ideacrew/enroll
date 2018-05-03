@@ -58,11 +58,53 @@ module BenefitMarkets
       scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
 
+      def premium_table_effective_on(effective_date)
+        premium_tables.detect { |premium_table| premium_table.effective_period.cover?(effective_date) }
+      end
+
+      # Add premium table, covering extended time period, to existing product.  Used for products that
+      # have periodic rate changes, such as ACA SHOP products that are updated quarterly.  
+      def add_premium_table(new_premium_table)
+        raise InvalidEffectivePeriodError unless is_valid_premium_table_effective_period?(new_premium_table)
+
+        if premium_table_effective_on(new_premium_table.effective_period.min).present? || 
+            premium_table_effective_on(new_premium_table.effective_period.max).present?
+          raise DuplicatePremiumTableError, "effective_period may not overlap existing premium_table"
+        else
+          premium_tables << new_premium_table
+        end
+        self
+      end
+
+      def update_premium_table(updated_premium_table)
+        raise InvalidEffectivePeriodError unless is_valid_premium_table_effective_period?(updated_premium_table)
+
+        drop_premium_table(premium_table_effective_on(updated_premium_table.effective_period.min))
+        add_premium_table(updated_premium_table)
+      end
+
+      def drop_premium_table(premium_table)
+        premium_tables.delete(premium_table) unless premium_table.blank?
+      end
+
+      def is_valid_premium_table_effective_period?(compare_premium_table)
+        return false unless application_period.present? && compare_premium_table.effective_period.present?
+
+        if application_period.cover?(compare_premium_table.effective_period.min) && 
+            application_period.cover?(compare_premium_table.effective_period.max)
+          true
+        else
+          false
+        end
+      end
+
+
       # TODO: Change this to API call
       def issuer_profile
         # return unless issuer_profile_urn.present?
         IssuerStub.new
       end
+
     end
 
     class IssuerStub
@@ -79,7 +121,9 @@ module BenefitMarkets
         @product_kinds        = [:health]  # => [:health, :dental]
         @issuer_state         = "MD"
       end
-
     end
   end
+
+  class DuplicatePremiumTableError < StandardError; end
+  class InvalidEffectivePeriodError < StandardError; end
 end
