@@ -58,7 +58,7 @@ BenefitSponsors::Engine.routes.draw do
       post 'publish'
       post 'force_publish'
 
-      resources :benefit_packages do
+      resources :benefit_packages, controller: "benefit_packages/benefit_packages" do
         resources :sponsored_benefits, only: :new
       end
     end
