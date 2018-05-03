@@ -96,20 +96,6 @@ module BenefitMarkets
 
 
 
-        def valid_premiums_for(effective_date)
-        end
-
-
-        # TODO
-        # Add premium table, covering extended time period, to existing product.  Used for products that
-        # have periodic rate changes, such as ACA SHOP products that are updated quarterly.  
-        # 
-        def append_premium_table(new_premium_table)
-          raise InvalidPeriodError unless application_period.cover?(new_premium_table)
-        end
-
-        def update_premium_table(updated_premium_table)
-        end
 
       end
     end

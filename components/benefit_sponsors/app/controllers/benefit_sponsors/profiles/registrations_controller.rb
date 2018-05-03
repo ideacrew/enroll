@@ -8,6 +8,8 @@ module BenefitSponsors
 
     before_action :check_logged_in?, only: [:new]
 
+    layout 'single_column', :only => :edit
+
     def new
       @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type: profile_type)
       authorize @agency
