@@ -8,8 +8,8 @@ module BenefitSponsors
 	  let(:employee_member_id) { "some_employee_id" }
 		let(:roster_entry) do
 			::BenefitSponsors::Members::MemberGroup.new(
+        roster_members,
         group_enrollment: group_enrollment,
-        members: roster_members
 			)
 		end
 
