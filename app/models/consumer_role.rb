@@ -21,9 +21,9 @@ class ConsumerRole
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
   INELIGIBLE_CITIZEN_VERIFICATION = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us)
 
-  SSN_VALIDATION_STATES = %w(na valid outstanding pending)
-  NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
-  LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
+  SSN_VALIDATION_STATES = %w(na valid outstanding pending expired)
+  NATIVE_VALIDATION_STATES = %w(na valid outstanding pending expired)
+  LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending expired) #attested state is used for people with active enrollments before locale residency verification was turned on
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
@@ -250,11 +250,15 @@ class ConsumerRole
   end
 
   def ssn_verified?
-    ["na", "valid"].include?(self.ssn_validation)
+    ["valid"].include?(self.ssn_validation)
   end
 
   def ssn_pending?
     self.ssn_validation == "pending"
+  end
+
+  def ssn_expired?
+    self.ssn_validation == "expired"
   end
 
   def ssn_outstanding?
@@ -263,6 +267,10 @@ class ConsumerRole
 
   def lawful_presence_verified?
     self.lawful_presence_determination.verification_successful?
+  end
+
+  def lawful_presence_expired?
+    self.lawful_presence_determination.expired?
   end
 
   def is_hbx_enrollment_eligible?
@@ -734,10 +742,13 @@ class ConsumerRole
     (!is_state_resident.nil?) && (!is_state_resident)
   end
 
+  def residency_expired?
+    self.local_residency_validation == "expired"
+  end
+
   def residency_verified?
     is_state_resident? || residency_attested?
   end
-
   def residency_attested?
     local_residency_validation == "attested" || person.residency_eligible? || person.age_on(TimeKeeper.date_of_record) <= 18
   end
@@ -748,6 +759,10 @@ class ConsumerRole
 
   def native_verified?
     native_validation == "valid"
+  end
+
+  def native_expired?
+    native_validation == 'expired'
   end
 
   def native_outstanding?
