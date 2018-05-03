@@ -33,7 +33,10 @@ module BenefitMarkets
         belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
         belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
 
-        embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
+        # embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
+
+        embedded_in :packagable, polymorphic: true
+
 
         validates_presence_of :title, :allow_blank => false
         # validates_presence_of :benefit_catalog_id, :allow_blank => false
@@ -56,7 +59,7 @@ module BenefitMarkets
         end
 
         def has_products
-          return true if benefit_catalog.blank?
+          return true if packagable.blank?
           if self.all_products.empty?
             self.errors.add(:base, "the package would have no products")
             false
@@ -67,7 +70,7 @@ module BenefitMarkets
 
         # Override this once the actual product implementation is available
         def all_products
-          Plan.where(:active_year => benefit_catalog.product_active_year, :market => benefit_catalog.product_market_kind)
+          Plan.where(:active_year => packagable.product_active_year, :market => packagable.product_market_kind)
         end
 
         def benefit_package_kind

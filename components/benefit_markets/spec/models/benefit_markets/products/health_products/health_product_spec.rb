@@ -11,6 +11,7 @@ module BenefitMarkets
     let(:issuer_profile_urn)      { "urn:openhbx:terms:v1:organization:name#safeco" }
     let(:title)                   { "SafeCo Active Life $0 Deductable Premier" }
     let(:description)             { "Highest rated and highest value" }
+    let(:service_area)            { BenefitMarkets::Locations::ServiceArea.new }
 
     let(:hios_id)                 { "86052DC0400001-01" }
     let(:hios_base_id)            { "86052DC0400001" }
@@ -24,8 +25,6 @@ module BenefitMarkets
     let(:rx_formulary_url)        { "http://example.com/formularies/1" }
 
     let(:sbc_document)            { Object.new }
-    let(:service_area)            { BenefitMarkets::Locations::ServiceArea.new }
-    let(:rating_areas)            { [BenefitMarkets::Locations::RatingArea.new, Locations::RatingArea.new] }
 
     let(:rating_area)         { BenefitMarkets::Locations::RatingArea.new }
     let(:quarter_1)           { Date.new(this_year, 1, 1)..Date.new(this_year, 3, 31) }
@@ -48,6 +47,7 @@ module BenefitMarkets
         issuer_profile_urn:       issuer_profile_urn,
         title:                    title,
         description:              description,
+        service_area:             service_area,
         premium_tables:           premium_tables,
 
         hios_id:                  hios_id,
@@ -63,8 +63,6 @@ module BenefitMarkets
         # renewal_product: renewal_product,
         # catastrophic_age_off_product: catastrophic_age_off_product,
         # sbc_document: sbc_document,
-        # service_area: service_area,
-        # rating_areas: rating_areas,
       }
     end
 

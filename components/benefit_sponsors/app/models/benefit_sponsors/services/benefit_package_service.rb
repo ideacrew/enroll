@@ -1,6 +1,7 @@
 module BenefitSponsors
   module Services
-    class BenefitApplicationService
+    class BenefitPackageService
+
       attr_reader :benefit_package_factory, :benefit_application
 
       def initialize(factory_kind = BenefitSponsors::BenefitPackages::BenefitPackageFactory)
@@ -9,10 +10,11 @@ module BenefitSponsors
 
       # load defaults from models
       def load_default_form_params(form)
-        form
+
       end
 
       def load_form_metadata(form)
+        form.catalog = BenefitSponsorCatalogDecorator.new(self.benefit_sponsor_catalog)
       end
 
       def load_form_params_from_resource(form)
@@ -65,7 +67,6 @@ module BenefitSponsors
       def store(form, benefit_package)
         valid_according_to_factory = benefit_package_factory.validate(benefit_application)
         if valid_according_to_factory
-
         else
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
@@ -89,7 +90,6 @@ module BenefitSponsors
       def map_model_error_attribute(model_attribute_name)
         model_attribute_name
       end
-
     end
   end
 end

@@ -28,16 +28,19 @@ module BenefitMarkets
       field :title,               type: String
       field :description,         type: String
 
-      belongs_to  :issuer, 
-                  class_name: "::IssuerProfile"
-                  # class_name: BenefitMarkets.issuer_class.to_s
+      # belongs_to  :issuer, 
+      #             class_name: "::IssuerProfile"
+
+      belongs_to  :service_area,
+                  counter_cache: true,
+                  class_name: "BenefitMarkets::Locations::ServiceArea"
 
       embeds_many :premium_tables,
                   class_name: "BenefitMarkets::Products::PremiumTable"
 
 
       validates_presence_of :hbx_id, :benefit_market_kind, :application_period, :title,
-                            :issuer_profile_urn, :premium_tables
+                            :issuer_profile_urn, :premium_tables, :service_area
 
 
       validates :benefit_market_kind,
@@ -51,6 +54,9 @@ module BenefitMarkets
               "premium_tables.effective_period.min" => 1, 
               "premium_tables.effective_period.max" => 1 },
               {name: "premium_tables"})
+
+
+      scope :by_service_area,       ->(service_area){ where(service_area: service_area) }
 
       scope :aca_shop_market,       ->{ where(benefit_market_kind: :aca_shop) }
       scope :aca_individual_market, ->{ where(benefit_market_kind: :aca_individual) }
