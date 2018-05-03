@@ -2,7 +2,7 @@ module BenefitSponsors
   module Services
     class SiteService
       def initialize(params = {})
-        @factory_class = BenefitSponsors::SiteFactory
+        @factory_class = BenefitSponsors::Factories::Site
         @params = params
       end
 
@@ -11,7 +11,7 @@ module BenefitSponsors
       end
 
       def store!(form)
-        BenefitSponsors::SiteFactory.call(form_attributes_to_params(form))
+        BenefitSponsors::Factories::Site.call(form_attributes_to_params(form))
       end
 
       def form_params_to_attributes(form, site)
@@ -93,7 +93,7 @@ module BenefitSponsors
         profile = BenefitSponsors::Organizations::Factories::HbxProfile.call(office_locations)
         owner_organization = BenefitSponsors::Organizations::Factories::OwnerOrganization.call(legal_name: form.owner_organization.legal_name, profile: profile)
         profile.organization = owner_organization
-        site = BenefitSponsors::SiteFactory.call site_key: form.site_key,
+        site = BenefitSponsors::Factories::Site.call site_key: form.site_key,
           byline: form.byline,
           long_name: form.long_name,
           short_name: form.short_name,
@@ -102,7 +102,7 @@ module BenefitSponsors
 
         owner_organization.site = site
 
-        valid_according_to_factory = BenefitSponsors::SiteFactory.validate(site)
+        valid_according_to_factory = BenefitSponsors::Factories::Site.validate(site)
         unless valid_according_to_factory
           map_errors_for(site, onto: form)
           return [false, nil]
