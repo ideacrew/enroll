@@ -59,7 +59,7 @@ module BenefitSponsors
 
     let(:employee_pricing_unit) do
       instance_double(
-        "::BenefitMarkets::PricingModels::RelationshipPricingUnit",
+        ::BenefitMarkets::PricingModels::RelationshipPricingUnit,
         eligible_for_threshold_discount: false,
         name: "employee"
       )
@@ -71,7 +71,7 @@ module BenefitSponsors
 
     let(:pricing_model) { 
       instance_double(
-        "::BenefitMarkets::PricingModels::PricingModel",
+        ::BenefitMarkets::PricingModels::PricingModel,
         pricing_calculator: pricing_calculator,
         id: "a pricing model id",
         pricing_units: pricing_units
@@ -80,7 +80,7 @@ module BenefitSponsors
 
     let(:spouse_pricing_unit) do
       instance_double(
-        "::BenefitMarkets::PricingModels::RelationshipPricingUnit",
+        ::BenefitMarkets::PricingModels::RelationshipPricingUnit,
         eligible_for_threshold_discount: false,
         name: "spouse"
       )
@@ -88,7 +88,7 @@ module BenefitSponsors
 
     let(:sponsor_contribution) do
       instance_double(
-        "::BenefitSponsors::SponsoredBenefits::SponsorContribution"
+        ::BenefitSponsors::SponsoredBenefits::SponsorContribution,
       )
     end
 
