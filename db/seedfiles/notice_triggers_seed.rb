@@ -624,50 +624,6 @@ if Settings.aca.state_abbreviation == "MA"
         ]
     },
 
-  {
-    hbx_id: 'SHOP27',
-    title: 'Action Required to Complete Employer Application – Deadline Extended',
-    description: 'All the initial employers with draft plan years will be notified to publish their plan year 1 day prior to soft deadline of 1st.',
-    resource_name: 'employer',
-    event_name: 'initial_employer_second_reminder_to_publish_plan_year',
-    notice_triggers: [
-      {
-        name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
-        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-        mpi_indicator: 'SHOP_M027',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP33',
-    title: 'Special Enrollment Period Denial',
-    description: 'EE SEP Requested by Employee outside of allowable time frame',
-    resource_name: 'employee_role',
-    event_name: 'sep_request_denial_notice',
-    notice_triggers: [
-      {
-         name: 'Denial of SEP Requested by EE outside of allowable time frame',
-          notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
-          notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-          mpi_indicator: 'SHOP_M033',
-          notice_trigger_element_group: {
-            market_places: ['shop'],
-            primary_recipients: ["employee"],
-            primary_recipient_delivery_method: ["secure_message"],
-            secondary_recipients: []
-                  }
-              }
-          ]
-      },
-
       {
           hbx_id: 'SHOP42',
           title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
@@ -1133,27 +1089,6 @@ if Settings.aca.state_abbreviation == "MA"
               }
           ]
       },
-      # {
-      #     hbx_id: 'SHOP59',
-      #     title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
-      #     description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
-      #     resource_name: 'employee_role',
-      #     event_name: 'ee_ers_plan_year_will_not_be_written_notice',
-      #     notice_triggers: [
-      #       {
-      #         name: " Notice to EEs that ER’s plan year will not be written",
-      #         notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
-      #         notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
-      #         mpi_indicator: 'SHOP_M059',
-      #         notice_trigger_element_group: {
-      #               market_places: ['shop'],
-      #               primary_recipients: ["employee"],
-      #               primary_recipient_delivery_method: ["secure_message"],
-      #               secondary_recipients: []
-      #         }
-      #       }
-      #     ]
-      # },
     # {
     #   hbx_id: 'SHOP_D092',
     #   title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
@@ -2573,7 +2508,6 @@ elsif Settings.aca.state_abbreviation == "DC"
         }
       ]
     },
-
     {
       hbx_id: 'IVLR3',
       title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
@@ -2701,112 +2635,27 @@ elsif Settings.aca.state_abbreviation == "DC"
         }
       ]
     },
-  # {
-  #   hbx_id: 'SHOP_D092',
-  #   title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
-  #   description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',
-  #   resource_name: 'employee_role',
-  #   event_name: 'notify_renewal_employees_dental_carriers_exiting_shop',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Renewal EEs Dental Carriers are Exiting SHOP market notice',
-  #       notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
-  #       notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
-  #       mpi_indicator: 'SHOP_D092',
-  #       notice_trigger_element_group: {
-  #         market_places: ['shop'],
-  #         primary_recipients: ["employee"],
-  #         primary_recipient_delivery_method: ["secure_message"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  #   {
-  #   hbx_id: 'SHOP_DAG043',
-  #   title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
-  #   description: 'Group termination confirmation for advance request',
-  #   resource_name: 'employer',
-  #   event_name: 'group_advance_termination_confirmation',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Confirmation notice to employer after group termination',
-  #       notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
-  #       notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
-  #       mpi_indicator: 'MPI_D043',
-  #       notice_trigger_element_group: {
-  #         market_places: ['shop'],
-  #         primary_recipients: ["employer"],
-  #          primary_recipient_delivery_method: ["secure_message"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'SHOP10066',
-  #   title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
-  #   description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
-  #   resource_name: 'employee_role',
-  #   event_name: 'notify_employee_of_renewing_employer_ineligibility',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Notify Employees of their employer termination due to ineligibility',
-  #       notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
-  #       notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
-  #       mpi_indicator: 'MPI_SHOP10066',
-  #       notice_trigger_element_group: {
-  #         market_places: ['shop'],
-  #         primary_recipients: ["employee"],
-  #         primary_recipient_delivery_method: ["secure_message"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'SHOP_D049',
-  #   title: 'Confirmation - Broker Hired',
-  #   description: 'Confirmation of Broker Hired Sent to Employer',
-  #   resource_name: 'employer',
-  #   event_name: 'broker_hired_confirmation_notice',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Boker Hired Confirmation',
-  #       notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
-  #       notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-  #       mpi_indicator: 'SHOP_D049',
-  #       notice_trigger_element_group: {
-  #         market_places: ['shop'],
-  #         primary_recipients: ["employer"],
-  #         primary_recipient_delivery_method: ["secure_message"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-
-    # {
-    #   hbx_id: 'IVL_ELA',
-    #   title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
-    #   description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
-    #   resource_name: 'consumer_role',
-    #   event_name: 'eligibility_notice',
-    #   notice_triggers: [
-    #     {
-    #       name: 'Eligibilty Notice',
-    #       notice_template: 'notices/ivl/eligibility_notice',
-    #       notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
-    #       mpi_indicator: 'IVL_ELA',
-    #       notice_trigger_element_group: {
-    #         market_places: ['individual'],
-    #         primary_recipients: ["consumer"],
-    #         primary_recipient_delivery_method: ["secure_message", "paper"],
-    #         secondary_recipients: []
-    #       }
-    #     }
-    #   ]
-    # },
+    {
+      hbx_id: 'IVL_ELA',
+      title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
+      description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
+      resource_name: 'consumer_role',
+      event_name: 'eligibility_notice',
+      notice_triggers: [
+        {
+          name: 'Eligibilty Notice',
+          notice_template: 'notices/ivl/eligibility_notice',
+          notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
+          mpi_indicator: 'IVL_ELA',
+          notice_trigger_element_group: {
+            market_places: ['individual'],
+            primary_recipients: ["consumer"],
+            primary_recipient_delivery_method: ["secure_message", "paper"],
+            secondary_recipients: []
+          }
+        }
+      ]
+    },
     {
       hbx_id: 'IVL_NEL',
       title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',

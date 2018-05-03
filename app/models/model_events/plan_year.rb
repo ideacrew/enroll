@@ -20,7 +20,10 @@ module ModelEvents
         :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
         :renewal_plan_year_first_reminder_before_soft_dead_line,
         :initial_employer_no_binder_payment_received,
-        :renewal_plan_year_publish_dead_line
+        :renewal_plan_year_publish_dead_line,
+        :initial_employer_first_reminder_to_publish_plan_year,
+        :initial_employer_second_reminder_to_publish_plan_year,
+        :initial_employer_final_reminder_to_publish_plan_year
     ]
 
     def notify_on_save
