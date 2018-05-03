@@ -35,7 +35,7 @@ module BenefitMarkets
 
         # embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
 
-        embedded_in :catalogable, polymorphic: true
+        embedded_in :packagable, polymorphic: true
 
 
         validates_presence_of :title, :allow_blank => false
@@ -59,7 +59,7 @@ module BenefitMarkets
         end
 
         def has_products
-          return true if catalogable.blank?
+          return true if packagable.blank?
           if self.all_products.empty?
             self.errors.add(:base, "the package would have no products")
             false
@@ -70,7 +70,7 @@ module BenefitMarkets
 
         # Override this once the actual product implementation is available
         def all_products
-          Plan.where(:active_year => catalogable.product_active_year, :market => catalogable.product_market_kind)
+          Plan.where(:active_year => packagable.product_active_year, :market => packagable.product_market_kind)
         end
 
         def benefit_package_kind

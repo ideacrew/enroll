@@ -13,7 +13,7 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
     embeds_one  :member_market_policy,
                 class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
-    embeds_many :product_packages, as: :catalogable,
+    embeds_many :product_packages, as: :packagable,
                 class_name: "::BenefitMarkets::Products::ProductPackage"
 
 
