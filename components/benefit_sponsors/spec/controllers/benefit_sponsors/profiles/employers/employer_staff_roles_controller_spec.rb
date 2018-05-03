@@ -149,8 +149,8 @@ module BenefitSponsors
           }
 
           before :each do
-            allow_any_instance_of(EmployerStaffRole).to receive(:save!).and_return(false)
             sign_in user
+            applicant_employer_staff_role.update_attributes(aasm_state:'is_closed')
             get  :approve, staff_params
           end
 
