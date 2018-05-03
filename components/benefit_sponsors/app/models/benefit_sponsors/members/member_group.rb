@@ -4,7 +4,7 @@ module BenefitSponsors
     include Enumerable
 
     attr_accessor :group_id, :group_enrollment
-    attr_reader :members
+    attr_reader :members, :primary_member
 
     def initialize(collection = [], group_id: nil, group_enrollment: nil)
       self.members = collection
@@ -26,10 +26,6 @@ module BenefitSponsors
 
     def add_member(new_member)
       self << new_member
-    end
-
-    def primary_member
-      @members.detect { |member| member.is_primary_member? }
     end
 
     def [](member_id)
