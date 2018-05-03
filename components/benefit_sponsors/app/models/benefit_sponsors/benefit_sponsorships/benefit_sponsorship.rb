@@ -69,6 +69,9 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
+      has_many    :census_employees,
+                  class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+
       belongs_to  :benefit_market, 
                   counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarket"
@@ -113,11 +116,11 @@ module BenefitSponsors
         @profile = profile
       end
 
-      # TODO: add find_by_benefit_sponsorhip scope to CensusEmployee
-      def census_employees
-        return @census_employees if is_defined?(@census_employees)
-        @census_employees = ::CensusEmployee.find_by_benefit_sponsorship(self)
-      end
+      # # TODO: add find_by_benefit_sponsorhip scope to CensusEmployee
+      # def census_employees
+      #   return @census_employees if is_defined?(@census_employees)
+      #   @census_employees = ::CensusEmployee.find_by_benefit_sponsorship(self)
+      # end
 
       # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
       def roster_size
