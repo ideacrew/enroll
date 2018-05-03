@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::Profile
+    class OrganizationForms::Profile
       include ActiveModel::Validations
       include ::Validations::Email
       include BenefitSponsors::Forms::NpnField

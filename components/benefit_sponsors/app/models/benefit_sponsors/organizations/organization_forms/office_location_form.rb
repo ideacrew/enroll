@@ -1,13 +1,13 @@
 module BenefitSponsors
   module Organizations
-    class Forms::OfficeLocationForm
+    class OrganizationForms::OfficeLocationForm
       include Virtus.model
       include ActiveModel::Validations
 
       attribute :id, String
       attribute :is_primary, Boolean
-      attribute :address, AddressForm
-      attribute :phone, PhoneForm
+      attribute :address, OrganizationForms::AddressForm
+      attribute :phone, OrganizationForms::PhoneForm
 
       def persisted?
         false
