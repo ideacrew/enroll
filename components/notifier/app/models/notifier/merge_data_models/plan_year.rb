@@ -32,7 +32,7 @@ module Notifier
     attribute :carrier_name, String
     attribute :renewal_carrier_name, String
 
-    attribute :warnings, Array[String]
+    attribute :warnings, String
     attribute :errors, Array[String]
     attribute :enrollment_errors, Hash[Symbol => String]
 
