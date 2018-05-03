@@ -38,10 +38,9 @@ module BenefitMarkets
 
     def destroy
       @benefit_market = BenefitMarkets::BenefitMarket.find params[:id]
-      @benefit_market.owner_organization.destroy
       @benefit_market.destroy
 
-      redirect_to benefit_markets_path
+      redirect_to site_benefit_markets_path(site_id: params[:site_id])
     end
 
     private

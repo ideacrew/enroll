@@ -124,27 +124,23 @@ module BenefitMarkets
       end
 
       def map_errors_for(benefit_market, onto:)
-        benefit_market.owner_organization.errors.each do |att, err|
-          onto.owner_organization.errors.add(att, err)
-        end
-
-        benefit_market.owner_organization.profiles.first.errors.each do |att, err|
-          onto.owner_organization.profile.errors.add(att, err)
-        end
-
-        benefit_market.owner_organization.profiles.first.office_locations.each_with_index do |location, index|
-          form_location = onto.owner_organization.profile.office_locations[index]
-
-          location.errors.each do |att, err|
-            form_location.errors.add(att, err)
+        case benefit_market.kind
+        when 'aca_shop'
+          benefit_market.configuration.errors.each do |att, err|
+            onto.aca_shop_configuration.errors.add(att, err)
           end
-
-          location.phone.errors.each do |att, err|
-            form_location.phone.errors.add(att, err)
+          benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
+            onto.aca_shop_configuration.initial_application_configuration.errors.add(att, err)
           end
-
-          location.address.errors.each do |att, err|
-            form_location.address.errors.add(att, err)
+           benefit_market.configuration.renewal_application_configuration.errors.each do |att, err|
+            onto.aca_shop_configuration.renewal_application_configuration.errors.add(att, err)
+          end
+        when 'aca_individual'
+          benefit_market.configuration.errors.each do |att, err|
+            onto.aca_individual_configuration.errors.add(att, err)
+          end
+          benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
+            onto.aca_individual_configuration.initial_application_configuration.errors.add(att, err)
           end
         end
 

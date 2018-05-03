@@ -19,7 +19,7 @@
         <td><%= bm.title %></td>
         <td><%= bm.description %></td>
         <td><%= link_to "Edit",edit_benefit_market_path(bm) %></td>
-        <td><%= link_to 'Delete', benefit_market_path(bm),method: :delete %></td>
+        <td><%= link_to 'Delete', benefit_market_path(id: bm.id,site_id: params[:site_id]),method: :delete %></td>
       </tr>
     <% end %>
   </tbody>

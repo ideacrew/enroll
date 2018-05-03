@@ -2,6 +2,8 @@ module BenefitMarkets
   module Configurations
     # AcaShopConfiguration settings
     class AcaShopConfiguration < BenefitMarkets::Configurations::Configuration
+
+      TRANSMIT_DAYS = %w(Monday Tuesday Wednesday Thursday Friday Saturday Sunday)
       embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration",
         autobuild: true
       embeds_one :renewal_application_configuration,  class_name: "BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration",
@@ -37,6 +39,8 @@ module BenefitMarkets
       field :carrier_filters_enabled, type: Boolean, default: false
       field :rating_areas, type: Array
 
+      
+      
       def employee_participation_ratio_min=(min_value)
         write_attribute(ee_ratio_min: min_value) if min_value.present?
       end
