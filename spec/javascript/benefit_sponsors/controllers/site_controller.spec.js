@@ -1,46 +1,50 @@
-import mountDOM from 'jsdom-mount';
-import { Application } from 'stimulus';
+//import mountDOM from 'jsdom-mount';
+import {Application as StimulusApp} from 'stimulus';
 import SiteController from '../../../../app/javascript/benefit_sponsors/controllers/site_controller';
 
 describe('BenefitSponsorsSiteController', () => {
   beforeEach(() => {
-    mountDOM(`
-      <form data-controller="site">
-        
-      </form>
-    `);
+    //This would use the commented out import which throws an error so I switched to the built in jsdom
 
-    const stimulusApp = Application.start();
+   // mountDOM(`
+     // <div data-controller="site">
+      //  <div data-target="site.officeLocation" class="js-office-location">
+       //   <div id="test" class="row d-none js-non-primary">
+
+         // </div>
+       // </div>
+       // <a id="button" class="btn btn-sm btn-outline-primary" data-action="click->site#addLocation"
+         // Add another location
+       // </a>
+      //</div>
+
+    //`);
+
+
+    // This used jsdom as it is built-in as part of Jest
+    document.body.innerHTML =
+      '<div data-controller=\"site\">' +
+       '<div data-target=\"site.officeLocation\" class=\"js-office-location\">' +
+       '<div id=\"test\" class=\"row d-none js-non-primary\">' +
+       '</div>' +
+       '</div>' +
+       '<a id=\"button\" class=\"btn btn-sm btn-outline-primary\" data-action=\"click->site#addLocation\"' +
+       'Add another location' +
+       '</a>' +
+      '</div>'
+
+    const stimulusApp = StimulusApp.start();
     stimulusApp.register('siteController', SiteController);
   });
 
   describe('#addLocation', () => {
-    it('adds params to the initial url when you type into any param field', () => {
-      const linkElem = document.getElementById('link');
-      const fooElem = document.getElementById('foo');
-      const barElem = document.getElementById('bar');
-      const inputEvent = new Event('input');
-      fooElem.value = 'fooValue';
-      fooElem.dispatchEvent(inputEvent);
-      barElem.value = 'barValue';
-      barElem.dispatchEvent(inputEvent);
+    it('unhides the remove button', () => {
+      const testDiv = document.getElementById("test");
+      const buttonElem = document.getElementById('button');
+      const clickEvent = new Event('click');
+      buttonElem.dispatchEvent(clickEvent);
 
-      expect(linkElem.value).toEqual('https://www.example.com/?ref=1234&bar=barValue&foo=fooValue');
-    });
-  });
-
-  describe('#removeLocation', () => {
-    it('adds params to the initial url when you type into any param field', () => {
-      const linkElem = document.getElementById('link');
-      const fooElem = document.getElementById('foo');
-      const barElem = document.getElementById('bar');
-      const inputEvent = new Event('input');
-      fooElem.value = 'fooValue';
-      fooElem.dispatchEvent(inputEvent);
-      barElem.value = 'barValue';
-      barElem.dispatchEvent(inputEvent);
-
-      expect(linkElem.value).toEqual('https://www.example.com/?ref=1234&bar=barValue&foo=fooValue');
+      expect(testDiv.getAttribute("class")).toEqual('row js-non-primary');
     });
   });
 });
