@@ -132,9 +132,10 @@ module BenefitMarkets
           benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
             onto.aca_shop_configuration.initial_application_configuration.errors.add(att, err)
           end
-           benefit_market.configuration.renewal_application_configuration.errors.each do |att, err|
+          benefit_market.configuration.renewal_application_configuration.errors.each do |att, err|
             onto.aca_shop_configuration.renewal_application_configuration.errors.add(att, err)
           end
+
         when 'aca_individual'
           benefit_market.configuration.errors.each do |att, err|
             onto.aca_individual_configuration.errors.add(att, err)
@@ -143,7 +144,7 @@ module BenefitMarkets
             onto.aca_individual_configuration.initial_application_configuration.errors.add(att, err)
           end
         end
-
+        
         benefit_market.errors.each do |att, err|
           onto.errors.add(att, err)
         end
