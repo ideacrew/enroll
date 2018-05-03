@@ -11,6 +11,7 @@ module BenefitSponsors
       attribute :description, String
       attribute :probation_period_kind, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
+      attribute :benefit_application_id
 
       # attr_accessor :benefit_application, :product_packages
       # validates :title, presence: true
@@ -22,8 +23,8 @@ module BenefitSponsors
         @service = BenefitSponsors::Services::BenefitPackageService.new
       end
 
-      def self.for_new(benefit_application_id)
-        form = self.new(:benefit_application_id => benefit_application_id)
+      def self.for_new(args)
+        form = self.new(:benefit_application_id => args[:benefit_application_id])
         service.load_default_form_params(form)
         service.load_form_metadata(form)
         form
