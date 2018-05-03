@@ -18,20 +18,20 @@ module BenefitMarkets
           }
 
 
-        field :hios_id,                 type: String
-        field :hios_base_id,            type: String
-        field :csr_variant_id,          type: String
+        field :hios_id,                     type: String
+        field :hios_base_id,                type: String
+        field :csr_variant_id,              type: String
 
-        field :health_plan_kind,        type: Symbol  # => :hmo, :ppo, :pos, :epo
-        field :metal_level_kind,        type: Symbol  
+        field :health_plan_kind,            type: Symbol  # => :hmo, :ppo, :pos, :epo
+        field :metal_level_kind,            type: Symbol  
 
         # Essential Health Benefit (EHB) percentage
         field :ehb,                         type: Float,    default: 0.0
         field :is_standard_plan,            type: Boolean,  default: false
         field :is_reference_plan_eligible,  type: Boolean,  default: false
 
-        field :provider_directory_url,  type: String
-        field :rx_formulary_url,        type: String
+        field :provider_directory_url,      type: String
+        field :rx_formulary_url,            type: String
 
 
         has_one     :health_product, as: :renewal_product,
@@ -45,12 +45,6 @@ module BenefitMarkets
         embeds_one  :sbc_document, as: :documentable,
                     :class_name => "::Document"
 
-        has_one     :service_area,
-                    class_name: "BenefitMarkets::Locations::ServiceArea"
-
-        has_many    :rating_areas,
-                    class_name: "BenefitMarkets::Locations::RatingArea"
-
 
         validates_presence_of :hios_id, :health_plan_kind, :ehb
 
@@ -60,9 +54,6 @@ module BenefitMarkets
         index({ hios_id: 1, "active_period.min": 1, "active_period.max": 1, name: 1 })
         index({ "active_period.min": 1, "active_period.max": 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
         index({ csr_variant_id: 1}, {sparse: true})
-
-
-        scope :by_service_area,     ->(service_area){ where(service_area: service_area) }
 
         scope :standard_plans,      ->{ where(is_standard_plan: true) }
 

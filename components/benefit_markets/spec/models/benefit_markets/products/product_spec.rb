@@ -10,6 +10,7 @@ module BenefitMarkets
     let(:issuer_profile_urn)  { "urn:openhbx:terms:v1:organization:name#safeco" }
     let(:title)               { "SafeCo Active Life $0 Deductable Premier" }
     let(:description)         { "Highest rated and highest value" }
+    let(:service_area)        { BenefitMarkets::Locations::ServiceArea.new }
 
     let(:rating_area)         { BenefitMarkets::Locations::RatingArea.new }
     let(:quarter_1)           { Date.new(this_year, 1, 1)..Date.new(this_year, 3, 31) }
@@ -33,11 +34,12 @@ module BenefitMarkets
           issuer_profile_urn:   issuer_profile_urn,
           title:                title,
           description:          description,
+          service_area:         service_area,
           premium_tables:       premium_tables,
         }
     end
 
-    context "A new HealthProduct instance" do
+    context "A new Product instance" do
 
       context "with no arguments" do
         subject { described_class.new }
@@ -66,6 +68,16 @@ module BenefitMarkets
             subject.validate
             expect(subject).to_not be_valid
             expect(subject.errors[:application_period]).to include("can't be blank")
+          end
+        end
+
+        context "that's missing an service_area" do
+          subject { described_class.new(params.except(:service_area)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:service_area]).to include("can't be blank")
           end
         end
 
