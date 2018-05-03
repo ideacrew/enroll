@@ -1,7 +1,7 @@
 module BenefitMarkets
   module Products
     module DentalProducts
-      class DentalProduct < ::BenefitMarket::Products::Product
+      class DentalProduct < ::BenefitMarkets::Products::Product
       end
     end
   end
