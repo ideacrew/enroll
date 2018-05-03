@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?
+  helper BenefitSponsors::Engine.helpers
 
   def format_js?
    request.format.js?
