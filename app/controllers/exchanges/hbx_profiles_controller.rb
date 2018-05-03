@@ -91,6 +91,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def employer_datatable
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+    respond_to do |format|
+      format.js
+    end
+  end
 
 def employer_poc
 
