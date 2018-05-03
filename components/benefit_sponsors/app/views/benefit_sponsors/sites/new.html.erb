@@ -1,6 +1,6 @@
 <h2>NEW SITE</h2>
 
-<%= form_for @site, url: new_site_path, html: { data: { controller: "site" }, class: "needs-validation", id:'broker_registration_form', novalidate: true } do |f| %>
+<%= form_for @site, as: :site, url: sites_path, html: { data: { controller: "site" }, class: "needs-validation", novalidate: true } do |f| %>
   <%= render partial: 'form', locals: { f: f } %>
 
   <div class="row">

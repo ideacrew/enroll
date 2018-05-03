@@ -39,7 +39,7 @@ module BenefitSponsors
 
       def attributes_to_form_params(site, form)
         form.attributes = {
-          id: site.id,
+          id: site.persisted? ? site.id : nil,
           site_key: site.site_key,
           byline: site.byline,
           long_name: site.long_name,
@@ -94,6 +94,7 @@ module BenefitSponsors
         owner_organization = BenefitSponsors::Organizations::Factories::OwnerOrganization.call(legal_name: form.owner_organization.legal_name, profile: profile)
         profile.organization = owner_organization
         site = BenefitSponsors::SiteFactory.call site_key: form.site_key,
+          byline: form.byline,
           long_name: form.long_name,
           short_name: form.short_name,
           domain_name: form.domain_name,
