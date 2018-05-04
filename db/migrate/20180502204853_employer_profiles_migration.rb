@@ -20,7 +20,7 @@ class EmployerProfilesMigration < Mongoid::Migration
         puts "Check employer_profiles_migration_data logs & employer_profiles_migration_status csv for additional information." unless Rails.env.test?
       else
         puts "" unless Rails.env.test?
-        puts "Rake Task execution failed for given input" unless Rails.env.test?
+        puts "Script execution failed for empty site" unless Rails.env.test?
       end
     end
     logger.info "End of the script" unless Rails.env.test?
@@ -71,10 +71,6 @@ class EmployerProfilesMigration < Mongoid::Migration
             person_records_with_old_employee_roles = find_employee_roles
             link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
 
-            #census employees migration
-            census_employees_with_old_id = find_census_employees
-            link_existing_census_employees_to_new_profile(census_employees_with_old_id)
-
             print '.' unless Rails.env.test?
             csv << [old_org.id, new_organization.id, "Migration Success"]
             success = success + 1
@@ -118,11 +114,11 @@ class EmployerProfilesMigration < Mongoid::Migration
 
   def self.build_documents(old_org, new_profile)
     @old_profile.documents.each do |document|
-      new_profile.documents.new(document.attributes.except("_id"))
+      new_profile.documents.new(document.attributes.except("_id", "_type"))
     end
 
     old_org.documents.each do |document|
-      new_profile.documents.new(document.attributes.except("_id"))
+      new_profile.documents.new(document.attributes.except("_id", "_type"))
     end
   end
 
@@ -138,7 +134,7 @@ class EmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :versions, :employer_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :versions, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
     general_organization = BenefitSponsors::Organizations::GeneralOrganization.new(old_org_params)
     general_organization.entity_kind = @old_profile.entity_kind.to_sym
@@ -168,14 +164,6 @@ class EmployerProfilesMigration < Mongoid::Migration
       old_employee_role = person.employee_roles.where(employer_profile_id: @old_profile.id).first
       old_employee_role.update_attributes(benefit_sponsor_employer_profile_id: @new_profile.id) if old_employee_role.present?
     end
-  end
-
-  def self.find_census_employees
-    CensusEmployee.where(employer_profile_id: @old_profile.id)
-  end
-
-  def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
-    census_employees_with_old_id.update_all(benefit_sponsor_employer_profile_id: @new_profile.id)
   end
 
   def self.find_site(site_key)
