@@ -108,10 +108,9 @@ module Notifier
     end
 
     def plan_year_enrollment_errors
-      if renewal_plan_year.present?
-        merge_model.plan_year.enrollment_errors = renewal_plan_year.enrollment_errors
-      elsif current_plan_year.present?
-        merge_model.plan_year.enrollment_errors = current_plan_year.enrollment_errors
+      plan_year = (renewal_plan_year || current_plan_year)
+      if plan_year.present?
+        merge_model.plan_year.enrollment_errors = plan_year.enrollment_errors.values.join(' AND/OR ')
       end
     end
 
