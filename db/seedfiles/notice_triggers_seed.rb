@@ -494,27 +494,27 @@ if Settings.aca.state_abbreviation == "MA"
       #   ]
       # },
 
-      {
-          hbx_id: 'SHOP_M017',
-          title: 'Open Enrollment Completed',
-          description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
-          resource_name: 'employer',
-          event_name: 'initial_employer_open_enrollment_completed',
-          notice_triggers: [
-              {
-                  name: 'Initial Employee Open Enrollment Successfully Completed',
-                  notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
-                  notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-                  mpi_indicator: 'SHOP_M017',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
+      # {
+      #     hbx_id: 'SHOP_M017',
+      #     title: 'Open Enrollment Completed',
+      #     description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
+      #     resource_name: 'employer',
+      #     event_name: 'initial_employer_open_enrollment_completed',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Initial Employee Open Enrollment Successfully Completed',
+      #             notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
+      #             notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
+      #             mpi_indicator: 'SHOP_M017',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employer"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
 
       # {
       #   hbx_id: 'SHOP13',
