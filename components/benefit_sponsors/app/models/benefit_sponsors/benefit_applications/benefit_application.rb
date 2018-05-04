@@ -30,15 +30,6 @@ module BenefitSponsors
       # Stored locally to enable sponsor-level exceptions
       field :open_enrollment_period,  type: Range
 
-      # Number of full-time employees
-      field :fte_count, type: Integer, default: 0
-
-      # Number of part-time employess
-      field :pte_count, type: Integer, default: 0
-
-      # Number of Medicare Second Payers
-      field :msp_count, type: Integer, default: 0
-
       # The date on which this application was canceled or terminated
       field :terminated_on,           type: Date
 

@@ -83,7 +83,7 @@ module BenefitSponsors
       end
     end
 
-    def display_families_tab(user,profile_id)
+    def benefit_sponsor_display_families_tab(user,profile_id)
       if user.present?
         user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(profile_id)
       end

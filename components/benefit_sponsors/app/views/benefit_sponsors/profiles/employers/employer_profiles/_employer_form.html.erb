@@ -63,16 +63,15 @@
               <%= staff.phone %>
             </td>
             <td>
-              <%# TODO - see Main App %>
               <%= staff.status %>
               <% if staff.status == "is_applicant" %>
-                  <%=  link_to(approve_profiles_employers_employer_staff_role_path(profile_id: @agency.profile_id, person_id: staff.person_id), id: 'approve_' + staff.person_id.to_s) do %>
+                  <%=  link_to(approve_profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id)) do %>
                       approve
                   <% end %>
               <% end %>
             </td>
             <td>
-              <%= link_to(profiles_employers_employer_staff_role_path(profile_id: @agency.profile_id, person_id: staff.person_id), method: 'delete', id: 'delete_' + staff.person_id.to_s, data: {confirm: 'Delete this role?'}) do %>
+              <%= link_to(profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
                   <i class="fa fa-trash-o fa-2x role-trashcan"></i>
               <%end%>
             </td>
@@ -85,6 +84,19 @@
       <br>
       <%= link_to 'Add Employer Staff Role', new_profiles_employers_employer_staff_role_path(profile_id:@agency.profile_id), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>
       <br/>
+      <div class="">
+        <h4> Employer Information</h4>
+        <div class="row no-buffer row-form-wrapper">
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
+            <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :readonly => true %>
+          </div>
+
         <br>
         <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
           <%= f.hidden_field :id, value: f.object.id %>
