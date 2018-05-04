@@ -451,7 +451,7 @@ class Person
     if self.us_citizen
       verification_types << 'Citizenship'
     else
-      verification_types << 'Immigration status'
+      verification_types << 'Immigration status' if !(us_citizen.nil?)
     end
     verification_types
   end

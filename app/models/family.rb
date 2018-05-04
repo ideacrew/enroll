@@ -862,7 +862,7 @@ class Family
 
   def build_consumer_role(family_member, opts = {})
     person = family_member.person
-    return if person.consumer_role.present?
+    return if person.has_consumer_or_resident_role?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
     transition = IndividualMarketTransition.new
     transition.role_type = "consumer"
@@ -883,7 +883,7 @@ class Family
 
   def build_resident_role(family_member, opts = {})
     person = family_member.person
-    return if person.resident_role.present?
+    return if person.has_consumer_or_resident_role?
     person.build_resident_role({:is_applicant => false}.merge(opts))
     transition = IndividualMarketTransition.new
     transition.role_type = "resident"
@@ -1017,7 +1017,8 @@ class Family
 
   def contingent_enrolled_active_family_members
     enrolled_family_members = []
-    family_members.active.each do |family_member|
+    family_members = active_family_members.collect { |member| member if member.person.is_consumer_role_active? }.compact
+    family_members.each do |family_member|
       if enrolled_policy(family_member).present?
         enrolled_family_members << family_member
       end
@@ -1082,7 +1083,7 @@ class Family
   end
 
   def has_active_consumer_family_members
-    self.active_family_members.collect { |member| member if member.person.is_consumer_role_active? }
+    self.active_family_members.collect { |member| member if member.person.consumer_role.present?}
   end
 
   def has_active_resident_family_members

@@ -9,7 +9,7 @@
       </li>
     <% end %>
 
-    <% if @family_members.present? %>
+    <% if has_active_consumer_or_resident_members?(@family_members) %>
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to verification_insured_families_path(tab: 'verification') do %>
             <%= l10n("documents") %>
@@ -20,7 +20,7 @@
       </li>
     <% end %>
 
-    <% if current_user.has_hbx_staff_role? && @family_members.present? %>
+    <% if current_user.has_hbx_staff_role? && has_active_consumer_or_resident_members?(@family_members) %>
       <li <%= menu_tab_class(@tab, 'verification') %>>
         <%= link_to upload_application_insured_families_path(tab: 'verification') do %>
             <%= l10n("upload_paper_application") %>

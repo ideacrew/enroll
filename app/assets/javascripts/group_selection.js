@@ -2,6 +2,10 @@ $(document).ready(function() {
  setGroupSelectionHandlers();
 });
 
+$(document).on('change', '#market_kind_coverall', function() {
+  $("#WarningOnCoverAllSelection").modal();
+});
+
 function setGroupSelectionHandlers(){
 
   var employers = $("[id^=census_employee_]");
