@@ -85,15 +85,15 @@
     $(document).ready(function() {
       setTimeout(function() {
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
-        var date = $('#plan_year_start_on').val().split("-");
-        plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
+        var date = $('#plan_year_start_on').val();
+        plansForDate(date);
       },50);
     });
   <% end %>
 
   $('#plan_year_start_on').change(function() {
-    var date = $(this).val().split('-');
-    plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
+    var date = $(this).val();
+    plansForDate(date);
   })
 
   function plansForDate(date) {
