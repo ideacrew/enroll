@@ -64,7 +64,7 @@ module BenefitSponsors
 
     # has_many :families,         class_name: "::Family"
 
-    validates_presence_of :site_key, :owner_organization
+    validates_presence_of :site_key, :owner_organization, :long_name, :short_name, :byline, :domain_name
     validate :association_limits
 
 

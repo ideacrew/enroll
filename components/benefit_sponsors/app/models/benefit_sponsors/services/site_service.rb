@@ -105,14 +105,14 @@ module BenefitSponsors
         valid_according_to_factory = BenefitSponsors::Factories::Site.validate(site)
         unless valid_according_to_factory
           map_errors_for(site, onto: form)
-          return [false, nil]
+          return false
         end
         save_successful = site.save
         unless save_successful
           map_errors_for(site, onto: form)
-          return [false, nil]
+          return false
         end
-        [true, site]
+        true
       end
 
       def store(form, site)

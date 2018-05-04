@@ -15,10 +15,6 @@ module BenefitMarkets
           vr_due: vr_due,
           vr_os_window: vr_os_window
       end
-
-      def self.validate(benefit_market)
-        benefit_market.valid?
-      end
     end
   end
 end

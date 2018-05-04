@@ -13,6 +13,8 @@ module BenefitMarkets
       field :quiet_per_end, as: :quiet_period_end_on, type: Integer, default: 28
       # After submitting an ineligible plan year application, time period an Employer must wait
       field :inelig_per_aft_app_denial_dys, as: :ineligible_period_after_application_denial_days, type: Integer, default: 90
+
+      validates_presence_of :pub_due_dom, :erlst_strt_prior_eff_months, :appeal_per_aft_app_denial_dys, :quiet_per_end, :inelig_per_aft_app_denial_dys
     end
   end
 end

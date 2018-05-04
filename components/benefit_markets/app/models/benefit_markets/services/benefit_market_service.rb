@@ -104,14 +104,15 @@ module BenefitMarkets
         valid_according_to_factory = BenefitMarkets::Factories::BenefitMarket.validate(benefit_market)
         unless valid_according_to_factory
           map_errors_for(benefit_market, onto: form)
-          return [false, nil]
+          return false
         end
+
         save_successful = benefit_market.save
         unless save_successful
           map_errors_for(benefit_market, onto: form)
-          return [false, nil]
+          return false
         end
-        [true, benefit_market]
+        true
       end
 
       def store(form, benefit_market)
@@ -125,23 +126,23 @@ module BenefitMarkets
 
       def map_errors_for(benefit_market, onto:)
         case benefit_market.kind
-        when 'aca_shop'
+        when :aca_shop
           benefit_market.configuration.errors.each do |att, err|
-            onto.aca_shop_configuration.errors.add(att, err)
+            onto.errors.add(att, err)
           end
           benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
-            onto.aca_shop_configuration.initial_application_configuration.errors.add(att, err)
+            onto.errors.add(att, err)
           end
-          benefit_market.configuration.renewal_application_configuration.errors.each do |att, err|
-            onto.aca_shop_configuration.renewal_application_configuration.errors.add(att, err)
+           benefit_market.configuration.renewal_application_configuration.errors.each do |att, err|
+            onto.errors.add(att, err)
           end
-
-        when 'aca_individual'
+          
+        when :aca_individual
           benefit_market.configuration.errors.each do |att, err|
-            onto.aca_individual_configuration.errors.add(att, err)
+            onto.errors.add(att, err)
           end
           benefit_market.configuration.initial_application_configuration.errors.each do |att, err|
-            onto.aca_individual_configuration.initial_application_configuration.errors.add(att, err)
+            onto.errors.add(att, err)
           end
         end
         

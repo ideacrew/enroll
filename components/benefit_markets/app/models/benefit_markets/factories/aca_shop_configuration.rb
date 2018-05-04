@@ -71,10 +71,6 @@ module BenefitMarkets
           trans_scheduled_er: trans_scheduled_er,
           use_simple_er_cal_model: use_simple_er_cal_model
       end
-
-      def self.validate(benefit_market)
-        benefit_market.valid?
-      end
     end
   end
 end

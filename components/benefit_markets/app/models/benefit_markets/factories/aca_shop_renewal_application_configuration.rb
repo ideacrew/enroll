@@ -9,10 +9,6 @@ module BenefitMarkets
           pub_due_dom: pub_due_dom,
           quiet_per_end: quiet_per_end
       end
-
-      def self.validate(benefit_market)
-        benefit_market.valid?
-      end
     end
   end
 end

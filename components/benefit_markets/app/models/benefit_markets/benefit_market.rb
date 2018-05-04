@@ -22,7 +22,8 @@ module BenefitMarkets
     embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
                                         autobuild: true
 
-    # validates_presence_of :configuration #, :contact_center_setting
+    validates_presence_of :configuration #, :contact_center_setting
+    validates_presence_of :site_urn, :kind, :title, :description
 
     validates :kind,
       inclusion:  { in: BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
