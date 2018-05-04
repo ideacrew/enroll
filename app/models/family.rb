@@ -1008,7 +1008,8 @@ class Family
 
   def contingent_enrolled_active_family_members
     enrolled_family_members = []
-    family_members.active.each do |family_member|
+    family_members = active_family_members.collect { |member| member if member.person.is_consumer_role_active? }.compact
+    family_members.each do |family_member|
       if enrolled_policy(family_member).present?
         enrolled_family_members << family_member
       end
@@ -1073,7 +1074,7 @@ class Family
   end
 
   def has_active_consumer_family_members
-    self.active_family_members.collect { |member| member if member.person.is_consumer_role_active? }
+    self.active_family_members.collect { |member| member if member.person.consumer_role.present?}
   end
 
   def has_active_resident_family_members

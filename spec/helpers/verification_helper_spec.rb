@@ -286,7 +286,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       allow(helper).to receive(:verification_type_status).and_return(status)
       persons = family.family_members.map(&:person)
 
-      expect(helper.get_person_v_type_status(persons)).to eq([status, status])
+      expect(helper.get_person_v_type_status(persons)).to eq([status])
     end
   end
 
