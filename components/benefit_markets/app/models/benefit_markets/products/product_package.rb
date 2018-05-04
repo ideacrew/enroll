@@ -5,81 +5,86 @@
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
 module BenefitMarkets
-  module Products
-      class ProductPackage
-        include Mongoid::Document
-        include Mongoid::Timestamps
+  class Products::ProductPackage
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embedded_in :packagable, polymorphic: true
+
+    field :key,                     type: Symbol
+    field :hbx_id,                  type: String
+    field :title,                   type: String
+    field :description,             type: String
+
+    embeds_many :products,
+                class_name: "BenefitMarkets::Products::Product"
+
+    embeds_one  :contribution_model, 
+                class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
+
+    embeds_one  :pricing_model, 
+                class_name: "::BenefitMarkets::PricingModels::PricingModel"
 
 
-        BENEFIT_PACKAGE_MAPPINGS = {
-          :any_dental             => [:dental, :any],
-          :single_product_health  => [:health, :single_product],
-          :single_product_dental  => [:dental, :single_product],
-          :issuer_health          => [:health, :issuer],
-          :metal_level_health     => [:health, :metal_level],
-          :composite_health       => [:health, :composite]
-        }
+    validates_presence_of :title, :allow_blank => false
+    validate :has_products
 
-        BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
+    # TODO: Override this once the actual product implementation is available
+    # Implement in subclass
+    def all_products
+      Plan.where(:active_year => packagable.product_active_year, :market => packagable.product_market_kind)
+    end
 
-        field :reference, type: Symbol
+    # Implement in subclass
+    def benefit_package_kind
+    end
 
-        field :hbx_id,                  type: String
-        field :title,                   type: String
-        field :contribution_model_id,   type: BSON::ObjectId
-        field :pricing_model_id,        type: BSON::ObjectId
-        field :product_multiplicity,    type: Symbol, default: ->() { default_product_multiplicity }
+# {
+#     benefit_kind: :health, # => :health, :dental
+#     by_issuer: "urn", #|| by_metal_level: :gold,
+# }
 
-        belongs_to :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel"
-        belongs_to :pricing_model, class_name: "::BenefitMarkets::PricingModels::PricingModel"
+    # Intersection of product that match service area and effective dates
+    def products_available_for?(service_area, effective_date)
+      products_available_on(effective_date) & products_available_where(service_area)
+    end
 
-        # embedded_in :benefit_catalog, class_name: "::BenefitMarkets::BenefitMarketCatalog"
+    def products_available_on(effective_date)
+      products.collect { |product| product.premium_table_effective_on(effective_date).present? }
+    end
 
-        embedded_in :packagable, polymorphic: true
-
-
-        validates_presence_of :title, :allow_blank => false
-        # validates_presence_of :benefit_catalog_id, :allow_blank => false
-        validate :has_products
-
-
-        def is_available_for?(service_area, effective_date)
-          #implement by subclasses
-          true
-        end
+    def products_available_where(service_area)
+      products.collect { |product| product.service_area == service_area }
+    end
 
 
-        def default_product_multiplicity 
-          :multiple
-        end
+    def self.subclass_for(benefit_option_kind)
+      product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
+      "::BenefitMarkets::Products::#{product_kind.to_s.camelcase}Products::#{constraint.to_s.camelcase}#{product_kind.to_s.camelcase}ProductPackage".constantize
+    end
 
-        def self.subclass_for(benefit_option_kind)
-          product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
-          "::BenefitMarkets::Products::#{product_kind.to_s.camelcase}Products::#{constraint.to_s.camelcase}#{product_kind.to_s.camelcase}ProductPackage".constantize
-        end
-
-        def has_products
-          return true if packagable.blank?
-          if self.all_products.empty?
-            self.errors.add(:base, "the package would have no products")
-            false
-          else
-            true
-          end
-        end
-
-        # Override this once the actual product implementation is available
-        def all_products
-          Plan.where(:active_year => packagable.product_active_year, :market => packagable.product_market_kind)
-        end
-
-        def benefit_package_kind
-          raise NotImplementedError.new("subclass responsibility")
-        end
-
-        def policy_class
-          ::BenefitMarkets::Products::ProductPackagePolicy
-        end
+    def has_products
+      return true if packagable.blank?
+      if self.all_products.empty?
+        self.errors.add(:base, "the package would have no products")
+        false
+      else
+        true
       end
     end
+
+  end
+
+
+  BENEFIT_PACKAGE_MAPPINGS = {
+    :any_dental             => [:dental, :any],
+    :single_product_health  => [:health, :single_product],
+    :single_product_dental  => [:dental, :single_product],
+    :issuer_health          => [:health, :issuer],
+    :metal_level_health     => [:health, :metal_level],
+    :composite_health       => [:health, :composite]
+  }
+
+  BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
+
 end
