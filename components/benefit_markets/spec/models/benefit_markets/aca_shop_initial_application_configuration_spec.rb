@@ -2,7 +2,7 @@ require 'rails_helper'
 
 # AcaShopInitialApplicationConfiguration test cases
 module BenefitMarkets
-  RSpec.describe AcaShopInitialApplicationConfiguration, type: :model do
+  RSpec.describe Configurations::AcaShopInitialApplicationConfiguration, type: :model do
     let(:pub_due_dom) { 10 }
     let(:quiet_per_end) { 28 }
 

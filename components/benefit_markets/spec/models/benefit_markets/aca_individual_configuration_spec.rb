@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe AcaIndividualConfiguration, type: :model do
+  RSpec.describe Configurations::AcaIndividualConfiguration, type: :model do
 
     let(:aca_individual_configuration) { AcaIndividualConfiguration.new }
 

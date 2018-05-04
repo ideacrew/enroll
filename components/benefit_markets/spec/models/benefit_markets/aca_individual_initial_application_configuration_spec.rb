@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe AcaIndividualInitialApplicationConfiguration, type: :model do
+  RSpec.describe Configurations::AcaIndividualInitialApplicationConfiguration, type: :model do
 
   	let(:aca_initial_individual_configuration) { AcaIndividualInitialApplicationConfiguration.new }
 
@@ -36,7 +36,6 @@ module BenefitMarkets
           expect(valid_aca_initial_individual_configuration.quiet_per_end).to eq quiet_per_end
           expect(valid_aca_initial_individual_configuration.inelig_per_aft_app_denial_dys).to eq inelig_per_aft_app_denial_dys
         end
-    end 
+    end
 	end
 end
-

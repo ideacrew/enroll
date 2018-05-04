@@ -16,9 +16,9 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require File.join(File.dirname(__FILE__), "factories", "wrapping_sequence")
 require 'factory_girl_rails'
-FactoryGirl.definition_file_paths = [File.expand_path('../factories', __FILE__),
-  File.expand_path('../../../benefit_markets/spec/factories', __FILE__),
-  File.expand_path('../../../benefit_sponsors/spec/factories', __FILE__),
+FactoryGirl.definition_file_paths = [File.expand_path('./factories', __FILE__),
+  File.expand_path('../components/benefit_markets/spec/factories', __FILE__),
+  File.expand_path('../components/benefit_sponsors/spec/factories', __FILE__),
 ]
 FactoryGirl.find_definitions
 RSpec.configure do |config|

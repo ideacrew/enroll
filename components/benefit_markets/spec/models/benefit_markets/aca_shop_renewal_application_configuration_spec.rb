@@ -2,7 +2,7 @@ require 'rails_helper'
 
 # AcaShopRenewalApplicationConfiguration test cases
 module BenefitMarkets
-  RSpec.describe AcaShopRenewalApplicationConfiguration, type: :model do
+  RSpec.describe Configurations::AcaShopRenewalApplicationConfiguration, type: :model do
     let(:erlst_strt_prior_eff_months) { -3 }
     let(:force_pub_dom) { 15 }
     let(:quiet_per_end) { 20 }

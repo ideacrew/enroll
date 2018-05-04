@@ -2,7 +2,7 @@ require 'rails_helper'
 
 # AcaShopApplicationConfiguration test cases
 module BenefitMarkets
-  RSpec.describe AcaShopConfiguration, type: :model do
+  RSpec.describe Configurations::AcaShopConfiguration, type: :model do
     let(:ee_ct_max) { 50 }
     let(:binder_due_dom) { 23 }
 
