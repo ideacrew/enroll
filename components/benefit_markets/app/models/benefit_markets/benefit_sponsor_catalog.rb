@@ -5,16 +5,25 @@ module BenefitMarkets
 
     embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
-    field :effective_date,    type: Date 
-    field :probation_period_kinds, type: Array, default: []
-    field :service_area_id
+    field :effective_date,          type: Date 
+    field :probation_period_kinds,  type: Array, default: []
+
+
+    embeds_one  :service_area
 
     embeds_one  :sponsor_market_policy,  
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
+
     embeds_one  :member_market_policy,
+
                 class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
+
     embeds_many :product_packages, as: :packagable,
                 class_name: "::BenefitMarkets::Products::ProductPackage"
+
+
+    def benefit_kinds
+    end
 
 
     def product_market_kind

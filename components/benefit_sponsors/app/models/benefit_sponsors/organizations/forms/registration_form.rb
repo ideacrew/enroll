@@ -108,7 +108,7 @@ module BenefitSponsors
       protected
 
       def self.resolve_service(attrs ={})
-        Services::NewProfileRegistrationService.new(attrs)
+        BenefitSponsors::Services::NewProfileRegistrationService.new(attrs)
       end
 
       def service(attrs={})

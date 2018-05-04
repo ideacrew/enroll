@@ -9,11 +9,13 @@ module BenefitSponsors
 
       field :title, type: String, default: ""
       field :description, type: String, default: ""
-
       field :probation_period_kind, type: Symbol
 
+      field :is_congress, type: Boolean, default: false
+      field :is_default, type: Boolean, default: false
+
       embeds_many :sponsored_benefits,
-                  class_name: "BenefitSponsors::BenefitPackages::SponsoredBenefit"
+                  class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
 
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range

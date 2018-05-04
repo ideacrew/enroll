@@ -25,7 +25,7 @@ module BenefitSponsors
         rescue Exception => e
           flash[:error] = e.message
         end
-        redirect_to edit_profiles_registration_path(id: params[:profile_id])
+        redirect_to edit_profiles_registration_path(id: staff_params[:profile_id])
       end
 
       #new person registered with existing organization is pending for staff role approval
@@ -39,7 +39,7 @@ module BenefitSponsors
         else
           flash[:notice] = 'Role is approved'
         end
-        redirect_to edit_profiles_registration_path(id: params[:profile_id])
+        redirect_to edit_profiles_registration_path(id: staff_params[:profile_id])
       end
 
       # For this person find an employer_staff_role that match this employer_profile_id and mark the role inactive
@@ -52,14 +52,14 @@ module BenefitSponsors
         else
           flash[:notice] = 'Staff role was deleted'
         end
-        redirect_to edit_profiles_registration_path(id: params[:profile_id])
+        redirect_to edit_profiles_registration_path(id: staff_params[:profile_id])
       end
 
       private
 
       def staff_params
         params[:staff].present? ? params[:staff] :  params[:staff] = {}
-        params[:staff].merge!({profile_id: params["profile_id"], person_id: params["person_id"]})
+        params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"]})
         params[:staff].permit!
       end
     end

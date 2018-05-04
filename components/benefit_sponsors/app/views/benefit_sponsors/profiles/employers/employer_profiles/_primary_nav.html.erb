@@ -12,7 +12,7 @@
     <li <%= menu_tab_class(active_tab, "brokers") %>>
       <%= link_to 'Brokers', profiles_employers_employer_profile_path(profile.id, :tab=>'brokers'), "aria-expanded" => "true" %>
     </li>
-    <% if display_families_tab(current_user, profile.id) %>
+    <% if benefit_sponsor_display_families_tab(current_user, profile.id) %>
       <li <%= menu_tab_class(active_tab, "families") %>>
         <%= link_to 'Families', profiles_employers_employer_profile_path(profile.id, :tab=>'families'), "aria-expanded" => "true" %>
       </li>
@@ -39,7 +39,7 @@
   <div class="module my-account-widget panel panel-default">
     <div class="panel-heading">
       <h4><%= organization.legal_name %></h4>
-      <%= link_to 'Update Business Info', edit_profiles_registration_path(profile.id, :tab=>'profile', add_staff: 'no') %>
+      <%= link_to 'Update Business Info', edit_profiles_registration_path(profile.id) %>
       <br/>
       <!-- TODO fix this when implementing Pundit -->
       <%#= pundit_span profile, :list_enrollments? %>
