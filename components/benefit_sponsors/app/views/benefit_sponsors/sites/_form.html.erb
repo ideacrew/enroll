@@ -50,6 +50,11 @@
             <div class="js-remove row">
               <label>Primary Address</label>
             </div>
+            <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
+              <%= address_fields.hidden_field :kind, value: 'primary' %>
+
+              <%= render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields } %>
+            <% end %>
           <% end %>
 
           <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
@@ -60,12 +65,6 @@
               <%= phone_fields.text_field :area_code, placeholder: "Area Code", class: 'form-control' %>
               <%= phone_fields.text_field :number, placeholder: "Number", class: 'form-control' %>
             </div>
-          <% end %>
-
-          <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
-            <%= address_fields.hidden_field :kind, value: 'primary' %>
-
-            <%= render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields } %>
           <% end %>
         </div>
 
