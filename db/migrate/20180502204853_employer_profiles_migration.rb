@@ -61,6 +61,8 @@ class EmployerProfilesMigration < Mongoid::Migration
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
+
+            raise Exception if !new_organization.valid?
             new_organization.save!
 
             #employer staff roles migration
@@ -82,7 +84,11 @@ class EmployerProfilesMigration < Mongoid::Migration
           failed = failed + 1
           print 'F' unless Rails.env.test?
           csv << [old_org.id, "0", "Migration Failed"]
-          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id} , #{e.inspect}" unless Rails.env.test?
+          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
+          validation_errors:
+          organization - #{new_organization.errors.messages}
+          profile - #{@new_profile.errors.messages},
+          #{e.inspect}" unless Rails.env.test?
         end
       end
     end
@@ -126,8 +132,8 @@ class EmployerProfilesMigration < Mongoid::Migration
     old_org.office_locations.each do |office_location|
       new_office_location = new_profile.office_locations.new()
       new_office_location.is_primary = office_location.is_primary
-      address_params = office_location.address.attributes.except("_id")
-      phone_params = office_location.phone.attributes.except("_id")
+      address_params = office_location.address.attributes.except("_id") if office_location.address.present?
+      phone_params = office_location.phone.attributes.except("_id") if office_location.phone.present?
       new_office_location.address = address_params
       new_office_location.phone = phone_params
     end
