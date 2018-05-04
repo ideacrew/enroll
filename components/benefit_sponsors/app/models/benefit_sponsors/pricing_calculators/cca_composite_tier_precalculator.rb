@@ -4,20 +4,20 @@ module BenefitSponsors
       class CalculatorState
         attr_reader :total
 
-        def initialize(p_calculator, product, p_model, r_coverage, gs_factor, pp_factor, sc_factor)
+        def initialize(p_calculator, product, p_model, r_coverage, c_eligibility_dates, gs_factor, pp_factor, sc_factor)
           @pricing_calculator = p_calculator
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
           @total = 0.00
           @rate_schedule_date = r_coverage.rate_schedule_date
-          @eligibility_dates = r_coverage.coverage_eligibility_dates
-          @coverage_start_date = r_coverage.coverage_start_date
+          @eligibility_dates = c_eligibility_dates
+          @coverage_start_date = r_coverage.coverage_start_on
           @rating_area = r_coverage.rating_area
           @product = product
           @group_size_factor = gs_factor
           @participation_percent_factor = pp_factor
           @sic_code_factor = sc_factor
-          @previous_product = r_coverage.previous_eligibility_product
+          @previous_product = r_coverage.previous_product
         end
 
         def add(member)
@@ -102,18 +102,21 @@ module BenefitSponsors
 
       def tier_and_total_for(pricing_model, benefit_roster_entry, group_size, participation_percent, sic_code)
         roster_entry = benefit_roster_entry
-        roster_coverage = benefit_roster_entry.roster_coverage
-        members_list = [roster_entry] + roster_entry.dependents
-        product = benefit_roster_entry.roster_coverage.product
+        roster_coverage = benefit_roster_entry.group_enrollment
+        coverage_eligibility_dates = {}
+        roster_coverage.member_enrollments.each do |m_en|
+          coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
+        end
+        product = benefit_roster_entry.group_enrollment.product
         gs_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_group_size_factor(product, group_size)
         pp_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_participation_percent_factor(product, participation_percent)
         sc_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_sic_code_factor(product, sic_code)
         age_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
-        sorted_members = members_list.sort_by do |rm|
-          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_date, roster_coverage.coverage_eligibility_dates, roster_coverage.previous_eligibility_product)
+        sorted_members = benefit_roster_entry.members.sort_by do |rm|
+          coverage_age = age_calculator.calc_coverage_age_for(rm, roster_coverage.product, roster_coverage.coverage_start_on, coverage_eligibility_dates, roster_coverage.previous_product)
           [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
         end
-        calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, roster_coverage, gs_factor, pp_factor, sc_factor)
+        calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, roster_coverage, coverage_eligibility_dates, gs_factor, pp_factor, sc_factor)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
           calc.add(mem)
         end

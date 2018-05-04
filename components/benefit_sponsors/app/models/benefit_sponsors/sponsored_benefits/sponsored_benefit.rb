@@ -6,8 +6,6 @@ module BenefitSponsors
 
       field :hbx_id,      type: String
       field :kind,        type: Symbol
-      field :title,       type: String
-      field :description, type: String
 
       embeds_many :benefit_products,      class_name: "::BenefitMarkets::Products::Product"
       embeds_one  :sponsor_contribution,  class_name: "::BenefitSponsors::SponsoredBenefits::SponsorContribution"

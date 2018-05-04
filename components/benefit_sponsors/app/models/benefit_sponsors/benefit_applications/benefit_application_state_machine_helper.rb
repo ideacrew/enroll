@@ -1,6 +1,6 @@
 module BenefitSponsors
   module BenefitApplications
-    module BenefitApplicationAasmCallbacks
+    module BenefitApplicationStateMachineHelper
 
       def is_application_unpublishable?
         open_enrollment_date_errors.present? || application_errors.present?

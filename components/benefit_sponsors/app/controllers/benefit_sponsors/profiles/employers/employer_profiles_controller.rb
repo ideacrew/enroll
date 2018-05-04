@@ -21,8 +21,7 @@ module BenefitSponsors
         else
           case @tab
             when 'benefits'
-              # @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-              # sort_plan_years(@employer_profile.plan_years)
+              @benefit_applications = find_benefit_applications
             when 'documents'
             when 'employees'
               # @current_plan_year = @employer_profile.show_plan_year
@@ -59,6 +58,10 @@ module BenefitSponsors
         @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
         @employer_profile = @organization.employer_profile
         render file: 'public/404.html', status: 404 if @employer_profile.blank?
+      end
+
+      def find_benefit_applications
+        @employer_profile.parent.active_benefit_sponsorship.benefit_applications
       end
     end
   end

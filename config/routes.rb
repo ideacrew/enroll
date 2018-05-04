@@ -57,6 +57,7 @@ Rails.application.routes.draw do
         get :employer_poc
         post :employer_poc_datatable
         get :employer_invoice
+        get :employer_datatable
         post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
