@@ -15,7 +15,7 @@
   <tbody>
     <% @sites.each do |site| %>
       <tr>
-        <td><%= site.site_key %></td>
+        <td><%= link_to site.site_key, "/benefit_markets/sites/#{site.id.to_s}/benefit_markets" %></td>
         <td><%= site.long_name %></td>
         <td><%= site.short_name %></td>
         <td><%= site.byline %></td>
