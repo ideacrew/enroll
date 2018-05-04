@@ -37,6 +37,7 @@ RSpec.describe Exchanges::AgentsController do
 
   describe "resume enrollment method behavior", dbclean: :after_each do
     let!(:consumer_role) { FactoryGirl.create(:consumer_role, bookmark_url: nil, person: person_user) }
+    let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :person => person_user)}
 
     before(:each) do
       allow(current_user).to receive(:roles).and_return ['consumer']
