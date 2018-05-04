@@ -145,6 +145,18 @@ module Observers
           trigger_on_queried_records("renewal_plan_year_publish_dead_line")
         end
 
+        if model_event.event_key == :initial_employer_first_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
+        end
+
+        if model_event.event_key == :initial_employer_second_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_second_reminder_to_publish_plan_year")
+        end
+
+        if model_event.event_key == :initial_employer_final_reminder_to_publish_plan_year
+          trigger_initial_employer_publish_remainder("initial_employer_final_reminder_to_publish_plan_year")
+        end
+
         if model_event.event_key == :initial_employer_no_binder_payment_received
           EmployerProfile.initial_employers_enrolled_plan_year_state.each do |org|
             if !org.employer_profile.binder_paid?
