@@ -192,6 +192,15 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         expect(family.initial_application_snapshot).not_to be_nil
       end
     end
+
+    context 'when send request in js' do
+      before do
+        sign_in user
+        get :new, person_id: person.id, employee_role_id: employee_role.id, format: :js
+      end
+      it { expect(response).to have_http_status(:success) }
+      it { expect(response).to render_template('new') }
+    end
   end
 
   context "GET terminate_selection" do
