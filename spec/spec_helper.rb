@@ -16,11 +16,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require File.join(File.dirname(__FILE__), "factories", "wrapping_sequence")
 require 'factory_girl_rails'
-FactoryGirl.definition_file_paths = [File.expand_path('./factories', __FILE__),
-  File.expand_path('../components/benefit_markets/spec/factories', __FILE__),
-  File.expand_path('../components/benefit_sponsors/spec/factories', __FILE__),
-]
-FactoryGirl.find_definitions
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
