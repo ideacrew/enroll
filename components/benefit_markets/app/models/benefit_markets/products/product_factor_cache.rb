@@ -3,7 +3,7 @@ module BenefitMarkets
     # Provides a cached, efficient lookup for referencing rate values
     # by multiple keys.
     class ProductFactorCache
-      def self.initialize_factory_cache!
+      def self.initialize_factor_cache!
         $pf_cache_for_composite_tier_factor = {}
         $pf_cache_for_group_size = {}
         $pf_cache_for_participation_percent = {}
