@@ -13,6 +13,7 @@ describe "insured/families/verification/_unverified_person.html.erb" do
     allow(view).to receive(:verification_type_status).and_return "Verified"
     allow(view).to receive(:policy_helper).and_return(double("Family", updateable?: true))
     allow(view).to receive_message_chain("current_user.has_hbx_staff_role?")
+    allow(family.family_members.first.person).to receive(:us_citizen).and_return false
     render :partial => 'insured/families/verification/unverified_person.html.erb', :locals => { :member => family.family_members.first}
   end
 
