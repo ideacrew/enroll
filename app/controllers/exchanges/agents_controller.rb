@@ -37,9 +37,9 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def resume_enrollment
-    if @person.resident_role && @person.resident_role.bookmark_url
+    if @person.resident_role && @person.is_resident_role_active? && @person.resident_role.bookmark_url
       redirect_to bookmark_url_path(@person.resident_role.bookmark_url)
-    elsif @person.consumer_role && @person.consumer_role.bookmark_url
+    elsif @person.consumer_role && @person.is_consumer_role_active? && @person.consumer_role.bookmark_url
       redirect_to bookmark_url_path(@person.consumer_role.bookmark_url)
     elsif @person.employee_roles.last && @person.employee_roles.last.bookmark_url
       redirect_to bookmark_url_path(@person.employee_roles.last.bookmark_url)

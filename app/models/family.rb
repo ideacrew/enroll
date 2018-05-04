@@ -853,7 +853,7 @@ class Family
 
   def build_consumer_role(family_member, opts = {})
     person = family_member.person
-    return if person.consumer_role.present?
+    return if person.has_consumer_or_resident_role?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
     transition = IndividualMarketTransition.new
     transition.role_type = "consumer"
@@ -874,7 +874,7 @@ class Family
 
   def build_resident_role(family_member, opts = {})
     person = family_member.person
-    return if person.resident_role.present?
+    return if person.has_consumer_or_resident_role?
     person.build_resident_role({:is_applicant => false}.merge(opts))
     transition = IndividualMarketTransition.new
     transition.role_type = "resident"
