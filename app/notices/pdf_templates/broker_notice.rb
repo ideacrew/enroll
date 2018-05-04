@@ -29,8 +29,12 @@ module PdfTemplates
       return true
     end
 
-    def general_agency_notice?
+    def employee_notice?
       return false
+    end
+
+    def general_agency?
+      false
     end
 
     def broker?

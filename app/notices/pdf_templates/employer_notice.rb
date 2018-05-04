@@ -44,11 +44,11 @@ module PdfTemplates
       return false
     end
 
-    def general_agency_notice?
-      return false
+    def employee_notice?
+      false
     end
 
-    def employee_notice?
+    def general_agency?
       false
     end
   end

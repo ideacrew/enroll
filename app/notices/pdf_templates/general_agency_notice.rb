@@ -11,7 +11,6 @@ module PdfTemplates
     attribute :general_agent_email, String
     attribute :employer, String
     attribute :employer_fullname, String
-    attribute :primary_identifier, String
     attribute :primary_fullname, String
     attribute :email, String
     attribute :broker_fullname, String
@@ -28,23 +27,24 @@ module PdfTemplates
     attribute :terminated_on, Date
 
     def shop?
-      return true
+      true
     end
 
-    def general_agency_notice?
-      return true
-  	end
+    def broker?
+      false
+    end
 
     def employee_notice?
-      return false
+      false
     end
 
+    def general_agency?
+      true
+    end
+    
     def employer_notice?
       return false
     end
 
-    def broker?
-      return false
-    end
   end
 end
