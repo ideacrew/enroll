@@ -10,6 +10,7 @@ module BenefitSponsors
             'long_name'=>'District of Columbia',
             'short_name'=>'DC',
             'byline'=>'Healthlink',
+            'domain_name' => 'dc.gov',
             'owner_organization_attributes'=>{
               'legal_name'=>'District of Columbia HealthLink',
               'profile_attributes'=>{
@@ -78,7 +79,7 @@ module BenefitSponsors
         end
       end
 
-      describe '##for_create' do
+      describe '##for_update' do
         include_context 'params'
 
         let(:site) { create :benefit_sponsors_site, :with_owner_exempt_organization }
