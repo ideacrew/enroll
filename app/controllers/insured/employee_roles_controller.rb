@@ -223,4 +223,5 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
+
 end
