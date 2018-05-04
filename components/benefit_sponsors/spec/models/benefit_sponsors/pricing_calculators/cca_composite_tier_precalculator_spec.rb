@@ -13,10 +13,10 @@ module BenefitSponsors
       )
     end
 
-    let(:group_size) { nil }
-    let(:participation_percent) { nil }
-    let(:sic_code) { nil }
-    let(:product) { nil }
+    let(:group_size) { 3 }
+    let(:participation_percent) { 50 }
+    let(:sic_code) { "a sic code" }
+    let(:product) { double }
 
     let(:benefit_roster) do
       benefit_roster_entries
@@ -214,6 +214,9 @@ module BenefitSponsors
           allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_and_spouse").and_return(1.5)
           allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_and_dependents").and_return(2.0)
           allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "family").and_return(2.5)
+          allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_group_size_factor).with(product, group_size).and_return(1.0)
+          allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_sic_code_factor).with(product, sic_code).and_return(1.0)
+          allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_participation_percent_factor).with(product, participation_percent).and_return(1.0)
         end
 
         it "calculates the pricing tiers" do

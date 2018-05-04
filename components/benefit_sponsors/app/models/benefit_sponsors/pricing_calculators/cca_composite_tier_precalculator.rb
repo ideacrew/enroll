@@ -22,7 +22,8 @@ module BenefitSponsors
 
         def add(member)
           coverage_age = @pricing_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
-          rel = @pricing_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
+          relationship = member.is_primary_member? ? "self" : member.relationship
+          rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           # TODO: make this more configurable, this is an awful hack.
           # The literal string value of "child" makes me uneasy.
