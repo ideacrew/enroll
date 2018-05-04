@@ -50,29 +50,5 @@ module BenefitSponsors
       fail NotAuthorizedError unless current_user.has_hbx_staff_role?
       # redirect_to root_url
     end
-
-    def update
-      @site = BenefitSponsors::Forms::Site.new current_user, id: params[:id]
-
-      if @site.save params[:site]
-        redirect_to :index
-      else
-        render 'edit'
-      end
-    end
-
-    def destroy
-      @site = BenefitSponsors::Site.find params[:id]
-      @site.destroy
-
-      redirect_to 'index'
-    end
-
-    private
-
-    def find_hbx_admin_user
-      fail NotAuthorizedError unless current_user.has_hbx_staff_role?
-      # redirect_to root_url
-    end
   end
 end
