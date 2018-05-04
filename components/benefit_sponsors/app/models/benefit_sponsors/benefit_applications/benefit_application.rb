@@ -4,8 +4,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include AASM
-
-      include BenefitApplicationAasmCallbacks
+      include BenefitApplicationStateMachineHelper
       include BenefitSponsors::Concerns::RecordTransition
 
       PUBLISHED = %w(published enrolling enrolled active suspended)
