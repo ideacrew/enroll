@@ -17,6 +17,7 @@ module BenefitSponsors
       it_behaves_like "should not permit for invalid user", :family_index?
       it_behaves_like "should not permit for invalid user", :family_datatable?
       it_behaves_like "should not permit for invalid user", :index?
+      it_behaves_like "should not permit for invalid user", :show?
     end
 
     context 'for a user with hbx staff role' do
@@ -31,6 +32,7 @@ module BenefitSponsors
       it_behaves_like "should permit for a user with hbx staff role", :family_index?
       it_behaves_like "should permit for a user with hbx staff role", :family_datatable?
       it_behaves_like "should permit for a user with hbx staff role", :index?
+      it_behaves_like "should permit for a user with hbx staff role", :show?
     end
 
     context 'for a user with broker role' do
@@ -48,6 +50,10 @@ module BenefitSponsors
       it "should not permit the user with broker role for index?" do
         expect(policy.send(:index?)).to be false
       end
+
+      it "should not permit the user with broker role for show?" do
+        expect(policy.show?).to be false
+      end
     end
 
     context 'for a user with csr role' do
@@ -64,6 +70,10 @@ module BenefitSponsors
 
       it "should permit the user with csr role for index?" do
         expect(policy.send(:index?)).to be true
+      end
+
+      it "should permit the user with csr role for show?" do
+        expect(policy.show?).to be true
       end
     end
   end

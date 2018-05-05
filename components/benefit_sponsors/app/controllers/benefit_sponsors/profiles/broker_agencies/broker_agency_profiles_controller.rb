@@ -1,3 +1,5 @@
+require_dependency "benefit_sponsors/application_controller"
+
 module BenefitSponsors
   module Profiles
     class BrokerAgencies::BrokerAgencyProfilesController < ApplicationController
@@ -6,11 +8,6 @@ module BenefitSponsors
       include Concerns::ProfileRegistration
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-
-      # before_action :find_broker_agency_profile, only: [:employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
-      # before_action :set_current_person, only: [:staff_index]
-      # before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
-      # before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
 
       layout 'single_column'
 
@@ -26,6 +23,7 @@ module BenefitSponsors
       end
 
       def show
+        authorize self, :redirect_signup?
         set_flash_by_announcement
         @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
         @provider = current_user.person
@@ -117,10 +115,6 @@ module BenefitSponsors
         end
       end
 
-      # def redirect_to_show(broker_agency_profile_id)
-      #   redirect_to profiles_broker_agencies_broker_agency_profile_path(id: broker_agency_profile_id)
-      # end
-
       private
 
       def find_broker_agency_profile(broker_agency_profile_id = nil)
@@ -131,7 +125,9 @@ module BenefitSponsors
       end
 
       def user_not_authorized(exception)
-        if current_user.has_broker_agency_staff_role?
+        if exception.query == :redirect_signup?
+          redirect_to main_app.new_user_registration_path
+        elsif current_user.has_broker_agency_staff_role?
           redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
         else
           redirect_to benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency)
