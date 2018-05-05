@@ -131,7 +131,7 @@ module SponsoredBenefits
 
       scope :employer_profiles_with_attestation_document, -> { exists(:"employer_profile.employer_attestation.employer_attestation_documents" => true) }
 
-      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
       def self.generate_fein
         loop do
@@ -162,7 +162,7 @@ module SponsoredBenefits
       end
 
       def self.search_hash(s_rex)
-        search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+        search_rex = ::Regexp.compile(::Regexp.escape(s_rex), true)
         {
           "$or" => ([
             {"legal_name" => search_rex},
@@ -273,7 +273,7 @@ module SponsoredBenefits
 
       def self.invoice_exist?(invoice_date,org)
         docs =org.documents.where("date" => invoice_date)
-        matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
+        matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
         return true if matching_documents.count > 0
       end
 
@@ -308,7 +308,7 @@ module SponsoredBenefits
           query_params = []
 
           if !search_params[:q].blank?
-            q = Regexp.new(Regexp.escape(search_params[:q].strip), true)
+            q = ::Regexp.new(::Regexp.escape(search_params[:q].strip), true)
             query_params << {"legal_name" => q}
           end
 

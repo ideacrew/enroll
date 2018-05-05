@@ -22,7 +22,7 @@ module SponsoredBenefits
       delegate :effective_date, to: :profile
       validates_uniqueness_of :claim_code, :case_sensitive => false, :allow_nil => true
 
-      scope :datatable_search, ->(query) { self.where({"$or" => ([{"title" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      scope :datatable_search, ->(query) { self.where({"$or" => ([{"title" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
       ## TODO: how are we defining 'initial' vs 'renewing'?
       scope :initial, -> { not_in(aasm_state: RENEWAL_STATES) }
       scope :renewing, ->{ any_in(aasm_state: RENEWAL_STATES) }
