@@ -14,7 +14,7 @@ module BenefitMarkets
     field :application_period,      type: Range
     field :hbx_id,                  type: String
 
-    field :key,                     type: Symbol
+    field :key,                     type: Symbol 
     field :title,                   type: String
     field :description,             type: String
 
@@ -31,10 +31,6 @@ module BenefitMarkets
     validates_presence_of :title, :allow_blank => false
     validate :has_products
 
-
-    # Implement in subclass
-    def to_sponsored_benefit
-    end
 
     # Implement in subclass
     def all_products

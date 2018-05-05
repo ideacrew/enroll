@@ -25,6 +25,7 @@ module BenefitSponsors
 
       def self.kinds
         %w(health)
+        # get kinds from catalog based on products/product packages
       end
     end
   end

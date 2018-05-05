@@ -17,7 +17,7 @@ module BenefitSponsors
         @products = []
         product_packages.each do |product_package|
           @products += product_package.all_products.collect do |product|
-            Product.new(product.id, product.name, product.metal_level, carriers[product.carrier_profile_id.to_s], product.coverage_kind)
+            Product.new(product.id, product.name, product.metal_level, carriers[product.carrier_profile_id.to_s], false, product.coverage_kind)
           end
         end
         @products
@@ -26,6 +26,23 @@ module BenefitSponsors
       def carriers
         return @carriers if defined? @carriers
         CarrierProfile.all.inject({}) {|carriers, carrier| carriers[carrier.id.to_s] = carrier.legal_name; carriers}
+      end
+
+      # TODO: calculate option kinds dynamically from products
+      def plan_option_kinds
+        ['Single Carrier', 'Metal Level', 'Single Plan']
+      end
+
+      def carrier_level_options
+        plan_options.group_by(&:carrier_name)
+      end
+
+      def metal_level_options
+        plan_options.group_by(&:metal_level)
+      end
+
+      def single_plan_options
+        plan_options
       end
     end
   end
