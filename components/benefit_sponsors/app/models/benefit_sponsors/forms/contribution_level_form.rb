@@ -1,10 +1,9 @@
 module BenefitSponsors
   module Forms
     class ContributionLevelForm
-      extend  ActiveModel::Naming
-      include ActiveModel::Conversion
-      include ActiveModel::Validations
+
       include Virtus.model
+      include ActiveModel::Model
 
       attribute :display_name, String
       attribute :contribution_unit_id, String
@@ -25,29 +24,29 @@ module BenefitSponsors
       # Benefit Sponsor Catalog
       def self.contribution_levels
 
-        # [
-        #   {
-        #     display_name: 'employee',
-        #     is_offered: true,
-        #     order: 0,
-        #     contribution_factor: 0.75,
-        #     min_contribution_factor: 0.50
-        #   },
-        #   {
-        #     display_name: 'spouse',
-        #     is_offered: true,
-        #     order: 1,
-        #     contribution_factor: 0.75,
-        #     min_contribution_factor: 0.50
-        #   },
-        #   {
-        #     display_name: 'dependent',
-        #     is_offered: true,
-        #     order: 2,
-        #     contribution_factor: 0.75,
-        #     min_contribution_factor: 0.50
-        #   }
-        # ]
+        [
+          {
+            display_name: 'employee',
+            is_offered: true,
+            order: 0,
+            contribution_factor: 0.75,
+            min_contribution_factor: 0.50
+          },
+          {
+            display_name: 'spouse',
+            is_offered: true,
+            order: 1,
+            contribution_factor: 0.75,
+            min_contribution_factor: 0.50
+          },
+          {
+            display_name: 'dependent',
+            is_offered: true,
+            order: 2,
+            contribution_factor: 0.75,
+            min_contribution_factor: 0.50
+          }
+        ]
       end
     end
   end

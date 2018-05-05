@@ -1,0 +1,76 @@
+<%= form_for @benefit_package_form, url: benefit_sponsorship_benefit_application_benefit_packages_path do |f| %>
+
+<a href="#" data-href="<%#= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
+<a href="#" data-href="<%#= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
+<a href="#" data-href="<%#= calc_offered_plan_contributions_employers_employer_profile_plan_years_path %>" id='calc_offered_plan_contributions_link' style='display:none;'></a>
+<a href="#" data-href="<%#= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
+<% i = f.index %>
+<div class="reference-summary">
+</div>
+<%#= render "employers/plan_years/employee_costs_modal" %>
+<fieldset id='benefit-group-<%#= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%#= f.object.id.to_s %>" data-benefit-group-index="<%# if i < 50 %><%#= i %><%# end %>">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <h1>
+        Benefit Package - Set Up
+      </h1>
+      <div class="module benefit-properties">
+        <div class="row row-form-wrapper no-buffer plan-title">
+          <div class="col-xs-12 form-group form-group-lg">
+            <!-- Offset :  -->
+            <label class="title">NAME YOUR BENEFIT PACKAGE</label>
+            <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
+            <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer description">
+          <div class="col-xs-12 form-group form-group-lg">
+            <label class="title">DESCRIPTION</label>
+            <%= f.text_field :description, class: "form-control", style: "font-weight: normal !important;" %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-xs-12 form-group form-group-lg">
+            <!-- Offset :  -->
+            <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
+            <%= f.select(:probation_period_kind, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.probation_period_kind), { :class => ''}) %>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <br/>
+    </div>
+  </div>
+<%= f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|  %>
+    <%= render "sponsored_benefit", f: sb %>
+  <% end %>
+</fieldset>
+<% end %>
+
+
+<% #if i < 50 %>
+  <script>
+  $(document).on('page:update', function() {
+    //validate plan year create for title, referencce plan, and premium Percentage
+    if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        $('.interaction-click-control-save-plan-year').removeClass('disabled');
+        EmployerProfile.validateEditPlanYear();
+        //validate plan year create for title, referencce plan, and premium Percentage
+        $(document).on('change', '.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+            EmployerProfile.validateEditPlanYear();
+        });
+        $(document).on('change', '.reference-plan input', function() {
+            EmployerProfile.validateEditPlanYear();
+        });
+    } else if (window.location.href.indexOf("new") > -1 && window.location.href.indexOf("plan_years") > -1) {
+        EmployerProfile.validatePlanYear();
+        $(document).on('change', '.plan-title input, .offerings input.hidden-param.premium-storage-input', function() {
+            EmployerProfile.validatePlanYear();
+        });
+        $(document).on('change', '.reference-plan input', function() {
+            EmployerProfile.validatePlanYear();
+        });
+    } else {}
+  });
+  </script>
+<% #end %>
