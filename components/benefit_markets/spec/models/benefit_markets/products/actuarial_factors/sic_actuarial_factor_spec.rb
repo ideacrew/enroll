@@ -7,8 +7,8 @@ module BenefitMarkets
 			subject.errors
 		}
 
-		it "requires a carrier profile" do
-			expect(validation_errors.has_key?(:carrier_profile_id)).to be_truthy  
+		it "requires an issuer profile" do
+			expect(validation_errors.has_key?(:issuer_profile_id)).to be_truthy  
 		end
 
 		it "requires a default factor value" do
@@ -28,14 +28,14 @@ module BenefitMarkets
 	" do
 
 		let(:default_factor_value) { 1.234567 }
-		let(:carrier_profile_id) { BSON::ObjectId.new }
+		let(:issuer_profile_id) { BSON::ObjectId.new }
 		let(:active_year) { 2015 }
 
 		subject do
 			Products::ActuarialFactors::SicActuarialFactor.new({
 				:default_factor_value => default_factor_value,
 				:active_year => active_year,
-				:carrier_profile_id => carrier_profile_id
+				:issuer_profile_id => issuer_profile_id
 			})
 		end
 

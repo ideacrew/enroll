@@ -113,7 +113,7 @@ module BenefitSponsors
       scope :by_broker_role, ->(broker_role_id) { broker_agency_profiles.where(:"profiles.primary_broker_role_id" => broker_role_id)}
       scope :by_employer_profile,->(profile_id){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
 
-      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
 
       # Strip non-numeric characters
@@ -169,7 +169,7 @@ module BenefitSponsors
         end
 
         def search_hash(s_rex)
-          search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+          search_rex = ::Regexp.compile(::Regexp.escape(s_rex), true)
           {
             "$or" => ([
               {"legal_name" => search_rex},

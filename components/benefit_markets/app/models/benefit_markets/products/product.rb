@@ -21,15 +21,12 @@ module BenefitMarkets
     field :title,                 type: String
     field :description,           type: String
     field :product_package_kinds, type: Array, default: []
+    field :issuer_profile_id,     type: BSON::ObjectId
 
-    # belongs_to  :issuer_profile, 
-    #             class_name: "::BenefitSponsors::Organizations::IssuerProfile"
-    
+
     belongs_to  :service_area,
                 counter_cache: true,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
-
-    embeds_one  :issuer_profile
 
     embeds_many :premium_tables,
                 class_name: "BenefitMarkets::Products::PremiumTable"
@@ -65,10 +62,14 @@ module BenefitMarkets
 
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
-    # TODO: Change this to API call
     def issuer_profile
-      # return unless issuer_profile_urn.present?
-      IssuerStub.new
+      return @issuer_profile if is_defined?(@issuer_profile)
+      @issuer_profile = ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_profile_id)
+    end
+
+    def issuer_profile=(new_issuer_profile)
+      write_attribute(:issuer_profile_id, new_issuer_profile.id)
+      @issuer_profile = new_issuer_profile
     end
 
     def premium_table_effective_on(effective_date)
@@ -122,33 +123,4 @@ module BenefitMarkets
 
   end
 
-  class IssuerStub
-    attr_reader :name, :urn, :hbx_carrier_id, :fein, :issuer_hios_id, :benefit_market_kinds, 
-                :product_kinds, :issuer_state
-
-    def initialize
-      @name                 = "SafeCo"
-      @urn                  = "urn:openhbx:terms:v1:"
-      @hbx_carrier_id       = "123456789"
-      @fein                 = "555555555"
-      @issuer_hios_id       = "hios-123"
-      @benefit_market_kinds = [:aca_shop]
-      @product_kinds        = [:health]  # => [:health, :dental]
-      @issuer_state         = "MD"
-    end
-
-    def as_document
-    end
-
-    def validated?
-      true
-    end
-
-    def flagged_for_destroy?
-      false
-    end
-  end
-
-  class DuplicatePremiumTableError < StandardError; end
-  class InvalidEffectivePeriodError < StandardError; end
 end

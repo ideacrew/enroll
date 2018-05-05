@@ -16,7 +16,7 @@
           li
             checkbox
               label
-                input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="#{level}"
+                input id="plan-metal-level-#{level}" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-#{level}" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="#{level}" data-category="planMetalLevel"
                 label for="plan-metal-level-#{level}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info')}"
                   = l10n("#{level}")
@@ -30,7 +30,7 @@
           li
             checkbox
               label
-                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)"
+                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)" data-category="planType"
                 label for="checkbox-#{10+i}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.'"#{type}"'_title_info')}"
                   = l10n("#{type}")
@@ -44,7 +44,7 @@
           li
             checkbox
               label
-                input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)"
+                input id="checkbox-#{13+i}" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-#{13+i}" type="checkbox" data-plan-network="#{network}" onClick="filterPlanNetwork(this)" data-category="planNetwork"
                 label for="checkbox-#{13+i}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
                   = l10n("#{network}")

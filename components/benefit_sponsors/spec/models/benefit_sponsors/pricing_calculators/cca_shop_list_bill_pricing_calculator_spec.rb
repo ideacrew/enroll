@@ -92,7 +92,7 @@ module BenefitSponsors
         sic_code: "a sic code"
       )
     end
-
+1
     describe "given:
       - a sponsor which offers choice rating 
       - with 'employee' and 'spouse' groups" do
@@ -127,6 +127,8 @@ module BenefitSponsors
         before(:each) do
           allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+          allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_group_size_factor).with(product, 1).and_return(1.0)
+          allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_sic_code_factor).with(product, "a sic code").and_return(1.0)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
             product,
             rate_schedule_date,

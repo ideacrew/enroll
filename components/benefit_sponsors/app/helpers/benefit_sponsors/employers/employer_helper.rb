@@ -48,28 +48,6 @@ module BenefitSponsors
           return false, 'No matching employer staff role'
         end
       end
-
-      def link_to_add_fields(name, f, association, classes='')
-        new_object = f.object.send(association).klass.new
-        id = new_object.object_id
-
-        # TODO add ability to build nested attributes dynamically
-        if f.object.send(association).klass == OfficeLocation
-          new_object.build_address
-          new_object.build_phone
-        end
-
-        if f.object.send(association).klass == BenefitGroup
-          new_object.build_relationship_benefits
-          new_object.build_dental_relationship_benefits
-        end
-
-        fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
-          render("benefit_sponsors/shared/" + association.to_s.singularize + "_fields", f: builder)
-        end
-        link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,
-                '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
-      end
     end
   end
 end

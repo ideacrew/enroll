@@ -56,7 +56,7 @@ module Forms
     end
 
     def regex_for(str)
-      Regexp.compile(Regexp.escape(str.to_s))
+      ::Regexp.compile(::Regexp.escape(str.to_s))
     end
   end
 end

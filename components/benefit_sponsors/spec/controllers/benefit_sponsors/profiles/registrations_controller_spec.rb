@@ -216,13 +216,17 @@ module BenefitSponsors
             post :create, :agency => self.send("#{profile_type}_params")
           end
 
-          it "should redirect" do
-            expect(response).to have_http_status(:redirect)
+          it "should success" do
+            expect(response).to have_http_status(:success)
           end
 
-          it "should redirect to new" do
-            expect(response.location.include?("new?profile_type=benefit_sponsor")).to eq true if profile_type == "benefit_sponsor"
-            expect(response.location.include?("new?profile_type=broker_agency")).to eq true if profile_type == "broker_agency"
+          it "should render new" do
+            expect(response).to render_template :new
+          end
+
+          it "should have profile_type in params" do
+            expect(controller.params[:agency][:profile_type] == "benefit_sponsor").to eq true if profile_type == "benefit_sponsor"
+            expect(controller.params[:agency][:profile_type] == "broker_agency").to eq true if profile_type == "broker_agency"
           end
         end
 

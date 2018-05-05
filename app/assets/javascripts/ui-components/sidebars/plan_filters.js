@@ -13,39 +13,15 @@ var deductibleFromAmountValue = new String;
 var deductibleToAmountValue = new String;
 
 function filterMetalLevel(element) {
-  if (element.checked) {
-    var metalLevel = element.dataset.planMetalLevel
-    selectedMetalLevels.push(metalLevel)
-  }
-  if (!element.checked) {
-    var metalLevel = element.dataset.planMetalLevel
-    index = selectedMetalLevels.indexOf(metalLevel)
-    removeItems(selectedMetalLevels,index)
-  }
+  processValues(element)
 }
 
 function filterPlanType(element) {
-  if (element.checked) {
-    var planType = element.dataset.planType
-    selectedPlanTypes.push(planType)
-  }
-  if (!element.checked) {
-    var planType = element.dataset.planType
-    index = selectedPlanTypes.indexOf(planType)
-    removeItems(selectedPlanTypes,index)
-  }
+  processValues(element)
 }
 
 function filterPlanNetwork(element) {
-  if (element.checked) {
-    var planNetwork = element.dataset.planNetwork
-    selectedPlanNetworks.push(planNetwork)
-  }
-  if (!element.checked) {
-    var planNetwork = element.dataset.planNetwork
-    index = selectedPlanNetworks.indexOf(planNetwork)
-    removeItems(selectedPlanNetworks,index)
-  }
+  processValues(element)
 }
 
 function filterPlanCarriers(element) {
@@ -71,6 +47,38 @@ function deductibleFromAmount(element) {
 function deductibleToAmount(element) {
   deductibleToAmountValue = element.value
 }
+// Passes values from inputs and passes to array
+function processValues(element) {
+  if (element.checked) {
+    var dataType = element.dataset.category;
+ 
+    if (dataType == "planMetalLevel") {
+      selectedMetalLevels.push(element.dataset.planMetalLevel)
+    }
+    if (dataType == "planType") {
+      selectedPlanTypes.push(element.dataset.planType)
+    }
+    if (dataType == "planNetwork") {
+      selectedPlanNetworks.push(element.dataset.planNetwork)
+    }
+  }
+  if (!element.checked) {
+    var dataType = element.dataset.category;
+    
+    if (dataType == "planMetalLevel") {
+      index = selectedMetalLevels.indexOf(element.dataset.planMetalLevel)
+      removeItems(selectedMetalLevels,index)
+    }
+    if (dataType == "planType") {
+      index = selectedPlanTypes.indexOf(element.dataset.planType)
+      removeItems(selectedPlanTypes,index)
+    }
+    if (dataType == "planNetwork") {
+      index = selectedPlanNetworks.indexOf(element.dataset.planNetwork)
+      removeItems(selectedPlanNetworks,index)
+    }
+  }
+}
 
 function clearAll() {
   // Clears all checkboxes within #filter-sidebar only
@@ -80,6 +88,10 @@ function clearAll() {
       inputs[i].checked = false;
       inputs[i].value = "";
   }
+  // Select options -- WISH LIST GET RID OF SELECTRIC TO REMOVE JQUERY RELIANCE --
+  $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+  $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+  
   // Clear stored values
   selectedMetalLevels = [];
   selectedPlanTypes = [];
@@ -88,9 +100,6 @@ function clearAll() {
   premiumToAmountValue = "";
   deductibleFromAmountValue = "";
   deductibleToAmountValue = "";
-  
-  var select = document.querySelectorAll("#filter-sidebar select");
-
 }
 
 // Gets the filtered Results
