@@ -12,7 +12,7 @@ module BenefitSponsors
       field :probation_period_kind, type: Symbol
 
       field :is_congress, type: Boolean, default: false
-      field :is_default, type: Boolean, default: false
+      field :default, type: Boolean, default: false
 
       embeds_many :sponsored_benefits,
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
