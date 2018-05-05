@@ -1,12 +1,19 @@
+## Product premium costs for a specified time period
+# Effective periods:
+#   DC & MA SHOP Health: Q1, Q2, Q3, Q4
+#   DC Dental: annual
+#   GIC Medicare: Jan-June, July-Dec
+#   DC & MA IVL: annual
+
 module BenefitMarkets
   class Products::PremiumTable
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :product,
-                class_name: "Products::Product"
+    embedded_in :product, class_name: "Products::Product"
 
-    field :effective_period,  type: Range
+    field       :effective_period,  type: Range
+
 
     belongs_to  :rating_area,
                 class_name: "BenefitMarkets::Locations::RatingArea"

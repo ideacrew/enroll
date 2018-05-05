@@ -163,7 +163,7 @@ module BenefitMarkets
         context "and a premium_table already exists for the effective_period" do
 
           it "should throw an error" do
-            expect{subject.add_premium_table(premium_table_q1)}.to raise_error("effective_period may not overlap existing premium_table")
+            expect{subject.add_premium_table(premium_table_q1)}.to raise_error(BenefitMarkets::DuplicatePremiumTableError)
           end
         end
 

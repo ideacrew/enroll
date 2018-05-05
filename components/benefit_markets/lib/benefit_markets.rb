@@ -72,4 +72,18 @@ module BenefitMarkets
     def self.range_is_increasing?(range)
       range.begin < range.end
     end
+
+    # Error classes
+    class UndefinedProductKindError                 < StandardError; end
+    class UndefinedContributionModelError           < StandardError; end
+    class UndefinedBenefitOptionError               < StandardError; end
+    class UndefinedPriceModelError                  < StandardError; end
+    class CompositeRatePriceModelIncompatibleError  < StandardError; end
+
+    class BenefitMarketCatalogError                 < StandardError; end
+
+    class DuplicatePremiumTableError                < StandardError; end
+    class InvalidEffectivePeriodError               < StandardError; end
+
+
 end

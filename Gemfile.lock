@@ -46,7 +46,7 @@ PATH
       aasm (~> 4.8.0)
       active_model_serializers
       config
-      mongoid (~> 5.0.1)
+      mongoid (~> 5.4.0)
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       slim (~> 3.0.8)
@@ -62,7 +62,7 @@ PATH
       devise (~> 3.4.1)
       language_list (~> 1.1.0)
       money-rails (~> 1.3.0)
-      mongoid (~> 5.0.1)
+      mongoid (~> 5.4.0)
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
@@ -76,7 +76,7 @@ PATH
     sponsored_benefits (0.0.1)
       aasm (~> 4.8.0)
       config
-      mongoid (~> 5.0.1)
+      mongoid (~> 5.4.0)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
       slim (= 3.0.8)
@@ -166,7 +166,7 @@ GEM
       rails (>= 4.0.0)
     bootstrap-slider-rails (6.0.17)
       railties (>= 3.2, < 5.0)
-    bson (3.2.6)
+    bson (4.3.0)
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -383,14 +383,14 @@ GEM
       monetize (~> 1.1.0)
       money (~> 6.5.0)
       railties (>= 3.0)
-    mongo (2.1.2)
-      bson (~> 3.0)
+    mongo (2.5.1)
+      bson (>= 4.3.0, < 5.0.0)
     mongo_session_store-rails4 (6.0.0)
       actionpack (>= 3.1)
-    mongoid (5.0.1)
+    mongoid (5.4.0)
       activemodel (~> 4.0)
-      mongo (~> 2.1)
-      origin (~> 2.1)
+      mongo (>= 2.5.1, < 3.0.0)
+      origin (~> 2.3)
       tzinfo (>= 0.3.37)
     mongoid-autoinc (5.0.2)
       mongoid (~> 5.0)
@@ -691,7 +691,7 @@ DEPENDENCIES
   benefit_sponsors!
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
-  bson (= 3.2.6)
+  bson (~> 4.3.0)
   byebug (= 8.2.2)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
@@ -727,9 +727,9 @@ DEPENDENCIES
   mail (= 2.6.3)
   maskedinput-rails
   money-rails (~> 1.3.0)
-  mongo (= 2.1.2)
+  mongo (= 2.5.1)
   mongo_session_store-rails4 (~> 6.0.0)
-  mongoid (= 5.0.1)
+  mongoid (~> 5.4.0)
   mongoid-autoinc
   mongoid-enum
   mongoid-history

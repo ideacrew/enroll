@@ -1,11 +1,5 @@
 # Support product import from SERFF, CSV templates, etc
 
-## Product premium periods
-# DC & MA SHOP Health: Q1, Q2, Q3, Q4
-# DC Dental: annual
-# GIC Medicare: Jan-June, July-Dec
-# DC & MA IVL: annual
-
 # Effective dates during which sponsor may purchase this product at this price
 ## DC SHOP Health   - annual product changes & quarterly rate changes
 ## CCA SHOP Health  - annual product changes & quarterly rate changes
@@ -17,18 +11,18 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    field :benefit_market_kind, type: Symbol
+    field :benefit_market_kind,   type: Symbol
 
     # Time period during which Sponsor may include this product in benefit application
-    field :application_period,  type: Range   # => Mon, 01 Jan 2018..Mon, 31 Dec 2018
+    field :application_period,    type: Range   # => Mon, 01 Jan 2018..Mon, 31 Dec 2018
 
-    field :hbx_id,              type: String
-    field :issuer_profile_urn,  type: String
-    field :title,               type: String
-    field :description,         type: String
+    field :hbx_id,                type: String
+    field :issuer_profile_urn,    type: String
+    field :title,                 type: String
+    field :description,           type: String
+    field :product_package_kinds, type: Array, default: []
+    field :issuer_profile_id,     type: BSON::ObjectId
 
-    # belongs_to  :issuer, 
-    #             class_name: "::IssuerProfile"
 
     belongs_to  :service_area,
                 counter_cache: true,
@@ -54,6 +48,12 @@ module BenefitMarkets
             "premium_tables.effective_period.max" => 1 },
             {name: "premium_tables"})
 
+    scope :by_product_package,    ->(product_package) {
+      # product_package.benefit_market_kind
+      # product_package.application_period
+      # product_package.product_kind
+      # product_package.kind
+    }
 
     scope :by_service_area,       ->(service_area){ where(service_area: service_area) }
 
@@ -62,6 +62,15 @@ module BenefitMarkets
 
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
+    def issuer_profile
+      return @issuer_profile if is_defined?(@issuer_profile)
+      @issuer_profile = ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_profile_id)
+    end
+
+    def issuer_profile=(new_issuer_profile)
+      write_attribute(:issuer_profile_id, new_issuer_profile.id)
+      @issuer_profile = new_issuer_profile
+    end
 
     def premium_table_effective_on(effective_date)
       premium_tables.detect { |premium_table| premium_table.effective_period.cover?(effective_date) }
@@ -103,31 +112,15 @@ module BenefitMarkets
       end
     end
 
+    def add_product_package(new_product_package)
+      product_packages.push(new_product_package).uniq!
+      product_packages
+    end
 
-    # TODO: Change this to API call
-    def issuer_profile
-      # return unless issuer_profile_urn.present?
-      IssuerStub.new
+    def drop_product_package(product_package)
+      product_packages.delete(product_package) { "not found" }
     end
 
   end
 
-  class IssuerStub
-    attr_reader :name, :urn, :hbx_carrier_id, :fein, :issuer_hios_id, :benefit_market_kinds, 
-                :product_kinds, :issuer_state
-
-    def initialize
-      @name                 = "SafeCo"
-      @urn                  = "urn:openhbx:terms:v1:"
-      @hbx_carrier_id       = "123456789"
-      @fein                 = "555555555"
-      @issuer_hios_id       = "hios-123"
-      @benefit_market_kinds = [:aca_shop]
-      @product_kinds        = [:health]  # => [:health, :dental]
-      @issuer_state         = "MD"
-    end
-    end
-
-  class DuplicatePremiumTableError < StandardError; end
-  class InvalidEffectivePeriodError < StandardError; end
 end
