@@ -3,7 +3,11 @@ require 'rails_helper'
 module BenefitMarkets
   RSpec.describe Products::ProductPackage, type: :model do
 
-    let(:key)                     { :product_package }
+    let(:this_year)               { TimeKeeper.date_of_record.year }
+    # let(:benefit_market_kind)     { :aca_shop }
+    let(:application_period)      { Date.new(this_year, 1, 1)..Date.new(this_year, 12, 31) }
+    let(:product_kind)            { :health }
+    let(:kind)                    { :single_issuer }
     let(:hbx_id)                  { "58585858" }
     let(:title)                   { "SafeCo Issuer Health" }
     let(:description)             { "All products offered by a single issuer" }
@@ -14,7 +18,9 @@ module BenefitMarkets
 
     let(:params) do
         {
-          key:                key,
+          application_period: application_period,
+          product_kind:       product_kind,
+          kind:               kind,
           hbx_id:             hbx_id,
           title:              title,
           description:        description,

@@ -9,7 +9,8 @@ module BenefitMarkets
     field :probation_period_kinds,  type: Array, default: []
 
 
-    embeds_one  :service_area
+    belongs_to  :service_area,
+                class_name: "BenefitMarkets::Locations::ServiceArea"
 
     embeds_one  :sponsor_market_policy,  
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"

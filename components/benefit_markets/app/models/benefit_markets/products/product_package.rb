@@ -14,9 +14,10 @@ module BenefitMarkets
     field :application_period,      type: Range
     field :hbx_id,                  type: String
 
-    field :key,                     type: Symbol
-    field :title,                   type: String
-    field :description,             type: String
+    field :product_kind,            type: Symbol
+    field :kind,                    type: Symbol
+    field :title,                   type: String, default: ""
+    field :description,             type: String, default: ""
 
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
@@ -27,26 +28,15 @@ module BenefitMarkets
     embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
+    embeds_one  :service_area,
+                class_name: "BenefitMarkets::Locations::ServiceArea"
 
+
+    validates_presence_of :application_period, :product_kind, :kind
     validates_presence_of :title, :allow_blank => false
-    validate :has_products
 
-
-    # Implement in subclass
-    def to_sponsored_benefit
-    end
-
-    # Implement in subclass
-    def all_products
-      Plan.where(:active_year => packagable.product_active_year, :market => packagable.product_market_kind)
-    end
-
-    # Implement in subclass
-    def add_product(new_product)
-    end
-
-    def drop_product(new_product)
-      products.delete(new_product) { "not found" }
+    def benefit_market_kind
+      packagable.benefit_market_kind
     end
 
     def issuer_profiles
@@ -54,52 +44,45 @@ module BenefitMarkets
       @issuer_profiles = products.select { |product| product.issuer_profile }.uniq!
     end
 
-    def all_products_for(issuer_profile)
-      products.collect { |issuer_profile| product.issuer_profile == issuer_profile }
+    def issuer_profile_products_for(issuer_profile)
+      return @issuer_profile_products if is_defined?(@issuer_profile_products)
+      @issuer_profile_products = products.collect { |issuer_profile| product.issuer_profile == issuer_profile }
     end
 
-    # Intersection of product that match service area and effective dates
-    def products_available_for(service_area, effective_date)
-      products_available_on(effective_date) & products_available_where(service_area)
+    # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
+    def load_embedded_products(service_area, effective_date)
+      products = benefit_market_products_available_for(service_area, effective_date)
     end
 
-    def products_available_on(effective_date)
-      products.collect { |product| product.premium_table_effective_on(effective_date).present? }
+    # Query products from database applicable to this product package
+    def all_benefit_market_products
+      return unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
+      return @all_benefit_market_products if is_defined?(@all_benefit_market_products)
+      @all_benefit_market_products = Product.by_product_package(self)
     end
 
-    def products_available_where(service_area)
-      products.collect { |product| product.service_area == service_area }
+    # Intersection of BenefitMarket::Products that match both service area and effective date
+    def benefit_market_products_available_for(service_area, effective_date)
+      benefit_market_products_available_on(effective_date) & benefit_market_products_available_where(service_area)
     end
 
-
-
-    def self.subclass_for(benefit_option_kind)
-      product_kind, constraint = BENEFIT_PACKAGE_MAPPINGS[benefit_option_kind.to_sym]
-      "::BenefitMarkets::Products::#{product_kind.to_s.camelcase}Products::#{constraint.to_s.camelcase}#{product_kind.to_s.camelcase}ProductPackage".constantize
+    # BenefitMarket::Products available for purchase on effective date
+    def benefit_market_products_available_on(effective_date)
+      all_benefit_market_products.collect { |product| product.premium_table_effective_on(effective_date).present? }
     end
 
-    def has_products
-      return true if packagable.blank?
-      if self.all_products.empty?
-        self.errors.add(:base, "the package would have no products")
-        false
-      else
-        true
-      end
+    # BenefitMarket::Products available for purchase within a specified service area
+    def benefit_market_products_available_where(service_area)
+      all_benefit_market_products.collect { |product| product.service_area == service_area }
+    end
+
+    def add_product(new_product)
+      products.push(new_product).uniq!
+    end
+
+    def drop_product(new_product)
+      products.delete(new_product) { "not found" }
     end
 
   end
-
-
-  BENEFIT_PACKAGE_MAPPINGS = {
-    :any_dental             => [:dental, :any],
-    :single_product_health  => [:health, :single_product],
-    :single_product_dental  => [:dental, :single_product],
-    :issuer_health          => [:health, :issuer],
-    :metal_level_health     => [:health, :metal_level],
-    :composite_health       => [:health, :composite]
-  }
-
-  BENEFIT_OPTION_KINDS = BENEFIT_PACKAGE_MAPPINGS.keys
-
 end
