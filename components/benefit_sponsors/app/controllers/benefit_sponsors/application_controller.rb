@@ -5,7 +5,6 @@ module BenefitSponsors
 
     helper BenefitSponsors::Engine.helpers
 
-    before_filter :require_login, unless: :authentication_not_required?
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
     def self.current_site
@@ -37,32 +36,6 @@ module BenefitSponsors
       message[:url] = request.original_url
       log(message, :severity=>'error')
       return false
-    end
-
-    def authentication_not_required?
-      devise_controller? ||
-      (controller_name == "registrations") ||
-      (controller_name == "office_locations") ||
-      (controller_name == "invitations") ||
-      (controller_name == "saml")
-    end
-
-    def require_login
-      unless current_user
-        unless request.format.js?
-          session[:portal] = url_for(params)
-        end
-        redirect_to main_app.new_user_registration_path
-      end
-    rescue Exception => e
-      message = {}
-      message[:message] = "Application Exception - #{e.message}"
-      message[:session_person_id] = session[:person_id] if session[:person_id]
-      message[:user_id] = current_user.id if current_user
-      message[:oim_id] = current_user.oim_id if current_user
-      message[:url] = request.original_url
-      message[:params] = params if params
-      log(message, :severity=>'error')
     end
 
     def set_flash_by_announcement

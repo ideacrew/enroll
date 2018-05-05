@@ -1,3 +1,5 @@
+require_dependency "benefit_sponsors/application_controller"
+
 module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
 
@@ -5,8 +7,6 @@ module BenefitSponsors
     include Pundit
 
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-
-    before_action :check_logged_in?, only: [:new]
 
     layout 'single_column', :only => :edit
 
@@ -40,8 +40,8 @@ module BenefitSponsors
       rescue Exception => e
         flash[:error] = e.message
       end
-
-      redirect_to default_url , :flash => { :error => @agency.errors.full_messages }
+      params[:profile_type] = profile_type
+      render default_template, :flash => { :error => @agency.errors.full_messages }
     end
 
     def edit
@@ -72,12 +72,8 @@ module BenefitSponsors
       @profile_type = params[:profile_type] || params[:agency][:profile_type] || @agency.profile_type
     end
 
-    def default_url
-      if is_employer_profile?
-        sponsor_new_registration_url
-      else
-        broker_new_registration_url
-      end
+    def default_template
+      :new
     end
 
     def is_employer_profile?
@@ -113,12 +109,6 @@ module BenefitSponsors
     def current_person
       current_user.reload # devise current user not loading changes
       current_user.person
-    end
-
-    def check_logged_in?
-      if is_employer_profile?
-        redirect_to main_app.root_path if current_user.blank?
-      end
     end
 
     def user_not_authorized(exception)
