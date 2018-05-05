@@ -5,7 +5,7 @@ module BenefitMarkets
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :benefit_market, class_name: "BenefitMarkets::Configurations::AcaShopConfiguration"
+      embedded_in :configuration, class_name: "BenefitMarkets::Configurations::AcaShopConfiguration"
 
       field :erlst_strt_prior_eff_months, as: :earliest_start_prior_to_effective_on_months, type: Integer, default: -3
       field :montly_oe_end, as: :monthly_open_enrollment_end_on, type: Integer, default: 13
