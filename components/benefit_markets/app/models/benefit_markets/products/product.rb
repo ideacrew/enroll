@@ -29,6 +29,8 @@ module BenefitMarkets
 
     # belongs_to  :issuer, 
     #             class_name: "::IssuerProfile"
+    
+    field :issuer_profile_id, type: BSON::ObjectId
 
     belongs_to  :service_area,
                 counter_cache: true,
@@ -79,6 +81,22 @@ module BenefitMarkets
         premium_tables << new_premium_table
       end
       self
+    end
+
+    def issuer=(val)
+      @issuer = issuer
+      write_attribute(:issuer_id, val.id)
+    end
+
+    def issuer_id=(val)
+      if (val.id != self.issuer_id)
+        @issuer = nil
+      end
+      write_attribute(:issuer_id, val)
+    end
+
+    def issuer
+      @issuer ||= ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_id)
     end
 
     def update_premium_table(updated_premium_table)
