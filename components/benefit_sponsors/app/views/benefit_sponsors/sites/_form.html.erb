@@ -2,13 +2,13 @@
   <label for="inputSiteKey">Site Key</label>
   <%= f.text_field :site_key, required:'true', id:'inputSiteKey', class:'form-control'%>
   <label for="inputLongName">Long Name</label>
-  <%= f.text_field :long_name, id:'inputLongName', class:'form-control'%>
+  <%= f.text_field :long_name, required:'true', id:'inputLongName', class:'form-control'%>
   <label for="inputShortName">Short Name</label>
-  <%= f.text_field :short_name, id:'inputShortName', class:'form-control'%>
+  <%= f.text_field :short_name, required:'true', id:'inputShortName', class:'form-control'%>
   <label for="inputByLine">By Line</label>
-  <%= f.text_field :byline, id:'inputShByLine', class:'form-control'%>
+  <%= f.text_field :byline, required:'true', id:'inputShByLine', class:'form-control'%>
   <label for="inputDomainName">Domain Name</label>
-  <%= f.text_field :domain_name, id:'inputDomainName', class:'form-control'%>
+  <%= f.text_field :domain_name, required:'true', id:'inputDomainName', class:'form-control'%>
 </div>
 
 <%= f.fields_for :owner_organization, @site.owner_organization do |organization_fields| %>
@@ -57,14 +57,13 @@
             <% end %>
           <% end %>
 
+          <div class="js-remove row">
+            <label>Main Phone </label>
+          </div>
           <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
             <%= phone_fields.hidden_field :kind, value: 'main' %>
 
-            <label for="inputPhoneAreaCode">Phone</label>
-            <div class="input-group">
-              <%= phone_fields.text_field :area_code, placeholder: "Area Code", class: 'form-control' %>
-              <%= phone_fields.text_field :number, placeholder: "Number", class: 'form-control' %>
-            </div>
+            <%= render partial: 'benefit_sponsors/locations/phone', locals: { f: phone_fields } %>
           <% end %>
         </div>
 

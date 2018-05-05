@@ -42,8 +42,11 @@ module BenefitSponsors
         inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
         allow_blank:true
 
+      validates :address_1, presence: {message: "Please enter address_1"}
+      validates :city, presence: {message: "Please enter city"}
+
       validates :zip,
-        allow_blank: true,
+        allow_blank: false,
         format: {
             :with => /\A\d{5}(-\d{4})?\z/,
             :message => "should be in the form: 12345 or 12345-1234"
@@ -51,11 +54,13 @@ module BenefitSponsors
       embedded_in :office_location
 
 
+
       # def plan_design_model?
       #   _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
       # end
 
       # @note Add support for GIS location
+
       def location
         nil #todo
       end
