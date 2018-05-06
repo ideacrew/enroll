@@ -65,8 +65,7 @@ function processValues(element) {
     if (dataType == "planNetwork") {
       filterParams.selectedPlanNetworks.push(element.dataset.planNetwork)
     }
-  }
-  if (!element.checked) {
+  } else if (!element.checked) {
     var dataType = element.dataset.category;
     
     if (dataType == "planMetalLevel") {
