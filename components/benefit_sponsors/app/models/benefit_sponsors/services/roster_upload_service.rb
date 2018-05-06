@@ -1,6 +1,7 @@
 module BenefitSponsors
   module Services
     class RosterUploadService
+      include ActiveModel::Validations
 
       attr_accessor :file, :profile, :sheet
 
@@ -35,9 +36,9 @@ module BenefitSponsors
       EmployeeTerminationMap = Struct.new(:employee, :termination_date)
       EmployeePersistMap = Struct.new(:employee)
 
-      def initialize(file, profile)
-        @file = file
-        @profile = profile
+      def initialize(args = {})
+        @file = args[:file]
+        @profile = args[:profile]
       end
 
       def load_form_metadata(form)
@@ -91,20 +92,36 @@ module BenefitSponsors
         @profile = form.profile
         @terminate_queue = {}
         @persist_queqe = {}
-        form.census_records.each do |census_form|
+        form.census_records.each_with_index do |census_form, i|
+          @index = i
           if census_form.termination_date.present?
             _insert_into_terms_queqe(census_form)
           else
             _insert_into_persist_queqe(census_form)
           end
         end
-
-        persist_census_records if @persist_queqe.present?
+        persist_census_records(form) if @persist_queqe.present?
         terminate_census_records if @terminate_queue.present?
       end
 
-      def persist_census_records
+      def persist_census_records(form)
+        employees = @persist_queqe.values.map(&:employee)
+        if employees.map(&:valid?).all? || self.errors.blank?
+          employees.compact.each(&:save!)
+        else
+          map_errors_for(self, onto: form)
+          employees.each_with_index do |record, i|
+            map_errors_for(record, i, onto: form)
+          end
+          return false
+        end
+      end
 
+      def map_errors_for(obj, key="", onto:)
+        obj.errors.each do |att, err|
+          row = key.present? ? "Row #{key + 4}:" : ""
+          onto.errors.add(:base, row + "#{att} #{err}")
+        end
       end
 
       def terminate_census_records
@@ -118,13 +135,13 @@ module BenefitSponsors
         census_employee = find_employee(form)
         if census_employee.present?
           if is_employee_terminable?(census_employee)
-            @terminate_queue[index + 4] = EmployeeTerminationMap.new(census_employee, form.termination_date)
+            @terminate_queue[@index + 4] = EmployeeTerminationMap.new(census_employee, form.termination_date)
             validate_newly_designated(form.newly_designated, census_employee)
           else
-            self.errors.add :base, "Row #{index + 4}: Could not terminate employee"
+            self.errors.add :base, "Row #{@index + 4}: Could not terminate employee"
           end
         else
-          self.errors.add :base, "Row #{index + 4}: Could not find employee"
+          self.errors.add :base, "Row #{@index + 4}: Could not find employee"
         end
       end
 
@@ -140,7 +157,7 @@ module BenefitSponsors
         # TODO
         member = find_employee(form) || CensusEmployee.new
         member = init_census_record(member, form)
-        @persist_queqe[index + 4] = EmployeePersistMap.new(member)
+        @persist_queqe[@index + 4] = EmployeePersistMap.new(member)
         validate_newly_designated(form.newly_designated, member)
         @primary_census_employee = member
         @primary_record = form
@@ -182,7 +199,7 @@ module BenefitSponsors
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
-          employer_profile: profile,
+          employer_profile_id: profile.id,
           address: build_address(form)
         })
         member.assign_attributes(params)

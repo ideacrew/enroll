@@ -56,6 +56,7 @@ module BenefitSponsors
           render "employers/employer_profiles/employee_csv_upload_errors"
         end
         rescue Exception => e
+          # TODO - get redirection path from form obj
           if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
             render "employers/employer_profiles/_download_new_template"
           else

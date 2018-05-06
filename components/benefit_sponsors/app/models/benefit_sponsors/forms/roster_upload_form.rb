@@ -21,7 +21,7 @@ module BenefitSponsors
       validate :roster_template
 
       def self.call(file, profile)
-        service = resolve_service.new(file, profile)
+        service = resolve_service.new(file: file, profile: profile)
         form = new
         service.load_form_metadata(form)
         form
@@ -46,7 +46,7 @@ module BenefitSponsors
       end
 
       def roster_template
-        template_date = parse_date(template_date)
+        template_date = parse_date(self.template_date)
         unless (template_date == TEMPLATE_DATE && template_version == TEMPLATE_VERSION && header_valid?(sheet.row(2)))
           self.errors.add(:base, "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template.")
         end
