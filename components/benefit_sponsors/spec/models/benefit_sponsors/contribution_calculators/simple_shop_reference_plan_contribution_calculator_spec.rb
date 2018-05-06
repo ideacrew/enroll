@@ -1,9 +1,9 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe ContributionCalculators::TieredPercentContributionCalculator do
+  RSpec.describe ContributionCalculators::SimpleShopReferencePlanContributionCalculator do
     let(:contribution_calculator) do
-      ::BenefitSponsors::ContributionCalculators::TieredPercentContributionCalculator.new
+      ::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator.new
     end
 
     let(:contribution_model) do
@@ -15,55 +15,41 @@ module BenefitSponsors
 
     let(:product) { double }
 
-    let(:benefit_roster) do
-      benefit_roster_entries
-    end
-
     describe "given:
-    - a tiered pricing model
-    - with an 'employee_only' group
-    - with an 'employee_and_spouse' group
-    - with an 'employee_and_dependents' group
-    - with a 'family' group" do
+    - a relationship based pricing model
+    - with an 'employee' group
+    - with a 'spouse' group
+    - with a 'dependent' group" do
 
       let(:contribution_units) do
         [
-          employee_only_contribution_unit,
-          employee_and_spouse_contribution_unit,
-          employee_and_dependents_contribution_unit,
-          family_contribution_unit
+          employee_contribution_unit,
+          spouse_contribution_unit,
+          dependent_contribution_unit,
         ]
       end
 
-      let(:employee_only_contribution_unit) do
+      let(:employee_contribution_unit) do
         instance_double(
           ::BenefitMarkets::ContributionModels::FixedPercentContributionUnit,
-          name: "employee_only",
-          id: "employee_only_cu_id"
+          name: "employee",
+          id: "employee_cu_id"
         )
       end
 
-      let(:employee_and_spouse_contribution_unit) do
+      let(:spouse_contribution_unit) do
         instance_double(
           ::BenefitMarkets::ContributionModels::FixedPercentContributionUnit,
-          name: "employee_and_spouse",
-          id: "employee_and_spouse_cu_id"
+          name: "spouse",
+          id: "spouse_cu_id"
         )
       end
 
-      let(:employee_and_dependents_contribution_unit) do
+      let(:dependent_contribution_unit) do
         instance_double(
           ::BenefitMarkets::ContributionModels::FixedPercentContributionUnit,
-          name: "employee_and_dependents",
-          id: "employee_and_dependents_cu_id"
-        )
-      end
-
-      let(:family_contribution_unit) do
-        instance_double(
-          ::BenefitMarkets::ContributionModels::FixedPercentContributionUnit,
-          name: "family",
-          id: "family_cu_id"
+          name: "dependent",
+          id: "dependent_cu_id"
         )
       end
 
@@ -144,10 +130,12 @@ module BenefitSponsors
             coverage_start_on: coverage_start_date,
             previous_product: nil,
             product: product,
-            rating_area: "MA1",
+            rating_area: rating_area,
             product_cost_total: family_price
           )
         end
+
+        let(:rating_area) { "DC01" }
 
         let(:family_roster_entry) do
           ::BenefitSponsors::Members::MemberGroup.new(
@@ -160,32 +148,59 @@ module BenefitSponsors
         let(:primary_price) { 106.68 }
         let(:dependent_price) { 106.66 }
 
-        let(:total_contribution) { 80.00 }
+        let(:total_contribution) { 181.68 }
 
-        let(:family_contribution_level) do
+        let(:employee_contribution_level) do
           instance_double(
             ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
-            contribution_unit_id: "family_cu_id",
+            contribution_unit_id: "employee_cu_id",
+            contribution_factor: 0.50
+          )
+        end
+
+        let(:spouse_contribution_level) do
+          instance_double(
+            ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
+            contribution_unit_id: "spouse_cu_id",
             contribution_factor: 0.25
+          )
+        end
+
+        let(:dependent_contribution_level) do
+          instance_double(
+            ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
+            contribution_unit_id: "dependent_cu_id",
+            contribution_factor: 0.00
           )
         end
 
         let(:sponsor_contribution) do
           instance_double(
-            ::BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution,
-            contribution_levels: [family_contribution_level],
+            ::BenefitSponsors::SponsoredBenefits::ReferenceProductFixedPercentSponsorContribution,
+            contribution_levels: [employee_contribution_level, spouse_contribution_level, dependent_contribution_level],
+            reference_product: reference_product,
             id: "some cacheable id"
           )
         end
+        
+        let(:reference_product) { double(id: "reference product id") }
 
         before(:each) do
 					allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
 					allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
 					allow(contribution_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
-          allow(employee_only_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_spouse_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_dependents_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(family_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(true)
+          allow(employee_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(true)
+          allow(employee_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(false)
+          allow(employee_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(false)
+          allow(spouse_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
+          allow(spouse_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(true)
+          allow(spouse_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(false)
+          allow(dependent_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
+          allow(dependent_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(false)
+          allow(dependent_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(true)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, employee_age, rating_area).and_return(250.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, spouse_age, rating_area).and_return(300.00)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, child_age, rating_area).and_return(300.00)
         end
 
         it "calculates the total contribution" do

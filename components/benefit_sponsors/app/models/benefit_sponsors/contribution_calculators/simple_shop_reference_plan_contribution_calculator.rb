@@ -1,26 +1,11 @@
 module BenefitSponsors
   module ContributionCalculators
     class SimpleShopReferencePlanContributionCalculator < ContributionCalculator
-      ContributionResult = Struct.new(:total_contribution, :member_contributions)
-      ContributionEntry = Struct.new(
-       :roster_coverage,
-       :relationship,
-       :dob,
-       :member_id,
-       :dependents,
-       :roster_entry_pricing,
-       :roster_entry_contribution,
-       :disabled
-      ) do
-        def is_disabled?
-          disabled
-        end
-      end
       class CalculatorState
         attr_reader :total_contribution
         attr_reader :member_contributions
 
-        def initialize(c_model, m_prices, r_coverage, r_product, l_map)
+        def initialize(c_model, m_prices, r_coverage, r_product, l_map, c_eligibility_dates)
           @rate_schedule_date = r_coverage.rate_schedule_date
           @contribution_model = c_model
           @contribution_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
@@ -28,12 +13,12 @@ module BenefitSponsors
           @member_prices = m_prices
           @member_contributions = {}
           @reference_product = r_product
-          @eligibility_dates = r_coverage.coverage_eligibility_dates
-          @coverage_start_on = r_coverage.coverage_start_date
+          @eligibility_dates = c_eligibility_dates
+          @coverage_start_on = r_coverage.coverage_start_on
           @rating_area = r_coverage.rating_area
           @level_map = l_map
           @product = r_coverage.product
-          @previous_product = r_coverage.previous_eligibility_product
+          @previous_product = r_coverage.previous_product
         end
 
         def add(member)
@@ -97,32 +82,32 @@ module BenefitSponsors
       #   contribution results paired with the roster
       def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
         reference_product = sponsor_contribution.reference_product
+        roster_coverage = priced_roster_entry.group_enrollment
         level_map = level_map_for(sponsor_contribution)
+        coverage_eligibility_dates = {}
+        roster_coverage.member_enrollments.each do |m_en|
+          coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
+        end
+        member_pricing = {}
+        roster_coverage.member_enrollments.each do |m_en|
+          member_pricing[m_en.member_id] = m_en.product_price
+        end
         state = CalculatorState.new(
           contribution_model,
-          priced_roster_entry.roster_entry_pricing.member_pricing,
-          priced_roster_entry.roster_coverage,
+          member_pricing,
+          roster_coverage,
           reference_product,
-          level_map
+          level_map,
+          coverage_eligibility_dates
         )
-        member_list = [priced_roster_entry] + priced_roster_entry.dependents
-        member_list.each do |member|
+        priced_roster_entry.members.each do |member|
           state.add(member)
         end
-        roster_entry_contribution = ContributionResult.new(
-          state.total_contribution,
-          state.member_contributions
-        )
-        ContributionEntry.new(
-          priced_roster_entry.roster_coverage,
-          priced_roster_entry.relationship,
-          priced_roster_entry.dob,
-          priced_roster_entry.member_id,
-          priced_roster_entry.dependents,
-          priced_roster_entry.roster_entry_pricing,
-          roster_entry_contribution,
-          priced_roster_entry.is_disabled?
-        )
+        roster_coverage.sponsor_contribution_total = state.total_contribution
+        roster_coverage.member_enrollments.each do |m_en|
+          m_en.sponsor_contribution = state.member_contributions[m_en.member_id]
+        end
+        priced_roster_entry
       end
 
       protected

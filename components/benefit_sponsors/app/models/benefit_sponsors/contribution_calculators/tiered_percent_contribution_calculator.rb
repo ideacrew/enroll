@@ -1,22 +1,6 @@
 module BenefitSponsors
   module ContributionCalculators
     class TieredPercentContributionCalculator < ContributionCalculator
-      ContributionResult = Struct.new(:total_contribution, :member_contributions)
-      ContributionEntry = Struct.new(
-       :roster_coverage,
-       :relationship,
-       :dob,
-       :member_id,
-       :dependents,
-       :roster_entry_pricing,
-       :roster_entry_contribution,
-       :disabled
-      ) do
-        def is_disabled?
-          disabled
-        end
-      end
-
       class CalculatorState
         attr :total_contribution
         attr :member_contributions
