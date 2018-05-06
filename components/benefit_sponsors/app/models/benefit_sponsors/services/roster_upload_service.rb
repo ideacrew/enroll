@@ -33,7 +33,7 @@ module BenefitSponsors
       )
 
       EmployeeTerminationMap = Struct.new(:employee, :termination_date)
-      EmployeeAddMap = Struct.new(:employee)
+      EmployeePersistMap = Struct.new(:employee)
 
       def initialize(file, profile)
         @file = file
@@ -91,11 +91,11 @@ module BenefitSponsors
         @profile = form.profile
         @terminate_queue = {}
         @persist_queqe = {}
-        form.census_records.each do |record|
-          if record.termination_date.present?
-            _insert_into_terms_queqe(record)
+        form.census_records.each do |census_form|
+          if census_form.termination_date.present?
+            _insert_into_terms_queqe(census_form)
           else
-            _insert_into_persist_queqe(record)
+            _insert_into_persist_queqe(census_form)
           end
         end
 
@@ -114,48 +114,44 @@ module BenefitSponsors
         end
       end
 
-      def _insert_into_terms_queqe(record)
-        census_employee = find_employee(record)
+      def _insert_into_terms_queqe(form)
+        census_employee = find_employee(form)
         if census_employee.present?
           if is_employee_terminable?(census_employee)
-            @terminate_queue[index + 4] = EmployeeTerminationMap.new(census_employee, record.termination_date)
-            validate_newly_designated(record.newly_designated, census_employee)
+            @terminate_queue[index + 4] = EmployeeTerminationMap.new(census_employee, form.termination_date)
+            validate_newly_designated(form.newly_designated, census_employee)
           else
             self.errors.add :base, "Row #{index + 4}: Could not terminate employee"
           end
-          # @last_ee_member = census_employee
-          # @last_ee_member_record = record
         else
           self.errors.add :base, "Row #{index + 4}: Could not find employee"
         end
       end
 
-      def _insert_into_persist_queqe(record)
-        # TODO
-        if record.employee_relationship == "self"
-          _insert_primary(record)
-          # TODO - add EE to queqe with census dependets info
-          # census_employee = find_employee(record) || CensusEmployee.new
+      def _insert_into_persist_queqe(form)
+        if form.employee_relationship == "self"
+          _insert_primary(form)
         else
-          _insert_dependent(record)
+          _insert_dependent(form)
         end
       end
 
-      def _insert_primary(record)
+      def _insert_primary(form)
         # TODO
-        member = find_employee(record) || CensusEmployee.new
-        member = init_census_record(member, record)
-        validate_newly_designated(record.newly_designated, member)
+        member = find_employee(form) || CensusEmployee.new
+        member = init_census_record(member, form)
+        @persist_queqe[index + 4] = EmployeePersistMap.new(member)
+        validate_newly_designated(form.newly_designated, member)
         @primary_census_employee = member
-        @primary_record = record
+        @primary_record = form
       end
 
-      def _insert_dependent(record)
+      def _insert_dependent(form)
         return nil if (@primary_census_employee.nil? || @primary_record.nil?)
-        if record.employer_assigned_family_id == @primary_record.employer_assigned_family_id
-          census_dependent = find_dependent(record)
+        if form.employer_assigned_family_id == @primary_record.employer_assigned_family_id
+          census_dependent = find_dependent(form)
 
-          params = sanitize_params(record)
+          params = sanitize_params(form)
           if census_dependent
             census_dependent.assign_attributes(params)
           else
@@ -179,62 +175,62 @@ module BenefitSponsors
         end
       end
 
-      def init_census_record(member, record)
+      def init_census_record(member, form)
         # TODO
-        params = sanitize_params(record).merge!({
-          hired_on: record.hire_date,
-          is_business_owner: is_business_owner?(record),
-          email: build_email(record),
-          employee_relationship: record.employee_relationship,
+        params = sanitize_params(form).merge!({
+          hired_on: form.hire_date,
+          is_business_owner: is_business_owner?(form),
+          email: build_email(form),
+          employee_relationship: form.employee_relationship,
           employer_profile: profile,
-          address: build_address(record)
+          address: build_address(form)
         })
         member.assign_attributes(params)
         # TODO - benefit application
         member
       end
 
-      def build_address(record)
+      def build_address(form)
         address = Address.new({
           kind: 'home',
-          address_1: record.address_1,
-          address_2: record.address_2,
-          city: record.city,
-          state: record.state,
-          zip: record.zip
+          address_1: form.address_1,
+          address_2: form.address_2,
+          city: form.city,
+          state: form.state,
+          zip: form.zip
         })
         address.valid? ? address : nil
       end
 
-      def build_email(record)
+      def build_email(form)
         # TODO
-        Email.new({address: record.email.to_s, kind: "home"}) if record.email
+        Email.new({address: form.email.to_s, kind: "home"}) if form.email
       end
 
-      def is_business_owner?(record)
-        if ["1", "true"].include? record.is_business_owner.to_s
+      def is_business_owner?(form)
+        if ["1", "true"].include? form.is_business_owner.to_s
           return true
         end
         false
       end
 
-      def  find_employee(record)
+      def  find_employee(form)
         # TODO
-        CensusEmployee.find_by_employer_profile(profile).by_ssn(record.ssn).active.first
+        CensusEmployee.find_by_employer_profile(profile).by_ssn(form.ssn).active.first
       end
 
-      def find_dependent(record)
+      def find_dependent(form)
         # TODO
         @primary_census_employee.census_dependents.detect do |dependent|
-          (dependent.ssn == record.ssn) && (dependent.dob == record.dob)
+          (dependent.ssn == form.ssn) && (dependent.dob == form.dob)
         end
       end
 
-      def sanitize_params(record)
-        record.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :dob, :gender)
+      def sanitize_params(form)
+        form.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :dob, :gender)
       end
 
-      def sanitize_primary_params(record)
+      def sanitize_primary_params(form)
       end
 
       def is_employee_terminable?(census_employee)
