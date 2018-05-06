@@ -9,19 +9,6 @@ module BenefitSponsors
     # in order to determine how to calculate 'estimated' composite
     # rates prior to having actual enrollments available.
     class TieredRosterEligibilityOptimizer
-      PricedEntry = Struct.new(
-        :roster_coverage,
-        :relationship,
-        :dob,
-        :member_id,
-        :dependents,
-        :disabled
-      ) do
-        def is_disabled?
-          disabled
-        end
-      end
-
       class OptimizerState
         class MixPossibility
           attr_reader :rel_list, :size, :rel_counts, :dob_list, :member_ids

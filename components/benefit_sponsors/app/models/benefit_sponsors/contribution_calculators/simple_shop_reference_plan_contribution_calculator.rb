@@ -60,7 +60,8 @@ module BenefitSponsors
 
         def get_contribution_unit(roster_entry_member)
           coverage_age = @contribution_calculator.calc_coverage_age_for(roster_entry_member, @product, @coverage_start_on, @eligibility_dates, @previous_product)
-          rel_name = @contribution_model.map_relationship_for(roster_entry_member.relationship, coverage_age, roster_entry_member.is_disabled?)
+          relationship = roster_entry_member.is_primary_member? ? "self" : roster_entry_member.relationship
+          rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, roster_entry_member.is_disabled?)
           @contribution_model.contribution_units.detect do |cu|
             cu.match?({rel_name.to_s => 1})
           end
