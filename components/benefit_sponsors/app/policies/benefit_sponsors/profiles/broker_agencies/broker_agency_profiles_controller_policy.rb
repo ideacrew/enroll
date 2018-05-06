@@ -14,6 +14,14 @@ module BenefitSponsors
         def index?
           return user.has_hbx_staff_role? || user.has_csr_role?
         end
+
+        def show?
+          self.send(:index?)
+        end
+
+        def redirect_signup?
+          user.present?
+        end
       end
     end
   end

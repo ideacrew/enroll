@@ -29,8 +29,8 @@ module BenefitSponsors
 
       scope :draft_proposals,     -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
 
-      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, 
-                                                                      {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, 
+                                                                      {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
 
       # TODO Move this method to BenefitMarket Model

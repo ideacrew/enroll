@@ -1,5 +1,5 @@
-$('#plans').html("<%= escape_javascript(render partial: "insured/plan_shoppings/plan_details", collection: @plans, as: :plan) %>")
-//$('#plans').html("<%= escape_javascript(render partial: "ui-components/v1/cards/plan_details", collection: @plans, as: :plan) %>")
+//$('#plans').html("<%= escape_javascript(render partial: "insured/plan_shoppings/plan_details", collection: @plans, as: :plan) %>")
+$('#plans').html("<%= escape_javascript(render partial: "ui-components/v1/cards/plan_details", collection: @plans, as: :plan) %>")
 
 
 $(document).ready(function(){
