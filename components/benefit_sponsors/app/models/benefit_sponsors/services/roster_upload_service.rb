@@ -57,9 +57,9 @@ module BenefitSponsors
       def load_census_records_form
         census_records = []
         columns = sheet.row(2)
-        (4..sheet.last_row).each do |id| 
+        (4..sheet.last_row).inject([]) do |result, id|
           row = Hash[[columns, sheet.row(id)].transpose]
-          census_records << Forms::CensusRecordForm.new(
+          result << Forms::CensusRecordForm.new(
             employer_assigned_family_id: parse_text(row["employer_assigned_family_id"]),
             employee_relationship: parse_relationship(row["employee_relationship"]),
             last_name: parse_text(row["last_name"]),
@@ -83,8 +83,8 @@ module BenefitSponsors
             zip: parse_text(row["zip"]),
             newly_designated: parse_boolean(row["newly_designated"])
           )
+          result
         end
-        census_records
       end
 
       def save(form)
@@ -119,7 +119,7 @@ module BenefitSponsors
         if census_employee.present?
           if is_employee_terminable?(census_employee)
             @terminate_queue[index + 4] = EmployeeTerminationMap.new(census_employee, record.termination_date)
-            validate_newly_designated(record.newly_designated)
+            validate_newly_designated(record.newly_designated, census_employee)
           else
             self.errors.add :base, "Row #{index + 4}: Could not terminate employee"
           end
@@ -139,15 +139,13 @@ module BenefitSponsors
         else
           _insert_dependent(record)
         end
-
-        validate_newly_designated(record.newly_designated)
       end
 
       def _insert_primary(record)
         # TODO
         member = find_employee(record) || CensusEmployee.new
         member = init_census_record(member, record)
-        validate_newly_designated(record.newly_designated)
+        validate_newly_designated(record.newly_designated, member)
         @primary_census_employee = member
         @primary_record = record
       end
@@ -167,7 +165,18 @@ module BenefitSponsors
         end
       end
 
-      def validate_newly_designated(val)
+      def validate_newly_designated(val, census_employee)
+        if val == '1'
+          begin
+            census_employee.newly_designate
+          rescue Exception => e
+            self.errors.add :base, "employee can't transition to newly designate state #{e.to_s}"
+          end
+        elsif val == '0'
+          if census_employee.may_rebase_new_designee?
+            census_employee.rebase_new_designee
+          end
+        end
       end
 
       def init_census_record(member, record)
