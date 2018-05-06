@@ -2,7 +2,7 @@ module BenefitSponsors
   module Profiles
     class Employers::EmployerProfilesController < ApplicationController
 
-      before_action :find_employer, only: [:show]
+      before_action :find_employer, only: [:show, :bulk_employee_upload]
 
       #New person registered with existing organization and approval request submitted to employer
       def show_pending
@@ -41,6 +41,26 @@ module BenefitSponsors
                 format.html
                 format.js
               end
+          end
+        end
+      end
+
+      def bulk_employee_upload
+        file = params.require(:file)
+        @form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+        # @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
+        begin
+        if @form.save
+          redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
+        else
+          render "employers/employer_profiles/employee_csv_upload_errors"
+        end
+        rescue Exception => e
+          if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+            render "employers/employer_profiles/_download_new_template"
+          else
+            @census_employee_import.errors.add(:base, e.message)
+            render "employers/employer_profiles/employee_csv_upload_errors"
           end
         end
       end
