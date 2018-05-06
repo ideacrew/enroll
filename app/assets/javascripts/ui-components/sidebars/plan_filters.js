@@ -4,13 +4,17 @@ window.addEventListener('load', function() {
 })
 
 // Stores values to be processed on function filterResults
-var selectedMetalLevels = [];
-var selectedPlanTypes = [];
-var selectedPlanNetworks = [];
-var premiumFromAmountValue = new String;
-var premiumToAmountValue = new String;
-var deductibleFromAmountValue = new String;
-var deductibleToAmountValue = new String;
+var filterParams = {
+  selectedMetalLevels: new Array,
+  selectedPlanTypes: new Array,
+  selectedPlanNetworks: new Array,
+  selectedCarrier: new String,
+  selectedHSA: new String,
+  premiumFromAmountValue: new String,
+  premiumToAmountValue: new String,
+  deductibleFromAmountValue: new String,
+  deductibleToAmountValue: new String
+}
 
 function filterMetalLevel(element) {
   processValues(element)
@@ -25,27 +29,27 @@ function filterPlanNetwork(element) {
 }
 
 function filterPlanCarriers(element) {
-  console.log("Plan Carriers ",element.value)
+  filterParams.selectedCarrier = element.value
 }
 
 function filterHSAEligibility(element) {
-  console.log("HSA Eligibility ",element.value)
+  filterParams.selectedHSA = element.value
 }
 
 function premuimFromAmount(element) {
-  premiumFromAmountValue = element.value
+  filterParams.premiumFromAmountValue = element.value
 }
 
 function premiumToAmount(element) {
-  premiumToAmountValue = element.value
+  filterParams.premiumToAmountValue = element.value
 }
 
 function deductibleFromAmount(element) {
-  deductibleFromAmountValue = element.value
+  filterParams.deductibleFromAmountValue = element.value
 }
 
 function deductibleToAmount(element) {
-  deductibleToAmountValue = element.value
+  filterParams.deductibleToAmountValue = element.value
 }
 // Passes values from inputs and passes to array
 function processValues(element) {
@@ -53,29 +57,29 @@ function processValues(element) {
     var dataType = element.dataset.category;
  
     if (dataType == "planMetalLevel") {
-      selectedMetalLevels.push(element.dataset.planMetalLevel)
+      filterParams.selectedMetalLevels.push(element.dataset.planMetalLevel)
     }
     if (dataType == "planType") {
-      selectedPlanTypes.push(element.dataset.planType)
+      filterParams.selectedPlanTypes.push(element.dataset.planType)
     }
     if (dataType == "planNetwork") {
-      selectedPlanNetworks.push(element.dataset.planNetwork)
+      filterParams.selectedPlanNetworks.push(element.dataset.planNetwork)
     }
   }
   if (!element.checked) {
     var dataType = element.dataset.category;
     
     if (dataType == "planMetalLevel") {
-      index = selectedMetalLevels.indexOf(element.dataset.planMetalLevel)
-      removeItems(selectedMetalLevels,index)
+      index = filterParams.selectedMetalLevels.indexOf(element.dataset.planMetalLevel)
+      removeItems(filterParams.selectedMetalLevels,index)
     }
     if (dataType == "planType") {
-      index = selectedPlanTypes.indexOf(element.dataset.planType)
-      removeItems(selectedPlanTypes,index)
+      index = filterParams.selectedPlanTypes.indexOf(element.dataset.planType)
+      removeItems(filterParams.selectedPlanTypes,index)
     }
     if (dataType == "planNetwork") {
-      index = selectedPlanNetworks.indexOf(element.dataset.planNetwork)
-      removeItems(selectedPlanNetworks,index)
+      index = filterParams.selectedPlanNetworks.indexOf(element.dataset.planNetwork)
+      removeItems(filterParams.selectedPlanNetworks,index)
     }
   }
 }
@@ -93,24 +97,28 @@ function clearAll() {
   $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
   
   // Clear stored values
-  selectedMetalLevels = [];
-  selectedPlanTypes = [];
-  selectedPlanNetworks = [];
-  premiumFromAmountValue = "";
-  premiumToAmountValue = "";
-  deductibleFromAmountValue = "";
-  deductibleToAmountValue = "";
+  filterParams.selectedMetalLevels = [];
+  filterParams.selectedPlanTypes = [];
+  filterParams.selectedPlanNetworks = [];
+  filterParams.selectedCarrier = "";
+  filterParams.selectedHSA = "";
+  filterParams.premiumFromAmountValue = "";
+  filterParams.premiumToAmountValue = "";
+  filterParams.deductibleFromAmountValue = "";
+  filterParams.deductibleToAmountValue = "";
 }
 
 // Gets the filtered Results
 function filterResults() {
-  console.log("Selected Metal Levels ", selectedMetalLevels)
-  console.log("Selected Plan Types ", selectedPlanTypes)
-  console.log("Selected Networks ", selectedPlanNetworks)
-  console.log("Premium From amount ", premiumFromAmountValue)
-  console.log("Premium To amount ", premiumToAmountValue)
-  console.log("Deductible From amount ", deductibleFromAmountValue)
-  console.log("Deductible To amount ", deductibleToAmountValue)
+  console.log("Selected Metal Levels ", filterParams.selectedMetalLevels)
+  console.log("Selected Plan Types ", filterParams.selectedPlanTypes)
+  console.log("Selected Networks ", filterParams.selectedPlanNetworks)
+  console.log("Selected Carrier ", filterParams.selectedCarrier)
+  console.log("Selected HSA ", filterParams.selectedHSA)
+  console.log("Premium From amount ", filterParams.premiumFromAmountValue)
+  console.log("Premium To amount ", filterParams.premiumToAmountValue)
+  console.log("Deductible From amount ", filterParams.deductibleFromAmountValue)
+  console.log("Deductible To amount ", filterParams.deductibleToAmountValue)
 }
 
 // Removes an item from array
