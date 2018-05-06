@@ -5,7 +5,7 @@ class Employers::CensusEmployeesController < ApplicationController
   layout "two_column"
   def new
     @census_employee = build_census_employee
-    if params[:modal].present?
+    if params[:modal].present? # Can remove this. Implemented in ER profiles controller
       respond_to do |format|
         format.js { render "employers/employer_profiles/upload_employees" }
       end

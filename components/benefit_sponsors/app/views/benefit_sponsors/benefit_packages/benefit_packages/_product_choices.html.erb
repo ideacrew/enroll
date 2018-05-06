@@ -1,0 +1,79 @@
+
+<% selected_kind_carrier = f.object.plan_option_kind == 'single_carrier' %>
+<% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
+<% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
+
+<% if @benefit_package_form.new_record? %>
+  <h1>Select Your Plan Offering</h1>
+  <h4 style="max-width: 660px;">Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.</h4>
+  <br/>
+<% else %>
+<div class="edit-offering health">
+
+  <h4 class="currently-offered" style="max-width: 660px; display: inline-block;">
+  </h4>
+    <div class="offered-plan">
+    </div>
+</div>
+<% end %>
+
+  <div class="reference-steps">
+    <% unless @benefit_package_form.new_record? %>
+    <br/>
+    <h1>Edit Your Plan Offering</h1>
+    <h4 class="currently-offering" style="max-width: 660px; display: inline-block;">
+    </h4>
+    <br/><br/>
+    <% end %>
+
+  <div class="health">
+    <ul class="nav nav-tabs row">
+      <li role="presentation" class="col-xs-4">
+        <%= f.radio_button :plan_option_kind, "single_carrier" %>
+        <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
+        <i class="fa fa-circle-o"></i>
+        <i class="fa fa-dot-circle-o"></i>
+        By carrier
+        <% end %>
+      </li>
+      <li role="presentation" class="col-xs-4">
+        <%= f.radio_button :plan_option_kind, "metal_level" %>
+        <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
+        <i class="fa fa-circle-o"></i>
+        <i class="fa fa-dot-circle-o"></i>
+        By metal level
+      </li>
+      <% end %>
+      <li role="presentation" class="col-xs-4">
+        <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
+        <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
+        <i class="fa fa-circle-o"></i>
+        <i class="fa fa-dot-circle-o"></i>
+        Single plan
+        <% end %>
+      </li>
+    </ul>
+
+  <div class="col-xs-12 plan-options">
+  </div>
+  <div class="reference-plans col-xs-12" style="display: none;">
+    <div class="col-xs-12 loading">
+      <i class='fa fa-spinner fa-spin fa-2x'></i>
+      <span></span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+$(function(){
+
+$('a[data-remote=true]').click( function() {
+   var current_href = $(this).attr('href');
+   var location_id = $(this).closest('.benefit-group-fields').attr('id');
+   $(this).attr('href', current_href + "&location_id=" + location_id);
+});
+
+})
+</script>
