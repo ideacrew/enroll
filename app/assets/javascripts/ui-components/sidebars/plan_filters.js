@@ -109,15 +109,7 @@ function clearAll() {
 
 // Gets the filtered Results
 function filterResults() {
-  console.log("Selected Metal Levels ", filterParams.selectedMetalLevels)
-  console.log("Selected Plan Types ", filterParams.selectedPlanTypes)
-  console.log("Selected Networks ", filterParams.selectedPlanNetworks)
-  console.log("Selected Carrier ", filterParams.selectedCarrier)
-  console.log("Selected HSA ", filterParams.selectedHSA)
-  console.log("Premium From amount ", filterParams.premiumFromAmountValue)
-  console.log("Premium To amount ", filterParams.premiumToAmountValue)
-  console.log("Deductible From amount ", filterParams.deductibleFromAmountValue)
-  console.log("Deductible To amount ", filterParams.deductibleToAmountValue)
+  console.log(filterParams)
 }
 
 // Removes an item from array
