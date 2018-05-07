@@ -16,10 +16,6 @@ module BenefitMarkets
     field :title,                   type: String, default: ""
     field :description,             type: String, default: ""
 
-    belongs_to  :benefit_market_catalog,
-                counter_cache: true,
-                class_name: "BenefitMarkets::BenefitMarketCatalog"
-
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
 
@@ -29,11 +25,12 @@ module BenefitMarkets
     embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    validates_presence_of :benefit_market_catalog, :product_kind, :kind
+    validates_presence_of :product_kind, :kind
     validates_presence_of :title, :allow_blank => false
 
     def benefit_market_kind
-      packagable.benefit_market_kind
+      # packagable.benefit_market_kind
+      return true
     end
 
     def issuer_profiles
@@ -53,24 +50,24 @@ module BenefitMarkets
 
     # Query products from database applicable to this product package
     def all_benefit_market_products
-      return unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
-      return @all_benefit_market_products if is_defined?(@all_benefit_market_products)
-      @all_benefit_market_products = Product.by_product_package(self)
+      # return unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
+      return @all_benefit_market_products if defined?(@all_benefit_market_products)
+      @all_benefit_market_products = BenefitMarkets::Products::Product.by_product_package(self)
     end
 
     # Intersection of BenefitMarket::Products that match both service area and effective date
     def benefit_market_products_available_for(service_area, effective_date)
-      benefit_market_products_available_on(effective_date) & benefit_market_products_available_where(service_area)
+      benefit_market_products_available_on(effective_date)# & benefit_market_products_available_where(service_area)
     end
 
     # BenefitMarket::Products available for purchase on effective date
     def benefit_market_products_available_on(effective_date)
-      all_benefit_market_products.collect { |product| product.premium_table_effective_on(effective_date).present? }
+      all_benefit_market_products.select { |product| product.premium_table_effective_on(effective_date).present? }
     end
 
     # BenefitMarket::Products available for purchase within a specified service area
     def benefit_market_products_available_where(service_area)
-      all_benefit_market_products.collect { |product| product.service_area == service_area }
+      all_benefit_market_products.select { |product| product.service_area == service_area }
     end
 
     def add_product(new_product)
