@@ -42,17 +42,24 @@ module BenefitMarkets
 
 
     index({ hbx_id: 1 })
-    index({ benefit_market_kind: 1, "application_period.min" => 1, "application_period.max" => 1 })
+    index({ "benefit_market_kind" => 1, 
+            "application_period.min" => 1, 
+            "application_period.max" => 1, 
+            "product_package_kinds" => 1, 
+            "_type" => 1 },
+            {name: "product_package"})
+
     index({ "premium_tables.rating_area" => 1, 
             "premium_tables.effective_period.min" => 1, 
             "premium_tables.effective_period.max" => 1 },
             {name: "premium_tables"})
 
-    scope :by_product_package,    ->(product_package) {
-      # product_package.benefit_market_kind
-      # product_package.application_period
-      # product_package.product_kind
-      # product_package.kind
+    scope :by_product_package,    ->(product_package) { where(
+                :"benefit_market_kind"    => product_package.benefit_market_kind,
+                :"application_period"     => product_package.application_period,
+                :"product_package_kinds"  => /#{product_package.kind}/,
+                :"_type"                  => /#{product_package.product_kind}/
+      )
     }
 
     scope :by_service_area,       ->(service_area){ where(service_area: service_area) }

@@ -108,13 +108,10 @@ benefit_market_catalog = benefit_market.benefit_market_catalogs.create!({
   probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS
 })
 
-benefit_market = BenefitMarkets::BenefitMarket.first
-benefit_market_catalog = benefit_market.benefit_market_catalogs.first
-
 puts "Creating Product Packages..."
-benefit_market_catalog.product_packages.create!({kind: :health, title: 'Single Issuer', product_kind: :single_issuer})
-benefit_market_catalog.product_packages.create!({kind: :health, title: 'Metal Level', product_kind: :metal_level})
-benefit_market_catalog.product_packages.create!({kind: :health, title: 'Single Product', product_kind: :single_product})
+benefit_market_catalog.product_packages.create!({product_kind: :health, title: 'Single Issuer', kind: :single_issuer, application_period: benefit_market_catalog.application_period})
+benefit_market_catalog.product_packages.create!({product_kind: :health, title: 'Metal Level', kind: :metal_level, application_period: benefit_market_catalog.application_period})
+benefit_market_catalog.product_packages.create!({product_kind: :health, title: 'Single Product', kind: :single_product, application_period: benefit_market_catalog.application_period})
 
 dc_contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Shop Contribution Model").first
 dc_pricing_model = ::BenefitMarkets::PricingModels::PricingModel.where(name: "DC Shop Pricing Model").first
@@ -126,9 +123,9 @@ benefit_market_catalog.product_packages.each do |product_package|
 end
 
 puts "Associating Products with Product Packages..."
-%w(single_product metal_level single_issuer).each do |package_kind|
-  if product_package = benefit_market_catalog.product_packages.detect{|package| package.product_kind == package_kind.to_sym}
-    product_package.products = BenefitMarkets::Products::Product.where(:product_package_kinds => /#{package_kind}/).to_a
+%w(single_product metal_level single_issuer).each do |kind|
+  if product_package = benefit_market_catalog.product_packages.detect{|package| package.kind == kind.to_sym}
+    product_package.products = BenefitMarkets::Products::HealthProducts::HealthProduct.where(:product_package_kinds => /#{kind}/).to_a
     product_package.save
   end
 end

@@ -6,7 +6,7 @@ module BenefitSponsors
       include Mongoid::Timestamps
 
       embedded_in :benefit_sponsorship
-      # embedded_in :family #TODO check if need to move into new model
+      embedded_in :family
 
       # Begin date of relationship
       field :start_on, type: DateTime
@@ -51,25 +51,23 @@ module BenefitSponsors
       end
 
       #TODO based on new organization and profile
-      # # belongs_to writing agent (broker)
-      # def writing_agent=(new_writing_agent)
-      #   raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
-      #   self.writing_agent_id = new_writing_agent._id
-      #   @writing_agent = new_writing_agent
-      # end
-      #
-      # def writing_agent
-      #   return @writing_agent if defined? @writing_agent
-      #   @writing_agent = BrokerRole.find(writing_agent_id)
-      # end
-      #
+      def writing_agent=(new_writing_agent)
+        raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
+        self.writing_agent_id = new_writing_agent._id
+        @writing_agent = new_writing_agent
+      end
+
+      def writing_agent
+        return @writing_agent if defined? @writing_agent
+        @writing_agent = BrokerRole.find(writing_agent_id)
+      end
+
       # class << self
       #   def find(id)
       #     org = Organization.unscoped.where(:"employer_profile.broker_agency_accounts._id" => id).first
       #     org.employer_profile.broker_agency_accounts.detect { |account| account._id == id } unless org.blank?
       #   end
       # end
-
     end
   end
 end

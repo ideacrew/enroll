@@ -7,6 +7,7 @@ BenefitSponsors::Engine.routes.draw do
         collection do
           get :family_index
           get :messages
+          get :staff_index
           get :agency_messages
           get :broker_portal
         end

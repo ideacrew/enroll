@@ -30,6 +30,7 @@ module BenefitMarkets
     field :title,                       type: String, default: ""
     field :description,                 type: String, default: ""
 
+    delegate    :kind, to: :benefit_market, prefix: true
 
     belongs_to  :benefit_market,
                 class_name: "BenefitMarkets::BenefitMarket"

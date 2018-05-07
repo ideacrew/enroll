@@ -52,6 +52,22 @@ module BenefitSponsors
       end
     end
 
+    def cur_page_no(alph="a")
+      page_string = params.permit(:page)[:page]
+      page_string.blank? ? alph : page_string.to_s
+    end
+
+    def page_alphabets(source, field)
+      # A good optimization would be an aggregate
+      # source.collection.aggregate([{ "$group" => { "_id" => { "$substr" => [{ "$toUpper" => "$#{field}"},0,1]}}}, "$sort" =>{"_id"=>1} ]).map do
+      #   |object| object["_id"]
+      # end
+      # but source.collection acts on the entire collection (Model.all) hence cant be used here as source is a Mongoid::Criteria
+    source.distinct(field).collect {|word| word.first.upcase}.uniq.sort
+    rescue
+      ("A".."Z").to_a
+    end
+
     def create_sso_account(user, personish, timeout, account_role = "individual")
       if !user.idp_verified?
         IdpAccountManager.create_account(user.email, user.oim_id, stashed_user_password, personish, account_role, timeout)
