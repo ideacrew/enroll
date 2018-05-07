@@ -1,5 +1,6 @@
 .row
   = f.fields_for :address, errors: {} do |f|
+    = f.hidden_field :id, value: f.object.id if f.object.id
     .col-md-9.mb-3
       label for="inputAddress" Address
       = f.text_field :address_1, placeholder:'1234 Main St', required:'true', id:'inputAddress', class:'form-control'
@@ -44,6 +45,7 @@
 h5.enroll-lead.mb-2 Phone
 
 = f.fields_for :phone, errors: {} do |f|
+  = f.hidden_field :id, value: f.object.id if f.object.id
   .row
     = f.hidden_field :kind, value:'phone main'
     .col-md-2.mb-3
