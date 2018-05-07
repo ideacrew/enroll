@@ -22,7 +22,7 @@ module BenefitMarkets
 
       NO_OP = lambda {|o| true }
 
-      def initialize(name, 
+      def initialize(name,
                       requires: [],
                       validate: NO_OP,
                       failure: NO_OP,

@@ -50,6 +50,11 @@ module BenefitMarkets
       def success?
         !!@result
       end
+
+      def add_error(context, error)
+        @context_errors << {context => error}
+      end
+
     end
   end
 end
