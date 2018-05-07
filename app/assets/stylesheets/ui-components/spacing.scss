@@ -5,7 +5,10 @@
   float:right;
 }
 .pl-0 {
-  padding-left:0px !important
+  padding-left:0px !important;
+}
+.pr-0 {
+  padding-right:0px !important;
 }
 .pl-1 {
   padding-left:10px !important
@@ -15,4 +18,7 @@
 }
 .ml-1 {
   margin-left:10px !important;
+}
+.mt-1 {
+  margin-top:10px !important;
 }

@@ -1,21 +1,6 @@
 module BenefitSponsors
   module PricingCalculators
     class ShopSimpleListBillPricingCalculator < PricingCalculator
-      PriceResult = Struct.new(:total_price, :member_pricing)
-      PricedEntry = Struct.new(
-       :roster_coverage,
-       :relationship,
-       :dob,
-       :member_id,
-       :dependents,
-       :roster_entry_pricing,
-       :disabled
-      ) do
-        def is_disabled?
-          disabled
-        end
-      end
-
       class CalculatorState
         attr_reader :total
         attr_reader :member_totals

@@ -1,22 +1,6 @@
 module BenefitSponsors
   module ContributionCalculators
     class TieredPercentContributionCalculator < ContributionCalculator
-      ContributionResult = Struct.new(:total_contribution, :member_contributions)
-      ContributionEntry = Struct.new(
-       :roster_coverage,
-       :relationship,
-       :dob,
-       :member_id,
-       :dependents,
-       :roster_entry_pricing,
-       :roster_entry_contribution,
-       :disabled
-      ) do
-        def is_disabled?
-          disabled
-        end
-      end
-
       class CalculatorState
         attr :total_contribution
         attr :member_contributions
@@ -34,12 +18,17 @@ module BenefitSponsors
           @total_contribution = 0.00
           @member_contributions = {}
           @product = r_coverage.product
-          @previous_product = r_coverage.previous_eligibility_product
+          @previous_product = r_coverage.previous_product
+          @primary_member_id = nil
         end
 
         def add(member)
+          if member.is_primary_member?
+            @primary_member_id = member.member_id
+          end
           coverage_age = @contribution_calculator.calc_coverage_age_for(member, @product, @coverage_start, @eligibility_dates, @previous_product)
-          rel_name = @contribution_model.map_relationship_for(member.relationship, coverage_age, member.is_disabled?)
+          relationship = member.is_primary_member? ? "self" : member.relationship
+          rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name] + 1
           @member_total = @member_total + 1
           @member_ids = @member_ids + [member.member_id]
@@ -52,12 +41,17 @@ module BenefitSponsors
           end
           cu = @level_map[contribution_unit.id]
           c_factor = cu.contribution_factor
-          @total_contribution = @total_price * c_factor
-          # Clean this math up to ensure the totals add correctly,
-          # use some sort of bucket algo maybe?
+          max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2)
+          @total_contribution = [max_contribution, @total_price].min
+          members_total_price = 0.00
           @member_ids.each do |m_id|
-            @member_contributions[m_id] = (@total_contribution / @member_total)
+            member_price = BigDecimal.new((@total_contribution / @member_total).to_s).floor(2)
+            members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
+            @member_contributions[m_id] = member_price
           end
+          member_discrepency = BigDecimal.new((@total_contribution - members_total_price).to_s).round(2)
+          @member_contributions[@primary_member_id] = BigDecimal.new((@member_contributions[@primary_member_id] + member_discrepency).to_s).round(2) 
+          self
         end
       end
 
@@ -75,28 +69,22 @@ module BenefitSponsors
       # @return [BenefitMarkets::SponsoredBenefits::ContributionRosterEntry] the
       #   contribution results paired with the roster
       def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
-        roster_coverage = priced_roster_entry.roster_coverage
-        state = CalculatorState.new(contribution_model, level_map_for(sponsor_contribution), priced_roster_entry.roster_entry_pricing.total_price, roster_coverage.coverage_eligibility_dates, roster_coverage.coverage_start_date, roster_coverage)
+        roster_coverage = priced_roster_entry.group_enrollment
+        coverage_eligibility_dates = {}
+        roster_coverage.member_enrollments.each do |m_en|
+          coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
+        end
         level_map = level_map_for(sponsor_contribution)
-        member_list = [priced_roster_entry] + priced_roster_entry.dependents
-        member_list.each do |member|
+        state = CalculatorState.new(contribution_model, level_map, roster_coverage.product_cost_total, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage)
+        priced_roster_entry.members.each do |member|
           state.add(member)
         end
         state.finalize_results
-        roster_entry_contribution = ContributionResult.new(
-          state.total_contribution,
-          state.member_contributions
-        )
-        ContributionEntry.new(
-          priced_roster_entry.roster_coverage,
-          priced_roster_entry.relationship,
-          priced_roster_entry.dob,
-          priced_roster_entry.member_id,
-          priced_roster_entry.dependents,
-          priced_roster_entry.roster_entry_pricing,
-          roster_entry_contribution,
-          priced_roster_entry.is_disabled?
-        )
+        roster_coverage.sponsor_contribution_total = state.total_contribution
+        roster_coverage.member_enrollments.each do |m_en|
+          m_en.sponsor_contribution = state.member_contributions[m_en.member_id]
+        end
+        priced_roster_entry
       end
 
       protected

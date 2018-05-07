@@ -5,10 +5,10 @@ module BenefitMarkets
 
     let(:this_year)               { TimeKeeper.date_of_record.year }
     # let(:benefit_market_kind)     { :aca_shop }
-    let(:application_period)      { Date.new(this_year, 1, 1)..Date.new(this_year, 12, 31) }
+
+    let(:benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog) }
     let(:product_kind)            { :health }
     let(:kind)                    { :single_issuer }
-    let(:hbx_id)                  { "58585858" }
     let(:title)                   { "SafeCo Issuer Health" }
     let(:description)             { "All products offered by a single issuer" }
     let(:products)                { [FactoryGirl.build(:benefit_markets_products_product)] }
@@ -18,13 +18,12 @@ module BenefitMarkets
 
     let(:params) do
         {
-          application_period: application_period,
-          product_kind:       product_kind,
-          kind:               kind,
-          hbx_id:             hbx_id,
-          title:              title,
-          description:        description,
-          products:           products,
+          benefit_market_catalog: benefit_market_catalog,
+          product_kind:           product_kind,
+          kind:                   kind,
+          title:                  title,
+          description:            description,
+          products:               products,
           # contribution_model: contribution_model,
           # pricing_model:      pricing_model,
         }
@@ -43,6 +42,16 @@ module BenefitMarkets
 
       context "without required params" do
 
+        context "that's missing benefit_market_catalog" do
+          subject { described_class.new(params.except(:benefit_market_catalog)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:benefit_market_catalog]).to include("can't be blank")
+          end
+        end
+
         context "that's missing title" do
           subject { described_class.new(params.except(:title)) }
 
@@ -50,6 +59,26 @@ module BenefitMarkets
             subject.validate
             expect(subject).to_not be_valid
             expect(subject.errors[:title]).to include("can't be blank")
+          end
+        end
+
+        context "that's missing product_kind" do
+          subject { described_class.new(params.except(:product_kind)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:product_kind]).to include("can't be blank")
+          end
+        end
+
+                context "that's missing kind" do
+          subject { described_class.new(params.except(:kind)) }
+
+          it "should be invalid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:kind]).to include("can't be blank")
           end
         end
       end

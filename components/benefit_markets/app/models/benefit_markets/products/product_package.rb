@@ -11,13 +11,14 @@ module BenefitMarkets
 
     embedded_in :packagable, polymorphic: true
 
-    field :application_period,      type: Range
-    field :hbx_id,                  type: String
-
     field :product_kind,            type: Symbol
     field :kind,                    type: Symbol
     field :title,                   type: String, default: ""
     field :description,             type: String, default: ""
+
+    belongs_to  :benefit_market_catalog,
+                counter_cache: true,
+                class_name: "BenefitMarkets::BenefitMarketCatalog"
 
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
@@ -28,11 +29,7 @@ module BenefitMarkets
     embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    embeds_one  :service_area,
-                class_name: "BenefitMarkets::Locations::ServiceArea"
-
-
-    validates_presence_of :application_period, :product_kind, :kind
+    validates_presence_of :benefit_market_catalog, :product_kind, :kind
     validates_presence_of :title, :allow_blank => false
 
     def benefit_market_kind
