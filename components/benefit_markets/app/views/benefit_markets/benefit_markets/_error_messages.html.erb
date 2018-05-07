@@ -5,6 +5,24 @@
       <% object.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
+      <% if object.kind == 'aca_shop' %>
+        <% object.aca_shop_configuration.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        <% object.aca_shop_configuration.initial_application_configuration.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        <% object.aca_shop_configuration.renewal_application_configuration.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      <% elsif object.kind == 'aca_individual' %>
+        <% object.aca_individual_configuration.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        <% object.aca_individual_configuration.initial_application_configuration.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      <% end %>
     </ul>
   </div>
 <% end %>

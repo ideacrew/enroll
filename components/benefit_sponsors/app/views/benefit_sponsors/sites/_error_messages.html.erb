@@ -5,6 +5,28 @@
       <% object.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
+
+      <% object.owner_organization.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+
+      <% object.owner_organization.profile.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+
+      <% object.owner_organization.profile.office_locations.each do |office_location| %>
+        <% office_location.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+
+        <% office_location.phone.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+
+        <% office_location.address.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      <% end %>
     </ul>
   </div>
 <% end %>
