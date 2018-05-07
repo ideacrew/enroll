@@ -19,6 +19,11 @@ module BenefitMarkets
 
       def fail!
       end
+
+      def add_error(context, error)
+        @context_errors << {context => error}
+      end
+
     end
   end
 end

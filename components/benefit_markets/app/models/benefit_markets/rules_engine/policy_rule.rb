@@ -10,14 +10,14 @@ module BenefitMarkets
       end
 
       attr_reader :requires
-      attr_reader :test
+      attr_reader :validate
       attr_reader :success
       attr_reader :failure
       attr_reader :name
 
       NO_OP = lambda {|o| true }
 
-      def initialize(name, 
+      def initialize(name,
                       requires: [],
                       validate: NO_OP,
                       failure: NO_OP,
