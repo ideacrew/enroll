@@ -12,11 +12,10 @@ module BenefitMarkets
     belongs_to  :service_area,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
 
-    embeds_one  :sponsor_market_policy,  
+    embeds_one  :sponsor_market_policy,
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
 
     embeds_one  :member_market_policy,
-
                 class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
 
     embeds_many :product_packages, as: :packagable,
@@ -25,7 +24,6 @@ module BenefitMarkets
 
     def benefit_kinds
     end
-
 
     def product_market_kind
       "shop"
