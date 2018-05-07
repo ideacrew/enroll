@@ -165,7 +165,6 @@ module BenefitSponsors
       end
 
       def _insert_primary(form)
-        binding.pry
         # TODO
         member = find_employee(form.ssn) || CensusMembers::CensusEmployee.new
         member = init_census_record(member, form)
