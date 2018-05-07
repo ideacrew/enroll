@@ -33,11 +33,12 @@ module BenefitMarkets
     end
     
     def add_product_packages
-      packages = benefit_market_catalog.product_packages.collect do |product_package|
-        product_package.products = product_package.benefit_market_products_available_for(@service_area, @effective_date)
-        product_package
-      end
-      @benefit_sponsor_catalog.product_packages = packages
+      # TODO: Optimize the code
+      # benefit_market_catalog.product_packages.collect do |product_package|
+      #   # product_package.products = product_package.benefit_market_products_available_for(@service_area, @effective_date)
+      # end
+
+      @benefit_sponsor_catalog.product_packages = benefit_market_catalog.product_packages
     end
 
     def benefit_sponsor_catalog
