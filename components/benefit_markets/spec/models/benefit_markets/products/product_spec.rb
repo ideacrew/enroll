@@ -81,15 +81,16 @@ module BenefitMarkets
           end
         end
 
-        context "that's missing an hbx_id" do
-          subject { described_class.new(params.except(:hbx_id)) }
+        # TODO: enable when hbx_id populated in products. validation disabled for now.
+        # context "that's missing an hbx_id" do
+        #   subject { described_class.new(params.except(:hbx_id)) }
 
-          it "should be invalid" do
-            subject.validate
-            expect(subject).to_not be_valid
-            expect(subject.errors[:hbx_id]).to include("can't be blank")
-          end
-        end
+        #   it "should be invalid" do
+        #     subject.validate
+        #     expect(subject).to_not be_valid
+        #     expect(subject.errors[:hbx_id]).to include("can't be blank")
+        #   end
+        # end
 
         context "that's missing a title" do
           subject { described_class.new(params.except(:title)) }
