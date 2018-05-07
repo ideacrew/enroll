@@ -6,7 +6,7 @@ module BenefitMarkets
       end
 
       def self.rule(*args)
-        add_rule(Rule.new(*args))
+        add_rule(PolicyRule.new(*args))
       end
 
       def self.add_rule(rule)
@@ -16,7 +16,7 @@ module BenefitMarkets
 
       def evaluate(context)
         self.class.rules.each do |rule|
-         rule.run(context)
+         rule.execute(context)
         end 
       end
     end
