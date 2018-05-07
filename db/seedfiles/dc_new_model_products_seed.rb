@@ -91,6 +91,7 @@ Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).
   product.issuer_profile_id = carrier.id
   product.service_area = BenefitMarkets::Locations::ServiceArea.first
 
+  product.issuer_profile_id = issuer_profile.id
   product.sbc_document = plan.sbc_document
   product.save!
 end

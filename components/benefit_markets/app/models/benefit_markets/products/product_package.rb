@@ -34,12 +34,12 @@ module BenefitMarkets
     end
 
     def issuer_profiles
-      return @issuer_profiles if is_defined?(@issuer_profiles)
+      return @issuer_profiles if defined?(@issuer_profiles)
       @issuer_profiles = products.select { |product| product.issuer_profile }.uniq!
     end
 
     def issuer_profile_products_for(issuer_profile)
-      return @issuer_profile_products if is_defined?(@issuer_profile_products)
+      return @issuer_profile_products if defined?(@issuer_profile_products)
       @issuer_profile_products = products.collect { |issuer_profile| product.issuer_profile == issuer_profile }
     end
 
