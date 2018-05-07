@@ -51,6 +51,7 @@ module BenefitSponsors
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
+        delegate :legal_name, :end_on, to: :organization
       end
 
       def parent
@@ -71,6 +72,15 @@ module BenefitSponsors
 
       def policy_class
         "BenefitSponsors::EmployerProfilePolicy"
+      end
+
+      # Benefit Sponsor will always have an active benefit sponsorship
+      def census_employees
+        parent.active_benefit_sponsorship.census_employees
+      end
+
+      def benefit_applications
+        parent.active_benefit_sponsorship.benefit_applications
       end
     end
   end

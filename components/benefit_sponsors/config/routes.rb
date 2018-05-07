@@ -23,6 +23,8 @@ BenefitSponsors::Engine.routes.draw do
 
     namespace :employers do
       resources :employer_profiles, only: [:show] do
+        get :export_census_employees
+        post :bulk_employee_upload
         collection do
           get :show_pending
         end
