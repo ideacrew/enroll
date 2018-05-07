@@ -88,6 +88,7 @@ Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).
   end
 
   product.is_reference_plan_eligible = true
+  product.issuer_profile_id = carrier.id
   product.service_area = BenefitMarkets::Locations::ServiceArea.first
 
   product.sbc_document = plan.sbc_document
