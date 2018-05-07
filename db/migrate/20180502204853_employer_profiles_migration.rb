@@ -120,11 +120,13 @@ class EmployerProfilesMigration < Mongoid::Migration
 
   def self.build_documents(old_org, new_profile,logger)
     @old_profile.documents.each do |document|
-      new_profile.documents.new(document.attributes.except("_id", "_type"))
+      doc = new_profile.documents.new(document.attributes.except("_id", "_type","identifier"))
+      doc.identifier = document.identifier if document.identifier.present?
     end
 
     old_org.documents.each do |document|
-      new_profile.documents.new(document.attributes.except("_id", "_type"))
+      new_profile.documents.new(document.attributes.except("_id", "_type","identifier"))
+      doc.identifier = document.identifier if document.identifier.present?
     end
   end
 
