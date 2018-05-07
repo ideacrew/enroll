@@ -16,9 +16,7 @@ module BenefitMarkets
     field :title,                   type: String, default: ""
     field :description,             type: String, default: ""
 
-    belongs_to  :benefit_market_catalog,
-                counter_cache: true,
-                class_name: "BenefitMarkets::BenefitMarketCatalog"
+
 
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
@@ -29,7 +27,7 @@ module BenefitMarkets
     embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    validates_presence_of :benefit_market_catalog, :product_kind, :kind
+    validates_presence_of :product_kind, :kind
     validates_presence_of :title, :allow_blank => false
 
     def benefit_market_kind

@@ -17,11 +17,10 @@ module BenefitMarkets
     field :application_period,    type: Range   # => Mon, 01 Jan 2018..Mon, 31 Dec 2018
 
     field :hbx_id,                type: String
-    field :issuer_profile_urn,    type: String
     field :title,                 type: String
-    field :description,           type: String
-    field :product_package_kinds, type: Array, default: []
+    field :description,           type: String, default: ""
     field :issuer_profile_id,     type: BSON::ObjectId
+    field :product_package_kinds, type: Array, default: []
 
 
     belongs_to  :service_area,
@@ -32,8 +31,9 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
 
-    validates_presence_of :hbx_id, :benefit_market_kind, :application_period, :title,
-                          :issuer_profile_urn, :premium_tables, :service_area
+    # validates_presence_of :hbx_id, :application_period,
+    validates_presence_of :benefit_market_kind,  :title,
+                          :premium_tables, :service_area
 
 
     validates :benefit_market_kind,
