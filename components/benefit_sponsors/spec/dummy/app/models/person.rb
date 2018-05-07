@@ -51,6 +51,8 @@ class Person
   # Login account
   belongs_to :user
 
+  embeds_many :employee_roles, cascade_callbacks: true, validate: true
+  embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :csr_role, cascade_callbacks: true, validate: true
   embeds_one :assister_role, cascade_callbacks: true, validate: true
@@ -98,6 +100,18 @@ class Person
       end
     end
     true
+  end
+
+  def has_active_consumer_role?
+    consumer_role.present? and consumer_role.is_active?
+  end
+
+  def has_active_employee_role?
+    active_employee_roles.any?
+  end
+
+  def active_employee_roles
+    employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
   end
 
   def generate_hbx_id

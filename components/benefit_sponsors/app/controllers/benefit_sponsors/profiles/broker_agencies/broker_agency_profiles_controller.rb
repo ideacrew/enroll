@@ -32,6 +32,7 @@ module BenefitSponsors
       end
 
       def staff_index
+        authorize self
         @q = params.permit(:q)[:q]
         @staff = eligible_brokers
         @page_alphabets = page_alphabets(@staff, "last_name")
