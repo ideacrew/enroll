@@ -8,6 +8,7 @@ class EmployeeRole
   embedded_in :person
 
   field :employer_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId
   field :census_employee_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId  # TODO: Deprecate
   field :employment_status, type: String
@@ -114,7 +115,7 @@ class EmployeeRole
 
   def new_census_employee
     return @census_employee if defined? @census_employee
-    @census_employee = CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
+    @census_employee = BenefitSponsors::CensusMembers::CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
   end
 
   alias_method :census_employee=, :new_census_employee=
