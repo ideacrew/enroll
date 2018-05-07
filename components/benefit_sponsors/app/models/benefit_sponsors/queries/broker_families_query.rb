@@ -45,17 +45,13 @@ module BenefitSponsors
       end
 
       def employee_person_ids
-        # TODO:  Revisit when CensusEmployee an BenefitSponsorship relationships are completed.
-        benefit_sponsorships_ids ||= BenefitSponsors::Organizations::Organization.employer_profiles.collection.aggregate([
-          { "$match" => { :'benefit_sponsorships.broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: @broker_agency_profile_id } } } },
-          { "$group" => { "_id" => "$benefit_sponsorships._id" }}
-        ]).map { |rec| rec["_id"] }
+        benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
+          :"broker_agency_accounts.benefit_sponsors_broker_agency_profile_id" => @broker_agency_profile_id
+        )
 
-        census_employee_ids = benefit_sponsorships_ids.inject([]) do |arr, benefit_sponsorships_id|
-          arr + BenefitSponsors::CensusMembers::CensusEmployee.find_by_benefit_sponsorship(benefit_sponsorships_id).id
-        end
+        @census_employee_ids = benefit_sponsorships.flat_map(&:census_employees).map(&:id)
 
-        employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => census_employee_ids}).pluck(:_id)
+        employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => @census_employee_ids}).pluck(:_id)
       end
     end
   end
