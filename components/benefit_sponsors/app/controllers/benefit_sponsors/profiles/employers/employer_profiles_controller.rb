@@ -21,7 +21,7 @@ module BenefitSponsors
         else
           case @tab
             when 'benefits'
-              @benefit_applications = find_benefit_applications
+              @benefit_applications = @employer_profile.benefit_applications
             when 'documents'
             when 'employees'
               # @current_plan_year = @employer_profile.show_plan_year
@@ -45,24 +45,24 @@ module BenefitSponsors
         end
       end
 
+      def export_census_employees
+        respond_to do |format|
+          format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+        end
+      end
+
       def bulk_employee_upload
         file = params.require(:file)
-        @form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
-        # @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
+        roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
         begin
-        if @form.save
-          redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
-        else
-          render "employers/employer_profiles/employee_csv_upload_errors"
-        end
-        rescue Exception => e
-          # TODO - get redirection path from form obj
-          if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
-            render "employers/employer_profiles/_download_new_template"
+          if roster_upload_form.save
+            redirect_to roster_upload_form.redirection_url
           else
-            @census_employee_import.errors.add(:base, e.message)
-            render "employers/employer_profiles/employee_csv_upload_errors"
+            render roster_upload_form.redirection_url
           end
+        rescue Exception => e
+          roster_upload_form.errors.add(:base, e.message)
+          render (roster_upload_form.redirection_url || default_url)
         end
       end
 
@@ -81,8 +81,8 @@ module BenefitSponsors
         render file: 'public/404.html', status: 404 if @employer_profile.blank?
       end
 
-      def find_benefit_applications
-        @employer_profile.parent.active_benefit_sponsorship.benefit_applications
+      def default_url
+        "employers/employer_profiles/employee_csv_upload_errors"
       end
     end
   end

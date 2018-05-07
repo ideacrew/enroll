@@ -30,7 +30,7 @@ module BenefitSponsors
     embeds_one :address, class_name: "BenefitSponsors::Locations::Address"
     accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
 
-    embeds_one :email, class_name: "BenefitSponsors::Email"
+    embeds_one :email, class_name: "BenefitSponsors::Locations::Email"
     accepts_nested_attributes_for :email, allow_destroy: true
 
     validates_presence_of :first_name, :last_name, :dob, :employee_relationship

@@ -14,6 +14,7 @@ module BenefitSponsors
       attribute :sheet
       attribute :census_records, Array[Forms::CensusRecordForm]
       attribute :census_titles, Array
+      attribute :redirection_url
 
       validates_presence_of :file, :profile, :template_version, :template_date
 
@@ -49,6 +50,7 @@ module BenefitSponsors
         template_date = parse_date(self.template_date)
         unless (template_date == TEMPLATE_DATE && template_version == TEMPLATE_VERSION && header_valid?(sheet.row(2)))
           self.errors.add(:base, "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template.")
+          self.redirection_url = "/employers/employer_profiles/_download_new_template"
         end
       end
 

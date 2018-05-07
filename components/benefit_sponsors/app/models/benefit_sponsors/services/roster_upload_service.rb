@@ -100,21 +100,28 @@ module BenefitSponsors
             _insert_into_persist_queqe(census_form)
           end
         end
-        persist_census_records(form) if @persist_queqe.present?
-        terminate_census_records if @terminate_queue.present?
+        unless persist_census_records(form) && terminate_census_records
+          form.redirection_url = "/employers/employer_profiles/employee_csv_upload_errors"
+          return false
+        end
+        form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/#{profile.id}?tab=employees"
+        true
       end
 
       def persist_census_records(form)
-        employees = @persist_queqe.values.map(&:employee)
-        if employees.map(&:valid?).all? || self.errors.blank?
-          employees.compact.each(&:save!)
-        else
-          map_errors_for(self, onto: form)
-          employees.each_with_index do |record, i|
-            map_errors_for(record, i, onto: form)
+        if @persist_queqe.present?
+          employees = @persist_queqe.values.map(&:employee)
+          if employees.map(&:valid?).all? || self.errors.blank?
+            employees.compact.each(&:save!)
+          else
+            map_errors_for(self, onto: form)
+            employees.each_with_index do |record, i|
+              map_errors_for(record, i, onto: form)
+            end
+            return false
           end
-          return false
         end
+        true
       end
 
       def map_errors_for(obj, key="", onto:)
@@ -126,13 +133,17 @@ module BenefitSponsors
 
       def terminate_census_records
         # TODO
-        @terminate_queue.each do |row, employee_termination_map|
-           employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
+        if @terminate_queue.present?
+          return false if self.errors.present?
+          @terminate_queue.each do |row, employee_termination_map|
+            employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
+          end
         end
+        true
       end
 
       def _insert_into_terms_queqe(form)
-        census_employee = find_employee(form)
+        census_employee = find_employee(form.ssn)
         if census_employee.present?
           if is_employee_terminable?(census_employee)
             @terminate_queue[@index + 4] = EmployeeTerminationMap.new(census_employee, form.termination_date)
@@ -154,8 +165,9 @@ module BenefitSponsors
       end
 
       def _insert_primary(form)
+        binding.pry
         # TODO
-        member = find_employee(form) || CensusEmployee.new
+        member = find_employee(form.ssn) || CensusMembers::CensusEmployee.new
         member = init_census_record(member, form)
         @persist_queqe[@index + 4] = EmployeePersistMap.new(member)
         validate_newly_designated(form.newly_designated, member)
@@ -199,7 +211,7 @@ module BenefitSponsors
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
-          employer_profile_id: profile.id,
+          # employer_profile_id: profile.id,
           address: build_address(form)
         })
         member.assign_attributes(params)
@@ -221,7 +233,7 @@ module BenefitSponsors
 
       def build_email(form)
         # TODO
-        Email.new({address: form.email.to_s, kind: "home"}) if form.email
+        Locations::Email.new({address: form.email.to_s, kind: "home"}) if form.email
       end
 
       def is_business_owner?(form)
@@ -231,9 +243,9 @@ module BenefitSponsors
         false
       end
 
-      def  find_employee(form)
+      def  find_employee(ssn)
         # TODO
-        CensusEmployee.find_by_employer_profile(profile).by_ssn(form.ssn).active.first
+        profile.census_employees.active.by_ssn(ssn).first
       end
 
       def find_dependent(form)
