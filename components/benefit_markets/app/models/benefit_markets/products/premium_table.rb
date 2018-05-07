@@ -19,9 +19,9 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::Locations::RatingArea"
 
     embeds_many :premium_tuples,
-                class_name: "BenefitMarkets::Products::PremiumTuple"
+                class_name: "BenefitMarkets::Products::PremiumTuple", cascade_callbacks: true
 
-    validates_presence_of :effective_period, :rating_area
+    validates_presence_of :effective_period #, :rating_area
     validates_presence_of :premium_tuples, :allow_blank => false
 
   end

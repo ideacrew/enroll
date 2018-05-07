@@ -18,11 +18,11 @@ module BenefitMarkets
     has_many    :benefit_market_catalogs,      
                 class_name: "BenefitMarkets::BenefitMarketCatalog"
 
-    embeds_one :configuration,  as: :configurable
+    # embeds_one :configuration,  as: :configurable
     embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
                                         autobuild: true
 
-    validates_presence_of :configuration #, :contact_center_setting
+    #validates_presence_of :configuration #, :contact_center_setting
 
     validates :kind,
       inclusion:  { in: BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
@@ -32,11 +32,12 @@ module BenefitMarkets
 
     # Mongoid initializes associations after setting attributes. It's necessary to autobuild the
     # configuration file and subsequently change following initialization, if necessary
-    before_validation :reset_configuration_attributes, if: :kind_changed?
+    # before_validation :reset_configuration_attributes, if: :kind_changed?
 
     def kind=(new_kind)
       return unless BenefitMarkets::BENEFIT_MARKET_KINDS.include?(new_kind)
       super(new_kind)
+      return
       reset_configuration_attributes
     end
 

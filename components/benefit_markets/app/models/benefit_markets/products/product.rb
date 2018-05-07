@@ -23,17 +23,48 @@ module BenefitMarkets
     field :product_package_kinds, type: Array, default: []
     field :issuer_profile_id,     type: BSON::ObjectId
 
+    field :active_year, type: Integer
+    field :coverage_kind, type: String
+    field :metal_level, type: String
+
+    field :hios_id, type: String
+    field :hios_base_id, type: String
+    field :csr_variant_id, type: String
+
+    field :abbrev, type: String
+    field :provider, type: String
+    field :ehb, type: Float, default: 0.0
+
+    field :renewal_plan_id, type: BSON::ObjectId
+    field :cat_age_off_renewal_plan_id, type: BSON::ObjectId
+    field :is_standard_plan, type: Boolean, default: false
+
+    field :minimum_age, type: Integer, default: 0
+    field :maximum_age, type: Integer, default: 120
+
+    # More Attributes from qhp
+    field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
+    field :deductible, type: String # Deductible
+    field :family_deductible, type: String
+    field :network_information, type: String
+    field :nationwide, type: Boolean # Nationwide
+    field :dc_in_network, type: Boolean # DC In-Network or not
+
+    # Fields for provider direcotry and rx formulary url
+    field :provider_directory_url, type: String
+    field :rx_formulary_url, type: String
+
 
     belongs_to  :service_area,
                 counter_cache: true,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
 
+    embeds_one  :sbc_document, :class_name => "Document", as: :documentable
     embeds_many :premium_tables,
-                class_name: "BenefitMarkets::Products::PremiumTable"
+                class_name: "BenefitMarkets::Products::PremiumTable", cascade_callbacks: true
 
 
-    validates_presence_of :hbx_id, :benefit_market_kind, :application_period, :title,
-                          :issuer_profile_urn, :premium_tables, :service_area
+    validates_presence_of :benefit_market_kind, :title, :premium_tables #:hbx_id, :issuer_profile_urn, :service_area, :application_period
 
 
     validates :benefit_market_kind,
@@ -53,6 +84,8 @@ module BenefitMarkets
       # product_package.application_period
       # product_package.product_kind
       # product_package.kind
+
+      where(:"product_package_kinds" => product_package.product_kind)
     }
 
     scope :by_service_area,       ->(service_area){ where(service_area: service_area) }
