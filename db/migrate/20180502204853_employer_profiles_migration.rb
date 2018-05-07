@@ -119,14 +119,17 @@ class EmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.build_documents(old_org, new_profile,logger)
+
     @old_profile.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type","identifier"))
       doc.identifier = document.identifier if document.identifier.present?
+      doc.save!
     end
 
     old_org.documents.each do |document|
-      new_profile.documents.new(document.attributes.except("_id", "_type","identifier"))
+      doc = new_profile.documents.new(document.attributes.except("_id", "_type","identifier"))
       doc.identifier = document.identifier if document.identifier.present?
+      doc.save!
     end
   end
 
