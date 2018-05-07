@@ -52,6 +52,7 @@ module BenefitSponsors
       end
 
       def bulk_employee_upload
+        authorize @employer_profile, :show?
         file = params.require(:file)
         roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
         begin
