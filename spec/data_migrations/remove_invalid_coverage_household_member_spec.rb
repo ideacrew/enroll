@@ -30,7 +30,7 @@ describe RemoveInvalidCoverageHouseholdMember, dbclean: :after_each do
         subject.migrate
         person.reload
         family.reload
-        expect(family.active_household.immediate_family_coverag e_household.coverage_household_members.size) == size-1
+        expect(family.active_household.immediate_family_coverage_household.coverage_household_members.size) == size-1
       end
     end
 end
