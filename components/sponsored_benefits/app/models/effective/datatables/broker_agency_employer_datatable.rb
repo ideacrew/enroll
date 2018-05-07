@@ -2,8 +2,13 @@
   module Effective
     module Datatables
       class BrokerAgencyEmployerDatatable < ::Effective::MongoidDatatable
+        include Config::AcaModelConcern
 
         datatable do
+          if individual_market_is_enabled?
+            bulk_actions_column do
+            end
+          end 
           table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
             if row.broker_relationship_inactive?
               row.legal_name

@@ -320,8 +320,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def update_assign
+    params[:general_agency_id] = params[:employers_general_agency_id] if params[:employers_general_agency_id]
     authorize HbxProfile, :modify_admin_tabs?
-    if params[:general_agency_id].present? && params[:employer_ids].present?
+    if params[:general_agency_id].present? || params[:employer_ids].present? && params[:bulk_actions_resources].present?
       general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
       case params[:type]
       when 'fire'
@@ -333,7 +334,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
         end
         notice = "Fire these employers successful."
       else
-        params[:employer_ids].each do |employer_id|
+        employer_ids = if params.key? :bulk_actions_resources
+        params[:bulk_actions_resources].map do |pdo_id|
+          SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
+        end
+        else
+          params[:employer_ids]
+        end
+        employer_ids.each do |employer_id|
           employer_profile = EmployerProfile.find(employer_id) rescue nil
           if employer_profile.present? #FIXME : Please move me to model
             broker_role_id = current_user.person.broker_role.id rescue nil
@@ -353,7 +361,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
         end
       end
     elsif params["commit"].try(:downcase) == "clear assignment"
-      params[:employer_ids].each do |employer_id|
+      employer_ids = if params.key? :bulk_actions_resources
+      params[:bulk_actions_resources].map do |pdo_id|
+        SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
+      end
+      else
+        params[:employer_ids]
+      end
+      employer_ids.each do |employer_id|
         employer_profile = EmployerProfile.find(employer_id) rescue next
         if employer_profile.general_agency_profile.present?
           send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
