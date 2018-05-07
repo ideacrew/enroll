@@ -121,14 +121,10 @@ class EmployerProfilesMigration < Mongoid::Migration
   def self.build_documents(old_org, new_profile,logger)
     @old_profile.documents.each do |document|
       new_profile.documents.new(document.attributes.except("_id", "_type"))
-      logger.info "validation_errors:
-          organization - #{new_profile.documents.errors.messages}" unless Rails.env.test? if !new_profile.documents.valid?
     end
 
     old_org.documents.each do |document|
       new_profile.documents.new(document.attributes.except("_id", "_type"))
-      logger.info "validation_errors:
-          organization - #{new_profile.documents.errors.messages}" unless Rails.env.test? if !new_profile.documents.valid?
     end
   end
 

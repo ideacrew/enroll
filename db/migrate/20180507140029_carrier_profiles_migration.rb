@@ -36,6 +36,7 @@ class CarrierProfilesMigration < Mongoid::Migration
 
     #find or build site
     sites = self.find_site(site_key)
+    return false unless sites.present?
     site = sites.first
 
     #get main app organizations for migration
@@ -117,7 +118,7 @@ class CarrierProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :fein, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :versions, :version, :fein, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
     general_organization = BenefitSponsors::Organizations::ExemptOrganization.new(old_org_params)
     general_organization.site = site
