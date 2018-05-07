@@ -128,11 +128,11 @@ module BenefitSponsors
       def map_errors_for(site, onto:)
 
         site.owner_organization.errors.each do |att, err|
-          onto.owner_organization.errors.add(att, err)
+          onto.errors.add(att, err)
         end
 
         site.owner_organization.profiles.first.errors.each do |att, err|
-          onto.owner_organization.profile.errors.add(att, err)
+          onto.errors.add(att, err)
         end
 
         site.owner_organization.profiles.first.office_locations.each_with_index do |location, index|
@@ -140,39 +140,21 @@ module BenefitSponsors
           form_location = onto.owner_organization.profile.office_locations[index]
 
           location.errors.each do |att, err|
-            errors = form_location.errors.add(att, err)
-            
-            errors.each do |att, err|
-              onto.errors.add(att, err)
-            end if errors.present?
-
+            onto.errors.add(att, err)
           end
 
           location.phone.errors.each do |att, err|
-            errors = form_location.phone.errors.add(att, err)
-            
-            errors.each do |att, err|
-              onto.errors.add(att, err)
-            end if errors.present?
-
+            onto.errors.add(att, err)
           end
 
           location.address.errors.each do |att, err|
-            errors = form_location.address.errors.add(att, err)
-            
-            errors.each do |att, err|
-              onto.errors.add(att, err)
-            end if errors.present?
-
+            onto.errors.add(att, err)
           end
         end
 
         site.errors.each do |att, err|
           onto.errors.add(att, err)
         end
-
-
-
 
       end
     end

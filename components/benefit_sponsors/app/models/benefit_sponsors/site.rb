@@ -92,8 +92,8 @@ module BenefitSponsors
     # Valid IDs are less than or equal to SITE_KEY_MAX_LENGTH characters, composed of letters and numbers only
     # (no special characters), all lower case, and may not begin with a number
     def scrub_site_key(site_key)
-      raise InvalidArgumentError, "numeric site_key not allowed" if site_key.numeric? || site_key.blank?
-      strip_leading_numbers(site_key.to_s).parameterize.gsub(/[-_]/,'').slice(0, SITE_KEY_MAX_LENGTH).to_sym
+      # raise InvalidArgumentError, "numeric site_key not allowed" if site_key.numeric? || site_key.blank?
+      strip_leading_numbers(site_key.to_s).parameterize.gsub(/[-_]/,'').slice(0, SITE_KEY_MAX_LENGTH).to_sym if site_key.present?
     end
 
     def strip_leading_numbers(input_string)
