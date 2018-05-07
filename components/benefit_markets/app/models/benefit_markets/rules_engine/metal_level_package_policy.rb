@@ -1,6 +1,6 @@
 module BenefitMarkets
   module RulesEngine
-    class MetalLevelPackagePolicy < BenefitMarkets::RulesEngine::Policy
+    class MetalLevelPackagePolicy < Policy
 
       rule :metal_level_selected,
         validate: lambda { |c| !c.get(:product_package).metal_level.blank? },
@@ -8,7 +8,7 @@ module BenefitMarkets
         requires: [:product_package]
 
       def self.call(product_package)
-        context = PolicyExecutionContext.new(product_package)
+        context = PolicyExecutionContext.new(product_package: product_package)
         self.new.evaluate(context)
         context
       end
