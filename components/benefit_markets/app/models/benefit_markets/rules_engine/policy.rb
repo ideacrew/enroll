@@ -1,23 +1,25 @@
 module BenefitMarkets
-  class RulesEngine::Policy
-    extend ActiveSupport::Concern
+  module RulesEngine
+    class Policy
 
-    def initialize(rules = [])
-      @rules = rules
-    end
+      def self.rules
+        @rules ||= []
+      end
 
-    def add_rule(new_rule)
-      @rules << new_rule
-    end
+      def self.rule(*args)
+        rules
+        add_rule(PolicyRule.new(*args))
+      end
 
-    def process_rules
-      collection.each do |rule|
-        @rules.sort_by(&:priority).each do |rule|
-          rule.run(rule)
+      def self.add_rule(rule)
+        @rules << rule
+      end
+
+      def evaluate(context)
+        self.class.rules.each do |rule|
+         rule.execute(context)
         end
-        rule.valid!
       end
     end
-
   end
 end

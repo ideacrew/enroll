@@ -5,16 +5,6 @@ module BenefitSponsors
       attr_reader :organization, :profile, :representative
       attr_accessor :profile_type, :profile_id, :factory_class
 
-      def self.for_broker_agency_portal(user)
-        if user.has_broker_agency_staff_role?
-          @id = user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id
-        elsif user.has_broker_role?
-          @id = user.person.broker_role.benefit_sponsors_broker_agency_profile_id.to_s
-        end
-
-        return @id
-      end
-
       def initialize(attrs={})
         @profile_id = attrs[:profile_id]
         @factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory

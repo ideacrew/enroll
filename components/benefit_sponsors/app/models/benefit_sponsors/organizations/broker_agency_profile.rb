@@ -83,6 +83,12 @@ module BenefitSponsors
         LanguageList::COMMON_LANGUAGES
       end
 
+      def languages
+        if languages_spoken.any?
+          return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+        end
+      end
+
       def primary_office_location
         office_locations.detect(&:is_primary?)
       end
