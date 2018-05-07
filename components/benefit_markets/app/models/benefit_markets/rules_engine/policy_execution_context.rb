@@ -12,6 +12,13 @@ module BenefitMarkets
       def get(kw)
         @context_values[kw]
       end
+
+      def provided_values
+        @context_values.keys
+      end
+
+      def fail!
+      end
     end
   end
 end
