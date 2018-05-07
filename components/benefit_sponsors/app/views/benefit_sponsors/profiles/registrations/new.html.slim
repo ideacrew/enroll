@@ -24,7 +24,7 @@
   = form_for @agency, as: :agency, url: {action: "create"} do |f|
     = f.hidden_field :profile_type, value: params[:profile_type]
     = render 'benefit_sponsors/shared/error_messages', :object => @agency
-    = render 'benefit_sponsors/profiles/employers/employer_profiles/employer_profile_form', f: f
+    = render './ui-components/v1/forms/employer_registration/employer_profile_form', f: f
     
 javascript:
   validateForm()

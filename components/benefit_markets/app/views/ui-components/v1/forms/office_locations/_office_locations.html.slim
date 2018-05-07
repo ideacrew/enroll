@@ -1,6 +1,7 @@
 h5.enroll-lead.mb-2 Office Location
 
 = f.fields_for :office_locations do |office_location|
+  = f.hidden_field :id, value: f.object.id if f.object.id
   = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: office_location}
 
 = link_to '+ Add Office Location', new_organizations_office_locations_path(:child_index => f.object.office_locations.length, :parent_object => f.object_name), remote: true, id:'add-office-locations'
