@@ -43,7 +43,7 @@
   $('select').selectric({
     onChange: function(element) {
       var date = $('.interaction-choice-control-forms-plan-design-proposal-effective-date').val().split('-');
-      plansForDate(date[1]+'/'+date[2]+'/'+date[0]);
+      plansForDate(date[0]+'-'+date[1]+'-'+date[2]);
     }
   });
   
