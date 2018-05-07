@@ -187,7 +187,6 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
           expect(merge_model.plan_year.current_py_end_date).to eq current_py.end_on.strftime('%m/%d/%Y')
           expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
           expect(merge_model.plan_year.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-binding.pry
           expect(merge_model.plan_year.enrollment_errors).to include(current_py.enrollment_errors.values.join(' AND/OR '))
           if model_instance.start_on.yday != 1
             expect(merge_model.plan_year.enrollment_errors).to include(current_py.enrollment_errors.values.join(' AND/OR '))
