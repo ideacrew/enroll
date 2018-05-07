@@ -50,7 +50,7 @@ module BenefitSponsors
         template_date = parse_date(self.template_date)
         unless (template_date == TEMPLATE_DATE && template_version == TEMPLATE_VERSION && header_valid?(sheet.row(2)))
           self.errors.add(:base, "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template.")
-          self.redirection_url = "/employers/employer_profiles/_download_new_template"
+          self.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/_download_new_template"
         end
       end
 

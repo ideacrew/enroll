@@ -54,16 +54,16 @@ module BenefitSponsors
       def bulk_employee_upload
         authorize @employer_profile, :show?
         file = params.require(:file)
-        roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+        @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
         begin
-          if roster_upload_form.save
-            redirect_to roster_upload_form.redirection_url
+          if @roster_upload_form.save
+            redirect_to @roster_upload_form.redirection_url
           else
-            render roster_upload_form.redirection_url
+            render @roster_upload_form.redirection_url
           end
         rescue Exception => e
-          roster_upload_form.errors.add(:base, e.message)
-          render (roster_upload_form.redirection_url || default_url)
+          @roster_upload_form.errors.add(:base, e.message)
+          render (@roster_upload_form.redirection_url || default_url)
         end
       end
 

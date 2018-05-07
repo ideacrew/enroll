@@ -101,7 +101,7 @@ module BenefitSponsors
           end
         end
         unless persist_census_records(form) && terminate_census_records
-          form.redirection_url = "/employers/employer_profiles/employee_csv_upload_errors"
+          form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/employee_csv_upload_errors"
           return false
         end
         form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/#{profile.id}?tab=employees"
