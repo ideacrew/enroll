@@ -82,6 +82,50 @@
         </span>
       </div>
     </div>
+
+    <% if draft_plan_year?(plan_year) %>
+      <div class="panel benefitgroup col-xs-12" style="min-height:226px">
+        <div class="col-xs-1">
+          <i class="make-default draft fa fa-star fa-3x" data-toggle="tooltip" style="margin-top:30px"></i>
+        </div>
+        <div class="col-xs-11">
+          <section class="col-xs-10">
+            <header class="row">
+              <h3 class="title">
+                <%= plan_year.start_on.to_date.year%>
+                Plan Year (<%= plan_year.aasm_state.to_s.humanize.titleize %>)
+              </h3>
+            </header>
+          </section>
+          <div class="col-xs-2">
+
+          </div>
+          <table>
+            <tr>
+              <td>
+                <header>Coverage Year</header>
+              </td>
+              <td>
+                <p>
+                  <%= plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
+                </p>
+              </td>
+              <% if plan_year.terminated_on %>
+                <td>
+                    <header>Terminated On</header>
+                </td>
+                <td>
+                   <p>
+                      <%= plan_year.terminated_on.to_date.to_formatted_s :long_ordinal %>
+                   </p>
+                </td>
+              <%end%>
+            </tr>
+          </table>
+        </div>
+      </div>
+    <% end %>
+    
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
     <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">

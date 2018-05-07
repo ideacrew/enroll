@@ -15,6 +15,12 @@ module ApplicationHelper
       plan.deductible
     end
   end
+  
+  def draft_plan_year?(plan_year)
+    if plan_year.aasm_state == "draft" && plan_year.try(:benefit_groups).empty?
+      plan_year
+    end
+  end
 
   def get_portals_text(insured, employer, broker)
     my_portals = []
