@@ -96,6 +96,7 @@ class ConsumerRole
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
+  delegate :us_citizen, :us_citizen=, to: :person, allow_nil: true
 
   delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
 
@@ -147,6 +148,7 @@ class ConsumerRole
   embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
+  before_validation :ensure_verification_types
 
   before_validation :ensure_validation_states, on: [:create, :update]
 
@@ -183,7 +185,7 @@ class ConsumerRole
 
   def ivl_coverage_selected
     if unverified?
-      coverage_purchased!
+      coverage_purchased!(verification_attr)
     end
   end
 
@@ -414,6 +416,8 @@ class ConsumerRole
     state :fully_verified
     state :verification_period_ended
 
+    before_all_events :ensure_verification_types
+
     event :import, :after => [:record_transition, :notify_of_eligibility_change, :update_all_verification_types] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
@@ -425,13 +429,13 @@ class ConsumerRole
     end
 
     event :coverage_purchased, :after => [:record_transition, :move_types_to_pending ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssn]
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_lawful_presence]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
     end
 
     event :coverage_purchased_no_residency, :after => [:record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn]
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_lawful_presence]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
     end
@@ -570,6 +574,27 @@ class ConsumerRole
     person.update_attributes(args[0])
   end
 
+  # collect all verification types user can have based on information he provided
+  def ensure_verification_types
+    if person
+      live_types = []
+      live_types << 'DC Residency'
+      live_types << 'Social Security Number' if ssn
+      live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
+      if us_citizen
+        live_types << 'Citizenship'
+      else
+        live_types << 'Immigration status' if us_citizen != nil
+      end
+      inactive = verification_types.map(&:type_name) - live_types
+      new_types = live_types - verification_types.active.map(&:type_name)
+      person.deactivate_types(inactive)
+      new_types.each do |new_type|
+        person.add_new_verification_type(new_type)
+      end
+    end
+  end
+
   def build_nested_models_for_person
     ["home", "mobile"].each do |kind|
       person.phones.build(kind: kind) if person.phones.select { |phone| phone.kind == kind }.blank?
@@ -679,7 +704,7 @@ class ConsumerRole
   end
 
   def verification_types
-    person.verification_types.active.where(applied_roles: "consumer_role")
+    person.verification_types.active.where(applied_roles: "consumer_role") if person
   end
 
   #class methods
@@ -794,7 +819,7 @@ class ConsumerRole
   end
 
   def revert_ssn
-    verification_types.by_name("Social Security Number").first.pending_type
+    verification_types.by_name("Social Security Number").first.pending_type if verification_types.by_name("Social Security Number").first
   end
 
   def move_to_expired(*args)

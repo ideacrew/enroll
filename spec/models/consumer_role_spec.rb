@@ -278,7 +278,7 @@ context "Verification process and notices" do
         it "update ssn with callback fail_ssa_for_no_ssn" do
           allow(person).to receive(:ssn).and_return nil
           allow(consumer).to receive(:citizen_status).and_return "us_citizen"
-          consumer.coverage_purchased!
+          consumer.coverage_purchased! verification_attr
           expect(consumer.ssn_validation).to eq("na")
         end
       end
@@ -497,6 +497,57 @@ context "Verification process and notices" do
       it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'naturalized_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
       it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', true, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
       it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', false, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
+    end
+  end
+
+  describe "verification types" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role) }
+    let(:consumer) { person.consumer_role }
+
+    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
+      before do
+        person.ssn = nil unless ssn
+        person.us_citizen = citizen
+        person.dob = TimeKeeper.date_of_record - age.to_i.years
+        person.tribal_id = "444444444" if native
+        person.citizen_status = "indian_tribe_member" if native
+        person.consumer_role.save
+      end
+      it "returns array of verification types" do
+        expect(person.verification_types).to be_a Array
+      end
+
+      it "returns #{types_count} verification types" do
+        expect(consumer.verification_types.count).to eq types_count
+      end
+
+      it "contains #{v_types} verification types" do
+        expect(consumer.verification_types.map(&:type_name)).to eq v_types
+      end
+    end
+
+    context "SSN + Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
+    end
+
+    context "SSN + Immigrant" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+    end
+
+    context "SSN + Native Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship", "American Indian Status"], 4, "2222222222", true, "native", 20
+    end
+
+    context "Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
+    end
+
+    context "Immigrant with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
+    end
+
+    context "Native Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship", "American Indian Status"], 3, nil, true, "native", 20
     end
   end
 

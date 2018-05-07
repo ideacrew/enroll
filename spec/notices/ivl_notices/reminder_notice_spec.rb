@@ -135,7 +135,10 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
     end
 
     context "immigration" do
-
+      before do
+        person.update_attributes(us_citizen: false)
+        person.consumer_role.save!
+      end
       it "should have immigration pdf template" do
         person.verification_types.by_name(immigration_type.type_name).first.update_attributes(inactive: nil)
         @reminder_notice.build
@@ -158,23 +161,6 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       xit "should not return immigration pdf template if person is outstanding due to citizenship" do
         @reminder_notice.build
         expect(@reminder_notice.notice.immigration_unverified.present?).to be_falsey
-      end
-    end
-
-    context "both citizenship and immigration" do
-      it "should return immigration pdf template and  citizenship pdf template" do
-        person.consumer_role.update_attributes!(citizen_status: "us_citizen")
-        person.verification_types.by_name(immigration_type.type_name).first.update_attributes(inactive: nil)
-        @reminder_notice.build
-        expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
-        expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy
-      end
-
-      xit "should not return any other pdf templates" do
-        @reminder_notice.build
-        expect(@reminder_notice.notice.american_indian_unverified.present?).to be_falsey
-        expect(@reminder_notice.notice.residency_inconsistency.present?).to be_falsey
-        expect(@reminder_notice.notice.ssa_unverified.present?).to be_falsey
       end
     end
   end

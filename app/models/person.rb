@@ -152,7 +152,6 @@ class Person
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
-  before_save :ensure_verification_types
 
   #after_save :generate_family_search
   after_create :create_inbox
@@ -427,23 +426,6 @@ class Person
     is_active
   end
 
-  # collect all verification types user can have based on information he provided
-  def ensure_verification_types
-    live_types = []
-    live_types << 'DC Residency'
-    live_types << 'Social Security Number' if ssn
-    live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
-    if self.us_citizen
-      live_types << 'Citizenship'
-    else
-      live_types << 'Immigration status'
-    end
-    deactivate_types(verification_types.active.map(&:type_name) - live_types) if (verification_types.active.map(&:type_name) - live_types).any?
-    (live_types - verification_types.active.map(&:type_name)).each do |new_type|
-      add_new_verification_type(new_type)
-    end
-  end
-
   def deactivate_types(types)
     types.each do |type|
       verification_type_by_name(type).update_attributes(:inactive => true) unless verification_type_by_name(type).inactive
@@ -451,8 +433,12 @@ class Person
   end
 
   def add_new_verification_type(new_type)
-    default_status = (new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : nil
-    verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status )
+    default_status = (new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : "unverified"
+    if verification_types.map(&:type_name).include? new_type
+      verification_type_by_name(new_type).update_attributes(:inactive => false)
+    else
+      verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status )
+    end
   end
 
   def verification_type_by_name(type)
