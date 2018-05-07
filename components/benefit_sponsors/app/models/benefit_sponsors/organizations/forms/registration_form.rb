@@ -53,15 +53,6 @@ module BenefitSponsors
         new(attrs)
       end
 
-      def self.for_broker_portal(user)
-        profile_id = Services::NewProfileRegistrationService.for_broker_agency_portal(user)
-        if profile_id.present?
-          return [true, profile_id]
-        else
-          return [false, nil]
-        end
-      end
-
       def save
         persist!
       end
