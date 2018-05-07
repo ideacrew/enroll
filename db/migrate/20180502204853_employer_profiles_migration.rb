@@ -59,7 +59,7 @@ class EmployerProfilesMigration < Mongoid::Migration
             json_data = @old_profile.to_json(:except => [:_id, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :sic_code, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
-            @new_profile = initialize_new_profile(old_org, old_profile_params)
+            @new_profile = initialize_new_profile(old_org, old_profile_params,logger)
             new_organization = initialize_new_organization(old_org, site)
 
             raise Exception if !new_organization.valid?
@@ -103,11 +103,11 @@ class EmployerProfilesMigration < Mongoid::Migration
     BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id)
   end
 
-  def self.initialize_new_profile(old_org, old_profile_params)
+  def self.initialize_new_profile(old_org, old_profile_params,logger)
     new_profile = BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(old_profile_params)
 
     build_inbox_messages(new_profile)
-    build_documents(old_org, new_profile)
+    build_documents(old_org, new_profile,logger)
     build_office_locations(old_org, new_profile)
     return new_profile
   end
@@ -118,13 +118,17 @@ class EmployerProfilesMigration < Mongoid::Migration
     end
   end
 
-  def self.build_documents(old_org, new_profile)
+  def self.build_documents(old_org, new_profile,logger)
     @old_profile.documents.each do |document|
       new_profile.documents.new(document.attributes.except("_id", "_type"))
+      logger.info "validation_errors:
+          organization - #{new_profile.documents.errors.messages}" unless Rails.env.test? if !new_profile.documents.valid?
     end
 
     old_org.documents.each do |document|
       new_profile.documents.new(document.attributes.except("_id", "_type"))
+      logger.info "validation_errors:
+          organization - #{new_profile.documents.errors.messages}" unless Rails.env.test? if !new_profile.documents.valid?
     end
   end
 
