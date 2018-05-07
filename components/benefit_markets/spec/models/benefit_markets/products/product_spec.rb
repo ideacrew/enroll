@@ -31,7 +31,7 @@ module BenefitMarkets
           benefit_market_kind:  benefit_market_kind,
           application_period:   application_period,
           hbx_id:               hbx_id,
-          issuer_profile_urn:   issuer_profile_urn,
+          # issuer_profile_urn:   issuer_profile_urn,
           title:                title,
           description:          description,
           service_area:         service_area,
