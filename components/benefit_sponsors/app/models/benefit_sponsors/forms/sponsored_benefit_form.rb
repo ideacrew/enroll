@@ -7,6 +7,8 @@ module BenefitSponsors
 
       attribute :kind, String
       attribute :plan_option_kind, String
+      attribute :carrier_for_elected_plan, String
+      attribute :metal_level_for_elected_plan, String
 
       attribute :products, Array[BenefitProductForm]
       attribute :reference_product, BenefitProductForm
