@@ -72,9 +72,9 @@ module BenefitSponsors
 
       class << self
         def find(id)
-          organizations = Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).entries
-          return unless organizations.size == 1
-          organizations.first.profiles.detect { |profile| profile.id.to_s == id.to_s }
+          organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).first
+          return unless organization
+          organization.profiles.detect { |profile| profile.id.to_s == id.to_s }
         end
       end
 

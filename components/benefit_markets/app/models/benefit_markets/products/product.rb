@@ -71,7 +71,7 @@ module BenefitMarkets
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
     def issuer_profile
-      return @issuer_profile if is_defined?(@issuer_profile)
+      return @issuer_profile if defined?(@issuer_profile)
       @issuer_profile = ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_profile_id)
     end
 
