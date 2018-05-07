@@ -23,6 +23,7 @@ module BenefitMarkets
           title:                  title,
           description:            description,
           products:               products,
+          application_period:     benefit_market_catalog.application_period
           # contribution_model: contribution_model,
           # pricing_model:      pricing_model,
         }
