@@ -549,6 +549,21 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
     end
 
+    it "should send notification to GA when the broker is terminated on hiring other broker by employer" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer =  organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111');
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      FactoryGirl.create(:general_agency_account, employer_profile: employer, aasm_state: 'active')
+
+      employer = Organization.find(employer.organization.id).employer_profile
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs
+      expect(queued_job.any? {|h| (h[:args] == [employer.id.to_s, 'general_agency_terminated'] && h[:job] == ShopNoticesNotifierJob)}).to eq true
+    end
+
     it 'works with multiple broker_agency_contacts'  do
       employer = er5
       org_id = employer.organization.id
@@ -929,18 +944,6 @@ describe EmployerProfile, "Renewal Queries" do
       expect(EmployerProfile.organizations_eligible_for_renewal(expected_renewal_start).to_a).to eq [organization2]
     end
   end
-
-  context '.organizations_for_low_enrollment_notice', dbclean: :after_each do
-    let(:date) { TimeKeeper.date_of_record }
-    let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
-    let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
-    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-
-    it 'should return organizations elgible low enrollment notice' do
-      expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
-    end
-  end
 end
 
 describe EmployerProfile, "For General Agency", dbclean: :after_each do
@@ -1013,6 +1016,20 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
       expect(employer_profile.general_agency_accounts.active.count).to eq 2
       employer_profile.fire_general_agency!
+      expect(employer_profile.active_general_agency_account.blank?).to eq true
+    end
+
+    it "when with active general agency profile must send notification on broker termination" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.active_general_agency_account.blank?).to eq false
+
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.fire_general_agency!
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'general_agency_terminated']
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end

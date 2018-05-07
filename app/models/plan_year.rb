@@ -869,9 +869,8 @@ class PlanYear
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
     state :published,         :after_enter => [:accept_application, :link_census_employees]     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
-
+    state :enrolled,  :after_enter => [:ratify_enrollment, :finalize_composite_rates] # Published plan open enrollment has ended and is eligible for coverage,
     state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
-    state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
     #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
@@ -882,7 +881,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-    state :renewing_enrolled, :after_enter => [:renewal_successful]
+    state :renewing_enrolled, :after_enter => [:renewal_successful, :finalize_composite_rates]
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled,          :after_enter => :cancel_application
 
@@ -947,7 +946,7 @@ class PlanYear
       transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
       transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
       transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => :record_sic_and_rating_area
-      transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
+      transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
@@ -1290,26 +1289,13 @@ class PlanYear
     self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
   end
 
-  def initial_employer_denial_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
-      self.employer_profile.trigger_notices("initial_employer_denial")
-    end
-  end
-
-  def initial_employer_open_enrollment_completed
-    #also check if minimum participation and non owner conditions are met by ER.
+  def finalize_composite_rates
     benefit_groups.each do |bg|
       bg.finalize_composite_rates
     end
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
   end
 
   def renewal_successful
-    benefit_groups.each do |bg|
-      bg.finalize_composite_rates
-    end
     if transmit_employers_immediately?
       employer_profile.transmit_renewal_eligible_event
     end
@@ -1335,6 +1321,17 @@ class PlanYear
         ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer renewal eligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
+    end
+  end
+
+  def initial_employee_plan_selection_confirmation
+    return true if (benefit_groups.any?{|bg| bg.is_congress?})
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+      rescue Exception => e
+        puts "Unable to send Employee Open Enrollment begin notice to #{ce.full_name}" unless Rails.env.test?
       end
     end
   end

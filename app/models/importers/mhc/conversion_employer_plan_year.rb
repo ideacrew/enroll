@@ -10,7 +10,7 @@ module Importers::Mhc
       "boston medical center health plan" => "BMCHP",
       "blue cross blue shield ma" => "BCBS",
       "tufts health plan premier" => "THPP",
-      "tufts health plan direct" => "THPD"
+      "tufts health direct" => "THPD"
     }
 
     validate :validate_plan_selection, :validate_reference_plan

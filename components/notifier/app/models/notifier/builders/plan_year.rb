@@ -101,6 +101,18 @@ module Notifier
       end
     end
 
+    def plan_year_total_enrolled_count
+      if load_plan_year.present?
+        merge_model.plan_year.total_enrolled_count = load_plan_year.total_enrolled_count
+      end
+    end
+
+    def plan_year_eligible_to_enroll_count
+      if load_plan_year.present?
+        merge_model.plan_year.eligible_to_enroll_count = load_plan_year.eligible_to_enroll_count
+      end
+    end
+
     def plan_year_renewal_py_end_on
       if renewal_plan_year.present?
         merge_model.plan_year.renewal_py_end_on = renewal_plan_year.end_on
@@ -112,6 +124,21 @@ module Notifier
       if plan_year.present?
         merge_model.plan_year.enrollment_errors = plan_year.enrollment_errors.values.join(' AND/OR ')
       end
+    end
+
+    def plan_year_warnings
+      plan_year_warnings = []
+      if current_plan_year.present?
+        current_plan_year.application_eligibility_warnings.each do |k, _|
+          case k.to_s
+          when "fte_count"
+            plan_year_warnings << "Full Time Equivalent must be 1-50"
+          when "primary_office_location"
+            plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
+          end
+        end
+      end
+      merge_model.plan_year.warnings = plan_year_warnings.join(', ')
     end
 
     def load_plan_year
