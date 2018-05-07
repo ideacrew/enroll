@@ -6,9 +6,9 @@ module BenefitSponsors
 
     # let(:date_range) { (Date.today..1.year.from_now) }
     let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new }
-    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc, benefit_markets: [benefit_market]) }
+    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
     let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
-    let(:benefit_market)            { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "DC Health SHOP") }
+    let(:benefit_market)            { create :benefit_markets_benefit_market, site: site, kind: 'aca_shop' }
 
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }

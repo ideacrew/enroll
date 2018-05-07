@@ -1,7 +1,4 @@
 require 'rails_helper'
-Dir[Rails.root.join("components/benefit_sponsors/spec/factories/benefit_sponsors_*.rb")].each do |f|
-  require f
-end
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::BenefitApplicationService, type: :model, :dbclean => :after_each do
