@@ -79,12 +79,13 @@ Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).
   premium_tables = plan.premium_tables.inject({}) do |premium_tables, premium_row|
     effective_period = premium_row.start_on..premium_row.end_on
     premium_tables[effective_period] ||= []
-    premium_tables[effective_period] << BenefitMarkets::Products::PremiumTuple.new(age: premium_row.age, cost: premium_row.cost)
+    # premium_tables[effective_period] << BenefitMarkets::Products::PremiumTuple.new(age: premium_row.age, cost: premium_row.cost)
     premium_tables
   end
 
   premium_tables.each do |effective_period, premium_tuples|
-    product.premium_tables << BenefitMarkets::Products::PremiumTable.new(effective_period: effective_period, premium_tuples: premium_tuples, rating_area: BenefitMarkets::Locations::RatingArea.first)
+    # product.premium_tables << BenefitMarkets::Products::PremiumTable.new(effective_period: effective_period, premium_tuples: premium_tuples, rating_area: BenefitMarkets::Locations::RatingArea.first)
+    product.premium_tables << BenefitMarkets::Products::PremiumTable.new(effective_period: effective_period, rating_area: BenefitMarkets::Locations::RatingArea.first)
   end
 
   product.is_reference_plan_eligible = true
