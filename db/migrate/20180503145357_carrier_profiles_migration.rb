@@ -7,7 +7,7 @@ class CarrierProfilesMigration < Mongoid::Migration
     file_name = "#{Rails.root}/hbx_report/carrier_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
     field_names = %w( organization_id benefit_sponsor_organization_id status)
 
-    logger = Logger.new("#{Rails.root}/log/carrier_profile_migration_data.log")
+    logger = Logger.new("#{Rails.root}/log/carrier_profile_migration_data.log") unless Rails.env.test?
     logger.info "Script Start for carrier_profile_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
     CSV.open(file_name, 'w') do |csv|
@@ -19,8 +19,7 @@ class CarrierProfilesMigration < Mongoid::Migration
       if status
         puts "Rake Task execution completed, check carrier_profile_migration_data logs & carrier_profile_migration_status csv for additional information." unless Rails.env.test?
       else
-        logger.info "Check if the inputed ENV values are valid" unless Rails.env.test?
-        puts "Rake Task execution failed for given input" unless Rails.env.test?
+        puts "Script execution failed for empty site" unless Rails.env.test?
       end
     end
 
@@ -36,23 +35,22 @@ class CarrierProfilesMigration < Mongoid::Migration
 
     #find or build site
     sites = self.find_site(site_key)
+    return false unless sites.present?
     site = sites.first
 
     #get main app organizations for migration
-    say_with_time("Time taken to extract organizations") do
-      @old_organizations = Organization.unscoped.exists("carrier_profile" => true)
-    end
-    return false unless @old_organizations.present?
+    old_organizations = Organization.unscoped.exists("carrier_profile" => true)
+    return false unless old_organizations.present?
 
     #counters
-    total_organizations = @old_organizations.count
+    total_organizations = old_organizations.count
     existing_organization = 0
     success =0
     failed = 0
     limit_count = 1000
 
     say_with_time("Time taken to migrate organizations") do
-      @old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
+      old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
         begin
           existing_new_organizations = find_new_organization(old_org)
           if existing_new_organizations.count == 0
@@ -101,7 +99,9 @@ class CarrierProfilesMigration < Mongoid::Migration
 
   def self.build_documents(old_org, new_profile)
     old_org.documents.each do |document|
-      new_profile.documents.new(document.attributes.except("_id"))
+      doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier"))
+      doc.identifier = document.identifier if document.identifier.present?
+      doc.save!
     end
   end
 
@@ -117,7 +117,7 @@ class CarrierProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :fein, :carrier_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :versions, :version, :fein, :employer_profile, :broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
     general_organization = BenefitSponsors::Organizations::ExemptOrganization.new(old_org_params)
     general_organization.site = site
