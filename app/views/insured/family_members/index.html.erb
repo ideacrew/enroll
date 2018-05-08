@@ -84,7 +84,7 @@
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
             step: '3',
-            url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
+            url: (@consumer_role.present? && !is_open_enrollment? ? find_sep_url : group_selection_url)
           } %>
         <% end %>
       </div>

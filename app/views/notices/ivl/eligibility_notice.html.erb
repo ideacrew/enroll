@@ -81,7 +81,7 @@
 <% end %>
 
 <% if notice.aqhp_individuals.present? %>
-  <% if is_under_open_enrollment? %>
+  <% if is_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
@@ -95,7 +95,7 @@
     previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
     listings: notice.uqhp_individuals} %>
 
-  <% if is_under_open_enrollment? %>
+  <% if is_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
@@ -114,7 +114,7 @@
 <% end %>
 
 <% if notice.aqhp_individuals.present? || notice.uqhp_individuals.present? %>
-  <% if is_under_open_enrollment? %>
+  <% if is_open_enrollment? %>
     <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
      contents: ["<strong>Don’t miss the deadline!</strong> Open enrollment for #{notice.coverage_year} private health plans began on #{notice.ivl_open_enrollment_start_on}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
        heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>

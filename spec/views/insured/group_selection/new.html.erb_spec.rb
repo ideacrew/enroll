@@ -345,7 +345,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(view).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(view).to receive(:is_open_enrollment?).and_return(true)
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(person).to receive(:is_consumer_role_active?).and_return(false)

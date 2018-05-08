@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <% if @market_kind == 'individual' && is_under_open_enrollment? %>
+      <% if @market_kind == 'individual' && is_open_enrollment? %>
         <div class='row top-pd'>
           <div class="col-sm-12">
             <h4>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></h4>
@@ -145,7 +145,7 @@
     </div>
     <div class="col-xs-3 right-section pull-right">
       <% if @change_plan.blank?  && @market_kind == "individual" %>
-        <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+        <% if @enrollment_kind.blank? && is_open_enrollment? %>
           <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
         <% else %>
           <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
@@ -157,7 +157,7 @@
       <% elsif @change_plan == "change_by_qle" %>
         <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:false} %>
       <% elsif @change_plan == "change_plan" %>
-        <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
+        <% if (@market_kind == "individual" && !is_open_enrollment?) || @enrollment_kind == 'sep' %>
           <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
         <% else %>
           <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>

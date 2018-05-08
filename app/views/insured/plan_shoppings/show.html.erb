@@ -56,7 +56,7 @@
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>
-          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+          <% if @enrollment_kind.blank? && is_open_enrollment? %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
           <% else %>
             <%= render  partial: 'shared/sep_progress', locals: {step: '5'} %>
@@ -68,7 +68,7 @@
         <% elsif @change_plan == "change_by_qle" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:'true'} %>
         <% elsif @change_plan == "change_plan" %>
-          <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
+          <% if (@market_kind == "individual" && !is_open_enrollment?) || @enrollment_kind == 'sep' %>
             <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
           <% else %>
             <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>

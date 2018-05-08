@@ -73,13 +73,13 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb", dbclean: :aft
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
-      allow(view).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(view).to receive(:is_open_enrollment?).and_return(true)
       sign_in(current_user)
     end
 
     context "during non-open enrollment period" do
       before :each do
-        allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        allow(view).to receive(:is_open_enrollment?).and_return(false)
         @employee_role = employee_role
         allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       end
@@ -107,7 +107,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb", dbclean: :aft
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
-      allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+      allow(view).to receive(:is_open_enrollment?).and_return(false)
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_selector("form[action='/insured/families/find_sep']")
     end

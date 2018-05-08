@@ -45,7 +45,7 @@ describe "insured/family_members/index.html.erb" do
     before :each do
       assign :type, "consumer"
       assign :consumer_role, consumer_role
-      allow(view).to receive(:is_under_open_enrollment?).and_return false
+      allow(view).to receive(:is_open_enrollment?).and_return false
       render template: "insured/family_members/index.html.erb"
     end
 
