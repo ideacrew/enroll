@@ -1,10 +1,10 @@
 FactoryGirl.define do
-  factory :benefit_markets_aca_individual_initial_application_configuration, class: 'BenefitMarkets::AcaIndividualInitialApplicationConfiguration' do
+  factory :benefit_markets_aca_individual_initial_application_configuration, class: 'BenefitMarkets::Configurations::AcaIndividualInitialApplicationConfiguration' do
 
-    mm_enr_due_on   15
-    vr_os_window  0
-    vr_due 95
-    open_enrl_start_on Date.new(2017,01,31)
-    open_enrl_end_on Date.new(2017,01,31)
+    pub_due_dom 5
+    erlst_strt_prior_eff_months -3
+    appeal_per_aft_app_denial_dys 30
+    quiet_per_end 28
+    inelig_per_aft_app_denial_dys 90
   end
 end

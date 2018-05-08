@@ -1,0 +1,74 @@
+<div class="form-group">
+  <label for="inputSiteKey">Site Key</label>
+  <%= f.text_field :site_key, required:'true', id:'inputSiteKey', class:'form-control'%>
+  <label for="inputLongName">Long Name</label>
+  <%= f.text_field :long_name, required:'true', id:'inputLongName', class:'form-control'%>
+  <label for="inputShortName">Short Name</label>
+  <%= f.text_field :short_name, required:'true', id:'inputShortName', class:'form-control'%>
+  <label for="inputByLine">By Line</label>
+  <%= f.text_field :byline, required:'true', id:'inputShByLine', class:'form-control'%>
+  <label for="inputDomainName">Domain Name</label>
+  <%= f.text_field :domain_name, required:'true', id:'inputDomainName', class:'form-control'%>
+</div>
+
+<%= f.fields_for :owner_organization, @site.owner_organization do |organization_fields| %>
+  <div class="form-group">
+    <label for="inputLegalName">Organization Legal Name</label>
+    <%= organization_fields.text_field :legal_name, id: 'inputLegalName', class: 'form-control' %>
+  </div>
+
+  <%= organization_fields.fields_for :profile, organization_fields.object.profile do |profile_fields| %>
+    <div data-target="site.officeLocations">
+      <%= profile_fields.fields_for :office_locations, profile_fields.object.office_locations do |office_fields| %>
+        <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
+
+        <% if office_fields.object.is_primary? %>
+          <div data-target="site.officeLocation" class="js-office-location">
+            <div class="row row-form-wrapper no-buffer d-none js-non-primary">
+        <% else %>
+          <div class="js-office-location">
+            <div class="row row-form-wrapper no-buffer js-non-primary">
+        <% end %>
+            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+            </div>
+
+            <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+              <div class="form-group form-group-lg">
+                <div class="row" style="margin: 0;">
+                  <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                  <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group no-pd">
+              <a class="btn btn-sm btn-outline-primary" data-action="click->site#removeLocation">Remove</a>
+            </div>
+          </div>
+
+          <% if office_fields.object.is_primary? %>
+            <div class="js-remove row">
+              <label>Primary Address</label>
+            </div>
+            <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
+              <%= address_fields.hidden_field :kind, value: 'primary' %>
+
+              <%= render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields } %>
+            <% end %>
+          <% end %>
+
+          <div class="js-remove row">
+            <label>Main Phone </label>
+          </div>
+          <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
+            <%= phone_fields.hidden_field :kind, value: 'main' %>
+
+            <%= render partial: 'benefit_sponsors/locations/phone', locals: { f: phone_fields } %>
+          <% end %>
+        </div>
+
+      <% end %> <!--- office_fields --->
+      </div>
+      <a class="btn btn-sm btn-outline-primary" data-action="click->site#addLocation">Add another location</a>
+  <% end %> <!--- profile_fields --->
+<% end %> <!--- organization_fields --->

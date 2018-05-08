@@ -13,16 +13,17 @@ module BenefitMarkets
     field :title,       type: String, default: "" # => DC Health Link SHOP Market
     field :description, type: String, default: ""
 
-    # belongs_to  :site,                  class_name: "::BenefitSponsors::Site"
+    belongs_to  :site, class_name: "::BenefitSponsors::Site"
     # has_many    :benefit_sponsorships,  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
     has_many    :benefit_market_catalogs,      
                 class_name: "BenefitMarkets::BenefitMarketCatalog"
 
-    embeds_one :configuration,  as: :configurable
+    embeds_one :configuration, class_name: "BenefitMarkets::Configurations::Configuration"
     embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
                                         autobuild: true
 
     validates_presence_of :configuration #, :contact_center_setting
+    validates_presence_of :site_urn, :kind, :title, :description
 
     validates :kind,
       inclusion:  { in: BenefitMarkets::BENEFIT_MARKET_KINDS, message: "%{value} is not a valid market kind" },
@@ -30,23 +31,12 @@ module BenefitMarkets
 
     index({ kind:  1 })
 
-    # Mongoid initializes associations after setting attributes. It's necessary to autobuild the
-    # configuration file and subsequently change following initialization, if necessary
-    before_validation :reset_configuration_attributes, if: :kind_changed?
-
-    def kind=(new_kind)
-      return unless BenefitMarkets::BENEFIT_MARKET_KINDS.include?(new_kind)
-      super(new_kind)
-      reset_configuration_attributes
-    end
-
     # BenefitMarketCatalogs may not overlap application_periods
     def add_benefit_market_catalog(new_benefit_market_catalog)
       application_period_is_covered = benefit_market_catalogs.detect do | catalog | 
         catalog.application_period.cover?(new_benefit_market_catalog.application_period.min) ||
         catalog.application_period.cover?(new_benefit_market_catalog.application_period.max)
       end
-      # binding.pry
       benefit_market_catalogs << new_benefit_market_catalog unless application_period_is_covered
     end
 
@@ -104,6 +94,7 @@ module BenefitMarkets
 
     def reset_configuration_attributes
       return unless kind.present? && BenefitMarkets::BENEFIT_MARKET_KINDS.include?(kind)
+      # TODO: Fix configuration
       klass_name = configuration_class_name
       self.configuration = klass_name.constantize.new
     end
@@ -111,7 +102,7 @@ module BenefitMarkets
     # Configuration setting model is automatically associated based on "kind" attribute value
     def configuration_class_name
       config_klass = "#{kind.to_s}_configuration".camelcase
-      namespace_for(self.class) + "::#{config_klass}"
+      namespace_for(self.class) + "::BenefitMarkets::Configurations::#{config_klass}"
     end
 
     # Isolate the namespace portion of the passed class

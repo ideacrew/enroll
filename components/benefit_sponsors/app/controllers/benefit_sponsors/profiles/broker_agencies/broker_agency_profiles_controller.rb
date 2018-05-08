@@ -9,6 +9,8 @@ module BenefitSponsors
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+      before_action :set_current_person, only: [:staff_index]
+
       layout 'single_column'
 
       EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
@@ -30,6 +32,16 @@ module BenefitSponsors
       end
 
       def staff_index
+        authorize self
+        @q = params.permit(:q)[:q]
+        @staff = eligible_brokers
+        @page_alphabets = page_alphabets(@staff, "last_name")
+        page_no = cur_page_no(@page_alphabets.first)
+        if @q.nil?
+          @staff = @staff.where(last_name: /^#{page_no}/i)
+        else
+          @staff = @staff.where(last_name: /^#{@q}/i)
+        end
       end
 
       # TODO need to refactor for cases around SHOP broker agencies
@@ -99,7 +111,6 @@ module BenefitSponsors
         end
       end
 
-
       def agency_messages
       end
 
@@ -138,12 +149,18 @@ module BenefitSponsors
       end
 
       def eligible_brokers
+        Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state'=> 'active').any_in(:'broker_role.market_kind'=>[person_market_kind, "both"])
       end
 
       def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)
       end
 
       def person_market_kind
+        if @person.has_active_consumer_role?
+          "individual"
+        elsif @person.has_active_employee_role?
+          "shop"
+        end
       end
 
       def check_general_agency_profile_permissions_assign

@@ -11,6 +11,7 @@ module BenefitMarkets
 
     embedded_in :packagable, polymorphic: true
 
+    field :application_period,      type: Range
     field :product_kind,            type: Symbol
     field :kind,                    type: Symbol
     field :title,                   type: String, default: ""
@@ -25,21 +26,20 @@ module BenefitMarkets
     embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    validates_presence_of :product_kind, :kind
+    validates_presence_of :product_kind, :kind, :application_period
     validates_presence_of :title, :allow_blank => false
 
     def benefit_market_kind
-      # packagable.benefit_market_kind
-      return true
+      packagable.benefit_market_kind
     end
 
     def issuer_profiles
-      return @issuer_profiles if is_defined?(@issuer_profiles)
+      return @issuer_profiles if defined?(@issuer_profiles)
       @issuer_profiles = products.select { |product| product.issuer_profile }.uniq!
     end
 
     def issuer_profile_products_for(issuer_profile)
-      return @issuer_profile_products if is_defined?(@issuer_profile_products)
+      return @issuer_profile_products if defined?(@issuer_profile_products)
       @issuer_profile_products = products.collect { |issuer_profile| product.issuer_profile == issuer_profile }
     end
 
@@ -50,7 +50,7 @@ module BenefitMarkets
 
     # Query products from database applicable to this product package
     def all_benefit_market_products
-      # return unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
+      raise StandardError, "Product package is invalid" unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
       return @all_benefit_market_products if defined?(@all_benefit_market_products)
       @all_benefit_market_products = BenefitMarkets::Products::Product.by_product_package(self)
     end

@@ -17,11 +17,10 @@ module BenefitMarkets
     field :application_period,    type: Range   # => Mon, 01 Jan 2018..Mon, 31 Dec 2018
 
     field :hbx_id,                type: String
-    field :issuer_profile_urn,    type: String
     field :title,                 type: String
-    field :description,           type: String
-    field :product_package_kinds, type: Array, default: []
+    field :description,           type: String, default: ""
     field :issuer_profile_id,     type: BSON::ObjectId
+    field :product_package_kinds, type: Array, default: []
 
 
     belongs_to  :service_area,
@@ -31,9 +30,9 @@ module BenefitMarkets
     embeds_many :premium_tables,
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
-
-    validates_presence_of :hbx_id, :benefit_market_kind, :application_period, :title,
-                          :issuer_profile_urn, :premium_tables, :service_area
+    # validates_presence_of :hbx_id
+    validates_presence_of :application_period, :benefit_market_kind,  :title,
+                          :premium_tables, :service_area
 
 
     validates :benefit_market_kind,
@@ -42,17 +41,25 @@ module BenefitMarkets
 
 
     index({ hbx_id: 1 })
-    index({ benefit_market_kind: 1, "application_period.min" => 1, "application_period.max" => 1 })
+    index({ "benefit_market_kind" => 1, 
+            "application_period.min" => 1, 
+            "application_period.max" => 1, 
+            "product_package_kinds" => 1, 
+            "_type" => 1 },
+            {name: "product_package"})
+
     index({ "premium_tables.rating_area" => 1, 
             "premium_tables.effective_period.min" => 1, 
             "premium_tables.effective_period.max" => 1 },
             {name: "premium_tables"})
 
-    scope :by_product_package,    ->(product_package) {
-      # product_package.benefit_market_kind
-      # product_package.application_period
-      # product_package.product_kind
-      # product_package.kind
+    scope :by_product_package,    ->(product_package) { where(
+                :"benefit_market_kind"          => product_package.benefit_market_kind,
+                :"application_period.min"       => product_package.application_period.min,
+                :"application_period.max"       => product_package.application_period.max,
+                :"product_package_kinds"        => /#{product_package.kind}/,
+                :"_type"                        => /#{product_package.product_kind}/i
+      )
     }
 
     scope :by_service_area,       ->(service_area){ where(service_area: service_area) }
@@ -63,7 +70,7 @@ module BenefitMarkets
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
     def issuer_profile
-      return @issuer_profile if is_defined?(@issuer_profile)
+      return @issuer_profile if defined?(@issuer_profile)
       @issuer_profile = ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_profile_id)
     end
 
