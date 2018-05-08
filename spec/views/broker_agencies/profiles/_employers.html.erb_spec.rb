@@ -19,7 +19,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
     context "General Agency can be enabled or disabled via settings" do
-      context "when enabled" do
+      context "when enabled", :if => Settings.aca.general_agency_enabled  do
         let(:general_agency_enabled) { true }
 
         it "should have general agency" do
@@ -53,7 +53,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
 
-    context "when GA is enabled" do
+    context "when GA is enabled", :if => Settings.aca.general_agency_enabled  do
       let(:general_agency_enabled) { true }
 
       it "should have general agency" do
