@@ -4,6 +4,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Validations
 
+      attribute :id, String
       attribute :is_primary, Boolean
       attribute :address, Forms::AddressForm
       attribute :phone, Forms::PhoneForm
