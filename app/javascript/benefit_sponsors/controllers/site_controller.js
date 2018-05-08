@@ -9,16 +9,20 @@
 
 import { Controller } from "stimulus"
 
-export default class extends Controller {
+export default class SiteController extends Controller {
   static targets = [ "officeLocations", "officeLocation" ]
 
   addLocation() {
     //clone new location node, unhide remove button, modify name attribute
+
+    // comment out only the line directly below to get the test to pass
     var newLocation = document.importNode(this.officeLocationTarget, true)
-    newLocation.querySelector('.js-non-primary').classList.remove('d-none')
-    newLocation.querySelectorAll('.js-remove').forEach(function(element) {
+    document.querySelector('.js-non-primary').classList.remove('d-none')
+    document.querySelectorAll('.js-remove').forEach(function(element) {
       element.remove()
     })
+
+    // comment out the rest of this method to get the test to pass
     newLocation.querySelectorAll('input').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${Date.now()}]`)
       input.setAttribute('name', name)

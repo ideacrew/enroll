@@ -1,5 +1,5 @@
 //import mountDOM from 'jsdom-mount';
-import {Application as StimulusApp} from 'stimulus';
+// import {Application as StimulusApp} from 'stimulus';
 import SiteController from '../../../../app/javascript/benefit_sponsors/controllers/site_controller';
 //import puppeteer from 'puppeteer';
 import {
@@ -43,7 +43,7 @@ describe('BenefitSponsorsSiteController', () => {
 //     await page.goto(app);
 //   });
 
-  beforeEach(() => {
+  beforeEach( () => {
     //This would use the commented out import which throws an error so I switched to the built in jsdom
 
    // mountDOM(`
@@ -75,17 +75,20 @@ describe('BenefitSponsorsSiteController', () => {
       '</div>'
       console.log(document.body.innerHTML);
 
-
-    const stimulusApp = StimulusApp.start();
-    stimulusApp.register('site', SiteController);
+    // const controller = new SiteController();
+    //const stimulusApp = StimulusApp.start();
+    //stimulusApp.register('site', SiteController);
   });
 
   describe('#addLocation', () => {
     it('unhides the remove button', () => {
+      const controller = new SiteController();
+      // replaces acually clicking he buon in he UI
+      controller.addLocation();
       const testDiv = document.getElementById("test");
-      const buttonElem = document.getElementById('button');
-      const clickEvent = new Event('click');
-      buttonElem.dispatchEvent(clickEvent);
+      //const buttonElem = document.getElementById('button');
+      //const clickEvent = new Event('click');
+      //buttonElem.dispatchEvent(clickEvent);
       expect(testDiv.getAttribute("class")).toEqual('row js-non-primary');
     });
   });
