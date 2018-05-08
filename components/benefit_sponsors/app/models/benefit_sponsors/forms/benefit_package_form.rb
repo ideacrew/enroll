@@ -5,6 +5,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Model
 
+      attribute :id, String
       attribute :title, String
       attribute :description, String
       attribute :probation_period_kind, String
