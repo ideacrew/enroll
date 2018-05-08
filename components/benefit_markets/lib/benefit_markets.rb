@@ -1,4 +1,5 @@
 require "benefit_markets/engine"
+require "virtus"
 require "mongoid"
 require "aasm"
 require 'config'
