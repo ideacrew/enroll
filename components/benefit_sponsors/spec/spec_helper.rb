@@ -16,7 +16,12 @@
 
 require File.expand_path("../dummy/config/environment", __FILE__)
 
-FactoryGirl.definition_file_paths = [File.expand_path('./factories', __FILE__), File.expand_path('../../../benefit_markets/spec/factories', __FILE__)]
+FactoryGirl.definition_file_paths = [
+    File.expand_path(File.join(File.dirname(__FILE__),'factories')),
+    File.expand_path(File.join(File.dirname(__FILE__),'../../benefit_markets/spec/factories'))
+    # You get this for free:
+    # #  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
+]
 FactoryGirl.find_definitions
 
 RSpec.configure do |config|
