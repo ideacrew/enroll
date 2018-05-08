@@ -20,7 +20,11 @@ require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'factory_girl_rails'
-FactoryGirl.definition_file_paths = [File.expand_path('./factories', __FILE__), File.expand_path('../../../benefit_sponsors/spec/factories', __FILE__)]
+FactoryGirl.definition_file_paths = [
+  File.expand_path(File.join(File.dirname(__FILE__),'factories'))
+# You get this for free:
+#  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
+]
 FactoryGirl.find_definitions
 
 RSpec.configure do |config|

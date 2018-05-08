@@ -69,6 +69,7 @@ PATH
       rails (~> 4.2.7.1)
       slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)
+      virtus
 
 PATH
   remote: components/benefit_sponsors
@@ -116,7 +117,7 @@ PATH
       mongoid (~> 5.4.0)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
-      slim (= 3.0.8)
+      slim (~> 3.0.8)
       symmetric-encryption (~> 3.6.0)
 
 PATH
@@ -880,7 +881,7 @@ DEPENDENCIES
   shoulda-matchers (= 3.1.1)
   simple_calendar!
   simplecov (= 0.14.1)
-  slim (= 3.0.8)
+  slim (~> 3.0.8)
   slim-rails
   sponsored_benefits!
   spring (= 1.6.3)

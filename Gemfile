@@ -63,7 +63,7 @@ gem 'resque'
 gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
-gem 'slim', '3.0.8'
+gem 'slim', '~> 3.0.8'
 gem 'slim-rails'
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
 gem "sponsored_benefits", path: "components/sponsored_benefits"
