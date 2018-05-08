@@ -30,9 +30,8 @@ module BenefitMarkets
     embeds_many :premium_tables,
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
-
-    # validates_presence_of :hbx_id, :application_period,
-    validates_presence_of :benefit_market_kind,  :title,
+    # validates_presence_of :hbx_id
+    validates_presence_of :application_period, :benefit_market_kind,  :title,
                           :premium_tables, :service_area
 
 

@@ -1,0 +1,15 @@
+<h2>NEW SITE</h2>
+
+<% if @site.errors.any? %>
+	<%= render partial: 'benefit_sponsors/sites/error_messages', locals: { object: @site } %>
+<% end %>
+
+<%= form_for @site, as: :site, url: sites_path, html: { data: { controller: "site" }, class: "needs-validation", novalidate: true } do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+
+  <div class="row">
+    <%= f.submit 'Save', class:'btn btn-primary' %>
+
+    <%= link_to 'Back', sites_path, class:'btn btn-default' %>
+  </div>
+<% end %>

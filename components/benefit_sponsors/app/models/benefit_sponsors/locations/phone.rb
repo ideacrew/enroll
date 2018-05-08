@@ -36,6 +36,8 @@ module BenefitSponsors
         allow_blank: true
       
       embedded_in :office_location
+      
+      validates_presence_of :area_code, :number
 
       def blank?
         [:full_phone_number, :area_code, :number, :extension].all? do |attr|

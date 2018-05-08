@@ -18,12 +18,12 @@ module BenefitMarkets
 
     let(:params) do
         {
-          benefit_market_catalog: benefit_market_catalog,
           product_kind:           product_kind,
           kind:                   kind,
           title:                  title,
           description:            description,
           products:               products,
+          application_period:     benefit_market_catalog.application_period
           # contribution_model: contribution_model,
           # pricing_model:      pricing_model,
         }
@@ -42,15 +42,15 @@ module BenefitMarkets
 
       context "without required params" do
 
-        context "that's missing benefit_market_catalog" do
-          subject { described_class.new(params.except(:benefit_market_catalog)) }
+        # context "that's missing benefit_market_catalog" do
+        #   subject { described_class.new(params.except(:benefit_market_catalog)) }
 
-          it "should be invalid" do
-            subject.validate
-            expect(subject).to_not be_valid
-            expect(subject.errors[:benefit_market_catalog]).to include("can't be blank")
-          end
-        end
+        #   it "should be invalid" do
+        #     subject.validate
+        #     expect(subject).to_not be_valid
+        #     expect(subject.errors[:benefit_market_catalog]).to include("can't be blank")
+        #   end
+        # end
 
         context "that's missing title" do
           subject { described_class.new(params.except(:title)) }
@@ -72,7 +72,7 @@ module BenefitMarkets
           end
         end
 
-                context "that's missing kind" do
+        context "that's missing kind" do
           subject { described_class.new(params.except(:kind)) }
 
           it "should be invalid" do

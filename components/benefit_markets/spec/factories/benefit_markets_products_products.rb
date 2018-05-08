@@ -4,7 +4,7 @@ FactoryGirl.define do
     benefit_market_kind  :aca_shop
     application_period   Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31)
     hbx_id               "6262626262"
-    issuer_profile_urn   "urn:openhbx:terms:v1:organization:name#safeco"
+    # issuer_profile_urn   "urn:openhbx:terms:v1:organization:name#safeco"
     title                "SafeCo Active Life $0 Deductable Premier"
     description          "Highest rated and highest value"
     service_area         BenefitMarkets::Locations::ServiceArea.new

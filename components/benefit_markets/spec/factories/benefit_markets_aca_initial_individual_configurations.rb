@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :benefit_markets_aca_initial_individual_configuration, class: 'BenefitMarkets::AcaInitialIndividualConfiguration' do
+  factory :benefit_markets_aca_initial_individual_configuration, class: 'BenefitMarkets::Configurations::AcaInitialIndividualConfiguration' do
 
     pub_due_dom   5
     erlst_strt_prior_eff_months  -3

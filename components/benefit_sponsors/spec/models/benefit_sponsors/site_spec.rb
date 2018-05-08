@@ -77,7 +77,14 @@ module BenefitSponsors
       context "with all required arguments", dbclean: :after_each do
         let(:valid_site) { Site.new(params) }
 
-        before { valid_site.owner_organization = owner_organization; valid_site.site_organizations << owner_organization }
+        before do
+          valid_site.byline = 'test'
+          valid_site.long_name = long_name
+          valid_site.short_name = short_name
+          valid_site.domain_name = domain_name
+          valid_site.owner_organization = owner_organization
+          valid_site.site_organizations << owner_organization
+        end
 
         it "should be valid" do
           valid_site.validate
