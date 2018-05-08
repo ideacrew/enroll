@@ -9,6 +9,9 @@ class EmployerProfile
   include StateTransitionPublisher
   include ScheduledEventService
   include Config::AcaModelConcern
+  include Concerns::Observable
+  include ModelEvents::EmployerProfile
+  include ApplicationHelper
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -76,7 +79,8 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
   validates_presence_of :entity_kind
-  validates_presence_of :sic_code
+
+  validates_presence_of :sic_code if EmployerProfile.sic_field_exists_for_employer?
   validates_presence_of :contact_method
 
   validates :profile_source,
@@ -88,7 +92,6 @@ class EmployerProfile
     allow_blank: false
 
   after_initialize :build_nested_models
-  after_save :save_associated_nested_models
 
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
@@ -145,6 +148,7 @@ class EmployerProfile
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_broker_agency(terminate_on)
+      fire_general_agency!(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
@@ -160,34 +164,18 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
-    employer_broker_fired
+    trigger_notice_observer(self, active_broker_agency_account, 'broker_fired_confirmation_to_employer')
     notify_broker_terminated
-    broker_fired_confirmation_to_broker
+    trigger_notice_observer(active_broker_agency_account.broker_agency_profile.primary_broker_role, self, "broker_fired_confirmation_to_broker")
     broker_agency_fired_confirmation
   end
 
-  def employer_broker_fired
-    begin
-      trigger_notices('employer_broker_fired')
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
-    end
-  end
-
   def broker_agency_fired_confirmation
-    begin
-      trigger_notices("broker_agency_fired_confirmation")
-    rescue Exception => e
-      puts "Unable to deliver broker agency fired confirmation notice to #{active_broker_agency_account.legal_name} due to #{e}" unless Rails.env.test?
-    end
+    trigger_notices("broker_agency_fired_confirmation")
   end
 
   def broker_fired_confirmation_to_broker
-    begin
-      trigger_notices('broker_fired_confirmation_to_broker')
-    rescue Exception => e
-      puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
-    end
+    trigger_notices('broker_fired_confirmation_to_broker')
   end
 
   def employer_broker_fired
@@ -266,6 +254,7 @@ class EmployerProfile
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
+    self.trigger_notices("general_agency_terminated")
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
@@ -314,8 +303,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result <<active_plan_year  if active_plan_year.present?
-    result <<renewing_published_plan_year  if renewing_published_plan_year.present?
+    result << active_plan_year  if active_plan_year.present?
+    result << renewing_published_plan_year  if renewing_published_plan_year.present?
     result
   end
 
@@ -589,16 +578,6 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
-    def organizations_for_low_enrollment_notice(new_date)
-      Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
-          :"open_enrollment_end_on" => new_date+2.days
-          }
-      })
-
-    end
-
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
           { :$elemMatch => {
@@ -636,16 +615,6 @@ class EmployerProfile
           :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
         }
       })
-    end
-
-    def initial_employers_reminder_to_publish(start_on)
-      Organization.where(:"employer_profile.plan_years" =>
-      {
-        :$elemMatch => {
-        :start_on => start_on,
-        :aasm_state => "draft"
-      }
-    })
     end
 
     def initial_employers_enrolled_plan_year_state
@@ -758,7 +727,6 @@ class EmployerProfile
         #     end
         #   end
         # end
-
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
         employer_enroll_factory.date = new_date
 
@@ -787,7 +755,7 @@ class EmployerProfile
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-            plan_year.force_publish!
+            plan_year.force_publish! if plan_year.may_force_publish?
           end
         end
 
@@ -797,8 +765,8 @@ class EmployerProfile
           plan_year.terminate! if plan_year.may_terminate?
         end
 
-        if Settings.aca.shop_market.transmit_scheduled_employers
-          if (new_date.prev_day.mday + 1) == Settings.aca.shop_market.employer_transmission_day_of_month
+        if aca_shop_market_transmit_scheduled_employers
+          if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
         end
@@ -807,37 +775,6 @@ class EmployerProfile
           effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
 
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
-        end
-
-        #Initial employer reminder notices to publish plan year.
-        start_on_1 = (new_date+1.month).beginning_of_month
-        if (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
-          initial_employers_reminder_to_publish(start_on_1).each do|organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
-            rescue Exception => e
-              Rails.logger.error { "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-            end
-          end
-        elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
-          initial_employers_reminder_to_publish(start_on_1).each do |organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
-            rescue Exception => e
-              Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-            end
-          end
-        else
-          plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
-          if (new_date + 2.days == plan_year_due_date)
-            initial_employers_reminder_to_publish(start_on_1).each do |organization|
-              begin
-                organization.employee_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
-              rescue Exception => e
-                Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
-              end
-            end
-          end
         end
 
         #initial employers misses binder payment due date deadline on next day notice
@@ -1079,7 +1016,7 @@ class EmployerProfile
   def self.update_status_to_binder_paid(organization_ids)
     organization_ids.each do |id|
       if org = Organization.find(id)
-        org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+        org.employer_profile.binder_credited!
       end
     end
   end
@@ -1180,7 +1117,7 @@ class EmployerProfile
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
     rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+      Rails.logger.error { "Unable to deliver #{event.humanize} notice #{self.legal_name} due to #{e}" }
     end
   end
 
@@ -1256,12 +1193,6 @@ class EmployerProfile
     employer_attestation.present? && employer_attestation.is_eligible?
   end
 
-  def validate_and_send_denial_notice
-    if !is_primary_office_local? || !(is_zip_outside?)
-      self.trigger_notices('initial_employer_denial')
-    end
-  end
-
   def terminate(termination_date)
     plan_year = published_plan_year
     if plan_year.present?
@@ -1280,6 +1211,14 @@ class EmployerProfile
         renewal_plan_year.cancel! if renewal_plan_year.may_cancel?
         renewal_plan_year.cancel_renewal! if renewal_plan_year.may_cancel_renewal?
       end
+    end
+  end
+
+  def trigger_shop_notices(event)
+    begin
+      trigger_model_event(event.to_sym)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
     end
   end
 
@@ -1340,9 +1279,6 @@ class EmployerProfile
 
   def build_nested_models
     build_inbox if inbox.nil?
-  end
-
-  def save_associated_nested_models
   end
 
   def save_inbox

@@ -1,6 +1,6 @@
 class OfficeLocation
   include Mongoid::Document
-
+  include Config::AcaModelConcern
   embedded_in :organization
 
   field :is_primary, type: Boolean, default: true
@@ -18,7 +18,7 @@ class OfficeLocation
   alias_method :is_primary?, :is_primary
 
   def address_includes_county_for_employers_primary_location
-    return unless is_an_employer?
+    return unless is_an_employer? && OfficeLocation.validate_county?
     if address.kind == 'primary' && address.county.blank?
       self.errors.add(:base, 'Employers must have a valid County for their primary office location')
     end

@@ -25,7 +25,7 @@
   &.footer {
     font-size: 14px;
     color: $primary-white;
-    background-color: $brand-primary;
+    background-color: $primary-color;
     padding: 15px;
     position: absolute;
     bottom: 0;
@@ -200,9 +200,9 @@
   }
   &.market-selection {
     padding: 0 15% 5%;
-/*
-  3.2.32
-    .btn-primary {
+
+
+    .btn-group .btn-primary {
       padding: 4%;
       font-size: 13px;
       background-color: transparent;
@@ -216,7 +216,7 @@
         }
       }
     }
-*/
+
   }
   &.modal-footer {
     .modal-sbc-link {
@@ -318,9 +318,8 @@
 			text-transform: capitalize;
 		}
 	}
- /*
- 3.2.32
- Consumer Documents Verification
+ 
+ // ***** Consumer Documents Verification ******** //
 
   &.verification-process {
     .family-member, .person {
@@ -362,6 +361,10 @@
       font-size: 0.9em;
       vertical-align: middle;
     }
+    .label {
+      min-width: 100px !important;
+      display: inline-block !important;
+    }
     .verification-update-reason, .return-for-def-reason, .fedhub-request, .extend-request, .view-history {
       margin-top: 10px;
       padding-bottom: 10px;
@@ -393,6 +396,6 @@
       margin-bottom: 10px;
     }
   }
-  */
+  // --- end of consumer verification --- //
 }
 

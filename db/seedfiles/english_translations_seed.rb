@@ -2,7 +2,7 @@ Dir.glob('db/seedfiles/translations/en/*').each do |file|
   require_relative 'translations/en/' + File.basename(file,File.extname(file))
 end
 
-puts "*"*80
+puts "*"*80 unless Rails.env.test?
 puts "::: Generating English Translations :::"
 
 MAIN_TRANSLATIONS = {
@@ -24,12 +24,14 @@ translations = [
   EMPLOYER_TRANSLATIONS
 ].reduce({}, :merge)
 
-puts "TRANSLATIONS"
-p translations unless Rails.env.test?
+unless Rails.env.test?
+  puts "TRANSLATIONS"
+  p translations
+end
 
 translations.keys.each do |k|
   Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{translations[k]}\"")
 end
 
 puts "::: English Translations Complete :::"
-puts "*"*80
+puts "*"*80 unless Rails.env.test?
