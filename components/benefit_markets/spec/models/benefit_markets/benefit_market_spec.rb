@@ -4,14 +4,18 @@ module BenefitMarkets
   RSpec.describe BenefitMarket, type: :model, dbclean: :after_each do
 
     let(:kind)            { :aca_shop }
+    let(:site_urn)        { 'dc' }
     let(:title)           {  "DC Health Link SHOP Market" }
     let(:description)     {  "Health Insurance Marketplace for District Employers and Employees" }
+    let(:configuration)   { build :benefit_markets_aca_shop_configuration }
 
     let(:params) do
       {
         kind: kind,
+        site_urn: site_urn,
         title: title,
         description: description,
+        configuration: configuration
       }
     end
 
@@ -67,6 +71,7 @@ module BenefitMarkets
 
         it "all provided attributes should be set" do
           expect(valid_benefit_market.kind).to eq kind
+          expect(valid_benefit_market.site_urn).to eq site_urn
           expect(valid_benefit_market.title).to eq title
           expect(valid_benefit_market.description).to eq description
         end
