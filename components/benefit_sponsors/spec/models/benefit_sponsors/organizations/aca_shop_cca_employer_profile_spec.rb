@@ -62,6 +62,10 @@ module BenefitSponsors
         context "and all arguments are valid", dbclean: :after_each do
 
           before { 
+              site.byline = 'test'
+              site.long_name = 'test'
+              site.short_name = 'test'
+              site.domain_name = 'test'
               site.owner_organization = organization
               site.site_organizations << organization
               organization.profiles << subject
