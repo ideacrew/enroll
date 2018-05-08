@@ -56,6 +56,7 @@ gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
 gem 'slim-rails'
+gem 'slim', '~> 3.0.8'
 gem 'sprockets', '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
