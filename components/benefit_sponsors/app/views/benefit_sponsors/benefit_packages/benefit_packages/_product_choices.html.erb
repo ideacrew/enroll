@@ -1,7 +1,7 @@
 
-<% selected_kind_carrier = f.object.plan_option_kind == 'single_carrier' %>
+<% selected_kind_carrier = f.object.plan_option_kind == 'single_issuer' %>
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
-<% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
+<% selected_kind_plan = f.object.plan_option_kind == 'single_product' %>
 
 <% if @benefit_package_form.new_record? %>
   <h1>Select Your Plan Offering</h1>
@@ -30,8 +30,8 @@
       <div class="product-options-tab">
         <ul class="nav nav-tabs row">
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "single_carrier" %>
-            <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
+            <%= f.radio_button :plan_option_kind, "single_issuer" %>
+            <%= f.label :plan_option_kind_single_issuer, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             By carrier
@@ -46,8 +46,8 @@
           </li>
           <% end %>
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-            <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
+            <%= f.radio_button :plan_option_kind, "single_product", selected: f.object.plan_option_kind %>
+            <%= f.label :plan_option_kind_single_product, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             Single plan
@@ -61,10 +61,10 @@
           <br><br>
           <h4>Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</h4>
           <br/><br/>
-          <% @benefit_package_form.catalog.carriers.each_pair do |ck, cv| %>
+          <% @benefit_package_form.catalog.carrier_names.each do |ck| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_issuer", benefit_group:f.object.id ), remote: true do %>
               <div class="col-xs-3">
                 <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
                 <%= f.label "carrier_for_elected_plan_#{ck}" do %>
@@ -76,7 +76,7 @@
               <div class="col-xs-9">
                 <div class="panel">
                   <div class="panel-heading">
-                    <h3><%= cv %></h3>
+                    <h3><%= ck %></h3>
                   </div>
                 </div>
               </div>
@@ -109,9 +109,6 @@
                   </div>
                 </div>
               </div>
-
-
-
             </div>
           </div>
 
@@ -126,10 +123,10 @@
           <br><br>
           <h4>Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</h4>
           <br/>
-          <% @benefit_package_form.catalog.carriers.each_pair do |ck, cv| %>
+          <% @benefit_package_form.catalog.single_product_options.each do |ck| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_product", benefit_group:f.object.id ), remote: true do %>
 
               <div class="col-xs-3">
                 <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
@@ -142,7 +139,7 @@
               <div class="col-xs-9">
                 <div class="panel">
                   <div class="panel-heading">
-                    <h3><%= cv %></h3>
+                    <h3><%= ck %></h3>
                   </div>
                 </div>
               </div>
@@ -175,9 +172,8 @@
   })
 
   $(document).on("change", ".reference-steps input[type=radio]", function(event) {
-
     switch($('.product-options-tab input[type=radio]:checked').val()){
-      case "single_carrier":
+      case "single_issuer":
         $("div.carriers-tab").show();
         $("div.metals-tab").hide();
         $("div.single-plan-tab").hide();
@@ -187,7 +183,7 @@
         $("div.single-plan-tab").hide();
         $("div.carriers-tab").hide();
         break;
-      case "single_plan":
+      case "single_product":
         $("div.single-plan-tab").show();
         $("div.metals-tab").hide();
         $("div.carriers-tab").hide();
@@ -198,7 +194,7 @@
   $(document).on('click', '.plan-options input[type=radio]', function(event)  {
     var selected_radio = event.target.value
     $('.reference-plans').html("<div class='col-xs-12 health select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @benefit_package_form.catalog.plan_options.count %> Plans</strong> </span></h4><br/></div>")
-    $('.reference-plans').append("<%= escape_javascript(render(partial: "products_listing", locals: {   })).html_safe %>")
+    $('.reference-plans').append("<%#= escape_javascript(render(partial: "products_listing", locals: {   })).html_safe %>")
     $('.reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
     $('.reference-plans').show();
   });

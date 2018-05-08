@@ -8,19 +8,16 @@ module BenefitSponsors
         plan_options.keys
       end
 
-      def plan_option_kind_filters
-        plan_option_kinds.inject({}) do |filters, option_kind|
-          filters[option_kind] = plan_options[option_kind].keys
-          filters
-        end
-      end
-
       def carrier_names
-        plan_option_kind_filters[:single_issuer]
+        plan_options[:single_issuer].keys
       end
 
       def metal_levels
-        plan_option_kind_filters[:metal_level]
+        plan_options[:metal_level].keys
+      end
+
+      def single_product_options
+        plan_options[:single_product].keys
       end
 
       def plan_options
@@ -37,7 +34,7 @@ module BenefitSponsors
             when :metal_level
               package_products.group_by(&:metal_level_kind)
             else
-              {:single_product => package_products}
+              package_products.group_by(&:carrier_name)
             end
         end
 
