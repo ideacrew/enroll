@@ -13,16 +13,18 @@ export default class SiteController extends Controller {
   static targets = [ "officeLocations", "officeLocation" ]
 
   addLocation() {
+    debugger;
     //clone new location node, unhide remove button, modify name attribute
 
     // comment out only the line directly below to get the test to pass
+    console.log(this);
     var newLocation = document.importNode(this.officeLocationTarget, true)
     document.querySelector('.js-non-primary').classList.remove('d-none')
     document.querySelectorAll('.js-remove').forEach(function(element) {
       element.remove()
     })
 
-    // comment out the rest of this method to get the test to pass
+    //comment out the rest of this method to get the test to pass
     newLocation.querySelectorAll('input').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${Date.now()}]`)
       input.setAttribute('name', name)
