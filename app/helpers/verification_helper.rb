@@ -32,6 +32,8 @@ module VerificationHelper
         "info"
       when "expired"
         "default"
+      when "unverified"
+        "default"
     end
   end
 
