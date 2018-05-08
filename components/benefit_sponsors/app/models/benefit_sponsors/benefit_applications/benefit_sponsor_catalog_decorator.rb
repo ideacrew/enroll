@@ -9,7 +9,7 @@ module BenefitSponsors
       end
 
       def metal_levels
-        plan_options.map(&:metal_level).uniq
+        plan_options.map(&:metal_level_kind).uniq
       end
 
       def plan_options
@@ -38,7 +38,7 @@ module BenefitSponsors
       end
 
       def metal_level_options
-        plan_options.group_by(&:metal_level)
+        plan_options.group_by(&:metal_level_kind)
       end
 
       def single_plan_options
