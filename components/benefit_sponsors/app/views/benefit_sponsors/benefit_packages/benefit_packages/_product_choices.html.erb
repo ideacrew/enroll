@@ -151,7 +151,7 @@
           <br><br>
         </div>
       </div>
-      <div class="reference-plans col-xs-12" style="display: none;">
+      <div class="reference-plans row" style="display: none;">
         <div class="col-xs-12 loading">
           <i class='fa fa-spinner fa-spin fa-2x'></i>
           <span></span>
@@ -170,6 +170,18 @@
        $(this).attr('href', current_href + "&location_id=" + location_id);
     });
   })
+
+  $(document).on('click', '.plan-options input[type=radio]', function(event)  {
+    var plan_option_kind = $('.product-options-tab input[type=radio]:checked').val();
+    var selected_radio = event.target.value;
+
+    var plan_options = <%= @benefit_package_form.catalog.plan_options.to_json.html_safe %>;
+    var filtered_products = plan_options[plan_option_kind][selected_radio];
+
+    var location_id = $(this).closest('.benefit-group-fields').attr('id');
+
+    initPlanOptions(filtered_products, location_id);
+  });
 
   $(document).on("change", ".reference-steps input[type=radio]", function(event) {
     switch($('.product-options-tab input[type=radio]:checked').val()){
@@ -191,12 +203,6 @@
     };
   });
 
-  $(document).on('click', '.plan-options input[type=radio]', function(event)  {
-    var selected_radio = event.target.value
-    $('.reference-plans').html("<div class='col-xs-12 health select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @benefit_package_form.catalog.plan_options.count %> Plans</strong> </span></h4><br/></div>")
-    $('.reference-plans').append("<%#= escape_javascript(render(partial: "products_listing", locals: {   })).html_safe %>")
-    $('.reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
-    $('.reference-plans').show();
-  });
+
 
 </script>

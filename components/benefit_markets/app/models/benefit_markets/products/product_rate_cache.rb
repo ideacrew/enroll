@@ -23,13 +23,13 @@ module BenefitMarkets
           }
           product.premium_tables.each do |pt|
             r_area_tag = rating_area_cache[pt.rating_area_id]
-            pt.premium_tuples.each do |pt|
-              $product_rate_calculation_cache[product.id][r_area_tag][pt.age] = (
-                $product_rate_calculation_cache[product.id][r_area_tag][pt.age] + 
+            pt.premium_tuples.each do |tuple|
+              $product_rate_calculation_cache[product.id][r_area_tag][tuple.age] = (
+                $product_rate_calculation_cache[product.id][r_area_tag][tuple.age] + 
                 [{
                   start_on: pt.effective_period.min,
                   end_on: pt.effective_period.max,
-                  cost: pt.cost
+                  cost: tuple.cost
                 }]
               )
             end
