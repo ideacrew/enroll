@@ -56,22 +56,22 @@ module SponsoredBenefits
     end
 
 
-    describe "Organization with customer" do 
-      
+    describe "Organization with customer" do
+
       let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month}
       let(:plan_year) { double(start_on: start_on)}
       let(:census_employees) { double(non_terminated: [])}
       let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
- 
+
       let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
         owner_profile_id: "5678",
         legal_name: "ABC Company",
-        sic_code: "0345" ) 
+        sic_code: "0345" )
       }
 
       let(:calculated_dates) { SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates }
 
-      before do 
+      before do
         allow(plan_design_organization).to receive(:employer_profile).and_return(employer_profile)
       end
 

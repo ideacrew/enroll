@@ -23,6 +23,17 @@ module Config::AcaHelper
     @aca_shop_market_valid_employer_attestation_documents_url ||= Settings.aca.shop_market.valid_employer_attestation_documents_url
   end
 
+  def aca_shop_market_new_employee_paper_application_is_enabled?
+    @aca_shop_market_new_employee_paper_application ||= Settings.aca.shop_market.new_employee_paper_application
+  end
+
+  def aca_shop_market_census_employees_template_file
+    @aca_shop_market_census_employees_template_file ||= Settings.aca.shop_market.census_employees_template_file
+  end
+
+  def aca_shop_market_coverage_start_period
+    @aca_shop_market_coverage_start_period ||= Settings.aca.shop_market.coverage_start_period
+  end
 
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
@@ -52,7 +63,8 @@ module Config::AcaHelper
     @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
   end
 
-  def metal_levels_explaned
+
+  def metal_levels_explained
     response = ""
     metal_level_contributions = {
       'bronze': '60%',
@@ -60,11 +72,11 @@ module Config::AcaHelper
       'gold': '80%',
       'platinum': '90%'
     }.with_indifferent_access
-    reference_plans_for_metal_level.each_with_index do |level, index|
+    enabled_metal_levels_for_single_carrier.each_with_index do |level, index|
       if metal_level_contributions[level]
         if index == 0
           response << "#{level.capitalize} means the plan is expected to pay #{metal_level_contributions[level]} of expenses for an average population of consumers"
-        elsif (index == reference_plans_for_metal_level.length - 2) # subtracting 2 because of dental
+        elsif (index == enabled_metal_levels_for_single_carrier.length - 2) # subtracting 2 because of dental
           response << ", and #{level.capitalize} #{metal_level_contributions[level]}."
         else
           response << ", #{level.capitalize} #{metal_level_contributions[level]}"
@@ -72,6 +84,25 @@ module Config::AcaHelper
       end
     end
     response
+  end
+
+  # CCA requested a specific file format for MA
+  #
+  # @param task_name_DC [String] it will holds specific report task name for DC
+  # @param task_name_MA[String] it will holds specific report task name for MA
+  # EX: task_name_DC  "employers_list"
+  #     task_name_MA "EMPLOYERSLIST"
+  #
+  # @return [String] absolute path location to writing a CSV
+  def fetch_file_format(task_name_DC, task_name_MA)
+    if individual_market_is_enabled?
+      time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
+      File.expand_path("#{Rails.root}/public/#{task_name_DC}_#{time_stamp}.csv")
+    else
+      # For MA stakeholders requested a specific file format
+      time_extract = TimeKeeper.datetime_of_record.try(:strftime, '%Y_%m_%d_%H_%M_%S')
+      File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name_MA}_#{time_extract}.csv")
+    end
   end
 
   def enabled_metal_level_years
@@ -98,8 +129,8 @@ module Config::AcaHelper
     Settings.site.plan_options_title_for_ma
   end
 
-  def reference_plans_for_metal_level
-    Settings.aca.reference_carriers_for_metal_level
+  def enabled_metal_levels_for_single_carrier
+    Settings.aca.enabled_metal_levels_for_single_carrier
   end
 
   def fetch_plan_title_for_sole_source
@@ -112,6 +143,10 @@ module Config::AcaHelper
 
   def fetch_plan_title_for_single_carrier
     Settings.plan_option_titles.single_carrier
+  end
+
+  def fetch_invoices_addendum
+    Settings.invoices.addendum
   end
 
   def carrier_special_plan_identifier_namespace
@@ -138,11 +173,58 @@ module Config::AcaHelper
    Settings.site.broker_claim_quoting_enabled
   end
 
-  def standard_industrial_classification_enabled?
-    @standard_industrial_classification_enabled ||= Settings.aca.shop_market.standard_industrial_classification
+  def calendar_is_enabled?
+    Settings.aca.calendar_enabled
   end
 
-  def constrain_service_areas?
-    @constrain_service_areas ||= (Settings.aca.offerings_constrained_to_service_areas.to_s.downcase == "true")
+  def aca_address_query_county
+    Settings.aca.address_query_county
   end
+
+  def aca_broker_routing_information
+    Settings.aca.broker_routing_information
+  end
+
+  def aca_recaptcha_enabled
+    Settings.aca.recaptcha_enabled
+  end
+
+  def aca_security_questions
+    Settings.aca.security_questions
+  end
+
+  def aca_user_accounts_enabled
+    Settings.aca.user_accounts_enabled
+  end
+
+  def employer_attestation_is_enabled?
+    Settings.aca.employer_attestation
+  end
+
+  def payment_pdf_helper
+    if Settings.site.payment_pdf_url.match("http")
+      Settings.site.payment_pdf_url
+    else
+      asset_path(Settings.site.payment_pdf_url)
+    end
+  end
+
+  def display_plan_cost_warning(bg)
+    return false unless offer_sole_source?
+    return false if bg.nil?
+    bg.sole_source?
+  end
+
+  def plan_match_tool_is_enabled?
+    Settings.aca.plan_match_tool
+  end
+
+  def invoice_bill_url_helper
+    Settings.site.invoice_bill_url
+  end
+
+  def payment_phone_number
+    Settings.contact_center.payment_phone_number
+  end
+
 end

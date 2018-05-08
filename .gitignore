@@ -63,3 +63,9 @@ plan_xmls.zip
 .idea
 .yardoc
 *.log
+
+# Ignore rspec state files
+**/spec/examples.txt
+
+# Ignore .orig files
+*.orig
