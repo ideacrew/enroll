@@ -1,7 +1,7 @@
 
-<% selected_kind_carrier = f.object.plan_option_kind == 'single_carrier' %>
+<% selected_kind_carrier = f.object.plan_option_kind == 'single_issuer' %>
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
-<% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
+<% selected_kind_plan = f.object.plan_option_kind == 'single_product' %>
 
 <% if @benefit_package_form.new_record? %>
   <h1>Select Your Plan Offering</h1>
@@ -30,8 +30,8 @@
       <div class="product-options-tab">
         <ul class="nav nav-tabs row">
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "single_carrier" %>
-            <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
+            <%= f.radio_button :plan_option_kind, "single_issuer" %>
+            <%= f.label :plan_option_kind_single_issuer, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             By carrier
@@ -46,8 +46,8 @@
           </li>
           <% end %>
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-            <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
+            <%= f.radio_button :plan_option_kind, "single_product", selected: f.object.plan_option_kind %>
+            <%= f.label :plan_option_kind_single_product, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             Single plan
@@ -64,7 +64,7 @@
           <% @benefit_package_form.catalog.carriers.each_pair do |ck, cv| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_issuer", benefit_group:f.object.id ), remote: true do %>
               <div class="col-xs-3">
                 <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
                 <%= f.label "carrier_for_elected_plan_#{ck}" do %>
@@ -129,7 +129,7 @@
           <% @benefit_package_form.catalog.carriers.each_pair do |ck, cv| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_product", benefit_group:f.object.id ), remote: true do %>
 
               <div class="col-xs-3">
                 <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
@@ -177,7 +177,7 @@
   $(document).on("change", ".reference-steps input[type=radio]", function(event) {
 
     switch($('.product-options-tab input[type=radio]:checked').val()){
-      case "single_carrier":
+      case "single_issuer":
         $("div.carriers-tab").show();
         $("div.metals-tab").hide();
         $("div.single-plan-tab").hide();
@@ -187,7 +187,7 @@
         $("div.single-plan-tab").hide();
         $("div.carriers-tab").hide();
         break;
-      case "single_plan":
+      case "single_product":
         $("div.single-plan-tab").show();
         $("div.metals-tab").hide();
         $("div.carriers-tab").hide();
