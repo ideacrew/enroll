@@ -16,12 +16,11 @@ module BenefitSponsors
       end
 
       def carrier_names
-        catalog.plan_options[:single_issuer].keys
-        plan_options.map(&:carrier_name).uniq
+        plan_option_kind_filters[:single_issuer]
       end
 
       def metal_levels
-        plan_options.map(&:metal_level_kind).uniq
+        plan_option_kind_filters[:metal_level]
       end
 
       def plan_options
