@@ -53,15 +53,6 @@ module BenefitMarkets
           end
         end
 
-        context "that's missing premium_tuples" do
-          subject { described_class.new(params.except(:premium_tuples)) }
-
-          it "should be invalid" do
-            subject.validate
-            expect(subject).to_not be_valid
-            expect(subject.errors[:premium_tuples]).to include("can't be blank")
-          end
-        end
       end
 
       context "with all valid params" do

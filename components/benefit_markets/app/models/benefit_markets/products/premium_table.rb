@@ -22,7 +22,7 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::Products::PremiumTuple"
 
     validates_presence_of :effective_period, :rating_area
-    validates_presence_of :premium_tuples, :allow_blank => false
+    # validates_presence_of :premium_tuples, :allow_blank => false
 
   end
 end
