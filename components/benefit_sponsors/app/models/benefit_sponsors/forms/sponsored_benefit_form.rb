@@ -18,12 +18,9 @@ module BenefitSponsors
 
       attr_accessor :sponsor_contribution
 
-      # def sponsor_contribution_attributes=(attributes)
-      #   @sponsor_contribution ||= []
-      #   attributes.each do |i, sponsor_contribution_attributes|
-      #     @sponsor_contribution.push(SponsorContributionForm.new(sponsor_contribution_attributes))
-      #   end
-      # end
+      def sponsor_contribution_attributes=(attributes)
+        @sponsor_contribution = SponsorContributionForm.new(attributes)
+      end
 
       def self.for_new
         kinds.collect do |kind|
@@ -31,13 +28,6 @@ module BenefitSponsors
           form.sponsor_contribution = SponsorContributionForm.for_new
           form
         end
-      end
-
-      def self.for_create(params)
-        sponsor_contribution_params = params.delete(:sponsor_contribution_attributes)
-        form = self.new(params)
-        form.sponsor_contribution = SponsorContributionForm.for_create(sponsor_contribution_params)
-        form
       end
 
       def self.kinds

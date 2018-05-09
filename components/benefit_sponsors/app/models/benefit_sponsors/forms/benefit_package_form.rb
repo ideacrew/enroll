@@ -20,12 +20,12 @@ module BenefitSponsors
 
       attr_reader :service
 
-      # def sponsored_benefits_attributes=(attributes)
-      #   @sponsored_benefits ||= []
-      #   attributes.each do |i, sponsored_benefit_attributes|
-      #     @sponsored_benefits.push(SponsoredBenefitForm.new(sponsored_benefit_attributes))
-      #   end
-      # end
+      def sponsored_benefits_attributes=(attributes)
+        @sponsored_benefits ||= []
+        attributes.each do |i, sponsored_benefit_attributes|
+          @sponsored_benefits.push(SponsoredBenefitForm.new(sponsored_benefit_attributes))
+        end
+      end
 
       def service
         return @service if defined? @service
@@ -41,11 +41,7 @@ module BenefitSponsors
       end
 
       def self.for_create(params)
-        sponsored_benefit_params = params.delete(:sponsored_benefits_attributes)
-        form = self.new(params)
-        form.sponsored_benefits = sponsored_benefit_params.collect{|i, attributes| SponsoredBenefitForm.for_create(attributes) }
-        # form.service.load_form_metadata(form)
-        form
+        self.new(params)
       end
 
       def self.for_edit(id)
@@ -70,12 +66,12 @@ module BenefitSponsors
         true
       end
 
-      def new_record?
-        true
-      end
-
       def save
         persist
+      end
+
+         def new_record?
+        true
       end
     end
   end
