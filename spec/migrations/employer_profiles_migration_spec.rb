@@ -3,9 +3,9 @@ require 'rails_helper'
 describe "EmployerProfilesMigration" do
 
   before :all do
-    Dir[Rails.root.join("components/benefit_sponsors/spec/factories/benefit_sponsors_*.rb")].each do |f|
-      require f
-    end
+    # Dir[Rails.root.join("components/benefit_sponsors/spec/factories/benefit_sponsors_*.rb")].each do |f|
+    #   require f
+    # end
 
     Dir[Rails.root.join('db', 'migrate', '*_employer_profiles_migration.rb')].each do |f|
       @path = f
