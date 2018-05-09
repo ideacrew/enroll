@@ -8,7 +8,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :title, String
       attribute :description, String
-      attribute :probation_period_kind, String
+      attribute :probation_period_kind, Symbol
       attribute :benefit_application_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
 
@@ -40,9 +40,7 @@ module BenefitSponsors
       end
 
       def self.for_create(params)
-        form = self.new(params)
-        form.service.load_form_metadata(form)
-        form
+        self.new(params)
       end
 
       def self.for_edit(id)
@@ -67,12 +65,12 @@ module BenefitSponsors
         true
       end
 
-      def new_record?
-        true
-      end
-
       def save
         persist
+      end
+
+         def new_record?
+        true
       end
     end
   end

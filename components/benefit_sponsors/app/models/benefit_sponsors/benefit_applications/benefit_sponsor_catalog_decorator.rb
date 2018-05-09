@@ -20,6 +20,14 @@ module BenefitSponsors
         plan_options[:single_product].keys
       end
 
+      def probation_period_kinds
+        [
+          ["First of the month following or coinciding with date of hire", 'first_of_month'], 
+          ["First of the month following 30 days", 'first_of_month_after_30_days'], 
+          ["First of the month following 60 days", 'first_of_month_after_60_days']
+        ]
+      end
+
       def plan_options
         return @products if defined? @products
         @products = {}

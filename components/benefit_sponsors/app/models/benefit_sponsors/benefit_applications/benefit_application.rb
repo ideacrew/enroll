@@ -408,16 +408,8 @@ module BenefitSponsors
       end
 
       class << self
-        def find(id)
-          application = nil
-          BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
-            sponsorships = pdo.try(:benefit_sponsorships) || []
-            sponsorships.each do |sponsorship|
-              application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
-              break if application.present?
-            end
-          end
-          application
+        def find(id)          
+          BenefitSponsors::BenefitApplications::BenefitApplication.where(id: BSON::ObjectId.from_string(id)).first
         end
       end
 
