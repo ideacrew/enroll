@@ -205,6 +205,7 @@ module BenefitSponsors
       end
 
       def renewal_group_notice
+        return
         event_name = aasm.current_event.to_s.gsub(/!/, '')
         return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
         if self.employer_profile.is_converting?

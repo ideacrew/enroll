@@ -131,6 +131,13 @@ module BenefitSponsors
         open_enrollment_start_on..open_enrollment_end_on
       end
 
+
+      def renewal_open_enrollment_dates(start_on)
+        open_enrollment_start_on = start_on - 2.months
+        open_enrollment_end_on =  Date.new((start_on - 1.month).year, (start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+        [open_enrollment_start_on, open_enrollment_end_on]
+      end
+
       def map_binder_payment_due_date_by_start_on(start_on)
         dates_map = {}
 
