@@ -30,6 +30,14 @@ module BenefitSponsors
 #   "benefit_application_id"=>"5af084bedbc76016bb949e66"}
 
       def create
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
+        
+        if @benefit_application_form.save
+          redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, @benefit_application_form.show_page_model)
+        else
+          flash[:error] = error_messages(@benefit_application_form)
+          render :new
+        end
       end
 
       def edit
@@ -39,7 +47,7 @@ module BenefitSponsors
 
       def benefit_package_params
         params.require(:forms_benefit_package_form).permit(
-          :title, :description, :probation_period_kind,
+          :title, :description, :probation_period_kind, :benefit_sponsorship_id, :benefit_application_id,
           :sponsored_benefits_attributes => [ :plan_option_kind, :metal_level_for_elected_plan, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
               :contribution_levels_attributes => [ :is_offered, :display_name, :contribution_factor]

@@ -10,6 +10,7 @@ module BenefitSponsors
       attribute :description, String
       attribute :probation_period_kind, String
       attribute :benefit_application_id, String
+      attribute :benefit_sponsorship_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
 
       attr_accessor :catalog, :sponsored_benefits
@@ -19,12 +20,12 @@ module BenefitSponsors
 
       attr_reader :service
 
-      def sponsored_benefits_attributes=(attributes)
-        @sponsored_benefits ||= []
-        attributes.each do |i, sponsored_benefit_attributes|
-          @sponsored_benefits.push(SponsoredBenefitForm.new(sponsored_benefit_attributes))
-        end
-      end
+      # def sponsored_benefits_attributes=(attributes)
+      #   @sponsored_benefits ||= []
+      #   attributes.each do |i, sponsored_benefit_attributes|
+      #     @sponsored_benefits.push(SponsoredBenefitForm.new(sponsored_benefit_attributes))
+      #   end
+      # end
 
       def service
         return @service if defined? @service
@@ -40,8 +41,10 @@ module BenefitSponsors
       end
 
       def self.for_create(params)
+        sponsored_benefit_params = params.delete(:sponsored_benefits_attributes)
         form = self.new(params)
-        form.service.load_form_metadata(form)
+        form.sponsored_benefits = sponsored_benefit_params.collect{|i, attributes| SponsoredBenefitForm.for_create(attributes) }
+        # form.service.load_form_metadata(form)
         form
       end
 

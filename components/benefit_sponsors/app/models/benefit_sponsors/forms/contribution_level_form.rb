@@ -21,6 +21,10 @@ module BenefitSponsors
         end
       end
 
+      def self.for_create(params)
+        self.new(params)
+      end
+
       # Benefit Sponsor Catalog
       def self.contribution_levels
         [

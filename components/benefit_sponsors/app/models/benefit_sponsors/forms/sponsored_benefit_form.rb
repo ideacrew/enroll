@@ -11,19 +11,19 @@ module BenefitSponsors
       attribute :metal_level_for_elected_plan, String
 
       attribute :products, Array[BenefitProductForm]
-      attribute :reference_product, BenefitProductForm
+      attribute :reference_plan_id, String
 
       attribute :sponsor_contribution, SponsorContributionForm
       attribute :pricing_determinations, Array[PricingDeterminationForm]
 
       attr_accessor :sponsor_contribution
 
-      def sponsor_contribution_attributes=(attributes)
-        @sponsor_contribution ||= []
-        attributes.each do |i, sponsor_contribution_attributes|
-          @sponsor_contribution.push(SponsorContributionForm.new(sponsor_contribution_attributes))
-        end
-      end
+      # def sponsor_contribution_attributes=(attributes)
+      #   @sponsor_contribution ||= []
+      #   attributes.each do |i, sponsor_contribution_attributes|
+      #     @sponsor_contribution.push(SponsorContributionForm.new(sponsor_contribution_attributes))
+      #   end
+      # end
 
       def self.for_new
         kinds.collect do |kind|
@@ -31,6 +31,13 @@ module BenefitSponsors
           form.sponsor_contribution = SponsorContributionForm.for_new
           form
         end
+      end
+
+      def self.for_create(params)
+        sponsor_contribution_params = params.delete(:sponsor_contribution_attributes)
+        form = self.new(params)
+        form.sponsor_contribution = SponsorContributionForm.for_create(sponsor_contribution_params)
+        form
       end
 
       def self.kinds
