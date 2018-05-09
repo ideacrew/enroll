@@ -6,7 +6,7 @@ class EmployerProfilesMigration < Mongoid::Migration
     file_name = "#{Rails.root}/hbx_report/employer_profiles_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
     field_names = %w( organization_id benefit_sponsor_organization_id status)
 
-    logger = Logger.new("#{Rails.root}/log/employer_profiles_migration_data.log")
+    logger = Logger.new("#{Rails.root}/log/employer_profiles_migration_data.log") unless Rails.env.test?
     logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
     CSV.open(file_name, 'w') do |csv|
@@ -39,18 +39,17 @@ class EmployerProfilesMigration < Mongoid::Migration
     site = sites.first
 
     #get main app organizations for migration
-    say_with_time("Time taken to extract organizations") do
-      @old_organizations = Organization.unscoped.exists(:employer_profile => true)
-    end
+      old_organizations = Organization.unscoped.exists(:employer_profile => true)
+
     #counters
-    total_organizations = @old_organizations.count
+    total_organizations = old_organizations.count
     existing_organization = 0
     success =0
     failed = 0
     limit_count = 1000
 
     say_with_time("Time taken to migrate organizations") do
-      @old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
+      old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
         begin
           existing_new_organizations = find_new_organization(old_org)
           if existing_new_organizations.count == 0
@@ -145,7 +144,7 @@ class EmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :versions, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :versions, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
     general_organization = BenefitSponsors::Organizations::GeneralOrganization.new(old_org_params)
     general_organization.entity_kind = @old_profile.entity_kind.to_sym
