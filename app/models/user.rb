@@ -16,7 +16,7 @@ class User
   validates_uniqueness_of :email,:case_sensitive => false
 
   scope :datatable_search, ->(query) {
-    search_regex = Regexp.compile(/.*#{query}.*/i)
+    search_regex = ::Regexp.compile(/.*#{query}.*/i)
     person_user_ids = Person.any_of({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
     User.any_of({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => person_user_ids} } )
   }
@@ -29,29 +29,6 @@ class User
     elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
       errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
     end
-  end
-
-  def password_complexity
-    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
-      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
-    elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
-      errors.add :password, "cannot contain username"
-    elsif password.present? and password_repeated_chars_limit(password)
-      errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
-    elsif password.present? and password.match(/(.)\1\1/)
-      errors.add :password, "must not repeat consecutive characters more than once"
-    elsif password.present? and !password.match(/(.*?[a-zA-Z]){4,}/)
-      errors.add :password, "must have at least 4 alphabetical characters"
-    end
-  end
-
-  def password_repeated_chars_limit(password)
-    return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
-    false
-  end
-
-  def password_required?
-    !persisted? || !password.nil? || !password_confirmation.nil?
   end
 
   def valid_attribute?(attribute_name)
@@ -223,37 +200,11 @@ class User
   end
 
   class << self
-    def generate_valid_password
-      password = Devise.friendly_token.first(16)
-      password = password + "aA1!"
-      password = password.squeeze
-      if password_invalid?(password)
-        password = generate_valid_password
-      else
-        password
-      end
-    end
-
-    def find_for_database_authentication(warden_conditions)
-      conditions = warden_conditions.dup
-      if login = conditions.delete(:login).downcase
-        where(conditions).where('$or' => [ {:oim_id => /^#{::Regexp.escape(login)}$/i}, {:email => /^#{::Regexp.escape(login)}$/i} ]).first
-      else
-        where(conditions).first
-      end
-    end
-
-    def password_invalid?(password)
-      ## TODO: oim_id is an explicit dependency to the User class
-      resource = self.new(oim_id: 'example1', password: password)
-      !resource.valid_attribute?('password')
-    end
-
     def find_for_database_authentication(warden_conditions)
       #TODO: Another explicit oim_id dependency
       conditions = warden_conditions.dup
       if login = conditions.delete(:login).downcase
-        where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+        where(conditions).where('$or' => [ {:oim_id => /^#{::Regexp.escape(login)}$/i}, {:email => /^#{::Regexp.escape(login)}$/i} ]).first
       else
         where(conditions).first
       end
