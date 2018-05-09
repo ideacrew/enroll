@@ -31,7 +31,7 @@ module BenefitSponsors
         renewal_application_end_on = benefit_applcation.end_on + 1.year
 
         oe_start_on, oe_end_on = schedular.renewal_open_enrollment_dates(renewal_application_start_on)
-        binding.pry
+
         formed_prams = OpenStruct.new("start_on" => plan_year_start_on,
                                       "end_on" => plan_year_end_on,
                                       "open_enrollment_start_on" => oe_start_on,
