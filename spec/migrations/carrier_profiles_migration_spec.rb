@@ -3,10 +3,6 @@ require 'rails_helper'
 describe "CarrierProfilesMigration" do
 
   before :all do
-    Dir[Rails.root.join("components/benefit_sponsors/spec/factories/benefit_sponsors_*.rb")].each do |f|
-      require f
-    end
-
     Dir[Rails.root.join('db', 'migrate', '*_carrier_profiles_migration.rb')].each do |f|
       @test = f
       require f
