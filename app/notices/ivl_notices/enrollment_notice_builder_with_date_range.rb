@@ -95,7 +95,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.outstanding_verification_types.present?
+      if person.consumer_role.types_include_to_notices.present?
         outstanding_people << person
         update_individual_due_date(person, date)
       end
@@ -131,7 +131,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def update_individual_due_date(person, date)
-    person.consumer_role.outstanding_verification_types.each do |verification_type|
+    person.consumer_role.types_include_to_notices.each do |verification_type|
       unless verification_type.due_date
         verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
         person.consumer_role.save!
@@ -140,23 +140,23 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
+    person.consumer_role.types_include_to_notices.include?("Social Security Number")
   end
 
   def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship')
+    person.consumer_role.types_include_to_notices.include?('Citizenship')
   end
 
   def immigration_status_outstanding?(person)
-   person.consumer_role.outstanding_verification_types.include?('Immigration status')
+   person.consumer_role.types_include_to_notices.include?('Immigration status')
   end
 
   def american_indian_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
+    person.consumer_role.types_include_to_notices.include?('American Indian Status')
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('DC Residency')
+    person.consumer_role.types_include_to_notices.include?('DC Residency')
   end
 
   def append_unverified_individuals(people)

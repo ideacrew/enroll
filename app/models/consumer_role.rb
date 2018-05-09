@@ -222,10 +222,16 @@ class ConsumerRole
     self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
   end
 
-  #use this method to check what verification types needs to be included to the notices
   def outstanding_verification_types
     verification_types.find_all do |type|
       type.is_type_outstanding?
+    end
+  end
+
+  #use this method to check what verification types needs to be included to the notices
+  def types_include_to_notices
+    verification_types.find_all do |type|
+      type.unverified_no_docs?
     end
   end
 
@@ -415,6 +421,7 @@ class ConsumerRole
     state :sci_verified #sci => ssn citizenship immigration
     state :fully_verified
     state :verification_period_ended
+    state :expired
 
     before_all_events :ensure_verification_types
 

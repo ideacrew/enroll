@@ -8,6 +8,7 @@ class VerificationType
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
 
   VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired)
+  OUTSTANDING_STATES = %w(outstanding)
   DUE_DATE_STATES = %w(review outstanding expired)
 
   field :type_name, type: String
@@ -44,6 +45,14 @@ class VerificationType
   end
 
   def is_type_outstanding?
+    validation_status == "outstanding"
+  end
+
+  def outstanding_no_docs?
+    is_type_outstanding? && vlp_documents.empty?
+  end
+
+  def unverified_no_docs?
     type_unverified? && vlp_documents.empty?
   end
 
