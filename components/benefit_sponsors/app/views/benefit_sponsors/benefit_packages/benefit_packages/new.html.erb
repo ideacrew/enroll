@@ -1,4 +1,4 @@
-<%= form_for @benefit_package_form, url: benefit_sponsorship_benefit_application_benefit_packages_path do |f| %>
+<%= form_for @benefit_package_form, url: benefit_sponsorship_benefit_application_benefit_packages_path, method: :create do |f| %>
 
 <a href="#" data-href="<%#= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
 <a href="#" data-href="<%#= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
@@ -7,8 +7,9 @@
 <% i = f.index %>
 <div class="reference-summary">
 </div>
+<%= f.hidden_field :benefit_application_id %>
 <%#= render "employers/plan_years/employee_costs_modal" %>
-<fieldset id='benefit-group-<%#= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%#= f.object.id.to_s %>" data-benefit-group-index="<%# if i < 50 %><%#= i %><%# end %>">
+<fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields' data-benefit-group="<%= f.object.id.to_s %>" data-benefit-group-index="<%# if i < 50 %><%#= i %><%# end %>">
   <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
       <h1>
@@ -33,7 +34,7 @@
           <div class="col-xs-12 form-group form-group-lg">
             <!-- Offset :  -->
             <label class="title">WHEN SHOULD NEWLY HIRED EMPLOYEES START THEIR COVERAGE? <!--<i class="fa fa-chevron-down"></i>--></label>
-            <%= f.select(:probation_period_kind, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.probation_period_kind), { :class => ''}) %>
+            <%= f.select(:probation_period_kind, options_for_select(@benefit_package_form.catalog.probation_period_kinds, selected: f.object.probation_period_kind), { :class => ''}) %>
           </div>
         </div>
       </div>
@@ -43,8 +44,20 @@
   </div>
 <%= f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|  %>
     <%= render "sponsored_benefit", f: sb %>
+
+
   <% end %>
 </fieldset>
+  <div class="row">
+    <div class="col-md-9 col-sm-9 col-xs-12">
+      <div class="row no-buffer">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <button type="submit" class
+          ="btn btn-primary">Submit Benefit Package</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <% end %>
 
 

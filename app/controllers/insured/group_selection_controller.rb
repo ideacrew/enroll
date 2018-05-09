@@ -2,37 +2,49 @@ class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
-  before_action :set_vars_for_market, only: [:new]
+  # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
     set_bookmark_url
-    hbx_enrollment = build_hbx_enrollment
-    @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
-    @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
-    @market_kind = select_market(@person, params)
-    @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
-    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
-      if params[:hbx_enrollment_id].present?
+    @adapter.disable_market_kinds(params) do |disabled_market_kind|
+      @disable_market_kind = disabled_market_kind
+    end
+
+    @adapter.set_mc_variables do |market_kind, coverage_kind|
+      @mc_market_kind = market_kind
+      @mc_coverage_kind = coverage_kind
+    end
+    @employee_role = @adapter.possible_employee_role 
+    @market_kind = @adapter.select_market(params)
+    @resident = @adapter.possible_resident_person
+    if @adapter.can_ivl_shop?(params)
+      if @adapter.if_changing_ivl?(params)
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
-        pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
+        pre_hbx = @adapter.previous_hbx_enrollment
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
 
-      correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
-      @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
+      @benefit = @adapter.ivl_benefit
     end
+    @qle = @adapter.is_qle?
 
-    insure_hbx_enrollment_for_shop_qle_flow
-    @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
+    # This is needed for the below two calls
+    @adapter.ensure_previous_shop_sep_enrollment_if_not_provided(params)
+    @hbx_enrollment = @adapter.previous_hbx_enrollment
+    @waivable = @adapter.can_waive?(params)
 
-    @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-    @benefit_group = select_benefit_group(@qle, @employee_role)
-    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
+    # Benefit group is what we will need
+    @benefit_group = @adapter.select_benefit_group(params)
+    @new_effective_on = @adapter.calculate_new_effective_on(params)
 
-    generate_coverage_family_members_for_cobra
+    @adapter.generate_coverage_family_members_for_cobra(params) do |cobra_members|
+      @coverage_family_members_for_cobra = cobra_members
+    end
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
-    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
+    @adapter.if_qle_with_date_option_selected(params) do |new_effective_date|
+      @new_effective_on = new_effective_date
+    end
   end
 
   def create
@@ -156,40 +168,30 @@ class Insured::GroupSelectionController < ApplicationController
 
 
   def initialize_common_vars
-    person_id = params.require(:person_id)
-    @person = Person.find(person_id)
-    @family = @person.primary_family
-    @coverage_household = @family.active_household.immediate_family_coverage_household
-    @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
+    @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params)
+    @person = @adapter.person
+    @family = @adapter.family
+    @coverage_household = @adapter.coverage_household
+    @hbx_enrollment = @adapter.previous_hbx_enrollment
+    @change_plan = @adapter.change_plan
+    @coverage_kind = @adapter.coverage_kind
+    @enrollment_kind = @adapter.enrollment_kind
+    @shop_for_plans = @adapter.shop_for_plans
+    @optional_effective_ond = @adapter.optional_effective_on
 
-    if params[:employee_role_id].present?
-      emp_role_id = params.require(:employee_role_id)
-      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-      @role = @employee_role
-    elsif params[:resident_role_id].present?
-      @resident_role = @person.resident_role
-      @role = @resident_role
-    else
-      @consumer_role = @person.consumer_role
-      @role = @consumer_role
+    @adapter.if_employee_role do |emp_role|
+      @employee_role = emp_role
+      @role = emp_role
     end
 
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
-    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
-    @optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
-  end
-
-  def set_vars_for_market
-    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
-      @disable_market_kind = "shop"
-      @disable_market_kind = "individual" if select_market(@person, params) == "shop"
+    @adapter.if_resident_role do |res_role|
+      @resident_role = res_role
+      @role = res_role
     end
 
-    if @hbx_enrollment.present? && @change_plan == "change_plan"
-      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
-      @mc_coverage_kind = @hbx_enrollment.coverage_kind
+    @adapter.if_consumer_role do |c_role|
+      @consumer_role = c_role
+      @role = c_role
     end
   end
 

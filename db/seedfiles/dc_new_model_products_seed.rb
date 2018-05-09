@@ -1,4 +1,7 @@
 site = BenefitSponsors::Site.all.first
+if site.blank?
+  site = BenefitSponsors::Site.new(site_key: :dc)
+end
 
 # Clear the current models
 puts "Clearing model instances..."
@@ -10,7 +13,7 @@ BenefitSponsors::Organizations::Organization.where(:"profiles._type" => "Benefit
 
 puts "Loading carrier profiles..."
 Organization.where(carrier_profile: {"$ne" => nil}).each do |org|
-  carrier_profile = org.carrier_profile
+  # carrier_profile = org.carrier_profile
 
   org_params = {
     hbx_id: org.hbx_id,
@@ -30,7 +33,7 @@ end
 
 puts "Loading Products..."
 Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).each do |plan|
-  
+
   carrier         = plan.carrier_profile
   issuer_org      = BenefitSponsors::Organizations::Organization.where(:legal_name => carrier.legal_name, :"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first
   issuer_profile  = issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
@@ -79,16 +82,16 @@ Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).
   premium_tables = plan.premium_tables.inject({}) do |premium_tables, premium_row|
     effective_period = premium_row.start_on..premium_row.end_on
     premium_tables[effective_period] ||= []
-    premium_tables[effective_period] << BenefitMarkets::Products::PremiumTuple.new(age: premium_row.age, cost: premium_row.cost)
+    # premium_tables[effective_period] << BenefitMarkets::Products::PremiumTuple.new(age: premium_row.age, cost: premium_row.cost)
     premium_tables
   end
 
   premium_tables.each do |effective_period, premium_tuples|
-    product.premium_tables << BenefitMarkets::Products::PremiumTable.new(effective_period: effective_period, premium_tuples: premium_tuples, rating_area: BenefitMarkets::Locations::RatingArea.first)
+    # product.premium_tables << BenefitMarkets::Products::PremiumTable.new(effective_period: effective_period, premium_tuples: premium_tuples, rating_area: BenefitMarkets::Locations::RatingArea.first)
+    product.premium_tables << BenefitMarkets::Products::PremiumTable.new(effective_period: effective_period, rating_area: BenefitMarkets::Locations::RatingArea.first)
   end
 
   product.is_reference_plan_eligible = true
-  product.issuer_profile_id = carrier.id
   product.service_area = BenefitMarkets::Locations::ServiceArea.first
 
   product.issuer_profile_id = issuer_profile.id
@@ -99,7 +102,10 @@ end
 puts "Creating Benefit Market..."
 benefit_market = ::BenefitMarkets::BenefitMarket.create!({
   kind: :aca_shop,
-  title: "DC Health Link SHOP Market"
+  title: "DC Health Link SHOP Market",
+  site_urn: "DC",
+  description: "DC Health Link Shop Market",
+  configuration: BenefitMarkets::Configurations::Configuration.new
 })
 
 puts "Creating Benefit Market Catalog..."

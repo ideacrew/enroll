@@ -80,9 +80,9 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidated = false;
           return false;
         }
-
     });
-    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+
+    if ( $('#plan_year_start_on').val() !== undefined && $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       editvalidatedbgemployeepremiums = true;
       editvalidated = true;
     } else {
@@ -239,7 +239,7 @@ var EmployerProfile = ( function( window, undefined ) {
         return false;
       }
     });
-    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+    if ( $('#plan_year_start_on').val() !== undefined && $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       validatedbgemployeepremiums = true;
       validated = true;
     } else {

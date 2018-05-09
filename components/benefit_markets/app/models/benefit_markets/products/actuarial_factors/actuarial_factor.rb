@@ -3,6 +3,8 @@ module BenefitMarkets
 		module ActuarialFactors
 			class ActuarialFactor
 				include Mongoid::Document
+        include Mongoid::Timestamps
+        
 				field :active_year, type: Integer
 				field :default_factor_value, type: Float
 				field :issuer_profile_id, type: BSON::ObjectId

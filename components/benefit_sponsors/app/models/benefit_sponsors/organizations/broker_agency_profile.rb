@@ -102,7 +102,7 @@ module BenefitSponsors
       class << self
 
         def find(id)
-          organizations = BenefitSponsors::Organizations::GeneralOrganization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
+          organizations = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
           organizations.size > 0 ? organizations.first.profiles.where(_type: /.*BrokerAgencyProfile$/, _id: id ).first: nil
         end
 
