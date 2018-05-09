@@ -24,7 +24,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('employer_sponsored')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
-      expect(rendered).to have_selector('strong', text: 'DC Health Link ID:')
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
 
     it "when kind is employer_sponsored_cobra" do
@@ -37,7 +37,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('individual')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
-      expect(rendered).to have_selector('strong', text: 'DC Health Link ID:')
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
   end
 
