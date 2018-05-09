@@ -62,7 +62,7 @@ class TaxHousehold
     tax_household_members.find_all(&:is_ia_eligible?)
   end
 
-  def aptc_ratio_by_member
+  def aptc_ratio_by_member(member_ids = nil)
     # if APTC is $100, we need to apportion it between member
     # For example, given family of 4, with 2 adults & 2 children, all who are eligible
     # Based on SLCSP, we will compute ratio for each member based on premium cost
@@ -79,7 +79,11 @@ class TaxHousehold
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.each do |member|
+    members = aptc_members
+    if member_ids.present?
+      members = aptc_members.select { |member| member_ids.include?(member.applicant_id) }
+    end
+    members.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium
@@ -103,19 +107,38 @@ class TaxHousehold
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
-    hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
+    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    total_aptc_available = hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
+      aptc_available_amount = aptc_available_amount_by_member(applicant_ids: applicant_ids)
+      sum + (aptc_available_amount[member.applicant_id.to_s] || 0)
     end
+    total_aptc_available = total_aptc_available - deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
+    total_aptc_available > 0 ? total_aptc_available : 0
   end
 
-  def aptc_available_amount_by_member
+  def deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
+    return 0 if hbx_enrollment.blank?
+    deduct_aptc_available_amount = 0
+    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    family_member_ids = hbx_enrollment.household.family_members.collect(&:id)
+    unenrolled = family_member_ids - applicant_ids
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+    hbx_enrollment.household.tax_households.last.tax_household_members.in(applicant_id: unenrolled).each do |member|
+      deduct_aptc_available_amount += slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date) || 0
+    end
+    deduct_aptc_available_amount
+  end
+
+  def aptc_available_amount_by_member(options = {})
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
-    aptc_ratio_by_member.each do |member_id, ratio|
-      aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
+    current_max_aptc_value = options[:used_calculated_max_aptc] ? total_aptc_available_amount_for_enrollment(options[:hbx_enrollment]) : current_max_aptc.to_f
+    aptc_ratio_by_member(options[:applicant_ids]).each do |member_id, ratio|
+      aptc_available_amount_hash[member_id] = current_max_aptc_value * ratio
     end
-
     # FIXME should get hbx_enrollments by effective_starting_on
     household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
@@ -133,15 +156,15 @@ class TaxHousehold
   end
 
   # Pass a list of tax_household_members and get amount of APTC available
-  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc)
+  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc, used_calculated_max_aptc = false)
     # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
     aptc_available_amount_hash_for_enrollment = {}
-
+    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
     total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
     elected_pct = total_aptc_available_amount > 0 ? (elected_aptc.to_f / total_aptc_available_amount.to_f) : 0
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
-      given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
+      given_aptc = (aptc_available_amount_by_member(applicant_ids: applicant_ids, used_calculated_max_aptc: used_calculated_max_aptc, hbx_enrollment: hbx_enrollment)[enrollment_member.applicant_id.to_s] || 0) * elected_pct
       ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
       if plan.coverage_kind == "dental"
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
