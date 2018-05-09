@@ -1060,6 +1060,8 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   person = people['Hbx AdminEnrollments']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  @user_1 = FactoryGirl.create :user, :with_family, :employer_staff, oim_id: "Employer1"
+  @user_2 = FactoryGirl.create :user, :with_family, :employer_staff, oim_id: "Employer2"
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   org1 = FactoryGirl.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
   employer_profile = FactoryGirl.create :employer_profile, organization: org1

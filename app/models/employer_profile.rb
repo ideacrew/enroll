@@ -578,16 +578,6 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
-    def organizations_for_low_enrollment_notice(new_date)
-      Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
-          :"open_enrollment_end_on" => new_date+2.days
-          }
-      })
-
-    end
-
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
           { :$elemMatch => {
@@ -737,7 +727,6 @@ class EmployerProfile
         #     end
         #   end
         # end
-
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
         employer_enroll_factory.date = new_date
 

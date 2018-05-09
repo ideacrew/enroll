@@ -101,6 +101,18 @@ module Notifier
       end
     end
 
+    def plan_year_total_enrolled_count
+      if load_plan_year.present?
+        merge_model.plan_year.total_enrolled_count = load_plan_year.total_enrolled_count
+      end
+    end
+
+    def plan_year_eligible_to_enroll_count
+      if load_plan_year.present?
+        merge_model.plan_year.eligible_to_enroll_count = load_plan_year.eligible_to_enroll_count
+      end
+    end
+
     def plan_year_renewal_py_end_on
       if renewal_plan_year.present?
         merge_model.plan_year.renewal_py_end_on = renewal_plan_year.end_on

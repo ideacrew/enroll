@@ -869,9 +869,8 @@ class PlanYear
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
     state :published,         :after_enter => [:accept_application, :link_census_employees]     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
-
+    state :enrolled,  :after_enter => [:ratify_enrollment, :finalize_composite_rates] # Published plan open enrollment has ended and is eligible for coverage,
     state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
-    state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
     #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
@@ -882,7 +881,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-    state :renewing_enrolled, :after_enter => [:renewal_successful]
+    state :renewing_enrolled, :after_enter => [:renewal_successful, :finalize_composite_rates]
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled,          :after_enter => :cancel_application
 
@@ -1290,19 +1289,13 @@ class PlanYear
     self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
   end
 
-  def initial_employer_open_enrollment_completed
-    #also check if minimum participation and non owner conditions are met by ER.
+  def finalize_composite_rates
     benefit_groups.each do |bg|
       bg.finalize_composite_rates
     end
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
   end
 
   def renewal_successful
-    benefit_groups.each do |bg|
-      bg.finalize_composite_rates
-    end
     if transmit_employers_immediately?
       employer_profile.transmit_renewal_eligible_event
     end
@@ -1337,6 +1330,17 @@ class PlanYear
     end
   end
 
+  def initial_employee_plan_selection_confirmation
+    return true if (benefit_groups.any?{|bg| bg.is_congress?})
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+      rescue Exception => e
+        puts "Unable to send Employee Open Enrollment begin notice to #{ce.full_name}" unless Rails.env.test?
+      end
+    end
+  end
+
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
@@ -1345,26 +1349,38 @@ class PlanYear
     )
   end
 
+  def send_employee_renewal_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_renewal_employee!(ce)
+      end
+    end
+  end
+
+  def send_employee_initial_enrollment_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_initial_employee!(ce)
+      end
+    end
+  end
+
+  def send_active_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
+  end
+
   def send_employee_invites
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
-      benefit_groups.each do |bg|
-        bg.census_employees.non_terminated.each do |ce|
-          Invitation.invite_renewal_employee!(ce)
-        end
-      end
+      notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:plan_year_id => self.id.to_s})
     elsif enrolling?
-      benefit_groups.each do |bg|
-        bg.census_employees.non_terminated.each do |ce|
-          Invitation.invite_initial_employee!(ce)
-        end
-      end
+      notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:plan_year_id => self.id.to_s})
     else
-      benefit_groups.each do |bg|
-        bg.census_employees.non_terminated.each do |ce|
-          Invitation.invite_employee!(ce)
-        end
-      end
+      notify("acapi.info.events.plan_year.employee_enrollment_invitations_requested", {:plan_year_id => self.id.to_s})
     end
   end
 
