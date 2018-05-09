@@ -6,7 +6,7 @@ function initPlanOptions(plan_options, location_id) {
       var productHtml = '<div class="col-xs-4">\
         <div class="col-xs-12 reference-plan">\
           <div class="col-xs-2">\
-            <input type="radio" value="' + product["id"] + '" name="forms_benefit_package_form[sponsored_benefits_attributes[reference_plan_id]]">\
+            <input type="radio" value="' + product["id"] + '" name="forms_benefit_package_form[sponsored_benefits_attributes][0][reference_plan_id]">\
             <label for="' + location_id + '_reference_plan_id">\
               <i class="fa fa-circle-o"></i>\
               <i class="fa fa-dot-circle-o"></i>\
