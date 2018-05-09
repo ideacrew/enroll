@@ -39,8 +39,9 @@ describe('BenefitSponsorsSiteController', () => {
     it('unhides the remove button', () => {
       
       // replaces acually clicking he buon in he UI
-      controller.addLocation();
       const testDiv = document.getElementById("test");
+      expect(testDiv.getAttribute("class")).toEqual('row d-none js-non-primary');
+      controller.addLocation();
       expect(testDiv.getAttribute("class")).toEqual('row js-non-primary');
     });
   });
