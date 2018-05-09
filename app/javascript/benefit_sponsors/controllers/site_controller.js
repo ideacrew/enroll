@@ -14,25 +14,23 @@ export default class SiteController extends Controller {
 
   addLocation() {
       //clone new location node, unhide remove button, modify name attribute
+      //need to add id to element to clone in the view for testing purposes
+      //jsdom won't select elements based off of data-target
 
-      // comment out only the line directly below to get the test to pass
-
-      //var newLocation = document.importNode(this.officeLocationTarget, true)
       var siteLocation = document.querySelector('#siteOfficeLocation');
-      var cln = siteLocation.cloneNode(true);
+      var newLocation = siteLocation.cloneNode(true);
       document.querySelector('.js-non-primary').classList.remove('d-none')
       document.querySelectorAll('.js-remove').forEach(function(element) {
         element.remove()
       })
 
-      //comment out the rest of this method to get the test to pass
-      cln.querySelectorAll('input').forEach(function(input) {
+      newLocation.querySelectorAll('input').forEach(function(input) {
         var name = input.getAttribute('name').replace('[0]', `[${Date.now()}]`)
         input.setAttribute('name', name)
         input.value = ''
       })
 
-      siteLocation.appendChild(cln)
+      siteLocation.appendChild(newLocation)
     }
 
   removeLocation(event) {
