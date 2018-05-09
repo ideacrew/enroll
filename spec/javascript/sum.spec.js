@@ -1,7 +1,13 @@
-import _ from 'lodash';
-import moment from 'moment';
+import chai, { expect } from 'chai'
+import chaiDom from 'chai-dom'
+import sinonChai from 'sinon-chai'
+chai.use(chaiDom)
+chai.use(sinonChai)
 
-test('1 + 1 equals 2', () => {
-  expect(1 + 1).toBe(2);
-  console.log(moment());
+
+describe('Calculator', function() {
+  it('should return 3 for 1 + 2', () => {
+    expect(1+2).to.equal(3);
+  });
+
 });
