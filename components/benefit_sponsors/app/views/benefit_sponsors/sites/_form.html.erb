@@ -23,7 +23,7 @@
         <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
 
         <% if office_fields.object.is_primary? %>
-          <div data-target="site.officeLocation" class="js-office-location">
+          <div data-target="site.officeLocation" class="js-office-location" id="siteOfficeLocation">
             <div class="row row-form-wrapper no-buffer d-none js-non-primary">
         <% else %>
           <div class="js-office-location">
