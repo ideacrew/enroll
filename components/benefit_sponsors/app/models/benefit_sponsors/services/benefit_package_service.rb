@@ -10,7 +10,8 @@ module BenefitSponsors
 
       # load defaults from models
       def load_default_form_params(form)
-
+        application  = find_benefit_application(form)
+        form.id = application.benefit_packages.new.id
       end
 
       def load_form_metadata(form)
