@@ -185,7 +185,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do
       family.family_members.each do |member|
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person = FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)
       end
       allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.documents_uploaded).to be_falsey
