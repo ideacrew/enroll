@@ -1,14 +1,12 @@
 # This rake task used to terminate employer active plan year && active enrollments.
 # RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
 # RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date', 'generate_termination_notice']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017',true/false]
 
 namespace :migrations do
   desc "Terminating active plan year and enrollments"
-  task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
+  task :terminate_employer_account, [:fein, :end_on, :termination_date] => :environment do |task, args|
     fein = args[:fein]
-    generate_termination_notice = (args[:generate_termination_notice].to_s == "true") ? true : false
+    # generate_termination_notice = (args[:generate_termination_notice].to_s == "true") ? true : false   #can be reenabled if business decides to send notice based on ER 
     organizations = Organization.where(fein: fein)
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
@@ -59,9 +57,9 @@ namespace :migrations do
               assignment.update(end_on: plan_year.end_on) if assignment.end_on.present? && assignment.end_on > plan_year.end_on
             end
           end
-          if generate_termination_notice
-            send_notice_to_employees(organization, plan_year)
-          end
+          # if generate_termination_notice
+            # send_notice_to_employees(organization, plan_year) 
+          # end
         end
       end
 
@@ -124,18 +122,6 @@ namespace :migrations do
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
-    end
-  end
-
-  def send_notice_to_employees(org, plan_year)
-    puts "Notification generated for employee"
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        observer = Observers::Observer.new
-        observer.trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_when_employer_requests_advance_termination")
-      rescue Exception => e
-        (Rails.logger.error { "Unable to deliver #{org.legal_name}'s termination notice to employee - #{ce.full_name} due to #{e}" }) unless Rails.env.test?
-      end
     end
   end
 end

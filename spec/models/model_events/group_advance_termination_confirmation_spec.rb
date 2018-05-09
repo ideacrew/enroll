@@ -2,15 +2,15 @@ require 'rails_helper'
 
 describe 'ModelEvents::GroupAdvanceTerminationConfirmation', dbclean: :around_each  do
   let(:model_event)  { "group_advance_termination_confirmation" }
-  let(:notice_event) { "group_advance_termination_confirmation" }
   let(:employer_profile){ create :employer_profile}
   let(:current_date) { TimeKeeper.date_of_record }
   let(:terminated_on) { current_date.next_month.end_of_month }
   let(:start_on) {  TimeKeeper.date_of_record.beginning_of_month.last_year.next_month}
-  let(:person){ create :person}
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id) }
+  let(:employee_role)     { FactoryGirl.create(:employee_role)}
   let(:benefit_group) { FactoryGirl.build(:benefit_group) }
   let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, aasm_state: 'active', terminated_on: terminated_on) }
-  
+
   describe "ModelEvent" do
     context "when initial employer denial notice" do
       let(:prior_month_open_enrollment_start)  { (TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days).prev_day}
@@ -44,9 +44,15 @@ describe 'ModelEvents::GroupAdvanceTerminationConfirmation', dbclean: :around_ea
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
+
+        expect(subject).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_advance_termination"
+          expect(payload[:employee_role_id]).to eq employee_role.id.to_s
+          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
         subject.plan_year_update(model_event)
       end
     end
   end
-
 end
