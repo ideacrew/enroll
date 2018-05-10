@@ -13,8 +13,9 @@ class EmployerStaffRole
   field :is_active, type: Boolean, default: true
   field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId
 
-  # validates_presence_of :employer_profile_id
-  validates_presence_of :benefit_sponsor_employer_profile_id
+  validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsor_employer_profile_id.blank? }
+  validates_presence_of :benefit_sponsor_employer_profile_id, :if => Proc.new { |m| m.employer_profile_id.blank? }
+
   field :aasm_state, type: String, default: 'is_active'
   scope :active, ->{ where(aasm_state: :is_active) }
   aasm do
@@ -35,7 +36,14 @@ class EmployerStaffRole
   end
 
   def notify_contact_changed
-    notify("acapi.info.events.employer.contact_changed", {employer_id: BenefitSponsors::Organizations::Profile.find(self.benefit_sponsor_employer_profile_id).hbx_id, event_name: "contact_changed"})
+    notify("acapi.info.events.employer.contact_changed", {employer_id: find_hbx_id_with_profile_id , event_name: "contact_changed"})
   end
 
+  def find_hbx_id_with_profile_id
+    if benefit_sponsor_employer_profile_id.present?
+      BenefitSponsors::Organizations::Profile.find(self.benefit_sponsor_employer_profile_id).hbx_id
+    elsif employer_profile_id.present?
+      EmployerProfile.find(self.employer_profile_id).hbx_id
+    end
+  end
 end
