@@ -62,7 +62,8 @@ module VerificationHelper
   end
 
   def documents_uploaded
-    @person.primary_family.active_family_members.all? { |member| docs_uploaded_for_all_types(member) }
+    family_members = @person.primary_family.active_family_members.select { |member| member if member.person.is_consumer_role_active? }
+    family_members.all? { |member| docs_uploaded_for_all_types(member) }
   end
 
   def member_has_uploaded_docs(member)
