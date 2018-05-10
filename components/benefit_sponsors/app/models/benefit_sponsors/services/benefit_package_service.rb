@@ -46,7 +46,6 @@ module BenefitSponsors
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
       def find_benefit_application(form)
-        binding.pry
         return @benefit_application if defined? @benefit_application
         @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.find(form.benefit_application_id)
       end
