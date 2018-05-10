@@ -387,8 +387,8 @@ module ApplicationHelper
 
   def display_carrier_logo(plan, options = {:width => 50})
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case hios_id
+    issuer_hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case issuer_hios_id
     when "75753DC"
       "oci"
     when "21066DC"
@@ -403,8 +403,8 @@ module ApplicationHelper
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case hios_id
+    issuer_hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case issuer_hios_id
     when "75753DC"
       "oci"
     when "21066DC"
