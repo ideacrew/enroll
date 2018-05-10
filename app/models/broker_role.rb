@@ -251,12 +251,20 @@ class BrokerRole
 
     def agencies_with_matching_broker(search_str)
       broker_role_ids = brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:id)
-
-      Person.collection.raw_aggregate([
-        {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
-        {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
-      ]).map do |record|
-        record["_id"]
+      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect{|b|b.benefit_sponsors_broker_agency_profile_id}.present?
+        Person.collection.raw_aggregate([
+                                            {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
+                                            {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
+                                        ]).map do |record|
+          record["_id"]
+        end
+      else
+        Person.collection.raw_aggregate([
+                                            {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
+                                            {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+                                        ]).map do |record|
+          record["_id"]
+        end
       end
     end
   end
