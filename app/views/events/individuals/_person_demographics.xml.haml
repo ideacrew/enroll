@@ -12,6 +12,10 @@
     %is_incarcerated= "false"
   - else
     %is_incarcerated= person_demographics.is_incarcerated.to_s
+  - if person_demographics.is_homeless.present?
+    %is_homeless= person_demographics.is_homeless.to_s
+  - if person_demographics.is_temporarily_out_of_state.present?
+    %is_temporarily_out_of_state= person_demographics.is_temporarily_out_of_state.to_s
   - if !person_demographics.race.blank?
     %race= person_demographics.race
   - if person_demographics.consumer_role && person_demographics.consumer_role.birth_location
