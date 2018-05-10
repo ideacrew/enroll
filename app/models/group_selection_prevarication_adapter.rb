@@ -56,7 +56,14 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def if_changing_ivl?(params)
-		params[:hbx_enrollment_id].present?
+		can_ivl_shop?(params) && params[:hbx_enrollment_id].present?
+	end
+
+	def if_employee_role_unset_but_can_be_derived(e_role_value)
+    return if e_role_value.present?
+		if @person.has_active_employee_role?
+			@person.active_employee_roles.first
+		end
 	end
 
 	def possible_employee_role
@@ -126,7 +133,7 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
-  def generate_coverage_family_members_for_cobra(params)
+  def if_should_generate_coverage_family_members_for_cobra(params)
     if (select_market(params) == 'shop') && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
       if hbx_enrollment.present?
@@ -135,10 +142,11 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
-	def ensure_previous_shop_sep_enrollment_if_not_provided(params)
-		if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @previous_hbx_enrollment.blank?
-			@previous_hbx_enrollment = selected_enrollment(@family, possible_employee_role)
-      @can_waive = @previous_hbx_enrollment.can_complete_shopping?
+	def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment)
+		if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && enrollment.blank?
+			prev_enrollment = selected_enrollment(@family, possible_employee_role)
+      waivable_value = prev_enrollment.can_complete_shopping?
+      yield prev_enrollment,waivable_value
 		end
 	end
 
@@ -146,13 +154,9 @@ class GroupSelectionPrevaricationAdapter
     (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
   end
 
-  def can_waive?(params)
-    @can_waive
-  end
-
 	def select_benefit_group(params)
-		if (select_market(params) == "shop") && @employee_role.present?
-			@employee_role.benefit_group(qle: is_qle?)
+		if (select_market(params) == "shop") && possible_employee_role.present?
+			possible_employee_role.benefit_group(qle: is_qle?)
 		else
 			nil
 		end
