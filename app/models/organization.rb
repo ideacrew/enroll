@@ -468,7 +468,7 @@ class Organization
 
   def self.commission_statement_exist?(statement_date,org)
     docs =org.documents.where("date" => statement_date)
-    matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
+    matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
     return true if matching_documents.count > 0
   end
 

@@ -26,7 +26,7 @@ class CarrierServiceArea
       :active_year => year,
       "$or" => [
         {:serves_entire_state => true},
-        {:service_area_zipcode => address.zip, county_name: Regexp.compile(Regexp.escape(address.county).downcase, true)}
+        {:service_area_zipcode => address.zip, county_name: ::Regexp.compile(::Regexp.escape(address.county).downcase, true)}
       ]
     })
   end
@@ -47,7 +47,7 @@ class CarrierServiceArea
         issuer_hios_id: { "$in" => carrier_profile.issuer_hios_ids },
         "$or" => [
           {:serves_entire_state => true},
-          {:service_area_zipcode => address.zip, county_name: Regexp.compile(Regexp.escape(address.county).downcase, true)}
+          {:service_area_zipcode => address.zip, county_name: ::Regexp.compile(::Regexp.escape(address.county).downcase, true)}
         ]
       })
     end

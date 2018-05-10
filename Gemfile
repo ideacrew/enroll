@@ -4,7 +4,7 @@ gem "benefit_markets", path: "components/benefit_markets"
 gem "benefit_sponsors", path: "components/benefit_sponsors"
 
 gem 'aasm', '~> 4.8.0'
-gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.0.0'
+gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 gem 'addressable', '2.3.8'
 gem 'animate-rails', '~> 1.0.7'
 gem 'aws-sdk', '2.2.4'
