@@ -103,9 +103,10 @@ module BenefitSponsors
         form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << {
             plan_option_kind: sponsored_benefit.plan_option_kind,
-            # TODO: Field is not present on the model
-            # reference_plan_id: sponsored_benefit.reference_plan_id,
-            sponsor_contribution: sponsored_contribution_attributes(sponsored_benefit)
+            carrier_for_elected_plan: sponsored_benefit.carrier_for_elected_plan,
+            metal_level_for_elected_plan: sponsored_benefit.metal_level_for_elected_plan,
+            reference_plan_id: sponsored_benefit.reference_plan_id,
+            sponsor_contributions: sponsored_contribution_attributes(sponsored_benefit)
           }
         end
       end

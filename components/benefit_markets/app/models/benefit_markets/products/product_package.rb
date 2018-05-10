@@ -29,6 +29,9 @@ module BenefitMarkets
     validates_presence_of :product_kind, :kind, :application_period
     validates_presence_of :title, :allow_blank => false
 
+    scope :by_kind,             ->(kind){ where(kind: kind) }
+    scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
+
     def benefit_market_kind
       packagable.benefit_market_kind
     end
