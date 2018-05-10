@@ -2,18 +2,26 @@ module BenefitSponsors
   module BenefitPackages
     class BenefitPackageFactory
  
-      # returns benefit package 
+      # returns benefit package
 
-      def initialize(benefit_application)
+      def self.call(benefit_application, args)
+        new(benefit_application, args).benefit_package
+      end
+
+      def self.validate(benefit_package)
+        # TODO: Add validations
+        true
+      end
+
+      def initialize(benefit_application, args)
         @benefit_application = benefit_application
-
-        @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.new
+        initialize_benefit_package(args)
       end
 
-      def probation_periods
-      end
-
-      def product_packages
+      def initialize_benefit_package(args)
+        @benefit_package = @benefit_application.benefit_packages.build
+        @benefit_package.assign_attributes(args)
+        @benefit_package.save
       end
 
       def benefit_package

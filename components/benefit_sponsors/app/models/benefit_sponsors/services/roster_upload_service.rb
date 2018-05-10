@@ -33,7 +33,7 @@ module BenefitSponsors
         newly_designated
       )
 
-      EmployeeTerminationMap = Struct.new(:employee, :termination_date)
+      EmployeeTerminationMap = Struct.new(:employee, :employment_terminated_on)
       EmployeePersistMap = Struct.new(:employee)
 
       def initialize(args = {})
@@ -67,25 +67,38 @@ module BenefitSponsors
             first_name: parse_text(row["first_name"]),
             middle_name: parse_text(row["middle_name"]),
             name_sfx: parse_text(row["name_sfx"]),
-            email: parse_text(row["email"]),
             ssn: parse_ssn(row["ssn"]),
             dob: parse_date(row["dob"]),
             gender: parse_text(row["gender"]),
-            hire_date: parse_date(row["hire_date"]),
-            termination_date: parse_date(row["termination_date"]),
+            hired_on: parse_date(row["hire_date"]),
+            employment_terminated_on: parse_date(row["termination_date"]),
             is_business_owner: parse_boolean(row["is_business_owner"]),
             benefit_group: parse_text(row["benefit_group"]),
             plan_year: parse_text(row["plan_year"]),
-            kind: parse_text(row["kind"]),
-            address_1: parse_text(row["address_1"]),
-            address_2: parse_text(row["address_2"]),
-            city: parse_text(row["city"]),
-            state: parse_text(row["state"]),
-            zip: parse_text(row["zip"]),
-            newly_designated: parse_boolean(row["newly_designated"])
+            newly_designated: parse_boolean(row["newly_designated"]),
+            email: Forms::EmailForm.new(email_params(row)),
+            address: Organizations::Forms::AddressForm.new(address_params(row))
           )
           result
         end
+      end
+
+      def address_params(row)
+        {
+          kind: parse_text(row["kind"]),
+          address_1: parse_text(row["address_1"]),
+          address_2: parse_text(row["address_2"]),
+          city: parse_text(row["city"]),
+          state: parse_text(row["state"]),
+          zip: parse_text(row["zip"])
+        }
+      end
+
+      def email_params(row)
+        {
+          kind: "home" || parse_text(row["email_kind"]), # Add this row to template
+          address: parse_text(row["email"])
+        }
       end
 
       def save(form)
@@ -94,7 +107,7 @@ module BenefitSponsors
         @persist_queqe = {}
         form.census_records.each_with_index do |census_form, i|
           @index = i
-          if census_form.termination_date.present?
+          if census_form.employment_terminated_on.present?
             _insert_into_terms_queqe(census_form)
           else
             _insert_into_persist_queqe(census_form)
@@ -136,7 +149,7 @@ module BenefitSponsors
         if @terminate_queue.present?
           return false if self.errors.present?
           @terminate_queue.each do |row, employee_termination_map|
-            employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
+            employee_termination_map.employee.terminate_employment(employee_termination_map.employment_terminated_on)
           end
         end
         true
@@ -146,7 +159,7 @@ module BenefitSponsors
         census_employee = find_employee(form.ssn)
         if census_employee.present?
           if is_employee_terminable?(census_employee)
-            @terminate_queue[@index + 4] = EmployeeTerminationMap.new(census_employee, form.termination_date)
+            @terminate_queue[@index + 4] = EmployeeTerminationMap.new(census_employee, form.employment_terminated_on)
             validate_newly_designated(form.newly_designated, census_employee)
           else
             self.errors.add :base, "Row #{@index + 4}: Could not terminate employee"
@@ -166,7 +179,7 @@ module BenefitSponsors
 
       def _insert_primary(form)
         # TODO
-        member = find_employee(form.ssn) || CensusMembers::CensusEmployee.new
+        member = find_employee(form.ssn) || ::CensusEmployee.new
         member = init_census_record(member, form)
         @persist_queqe[@index + 4] = EmployeePersistMap.new(member)
         validate_newly_designated(form.newly_designated, member)
@@ -206,11 +219,11 @@ module BenefitSponsors
       def init_census_record(member, form)
         # TODO
         params = sanitize_params(form).merge!({
-          hired_on: form.hire_date,
+          hired_on: form.hired_on,
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
-          # employer_profile_id: profile.id,
+          benefit_sponsors_employer_profile_id: profile.id,
           address: build_address(form)
         })
         member.assign_attributes(params)
@@ -219,20 +232,13 @@ module BenefitSponsors
       end
 
       def build_address(form)
-        address = Address.new({
-          kind: 'home',
-          address_1: form.address_1,
-          address_2: form.address_2,
-          city: form.city,
-          state: form.state,
-          zip: form.zip
-        })
+        address = ::Address.new(sanitize_address_params(form.address))
         address.valid? ? address : nil
       end
 
       def build_email(form)
         # TODO
-        Locations::Email.new({address: form.email.to_s, kind: "home"}) if form.email
+        ::Email.new(sanitize_email_params(form.email)) if form.email
       end
 
       def is_business_owner?(form)
@@ -252,6 +258,14 @@ module BenefitSponsors
         @primary_census_employee.census_dependents.detect do |dependent|
           (dependent.ssn == form.ssn) && (dependent.dob == form.dob)
         end
+      end
+
+      def sanitize_address_params(form)
+        form.attributes.slice(:address_1, :address_2, :state, :city, :zip, :kind)
+      end
+
+      def sanitize_email_params(form)
+        form.attributes.slice(:address, :kind)
       end
 
       def sanitize_params(form)

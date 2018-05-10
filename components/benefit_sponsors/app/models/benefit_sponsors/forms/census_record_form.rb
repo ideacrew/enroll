@@ -11,22 +11,20 @@ module BenefitSponsors
       attribute :first_name, String
       attribute :middle_name, String
       attribute :name_sfx, String
-      attribute :email, String
       attribute :ssn, String
       attribute :dob, String
       attribute :gender, String
-      attribute :hire_date, String
-      attribute :termination_date, String
+      attribute :hired_on, String
+      attribute :employment_terminated_on, String
       attribute :is_business_owner, String
+      
+      # template attributes
       attribute :benefit_group, String
       attribute :plan_year, String
-      attribute :kind, String
-      attribute :address_1, String
-      attribute :address_2, String
-      attribute :city, String
-      attribute :state, String
-      attribute :zip, String
       attribute :newly_designated, String
+
+      attribute :email, Forms::EmailForm
+      attribute :address, Organizations::Forms::AddressForm
 
       validates_presence_of :employee_relationship, :email
     end
