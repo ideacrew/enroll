@@ -35,9 +35,7 @@ puts "Loading Products..."
 Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).each do |plan|
 
   carrier         = plan.carrier_profile
-  issuer_org      = BenefitSponsors::Organizations::Organization.where(:legal_name => carrier.legal_name, :"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first
-  issuer_profile  = issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
-
+  issuer_profile  = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(carrier.legal_name)
 
   attribute_map = {
 

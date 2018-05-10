@@ -17,6 +17,8 @@ module BenefitSponsors
       embeds_many :sponsored_benefits,
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
 
+      delegate :benefit_sponsor_catalog, to: :benefit_application
+
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range
  
@@ -48,6 +50,13 @@ module BenefitSponsors
       def set_sponsor_choices(sponsored_benefit)
         # trigger composite
 
+      end
+
+      def sponsored_benefits=(sponsored_benefits_attrs)
+        sponsored_benefits_attrs.each do |sponsored_benefit_attrs|
+          sponsored_benefit = sponsored_benefits.build
+          sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
+        end
       end
     end
   end
