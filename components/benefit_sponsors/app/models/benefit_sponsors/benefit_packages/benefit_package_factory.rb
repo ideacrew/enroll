@@ -21,7 +21,6 @@ module BenefitSponsors
       def initialize_benefit_package(args)
         @benefit_package = @benefit_application.benefit_packages.build
         @benefit_package.assign_attributes(args)
-        binding.pry
         @benefit_package.save
       end
 
