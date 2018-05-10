@@ -131,7 +131,11 @@ class User
     end
   end
 
-  def is_active_broker?(profile_id)
+  def is_active_broker?(employer_profile)
+    person == employer_profile.active_broker if employer_profile.active_broker
+  end
+
+  def is_benefit_sponsor_active_broker?(profile_id)
     profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(profile_id)).first
     employer_profile =  profile_organization.employer_profile if profile_organization.present?
     person == employer_profile.active_broker if employer_profile.active_broker

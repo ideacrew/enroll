@@ -776,8 +776,8 @@ class CensusEmployee < CensusMember
   end
 
   def self.roster_import_fallback_match(f_name, l_name, dob, bg_id)
-    fname_exp = g.compile(::Regexp.escape(f_name), true)
-    lname_exp = g.compile(::Regexp.escape(l_name), true)
+    fname_exp = ::Regexp.compile(::Regexp.escape(f_name), true)
+    lname_exp = ::Regexp.compile(::Regexp.escape(l_name), true)
     self.where({
       first_name: fname_exp,
       last_name: lname_exp,
