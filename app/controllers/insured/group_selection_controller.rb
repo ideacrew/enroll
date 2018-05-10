@@ -68,6 +68,10 @@ class Insured::GroupSelectionController < ApplicationController
 
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
+    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
+    if invalid_member_exist
+      raise "Please select valid enrolling members"
+    end
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -81,7 +85,6 @@ class Insured::GroupSelectionController < ApplicationController
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
-      raise "Errors: #{hbx_enrollment.errors.full_messages.join("\n")}" if hbx_enrollment.errors.any?
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
   rescue Exception => error
