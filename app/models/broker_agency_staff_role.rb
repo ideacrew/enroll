@@ -13,7 +13,8 @@ class BrokerAgencyStaffRole
 
   associated_with_one :broker_agency_profile, :benefit_sponsors_broker_agency_profile_id, "BenefitSponsors::Organizations::BrokerAgencyProfile"
 
-  validates_presence_of :benefit_sponsors_broker_agency_profile_id
+  validates_presence_of :benefit_sponsors_broker_agency_profile_id, :if => Proc.new { |m| m.broker_agency_profile_id.blank? }
+  validates_presence_of :broker_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsors_broker_agency_profile_id.blank? }
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
 

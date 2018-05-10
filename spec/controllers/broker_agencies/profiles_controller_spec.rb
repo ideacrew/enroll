@@ -26,7 +26,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { FactoryGirl.create(:person) }
 
     before(:each) do
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile, person: person)
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile, person: person)
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       FactoryGirl.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
       sign_in(user)
@@ -50,7 +50,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:person) { FactoryGirl.create(:person) }
     before :each do
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile, person: person)
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile, person: person)
       sign_in user
       get :edit, id: broker_agency_profile.id
     end
@@ -196,7 +196,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person1) {broker_role.person}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
+    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile)}
     let(:broker_role) { FactoryGirl.create(:broker_role,  broker_agency_profile: broker_agency_profile, aasm_state: 'active')}
     it "should get organizations for employers where broker_agency_account is active" do
       allow(person).to receive(:broker_role).and_return(nil)
