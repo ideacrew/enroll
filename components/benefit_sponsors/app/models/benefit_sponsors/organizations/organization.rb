@@ -94,6 +94,8 @@ module BenefitSponsors
 
       validates_presence_of :legal_name, :site, :profiles
 
+      validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
+
       before_save :generate_hbx_id
 
       index({ legal_name: 1 })
@@ -190,7 +192,9 @@ module BenefitSponsors
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
       end
 
-
+      def is_benefit_sponsor?
+        employer_profile.present?
+      end
     end
   end
 end

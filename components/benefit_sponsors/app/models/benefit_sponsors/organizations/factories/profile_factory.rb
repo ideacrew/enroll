@@ -215,11 +215,20 @@ module BenefitSponsors
 
         def build_broker_profile(attrs = {})
           Organizations::BrokerAgencyProfile.new(attrs)
-
         end
 
         def build_sponsor_profile(attrs = {})
-          build_sponsor_profile_class.new(attrs)
+          profile = build_sponsor_profile_class.new(attrs)
+          build_benefit_sponsorship(profile)
+          profile
+        end
+
+        def build_benefit_sponsorship(profile)
+          benefit_market = get_market_place
+          self.organization.benefit_sponsorships << BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new({
+            profile_id: profile.id,
+            benefit_market: benefit_market
+          })
         end
 
         def build_sponsor_profile_class
@@ -338,7 +347,8 @@ module BenefitSponsors
         protected
 
         def site
-          BenefitSponsors::ApplicationController::current_site
+          return @site if defined? @site
+          @site = BenefitSponsors::ApplicationController::current_site
         end
 
         def site_key
@@ -351,6 +361,32 @@ module BenefitSponsors
 
         def self.is_employer_profile?
           profile_type == "benefit_sponsor"
+        end
+
+        def get_market_place
+          if site_key == :dc
+            dc_shop_market_place
+          elsif site_key == :cca
+            cca_shop_market_place
+          end
+        end
+
+        def dc_shop_market_place
+          benefit_market_class.where(
+            site_urn: :dc,
+            kind: :aca_shop
+          ).first
+        end
+
+        def cca_shop_market_place
+          benefit_market_class.where(
+            site_urn: :cca,
+            kind: :aca_shop
+          ).first
+        end
+
+        def benefit_market_class
+          ::BenefitMarkets::BenefitMarket
         end
 
         def add_person_contact_info

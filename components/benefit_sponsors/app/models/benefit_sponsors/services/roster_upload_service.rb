@@ -223,7 +223,7 @@ module BenefitSponsors
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
-          benefit_sponsors_employer_profile_id: profile.id,
+          benefit_sponsors_employer_profile_id: profile.parent.active_benefit_sponsorship.id,
           address: build_address(form)
         })
         member.assign_attributes(params)

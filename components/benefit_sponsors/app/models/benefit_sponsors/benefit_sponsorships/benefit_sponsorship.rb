@@ -69,8 +69,10 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      has_many    :census_employees,
-                  class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+      # has_many    :census_employees,
+      #             class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+
+      has_many    :census_employees
 
       belongs_to  :benefit_market, 
                   counter_cache: true,
