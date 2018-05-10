@@ -31,6 +31,7 @@ class CensusEmployee < CensusMember
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId
 
   # Employee linked to this roster record
   field :employee_role_id, type: BSON::ObjectId
@@ -49,7 +50,9 @@ class CensusEmployee < CensusMember
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
-  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
+  validates_presence_of :ssn, :dob, :hired_on, :is_business_owner
+  # validates_presence_of :employer_profile_id
+  validates_presence_of :benefit_sponsors_employer_profile_id
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
