@@ -1,4 +1,3 @@
-require "acapi/subscribers/edi"
 Rails.application.configure do
   # Verifies that versions and hashed value of the package contents in the project's package.json
   config.webpacker.check_yarn_integrity = true
@@ -58,6 +57,9 @@ Rails.application.configure do
   config.active_job.queue_adapter = :resque
 
   HbxIdGenerator.slug!
+  config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+  config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
+
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

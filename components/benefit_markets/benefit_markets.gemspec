@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", "~> 4.2.7.1"
-  s.add_dependency "slim", "~> 3.0.8"
+  s.add_dependency "slim", "~> 3.0.9"
   s.add_dependency "mongoid", "~> 5.4.0"
   # s.add_dependency 'mongoid-multitenancy', '~> 1.2'
   s.add_dependency "aasm", "~> 4.8.0"
@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'pundit', '~> 1.0.1'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'virtus'
-  
+
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'database_cleaner'

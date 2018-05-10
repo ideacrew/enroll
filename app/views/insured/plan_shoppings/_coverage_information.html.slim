@@ -1,7 +1,7 @@
 .table-border.table-responsive
   table.table.table-striped
     thead
-      tr 
+      tr
         th scope="col" = l10n("name")
         th scope="col" = l10n("relationship")
         th scope="col" = l10n("age")
@@ -14,9 +14,9 @@
           td = member.person.full_name
           td = member.primary_relationship
           td = dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob)
-          td.text-right = number_to_currency(@plan.premium_for(member))
-          td.text-right = number_to_currency(@plan.employer_contribution_for(member))
-          td.text-right = number_to_currency(@plan.employee_cost_for(member))
+          td.text-right = @plan.sole_source? && @enrollment.coverage_kind == "health" ? "--" : number_to_currency(@plan.premium_for(member))
+          td.text-right = @plan.sole_source? && @enrollment.coverage_kind == "health" ? "--" : number_to_currency(@plan.employer_contribution_for(member))
+          td.text-right = @plan.sole_source? && @enrollment.coverage_kind == "health" ? "--" : number_to_currency(@plan.employee_cost_for(member))
       tr.gray-row
         td.ext-right.capital colspan="3"
           strong Totals
@@ -28,11 +28,10 @@
           strong = number_to_currency(@plan.total_employee_cost)
       tr
         td.text-right colspan="5" Your coverage start date :
-        td 
+        td
           span.coverage_effective_date = @enrollment.effective_on.strftime("%m/%d/%Y")
       - if @terminate.present? && @terminate_date.present?
         tr
           td.text-right colspan="5" Termination Date:
           td
             span.coverage_effective_date = @terminate_date.strftime("%m/%d/%Y")
-        
