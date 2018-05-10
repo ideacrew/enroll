@@ -58,7 +58,7 @@ class CensusEmployee < CensusMember
 
   validates_presence_of :ssn, :dob, :hired_on, :is_business_owner
   # validates_presence_of :employer_profile_id
-  validates_presence_of :benefit_sponsors_employer_profile_id
+  # validates_presence_of :benefit_sponsors_employer_profile_id
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
