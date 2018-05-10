@@ -69,7 +69,7 @@ module BenefitMarkets
 
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
-    scope :by_issuer,             ->(issuer_profile_id){ where(issuer_profile_id: issuer_profile_id) }
+    scope :by_issuer_profile,     ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
     scope :by_metal_level,        ->(metal_level){ where(metal_level: /#{metal_level}/i) }
    
     def issuer_profile
