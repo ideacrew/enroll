@@ -17,7 +17,7 @@ module BenefitSponsors
       # attr_accessor :benefit_application, :product_packages
       # validates :title, presence: true
 
-      attr_reader :service
+      attr_reader :service, :show_page_model
 
       def sponsored_benefits_attributes=(attributes)
         @sponsored_benefits ||= []
@@ -40,7 +40,9 @@ module BenefitSponsors
       end
 
       def self.for_create(params)
-        self.new(params)
+        form = self.new(params)
+        form.service.load_form_metadata(form)
+        form
       end
 
       def self.for_edit(id)

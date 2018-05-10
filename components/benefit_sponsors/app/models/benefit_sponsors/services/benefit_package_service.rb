@@ -46,6 +46,7 @@ module BenefitSponsors
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
       def find_benefit_application(form)
+        binding.pry
         return @benefit_application if defined? @benefit_application
         @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.find(form.benefit_application_id)
       end
@@ -103,7 +104,8 @@ module BenefitSponsors
         form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << {
             plan_option_kind: sponsored_benefit.plan_option_kind,
-            reference_plan_id: sponsored_benefit.reference_plan_id,
+            # TODO: Field is not present on the model
+            # reference_plan_id: sponsored_benefit.reference_plan_id,
             sponsor_contribution: sponsored_contribution_attributes(sponsored_benefit)
           }
         end
