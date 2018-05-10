@@ -268,7 +268,6 @@ describe BenefitGroup, type: :model do
   end
 end
 
-
 describe BenefitGroup, type: :model do
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
@@ -300,7 +299,6 @@ describe BenefitGroup, type: :model do
   let(:terminate_on_kind_default)     { "end_of_month" }
 
   let(:elected_plans)                 { reference_plan.to_a }
-
 
   let(:relationship_benefits) do
     [
@@ -336,6 +334,7 @@ describe BenefitGroup, type: :model do
       before do
         subject.build_composite_tier_contributions
       end
+
       it "assigns each composite tier type" do
         expect(subject.composite_tier_contributions).to_not be_empty
       end
@@ -512,6 +511,23 @@ describe BenefitGroup, type: :model do
         end
 
       end
+    end
+  end
+
+  context "#monthly_min_employee_cost" do
+    let(:params)                { valid_params }
+    let(:benefit_group)         { BenefitGroup.create(**params) }
+    let(:census_employees)      {create_list(:census_employee, 200, employer_profile_id: benefit_group.plan_year.employer_profile.id)}
+
+    before do
+      # allow(:benefit_group).to receive(:targeted_census_employees).and_return(total_count)
+    end
+
+    it "should return zero" do
+      expect(census_employees.size).to eq 200
+      expect(benefit_group.monthly_employee_cost).to eq [0]
+      expect(benefit_group.monthly_min_employee_cost).to eq 0
+      expect(benefit_group.monthly_max_employee_cost).to eq 0
     end
   end
 
