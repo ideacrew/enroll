@@ -5,10 +5,6 @@
   - if person.contact_addresses.any?
     %addresses
       = render :partial => "events/addresses/address", :collection => person.contact_addresses
-  - if person.is_homeless.present?
-    %is_homeless= person.is_homeless.to_s
-  - if person.is_temporarily_out_of_state.present?
-    %is_temporarily_out_of_state= person.is_temporarily_out_of_state.to_s
   - if person.emails.any?
     %emails
       = render :partial => "events/individuals/email", :collection => person.emails
