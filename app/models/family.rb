@@ -1074,11 +1074,11 @@ class Family
   end
 
   def has_active_consumer_family_members
-    self.active_family_members.collect { |member| member if member.person.consumer_role.present?}
+    self.active_family_members.select { |member| member if member.person.consumer_role.present?}
   end
 
   def has_active_resident_family_members
-    self.active_family_members.collect { |member| member if member.person.is_resident_role_active? }
+    self.active_family_members.select { |member| member if member.person.is_resident_role_active? }
   end
 
   def update_family_document_status!
