@@ -387,13 +387,33 @@ module ApplicationHelper
 
   def display_carrier_logo(plan, options = {:width => 50})
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    carrier_name = plan.carrier_profile.legal_name.extract_value
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+    when "75753DC"
+      "oci"
+    when "21066DC"
+      "uhcma"
+    when "41842DC"
+      "uhic"
+    else
+      plan.carrier_profile.legal_name.extract_value
+    end
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    carrier_name = plan.carrier_profile.legal_name.extract_value
+    hios_id = plan.hios_id[0..6].extract_value
+    carrier_name = case hios_id
+    when "75753DC"
+      "oci"
+    when "21066DC"
+      "uhcma"
+    when "41842DC"
+      "uhic"
+    else
+      plan.carrier_profile.legal_name.extract_value
+    end
     image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
