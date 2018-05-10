@@ -521,7 +521,7 @@ class ConsumerRole
       transitions from: :expired, to: :unverified
     end
 
-    event :move_to_coverall, :after => [:move_to_expired, :notify_of_eligibility_change, :record_transition] do
+    event :move_to_coverall, :after => [:move_to_expired, :record_transition] do
       transitions from: :unverified, to: :expired
       transitions from: :ssa_pending, to: :expired
       transitions from: :dhs_pending, to: :expired
