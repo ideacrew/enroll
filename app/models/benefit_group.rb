@@ -405,19 +405,7 @@ class BenefitGroup
   end
 
   def monthly_max_employee_cost(coverage_kind = nil)
-    return 0 if targeted_census_employees.count > 100
-    targeted_census_employees_participation.collect do |ce|
-      if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-      else
-        if coverage_kind == 'dental'
-          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
-        else
-          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-        end
-      end
-      pcd.total_employee_cost
-    end.max
+    monthly_employee_cost(coverage_kind).max
   end
 
   def targeted_census_employees
