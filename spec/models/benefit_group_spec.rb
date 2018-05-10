@@ -519,10 +519,6 @@ describe BenefitGroup, type: :model do
     let(:benefit_group)         { BenefitGroup.create(**params) }
     let(:census_employees)      {create_list(:census_employee, 200, employer_profile_id: benefit_group.plan_year.employer_profile.id)}
 
-    before do
-      # allow(:benefit_group).to receive(:targeted_census_employees).and_return(total_count)
-    end
-
     it "should return zero" do
       expect(census_employees.size).to eq 200
       expect(benefit_group.monthly_employee_cost).to eq [0]
