@@ -10,7 +10,7 @@ module SponsoredBenefits
       delegate :rating_area, to: :benefit_sponsorship
       delegate :census_employees, to: :benefit_sponsorship
       delegate :plan_design_organization, to: :benefit_sponsorship
-      
+
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date
@@ -171,7 +171,6 @@ module SponsoredBenefits
         end
 
         def enrollment_timetable_by_effective_date(effective_date)
-
           effective_date            = effective_date.to_date.beginning_of_month
           effective_period          = effective_date..(effective_date + 1.year - 1.day)
           open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)

@@ -1,8 +1,8 @@
 module BenefitSponsors
   module Organizations
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
-#      include BenefitSponsors::Employers::EmployerHelper
-      include Concerns::EmployerProfileConcern
+      # include BenefitSponsors::Employers::EmployerHelper
+      include BenefitSponsors::Concerns::EmployerProfileConcern
 
 
       def rating_area
