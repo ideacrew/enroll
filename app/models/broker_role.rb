@@ -122,7 +122,7 @@ class BrokerRole
   end
 
   def has_broker_agency_profile?
-    self.benefit_sponsors_broker_agency_profile_id.present?
+    self.benefit_sponsors_broker_agency_profile_id.present? || self.broker_agency_profile_id.present?
   end
 
   def address=(new_address)
@@ -182,10 +182,14 @@ class BrokerRole
     end
 
     def find_by_broker_agency_profile(broker_agency_profile)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
-      # list_brokers(Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => profile._id))
-      people = (Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id))
-      people.collect(&:broker_role)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile) || broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+      if broker_agency_profile.is_a?(BrokerAgencyProfile)
+        people = (Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id))
+        people.collect(&:broker_role)
+      else
+        people = (Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id))
+        people.collect(&:broker_role)
+      end
     end
 
     def find_candidates_by_broker_agency_profile(broker_agency_profile)
