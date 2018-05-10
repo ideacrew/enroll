@@ -14,6 +14,7 @@ export default class SiteController extends Controller {
 
   addLocation() {
     //clone new location node, unhide remove button, modify name attribute
+    console.log(this);
     var newLocation = document.importNode(this.officeLocationTarget, true)
     newLocation.querySelector('.js-non-primary').classList.remove('d-none')
     newLocation.querySelectorAll('.js-remove').forEach(function(element) {
@@ -32,4 +33,5 @@ export default class SiteController extends Controller {
     //remove itself
     event.target.closest('.js-office-location').remove()
   }
+
 }
