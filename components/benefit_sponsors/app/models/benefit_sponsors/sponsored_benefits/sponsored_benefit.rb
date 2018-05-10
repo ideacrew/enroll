@@ -14,7 +14,9 @@ module BenefitSponsors
 
       field :hbx_id,      type: String
       field :kind,        type: Symbol
+
       field :plan_option_kind, type: String
+      field :plan_option_choice , type: String
 
       embeds_many :products, class_name: "::BenefitMarkets::Products::Product"
       embeds_one  :reference_product, class_name: "::BenefitMarkets::Products::Product"
@@ -28,14 +30,9 @@ module BenefitSponsors
         pricing_determinations.sort_by(&:created_at).last
       end
 
-      def carrier_for_elected_plan=(issuer_name)
-        return if issuer_name.blank?
-        self.products = benefit_sponsor_catalog.products_for(plan_option_kind, issuer_name)
-      end
-
-      def metal_level_for_elected_plan=(metal_level)
-        return if metal_level.blank?
-        self.products = benefit_sponsor_catalog.products_for(plan_option_kind, metal_level)
+      def plan_option_choice=(choice)
+        return if choice.blank?
+        self.products = benefit_sponsor_catalog.products_for(plan_option_kind, choice)
       end
 
       def reference_plan_id=(product_id)

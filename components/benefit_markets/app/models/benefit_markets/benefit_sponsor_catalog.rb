@@ -37,8 +37,8 @@ module BenefitMarkets
       product_package = product_packages.by_kind(plan_option_kind.to_sym).first
       return [] unless product_package
 
-      if plan_option_choice == 'metal_level'
-        product_package.products.by_metal_level(plan_option_choice)
+      if plan_option_kind == 'metal_level'
+        product_package.products.by_metal_level_kind(plan_option_choice)
       elsif 
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(plan_option_choice)
         return [] unless issuer_profile
