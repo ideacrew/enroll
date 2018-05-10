@@ -1,34 +1,16 @@
 $(document).ready(function() {
   $(document).on('click', 'a[href]:not(.disabled).interaction-click-control-other-questions', function(e) {
-    if($('#unsavedOtherQuestionsWarning').length == 1) {
-      e.preventDefault();
-      var self = this;
-      $('#unsavedOtherQuestionsWarning').modal('show');
-      $('.btn.btn-danger').click(function() {
-        window.location.href = $(self).attr('href');
-      });
-      $('.btn.btn-primary').click(function() {
+    //Leave without saving
+    $('.btn.btn-primary').click(function() {
         window.location.href = e.target.href;
       });
-      return false;
-    } else
-    return true;
   });
 
   $(document).on('click', 'a[href]:not(.disabled).interaction-click-control-tax-info', function(e) {
-    if($('#unsavedTaxInfoQuestionsWarning').length == 1) {
-      e.preventDefault();
-      var self = this;
-      $('#unsavedTaxInfoQuestionsWarning').modal('show');
-      $('.btn.btn-danger').click(function() {
-        window.location.href = $(self).attr('href');
-      });
-      $('.btn.btn-primary').click(function() {
+    //Leave without saving
+    $('.btn.btn-primary').click(function() {
         window.location.href = e.target.href;
       });
-      return false;
-    } else
-    return true;
   });
 
   /* attestations */
