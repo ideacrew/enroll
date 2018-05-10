@@ -726,20 +726,37 @@ class Person
     end
 
     def staff_for_employer(employer_profile)
-      self.where(:employer_staff_roles => {
-          '$elemMatch' => {
-              benefit_sponsor_employer_profile_id: employer_profile.id,
-              aasm_state: :is_active}
-          }).to_a
+      if employer_profile.is_a? (EmployerProfile)
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                employer_profile_id: employer_profile.id,
+                aasm_state: :is_active}
+        }).to_a
+      else
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                benefit_sponsor_employer_profile_id: employer_profile.id,
+                aasm_state: :is_active}
+        }).to_a
+      end
     end
 
     def staff_for_employer_including_pending(employer_profile)
-      self.where(:employer_staff_roles => {
-        '$elemMatch' => {
-            benefit_sponsor_employer_profile_id: employer_profile.id,
-            :aasm_state.ne => :is_closed
-        }
+      if employer_profile.is_a? (EmployerProfile)
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                employer_profile_id: employer_profile.id,
+                :aasm_state.ne => :is_closed
+            }
         })
+      else
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                benefit_sponsor_employer_profile_id: employer_profile.id,
+                :aasm_state.ne => :is_closed
+            }
+        })
+      end
     end
 
     # Adds employer staff role to person
@@ -751,8 +768,14 @@ class Person
       return false, 'Person count too high, please contact HBX Admin' if person.count > 1
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
-      employer_staff_role = EmployerStaffRole.create(person: person.first, benefit_sponsor_employer_profile_id: employer_profile._id)
+      if employer_profile.is_a? (EmployerProfile)
+        employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      else
+        employer_staff_role = EmployerStaffRole.create(person: person.first, benefit_sponsor_employer_profile_id: employer_profile._id)
+      end
+
       employer_staff_role.save
+
       return true, person.first
     end
 
@@ -767,7 +790,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.benefit_sponsor_employer_profile_id.to_s == employer_profile_id.to_s && !role.is_closed?}
+      if role = person.employer_staff_roles.detect{|role| (role.benefit_sponsor_employer_profile_id.to_s == employer_profile_id.to_s || role.employer_profile_id.to_s == employer_profile_id.to_s) && !role.is_closed?}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else
