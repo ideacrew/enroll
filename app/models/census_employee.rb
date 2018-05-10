@@ -51,8 +51,8 @@ class CensusEmployee < CensusMember
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
   validates_presence_of :ssn, :dob, :hired_on, :is_business_owner
-  # validates_presence_of :employer_profile_id
-  validates_presence_of :benefit_sponsors_employer_profile_id
+  validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsors_employer_profile_id.blank? }
+  validates_presence_of :benefit_sponsors_employer_profile_id, :if => Proc.new { |m| m.employer_profile_id.blank? }
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
@@ -683,9 +683,9 @@ class CensusEmployee < CensusMember
 
     # Search query string on census employee with first name,last name,SSN.
     def search_hash(s_rex)
-      clean_str = s_rex.strip.split.map{|i| g.escape(i)}.join("|")
+      clean_str = s_rex.strip.split.map{|i| Regexp.escape(i)}.join("|")
       action = s_rex.strip.split.size > 1 ? "$and" : "$or"
-      search_rex = g.compile(clean_str, true)
+      search_rex = Regexp.compile(clean_str, true)
       {
           "$or" => [
               {action => [

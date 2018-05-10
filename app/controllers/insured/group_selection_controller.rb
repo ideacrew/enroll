@@ -15,7 +15,9 @@ class Insured::GroupSelectionController < ApplicationController
       @mc_market_kind = market_kind
       @mc_coverage_kind = coverage_kind
     end
-    @employee_role = @adapter.possible_employee_role 
+    @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |derived_employee_role|
+      @employee_role = derived_employee_role
+    end
     @market_kind = @adapter.select_market(params)
     @resident = @adapter.possible_resident_person
     if @adapter.can_ivl_shop?(params)
@@ -29,16 +31,16 @@ class Insured::GroupSelectionController < ApplicationController
     end
     @qle = @adapter.is_qle?
 
-    # This is needed for the below two calls
-    @adapter.ensure_previous_shop_sep_enrollment_if_not_provided(params)
-    @hbx_enrollment = @adapter.previous_hbx_enrollment
-    @waivable = @adapter.can_waive?(params)
+    @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment) do |enrollment, can_waive|
+      @hbx_enrollment = enrollment
+      @waivable = can_waive
+    end
 
-    # Benefit group is what we will need
+    # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)
 
-    @adapter.generate_coverage_family_members_for_cobra(params) do |cobra_members|
+    @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
       @coverage_family_members_for_cobra = cobra_members
     end
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
