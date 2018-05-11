@@ -385,19 +385,19 @@ module ApplicationHelper
     return link
   end
 
-  def carrier_logo(plan, options)
+  def carrier_logo(plan)
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
     issuer_hios_id = plan.hios_id[0..4].extract_value
     Settings.aca.carrier_hios_logo_variant.present? ? Settings.aca.carrier_hios_logo_variant[issuer_hios_id] : plan.carrier_profile.legal_name.extract_value
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
-    carrier_name = carrier_logo(plan, options)
+    carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
-    carrier_name = carrier_logo(plan, options)
+    carrier_name = carrier_logo(plan)
     image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 

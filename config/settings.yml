@@ -126,7 +126,7 @@ aca:
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
-  carrier_hios_logo_variant: nil
+  carrier_hios_logo_variant: ""
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
   plan_option_years:
