@@ -116,7 +116,6 @@ group :development, :test do
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
-  gem "parallel_tests"
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rails'
