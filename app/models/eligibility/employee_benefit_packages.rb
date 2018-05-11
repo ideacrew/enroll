@@ -2,6 +2,7 @@ module Eligibility
   module EmployeeBenefitPackages
 
     def assign_default_benefit_package
+      # TODO
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
         if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
@@ -29,7 +30,7 @@ module Eligibility
 
     def add_default_benefit_group_assignment
       if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
-        add_benefit_group_assignment(plan_year.benefit_groups.first)
+        add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.benefit_groups.first.start_on)
         if self.employer_profile.renewing_plan_year.present?
           add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
         end

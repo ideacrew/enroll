@@ -7,11 +7,10 @@ module BenefitSponsors
 
       attribute :kind, String
       attribute :plan_option_kind, String
-      attribute :carrier_for_elected_plan, String
-      attribute :metal_level_for_elected_plan, String
+      attribute :plan_option_choice, String
 
       attribute :products, Array[BenefitProductForm]
-      attribute :reference_product, BenefitProductForm
+      attribute :reference_plan_id, String
 
       attribute :sponsor_contribution, SponsorContributionForm
       attribute :pricing_determinations, Array[PricingDeterminationForm]
@@ -19,10 +18,7 @@ module BenefitSponsors
       attr_accessor :sponsor_contribution
 
       def sponsor_contribution_attributes=(attributes)
-        @sponsor_contribution ||= []
-        attributes.each do |i, sponsor_contribution_attributes|
-          @sponsor_contribution.push(SponsorContributionForm.new(sponsor_contribution_attributes))
-        end
+        @sponsor_contribution = SponsorContributionForm.new(attributes)
       end
 
       def self.for_new

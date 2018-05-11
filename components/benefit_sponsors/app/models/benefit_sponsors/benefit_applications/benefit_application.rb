@@ -111,6 +111,35 @@ module BenefitSponsors
           )
       }
 
+      def renew(benefit_period)
+        renewal_application = benefit_sponsorship.benefit_applications.new
+
+        renewal_application.fte_count = fte_count
+        renewal_application.pte_count = pte_count
+        renewal_application.msp_count = msp_count
+
+        # renewal_application.effective_period = 
+        # renewal_application.open_enrollment_period = 
+        
+        benefit_market = benefit_sponsorship.benefit_market
+        benefit_market_catalog = benefit_market.benefit_market_catalog_for(effective_period.begin)
+        benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_area)
+
+        renewal_application.benefit_sponsor_catalog = benefit_sponsor_catalog
+
+        benefit_packages.each do |benefit_package|
+          renewal_application.benefit_packages << benefit_package.renew
+        end
+      end
+
+      def terminate
+
+      end
+
+      def reinstate
+
+      end
+
       # after_update :update_employee_benefit_packages
       # TODO: Refactor code into benefit package updater
       def update_employee_benefit_packages
@@ -408,16 +437,8 @@ module BenefitSponsors
       end
 
       class << self
-        def find(id)
-          application = nil
-          BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships.benefit_applications._id" => BSON::ObjectId.from_string(id)).each do |pdo|
-            sponsorships = pdo.try(:benefit_sponsorships) || []
-            sponsorships.each do |sponsorship|
-              application = sponsorship.benefit_applications.detect { |benefit_application| benefit_application._id == BSON::ObjectId.from_string(id) }
-              break if application.present?
-            end
-          end
-          application
+        def find(id)          
+          BenefitSponsors::BenefitApplications::BenefitApplication.where(id: BSON::ObjectId.from_string(id)).first
         end
       end
 

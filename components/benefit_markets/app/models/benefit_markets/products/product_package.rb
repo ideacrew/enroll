@@ -29,6 +29,9 @@ module BenefitMarkets
     validates_presence_of :product_kind, :kind, :application_period
     validates_presence_of :title, :allow_blank => false
 
+    scope :by_kind,             ->(kind){ where(kind: kind) }
+    scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
+
     def benefit_market_kind
       packagable.benefit_market_kind
     end
@@ -40,7 +43,7 @@ module BenefitMarkets
 
     def issuer_profile_products_for(issuer_profile)
       return @issuer_profile_products if defined?(@issuer_profile_products)
-      @issuer_profile_products = products.collect { |issuer_profile| product.issuer_profile == issuer_profile }
+      @issuer_profile_products = products.by_issuer_profile(issuer_profile)
     end
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
@@ -68,6 +71,16 @@ module BenefitMarkets
     # BenefitMarket::Products available for purchase within a specified service area
     def benefit_market_products_available_where(service_area)
       all_benefit_market_products.select { |product| product.service_area == service_area }
+    end
+
+    def products_for_plan_option_choice(plan_option_choice)
+      if kind == :metal_level
+        product_package.products.by_metal_level(plan_option_choice)
+      else
+        issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(plan_option_choice)
+        return [] unless issuer_profile
+        issuer_profile_products_for(issuer_profile)
+      end
     end
 
     def add_product(new_product)

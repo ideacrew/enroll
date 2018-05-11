@@ -69,6 +69,9 @@ module BenefitMarkets
 
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
+    scope :by_metal_level_kind,   ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
+    scope :by_issuer_profile,     ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
+   
     def issuer_profile
       return @issuer_profile if defined?(@issuer_profile)
       @issuer_profile = ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_profile_id)

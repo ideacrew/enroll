@@ -8,7 +8,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :title, String
       attribute :description, String
-      attribute :probation_period_kind, String
+      attribute :probation_period_kind, Symbol
       attribute :benefit_application_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
 
@@ -17,7 +17,7 @@ module BenefitSponsors
       # attr_accessor :benefit_application, :product_packages
       # validates :title, presence: true
 
-      attr_reader :service
+      attr_reader :service, :show_page_model
 
       def sponsored_benefits_attributes=(attributes)
         @sponsored_benefits ||= []
@@ -45,15 +45,15 @@ module BenefitSponsors
         form
       end
 
-      def self.for_edit(id)
-        form = self.new(id: id)
+      def self.for_edit(params)
+        form = self.new(params)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
       end
 
-      def self.for_update(id)
-        form = self.new(id: id)
+      def self.for_update(params)
+        form = self.new(params)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
@@ -67,12 +67,17 @@ module BenefitSponsors
         true
       end
 
-      def new_record?
-        true
-      end
-
       def save
         persist
+      end
+
+      def update_attributes(params)
+        self.attributes = params
+        persist(update: true)
+      end
+
+      def new_record?
+        true
       end
     end
   end

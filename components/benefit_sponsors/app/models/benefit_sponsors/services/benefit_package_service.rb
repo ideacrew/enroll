@@ -20,13 +20,14 @@ module BenefitSponsors
       end
 
       def load_form_params_from_resource(form)
+        application  = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
         attributes_to_form_params(benefit_package, form)
       end
 
       def save(form)
-        model_attributes = form_params_to_attributes(form)
         benefit_application = find_benefit_application(form)
+        model_attributes = form_params_to_attributes(form)
         benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
         store(form, benefit_package)
       end
@@ -41,29 +42,13 @@ module BenefitSponsors
       # TODO: Test this query for benefit applications cca/dc
       # TODO: Change it back to find once find method on BenefitApplication is fixed.
       def find_model_by_id(id)
-        BenefitSponsors::BenefitPackages::BenefitPackage.where(id: id).first
+        @benefit_application.benefit_packages.find(id)
       end
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
       def find_benefit_application(form)
         return @benefit_application if defined? @benefit_application
-        @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(id: form.benefit_application_id).first
-      end
-
-      def attributes_to_form_params(benefit_package, form)
-        form.attributes = {
-          title: benefit_package.title,
-          description: benefit_package.description,
-          probation_period_kind: benefit_package.probation_period_kind
-        }
-      end
-
-      def form_params_to_attributes(form)
-        {
-          title: form.title,
-          description: form.description,
-          probation_period_kind: form.probation_period_kind,
-        }
+        @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.find(form.benefit_application_id)
       end
 
       def store(form, benefit_package)
@@ -91,6 +76,76 @@ module BenefitSponsors
       # close together - normally this will be more complex
       def map_model_error_attribute(model_attribute_name)
         model_attribute_name
+      end
+
+      private
+
+      def attributes_to_form_params(benefit_package, form)
+        form.attributes = {
+          title: benefit_package.title,
+          description: benefit_package.description,
+          probation_period_kind: benefit_package.probation_period_kind,
+          sponsored_benefits: sponsored_benefits_attributes_to_form_params(benefit_package)
+        }
+        form.attributes
+      end
+
+      def sponsored_benefits_attributes_to_form_params(benefit_package)
+        benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
+          sponsored_benefits << Forms::SponsoredBenefitForm.new({
+            plan_option_kind: sponsored_benefit.plan_option_kind,
+            kind: sponsored_benefit.kind,
+            plan_option_choice: sponsored_benefit.plan_option_choice,
+            reference_plan_id: sponsored_benefit.reference_product.id,
+            sponsor_contribution: sponsored_contribution_attributes_to_form_params(sponsored_benefit)
+          })
+        end
+      end
+
+      def sponsored_contribution_attributes_to_form_params(sponsored_benefit)
+        contribution_levels = sponsored_benefit.sponsor_contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
+          contribution_levels << Forms::ContributionLevelForm.new({
+            display_name: contribution_level.display_name,
+            contribution_factor: contribution_level.contribution_factor,
+            is_offered: contribution_level.is_offered
+          })
+        end
+        Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})
+      end
+
+      def form_params_to_attributes(form)
+        attributes = {
+          title: form.title,
+          description: form.description,
+          probation_period_kind: form.probation_period_kind
+        }
+        attributes[:sponsored_benefits] = sponsored_benefits_attributes(form)
+        attributes
+      end
+
+      def sponsored_benefits_attributes(form)
+        form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
+          sponsored_benefits << {
+            plan_option_kind: sponsored_benefit.plan_option_kind,
+            kind: sponsored_benefit.kind,
+            plan_option_choice: sponsored_benefit.plan_option_choice,
+            reference_plan_id: sponsored_benefit.reference_plan_id,
+            sponsor_contribution: sponsored_contribution_attributes(sponsored_benefit)
+          }
+        end
+      end
+
+      def sponsored_contribution_attributes(sponsored_benefit)
+        contribution = sponsored_benefit.sponsor_contribution
+        contribution_levels = contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
+          contribution_levels << {
+            display_name: contribution_level.display_name,
+            contribution_factor: contribution_level.contribution_factor,
+            is_offered: contribution_level.is_offered
+          }
+        end
+
+        { contribution_levels: contribution_levels}
       end
     end
   end

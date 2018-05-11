@@ -108,14 +108,14 @@ class EmployeeRole
   end
 
   def new_census_employee=(new_census_employee)
-    raise ArgumentError.new("expected CensusEmployee class") unless new_census_employee.is_a? CensusEmployee
+    raise ArgumentError.new("expected CensusEmployee class") unless new_census_employee.is_a? ::CensusEmployee
     self.census_employee_id = new_census_employee._id
     @census_employee = new_census_employee
   end
 
   def new_census_employee
     return @census_employee if defined? @census_employee
-    @census_employee = BenefitSponsors::CensusMembers::CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
+    @census_employee = ::CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
   end
 
   alias_method :census_employee=, :new_census_employee=

@@ -86,7 +86,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     it "should get hbx_enrollment when has active hbx_enrollments and in qle flow" do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
-      allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
+      # FIXME: This is no better than mocking the controller itself on the
+      # #selected_enrollment method - and we need to actually mock out the items
+      # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
+      allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop'
@@ -112,7 +115,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should get hbx_enrollment when has enrolled hbx_enrollments and in shop qle flow but user has both employee_role and consumer_role" do
-      allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
+      # FIXME: This is no better than mocking the controller itself on the
+      # #selected_enrollment method - and we need to actually mock out the items
+      # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
+      allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
@@ -126,8 +132,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should disable individual market kind if selected market kind is shop in dual role SEP" do
+      # FIXME: This is no better than mocking the controller itself on the
+      # #selected_enrollment method - and we need to actually mock out the items
+      # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
+      allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
-      allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
@@ -138,12 +147,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       let(:census_employee) {FactoryGirl.build(:census_employee)}
 
       before do
-        controller.instance_variable_set(:@hbx_enrollment, hbx_enrollment)
+        allow(HbxEnrollment).to receive(:find).with("123").and_return(hbx_enrollment)
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
         allow(hbx_enrollment).to receive(:kind).and_return "individual"
         allow(employee_role).to receive(:census_employee).and_return census_employee
         sign_in user
-        get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan'
+        get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan', hbx_enrollment_id: "123"
       end
 
       it "should set market kind when user select to make changes in open enrollment" do
