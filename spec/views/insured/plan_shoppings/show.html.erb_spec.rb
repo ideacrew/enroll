@@ -37,7 +37,7 @@ RSpec.describe "insured/show" do
     current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
   end
 
-  it 'should display information about t  he employee when signed in as Broker' do
+  it 'should display information about the employee when signed in as Broker' do
     sign_in current_broker_user
     render :template => "insured/plan_shoppings/show.html.slim"
     expect(rendered).to have_selector('span', text:  @person.full_name)
