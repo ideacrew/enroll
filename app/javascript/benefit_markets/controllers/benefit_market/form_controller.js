@@ -6,7 +6,7 @@ export default class extends Controller {
   initialize() {
   	this.configurationChange({ currentTarget: this.selectTarget })
   }
-  
+
   configurationChange(event) {
   	Array.prototype.forEach.call(event.currentTarget.options, (option) => {
       this[`${option.value}Target`].classList.add('d-none');
