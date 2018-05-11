@@ -8,7 +8,11 @@ module PortalHeaderHelper
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role)
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id), class: "portal"
+      if current_user.person.broker_role.broker_agency_profile.is_a? BrokerAgencyProfile
+        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, main_app.broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
+      else
+        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id), class: "portal"
+      end
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
     elsif current_user.person && current_user.person.active_employee_roles.any?
