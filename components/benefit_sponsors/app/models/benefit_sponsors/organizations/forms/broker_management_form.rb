@@ -12,7 +12,6 @@ module BenefitSponsors
         @broker_agency_profile_id = val
       end
 
-      # for create
       def self.for_create(attrs)
         create_for = new(attrs)
         create_for
@@ -28,13 +27,13 @@ module BenefitSponsors
 
       protected
 
-      def self.resolve_service(attrs ={})
-        Services::BrokerManagementService.new(attrs)
+      def self.resolve_service
+        Services::BrokerManagementService.new
       end
 
-      def service(attrs={})
+      def service
         return @service if defined?(@service)
-        @service = self.class.resolve_service(attrs)
+        @service = self.class.resolve_service
       end
     end
   end

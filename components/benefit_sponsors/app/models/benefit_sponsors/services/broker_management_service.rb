@@ -2,12 +2,6 @@ module BenefitSponsors
   module Services
     class BrokerManagementService
 
-      # attr_accessor :employer_profile_id, :broker_agency_profile_id, :broker_role_id
-
-      def initialize(attrs={})
-        # @employer_profile = BenefitSponsors::Organizations::Profile.find(attrs[:employer_profile_id])
-      end
-
       def assign_agencies(form)
         assign_agencies_for_employer(form)
       end
@@ -76,7 +70,6 @@ module BenefitSponsors
         msg_box.post_message(message)
         msg_box.save
       end
-
     end
   end
 end

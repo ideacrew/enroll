@@ -86,11 +86,11 @@ module BenefitSponsors
       end
 
       def active_benefit_sponsorship
-        organization.active_benefit_sponsorship
+        organization.active_benefit_sponsorship rescue nil
       end
 
       def active_broker_agency_account
-        active_benefit_sponsorship.active_broker_agency_account
+        active_benefit_sponsorship.active_broker_agency_account rescue nil
       end
 
       def broker_agency_profile
@@ -122,13 +122,14 @@ module BenefitSponsors
       def fire_broker_agency(terminate_on = today)
         return unless active_broker_agency_account
         active_broker_agency_account.update_attributes!(end_on: terminate_on, is_active: false)
+        # TODO fix these during notices implementation
         # employer_broker_fired
         # notify_broker_terminated
         # broker_fired_confirmation_to_broker
       end
 
       def broker_fired_confirmation_to_broker
-          trigger_notices('broker_fired_confirmation_to_broker')
+        trigger_notices('broker_fired_confirmation_to_broker')
       end
 
       def employer_broker_fired
