@@ -22,15 +22,15 @@ module BenefitSponsors
 
       # Origination of this BenefitSponsorship instance in association
       # with BenefitMarkets::APPLICATION_INTERVAL_KINDS
-      #   :self_serve               =>  sponsor independently joined HBX with initial effective date 
+      #   :self_serve               =>  sponsor independently joined HBX with initial effective date
       #                                 coinciding with standard benefit application interval
-      #   :conversion               =>  sponsor transferred to HBX with initial effective date 
+      #   :conversion               =>  sponsor transferred to HBX with initial effective date
       #                                 immediately following benefit expiration in prior system
       #   :mid_plan_year_conversion =>  sponsor transferred to HBX with effective date during active plan
-      #                                 year, before benefit expiration in prior system, and benefits are 
+      #                                 year, before benefit expiration in prior system, and benefits are
       #                                 carried over to HBX
       #   :reapplied                =>  sponsor, previously active on HBX, voluntarily terminated early
-      #                                 and sponsorship continued without interuption, or sponsor returned 
+      #                                 and sponsorship continued without interuption, or sponsor returned
       #                                 following time period gap in benefit coverage
       #   :restored                 =>  sponsor, previously active on HBX, was involuntarily terminated
       #                                 and sponsorship resumed according to HBX policy
@@ -41,7 +41,7 @@ module BenefitSponsors
       field :profile_id,          type: BSON::ObjectId
       field :contact_method,      type: Symbol, default: :paper_and_electronic
 
-      # Effective begin/end are the date period during which this benefit sponsorship is active.  
+      # Effective begin/end are the date period during which this benefit sponsorship is active.
       # effective_begin_on is date with initial application coverage effectuates
       # effective_end_on reflects date when all benefit applications are terminate and sponsorship terminates
       field :effective_begin_on,  type: Date
@@ -61,8 +61,8 @@ module BenefitSponsors
 
       delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
 
-      belongs_to  :organization, 
-                  inverse_of: :benefit_sponorships, 
+      belongs_to  :organization,
+                  inverse_of: :benefit_sponorships,
                   counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
@@ -72,11 +72,12 @@ module BenefitSponsors
       has_many    :census_employees,
                   class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
 
-      belongs_to  :benefit_market, 
+      belongs_to  :benefit_market,
                   counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarket"
 
-      has_many    :service_areas, 
+      belongs_to  :service_area,
+                  counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
