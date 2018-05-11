@@ -51,9 +51,6 @@ module BenefitSponsors
       field :origin_kind,         type: Symbol, default: :self_serve
       field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
-      field :rating_area_id,      type: BSON::ObjectId
-      field :service_area_id,     type: BSON::ObjectId
-
       # This sponsorship's workflow status
       field :aasm_state,    type: String, default: :applicant do
         error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
@@ -75,6 +72,10 @@ module BenefitSponsors
       belongs_to  :benefit_market,
                   counter_cache: true,
                   class_name: "::BenefitMarkets::BenefitMarket"
+
+      belongs_to  :rating_area,
+                  :counter_cache: true,
+                  class_name: "::BenefitMarkets::Locations::RatingArea"
 
       belongs_to  :service_area,
                   counter_cache: true,
