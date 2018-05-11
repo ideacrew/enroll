@@ -1,8 +1,16 @@
 module BenefitMarkets
   module Products
     class ProductPackageFactory
-      def self.call(benefit_option_kind:, benefit_catalog:, title:, contribution_model:, pricing_model:, **other_params)
-        build_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, other_params)
+      def self.build
+        BenefitMarkets::Products::ProductPackage.new
+      end
+
+      def self.call(benefit_catalog:, benefit_option_kind:, title:, contribution_model:, pricing_model:, **other_params)
+        benefit_catalog.product_packages.build kind: benefit_option_kind,
+          title: title,
+          contribution_model: contribution_model,
+          pricing_model: pricing_model,
+          **other_params
       end
 
       def self.validate(product_package)
@@ -45,7 +53,7 @@ module BenefitMarkets
 
       def self.is_contribution_model_satisfied?(product_package)
         contribution_model = product_package.contribution_model
-        return true if product_package.contribution_model.nil?
+        return true if contribution_model.nil?
         unless contribution_model.product_multiplicities.include?(product_package.product_multiplicity)
           product_package.errors.add(:contribution_model_id, "does not match the multiplicity of the product package")
           return false
