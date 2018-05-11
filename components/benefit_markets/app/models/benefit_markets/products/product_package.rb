@@ -75,7 +75,7 @@ module BenefitMarkets
 
     def products_for_plan_option_choice(plan_option_choice)
       if kind == :metal_level
-        product_package.products.by_metal_level(plan_option_choice)
+        products.by_metal_level(plan_option_choice)
       else
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(plan_option_choice)
         return [] unless issuer_profile
