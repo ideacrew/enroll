@@ -1,8 +1,10 @@
+# Timescapes::BenefitPeriod
+# Single interval -- typically annual, when the HBX hosts Issuer Products that Sponsors
+# may offer to their Members
 module BenefitMarkets
   class Timescapes::BenefitPeriod
     include Mongoid::Document
     include Mongoid::Timestamps
-
 
     field :begin_on,  type: Date
     field :end_on,    type: Date
@@ -10,11 +12,9 @@ module BenefitMarkets
     validates_presence_of :begin_on, :end_on
     validate :ascending_dates
 
-
-    scope :active_period_on,   ->(compare_date = TimeKeeper.date_of_record) { 
+    scope :active_period_on,   ->(compare_date = TimeKeeper.date_of_record) {
         where(:"begin_on".lte  => compare_date, :"end_on".gte => compare_date).first
       }
-
 
     def cover?(compare_date)
       return false unless begin_on.present? && end_on.present?
@@ -33,6 +33,5 @@ module BenefitMarkets
     def ascending_dates
       # raise StandardError "begin date must start on or before end date" unless (self.begin_on <= self.end_on)
     end
-
   end
 end
