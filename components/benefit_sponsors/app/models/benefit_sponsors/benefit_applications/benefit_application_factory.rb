@@ -16,18 +16,8 @@ module BenefitSponsors
 
       def initialize(benefit_sponsorship, args)
         @benefit_sponsorship = benefit_sponsorship
-        initialize_benefit_application
+        @benefit_application = benefit_sponsorship.benefit_applications.new
         assign_application_attributes(args)
-      end
-
-      def initialize_benefit_application
-        # benefit_market = benefit_sponsorship.benefit_market
-        # site_key = benefit_market.site_urn
-        # klass_name  = [benefit_market.kind.to_s.camelcase, site_key.to_s.camelcase, "BenefitApplication"].join('')
-        # @benefit_application = [parent_namespace_for(self.class), klass_name].join("::").constantize.new
-
-        @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.new
-        @benefit_application.benefit_sponsorship = benefit_sponsorship
       end
 
       def benefit_application
@@ -35,12 +25,6 @@ module BenefitSponsors
       end
 
       protected
-
-      def parent_namespace_for(klass)
-        klass_name = klass.to_s.split("::")
-        klass_name.slice!(-1) || []
-        klass_name.join("::")
-      end
 
       def assign_application_attributes(args)
         return nil if args.blank?

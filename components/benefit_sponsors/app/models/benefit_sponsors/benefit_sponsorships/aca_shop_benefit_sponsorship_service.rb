@@ -1,16 +1,74 @@
 module BenefitSponsors
+  class BenefitSponsorships::AcaShopBenefitApplicationService
+
+    def initialize(benefit_application)
+      @benefit_application = benefit_application
+    end
+
+    def renew
+      @benefit_sponsorship = @benefit_application.benefit_sponsorship
+      @benefit_application.renew(renewal_benefit_period)
+    end
+
+    # benefit_market_catalog - ?
+    # benefit_sponsor_catalog
+    def terminate
+    end
+
+    def reinstate
+    end
+  end
+end
+
+module BenefitSponsors
   class BenefitSponsorships::AcaShopBenefitSponsorshipService
 
+    def initialize(benefit_sponsorship)
+      @benefit_sponsorship = benefit_sponsorship
+    end
 
+    # How's this related to benefit application factory? 
     def initiate_benefit_application(effective_date)
 
       benefit_application
     end
 
+    # Trigger : Periodic automatic renewal
+    #         : Manual renewals for conversion & error recovery
     # Must have uninterrupted coverage between application periods
     def renew_benefit_application(benefit_application)
+      # Verify benefit sponsor states
+      # Verify states to check if application is eligible for renewal
+      # Instantiate renewal application
+      #   - Get the renewal schedule using schedular and populate dates
+      #   - benefit sponsor catalog (build & store)
+      #     - check for late rates
+      #     - check availability (service areas)
+      #     
+      #   - Renew benefit packages
+      #     - construct benefit package
+      #       - construct sponsored benefits
+      #         - Map products to renewal products
+      #     - Add Renewal benefit package assignments
+      #   - Trigger notices if any
 
+      benefit_sponsorship = benefit_application.benefit_sponsorship
+      renewal_effective_date = benefit_application.effective_period.end.next_day
+
+      renewal_application_dates = renewal_schedule_for(renewal_effective_date)
+      renewal_benefit_application = benefit_sponsorship.benefit_applications.build(renewal_application_dates)
+      
+      renewal_benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date)
       renewal_benefit_application
+    end
+
+    def renewal_schedule_for(effective_date)
+      open_enrollment_start_on = effective_date - 2.months
+      open_enrollment_end_on = Date.new((effective_date - 1.month).year, (effective_date - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+      {
+        effective_period: (effective_date..effective_date.next_year.prev_day),
+        open_enrollment_period: (open_enrollment_start_on..open_enrollment_end_on)
+      }
     end
 
     # Must have uninterrupted coverage between periods

@@ -14,14 +14,18 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  BROKER_CARRIER_APPOINTMENTS = {"Aetna Health Inc" => nil,
-    "Aetna Life Insurance Company" => nil,
-     "Carefirst Bluechoice Inc" => nil,
-     "Group Hospitalization and Medical Services Inc" => nil,
-     "Kaiser Foundation" => nil,
-     "Optimum Choice" => nil,
-     "United Health Care Insurance" => nil,
-     "United Health Care Mid Atlantic" => nil}
+  BROKER_CARRIER_APPOINTMENTS = {"Altus" => nil,
+    "Blue Cross Blue Shield MA" => nil,
+     "Boston Medical Center Health Plan" => nil,
+     "Delta" => nil,
+     "FCHP" => nil,
+     "Guardian" => nil,
+     "Health New England" => nil,
+     "Harvard Pilgrim Health Care" => nil,
+     "Minuteman Health" => nil,
+     "Neighborhood Health Plan" => nil,
+     "Tufts Health Plan Direct" => nil,
+     "Tufts Health Plan Premier" => nil}
 
   embedded_in :person
 
@@ -247,12 +251,20 @@ class BrokerRole
 
     def agencies_with_matching_broker(search_str)
       broker_role_ids = brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:id)
-
-      Person.collection.raw_aggregate([
-        {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
-        {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
-      ]).map do |record|
-        record["_id"]
+      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect{|b|b.benefit_sponsors_broker_agency_profile_id}.present?
+        Person.collection.raw_aggregate([
+                                            {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
+                                            {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
+                                        ]).map do |record|
+          record["_id"]
+        end
+      else
+        Person.collection.raw_aggregate([
+                                            {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
+                                            {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+                                        ]).map do |record|
+          record["_id"]
+        end
       end
     end
   end

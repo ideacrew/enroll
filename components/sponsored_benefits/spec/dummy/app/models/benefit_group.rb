@@ -8,7 +8,7 @@ class BenefitGroup
   field :elected_plan_ids, type: Array, default: []
 
   embeds_many :relationship_benefits, cascade_callbacks: true
-      
+
   def self.find(id)
   end
 
