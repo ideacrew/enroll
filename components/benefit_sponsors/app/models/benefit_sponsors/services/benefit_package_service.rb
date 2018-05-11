@@ -20,6 +20,7 @@ module BenefitSponsors
       end
 
       def load_form_params_from_resource(form)
+        application  = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
         attributes_to_form_params(benefit_package, form)
       end
@@ -41,7 +42,7 @@ module BenefitSponsors
       # TODO: Test this query for benefit applications cca/dc
       # TODO: Change it back to find once find method on BenefitApplication is fixed.
       def find_model_by_id(id)
-        BenefitSponsors::BenefitPackages::BenefitPackage.where(id: id).first
+        @benefit_application.benefit_packages.find(id)
       end
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
@@ -49,15 +50,6 @@ module BenefitSponsors
         return @benefit_application if defined? @benefit_application
         @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.find(form.benefit_application_id)
       end
-
-      def attributes_to_form_params(benefit_package, form)
-        form.attributes = {
-          title: benefit_package.title,
-          description: benefit_package.description,
-          probation_period_kind: benefit_package.probation_period_kind
-        }
-      end
-
 
       def store(form, benefit_package)
         valid_according_to_factory = benefit_package_factory.validate(benefit_application)
@@ -86,7 +78,40 @@ module BenefitSponsors
         model_attribute_name
       end
 
-      private 
+      private
+
+      def attributes_to_form_params(benefit_package, form)
+        form.attributes = {
+          title: benefit_package.title,
+          description: benefit_package.description,
+          probation_period_kind: benefit_package.probation_period_kind,
+          sponsored_benefits: sponsored_benefits_attributes_to_form_params(benefit_package)
+        }
+        form.attributes
+      end
+
+      def sponsored_benefits_attributes_to_form_params(benefit_package)
+        benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
+          sponsored_benefits << Forms::SponsoredBenefitForm.new({
+            plan_option_kind: sponsored_benefit.plan_option_kind,
+            kind: sponsored_benefit.kind,
+            plan_option_choice: sponsored_benefit.plan_option_choice,
+            reference_plan_id: sponsored_benefit.reference_product.id,
+            sponsor_contribution: sponsored_contribution_attributes_to_form_params(sponsored_benefit)
+          })
+        end
+      end
+
+      def sponsored_contribution_attributes_to_form_params(sponsored_benefit)
+        contribution_levels = sponsored_benefit.sponsor_contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
+          contribution_levels << Forms::ContributionLevelForm.new({
+            display_name: contribution_level.display_name,
+            contribution_factor: contribution_level.contribution_factor,
+            is_offered: contribution_level.is_offered
+          })
+        end
+        Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})
+      end
 
       def form_params_to_attributes(form)
         attributes = {
@@ -94,7 +119,6 @@ module BenefitSponsors
           description: form.description,
           probation_period_kind: form.probation_period_kind
         }
-
         attributes[:sponsored_benefits] = sponsored_benefits_attributes(form)
         attributes
       end
@@ -103,9 +127,10 @@ module BenefitSponsors
         form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << {
             plan_option_kind: sponsored_benefit.plan_option_kind,
+            kind: sponsored_benefit.kind,
             plan_option_choice: sponsored_benefit.plan_option_choice,
             reference_plan_id: sponsored_benefit.reference_plan_id,
-            sponsor_contributions: sponsored_contribution_attributes(sponsored_benefit)
+            sponsor_contribution: sponsored_contribution_attributes(sponsored_benefit)
           }
         end
       end

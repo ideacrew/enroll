@@ -17,7 +17,17 @@ module BenefitSponsors
       end
 
       def edit
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.require(:id))
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.permit(:id, :benefit_application_id))
+      end
+
+      def update
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(params.permit(:id, :benefit_application_id))
+        if @benefit_package_form.update_attributes(benefit_package_params)
+          redirect_to benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+        else
+          flash[:error] = error_messages(@benefit_package_form)
+          render :edit
+        end
       end
 
       private
@@ -29,7 +39,7 @@ module BenefitSponsors
       def benefit_package_params
         params.require(:benefit_package).permit(
           :title, :description, :probation_period_kind, :benefit_application_id,
-          :sponsored_benefits_attributes => [ :plan_option_kind, :plan_option_choice, :reference_plan_id,
+          :sponsored_benefits_attributes => [ :plan_option_kind, :kind, :plan_option_choice, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
               :contribution_levels_attributes => [ :is_offered, :display_name, :contribution_factor]
             ]
