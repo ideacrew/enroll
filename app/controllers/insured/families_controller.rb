@@ -133,11 +133,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
-    @family_members = @person.primary_family.has_active_consumer_family_members.compact
+    @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
   def upload_application
-    @family_members = @person.primary_family.has_active_resident_family_members.compact
+    @family_members = @person.primary_family.has_active_resident_family_members
   end
 
   def check_qle_date

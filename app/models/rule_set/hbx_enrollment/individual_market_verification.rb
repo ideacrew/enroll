@@ -13,7 +13,7 @@ module RuleSet
       end
 
       def roles_for_determination
-        hbx_enrollment.hbx_enrollment_members.map(&:person).map(&:consumer_role)
+        hbx_enrollment.hbx_enrollment_members.map(&:person).map(&:consumer_role).compact
       end
 
       def determine_next_state

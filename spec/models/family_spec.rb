@@ -1234,6 +1234,8 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should build the consumer role for the dependents when primary has a consumer role" do
+    allow(person).to receive(:is_consumer_role_active?).and_return(true)
+    allow(family_member_dependent.person).to receive(:is_consumer_role_active?).and_return(true)
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
     expect(family_member_dependent.person.consumer_role).to eq nil
