@@ -17,12 +17,6 @@ module BenefitSponsors
       INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
       INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
-      # Unique Resource Name identifier for benefit market_catalog
-      field :benefit_market_catalog_urn,      type: String
-
-      belongs_to  :benefit_market_catalog, counter_cache: true,
-                  class_name: "::BenefitMarkets::BenefitMarketCatalog"
-
       # The date range when this application is active
       field :effective_period,        type: Range
 
@@ -54,17 +48,17 @@ module BenefitSponsors
       field :recorded_rating_area_id,      type: BSON::ObjectId
       field :recorded_service_area_id,     type: BSON::ObjectId
 
-      belongs_to  :benefit_sponsorship, 
+      belongs_to  :benefit_sponsorship, counter_cache: true,
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-
-      embeds_many :benefit_packages, 
-                  class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
       embeds_one  :benefit_sponsor_catalog,
                   class_name: "::BenefitMarkets::BenefitSponsorCatalog"
-      
+
+      embeds_many :benefit_packages,
+                  class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
+
       validates_presence_of :effective_period, :open_enrollment_period
-      
+
       validate :validate_application_dates
       # validate :open_enrollment_date_checks
 
@@ -79,7 +73,7 @@ module BenefitSponsors
       scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
       scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
       scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
-      
+
       scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
         where(
           "$and" => [
@@ -110,6 +104,35 @@ module BenefitSponsors
           ]
           )
       }
+
+      def renew(benefit_period)
+        renewal_application = benefit_sponsorship.benefit_applications.new
+
+        renewal_application.fte_count = fte_count
+        renewal_application.pte_count = pte_count
+        renewal_application.msp_count = msp_count
+
+        # renewal_application.effective_period =
+        # renewal_application.open_enrollment_period =
+
+        benefit_market = benefit_sponsorship.benefit_market
+        benefit_market_catalog = benefit_market.benefit_market_catalog_for(effective_period.begin)
+        benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_area)
+
+        renewal_application.benefit_sponsor_catalog = benefit_sponsor_catalog
+
+        benefit_packages.each do |benefit_package|
+          renewal_application.benefit_packages << benefit_package.renew
+        end
+      end
+
+      def terminate
+
+      end
+
+      def reinstate
+
+      end
 
       # after_update :update_employee_benefit_packages
       # TODO: Refactor code into benefit package updater
@@ -408,7 +431,7 @@ module BenefitSponsors
       end
 
       class << self
-        def find(id)          
+        def find(id)
           BenefitSponsors::BenefitApplications::BenefitApplication.where(id: BSON::ObjectId.from_string(id)).first
         end
       end

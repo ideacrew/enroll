@@ -11,7 +11,7 @@ module SponsoredBenefits
     let(:sponsor) { double(:sponsor, id: '555', sic_code: '1111') }
     let(:active_user) { double(:has_hbx_staff_role? => false) }
 
-    let!(:plan_design_organization) { 
+    let!(:plan_design_organization) {
       create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: sponsor.id, owner_profile_id: '5ac4cb58be0a6c3ef400009b', plan_design_proposals: [ plan_design_proposal ], sic_code: sponsor.sic_code )
     }
 
@@ -25,10 +25,10 @@ module SponsoredBenefits
                         benefit_applications: [ benefit_application ]
                         ) }
     let(:benefit_application) { build(:plan_design_benefit_application, effective_period: initial_enrollment_period, open_enrollment_period: (Date.today..end_of_month)) }
-    let(:cca_employer_profile) { 
+    let(:cca_employer_profile) {
       employer = build(:shop_cca_employer_profile)
       employer.benefit_sponsorships = [sponsorship]
-      employer 
+      employer
     }
     let(:plan_design_proposal) { build(:plan_design_proposal, profile: cca_employer_profile) }
     let(:beginning_of_next_month) { Date.today.next_month.beginning_of_month }

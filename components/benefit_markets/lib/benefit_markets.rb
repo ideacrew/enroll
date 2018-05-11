@@ -6,7 +6,7 @@ require 'config'
 
 module BenefitMarkets
 
-    BENEFIT_MARKET_KINDS    = [:aca_shop, :aca_individual, :medicaid, :medicare]
+    BENEFIT_MARKET_KINDS    = [:aca_shop, :aca_individual, :fehb, :medicaid, :medicare]
     PRODUCT_KINDS           = [:health, :dental, :term_life, :short_term_disability, :long_term_disability]
     PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
@@ -16,7 +16,7 @@ module BenefitMarkets
     #   :annual_with_midyear_initial - may start mid-year and renew at subsequent annual effective date month
     APPLICATION_INTERVAL_KINDS  = [:monthly, :annual, :annual_with_midyear_initial]
 
-    
+
     CONTACT_METHOD_KINDS        = [:paper_and_electronic, :paper_only]
 
 

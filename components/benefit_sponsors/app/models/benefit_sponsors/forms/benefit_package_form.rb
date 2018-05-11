@@ -45,15 +45,15 @@ module BenefitSponsors
         form
       end
 
-      def self.for_edit(id)
-        form = self.new(id: id)
+      def self.for_edit(params)
+        form = self.new(params)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
       end
 
-      def self.for_update(id)
-        form = self.new(id: id)
+      def self.for_update(params)
+        form = self.new(params)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
@@ -71,7 +71,12 @@ module BenefitSponsors
         persist
       end
 
-         def new_record?
+      def update_attributes(params)
+        self.attributes = params
+        persist(update: true)
+      end
+
+      def new_record?
         true
       end
     end

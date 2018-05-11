@@ -8,7 +8,6 @@ module BenefitMarkets
     field :effective_date,          type: Date 
     field :probation_period_kinds,  type: Array, default: []
 
-
     belongs_to  :service_area,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
 
@@ -26,24 +25,19 @@ module BenefitMarkets
     end
 
     def product_market_kind
-      "shop"
+      :shop
     end
     
     def product_active_year
       benefit_application.effective_period.begin.year
     end
 
+    # plan_option_kind: metal_level/single_issuer/single_product
+    # plan_option_choice: <metal level name>/<issuer name>
     def products_for(plan_option_kind, plan_option_choice)
       product_package = product_packages.by_kind(plan_option_kind.to_sym).first
       return [] unless product_package
-
-      if plan_option_choice == 'metal_level'
-        product_package.products.by_metal_level(plan_option_choice)
-      elsif 
-        issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(plan_option_choice)
-        return [] unless issuer_profile
-        product_package.products.by_issuer(issuer_profile.id)
-      end
+      product_package.products_for_plan_option_choice(plan_option_choice)
     end
   end
 end

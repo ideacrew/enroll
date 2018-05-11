@@ -57,6 +57,8 @@
       </div>
 
       <div class="col-xs-12 plan-options">
+
+        <%= f.hidden_field :kind, value: "health" %>
         <div class="col-xs-12 carriers-tab" style="display: none;">
           <br><br>
           <h4>Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</h4>
@@ -64,10 +66,10 @@
           <% @benefit_package_form.catalog.carrier_names.each do |ck| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_issuer", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_choice: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_issuer", benefit_group:f.object.id ), remote: true do %>
               <div class="col-xs-3">
-                <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-                <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+                <%= f.radio_button :plan_option_choice, "#{ck}" %>
+                <%= f.label "plan_option_choice_#{ck}" do %>
                 <i class="fa fa-circle-o"></i>
                 <i class="fa fa-dot-circle-o"></i>
                 <% end %>
@@ -94,8 +96,8 @@
               <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
 
               <div class="col-xs-3">
-                <%= f.radio_button :metal_level_for_elected_plan, kind %>
-                <%= f.label "metal_level_for_elected_plan_#{kind}" do %>
+                <%= f.radio_button :plan_option_choice, kind %>
+                <%= f.label "plan_option_choice_#{kind}" do %>
                 <i class="fa fa-circle-o"></i>
                 <i class="fa fa-dot-circle-o"></i>
                 <% end %>
@@ -126,11 +128,11 @@
           <% @benefit_package_form.catalog.single_product_options.each do |ck| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_product", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_choice: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_product", benefit_group:f.object.id ), remote: true do %>
 
               <div class="col-xs-3">
-                <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-                <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+                <%= f.radio_button :plan_option_choice, "#{ck}" %>
+                <%= f.label "plan_option_choice_#{ck}" do %>
                 <i class="fa fa-circle-o"></i>
                 <i class="fa fa-dot-circle-o"></i>
                 <% end %>
@@ -191,7 +193,7 @@
       var productHtml = '<div class="col-xs-4">\
         <div class="col-xs-12 reference-plan">\
           <div class="col-xs-2">\
-            <input type="radio" value="' + product["id"] + '" name="forms_benefit_package_form[sponsored_benefits_attributes][0][reference_plan_id]">\
+            <input type="radio" value="' + product["id"] + '" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]">\
             <label for="' + location_id + '_reference_plan_id">\
               <i class="fa fa-circle-o"></i>\
               <i class="fa fa-dot-circle-o"></i>\

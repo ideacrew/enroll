@@ -145,7 +145,7 @@ module BenefitSponsors
             pending = false
           else
             pending = existing_company && Person.staff_for_employer(profile).detect{|person|person.user_id}
-            role_state = pending ? 'is_applicant' : 'is_active' 
+            role_state = pending ? 'is_applicant' : 'is_active'
             person.employer_staff_roles << EmployerStaffRole.new(person: person, :benefit_sponsor_employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
           end
           self.pending = pending
@@ -458,7 +458,7 @@ module BenefitSponsors
         end
 
         def regex_for(str)
-          clean_string = Regexp.escape(str.strip)
+          clean_string = ::Regexp.escape(str.strip)
           /^#{clean_string}$/i
         end
 

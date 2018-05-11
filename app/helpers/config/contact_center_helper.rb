@@ -84,7 +84,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_appeal_state
-     Settings.contact_center.appeal_center.state
+    Settings.contact_center.appeal_center.state
   end
 
   def contact_center_appeal_zip
