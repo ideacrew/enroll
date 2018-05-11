@@ -41,6 +41,21 @@ module BenefitMarkets
     end
 
 
+    # Constructs a symbol using an input string, stripping leading numbers and special characters, limiting
+    # length, and leaving only lower case letters
+    def self.string_to_symbol_key(string_value, max_length = 15)
+      strip_leading_numbers(string_value.to_s).parameterize.gsub(/[-_]/,'').slice(0, max_length).to_sym
+    end
+
+    # Using an input string, return version of string with only non-numbers as first character
+    def self.strip_leading_numbers(string_value)
+      while string_value.chr.numeric? do
+        string_value = string_value.slice!(1, string_value.length - 1)
+      end
+      string_value
+    end
+
+
     # Ensure class type and integrity of date period ranges
     def self.tidy_date_range(range_period, attribute = nil)
 

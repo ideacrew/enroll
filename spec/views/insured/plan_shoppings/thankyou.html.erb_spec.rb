@@ -85,8 +85,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       allow(@enrollment).to receive(:employee_role).and_return(double)
       allow(@enrollment).to receive(:is_cobra_status?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
-      expect(rendered).to have_selector('div#waive_confirm')
-      expect(response).to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
+      expect(response).to render_template(partial: "ui-components/v1/modals/waive_confirmation", locals: {enrollment: hbx_enrollment})
     end
 
     it "should not render waive_confirmation partial" do
