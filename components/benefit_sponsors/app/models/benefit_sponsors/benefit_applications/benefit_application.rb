@@ -105,24 +105,22 @@ module BenefitSponsors
           )
       }
 
-      def renew(benefit_period)
+      def renew(benefit_sponsor_catalog)
         renewal_application = benefit_sponsorship.benefit_applications.new
 
         renewal_application.fte_count = fte_count
         renewal_application.pte_count = pte_count
         renewal_application.msp_count = msp_count
 
+        # benefit sponsor catalog should provide these
         # renewal_application.effective_period =
         # renewal_application.open_enrollment_period =
-
-        benefit_market = benefit_sponsorship.benefit_market
-        benefit_market_catalog = benefit_market.benefit_market_catalog_for(effective_period.begin)
-        benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_area)
 
         renewal_application.benefit_sponsor_catalog = benefit_sponsor_catalog
 
         benefit_packages.each do |benefit_package|
-          renewal_application.benefit_packages << benefit_package.renew
+          new_benefit_package = renewal_application.benefit_packages.new
+          benefit_package.renew(new_benefit_package)
         end
       end
 
