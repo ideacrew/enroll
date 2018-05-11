@@ -388,7 +388,7 @@ module ApplicationHelper
   def carrier_logo(plan)
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
     issuer_hios_id = plan.hios_id[0..4].extract_value
-    Settings.aca.carrier_hios_logo_variant.present? ? Settings.aca.carrier_hios_logo_variant[issuer_hios_id] : plan.carrier_profile.legal_name.extract_value
+    Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
