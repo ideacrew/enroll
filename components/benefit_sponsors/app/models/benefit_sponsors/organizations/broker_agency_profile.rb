@@ -69,6 +69,10 @@ module BenefitSponsors
         @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
       end
 
+      def active_broker_roles
+        @active_broker_roles = BrokerRole.find_active_by_broker_agency_profile(self)
+      end
+
       def employer_clients
       end
 

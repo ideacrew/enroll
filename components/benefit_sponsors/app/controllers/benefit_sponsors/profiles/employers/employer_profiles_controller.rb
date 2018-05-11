@@ -27,11 +27,11 @@ module BenefitSponsors
               # @current_plan_year = @employer_profile.show_plan_year
               # paginate_employees
             when 'brokers'
-              # @broker_agency_accounts = @employer_profile.broker_agency_accounts
+              @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'inbox'
 
             else
-              # @broker_agency_accounts = @employer_profile.broker_agency_accounts
+              @broker_agency_account = @employer_profile.active_broker_agency_account
               # @current_plan_year = @employer_profile.show_plan_year
               # collect_and_sort_invoices(params[:sort_order])
               # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
