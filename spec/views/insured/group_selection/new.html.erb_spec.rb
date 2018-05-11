@@ -427,7 +427,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should have the waive confirmation modal" do
       render file: "insured/group_selection/new.html.erb"
-      expect(view).to render_template(:partial => "insured/plan_shoppings/_waive_confirmation", :count => 1)
+      expect(view).to render_template(:partial => "ui-components/v1/modals/_waive_confirmation", :count => 1)
     end
   end
 

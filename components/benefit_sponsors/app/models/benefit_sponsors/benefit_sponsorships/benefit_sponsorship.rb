@@ -172,8 +172,7 @@ module BenefitSponsors
       end
 
       def active_broker_agency_account
-        #TODO pick the correct broker_agency_account
-        broker_agency_accounts.first
+        broker_agency_accounts.detect { |baa| baa.is_active }
       end
 
       class << self

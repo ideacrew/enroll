@@ -10,10 +10,10 @@ module BenefitSponsors
     let!(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let!(:new_benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let!(:employer_profile) {benefit_sponsor.employer_profile}
-    let!(:active_employer_staff_role) {FactoryGirl.build(:employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
     let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
     let!(:new_person_for_staff) { FactoryGirl.create(:person) }
-    let(:applicant_employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_applicant', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let(:applicant_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_applicant', benefit_sponsor_employer_profile_id: employer_profile.id)}
     let!(:applicant_person) { FactoryGirl.create(:person,employer_staff_roles:[applicant_employer_staff_role]) }
     let(:user) { FactoryGirl.create(:user, :person => person)}
 

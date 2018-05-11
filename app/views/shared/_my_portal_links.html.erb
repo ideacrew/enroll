@@ -5,11 +5,10 @@
 <% roles = [insured, broker] %>
 <% portal_count = roles.select{|role|role}.count + employer_staff.count%>
 
-
   <% if portal_count == 1 %>
     <span>
       <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
-      <%= link_to l10n('.my_employer_portal'), main_app.new_employers_employer_profile_path, class: 'header-text' if employer_staff.present? %>
+      <%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'header-text' if employer_staff.present? %>
       <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker %>
       <span> | </span>
     </span>

@@ -38,7 +38,7 @@ RSpec.describe "insured/show" do
 
   it 'should display information about the employee when signed in as Broker' do
     sign_in current_broker_user
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to have_selector('span', text:  @person.full_name)
     expect(rendered).to match(@benefit_group.plan_year.employer_profile.legal_name)
   end
@@ -54,7 +54,7 @@ RSpec.describe "insured/show" do
 
   it 'should display information about the employee when signed in as Consumer' do
     sign_in consumer_user
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to have_selector('span', text:  @person.full_name)
     expect(rendered).to match(@benefit_group.plan_year.employer_profile.legal_name)
 
@@ -71,27 +71,27 @@ RSpec.describe "insured/show" do
 
   it "should get the plans-count" do
     sign_in consumer_user
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to have_selector('strong#plans-count')
   end
 
   it "should display special note related to plan cost" do
     sign_in consumer_user
     allow(benefit_group).to receive(:sole_source?).and_return(true)
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to match(/Please note your final cost may change based on the final enrollment of all employees/)
   end
 
   it "should not display note for benefit_groups other than sole_source" do
     sign_in consumer_user
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to_not match(/Please note your final cost may change based on the final enrollment of all employees/)
   end
 
   it "should not render waive_confirmation partial" do
     sign_in current_broker_user
     allow(@hbx_enrollment).to receive(:employee_role).and_return(false)
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).not_to have_selector('div#waive_confirm')
     expect(response).not_to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
   end
@@ -99,7 +99,7 @@ RSpec.describe "insured/show" do
   it 'should render waive_confirmation partial' do
     sign_in current_broker_user
     allow(@hbx_enrollment).to receive(:employee_role).and_return(double)
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to have_selector('div#waive_confirm')
     expect(response).to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
   end
@@ -107,7 +107,7 @@ RSpec.describe "insured/show" do
   it "should have plans area" do
     sign_in current_broker_user
     allow(@hbx_enrollment).to receive(:employee_role).and_return(double)
-    render :template => "insured/plan_shoppings/show.html.erb"
+    render :template => "insured/plan_shoppings/show.html"
     expect(rendered).to have_selector('#plans', text: 'Loading...')
   end
 end

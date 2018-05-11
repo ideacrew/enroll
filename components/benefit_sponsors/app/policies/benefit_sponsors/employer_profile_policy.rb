@@ -22,5 +22,10 @@ module BenefitSponsors
       # TODO
       return true
     end
+
+    def updateable?
+      return true unless role = user.person && user.person.hbx_staff_role
+      role.permission.modify_employer
+    end
   end
 end

@@ -34,7 +34,15 @@ BenefitSponsors::Engine.routes.draw do
         member do
           get :inbox
         end
+
+        resources :broker_agency, only: [:index, :show, :create] do
+          collection do
+            get :active_broker
+          end
+          get :terminate
+        end
       end
+
       resources :employer_staff_roles do
         member do
           get :approve
