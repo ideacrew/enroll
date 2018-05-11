@@ -248,7 +248,7 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
@@ -817,6 +817,18 @@ end
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
   wait_for_ajax
+end
+
+And(/^clicks on the person in families tab$/) do
+  login_as hbx_admin, scope: :user
+  visit exchanges_hbx_profiles_root_path
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
+  wait_for_ajax(10,2)
+  family_member = page.find('a', :text => "#{user.person.full_name}")
+  family_member.trigger('click')
+  visit verification_insured_families_path
+  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|

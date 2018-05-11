@@ -6,12 +6,21 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   describe "#can shop individual" do
     let(:person) { FactoryGirl.create(:person) }
 
+    before(:each) do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+    end
+
+
     it "should not have an active consumer role" do
       expect(subject.can_shop_individual?(person)).not_to be_truthy
     end
 
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+
+      before(:each) do
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      end
       it "should have active consumer role" do
         expect(subject.can_shop_individual?(person)).to be_truthy
       end
@@ -57,6 +66,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).not_to be_truthy
@@ -68,6 +78,8 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).to be_truthy
@@ -159,6 +171,26 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
   end
 
+  describe "#view_market_places" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should return shop & individual if can_shop_both_markets? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
+      expect(helper.view_market_places(person)).to eq Plan::MARKET_KINDS
+      expect(helper.view_market_places(person)).to eq ["shop", "individual"]
+    end
+
+    it "should return individual & coverall if can_shop_individual? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_resident? return true" do
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
+  end
 
   describe "#selected_enrollment" do
 
@@ -343,11 +375,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq false
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq false
           end
 
           it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq true
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq true
           end
         end
 
@@ -358,11 +390,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq false
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq false
           end
 
           it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq true
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq true
           end
         end
       end
@@ -672,18 +704,28 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         end
       end
 
-      context "when EE clicked on make changes button of enrollment" do
-        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg, :is_shop? => true)}
-        before do
-          allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return true
-        end
-        it "should return true if active benefit group offers dental" do
+      context "when EE clicked on make changes button of a shop enrollment" do
+        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg, is_shop?: true)}
+
+        it "should return true if benefit group on enrollment offers dental" do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
           expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq true
         end
 
-        it "should return false if active benefit group not offers dental" do
+        it "should return false if benefit group on enrollment does not offers dental" do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq false
+        end
+      end
+
+      context "when EE clicked on make changes button of an ivl enrollment" do
+        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg, is_shop?: false)}
+        before do
+          allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return true
+        end
+        it "should not depend on enrollment benefit group" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return false
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
           expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq false
         end
       end
@@ -720,7 +762,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([false, false])
       expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq true
       expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq true
-    end 
+    end
 
     it "should have 'ineligible_ivl_row' class if not eligible for IVL benefits" do
       allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])

@@ -150,6 +150,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -163,6 +164,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
       allow(enrollment).to receive(:ee_plan_selection_confirmation_sep_new_hire).and_return(true)
       allow(enrollment).to receive(:mid_year_plan_change_notice).and_return(true)
+      allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return("consumer")
     end
 
     it "returns http success" do
@@ -190,6 +193,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:family) { double("Family") }
     let(:plan_year) { double("PlanYear") }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -210,6 +214,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
       allow(enrollment).to receive(:set_special_enrollment_period).and_return(true)
       allow(enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
+      allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return(nil)
     end
 
     it "returns http success" do
@@ -241,6 +247,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "returns http success as BROKER" do
       person = create(:person)
+      transition = FactoryGirl.build(:individual_market_transition, :resident)
+      person.individual_market_transitions << transition
       f=FactoryGirl.create(:family,:family_members=>[{:is_primary_applicant=>true, :is_active=>true, :person_id => person.id}])
       current_broker_user = FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
         :person => person )
@@ -405,6 +413,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:plan3) {double("Plan3", id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
     let(:plans) {[plan1, plan2, plan3]}
     let(:coverage_kind){"health"}
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
+
 
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -426,6 +436,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
       allow(hbx_enrollment).to receive(:family).and_return(family)
+      allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+      allow(individual_market_transition).to receive(:role_type).and_return(nil)
 
       sign_in user
     end
@@ -498,7 +510,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
       let(:family) { FactoryGirl.build(:individual_market_family) }
-      let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
+      let(:person) {double("Person",primary_family: family, is_consumer_role_active?: true)}
       let(:user) {double("user",person: person)}
 
       before do
@@ -515,7 +527,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+          #allow(hbx_enrollment).to receive_message_chain(:employee_rol,:census_employe).and_return 'individual'
           get :show, id: "hbx_id"
         end
 
@@ -533,6 +547,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -550,6 +565,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
           get :show, id: "hbx_id"
@@ -570,8 +586,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(hbx_enrollment).to receive(:kind).and_return 'shop'
+          allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
           get :show, id: "hbx_id"
         end
 

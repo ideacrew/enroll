@@ -428,7 +428,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
@@ -514,7 +514,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.try(:under_open_enrollment?)
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_enrollment_effective_date
@@ -667,5 +667,10 @@ module ApplicationHelper
     return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
     raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
 end
 

@@ -1180,6 +1180,7 @@ end
 
 describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person)}
+  let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person)}
   let(:person_two) { FactoryGirl.create(:person) }
   let(:family_member_dependent) { FactoryGirl.build(:family_member, person: person_two, family: family)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
@@ -1191,6 +1192,8 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should build the consumer role for the dependents when primary has a consumer role" do
+    allow(person).to receive(:is_consumer_role_active?).and_return(true)
+    allow(family_member_dependent.person).to receive(:is_consumer_role_active?).and_return(true)
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
     expect(family_member_dependent.person.consumer_role).to eq nil
@@ -1199,6 +1202,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should return the existing consumer roles if dependents already have a consumer role" do
+    allow(person_two).to receive(:is_consumer_role_active?).and_return(true)
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
     cr = FactoryGirl.create(:consumer_role)
