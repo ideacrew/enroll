@@ -350,7 +350,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(person).to receive(:employee_roles).and_return([employee_role])
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
+      expect(flash[:error]).to eq "You must select the primary applicant to enroll in the healthcare plan"
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
 
