@@ -92,7 +92,6 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
 
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
-      console.log('clicked change reference plan')
       $('.benefits-fields').css('pointer-events','none');
       $('.composite-offerings').css('opacity','0.5');
       $(this).closest('.selected-plan').hide();
