@@ -22,9 +22,12 @@ class ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal < ShopEmployeeNoti
       :plan_name => enrollment.plan.name
       })
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :enrollees => enrollment.hbx_enrollment_members.map(&:person).map(&:full_name),
+      :enrollees => enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+        enrollee = PdfTemplates::Individual.new({
+          full_name: member.person.full_name.titleize })
+        enrollees << enrollee end,
       :employee_cost => enrollment.total_employee_cost
-      })
+    })
   end
 
 end
