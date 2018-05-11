@@ -385,38 +385,21 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(plan, options = {:width => 50})
+  def carrier_logo(plan, options)
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    issuer_hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case issuer_hios_id
-    when "75753DC"
-      "oci"
-    when "21066DC"
-      "uhcma"
-    when "41842DC"
-      "uhic"
-    else
-      plan.carrier_profile.legal_name.extract_value
-    end
+    issuer_hios_id = plan.hios_id[0..4].extract_value
+    Settings.aca.carrier_hios_logo_variant.present? ? Settings.aca.carrier_hios_logo_variant[issuer_hios_id] : plan.carrier_profile.legal_name.extract_value
+  end
+
+  def display_carrier_logo(plan, options = {:width => 50})
+    carrier_name = carrier_logo(plan, options)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
-    return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    issuer_hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case issuer_hios_id
-    when "75753DC"
-      "oci"
-    when "21066DC"
-      "uhcma"
-    when "41842DC"
-      "uhic"
-    else
-      plan.carrier_profile.legal_name.extract_value
-    end
+    carrier_name = carrier_logo(plan, options)
     image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
-
 
   def dob_in_words(age, dob)
     return age if age > 0
