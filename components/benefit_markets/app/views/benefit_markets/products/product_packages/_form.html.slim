@@ -9,6 +9,31 @@
     = f.text_field :title, class: "form-control", required: true
 
 .row
+  = f.label :multiplicity, "Support muliple plans", class: "col-sm-2 col-form-label"
+  .col-sm-5.pt-2
+    = f.check_box :multiplicity, class: "form-control"
+.row
+  = f.label :application_period, "Application Period", class: "col-sm-2 col-form-label"
+  .col-sm-5
+    .row
+      =f.label :start_on, 'Start', class: "col-sm-1 col-form-label"
+      .col-sm-5
+        =f.date_field :start_on, value: @product_package.start_on, class: "form-control", required: true, data: { action: 'product-package--form#startChange' }
+      =f.label :end_on, 'End', class: "col-sm-1 col-form-label"
+      .col-sm-5
+        =f.date_field :end_on, value: @product_package.end_on, class: "form-control", required: true, data: { target: 'product-package--form.endOn' }
+
+.row
+  = f.label :benefit_option_kind, 'Benefit Kind', class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :benefit_option_kind, options_for_select([["Please select the kind of benefit", nil]] + @product_package.available_benefit_option_kinds, selected: @product_package.benefit_option_kind), class: "form-control"
+
+.row
+  = f.label :product_kind, class: "col-sm-2 col-form-label"
+  .col-sm-5
+    = f.select :product_kind, options_for_select([["Please select the kind of product", nil]] + @product_package.available_product_kinds, selected: @product_package.product_kind), {class: "form-control"}
+
+.row
   = f.label :pricing_model_id, class: "col-sm-2 col-form-label"
   .col-sm-5
     = f.select :pricing_model_id, options_for_select([["Please select a pricing model", nil]] + @product_package.available_pricing_models, selected: @product_package.pricing_model_id), class: "form-control"
@@ -23,7 +48,6 @@
   .col-sm-5
     = f.select :benefit_catalog_id, options_for_select([["Please select a benefit catalog", nil]] + @product_package.available_benefit_catalogs, selected: @product_package.benefit_catalog_id)
 
-= f.hidden_field :benefit_option_kind
 
 - if @product_package.has_additional_attributes?
   = render partial: "benefit_markets/products/product_packages/#{@product_package.additional_form_fields_partial}", :locals => { :form => f }

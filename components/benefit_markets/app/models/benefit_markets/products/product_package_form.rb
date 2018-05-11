@@ -6,15 +6,23 @@ module BenefitMarkets
       include ActiveModel::Validations
 
       attribute :id, String
-      attribute :title, String
-      attribute :contribution_model_id, String
-      attribute :pricing_model_id, String
+
       attribute :benefit_catalog_id, String
       attribute :benefit_option_kind, String
+      attribute :contribution_model_id, String
+      attribute :multiplicity, Boolean
+      attribute :pricing_model_id, String
+      attribute :product_kind, String
+      attribute :title, String
+      attribute :end_on, String
+      attribute :start_on, String
+
       attribute :allowed_benefit_option_kinds, Array
-      attribute :available_pricing_models, Array
-      attribute :available_contribution_models, Array
       attribute :available_benefit_catalogs, Array
+      attribute :available_benefit_option_kinds, Array
+      attribute :available_contribution_models, Array
+      attribute :available_pricing_models, Array
+      attribute :available_product_kinds, Array
 
       attr_reader :show_page_model
 
@@ -30,11 +38,8 @@ module BenefitMarkets
       # @param benefit_option_kind [String] the benefit option kind
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
-      def self.for_new(benefit_option_kind)
-        service = resolve_service
-        form = resolve_form_subclass(benefit_option_kind).new(
-          :benefit_option_kind => benefit_option_kind
-        )
+      def self.for_new
+        form = service.attributes_to_form_params(service.build, new)
         service.load_default_form_params(form)
         service.load_form_metadata(form)
         form
@@ -46,9 +51,7 @@ module BenefitMarkets
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
       def self.for_create(params)
-        service = resolve_service
-        benefit_option_kind = params.require(:benefit_option_kind)
-        form = resolve_form_subclass(benefit_option_kind).new(params)
+        form = new params
         service.load_form_metadata(form)
         form
       end
@@ -57,8 +60,8 @@ module BenefitMarkets
       # @param id [Object] an opaque ID from the controller parameters
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
-      def self.for_edit(id)
-        find_for(id)
+      def self.for_edit(params)
+        find_for(params)
       end
 
       # Find the 'update' form corresponding to the given ID.
@@ -87,7 +90,7 @@ module BenefitMarkets
       # Has this form been successfully saved before?  Used mainly by form_for.
       # @return [Boolean] true if previously saved, otherwise false
       def persisted?
-        !id.blank?
+        id.present?
       end
 
       # Return the class of the policy which should be used by pundit.
@@ -103,40 +106,26 @@ module BenefitMarkets
 
       protected
 
-      def self.resolve_service
-        ProductPackageService.new
+      def self.service
+        @service ||= ProductPackageService.new
       end
 
-      def self.find_for(id)
-        service = resolve_service
-        params_form = self.new(id: id)
-        form = service.load_form_params_from_resource(params_form)
+      def service
+        @service ||= ProductPackageService.new
+      end
+
+      def self.find_for(params)
+        form = service.load_form_params_from_resource(new(params))
         service.load_form_metadata(form)
         form
-      end
-      
-      # @!visibility private
-      def self.resolve_form_subclass(benefit_option_kind)
-        name_parts = benefit_option_kind.to_s.split("_")
-        product_kind = name_parts.last
-        case benefit_option_kind.to_s
-        when "metal_level_health", "issuer_health"
-          "::BenefitMarkets::Products::#{product_kind.camelcase}Products::#{benefit_option_kind.to_s.camelcase}ProductPackageForm".constantize
-        else
-          self
-        end
       end
 
       def persist(update: false)
         return false unless self.valid?
         persist_result, persisted_object = update ? service.update(self) : service.save(self)
         return false unless persist_result
-        @show_page_model = persisted_object
+        @show_page_model = [service.benefit_catalog_for(self), persisted_object]
         true
-      end
-
-      def service
-        @service ||= self.class.resolve_service
       end
     end
   end
