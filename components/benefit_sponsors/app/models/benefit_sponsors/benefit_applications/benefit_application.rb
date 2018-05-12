@@ -28,11 +28,11 @@ module BenefitSponsors
       field :terminated_on,           type: Date
 
       # This application's workflow status
-      field :aasm_state,              type: String, default: :draft
+      field :aasm_state,              type: String,   default: :draft
 
       # Calculated Fields for DataTable
-      field :enrolled_summary, type: Integer, default: 0
-      field :waived_summary, type: Integer, default: 0
+      field :enrolled_summary,        type: Integer,  default: 0
+      field :waived_summary,          type: Integer,  default: 0
 
       # Sponsor self-reported number of full-time employees
       field :fte_count, type: Integer, default: 0
@@ -45,11 +45,30 @@ module BenefitSponsors
 
       # # SIC code, Rating Area, Service Area frozen when the plan year is published,
       field :recorded_sic_code,            type: String
-      field :recorded_rating_area_id,      type: BSON::ObjectId
-      field :recorded_service_area_id,     type: BSON::ObjectId
 
-      belongs_to  :benefit_sponsorship, counter_cache: true,
-                  class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+
+      # Create a doubly-linked list of application chain:
+      # predecessor_application is nil if it's the first in an application chain without
+      # gaps in dates.  Otherwise, it references the preceding application that it replaces
+      # successor_application is nil if this is the last in an application chain without
+      # gaps in dates.  Otherwise, it references the application which immediately follows
+      has_one     :predecessor_application, inverse_of: :successor_application,
+                  class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+
+      belongs_to  :successor_application, inverse_of: :predecessor_application,
+                  class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+
+      belongs_to  :recorded_rating_area,
+                  :counter_cache: true,
+                  class_name: "::BenefitMarkets::Locations::RatingArea"
+
+      belongs_to  :recorded_service_area,
+                  :counter_cache: true,
+                  class_name: "::BenefitMarkets::Locations::ServiceArea"
+
+      belongs_to  :benefit_sponsorship,
+                  counter_cache: true,
+                  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
       embeds_one  :benefit_sponsor_catalog,
                   class_name: "::BenefitMarkets::BenefitSponsorCatalog"
@@ -65,14 +84,14 @@ module BenefitSponsors
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
 
-      scope :by_open_enrollment_end_date,   ->(end_on) { where(:"effective_period.max" => end_on) }
+      scope :by_open_enrollment_end_date,     ->(end_on) { where(:"effective_period.max" => end_on) }
+      scope :by_effective_date,               ->(effective_date)    { where(:"effective_period.min" => effective_date) }
+      scope :by_effective_date_range,         ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
 
-      scope :by_effective_date,       ->(effective_date)    { where(:"effective_period.min" => effective_date) }
-      scope :by_effective_date_range, ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
-      scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
-      scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
-      scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
-      scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
+      scope :published,                       ->{ any_in(aasm_state: PUBLISHED) }
+      scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
+      scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
+      scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
 
       scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
         where(
@@ -105,24 +124,28 @@ module BenefitSponsors
           )
       }
 
-      def renew(benefit_period)
-        renewal_application = benefit_sponsorship.benefit_applications.new
+      # Build a new application instance along with all associated child model instances, for the
+      # benefit period immediately following this application, applying the benefit_sponsor_catalog
+      # renewal attributes
+      # Service and rating areas are assgiend from the benefit_sponsorhip to pick up when sponsor
+      # changes primary office location following the prior application
+      def renew(benefit_sponsor_catalog)
 
-        renewal_application.fte_count = fte_count
-        renewal_application.pte_count = pte_count
-        renewal_application.msp_count = msp_count
-
-        # renewal_application.effective_period =
-        # renewal_application.open_enrollment_period =
-
-        benefit_market = benefit_sponsorship.benefit_market
-        benefit_market_catalog = benefit_market.benefit_market_catalog_for(effective_period.begin)
-        benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_area)
-
-        renewal_application.benefit_sponsor_catalog = benefit_sponsor_catalog
+        renewal_application = benefit_sponsorship.benefit_applications.new(
+            fte_count:                fte_count,
+            pte_count:                pte_count,
+            msp_count:                msp_count,
+            benefit_sponsor_catalog:  benefit_sponsor_catalog,
+            preceding_application:    self,
+            recorded_service_area:    benefit_sponsorship.service_area,
+            recorded_rating_area:     benefit_sponsorship.rating_area,
+            # effective_period:
+            # open_enrollment_period:
+          )
 
         benefit_packages.each do |benefit_package|
-          renewal_application.benefit_packages << benefit_package.renew
+          new_benefit_package = renewal_application.benefit_packages.new
+          benefit_package.renew(new_benefit_package)
         end
       end
 
@@ -179,12 +202,12 @@ module BenefitSponsors
 
       def effective_period=(new_effective_period)
         effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
-        write_attribute(:effective_period, effective_range) unless effective_range.blank?
+        super(effective_range) unless effective_range.blank?
       end
 
       def open_enrollment_period=(new_open_enrollment_period)
         open_enrollment_range = BenefitSponsors.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
-        write_attribute(:open_enrollment_period, open_enrollment_range) unless open_enrollment_range.blank?
+        super(open_enrollment_range) unless open_enrollment_range.blank?
       end
 
       def eligible_for_export?
