@@ -34,18 +34,23 @@ module BenefitSponsors
       #                                 following time period gap in benefit coverage
       #   :restored                 =>  sponsor, previously active on HBX, was involuntarily terminated
       #                                 and sponsorship resumed according to HBX policy
-      ORIGIN_KINDS = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
+      ORIGIN_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
+
+      TERMINATION_KINDS         = [:voluntary, :involuntary]
+      TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud]
 
 
       field :hbx_id,              type: String
       field :profile_id,          type: BSON::ObjectId
       field :contact_method,      type: Symbol, default: :paper_and_electronic
 
-      # Effective begin/end are the date period during which this benefit sponsorship is active.
-      # effective_begin_on is date with initial application coverage effectuates
-      # effective_end_on reflects date when all benefit applications are terminate and sponsorship terminates
+      # Effective begin/end are the date period during which this benefit sponsorship is active
+      # Date when initial application coverage starts for this sponsor
       field :effective_begin_on,  type: Date
+
+      # When present, date when all benefit applications are terminated and sponsorship ceases
       field :effective_end_on,    type: Date
+      field :termination_kind,    type: Symbol
 
       # Immutable value indicating origination of this BenefitSponsorship
       field :origin_kind,         type: Symbol, default: :self_serve
@@ -74,7 +79,7 @@ module BenefitSponsors
                   class_name: "::BenefitMarkets::BenefitMarket"
 
       belongs_to  :rating_area,
-                  :counter_cache: true,
+                  counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
       belongs_to  :service_area,
@@ -135,30 +140,65 @@ module BenefitSponsors
         benefit_market.benefit_sponsor_catalog_for([], effective_date)
       end
 
-      def rating_area=(new_rating_area)
-        write_attribute(:rating_area_id, new_rating_area._id)
-        @rating_area = new_rating_area
+
+      def employer_profile_to_benefit_sponsor_state_map
+        {
+          :applicant            => :new,
+          :registered           => :initial_application_submitted,
+          :conversion_expired   => :initial_application_expired,
+        }
       end
 
-      def rating_area
-        return unless rating_area_id.present?
-        return @rating_area if defined? @rating_area
-        @rating_area = BenefitSponsors::Locations::RatingArea.find(rating_area_id)
-      end
 
       # Workflow for self service
       aasm do
-        state :applicant, initial: true
-        state :registered                 # Employer has submitted valid application
-        state :eligible                   # Employer has completed enrollment and is eligible for coverage
-        state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-        state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
-      # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
-        state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
-        state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
+        state :new, initial: true
 
-        state :terminated_involuntarily   # Employer is unable to obtain coverage on the HBX per regulation or policy
-        state :voluntarily_terminated     # Employer is unable to obtain coverage on the HBX per regulation or policy
+
+        # What is initial state for conversion groups?
+
+        state :initial_application_transferred
+        state :initial_application_generated
+
+        state :initial_application_submitted
+
+        state :initial_application_approved
+        state :initial_application_canceled
+        state :initial_application_expired
+        state :initial_application_denied
+
+        state :initial_enrollment_open
+        state :initial_enrollment_closed
+        state :initial_enrollment_eligible
+        state :initial_enrollment_ineligible
+
+        # state :initial_enrollment_binder_paid  => pay_binder event should transition to :initial_enrollment_effectuated
+        state :initial_enrollment_effectuated
+        state :initial_enrollment_issuer_effectuated  # Sponsor's Group transmitted to Issuer
+
+
+        state :enrolled                   # Sponsor eligibility to offer benefits is approved, members are enrolled, and coverage is active
+
+        state :suspended                  # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
+        state :terminated                 # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
+        state :ineligible                 # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
+
+        # state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
+
+
+        state :approved
+        state :eligible
+
+
+        state :application_submitted  # Sponsor has submitted valid initial benefit application
+        state :application_pending    # Sponsor has submitted valid initial benefit application
+        state :application_denied     # Sponsor has submitted valid initial benefit application
+        state :application_appealing  # Sponsor has submitted valid initial benefit application
+        state :eligible                   # Initial open enrollment is complete and members eligible for coverage
+
+
+        state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+      # state :lapsed                     # Sponsor benefit coverage has reached end of term without renewal
 
 
         event :application_accepted, :after => :record_transition do
