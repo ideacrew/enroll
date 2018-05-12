@@ -59,11 +59,11 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       belongs_to  :recorded_rating_area,
-                  :counter_cache: true,
+                  counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
       belongs_to  :recorded_service_area,
-                  :counter_cache: true,
+                  counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       belongs_to  :benefit_sponsorship,
@@ -147,6 +147,8 @@ module BenefitSponsors
           new_benefit_package = renewal_application.benefit_packages.new
           benefit_package.renew(new_benefit_package)
         end
+
+        renewal_application
       end
 
       def terminate
@@ -290,10 +292,44 @@ module BenefitSponsors
         BenefitApplicationEnrollmentsMonthlyQuery.new(self).call(date)
       end
 
+      def plan_year_to_benefit_application_state_map
+        {
+          :draft                => :draft,
+          :publish_pending      => :pending,
+          :submitted            => :submitted,
+          :published            => :approved,
+          :eligibility_review   => :pending,
+
+          :expired          => :expired,
+        }
+      end
+
       aasm do
         state :draft, initial: true
 
+        state :submitted            # presented for approval
+        state :denied               # rejected
+        state :approved             # accepted
+
+        # Compare these states with CCA values for Employer Attestation approval flow
+        # Begin optional states for exception processing
+        state :pending              # queued for review or verification
+        state :assigned             # assigned to case worker
+        state :processing           # under consideration and determination
+        state :reviewing            # determination under peer or supervisory review
+        state :information_needed   # returned for supplementary information
+        state :appealing            # request reversal of negative determination
+        # End optional states for exception processing
+
+        state :verified
+        state :expired
+
+
+        # Do we differentiate applications for conversion groups that are used only for seeding renewals?
+
+
         state :publish_pending      # Plan application as submitted has warnings
+
         state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
         state :published#,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
         state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
