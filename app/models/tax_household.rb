@@ -109,7 +109,7 @@ class TaxHousehold
     return 0 if hbx_enrollment.blank?
     applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
     total_aptc_available = hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      aptc_available_amount = aptc_available_amount_by_member(applicant_ids: applicant_ids)
+      aptc_available_amount = aptc_available_amount_by_member(applicant_ids: applicant_ids, hbx_enrollment: hbx_enrollment)
       sum + (aptc_available_amount[member.applicant_id.to_s] || 0)
     end
     total_aptc_available = total_aptc_available - deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
@@ -147,7 +147,23 @@ class TaxHousehold
         aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end
-
+    if options[:hbx_enrollment].present?
+      coverage_applicant_ids = household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state" => "coverage_selected").map(&:hbx_enrollment_members).flatten.uniq.map(&:applicant_id).map(&:to_s)
+      current_applicant_ids = options[:hbx_enrollment].hbx_enrollment_members.pluck(:applicant_id).map(&:to_s)
+      if coverage_applicant_ids.present?
+        coverage_applicant_ids.each do | applicant_id |
+          aptc_available_amount_hash[applicant_id.to_s] = 0 
+        end
+        uncoverage_applicant_ids = current_applicant_ids - coverage_applicant_ids
+        uncoverage_applicant_hash = []
+        benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+        benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+        slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+        household.tax_households.last.tax_household_members.in(applicant_id: uncoverage_applicant_ids).each do |member|
+          aptc_available_amount_hash[member.applicant_id.to_s] = slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date) || 0
+        end
+      end
+    end
     aptc_available_amount_hash
   end
 
