@@ -17,6 +17,12 @@ module BenefitSponsors
     end
 
     context "A new model instance" do
+       it { is_expected.to be_mongoid_document }
+       it { is_expected.to have_fields(:hbx_id, :profile_id)}
+       it { is_expected.to have_field(:origin_kind).of_type(Symbol).with_default_value_of(:self_serve)}
+       it { is_expected.to embed_many(:broker_agency_accounts)}
+       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponorships)}
+
       context "with no arguments" do
         subject { described_class.new }
 
@@ -62,14 +68,6 @@ module BenefitSponsors
           expect(subject).to be_valid
         end
       end
-
-     describe "validators for model" do
-       it { is_expected.to be_mongoid_document }
-       it { is_expected.to have_fields(:hbx_id, :profile_id)}
-       it { is_expected.to have_field(:origin_kind).of_type(Symbol).with_default_value_of(:self_serve)}
-       it { is_expected.to embed_many(:broker_agency_accounts)}
-       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponorships)}
-     end
 
       context "with all required arguments" do
         subject { described_class.new(params) }
