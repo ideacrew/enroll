@@ -32,7 +32,7 @@ module BenefitSponsors
       field :terminated_on,           type: Date
 
       # This application's workflow status
-      field :aasm_state,              type: String,   default: :draft
+      field :aasm_state,              type: Symbol,   default: :draft
 
       # Calculated Fields for DataTable
       field :enrolled_summary,        type: Integer,  default: 0
@@ -60,11 +60,9 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       belongs_to  :recorded_rating_area,
-                  counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
       belongs_to  :recorded_service_area,
-                  counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       belongs_to  :benefit_sponsorship,
@@ -77,7 +75,7 @@ module BenefitSponsors
       embeds_many :benefit_packages,
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
-      validates_presence_of :effective_period, :open_enrollment_period
+      validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_area, :recorded_rating_area
 
       index({ "aasm" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
