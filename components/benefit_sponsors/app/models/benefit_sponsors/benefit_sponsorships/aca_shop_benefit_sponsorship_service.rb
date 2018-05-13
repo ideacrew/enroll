@@ -36,9 +36,10 @@ module BenefitSponsors
     # Trigger : Periodic automatic renewal
     #         : Manual renewals for conversion & error recovery
     # Must have uninterrupted coverage between application periods
-    def renew_benefit_application(benefit_application)
-      # Verify benefit sponsor states
-      # Verify states to check if application is eligible for renewal
+    def renew_benefit_application
+
+       benefit_sponsorship.renewal_application
+
       # Instantiate renewal application
       #   - Get the renewal schedule using schedular and populate dates
       #   - benefit sponsor catalog (build & store)

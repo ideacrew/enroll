@@ -38,15 +38,15 @@ RSpec.describe "_consumer_brokers_widget.html.erb" do
 
   context 'insured home broker widget as consumer without broker agency accounts' do
     let!(:consumer_role) { FactoryGirl.create(:consumer_role) }
+    let(:broker_agency_profile){FactoryGirl.create(:broker_agency_profile)}
+    let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account,broker_agency_profile_id:broker_agency_profile.id)}
     let(:person) { consumer_role.person }
     let!(:family) do
       f = FactoryGirl.build(:family)
       f.family_members = [
         FactoryGirl.build(:family_member, family: f, person: person, is_primary_applicant: true)
       ]
-      f.broker_agency_accounts = [
-        FactoryGirl.build(:broker_agency_account, family: f)
-      ]
+      f.broker_agency_accounts = [broker_agency_account]
       f.save
       f
     end
