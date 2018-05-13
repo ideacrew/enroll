@@ -218,17 +218,7 @@ module BenefitSponsors
         end
 
         def build_sponsor_profile(attrs = {})
-          profile = build_sponsor_profile_class.new(attrs)
-          build_benefit_sponsorship(profile)
-          profile
-        end
-
-        def build_benefit_sponsorship(profile)
-          benefit_market = get_market_place
-          self.organization.benefit_sponsorships << BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new({
-            profile_id: profile.id,
-            benefit_market: benefit_market
-          })
+          build_sponsor_profile_class.new(attrs)
         end
 
         def build_sponsor_profile_class

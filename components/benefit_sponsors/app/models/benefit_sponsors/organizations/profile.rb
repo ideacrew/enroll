@@ -36,6 +36,7 @@ module BenefitSponsors
       # @!method initialize_profile
       # Initialize settings for the abstract profile
       after_initialize :initialize_profile, :build_nested_models
+      before_save :build_benefit_sponsorship
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
@@ -89,6 +90,9 @@ module BenefitSponsors
       end
 
       def build_nested_models
+      end
+
+      def build_benefit_sponsorship
       end
     end
   end

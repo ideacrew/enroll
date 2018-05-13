@@ -2,7 +2,7 @@ module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile < BenefitSponsors::Organizations::Profile
       # include Concerns::AcaRatingAreaConfigConcern
-      # include Concerns::EmployerProfileConcern
+      include Concerns::EmployerProfileConcern
 
       field :sic_code,                type: String
 
@@ -47,7 +47,12 @@ module BenefitSponsors
       #### 
 
 
-      private 
+      private
+
+      def site
+        return @site if defined? @site
+        @site = BenefitSponsors::Site.by_site_key(:cca).first
+      end
 
       def initialize_profile
         return unless is_benefit_sponsorship_eligible.blank?

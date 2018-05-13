@@ -54,6 +54,13 @@ module BenefitSponsors
         delegate :legal_name, :end_on, to: :organization
       end
 
+      def build_benefit_sponsorship
+        self.organization.benefit_sponsorships << BenefitSponsorships::BenefitSponsorship.new({
+          profile_id: id,
+          benefit_market: site.benefit_markets.first
+        })
+      end
+
       def parent
         self.organization
       end
@@ -81,6 +88,16 @@ module BenefitSponsors
 
       def benefit_applications
         parent.active_benefit_sponsorship.benefit_applications
+      end
+
+      def initial_benefit_applications
+        # TODO
+        []
+      end
+
+      def renewing_benefit_applications
+        # TODO
+        []
       end
     end
   end
