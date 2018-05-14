@@ -58,7 +58,7 @@ class Insured::GroupSelectionController < ApplicationController
       BSON::ObjectId.from_string(family_member_id)
     end
     hbx_enrollment = build_hbx_enrollment
-    if (@adapter.keep_existing_plan?(params) && @hbx_enrollment.present?)
+    if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
 
       if sep.present?
@@ -140,22 +140,10 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_group_assignment = nil
 
       if @adapter.previous_hbx_enrollment.present?
-        if @employee_role == @adapter.previous_hbx_enrollment.employee_role
-          benefit_group = @adapter.previous_hbx_enrollment.benefit_group
-          benefit_group_assignment = @adapter.previous_hbx_enrollment.benefit_group_assignment
-        else
-          benefit_group = @employee_role.benefit_group(qle: @adapter.is_qle?)
-          benefit_group_assignment = @adapter.benefit_group_assignment_by_plan_year(@employee_role, benefit_group, @change_plan)
-        end
+        @adapter.build_shop_change_enrollment(@employee_role, @change_plan)
+      else
+        @adapter.build_new_shop_enrollment(@employee_role)
       end
-      @adapter.coverage_household.household.new_hbx_enrollment_from(
-        employee_role: @employee_role,
-        resident_role: @adapter.person.resident_role,
-        coverage_household: @adapter.coverage_household,
-        benefit_group: benefit_group,
-        benefit_group_assignment: benefit_group_assignment,
-        qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
     when 'individual'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @adapter.person.consumer_role,

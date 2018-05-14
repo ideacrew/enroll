@@ -161,6 +161,10 @@ module BenefitSponsors
         super(open_enrollment_range) unless open_enrollment_range.blank?
       end
 
+      def rate_schedule_date
+        start_on
+      end
+
       def start_on
         effective_period.begin unless effective_period.blank?
       end
@@ -321,7 +325,7 @@ module BenefitSponsors
         ## Application eligibility determination process
 
         # Submit plan year application
-        event :submit do
+        event :submit_application do
           transitions from: :draft, to: :draft,           guard:  :is_application_unpublishable?
           transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
           transitions from: :draft, to: :approved,        guard:  :is_application_eligible?#, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
@@ -365,6 +369,15 @@ module BenefitSponsors
           transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :denied
         end
 
+        event :begin_open_enrollment do
+          transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
+                      to:     :enrollment_open
+        end
+
+        event :end_open_enrollment do
+          transitions from:   :enrollment_open, to: :enrollment_closed
+        end
+
         event :approve_enrollment_eligiblity do
           transitions from:   ENROLLING_STATES,
                       to:     :enrollment_eligible
@@ -375,18 +388,12 @@ module BenefitSponsors
                       to:     :enrollment_ineligible
         end
 
-        event :begin_open_enrollment do
-          transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
-                      to:     :enrollment_open
-        end
-
-
-        event :revert_submitted_application, :after => :revert_employer_profile_application do
-          transitions from:   PLAN_DESIGN_EXCEPTION_STATES,
+        event :revert_application do #, :after => :revert_employer_profile_application do
+          transitions from:   [:approved, :denied] + PLAN_DESIGN_EXCEPTION_STATES,
                       to:     :draft
         end
 
-        event :revert_active_application, :after => :revert_employer_profile_application do
+        event :revert_enrollment do #, :after => :revert_employer_profile_application do
           transitions from:   [
                                   :enrollment_open, :enrollment_closed,
                                   :enrollment_eligible, :enrollment_ineligible,
@@ -396,7 +403,7 @@ module BenefitSponsors
                       after:  [:cancel_enrollments]
         end
 
-        event :activate do
+        event :activate_enrollment do
           transitions from:   [:enrollment_open, :enrollment_closed, :enrollment_eligible],
                       to:     :active,
                       guard:  :can_be_activated?
@@ -408,24 +415,24 @@ module BenefitSponsors
                       guard:  :can_be_expired?
         end
 
-        # Coverage disabled due to non-payment
-        event :suspend do
-          transitions from: :active, to: :suspended
-        end
-
         # Enrollment processed stopped due to missing binder payment
         event :cancel do
           transitions from:   PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES,
                       to:     :canceled
         end
 
+        # Coverage disabled due to non-payment
+        event :suspend_enrollment do
+          transitions from: :active, to: :suspended
+        end
+
         # Coverage terminated due to non-payment
-        event :terminate do
+        event :terminate_enrollment do
           transitions from: [:active, :suspended], to: :terminated
         end
 
         # Coverage reinstated
-        event :reinstate do
+        event :reinstate_enrollment do
           transitions from: [:suspended, :terminated], to: :active, after: :reset_termination_and_end_date
         end
       end
