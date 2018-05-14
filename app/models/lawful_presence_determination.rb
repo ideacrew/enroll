@@ -37,20 +37,17 @@ class LawfulPresenceDetermination
     state :verification_pending, initial: true
     state :verification_outstanding
     state :verification_successful
-    state :expired
 
     event :authorize, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_successful, after: :record_approval_information
       transitions from: :verification_outstanding, to: :verification_successful, after: :record_approval_information
       transitions from: :verification_successful, to: :verification_successful, after: :record_approval_information
-      transitions from: :expired, to: :verification_successful
     end
 
     event :deny, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_successful, to: :verification_outstanding, after: :record_denial_information
-      transitions from: :expired, to: :verification_outstanding
     end
 
     event :revert, :after => :record_transition do
