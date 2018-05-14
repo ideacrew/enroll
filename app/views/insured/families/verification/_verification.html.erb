@@ -33,7 +33,7 @@
                   <div class="v-type-status col-md-2 text-center">
                     <% if f_member.is_applying_coverage %>
                       <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
-                        <%= show_v_type(verif_type.validation_status) %>
+                        <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
                       </span>&nbsp;
                         <%= pundit_span Family, :updateable? %>
                     <% end %>
