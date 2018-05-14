@@ -142,7 +142,9 @@ module SponsoredBenefits
         copied_benefit_groups = []
         benefit_groups.each do |benefit_group|
           benefit_group.attributes.delete("_type")
-          copied_benefit_groups << ::BenefitGroup.new(benefit_group.attributes)
+          new_benefit_group = ::BenefitGroup.new(benefit_group.attributes)
+          new_benefit_group.relationship_benefits = benefit_group.relationship_benefits
+          copied_benefit_groups << new_benefit_group
         end
 
         ::PlanYear.new(
