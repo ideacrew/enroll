@@ -93,9 +93,8 @@ module BenefitSponsors
       def sponsored_benefits_attributes_to_form_params(benefit_package)
         benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << Forms::SponsoredBenefitForm.new({
-            plan_option_kind: sponsored_benefit.plan_option_kind,
-            kind: sponsored_benefit.kind,
-            plan_option_choice: sponsored_benefit.plan_option_choice,
+            product_option_choice: sponsored_benefit.product_option_choice,
+            product_package_kind: sponsored_benefit.product_package_kind,
             reference_plan_id: sponsored_benefit.reference_product.id,
             sponsor_contribution: sponsored_contribution_attributes_to_form_params(sponsored_benefit)
           })
@@ -126,9 +125,9 @@ module BenefitSponsors
       def sponsored_benefits_attributes(form)
         form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << {
-            plan_option_kind: sponsored_benefit.plan_option_kind,
             kind: sponsored_benefit.kind,
-            plan_option_choice: sponsored_benefit.plan_option_choice,
+            product_package_kind: sponsored_benefit.product_package_kind,
+            product_option_choice: sponsored_benefit.product_option_choice,
             reference_plan_id: sponsored_benefit.reference_plan_id,
             sponsor_contribution: sponsored_contribution_attributes(sponsored_benefit)
           }

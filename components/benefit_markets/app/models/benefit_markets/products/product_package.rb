@@ -78,11 +78,11 @@ module BenefitMarkets
       all_benefit_market_products.select { |product| product.service_area == service_area }
     end
 
-    def products_for_plan_option_choice(plan_option_choice)
+    def products_for_plan_option_choice(product_option_choice)
       if kind == :metal_level
-        products.by_metal_level(plan_option_choice)
+        products.by_metal_level(product_option_choice)
       else
-        issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(plan_option_choice)
+        issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(product_option_choice)
         return [] unless issuer_profile
         issuer_profile_products_for(issuer_profile)
       end
