@@ -238,7 +238,7 @@ class GroupSelectionPrevaricationAdapter
       benefit_group = controller_employee_role.benefit_group(qle: is_qle?)
       benefit_group_assignment = benefit_group_assignment_by_plan_year(controller_employee_role, benefit_group, controller_change_plan)
     end
-    coverage_household.household.new_hbx_enrollment_from(
+    change_enrollment = coverage_household.household.new_hbx_enrollment_from(
       employee_role: controller_employee_role,
       resident_role: person.resident_role,
       coverage_household: coverage_household,
@@ -246,6 +246,8 @@ class GroupSelectionPrevaricationAdapter
       benefit_group_assignment: benefit_group_assignment,
       qle: is_qle?,
       opt_effective_on: optional_effective_on)
+    change_enrollment.predecessor_enrollment_id = previous_hbx_enrollment.id
+    change_enrollment
   end
 
   def build_new_shop_enrollment(

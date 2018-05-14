@@ -202,8 +202,6 @@ module BenefitSponsors
 
     describe "Scopes" do
 
-      benefit_application
-
       let(:this_year)         { TimeKeeper.date_of_record.year }
       let(:march)             { Date.new(this_year,3,1) }
 
