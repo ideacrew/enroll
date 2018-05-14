@@ -44,7 +44,7 @@ module Notifier
         
         conditional_token_loops = []
         loop_iterators = conditional_tokens.inject([]) do |iterators, conditional_token|
-          return iterators unless conditional_token.match(/(.+)\.each/i)
+          iterators unless conditional_token.match(/(.+)\.each/i)
           loop_match = conditional_token.match(/\|(.+)\|/i)
           if loop_match.present?
             tokens << conditional_token.match(/(.+)\.each/i)[1]
