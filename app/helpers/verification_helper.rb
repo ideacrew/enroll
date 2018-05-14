@@ -142,9 +142,9 @@ module VerificationHelper
     ["verified", "rejected"].include?(status)
   end
 
-  def show_v_type(status)
+  def show_v_type(status, admin = nil)
     if status == "curam"
-      "External source".center(12)
+      admin ? "External Source".center(12) : "verified".capitalize.center(12).gsub(' ', '&nbsp;').html_safe
     elsif status
       status = "verified" if status == "valid"
       status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe

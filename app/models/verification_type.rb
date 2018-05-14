@@ -7,7 +7,7 @@ class VerificationType
   ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
 
-  VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired)
+  VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired curam)
   OUTSTANDING_STATES = %w(outstanding)
   DUE_DATE_STATES = %w(review outstanding)
 
@@ -62,6 +62,10 @@ class VerificationType
 
   def verif_due_date
     due_date || TimeKeeper.date_of_record + 95.days
+  end
+
+  def move_type_to_curam
+    update_attributes(:validation_status => "curam")
   end
 
   def pass_type
