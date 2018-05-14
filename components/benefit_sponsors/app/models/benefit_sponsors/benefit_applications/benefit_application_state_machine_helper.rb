@@ -65,22 +65,22 @@ module BenefitSponsors
       end
 
       def send_employee_invites
-        return true if benefit_groups.any?{|bg| bg.is_congress?}
+        # return true if benefit_groups.any?{|bg| bg.is_congress?}
         if is_renewing?
-          benefit_groups.each do |bg|
-            bg.census_employees.non_terminated.each do |ce|
+          benefit_packages.each do |benefit_package|
+            benefit_package.census_employees.non_terminated.each do |ce|
               Invitation.invite_renewal_employee!(ce)
             end
           end
-        elsif enrolling?
-          benefit_groups.each do |bg|
-            bg.census_employees.non_terminated.each do |ce|
+        elsif enrollment_open?
+          benefit_packages.each do |benefit_package|
+            benefit_package.census_employees.non_terminated.each do |ce|
               Invitation.invite_initial_employee!(ce)
             end
           end
         else
-          benefit_groups.each do |bg|
-            bg.census_employees.non_terminated.each do |ce|
+          benefit_packages.each do |benefit_package|
+            benefit_package.census_employees.non_terminated.each do |ce|
               Invitation.invite_employee!(ce)
             end
           end

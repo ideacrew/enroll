@@ -94,11 +94,107 @@ module BenefitSponsors
       end
 
       context "with all required arguments" do
-        subject { described_class.new(params) }
+        subject {described_class.new(params) }
 
         it "should be valid" do
           subject.validate
           expect(subject).to be_valid
+        end
+
+        context "and it is saved" do
+
+          it "should save" do
+            expect(subject.save).to eq true
+          end
+
+          context "it should be findable" do
+            before { subject.save! }
+            it "should return the instance" do
+              expect(described_class.find(subject.id.to_s)).to eq subject
+            end
+          end
+        end
+      end
+    end
+
+    describe "Extending a BenefitApplication's open_enrollment_period" do
+      let(:benefit_application)   { described_class.new(**params) }
+
+      context "and the application can transition to open enrollment state" do
+        let(:valid_open_enrollment_transition_state)    { :approved }
+
+        before { benefit_application.aasm_state = valid_open_enrollment_transition_state }
+
+        it "transition into open enrollment should be valid" do
+          expect(benefit_application.may_begin_open_enrollment?).to eq true
+        end
+
+        context "and the new end date is later than effective_period start" do
+          let(:late_open_enrollment_end_date)  { effective_period.min + 1.day }
+
+          before do
+            benefit_application.extend_open_enrollment_period(late_open_enrollment_end_date)
+          end
+
+          it "should not change the open_enrollment_period" do
+            expect(benefit_application.open_enrollment_end_on).to eq open_enrollment_period_end_on
+          end
+
+          it "should not change the application state" do
+            expect(benefit_application.aasm_state).to eq valid_open_enrollment_transition_state
+          end
+        end
+
+        context "and the new end date is in the past" do
+          let(:past_date) { open_enrollment_period_end_on - 1.day }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(open_enrollment_period_end_on)
+            benefit_application.extend_open_enrollment_period(past_date)
+          end
+
+          it "should be able to transition into open enrollment" do
+            expect(benefit_application.may_begin_open_enrollment?).to eq true
+          end
+
+          it "should not change the open_enrollment_period" do
+            expect(benefit_application.open_enrollment_end_on).to eq open_enrollment_period_end_on
+          end
+
+          it "should not change the application state" do
+            expect(benefit_application.aasm_state).to eq valid_open_enrollment_transition_state
+          end
+        end
+
+        context "and the new end date is valid" do
+          let(:valid_date)  { effective_period_start_on - 1.day }
+
+          before { benefit_application.extend_open_enrollment_period(valid_date) }
+
+          it "should change the open_enrollment_period end date and transition into open_enrollment" do
+            expect(benefit_application.open_enrollment_end_on).to eq valid_date
+            expect(benefit_application.aasm_state).to eq(:enrollment_open)
+          end
+
+          context "and the application cannot transition into open_enrollment_state" do
+            let(:invalid_open_enrollment_transition_state)  { :draft }
+
+            before do
+              benefit_application.open_enrollment_period = open_enrollment_period
+              benefit_application.aasm_state = invalid_open_enrollment_transition_state
+              benefit_application.extend_open_enrollment_period(valid_date)
+            end
+
+            it "transition into open enrollment should be invalid" do
+              expect(benefit_application.may_begin_open_enrollment?).to eq false
+            end
+
+            it "should not change the open_enrollment_period or transition into open_enrollment" do
+              expect(benefit_application.open_enrollment_end_on).to eq open_enrollment_period_end_on
+              expect(benefit_application.aasm_state).to eq(invalid_open_enrollment_transition_state)
+            end
+
+          end
         end
       end
     end
@@ -126,30 +222,8 @@ module BenefitSponsors
     end
 
 
-    describe "Extending a BenefitApplication's open_enrollment_period" do
-
-      context "and the new end date is later than effective_period start" do
-        it "should not change the open_enrollment_period"
-        it "should not change the application state"
-      end
-
-      context "and the new end date is in the past" do
-        it "should not change the open_enrollment_period"
-        it "should not change the application state"
-      end
-
-      context "and the application cannot transition to open enrollment state" do
-
-      end
-
-      context "and the application can transition to open enrollment state and the new end date is before the effective period start" do
-        it "should change the open_enrollment_period end date"
-        it "should change the application state"
-      end
-
-    end
-
     describe "Transitioning a BenefitApplication through Plan Design states" do
+      let(:benefit_application)   { described_class.new(**params) }
 
     end
 

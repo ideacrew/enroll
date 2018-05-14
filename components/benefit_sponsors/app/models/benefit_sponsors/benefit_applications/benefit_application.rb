@@ -183,8 +183,10 @@ module BenefitSponsors
       # @return [ BenefitApplication ] Self, with the updated open enrollment period and application in
       # open enrollment state
       def extend_open_enrollment_period(new_end_date)
-        if can_begin_open_enrollment? &&
-           [new_end_date, open_enrollment_end_on, Timekeeper.date_of_record, (start_on - 1.day)].max == new_end_date
+        if may_begin_open_enrollment? &&
+           new_end_date < start_on &&
+           [new_end_date, open_enrollment_end_on, TimeKeeper.date_of_record].max == new_end_date
+
           self.open_enrollment_period = open_enrollment_start_on..new_end_date
           begin_open_enrollment!
         end
