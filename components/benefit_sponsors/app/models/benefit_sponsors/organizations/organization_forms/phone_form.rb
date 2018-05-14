@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::PhoneForm
+    class OrganizationForms::PhoneForm
       include Virtus.model
       include ActiveModel::Validations
 

@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::AddressForm
+    class OrganizationForms::AddressForm
       include Virtus.model
       include ActiveModel::Validations
 

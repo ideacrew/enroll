@@ -6,12 +6,29 @@ module BenefitSponsors
         assign_agencies_for_employer(form)
       end
 
+      def terminate_agencies(form)
+        terminate_agencies_for_employer(form)
+      end
+
       private
+
+      def terminate_agencies_for_employer(form)
+        @employer_profile = BenefitSponsors::Organizations::Profile.find(form.employer_profile_id)
+        if form.termination_date
+          @employer_profile.fire_broker_agency(form.termination_date)
+          #TODO fix this during GA's implementation
+          # @employer_profile.fire_general_agency!(termination_date)
+          @employer_profile.save!
+          return true
+        else
+          return false
+        end
+      end
 
       def assign_agencies_for_employer(form)
         @employer_profile = BenefitSponsors::Organizations::Profile.find(form.employer_profile_id)
         assign_broker_agency_for_emp(form.broker_agency_profile_id, form.broker_role_id)
-        # # TODO fix this during GAs implementation
+        # # TODO fix this during GA's implementation
         # assign_general_agency_for_employer(form)
         # # TODO fix this during notices implementation
         # send_notices_associated_to_employer_profile

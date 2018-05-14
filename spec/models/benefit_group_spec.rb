@@ -573,7 +573,7 @@ describe BenefitGroup, type: :model do
       end
     end
 
-    context "and the 'carrier plans' option is offered" do
+    context "and the 'carrier plans' option is offered", dbclean: :after_each do
       let(:organization)            { employer_profile.organization }
       let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
       let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
@@ -601,7 +601,7 @@ describe BenefitGroup, type: :model do
         end
       end
 
-      context "and the reference plan is not in the elected plan set" do
+      context "and the reference plan is not in the elected plan set", dbclean: :after_each do
         before do
           benefit_group.plan_option_kind = :single_carrier
           benefit_group.reference_plan = reference_plan_choice
