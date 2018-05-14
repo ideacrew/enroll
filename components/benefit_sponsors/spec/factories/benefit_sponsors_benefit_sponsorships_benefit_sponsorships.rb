@@ -14,9 +14,9 @@ FactoryGirl.define do
     end
 
     trait :with_full_package do
-      organization { FactoryGirl.build(:benefit_sponsors_organizations_general_organization) }
+      organization { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
       # using another engine
-      benefit_market { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "DC Health SHOP") }
+      benefit_market { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "DC Health SHOP", site_urn: :dc) }
       profile { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
     end
 

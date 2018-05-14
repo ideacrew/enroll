@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::ProfileForm
+    class OrganizationForms::ProfileForm
       include Virtus.model
       include ActiveModel::Validations
 
@@ -20,9 +20,9 @@ module BenefitSponsors
       attribute :language_options, Array
       attribute :contact_method_options, Array
       attribute :profile_type, String
-      attribute :parent, Forms::OrganizationForm
+      attribute :parent, OrganizationForms::OrganizationForm
 
-      attribute :office_locations, Array[Forms::OfficeLocationForm]
+      attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
       validates_presence_of :entity_kind
       validates_presence_of :market_kind, if: :is_broker_profile?

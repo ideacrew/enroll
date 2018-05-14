@@ -50,5 +50,6 @@ module BenefitSponsors
       # # def to_plan_year
       # #   BenefitApplicationToPlanYearConverter.new(self).call
       # # end
+    end
 
-end
+  end

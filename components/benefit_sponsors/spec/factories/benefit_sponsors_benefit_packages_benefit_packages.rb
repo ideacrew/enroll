@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :benefit_sponsors_benefit_packages_benefit_package, class: 'BenefitSponsors::BenefitPackages::BenefitPackage' do
 
-    benefit_application { create(:benefit_sponsors_benefit_applications) }
+    benefit_application { create(:benefit_sponsors_benefit_applications, :with_benefit_sponsor_catalog) }
 
     title "first benefit package"
     description "my first benefit pacakge"
