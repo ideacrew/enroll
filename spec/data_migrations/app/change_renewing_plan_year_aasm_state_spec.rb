@@ -49,7 +49,6 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("py_aasm_state").and_return('renewing_publish_pending')
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
-      # debugger
     end
 
     it "should update aasm_state of plan year to renewing_enrolling when no enrollment present" do
