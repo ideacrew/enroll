@@ -251,20 +251,12 @@ class ConsumerRole
     self.ssn_validation == "pending"
   end
 
-  def ssn_expired?
-    self.ssn_validation == "expired"
-  end
-
   def ssn_outstanding?
     self.ssn_validation == "outstanding"
   end
 
   def lawful_presence_verified?
     self.lawful_presence_determination.verification_successful?
-  end
-
-  def lawful_presence_expired?
-    self.lawful_presence_determination.expired?
   end
 
   def is_hbx_enrollment_eligible?
@@ -429,7 +421,6 @@ class ConsumerRole
     state :sci_verified #sci => ssn citizenship immigration
     state :fully_verified
     state :verification_period_ended
-    state :expired
 
     before_all_events :ensure_verification_types
 
@@ -526,17 +517,6 @@ class ConsumerRole
       transitions from: :fully_verified, to: :unverified
       transitions from: :sci_verified, to: :unverified
       transitions from: :verification_period_ended, to: :unverified
-      transitions from: :expired, to: :unverified
-    end
-
-    event :move_to_coverall, :after => [:move_to_expired, :record_transition] do
-      transitions from: :unverified, to: :expired
-      transitions from: :ssa_pending, to: :expired
-      transitions from: :dhs_pending, to: :expired
-      transitions from: :verification_outstanding, to: :expired
-      transitions from: :fully_verified, to: :fully_verified
-      transitions from: :sci_verified, to: :sci_verified
-      transitions from: :verification_period_ended, to: :expired
     end
 
     event :verifications_backlog, :after => [:record_transition] do
@@ -773,10 +753,6 @@ class ConsumerRole
     (!is_state_resident.nil?) && (!is_state_resident)
   end
 
-  def residency_expired?
-    self.local_residency_validation == "expired"
-  end
-
   def residency_verified?
     is_state_resident? || residency_attested?
   end
@@ -790,10 +766,6 @@ class ConsumerRole
 
   def native_verified?
     native_validation == "valid"
-  end
-
-  def native_expired?
-    native_validation == 'expired'
   end
 
   def native_outstanding?
@@ -844,8 +816,8 @@ class ConsumerRole
     verification_types.by_name("Social Security Number").first.pending_type if verification_types.by_name("Social Security Number").first
   end
 
-  def move_to_expired(*args)
-    verification_types.each{|type| type.expire_type} if expired?
+  def move_to_expired
+    verification_types.each{|type| type.expire_type if type.is_type_outstanding? }
   end
 
   def revert_native

@@ -9,7 +9,7 @@ class VerificationType
 
   VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired)
   OUTSTANDING_STATES = %w(outstanding)
-  DUE_DATE_STATES = %w(review outstanding expired)
+  DUE_DATE_STATES = %w(review outstanding)
 
   field :type_name, type: String
   field :validation_status, type: String
@@ -77,6 +77,6 @@ class VerificationType
   end
 
   def expire_type
-    update_attributes(:validation_status => "expired")
+    update_attributes(:validation_status => "expired", :update_reason => "Moved to Coverall")
   end
 end

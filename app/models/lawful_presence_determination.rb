@@ -59,12 +59,6 @@ class LawfulPresenceDetermination
       transitions from: :expired, to: :verification_pending
       transitions from: :verification_successful, to: :verification_pending
     end
-
-    event :expired, :after => :record_transition do
-      transitions from: :verification_pending, to: :expired
-      transitions from: :verification_outstanding, to: :expired
-      transitions from: :expired, to: :expired
-    end
   end
 
   def latest_denial_date
