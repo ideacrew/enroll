@@ -421,7 +421,6 @@ class ConsumerRole
     state :sci_verified #sci => ssn citizenship immigration
     state :fully_verified
     state :verification_period_ended
-    state :expired
 
     before_all_events :ensure_verification_types
 
@@ -518,17 +517,6 @@ class ConsumerRole
       transitions from: :fully_verified, to: :unverified
       transitions from: :sci_verified, to: :unverified
       transitions from: :verification_period_ended, to: :unverified
-      transitions from: :expired, to: :unverified
-    end
-
-    event :move_to_coverall, :after => [:move_to_expired, :record_transition] do
-      transitions from: :unverified, to: :expired
-      transitions from: :ssa_pending, to: :expired
-      transitions from: :dhs_pending, to: :expired
-      transitions from: :verification_outstanding, to: :expired
-      transitions from: :fully_verified, to: :fully_verified
-      transitions from: :sci_verified, to: :sci_verified
-      transitions from: :verification_period_ended, to: :expired
     end
 
     event :verifications_backlog, :after => [:record_transition] do
@@ -829,8 +817,8 @@ class ConsumerRole
     verification_types.by_name("Social Security Number").first.pending_type if verification_types.by_name("Social Security Number").first
   end
 
-  def move_to_expired(*args)
-    verification_types.each{|type| type.expire_type} if expired?
+  def move_to_expired
+    verification_types.each{|type| type.expire_type if type.is_type_outstanding? }
   end
 
   def revert_native
