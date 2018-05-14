@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-xs-6">
     <h4>
-      <% if @family.enrollments.verification_needed.any? %>
+      <% if can_show_due_date?(@person) %>
           <%= l10n("document_due_date") %>:&nbsp;&nbsp;
           <% if (@person.primary_family.best_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
               <span class="label label-danger"><%= @person.primary_family.best_verification_due_date %> (Past Due)</span>
