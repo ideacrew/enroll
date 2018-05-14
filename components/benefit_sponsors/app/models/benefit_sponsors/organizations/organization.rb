@@ -154,6 +154,10 @@ module BenefitSponsors
         self.profiles.where(_type: /.*HbxProfile$/).first
       end
 
+      def issuer_profile
+        self.profiles.where(_type: /.*IssuerProfile$/).first
+      end
+
       def is_an_issuer_profile?
         self.profiles.where(_type: /.*IssuerProfile$/).present?
       end
