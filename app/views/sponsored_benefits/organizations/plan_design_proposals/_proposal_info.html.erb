@@ -45,18 +45,18 @@ $(function() {
   }
 
   $("#new_forms_plan_design_proposal input[type=text]").each(function(){
-    //$(this).on("change", submitPlanDesignProposalInfo);
+    $(this).on("change", submitPlanDesignProposalInfo);
   })
 
   $("#forms_plan_design_proposal_effective_date").change(function(e) {
       if(e.handled !== true) // This will prevent event triggering more then once
         {
-            //submitPlanDesignProposalInfo();
+            submitPlanDesignProposalInfo();
             e.handled = true;
         }
-        console.log("I was ssave")
   })
 });
+
 
 $(function() {
   
@@ -72,6 +72,7 @@ $(function() {
         success: function(res) {
           if (res != true) { // late rate scenario
             $('.interaction-click-control-select-health-benefits').hide();
+            $('.alert-info').removeClass('hide');
           } else if (res == true) {
            $('.interaction-click-control-select-health-benefits').show();
           }
