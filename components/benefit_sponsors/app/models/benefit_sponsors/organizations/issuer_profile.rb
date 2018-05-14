@@ -5,7 +5,6 @@ module BenefitSponsors
       include Mongoid::Timestamps
 
 
-
       def benefit_products
       end
 

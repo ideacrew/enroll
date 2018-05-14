@@ -42,7 +42,8 @@ module BenefitSponsors
       field :format, type: String, default: "application/octet-stream"
 
       # An unambiguous reference to the resource - Conforms to URI
-      field :identifier, type: String
+      #TODO remove the defaulted value after migration is successful
+      field :identifier, type: String, default: "missing_uri"
 
       # A related resource from which the described resource is derived
       field :source, type: String, default: "enroll_system"
