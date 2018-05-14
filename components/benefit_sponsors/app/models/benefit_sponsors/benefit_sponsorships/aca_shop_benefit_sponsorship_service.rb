@@ -1,33 +1,11 @@
 module BenefitSponsors
-  class BenefitSponsorships::AcaShopBenefitApplicationService
-
-    def initialize(benefit_application)
-      @benefit_application = benefit_application
-    end
-
-    def renew
-      @benefit_sponsorship = @benefit_application.benefit_sponsorship
-      @benefit_application.renew(renewal_benefit_period)
-    end
-
-    # benefit_market_catalog - ?
-    # benefit_sponsor_catalog
-    def terminate
-    end
-
-    def reinstate
-    end
-  end
-end
-
-module BenefitSponsors
   class BenefitSponsorships::AcaShopBenefitSponsorshipService
 
     def initialize(benefit_sponsorship)
       @benefit_sponsorship = benefit_sponsorship
     end
 
-    # How's this related to benefit application factory? 
+    # How's this related to benefit application factory?
     def initiate_benefit_application(effective_date)
 
       benefit_application
@@ -45,7 +23,7 @@ module BenefitSponsors
       #   - benefit sponsor catalog (build & store)
       #     - check for late rates
       #     - check availability (service areas)
-      #     
+      #
       #   - Renew benefit packages
       #     - construct benefit package
       #       - construct sponsored benefits
@@ -58,7 +36,7 @@ module BenefitSponsors
 
       renewal_application_dates = renewal_schedule_for(renewal_effective_date)
       renewal_benefit_application = benefit_sponsorship.benefit_applications.build(renewal_application_dates)
-      
+
       renewal_benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date)
       renewal_benefit_application
     end

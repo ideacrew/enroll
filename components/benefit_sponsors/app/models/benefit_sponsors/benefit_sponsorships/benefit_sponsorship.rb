@@ -141,13 +141,30 @@ module BenefitSponsors
       end
 
 
-      def employer_profile_to_benefit_sponsor_state_map
+      def employer_profile_to_benefit_sponsor_states_map
         {
           :applicant            => :new,
           :registered           => :initial_application_submitted,
           :conversion_expired   => :initial_application_expired,
         }
       end
+
+      # TODO Refactor (moved from PlanYear)
+      # def overlapping_published_plan_years
+      #   benefit_sponsorship.benefit_applications.published_benefit_applications_within_date_range(start_on, end_on)
+      # end
+
+      # TODO Refactor (moved from PlanYear)
+      # def overlapping_published_plan_year?
+      #   self.benefit_sponsorship.benefit_applications.published_or_renewing_published.any? do |benefit_application|
+      #     benefit_application.effective_period.cover?(self.start_on) && (benefit_application != self)
+      #   end
+      # end
+
+
+      def renew_benefit_application
+      end
+
 
 
       # Workflow for self service
