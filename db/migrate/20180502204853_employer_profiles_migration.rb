@@ -172,7 +172,7 @@ class EmployerProfilesMigration < Mongoid::Migration
   def self.link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
     person_records_with_old_employee_roles.each do |person|
       old_employee_role = person.employee_roles.where(employer_profile_id: @old_profile.id).first
-      old_employee_role.update_attributes(benefit_sponsor_employer_profile_id: @new_profile.id) if old_employee_role.present?
+      old_employee_role.update_attributes(benefit_sponsors_employer_profile_id: @new_profile.id) if old_employee_role.present?
     end
   end
 
