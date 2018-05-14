@@ -16,7 +16,7 @@ describe "EmployerProfilesMigration" do
   describe ".up" do
 
     before :all do
-      site = FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :dc)
+      site = FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
       organization1 = FactoryGirl.create(:organization, legal_name: "Delta Dental")

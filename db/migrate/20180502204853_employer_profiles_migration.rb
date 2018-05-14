@@ -1,6 +1,6 @@
 class EmployerProfilesMigration < Mongoid::Migration
   def self.up
-    site_key = "dc"
+    site_key = "cca"
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/employer_profiles_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
@@ -144,7 +144,7 @@ class EmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :version, :versions, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :issuer_assigned_id, :version, :versions, :employer_profile,:broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
     general_organization = BenefitSponsors::Organizations::GeneralOrganization.new(old_org_params)
     general_organization.entity_kind = @old_profile.entity_kind.to_sym
