@@ -55,7 +55,7 @@ class EmployerProfilesMigration < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :sic_code, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :sic_code, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params,logger)
@@ -103,7 +103,7 @@ class EmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_profile(old_org, old_profile_params,logger)
-    new_profile = BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(old_profile_params)
+    new_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(old_profile_params)
 
     build_inbox_messages(new_profile)
     build_documents(old_org, new_profile,logger)
