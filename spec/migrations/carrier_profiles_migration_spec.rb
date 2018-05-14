@@ -4,7 +4,7 @@ describe "CarrierProfilesMigration" do
 
   before :all do
     Dir[Rails.root.join('db', 'migrate', '*_carrier_profiles_migration.rb')].each do |f|
-      @test = f
+      @path = f
       require f
     end
   end
@@ -12,7 +12,7 @@ describe "CarrierProfilesMigration" do
   describe ".up" do
 
     before :all do
-      site = FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :dc)
+      site = FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
       organization1 = FactoryGirl.create(:organization, legal_name: "Delta Dental")
@@ -27,7 +27,7 @@ describe "CarrierProfilesMigration" do
 
 
       @migrations_paths = Rails.root.join("db/migrate")
-      @test_version = @test.split("/").last.split("_").first
+      @test_version = @path.split("/").last.split("_").first
     end
 
     it "should match total migrated organizations with carrier profiles" do
