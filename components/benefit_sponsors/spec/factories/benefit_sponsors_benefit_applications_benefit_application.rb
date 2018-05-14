@@ -15,7 +15,12 @@ FactoryGirl.define do
       open_enrollment_period_end_on = open_enrollment_period_start_on + 9.days
       open_enrollment_period_start_on..open_enrollment_period_end_on
     end
+
+    recorded_service_area  { ::BenefitMarkets::Locations::ServiceArea.new }
+    recorded_rating_area   { ::BenefitMarkets::Locations::RatingArea.new }
+
+    trait :with_benefit_sponsor_catalog do      
+      benefit_sponsor_catalog { ::BenefitMarkets::BenefitSponsorCatalog.new }
+    end
   end
 end
-
-
