@@ -32,5 +32,18 @@ module BenefitSponsors
       self
     end
 
+    def clone_for_coverage(new_product)
+      self.class.new({
+        group_id: @group_id,
+        coverage_start_on: @coverage_start_on,
+        benefit_sponsor: @benefit_sponsor,
+        previous_product: @previous_product,
+        product: new_product,
+        rate_schedule_date: @rate_schedule_date,
+        rating_area: @rating_area,
+        member_enrollments: member_enrollments.map(&:clone_for_coverage)
+      })
+    end
+
   end
 end

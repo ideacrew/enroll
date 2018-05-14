@@ -20,6 +20,8 @@ module BenefitSponsors
 
       delegate :benefit_sponsor_catalog, to: :benefit_application
 
+      delegate :rate_schedule_date, to: :benefit_application
+
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range
  
