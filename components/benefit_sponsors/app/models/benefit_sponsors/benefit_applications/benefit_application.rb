@@ -3,9 +3,8 @@ module BenefitSponsors
     class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
-      include AASM
-      include BenefitApplicationStateMachineHelper
       include BenefitSponsors::Concerns::RecordTransition
+      include AASM
 
       PLAN_DESIGN_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
       PLAN_DESIGN_DRAFT_STATES      = [:draft] + PLAN_DESIGN_EXCEPTION_STATES.freeze
@@ -280,7 +279,7 @@ module BenefitSponsors
         state :appealing            # request reversal of negative determination
         ## End optional states for exception processing
 
-        state :enrollment_open,       :after_enter => :send_employee_invites          # Approved application has entered open enrollment period
+        state :enrollment_open      #,       :after_enter => :send_employee_invites          # Approved application has entered open enrollment period
         # state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
 
         state :enrollment_closed
@@ -300,6 +299,8 @@ module BenefitSponsors
         state :expired              # Non-published plans are expired following their end on date
         state :canceled             # Application closed prior to coverage taking effect
 
+        after_all_transitions :publish_state_transition
+
         event :import do
           transitions from: :draft, to: :imported
         end
@@ -309,7 +310,7 @@ module BenefitSponsors
           transitions from: :enrollment_eligible,                   to: :active,                 guard:   :is_event_date_valid?
           transitions from: :approved,                              to: :enrollment_open,        guard:   :is_event_date_valid?
           transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_eligible,    guards:  [:is_open_enrollment_closed?, :is_enrollment_valid?]
-          transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+          transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed? #, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
           transitions from: :enrollment_open,                       to: :enrollment_closed,      guard:   :is_event_date_valid?
 
           transitions from: :active,                                to: :terminated,             guard:   :is_event_date_valid?
@@ -436,7 +437,16 @@ module BenefitSponsors
           transitions from: [:suspended, :terminated], to: :active, after: :reset_termination_and_end_date
         end
       end
+     
+      def publish_state_transition
+        benefit_sponsorship.application_event_subscriber(aasm)
+      end
 
+      def benefit_sponsorship_event_subscriber(aasm)
+        if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
+          approve_enrollment_eligiblity!
+        end
+      end
 
       private
 
