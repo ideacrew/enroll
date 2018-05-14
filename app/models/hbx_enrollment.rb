@@ -1561,9 +1561,14 @@ class HbxEnrollment
     end
   end
 
-  def as_shop_member_group(previous_product = nil)
+  def as_shop_member_group
     roster_members = []
     group_enrollment_members = []
+    previous_enrollment = self.parent_enrollment
+    previous_product = nil
+    if previous_enrollment
+      previous_product = previous_enrollment.plan
+    end
     hbx_enrollment_members.each do |hem|
       person = hem.person
       roster_member = EnrollmentMemberAdapter.new(
