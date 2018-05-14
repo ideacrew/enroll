@@ -730,13 +730,13 @@ class ConsumerRole
   def mark_residency_denied(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false)
-    verification_types.by_name("DC Residency").first.fail_type
+    verification_types.by_name("DC Residency").first.fail_type if verification_types.by_name("DC Residency").first
   end
 
   def mark_residency_pending(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => nil)
-    verification_types.by_name("DC Residency").first.pending_type
+    verification_types.by_name("DC Residency").first.pending_type if verification_types.by_name("DC Residency").first
   end
 
   def mark_residency_authorized(*args)
@@ -798,11 +798,11 @@ class ConsumerRole
   end
 
   def pass_ssn(*args)
-    verification_types.by_name("Social Security Number").first.pass_type
+    verification_types.by_name("Social Security Number").first.pass_type if verification_types.by_name("Social Security Number").first
   end
 
   def fail_ssn(*args)
-    verification_types.by_name("Social Security Number").first.fail_type
+    verification_types.by_name("Social Security Number").first.fail_type if verification_types.by_name("Social Security Number").first
   end
 
   def move_types_to_pending(*args)
@@ -834,7 +834,7 @@ class ConsumerRole
   end
 
   def revert_native
-    verification_types.by_name("American Indian Status").first.pending_type
+    verification_types.by_name("American Indian Status").first.pending_type if verification_types.by_name("American Indian Status").first
   end
 
   def revert_lawful_presence(*args)
