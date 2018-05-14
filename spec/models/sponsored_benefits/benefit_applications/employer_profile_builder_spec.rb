@@ -19,7 +19,7 @@ module SponsoredBenefits
 
     context "add_plan_year" do
 
-      let(:employer_profile)          { EmployerProfile.new(entity_kind:'governmental_employer') }
+      let(:employer_profile)          { EmployerProfile.new(entity_kind:'governmental_employer',sic_code:'01330') }
       let!(:organization)              { Organization.create(employer_profile:employer_profile) }
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
@@ -39,7 +39,7 @@ module SponsoredBenefits
       let(:plan_design_organization)  { SponsoredBenefits::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
       let(:plan_design_proposal)      { SponsoredBenefits::Organizations::PlanDesignProposal.new(title: "New Proposal") }
       let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
-      let(:relationship_benefits) do
+      let!(:relationship_benefits) do
           [
             ::RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
             ::RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
