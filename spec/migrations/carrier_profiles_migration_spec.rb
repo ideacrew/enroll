@@ -40,7 +40,7 @@ describe "CarrierProfilesMigration" do
     end
 
     it "should match FEIN" do
-      expect(@migrated_organizations.first.issuer_profile.issuer_hios_ids.first).to eq @old_organizations.first.carrier_profile.issuer_hios_id
+      expect(@migrated_organizations.first.issuer_profile.issuer_hios_ids.first).to eq @old_organizations.first.carrier_profile.issuer_hios_ids.first
     end
 
     it "should match office locations" do

@@ -56,11 +56,11 @@ class CarrierProfilesMigration < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.carrier_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :updated_by_id, :issuer_hios_id])
+            json_data = @old_profile.to_json(:except => [:_id, :updated_by_id])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = self.initialize_new_profile(old_org, old_profile_params)
-            @new_profile.issuer_hios_ids << @old_profile.issuer_hios_id
+            # @new_profile.issuer_hios_ids << @old_profile.issuer_hios_ids
 
             new_organization = self.initialize_new_organization(old_org, site)
             new_organization.save!
@@ -117,7 +117,7 @@ class CarrierProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :versions, :version, :fein, :employer_profile, :broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :issuer_assigned_id, :versions, :version, :fein, :employer_profile, :broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :home_page, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
     exempt_organization = BenefitSponsors::Organizations::ExemptOrganization.new(old_org_params)
     exempt_organization.site = site
