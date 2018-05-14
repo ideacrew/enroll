@@ -158,6 +158,10 @@ module BenefitSponsors
         super(open_enrollment_range) unless open_enrollment_range.blank?
       end
 
+      def rate_schedule_date
+        start_on
+      end
+
       def start_on
         effective_period.begin unless effective_period.blank?
       end

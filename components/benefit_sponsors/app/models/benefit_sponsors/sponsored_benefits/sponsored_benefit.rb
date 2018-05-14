@@ -17,6 +17,7 @@ module BenefitSponsors
                   class_name: "::BenefitSponsors::SponsoredBenefits::PricingDetermination"
 
       delegate :benefit_sponsor_catalog, to: :benefit_package
+      delegate :rate_schedule_date, to: :benefit_package
 
       def latest_pricing_determination
         pricing_determinations.sort_by(&:created_at).last
