@@ -5,7 +5,7 @@ FactoryGirl.define do
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }
     sequence(:address_2, 111) { |n| "##{n}" }
     city 'Washington'
-    state 'DC' #Settings.aca.state_abbreviation
+    state Settings.aca.state_abbreviation
     zip '01001'
     county 'Hampden'
 

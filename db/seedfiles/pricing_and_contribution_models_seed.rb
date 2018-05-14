@@ -47,7 +47,7 @@ pricing_model = BenefitMarkets::PricingModels::PricingModel.create!(
   :price_calculator_kind => "::BenefitSponsors::PricingCalculators::ShopSimpleListBillPricingCalculator",
   :pricing_units => employer_pricing_units,
   :member_relationships => employer_member_relationships,
-  :name => "DC Shop Pricing Model"
+  :name => "#{Settings.aca.state_abbreviation} Shop Pricing Model"
 )
 
 # Contribution Models
@@ -123,6 +123,6 @@ contribution_model = BenefitMarkets::ContributionModels::ContributionModel.creat
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::SimpleShopReferencePlanContributionCalculator",
   contribution_units: employer_contribution_units,
   member_relationships: employer_contribution_relationships,
-  title: "DC Shop Contribution Model",
+  title: "#{Settings.aca.state_abbreviation} Shop Contribution Model",
   many_simultaneous_contribution_units: true
 })

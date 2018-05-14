@@ -6,6 +6,8 @@ module BenefitSponsors
       extend ActiveSupport::Concern
       include StateMachines::EmployerProfileStateMachine
 
+      attr_accessor :broker_role_id
+
       included do
         ENTITY_KINDS ||= [
           :tax_exempt_organization,
@@ -99,6 +101,71 @@ module BenefitSponsors
         # TODO
         []
       end
+
+      def active_benefit_sponsorship
+        organization.active_benefit_sponsorship rescue nil
+      end
+
+      def active_broker_agency_account
+        active_benefit_sponsorship.active_broker_agency_account rescue nil
+      end
+
+      def broker_agency_profile
+        active_broker_agency_account.broker_agency_profile rescue nil
+      end
+
+      def today=(new_date)
+        raise ArgumentError.new("expected Date") unless new_date.is_a?(Date)
+        @today = new_date
+      end
+
+      def today
+        return @today if defined? @today
+        @today = TimeKeeper.date_of_record
+      end
+
+      def hire_broker_agency(new_broker_agency, start_on = today)
+        start_on = start_on.to_date.beginning_of_day
+        if active_broker_agency_account.present?
+          terminate_on = (start_on - 1.day).end_of_day
+          fire_broker_agency(terminate_on)
+          # fire_general_agency!(terminate_on)
+        end
+
+        organization.active_benefit_sponsorship.broker_agency_accounts.create(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on).save!
+        @broker_agency_profile = new_broker_agency
+      end
+
+      def fire_broker_agency(terminate_on = today)
+        return unless active_broker_agency_account
+        active_broker_agency_account.update_attributes!(end_on: terminate_on, is_active: false)
+        # TODO fix these during notices implementation
+        # employer_broker_fired
+        # notify_broker_terminated
+        # broker_fired_confirmation_to_broker
+      end
+
+      def broker_fired_confirmation_to_broker
+        trigger_notices('broker_fired_confirmation_to_broker')
+      end
+
+      def employer_broker_fired
+        trigger_notices('employer_broker_fired')
+      end
+
+      def notify_broker_terminated
+        notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
+      end
+
+      def trigger_notices(event)
+        begin
+          ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
+        end
+      end
+
+      alias_method :broker_agency_profile=, :hire_broker_agency
     end
   end
 end

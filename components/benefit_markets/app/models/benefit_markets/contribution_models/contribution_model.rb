@@ -35,7 +35,6 @@ module BenefitMarkets
       validates_presence_of :member_relationships
       validates_presence_of :product_multiplicities, :allow_blank => false
 
-
       index({"key" => 1})
 
       scope :options_for_select,  ->{ unscoped.distinct(:key).as_json } #.reduce([]) { |list, cm| list << [cm.title, cm.key] } }

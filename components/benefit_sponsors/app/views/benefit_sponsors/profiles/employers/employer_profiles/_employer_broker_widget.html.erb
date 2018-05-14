@@ -1,4 +1,4 @@
-<% broker_and_agency_present = true if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
+<% broker_and_agency_present = true if @employer_profile.broker_agency_profile.present? && @broker_agency_account.writing_agent.present? %>
 <!-- TODO fix this during pundit implementation-->
 <div class="panel panel-default module employer-broker-widget <%#= pundit_class EmployerProfile, :updateable? %>">
   <div class="panel-heading">
@@ -26,7 +26,7 @@
     <div class="text-left">
       <% if broker_and_agency_present %>
       <div class="broker-information">
-        <% active_broker = @broker_agency_accounts[0].writing_agent %>
+        <% active_broker = @broker_agency_account.writing_agent %>
         <%= active_broker.person.full_name.titleize %>
         <br/>
         <a href="tel:1-<%= active_broker.phone %>">1

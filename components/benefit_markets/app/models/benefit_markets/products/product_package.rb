@@ -16,6 +16,7 @@ module BenefitMarkets
     field :kind,                    type: Symbol
     field :title,                   type: String, default: ""
     field :description,             type: String, default: ""
+    field :multiplicity,            type: Boolean, default: true
 
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
@@ -34,6 +35,10 @@ module BenefitMarkets
 
     def benefit_market_kind
       packagable.benefit_market_kind
+    end
+
+    def product_multiplicity
+      multiplicity ? :multiple : :single
     end
 
     def issuer_profiles
@@ -75,7 +80,7 @@ module BenefitMarkets
 
     def products_for_plan_option_choice(plan_option_choice)
       if kind == :metal_level
-        product_package.products.by_metal_level(plan_option_choice)
+        products.by_metal_level(plan_option_choice)
       else
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(plan_option_choice)
         return [] unless issuer_profile

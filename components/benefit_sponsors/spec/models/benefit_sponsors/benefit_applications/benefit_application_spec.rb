@@ -18,90 +18,184 @@ module BenefitSponsors
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
 
+
+    let(:recorded_service_area)     { ::BenefitMarkets::Locations::ServiceArea.new }
+    let(:recorded_rating_area)      { ::BenefitMarkets::Locations::RatingArea.new }
+
     let(:params) do
       {
         effective_period: effective_period,
         open_enrollment_period: open_enrollment_period,
+        recorded_service_area:  recorded_service_area,
+        recorded_rating_area:   recorded_rating_area,
       }
     end
 
-    before do
-      site.owner_organization = owner_organization
-      benefit_market.save!
-    end
 
-    context "with no arguments" do
-      subject { described_class.new }
+    context "A new model instance" do
+     it { is_expected.to be_mongoid_document }
+     it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
+     it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
+     it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
+     it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
+     it { is_expected.to have_field(:msp_count).of_type(Integer).with_default_value_of(0)}
 
-      it "should not be valid" do
-        subject.validate
-        expect(subject).to_not be_valid
+     it { is_expected.to embed_many(:benefit_packages)}
+     it { is_expected.to belong_to(:successor_application).as_inverse_of(:predecessor_application)}
+
+      before do
+        site.owner_organization = owner_organization
+        benefit_market.save!
+      end
+
+      context "with no arguments" do
+        subject { described_class.new }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with no effective_period" do
+        subject { described_class.new(params.except(:effective_period)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with no open_enrollment_period" do
+        subject { described_class.new(params.except(:open_enrollment_period)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with no recorded_service_area" do
+        subject { described_class.new(params.except(:recorded_service_area)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with no recorded_rating_area" do
+        subject { described_class.new(params.except(:recorded_rating_area)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with all required arguments" do
+        subject { described_class.new(params) }
+
+        it "should be valid" do
+          subject.validate
+          expect(subject).to be_valid
+        end
       end
     end
 
-    context "with no effective_period" do
-      subject { described_class.new(params.except(:effective_period)) }
 
-      it "should not be valid" do
-        subject.validate
-        expect(subject).to_not be_valid
-      end
+    describe "Scopes" do
+
+      it "should find applications by Effective date start"
+      it "should find applications by Open Enrollment end"
+
+      it "should find applications in renewing status"
+
+      it "should find applications in Plan Draft status"
+      it "should find applications in Plan Design Exception status"
+      it "should find applications in Plan Design Approved status"
+      it "should find applications in Enrolling status"
+      it "should find applications in Enrollment Eligible status"
+      it "should find applications in Enrollment Ineligible status"
+      it "should find applications in Coverage Effective status"
+      it "should find applications in Terminated status"
+      it "should find applications in Expired Effective status"
+
+      it "should find applications with chained scopes"
+
     end
 
-    context "with no open enrollment period" do
-      subject { described_class.new(params.except(:open_enrollment_period)) }
 
-      it "should not be valid" do
-        subject.validate
-        expect(subject).to_not be_valid
+    describe "Extending a BenefitApplication's open_enrollment_period" do
+
+      context "and the new end date is later than effective_period start" do
+        it "should not change the open_enrollment_period"
+        it "should not change the application state"
       end
+
+      context "and the new end date is in the past" do
+        it "should not change the open_enrollment_period"
+        it "should not change the application state"
+      end
+
+      context "and the application cannot transition to open enrollment state" do
+
+      end
+
+      context "and the application can transition to open enrollment state and the new end date is before the effective period start" do
+        it "should change the open_enrollment_period end date"
+        it "should change the application state"
+      end
+
     end
 
-    context "with all required arguments" do
-      subject { described_class.new(params) }
+    describe "Transitioning a BenefitApplication through Plan Design states" do
 
-      it "should be valid" do
-        subject.validate
-        expect(subject).to be_valid
-      end
     end
 
-    context "#to_plan_year", dbclean: :after_each do
-      let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
-      let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(benefit_market: :aca_shop_cca) }
 
-      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
-      let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
-      let(:office_location) { OfficeLocation.new(
-          is_primary: true,
-          address: address,
-          phone: phone
-        )
-      }
+    describe "Transitioning a BenefitApplication through Enrolling states" do
 
-      let(:plan_design_organization)  { BenefitSponsors::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc") }
-      let(:plan_design_proposal)      { BenefitSponsors::Organizations::PlanDesignProposal.new(title: "New Proposal") }
-      let(:profile) {BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new}
-
-      before(:each) do
-        plan_design_organization.plan_design_proposals << [plan_design_proposal]
-        plan_design_proposal.profile = profile
-        profile.organization.benefit_sponsorships = [benefit_sponsorship]
-        benefit_sponsorship.benefit_applications  = [benefit_application]
-        benefit_application.benefit_packages.build
-        plan_design_organization.save
-      end
-
-      it "should instantiate a plan year object and must have correct values assigned" do
-        plan_year = benefit_application.to_plan_year
-        expect(plan_year.class).to eq PlanYear
-        expect(plan_year.benefit_groups.present?).to eq true
-        expect(plan_year.start_on).to eq benefit_application.effective_period.begin
-        expect(plan_year.end_on).to eq benefit_application.effective_period.end
-        expect(plan_year.open_enrollment_start_on).to eq benefit_application.open_enrollment_period.begin
-        expect(plan_year.open_enrollment_end_on).to eq benefit_application.open_enrollment_period.end
-      end
     end
+
+
+    ## TODO: Refactor for BenefitApplication
+    # context "#to_plan_year", dbclean: :after_each do
+    #   let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
+    #   let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(benefit_market: :aca_shop_cca) }
+
+    #   let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+    #   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+    #   let(:office_location) { OfficeLocation.new(
+    #       is_primary: true,
+    #       address: address,
+    #       phone: phone
+    #     )
+    #   }
+
+    #   let(:plan_design_organization)  { BenefitSponsors::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc") }
+    #   let(:plan_design_proposal)      { BenefitSponsors::Organizations::PlanDesignProposal.new(title: "New Proposal") }
+    #   let(:profile) {BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new}
+
+    #   before(:each) do
+    #     plan_design_organization.plan_design_proposals << [plan_design_proposal]
+    #     plan_design_proposal.profile = profile
+    #     profile.organization.benefit_sponsorships = [benefit_sponsorship]
+    #     benefit_sponsorship.benefit_applications  = [benefit_application]
+    #     benefit_application.benefit_packages.build
+    #     plan_design_organization.save
+    #   end
+
+    #   it "should instantiate a plan year object and must have correct values assigned" do
+    #     plan_year = benefit_application.to_plan_year
+    #     expect(plan_year.class).to eq PlanYear
+    #     expect(plan_year.benefit_groups.present?).to eq true
+    #     expect(plan_year.start_on).to eq benefit_application.effective_period.begin
+    #     expect(plan_year.end_on).to eq benefit_application.effective_period.end
+    #     expect(plan_year.open_enrollment_start_on).to eq benefit_application.open_enrollment_period.begin
+    #     expect(plan_year.open_enrollment_end_on).to eq benefit_application.open_enrollment_period.end
+    #   end
+    # end
 
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
@@ -158,7 +252,7 @@ module BenefitSponsors
           end
         end
 
-        # TODO: Open enrollment minimum length setting for days & adv_days same. 
+        # TODO: Open enrollment minimum length setting for days & adv_days same.
         #       Following spec need to be improved to handle this scenario.
         # context "that is after the standard period, but before the grace period deadline" do
         #   it "should provide an effective (standard) period beginning the first of month following next month" do
@@ -230,7 +324,12 @@ module BenefitSponsors
 
         it "timetable date values should be valid" do
           timetable = subject.enrollment_timetable_by_effective_date(effective_date)
-          expect(BenefitApplications::BenefitApplication.new(effective_period: timetable[:effective_period], open_enrollment_period: timetable[:open_enrollment_period])).to be_valid
+          expect(BenefitApplications::BenefitApplication.new(
+                              effective_period: timetable[:effective_period],
+                              open_enrollment_period: timetable[:open_enrollment_period],
+                              recorded_service_area:  recorded_service_area,
+                              recorded_rating_area:   recorded_rating_area,
+                            )).to be_valid
         end
       end
 

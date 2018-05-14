@@ -1,6 +1,6 @@
 site = BenefitSponsors::Site.all.first
 if site.blank?
-  site = BenefitSponsors::Site.new(site_key: :dc)
+  site = BenefitSponsors::Site.new(site_key: "#{Settings.site.key}")
 end
 
 # Clear the current models
@@ -30,6 +30,17 @@ Organization.where(carrier_profile: {"$ne" => nil}).each do |org|
   organization.site = site
   organization.save
 end
+
+puts "Creating Rating Area and Service Area.."
+county_zip = ::BenefitMarkets::Locations::CountyZip.new(county_name: "Hampden", zip: "01001", state: "#{Settings.aca.state_abbreviation}")
+county_zip.save
+rating_area = BenefitMarkets::Locations::RatingArea.new(covered_states: ["#{Settings.aca.state_abbreviation}"], county_zip_ids: [county_zip.id], exchange_provided_code: "#{Settings.aca.state_abbreviation}", active_year: 2018)
+rating_area.save
+
+issuer_id = BenefitSponsors::Organizations::Organization.where(:"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first.id
+
+service_area = BenefitMarkets::Locations::ServiceArea.new(covered_states: ["#{Settings.aca.state_abbreviation}"], issuer_id: issuer_id,county_zip_ids: [county_zip.id], issuer_provided_code: "#{Settings.aca.state_abbreviation}", active_year: 2018)
+service_area.save
 
 puts "Loading Products..."
 Plan.where(:market => 'shop', :coverage_kind => 'health', :active_year => 2018).each do |plan|
@@ -100,15 +111,15 @@ end
 puts "Creating Benefit Market..."
 benefit_market = ::BenefitMarkets::BenefitMarket.create!({
   kind: :aca_shop,
-  title: "DC Health Link SHOP Market",
-  site_urn: "DC",
-  description: "DC Health Link Shop Market",
+  title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Market",
+  site_urn: "#{Settings.aca.state_abbreviation}",
+  description: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} Shop Market",
   configuration: BenefitMarkets::Configurations::Configuration.new
 })
 
 puts "Creating Benefit Market Catalog..."
 benefit_market_catalog = benefit_market.benefit_market_catalogs.create!({
-  title: "DC Health Link SHOP Benefit Catalog",
+  title: "#{Settings.aca.state_abbreviation} #{Settings.site.short_name} SHOP Benefit Catalog",
   application_interval_kind: :monthly,
   application_period: Date.new(2018,1,1)..Date.new(2018,12,31),
   probation_period_kinds: ::BenefitMarkets::PROBATION_PERIOD_KINDS
@@ -119,8 +130,8 @@ benefit_market_catalog.product_packages.create!({product_kind: :health, title: '
 benefit_market_catalog.product_packages.create!({product_kind: :health, title: 'Metal Level', kind: :metal_level, application_period: benefit_market_catalog.application_period})
 benefit_market_catalog.product_packages.create!({product_kind: :health, title: 'Single Product', kind: :single_product, application_period: benefit_market_catalog.application_period})
 
-dc_contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where(title: "DC Shop Contribution Model").first
-dc_pricing_model = ::BenefitMarkets::PricingModels::PricingModel.where(name: "DC Shop Pricing Model").first
+dc_contribution_model = ::BenefitMarkets::ContributionModels::ContributionModel.where(title: "#{Settings.aca.state_abbreviation} Shop Contribution Model").first
+dc_pricing_model = ::BenefitMarkets::PricingModels::PricingModel.where(name: "#{Settings.aca.state_abbreviation} Shop Pricing Model").first
 
 benefit_market_catalog.product_packages.each do |product_package|
   product_package.contribution_model = dc_contribution_model

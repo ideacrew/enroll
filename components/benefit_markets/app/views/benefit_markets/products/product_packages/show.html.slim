@@ -5,8 +5,10 @@ dl
   dt= t("product_package.pricing_model", default: "Pricing Model")
   dd= @product_package.pricing_model.name
   dt= t("product_package.contribution_model", default: "Contribution Model")
-  dd= @product_package.contribution_model.name
+  dd= @product_package.contribution_model.title
 
 ul
-  - @product_package.all_products.each do |product|
+  - @product_package.products.each do |product|
     li= product.name
+
+= link_to 'Back to All Product Packages', products_product_packages_path
