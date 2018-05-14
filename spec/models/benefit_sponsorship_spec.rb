@@ -49,7 +49,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
         before { benefit_sponsorship.save }
 
         it "should be findable by ID" do
-          expect(BenefitSponsorship.find(benefit_sponsorship.id)).to eq benefit_sponsorship
+          expect(BenefitSponsorship.find(hbx_profile.benefit_sponsorship.id)).to eq benefit_sponsorship
         end
 
         context "and a benefit coverage period is defined with open enrollment start/end dates" do
