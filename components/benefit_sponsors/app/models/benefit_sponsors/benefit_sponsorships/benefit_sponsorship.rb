@@ -171,56 +171,39 @@ module BenefitSponsors
       aasm do
         state :new, initial: true
 
+        state :initial_applicant        # Sponsor's first application is submitted and approved
+        state :initial_eligible         # Sponsor members have successfully completed open enrollment and Sponsor is authorized to offer benefits
+                                        #, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+        state :initial_approved         # Sponsor has paid first premium in-full
 
-        # What is initial state for conversion groups?
-
-        state :initial_application_transferred
-        state :initial_application_generated
-
-        state :initial_application_submitted
-
-        state :initial_application_approved
-        state :initial_application_canceled
-        state :initial_application_expired
-        state :initial_application_denied
-
-        state :initial_enrollment_open
-        state :initial_enrollment_closed
-        state :initial_enrollment_eligible
-        state :initial_enrollment_ineligible
-
-        # state :initial_enrollment_binder_paid  => pay_binder event should transition to :initial_enrollment_effectuated
-        state :initial_enrollment_effectuated
-        state :initial_enrollment_issuer_effectuated  # Sponsor's Group transmitted to Issuer
+        state :enrolled                 # Sponsor's members are actively enrolled in coverage
+        state :suspended                # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
+        state :terminated               # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
+        state :ineligible               # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
 
-        state :enrolled                   # Sponsor eligibility to offer benefits is approved, members are enrolled, and coverage is active
+        event :approve_initial_plan_design do
+          transitions from: :new, to: :initial_applicant
+        end
 
-        state :suspended                  # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
-        state :terminated                 # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
-        state :ineligible                 # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
+        event :approve_initial_enrollment_eligibility do
+          transitions from: :initial_applicant, to: :initial_eligible
+        end
 
-        # state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
+        event :deny_initial_enrollment_eligibility do
+          transitions from: :initial_applicant, to: :initial_ineligible
+        end
 
+        event :pay_binder do
+          transitions from: :initial_eligible, to: :initial_approved
+        end
 
-        state :approved
-        state :eligible
+        event :begin_coverage do
+          transitions from: :initial_approved, to: :enrolled
+        end
 
-
-        state :application_submitted  # Sponsor has submitted valid initial benefit application
-        state :application_pending    # Sponsor has submitted valid initial benefit application
-        state :application_denied     # Sponsor has submitted valid initial benefit application
-        state :application_appealing  # Sponsor has submitted valid initial benefit application
-        state :eligible                   # Initial open enrollment is complete and members eligible for coverage
-
-
-        state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-      # state :lapsed                     # Sponsor benefit coverage has reached end of term without renewal
-
-
-        event :application_accepted, :after => :record_transition do
-          transitions from: [:registered], to: :registered
-          transitions from: [:applicant, :ineligible], to: :registered
+        event :revert_to_new do
+          transitions from: [:new, :initial_applicant, :initial_eligible, :initial_ineligible, :initial_approved], to: :new
         end
 
       end
