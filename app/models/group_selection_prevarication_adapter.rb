@@ -220,8 +220,44 @@ class GroupSelectionPrevaricationAdapter
 		end
 	end
 
-	# Create specific methods
 	def create_action_market_kind(params)
 		params[:market_kind].present? ? params[:market_kind] : 'shop'
 	end
+
+  # SHOP enrollment creation adapters
+  def build_shop_change_enrollment(
+    controller_employee_role,
+    controller_change_plan
+  )
+    benefit_group = nil
+    benefit_group_assignment = nil
+    if controller_employee_role == previous_hbx_enrollment.employee_role
+      benefit_group = previous_hbx_enrollment.benefit_group
+      benefit_group_assignment = previous_hbx_enrollment.benefit_group_assignment
+    else
+      benefit_group = controller_employee_role.benefit_group(qle: is_qle?)
+      benefit_group_assignment = benefit_group_assignment_by_plan_year(controller_employee_role, benefit_group, controller_change_plan)
+    end
+    coverage_household.household.new_hbx_enrollment_from(
+      employee_role: controller_employee_role,
+      resident_role: person.resident_role,
+      coverage_household: coverage_household,
+      benefit_group: benefit_group,
+      benefit_group_assignment: benefit_group_assignment,
+      qle: is_qle?,
+      opt_effective_on: optional_effective_on)
+  end
+
+  def build_new_shop_enrollment(
+    controller_employee_role
+  )
+    coverage_household.household.new_hbx_enrollment_from(
+      employee_role: controller_employee_role,
+      resident_role: person.resident_role,
+      coverage_household: coverage_household,
+      benefit_group: nil,
+      benefit_group_assignment: nil,
+      qle: is_qle?,
+      opt_effective_on: optional_effective_on)
+  end
 end
