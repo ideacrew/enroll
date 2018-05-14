@@ -34,7 +34,7 @@ module BenefitSponsors
       #                                 following time period gap in benefit coverage
       #   :restored                 =>  sponsor, previously active on HBX, was involuntarily terminated
       #                                 and sponsorship resumed according to HBX policy
-      ORIGIN_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
+      SOURCE_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
 
       TERMINATION_KINDS         = [:voluntary, :involuntary]
       TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud]
@@ -53,7 +53,7 @@ module BenefitSponsors
       field :termination_kind,    type: Symbol
 
       # Immutable value indicating origination of this BenefitSponsorship
-      field :origin_kind,         type: Symbol, default: :self_serve
+      field :source_kind,         type: Symbol, default: :self_serve
       field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
       # This sponsorship's workflow status
@@ -72,6 +72,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       has_many    :census_employees,
+                  counter_cache: true,
                   class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
 
       belongs_to  :benefit_market,
@@ -97,16 +98,15 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Documents::Document"
 
 
-      validates_presence_of :organization, :profile_id, :benefit_market
+      validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
       validates :contact_method,
         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
         allow_blank: false
 
-      validates :origin_kind,
-        inclusion: { in: ORIGIN_KINDS, message: "%{value} is not a valid origin kind" },
+      validates :source_kind,
+        inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
         allow_blank: false
-
 
       before_create :generate_hbx_id
 
@@ -123,13 +123,6 @@ module BenefitSponsors
         @profile = profile
       end
 
-      # # TODO: add find_by_benefit_sponsorhip scope to CensusEmployee
-      # def census_employees
-      #   return @census_employees if is_defined?(@census_employees)
-      #   @census_employees = ::CensusEmployee.find_by_benefit_sponsorship(self)
-      # end
-
-      # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
       def roster_size
         return @roster_size if defined? @roster_size
         @roster_size = census_employees.active.size
@@ -140,14 +133,6 @@ module BenefitSponsors
         benefit_market.benefit_sponsor_catalog_for([], effective_date)
       end
 
-
-      def employer_profile_to_benefit_sponsor_states_map
-        {
-          :applicant            => :new,
-          :registered           => :initial_application_submitted,
-          :conversion_expired   => :initial_application_expired,
-        }
-      end
 
       # TODO Refactor (moved from PlanYear)
       # def overlapping_published_plan_years
@@ -188,10 +173,12 @@ module BenefitSponsors
 
         event :approve_initial_enrollment_eligibility do
           transitions from: :initial_applicant, to: :initial_eligible
+          transitions from: :initial_eligible,  to: :initial_eligible
         end
 
         event :deny_initial_enrollment_eligibility do
           transitions from: :initial_applicant, to: :initial_ineligible
+          transitions from: :initial_eligible,  to: :initial_ineligible
         end
 
         event :pay_binder do
@@ -205,38 +192,24 @@ module BenefitSponsors
         event :revert_to_new do
           transitions from: [:new, :initial_applicant, :initial_eligible, :initial_ineligible, :initial_approved], to: :new
         end
-
-      end
-
-      def find_benefit_application(id)
-        benefit_applications.find(BSON::ObjectId.from_string(id))
       end
 
       def active_broker_agency_account
         broker_agency_accounts.detect { |baa| baa.is_active }
       end
 
-      class << self
-        def find(id)
-          organization = BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
-          organization.benefit_sponsorships.find(id)
-        end
-
-        def find_broker_for_sponsorship(id)
-          organization = nil
-          Organizations::PlanDesignOrganization.all.each do |pdo|
-            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
-            organization = pdo if sponsorships.any? { |sponsorship| sponsorship._id == BSON::ObjectId.from_string(id)}
-          end
-          organization
-        end
-      end
-
-
       private
 
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
+      end
+
+      def employer_profile_to_benefit_sponsor_states_map
+        {
+          :applicant            => :new,
+          :registered           => :initial_applicant,
+          :conversion_expired   => :new,
+        }
       end
 
     end
