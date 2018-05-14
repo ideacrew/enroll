@@ -42,8 +42,15 @@
 <script>
   $('select').selectric({
     onChange: function(element) {
-      var date = $('.interaction-choice-control-forms-plan-design-proposal-effective-date').val();
-      plansForDate(date);
+      var path = window.location.pathname.split('/')[1];
+      
+      if (path == "sponsored_benefits") {
+        var date = $('#effectiveDate').val().split('-');
+        plansForDate(date[2]+'/'+date[1]+'/'+date[0]);
+      } else {
+        var date = $('.interaction-choice-control-forms-plan-design-proposal-effective-date').val();
+        plansForDate(date);
+      }
     }
   });
   
@@ -58,7 +65,8 @@
          $('.interaction-click-control-select-health-benefits').hide();
          $('.alert-info').removeClass('hide');
        } else if (res == true) {
-  
+         $('.alert-info').addClass('hide');
+         $('.interaction-click-control-select-health-benefits').show();
        }
      },
      url: "/employers/employer_profiles/1/plan_years/1/late_rates_check"
