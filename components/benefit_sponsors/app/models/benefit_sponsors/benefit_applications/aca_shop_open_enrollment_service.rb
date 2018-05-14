@@ -6,28 +6,28 @@ module BenefitSponsors
       # Needs to handle exempt applcations
 
 
-      BenefitSponsorships.may_begin_open_enrollment?
-      BenefitSponsorships.may_end_open_enrollment?
+#      BenefitSponsorships.may_begin_open_enrollment?
+#      BenefitSponsorships.may_end_open_enrollment?
 
-      BenefitSponsorships.may_begin_benefit_coverage?
+#      BenefitSponsorships.may_begin_benefit_coverage?
 
-      BenefitSponsorships.may_renew_application?
+#      BenefitSponsorships.may_renew_application?
 
-      BenefitSponsorships.may_terminate_benefit_coverage?
-      BenefitSponsorships.may_reinstate_benefit_coverage?
+#      BenefitSponsorships.may_terminate_benefit_coverage?
+#      BenefitSponsorships.may_reinstate_benefit_coverage?
 
 
-      BenefitApplication.can_renew?
-      BenefitApplication.is_renewing?
+#      BenefitApplication.can_renew?
+#      BenefitApplication.is_renewing?
 
-      BenefitApplication.is_plan_design_eligible?
-      BenefitApplication.is_open_enrollment_enrollment_eligible?
-      BenefitApplication.is_benefit_coverage_begin_eligible?
+#      BenefitApplication.is_plan_design_eligible?
+#      BenefitApplication.is_open_enrollment_enrollment_eligible?
+#      BenefitApplication.is_benefit_coverage_begin_eligible?
 
-      BenefitApplication.can_begin_open_enrollment?
-      BenefitApplication.can_end_open_enrollment?
-      BenefitApplication.can_begin_benefit_coverage?
-      BenefitApplication.can_end_benefit_coverage?
+#      BenefitApplication.can_begin_open_enrollment?
+#      BenefitApplication.can_end_open_enrollment?
+#      BenefitApplication.can_begin_benefit_coverage?
+#      BenefitApplication.can_end_benefit_coverage?
 
 
       def initialize(benefit_application)

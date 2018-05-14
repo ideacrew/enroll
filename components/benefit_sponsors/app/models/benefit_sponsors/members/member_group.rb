@@ -60,6 +60,16 @@ module BenefitSponsors
       end
     end
 
+    def clone_for_coverage(new_product)
+      self.class.new(
+        members,
+        {
+          group_id: @group_id,
+          group_enrollment: group_enrollment.clone_for_coverage(new_product)
+        }
+      )
+    end
+
     private
 
     def discard_member_enrollments(removed_members)
