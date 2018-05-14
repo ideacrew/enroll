@@ -4,7 +4,7 @@
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.select :effective_date, options_for_select(@plan_design_organization.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"}, disabled: read_only %>
+    <%= f.select :effective_date, options_for_select(@plan_design_organization.calculate_start_on_options, selected: f.object.effective_date), {:include_blank => "SELECT START ON"}, id:'effectiveDate', disabled: read_only %>
   </div>
 
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
@@ -45,15 +45,41 @@ $(function() {
   }
 
   $("#new_forms_plan_design_proposal input[type=text]").each(function(){
-    $(this).on("change", submitPlanDesignProposalInfo);
+    //$(this).on("change", submitPlanDesignProposalInfo);
   })
 
   $("#forms_plan_design_proposal_effective_date").change(function(e) {
       if(e.handled !== true) // This will prevent event triggering more then once
         {
-            submitPlanDesignProposalInfo();
+            //submitPlanDesignProposalInfo();
             e.handled = true;
         }
+        console.log("I was ssave")
   })
 });
+
+$(function() {
+  
+  var date = $('#effectiveDate').val().split('-');
+  plansForDate(date[2]+'/'+date[1]+'/'+date[0]);
+
+  function plansForDate(date) {
+      $.ajax({
+        type: "GET",
+        data:{
+          start_on_date: date
+        },
+        success: function(res) {
+          if (res != true) { // late rate scenario
+            $('.interaction-click-control-select-health-benefits').hide();
+          } else if (res == true) {
+           $('.interaction-click-control-select-health-benefits').show();
+          }
+        },
+        url: "/employers/employer_profiles/1/plan_years/2/late_rates_check"
+      });
+    }
+})
+
+
 </script>
