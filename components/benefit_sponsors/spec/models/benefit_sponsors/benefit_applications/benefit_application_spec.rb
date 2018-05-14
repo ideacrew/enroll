@@ -202,10 +202,15 @@ module BenefitSponsors
 
     describe "Scopes" do
 
-      it "should find applications by Effective date start"
-      it "should find applications by Open Enrollment end"
+      let(:this_year)         { TimeKeeper.date_of_record.year }
+      let(:march)             { Date.new(this_year,3,1) }
 
       it "should find applications in renewing status"
+
+
+
+      it "should find applications by Effective date start"
+      it "should find applications by Open Enrollment end"
 
       it "should find applications in Plan Draft status"
       it "should find applications in Plan Design Exception status"

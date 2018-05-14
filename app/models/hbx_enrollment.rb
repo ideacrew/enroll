@@ -93,8 +93,14 @@ class HbxEnrollment
 
   field :consumer_role_id, type: BSON::ObjectId
   field :resident_role_id, type: BSON::ObjectId
+  # We will need to re-visit these names possibly, as we implement sponsored benefits.
   field :benefit_package_id, type: BSON::ObjectId
   field :benefit_coverage_period_id, type: BSON::ObjectId
+
+  # Fields for new model
+  field :benefit_sponsorship_id, type: BSON::ObjectId
+  field :sponsored_benefit_package_id, type: BSON::ObjectId
+  field :sponsored_benefit_id, type: BSON::ObjectId
 
   field :original_application_type, type: String
 
@@ -1540,6 +1546,55 @@ class HbxEnrollment
    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil
    !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
  end
+
+  def sponsored_benefit
+    @sponsored_benefit ||= ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit.find(self.sponsored_benefit_id)
+  end
+
+  EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
+    def is_disabled?
+      is_disabled
+    end
+
+    def is_primary_member?
+      is_primary_member
+    end
+  end
+
+  def as_shop_member_group
+    roster_members = []
+    group_enrollment_members = []
+    previous_enrollment = self.parent_enrollment
+    previous_product = nil
+    if previous_enrollment
+      previous_product = previous_enrollment.plan
+    end
+    hbx_enrollment_members.each do |hem|
+      person = hem.person
+      roster_member = EnrollmentMemberAdapter.new(
+        hem.id,
+        person.dob,
+        hem.primary_relationship,
+        hem.is_subscriber?,
+        person.is_disabled
+      )
+      group_enrollment_member = BenefitSponsors::Enrollments::MemberEnrollment.new({
+        member_id: hem.id,
+        coverage_eligibility_on: hem.eligibility_date
+      })
+    end
+    group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
+      previous_product: previous_product,
+      coverage_start_on: effective_on,
+      member_enrollments: group_enrollment_members,
+      rate_schedule_date: sponsored_benefit.rate_schedule_date
+    )
+    BenefitSponsors::Members::MemberGroup.new(
+      roster_members,
+      group_id: self.id,
+      group_enrollment: group_enrollment
+    )
+  end
 
   private
 

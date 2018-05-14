@@ -34,7 +34,7 @@ module BenefitSponsors
       #                                 following time period gap in benefit coverage
       #   :restored                 =>  sponsor, previously active on HBX, was involuntarily terminated
       #                                 and sponsorship resumed according to HBX policy
-      ORIGIN_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
+      SOURCE_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
 
       TERMINATION_KINDS         = [:voluntary, :involuntary]
       TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud]
@@ -53,7 +53,7 @@ module BenefitSponsors
       field :termination_kind,    type: Symbol
 
       # Immutable value indicating origination of this BenefitSponsorship
-      field :origin_kind,         type: Symbol, default: :self_serve
+      field :source_kind,         type: Symbol, default: :self_serve
       field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
       # This sponsorship's workflow status
@@ -72,6 +72,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       has_many    :census_employees,
+                  counter_cache: true,
                   class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
 
       belongs_to  :benefit_market,
@@ -97,16 +98,15 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Documents::Document"
 
 
-      validates_presence_of :organization, :profile_id, :benefit_market
+      validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
       validates :contact_method,
         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
         allow_blank: false
 
-      validates :origin_kind,
-        inclusion: { in: ORIGIN_KINDS, message: "%{value} is not a valid origin kind" },
+      validates :source_kind,
+        inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
         allow_blank: false
-
 
       before_create :generate_hbx_id
 
@@ -123,13 +123,6 @@ module BenefitSponsors
         @profile = profile
       end
 
-      # # TODO: add find_by_benefit_sponsorhip scope to CensusEmployee
-      # def census_employees
-      #   return @census_employees if is_defined?(@census_employees)
-      #   @census_employees = ::CensusEmployee.find_by_benefit_sponsorship(self)
-      # end
-
-      # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
       def roster_size
         return @roster_size if defined? @roster_size
         @roster_size = census_employees.active.size
@@ -140,14 +133,6 @@ module BenefitSponsors
         benefit_market.benefit_sponsor_catalog_for([], effective_date)
       end
 
-
-      def employer_profile_to_benefit_sponsor_states_map
-        {
-          :applicant            => :new,
-          :registered           => :initial_application_submitted,
-          :conversion_expired   => :initial_application_expired,
-        }
-      end
 
       # TODO Refactor (moved from PlanYear)
       # def overlapping_published_plan_years
@@ -165,95 +150,119 @@ module BenefitSponsors
       def renew_benefit_application
       end
 
-
-
       # Workflow for self service
       aasm do
         state :new, initial: true
+        state :initial_application_approved # Sponsor's first application is submitted and approved     
+        state :initial_enrollment_closed    # Sponsor members have successfully completed open enrollment
+        state :initial_enrollment_ineligible       
+        state :initial_enrollment_eligible, after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
+                                        #, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+        state :active                   # Sponsor's members are actively enrolled in coverage
+        state :suspended                # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
+        state :terminated               # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
+        state :ineligible               # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
-
-        # What is initial state for conversion groups?
-
-        state :initial_application_transferred
-        state :initial_application_generated
-
-        state :initial_application_submitted
-
-        state :initial_application_approved
-        state :initial_application_canceled
-        state :initial_application_expired
-        state :initial_application_denied
-
-        state :initial_enrollment_open
-        state :initial_enrollment_closed
-        state :initial_enrollment_eligible
-        state :initial_enrollment_ineligible
-
-        # state :initial_enrollment_binder_paid  => pay_binder event should transition to :initial_enrollment_effectuated
-        state :initial_enrollment_effectuated
-        state :initial_enrollment_issuer_effectuated  # Sponsor's Group transmitted to Issuer
-
-
-        state :enrolled                   # Sponsor eligibility to offer benefits is approved, members are enrolled, and coverage is active
-
-        state :suspended                  # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
-        state :terminated                 # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
-        state :ineligible                 # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
-
-        # state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
-
-
-        state :approved
-        state :eligible
-
-
-        state :application_submitted  # Sponsor has submitted valid initial benefit application
-        state :application_pending    # Sponsor has submitted valid initial benefit application
-        state :application_denied     # Sponsor has submitted valid initial benefit application
-        state :application_appealing  # Sponsor has submitted valid initial benefit application
-        state :eligible                   # Initial open enrollment is complete and members eligible for coverage
-
-
-        state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-      # state :lapsed                     # Sponsor benefit coverage has reached end of term without renewal
-
-
-        event :application_accepted, :after => :record_transition do
-          transitions from: [:registered], to: :registered
-          transitions from: [:applicant, :ineligible], to: :registered
+        event :approve_initial_application do
+          transitions from: :new, to: :initial_application_approved
         end
 
+        event :close_initial_enrollment do 
+          transitions from: :initial_application_approved, to: :initial_enrollment_closed
+        end
+
+        event :approve_initial_enrollment_eligibility do
+          transitions from: :initial_enrollment_closed, to: :initial_enrollment_eligible
+          transitions from: :initial_enrollment_ineligible,  to: :initial_enrollment_eligible
+        end
+
+        event :deny_initial_enrollment_eligibility do
+          transitions from: :initial_enrollment_closed, to: :initial_enrollment_ineligible
+          transitions from: :initial_enrollment_eligible,  to: :initial_enrollment_ineligible
+        end
+
+        event :pay_binder do
+          transitions from: :initial_enrollment_closed, to: :initial_enrollment_eligible
+        end
+
+        event :begin_coverage do
+          transitions from: :initial_enrollment_eligible, to: :active
+        end
+
+        event :revert_to_new do
+          transitions from: [:new, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
+        end
+
+        event :terminate do 
+          transitions from: [:active, :suspended], to: :terminated
+        end
+
+        event :suspend do
+          transitions from: :active, to: :suspended
+        end
+
+        event :unsuspend do 
+          transitions from: :suspended, to: :active
+        end
+
+        event :reinstate do
+          transitions from: :terminated, to: :active
+        end
+
+        event :reactivate do
+          transitions from: :terminated, to: :initial_application_approved 
+        end
+
+        event :ban do
+          transitions from: [:active, :suspend, :terminated], to: :ineligible
+        end
+
+        event :cancel do
+          transitions from: [:initial_application_approved, :initial_enrollment_closed], to: :new
+        end
       end
 
-      def find_benefit_application(id)
-        benefit_applications.find(BSON::ObjectId.from_string(id))
+      def publish_binder_paid
+        benefit_applications.each do |benefit_application| 
+          benefit_application.application_event_subscriber(aasm)
+        end
+      end
+
+      # BenefitApplication        BenefitSponsorship
+      # approved               -> initial_application_approved
+      # enrollment_closed      -> initial_enrollment_closed
+      # application_ineligible -> initial_enrollment_ineligible
+      # application_eligible   -> initial_enrollment_eligible
+      # active                 -> active
+      def application_event_subscriber(aasm)
+        case aasm.to_state
+        when :approved
+          approve_initial_application! if may_approve_initial_application?
+        when :enrollment_closed
+          close_initial_enrollment! if may_close_initial_enrollment?
+        when :application_ineligible
+          deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
+        when :active
+          begin_coverage! if may_begin_coverage?
+        end
       end
 
       def active_broker_agency_account
         broker_agency_accounts.detect { |baa| baa.is_active }
       end
 
-      class << self
-        def find(id)
-          organization = BenefitSponsors::Organizations::Organization.where(:"benefit_sponsorships._id" => BSON::ObjectId.from_string(id)).first
-          organization.benefit_sponsorships.find(id)
-        end
-
-        def find_broker_for_sponsorship(id)
-          organization = nil
-          Organizations::PlanDesignOrganization.all.each do |pdo|
-            sponsorships = pdo.plan_design_profile.try(:benefit_sponsorships) || []
-            organization = pdo if sponsorships.any? { |sponsorship| sponsorship._id == BSON::ObjectId.from_string(id)}
-          end
-          organization
-        end
-      end
-
-
       private
 
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
+      end
+
+      def employer_profile_to_benefit_sponsor_states_map
+        {
+          :applicant            => :new,
+          :registered           => :initial_applicant,
+          :conversion_expired   => :new,
+        }
       end
 
     end
