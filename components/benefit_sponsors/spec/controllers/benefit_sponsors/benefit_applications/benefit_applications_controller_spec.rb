@@ -9,7 +9,7 @@ module BenefitSponsors
     let(:user) { FactoryGirl.create :user}
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog, :dc) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization,benefit_market: site.benefit_markets[0]) }
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: site.benefit_markets[0]) }
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -106,10 +106,15 @@ module BenefitSponsors
 
       let(:params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
             open_enrollment_period: open_enrollment_period
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
 
       before do
@@ -141,10 +146,15 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
             open_enrollment_period: open_enrollment_period
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
 
       before do
@@ -199,10 +209,15 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
             open_enrollment_period: open_enrollment_period
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
 
       before do
@@ -268,6 +283,8 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
             open_enrollment_period: open_enrollment_period
           }
@@ -312,10 +329,15 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
             open_enrollment_period: open_enrollment_period
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
 
       before do
