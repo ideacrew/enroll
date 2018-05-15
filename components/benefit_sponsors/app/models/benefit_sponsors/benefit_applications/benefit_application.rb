@@ -78,7 +78,7 @@ module BenefitSponsors
 
       validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_area, :recorded_rating_area
 
-      index({ "aasm" => 1 })
+      index({ "aasm_state" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
 
