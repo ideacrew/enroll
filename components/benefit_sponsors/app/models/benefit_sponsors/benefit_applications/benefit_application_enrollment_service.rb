@@ -17,9 +17,17 @@ module BenefitSponsors
         end
       end
     end
-    
+
     def is_application_ineligible?
       application_eligibility_warnings.present?
+    end
+
+    def force_submit_application
+      if is_application_ineligible?
+        benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
+      else
+        benefit_application.submit_application! if benefit_application.may_submit_application?
+      end
     end
    
     def submit_application

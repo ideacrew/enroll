@@ -235,7 +235,7 @@ module BenefitSponsors
       # BenefitApplication instance's effective_period
       # @return [ BenefitApplication ] The built renewal application instance and submodels
       def renew(benefit_sponsor_catalog)
-        if benefit_sponsor_catalog.effective_date.min != end_on + 1.day
+        if benefit_sponsor_catalog.effective_date != end_on + 1.day
           raise StandardError, "effective period must begin on #{end_on + 1.day}"
         end
 
@@ -244,7 +244,7 @@ module BenefitSponsors
             pte_count:                pte_count,
             msp_count:                msp_count,
             benefit_sponsor_catalog:  benefit_sponsor_catalog,
-            preceding_application:    self,
+            predecessor_application:    self,
             recorded_service_area:    benefit_sponsorship.service_area,
             recorded_rating_area:     benefit_sponsorship.rating_area,
             effective_period:         benefit_sponsor_catalog.effective_period,
@@ -259,6 +259,24 @@ module BenefitSponsors
         renewal_application
       end
 
+      def is_event_date_valid?
+        today = TimeKeeper.date_of_record
+
+        valid = case aasm_state
+        when "approved", "draft"
+          today >= open_enrollment_period.begin
+        when "enrollment_open"
+          today > open_enrollment_period.end
+        when "enrollment_closed"
+          today >= effective_period.begin
+        when "active"
+          today > effective_period.end
+        else
+          false
+        end
+
+        valid
+      end
 
       aasm do
         state :draft, initial: true
@@ -329,9 +347,8 @@ module BenefitSponsors
 
         # Submit plan year application
         event :submit_application do
-          transitions from: :draft, to: :draft,           guard:  :is_application_unpublishable?
-          transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
-          transitions from: :draft, to: :approved,        guard:  :is_application_eligible?#, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
+          transitions from: :draft, to: :enrollment_open, guard:  [:is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
+          transitions from: :draft, to: :approved #, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
 
           ## TODO update these renewal transitions
           # transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
@@ -365,6 +382,10 @@ module BenefitSponsors
         # Upon review, application ineligible status overturned and deemed eligible
         event :approve_application do
           transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :approved
+        end
+
+        event :submit_for_review do
+          transitions from: :draft, to: :pending
         end
 
         # Upon review, submitted application ineligible status verified ineligible
