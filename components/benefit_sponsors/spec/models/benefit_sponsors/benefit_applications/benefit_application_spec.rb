@@ -336,9 +336,9 @@ module BenefitSponsors
         # Create benefit applications
         # Create benefit sponsor catalogs
 
-        # let(:renewal_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-        # let(:current_effective_date) { renewal_effective_date.prev_year }
-        # let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
+        let(:renewal_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+        let(:current_effective_date) { renewal_effective_date.prev_year }
+        let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
 
         # let(:benefit_market) { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
 
@@ -354,7 +354,7 @@ module BenefitSponsors
 
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
         
-        let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
+        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period) }
         let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date) }
 
         it "should generate renewal application" do
