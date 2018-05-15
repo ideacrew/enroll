@@ -1,7 +1,8 @@
-class CarrierProfilesMigration < Mongoid::Migration
+class CcaCarrierProfilesMigration < Mongoid::Migration
   def self.up
 
-    site_key = "cca"
+    if Settings.site.key.to_s == "mhc"
+    site_key = "mhc"
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/carrier_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
@@ -24,6 +25,9 @@ class CarrierProfilesMigration < Mongoid::Migration
     end
 
     logger.info "End of the script for carrier_profile" unless Rails.env.test?
+    else
+      say "Skipping for non-CCA site"
+    end
   end
 
   def self.down

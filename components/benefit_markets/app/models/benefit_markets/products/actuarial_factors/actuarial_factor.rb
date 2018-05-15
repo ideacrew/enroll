@@ -25,7 +25,7 @@ module BenefitMarkets
         def cacherize!
           @cached_values = {}
           actuarial_factor_entries.each do |entry|
-            @cached_values[entry.factory_key] = entry.factory_value
+            @cached_values[entry.factor_key] = entry.factor_value
           end
           self 
         end
