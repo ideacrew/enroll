@@ -214,7 +214,7 @@ module BenefitSponsors
       end
 
       def is_renewing?
-        predecessor_application.present? && PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES.include?(aasm_state)
+        predecessor_application.present? && (PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
       end
 
       # TODO Refactor -- use the new state: :open_enrollment_closed

@@ -263,6 +263,10 @@ module BenefitSponsors
 
         it "should find the renewing application" do
           expect(BenefitApplications::BenefitApplication.is_renewing).to eq [renewal_application]
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.is_renewing?).to eq true
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application).to eq initial_application
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application.successor_applications).to eq [renewal_application]
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application.is_renewing?).to eq false
         end
       end
 
