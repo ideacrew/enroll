@@ -18,7 +18,7 @@ module BenefitSponsors
     end
 
     describe '.generate_renewal' do
-      let!(:benefit_application) {FactoryGirl.create(:benefit_sponsors_benefit_applications)}
+      let!(:benefit_application) {FactoryGirl.create(:benefit_sponsors_benefit_application)}
       let(:profile) {benefit_application.benefit_sponsorship.profile}
 
       context 'created renewal for benefit application' do
