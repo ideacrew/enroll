@@ -462,6 +462,7 @@ module BenefitSponsors
       end
 
       def publish_state_transition
+        return unless benefit_sponsorship.present?
         benefit_sponsorship.application_event_subscriber(aasm)
       end
 
