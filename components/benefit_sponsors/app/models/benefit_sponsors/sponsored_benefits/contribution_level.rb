@@ -19,7 +19,7 @@ module BenefitSponsors
       field :flat_contribution_amount, type: Float
 
       validates_presence_of :display_name, :allow_blank => false
-      # validates_presence_of :contribution_unit_id, :allow_blank => false
+      validates_presence_of :contribution_unit_id, :allow_blank => false
     end
   end
 end

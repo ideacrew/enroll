@@ -35,7 +35,7 @@ module BenefitMarkets
         :state_code => address.state
       ).map(&:id)
       area = []
-      self.where(
+      area << self.where(
         active_year: during.year,
         "$or" => [
           {"county_zip_ids" => { "$in" => county_zips.map(&:id) }},
@@ -44,9 +44,9 @@ module BenefitMarkets
           }}
         ]
       )
-      raise "Multiple Rating Areas Returned" if areas.size > 1
-      return nil if areas.empty?
-      areas.first
+      raise "Multiple Rating Areas Returned" if area.size > 1
+      return nil if area.empty?
+      area.first
     end
   end
 end

@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    module Forms
+    module OrganizationForms
       class RegistrationFormPolicy < ApplicationPolicy
 
         attr_reader :service

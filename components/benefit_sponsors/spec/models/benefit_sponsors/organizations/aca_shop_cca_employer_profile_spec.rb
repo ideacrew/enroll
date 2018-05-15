@@ -32,7 +32,8 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        sic_code: sic_code
+        sic_code: sic_code,
+        entity_kind:  entity_kind
       }
     end
 
@@ -178,7 +179,7 @@ module BenefitSponsors
 
     context "Embedded in a Plan Design Proposal" do
       let(:title)                     { 'New proposal' }
-      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
+      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code, entity_kind:  entity_kind) }
 
       let(:plan_design_organization)  { Organizations::PlanDesignOrganization.new(fein: fein, legal_name: legal_name, sic_code: sic_code) }
       let(:plan_design_proposal)      { plan_design_organization.plan_design_proposals.build(title: title, profile: cca_employer_profile) }

@@ -101,6 +101,7 @@ class HbxEnrollment
   field :benefit_sponsorship_id, type: BSON::ObjectId
   field :sponsored_benefit_package_id, type: BSON::ObjectId
   field :sponsored_benefit_id, type: BSON::ObjectId
+  field :rating_area_id, type: BSON::ObjectId
 
   field :original_application_type, type: String
 
@@ -1551,6 +1552,10 @@ class HbxEnrollment
     @sponsored_benefit ||= ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit.find(self.sponsored_benefit_id)
   end
 
+  def rating_area
+    @rating_area ||= ::BenefitMarkets::Locations::RatingArea.find(self.rating_area_id)
+  end
+
   EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
     def is_disabled?
       is_disabled
@@ -1587,7 +1592,8 @@ class HbxEnrollment
       previous_product: previous_product,
       coverage_start_on: effective_on,
       member_enrollments: group_enrollment_members,
-      rate_schedule_date: sponsored_benefit.rate_schedule_date
+      rate_schedule_date: sponsored_benefit.rate_schedule_date,
+      rating_area: rating_area.exchange_provided_code
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,

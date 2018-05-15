@@ -125,6 +125,7 @@ module BenefitSponsors
         if valid_according_to_factory
           benefit_sponsorship = benefit_application.benefit_sponsorship || find_benefit_sponsorship(form)
           benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
+          assign_rating_and_service_area(benefit_application)
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
@@ -135,6 +136,12 @@ module BenefitSponsors
           return [false, nil]
         end
         [true, benefit_application]
+      end
+
+      #TODO: FIX this method once countzips are loaded
+      def assign_rating_and_service_area(benefit_application)
+        benefit_application.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.new
+        benefit_application.recorded_service_area = ::BenefitMarkets::Locations::ServiceArea.new
       end
 
       def map_errors_for(benefit_application, onto:)
