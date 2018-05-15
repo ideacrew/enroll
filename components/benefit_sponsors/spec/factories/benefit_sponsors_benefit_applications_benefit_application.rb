@@ -5,7 +5,7 @@ FactoryGirl.define do
     @random_counts[n]
   end
 
-  factory :benefit_sponsors_benefit_applications, class: 'BenefitSponsors::BenefitApplications::BenefitApplication' do
+  factory :benefit_sponsors_benefit_application, class: 'BenefitSponsors::BenefitApplications::BenefitApplication' do
     benefit_sponsorship { create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
 
     fte_count   FactoryGirl.generate(:random_count)
