@@ -72,6 +72,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_add_sep: true)
   end
 
+  def hbx_admin_can_add_pdc
+    Permission.hbx_staff.update_attributes!(can_add_pdc: true)
+  end
+
   def hbx_admin_can_view_username_and_email
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)

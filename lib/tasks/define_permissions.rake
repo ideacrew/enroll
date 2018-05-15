@@ -27,6 +27,11 @@ namespace :permissions do
 end
 
 namespace :permissions do
+  desc 'hbx admin can add pdc'
+  DefinePermissions.define_task :hbx_admin_can_add_pdc => :environment
+end
+
+namespace :permissions do
   desc 'hbx admin can view username and email'
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
@@ -71,3 +76,4 @@ end
 #rake permissions:hbx_admin_can_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_can_access_outstanding_verification_sub_tab
 #rake permissions:hbx_admin_can_transition_family_members
+#rake permissions:hbx_admin_can_add_pdc
