@@ -1,31 +1,32 @@
-class CcaEmployerProfilesMigration < Mongoid::Migration
+class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
   def self.up
 
     if Settings.site.key.to_s == "mhc"
       site_key = "mhc"
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/employer_profiles_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( organization_id benefit_sponsor_organization_id status)
+      file_name = "#{Rails.root}/hbx_report/cca_broker_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
+      field_names = %w( organization_id hbx_id status)
 
-      logger = Logger.new("#{Rails.root}/log/employer_profiles_migration_data.log") unless Rails.env.test?
-      logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
+      logger = Logger.new("#{Rails.root}/log/cca_broker_profile_migration_data.log") unless Rails.env.test?
+      logger.info "Script Start for broker_profile_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
       CSV.open(file_name, 'w') do |csv|
         csv << field_names
 
-        #build and create GeneralOrganization and its profiles
+        #build and create Organization and its profiles
         status = create_profile(site_key, csv, logger)
 
         if status
           puts "" unless Rails.env.test?
-          puts "Check employer_profiles_migration_data logs & employer_profiles_migration_status csv for additional information." unless Rails.env.test?
+          puts "Check cca broker_agency_profiles_migration_data logs & broker_agency_profiles_migration_status csv for additional information." unless Rails.env.test?
         else
           puts "" unless Rails.env.test?
           puts "Script execution failed" unless Rails.env.test?
         end
       end
-      logger.info "End of the script" unless Rails.env.test?
+
+      logger.info "End of the script for broker_profile" unless Rails.env.test?
     else
       say "Skipping for non-CCA site"
     end
@@ -39,17 +40,17 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   def self.create_profile(site_key, csv, logger)
 
     #find or build site
-    sites = find_site(site_key)
+    sites = self.find_site(site_key)
     return false unless sites.present?
     site = sites.first
 
     #get main app organizations for migration
-    old_organizations = Organization.unscoped.exists(:employer_profile => true)
+    old_organizations = Organization.unscoped.exists(:broker_agency_profile => true)
 
     #counters
     total_organizations = old_organizations.count
     existing_organization = 0
-    success =0
+    success = 0
     failed = 0
     limit_count = 1000
 
@@ -58,28 +59,21 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
         begin
           existing_new_organizations = find_new_organization(old_org)
           if existing_new_organizations.count == 0
-            @old_profile = old_org.employer_profile
+            @old_profile = old_org.broker_agency_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :aasm_state_set_on,:ach_routing_number, :ach_account_number, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
-            @new_profile = initialize_new_profile(old_org, old_profile_params)
-            new_organization = initialize_new_organization(old_org, site)
+            @new_profile = self.initialize_new_profile(old_org, old_profile_params)
+            new_organization = self.initialize_new_organization(old_org, site)
 
             raise Exception unless new_organization.valid?
             new_organization.save!
 
-            #employer staff roles migration
+            #Roles Migration
             person_records_with_old_staff_roles = find_staff_roles
-            link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
+            link_existing_staff_roles_to_new_profile( person_records_with_old_staff_roles)
 
-            #employee roles migration
-            person_records_with_old_employee_roles = find_employee_roles
-            link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
-
-            #census employees migration
-            census_employees_with_old_id = find_census_employees
-            link_existing_census_employees_to_new_profile(census_employees_with_old_id)
 
             print '.' unless Rails.env.test?
             csv << [old_org.id, new_organization.id, "Migration Success"]
@@ -100,7 +94,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
         end
       end
     end
-    logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
+    logger.info " Total #{total_organizations} old organizations for type: broker agency profile." unless Rails.env.test?
     logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{existing_organization} old organizations are already present in new DB." unless Rails.env.test?
@@ -112,7 +106,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_profile(old_org, old_profile_params)
-    new_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(old_profile_params)
+    new_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(old_profile_params)
 
     build_inbox_messages(new_profile)
     build_documents(old_org, new_profile)
@@ -143,7 +137,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
   def self.build_office_locations(old_org, new_profile)
     old_org.office_locations.each do |office_location|
-      new_office_location = new_profile.office_locations.new
+      new_office_location = new_profile.office_locations.new()
       new_office_location.is_primary = office_location.is_primary
       address_params = office_location.address.attributes.except("_id") if office_location.address.present?
       phone_params = office_location.phone.attributes.except("_id") if office_location.phone.present?
@@ -153,47 +147,32 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.initialize_new_organization(organization, site)
-    json_data = organization.to_json(:except => [:_id, :updated_by_id, :issuer_assigned_id, :version, :versions, :employer_profile, :broker_agency_profile, :general_agency_profile, :carrier_profile, :hbx_profile, :office_locations, :is_fake_fein, :is_active, :updated_by, :documents])
+    json_data = organization.to_json(:except => [:_id, :updated_by_id, :issuer_assigned_id, :version, :versions, :fein, :broker_agency_profile, :office_locations, :is_fake_fein, :is_active, :updated_by, :documents])
     old_org_params = JSON.parse(json_data)
-    general_organization = BenefitSponsors::Organizations::GeneralOrganization.new(old_org_params)
-    general_organization.entity_kind = @old_profile.entity_kind.to_sym
-    general_organization.site = site
-    general_organization.profiles << [@new_profile]
-    return general_organization
+    exempt_organization = BenefitSponsors::Organizations::ExemptOrganization.new(old_org_params)
+    exempt_organization.entity_kind = @old_profile.entity_kind.to_sym
+    exempt_organization.site = site
+    exempt_organization.profiles << [@new_profile]
+    return exempt_organization
   end
 
   def self.find_staff_roles
-    Person.where(:employer_staff_roles => {
-        '$elemMatch' => {employer_profile_id: @old_profile.id}})
+    Person.or({:"broker_role.broker_agency_profile_id" => @old_profile.id},
+              {:"broker_agency_staff_roles.broker_agency_profile_id" => @old_profile.id})
   end
 
-  def self.link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
+  def self.link_existing_staff_roles_to_new_profile( person_records_with_old_staff_roles)
     person_records_with_old_staff_roles.each do |person|
-      old_employer_staff_role = person.employer_staff_roles.where(employer_profile_id: @old_profile.id).first
-      old_employer_staff_role.update_attributes(benefit_sponsor_employer_profile_id: @new_profile.id) if old_employer_staff_role.present?
+
+      old_broker_role = person.broker_role
+      old_broker_agency_staff_role = person.broker_agency_staff_roles.where(broker_agency_profile_id: @old_profile.id).first
+
+      old_broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: @new_profile.id)
+      old_broker_agency_staff_role.update_attributes(benefit_sponsors_broker_agency_profile_id: @new_profile.id) if old_broker_agency_staff_role.present?
     end
-  end
-
-  def self.find_employee_roles
-    Person.where(:"employee_roles.employer_profile_id" => @old_profile.id)
-  end
-
-  def self.link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
-    person_records_with_old_employee_roles.each do |person|
-      old_employee_role = person.employee_roles.where(employer_profile_id: @old_profile.id).first
-      old_employee_role.update_attributes(benefit_sponsors_employer_profile_id: @new_profile.id) if old_employee_role.present?
-    end
-  end
-
-  def self.find_census_employees
-    CensusEmployee.where(employer_profile_id: @old_profile.id)
-  end
-
-  def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
-    census_employees_with_old_id.update_all(benefit_sponsor_employer_profile_id: @new_profile.id)
   end
 
   def self.find_site(site_key)
-    BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
+    BenefitSponsors::Site.all.where(site_key: site_key.to_sym) if site_key.present?
   end
 end
