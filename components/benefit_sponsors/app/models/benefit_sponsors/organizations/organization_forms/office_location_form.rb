@@ -6,8 +6,8 @@ module BenefitSponsors
 
       attribute :id, String
       attribute :is_primary, Boolean
-      attribute :address, OrganizationForms::AddressForm
-      attribute :phone, OrganizationForms::PhoneForm
+      attribute :address, ::BenefitSponsors::Organizations::OrganizationForms::AddressForm
+      attribute :phone, ::BenefitSponsors::Organizations::OrganizationForms::PhoneForm
 
       alias_method :is_primary?, :is_primary
 
@@ -16,11 +16,11 @@ module BenefitSponsors
       end
 
       def phone_attributes=(phone)
-        self.phone = Forms::PhoneForm.new(phone)
+        self.phone = ::BenefitSponsors::Organizations::OrganizationForms::PhoneForm.new(phone)
       end
 
       def address_attributes=(address)
-        self.address = Forms::AddressForm.new(address)
+        self.address = ::BenefitSponsors::Organizations::OrganizationForms::AddressForm.new(address)
       end
     end
   end

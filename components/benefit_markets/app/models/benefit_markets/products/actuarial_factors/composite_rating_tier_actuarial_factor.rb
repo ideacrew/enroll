@@ -7,7 +7,7 @@ module BenefitMarkets
 					if record.present?
 						record.lookup(val)
 					else
-						logger.error "Lookup for #{val} failed with no FactorSet found: Carrier: #{carrier_profile_id}, Year: #{year}"
+						logger.error "Lookup for #{val} failed with no FactorSet found: Issuer: #{carrier_profile_id}, Year: #{year}"
 						1.0
 					end
 				end

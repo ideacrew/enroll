@@ -5,8 +5,9 @@ module BenefitMarkets
       include Mongoid::Timestamps
 
       field :active_year, type: Integer
+      field :issuer_provided_title, type: String
       field :issuer_provided_code, type: String
-      field :issuer_id, type: BSON::ObjectId
+      field :issuer_profile_id, type: BSON::ObjectId
 
       # The list of county-zip pairs covered by this service area
       field :county_zip_ids, type: Array
@@ -20,7 +21,7 @@ module BenefitMarkets
 
       validates_presence_of :active_year, allow_blank: false
       validates_presence_of :issuer_provided_code, allow_nil: false
-      validates_presence_of :issuer_id, allow_nil: false
+      validates_presence_of :issuer_profile_id, allow_nil: false
       validate :location_specified
 
       index({county_zip_ids: 1})
