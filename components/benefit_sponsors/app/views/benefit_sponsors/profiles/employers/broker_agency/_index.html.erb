@@ -4,7 +4,7 @@
     <div class="pull-right broker_agencies_search">
 
       <div class="search-wp">
-        <%= render 'shared/search', url: "/benefit_sponsors/profiles/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
+        <%= render 'benefit_sponsors/shared/search', url: "/benefit_sponsors/profiles/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
         <span class="pull-right">
           <a class="broker-advanced-search-options" style="cursor: pointer;">Advanced Options</a>
         </span>

@@ -5,7 +5,7 @@ FactoryGirl.define do
     organization { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
 
     trait :with_benefit_market do
-      # build only markey here
+      benefit_market { FactoryGirl.build(:benefit_markets_benefit_market) }
     end
 
     trait :with_organization_dc_profile do
