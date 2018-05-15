@@ -1,4 +1,5 @@
 class ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal < ShopEmployeeNotice
+include ActionView::Helpers::NumberHelper
 
   attr_accessor :census_employee
 
@@ -23,7 +24,7 @@ class ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal < ShopEmployeeNoti
       :plan_name => enrollment.plan.name
       })
     
-    total_employee_cost =  Money.new(enrollment.total_employee_cost.to_f * 100).format
+    total_employee_cost =  number_to_currency(enrollment.total_employee_cost)
     notice.enrollment = PdfTemplates::Enrollment.new({
       :enrollees => enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
         enrollee = PdfTemplates::Individual.new({
