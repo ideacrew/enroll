@@ -1,0 +1,25 @@
+.panel-heading {
+  color:$mhc-orange !important;
+  font-weight: 600;
+  font-size: 18px;
+  text-transform: uppercase;
+  font-family: "Roboto Slab", serif;
+}
+.plan-year-heading, .benefit-group-heading {
+  color:$primary-table-heading;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.plan-year-status {
+  color:$primary-green;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.borderless td, .borderless th {
+  border: none !important;
+}
+.offered {
+  color:$primary-green;
+}
