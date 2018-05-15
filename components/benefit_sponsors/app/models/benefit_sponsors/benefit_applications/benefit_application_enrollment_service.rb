@@ -1,5 +1,6 @@
 module BenefitSponsors
   class BenefitApplications::BenefitApplicationEnrollmentService
+    include Config::AcaModelConcern
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
@@ -10,10 +11,30 @@ module BenefitSponsors
     def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)
       # query all benefit_applications in OE state with open_enrollment_period.max < date
       @benefit_applications = BenefitSponsors::BenefitApplications::BenefitApplication.by_open_enrollment_end_date
-
       @benefit_applications.each do |application|
         if application && application.may_advance_date?
           application.advance_date!
+        end
+      end
+    end
+    
+    def is_application_ineligible?
+      application_eligibility_warnings.present?
+    end
+   
+    def submit_application
+      if benefit_application.may_publish? && is_application_ineligible?
+        [false, benefit_application, application_eligibility_warnings]
+      else
+        benefit_application.submit_application! if benefit_application.may_submit_application?
+        if benefit_application.approved? || benefit_application.enrollment_open?
+          unless benefit_application.assigned_census_employees_without_owner.present?
+            warnings = { base: "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?" }
+          end
+          [true, benefit_application, warnings || {}]
+        else
+          errors = application_errors.merge(open_enrollment_date_errors)
+          [false, benefit_application, errors]
         end
       end
     end
@@ -48,7 +69,12 @@ module BenefitSponsors
     end
     
     def renew
-      @benefit_application.renew
+      effective_period_end = @benefit_application.effective_period.end
+      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end.next_day)
+      
+      if benefit_sponsor_catalog
+        @benefit_application.renew(benefit_sponsor_catalog)
+      end
     end
 
     # benefit_market_catalog - ?
@@ -208,27 +234,40 @@ module BenefitSponsors
     # Check plan year application for regulatory compliance
     def application_eligibility_warnings
       warnings = {}
-      unless benefit_sponsorship.profile.is_primary_office_local?
-        warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
+
+      if employer_attestation_is_enabled?
+        unless benefit_sponsorship.is_attestation_eligible?
+          if benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+            warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+          elsif benefit_sponsorship.employer_attestation.denied?
+            warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+          else
+            warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+          end
+        end
       end
 
+      unless benefit_sponsorship.profile.is_primary_office_local?
+        warnings.merge!({primary_office_location: "Is a small business located in #{Settings.aca.state_name}"})
+      end
+
+      # TODO: These valiations occuring when employer publish their benefit application. Following state not relavant for an unpublished application.
       # Application is in ineligible state from prior enrollment activity
-      if aasm_state == "application_ineligible" || aasm_state == "renewing_application_ineligible"
+      if @benefit_application.aasm_state == "enrollment_ineligible"
         warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
       end
 
       # Maximum company size at time of initial registration on the HBX
-      if !(is_renewing?) && (fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
-        warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
+      if @benefit_application.fte_count < 1 || @benefit_application.fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
+        warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time equivalent employees" })
       end
 
       # Exclude Jan 1 effective date from certain checks
-      unless effective_date.yday == 1
+      unless @benefit_application.effective_date.yday == 1
         # Employer contribution toward employee premium must meet minimum
-        # TODO: FIX this once minimum_employer_contribution is fixed
-        # if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
-          # warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
-        # end
+        if @benefit_application.benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+          warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
+        end
       end
 
       warnings
