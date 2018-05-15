@@ -104,10 +104,15 @@ class TaxHousehold
     {}
   end
 
+  def hbx_applicant_ids(hbx_enrollment)
+    return [] if hbx_enrollment.blank?
+    hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+  end
+
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
-    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    applicant_ids = hbx_applicant_ids(hbx_enrollment)
     total_aptc_available = hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
       aptc_available_amount = aptc_available_amount_by_member(applicant_ids: applicant_ids, hbx_enrollment: hbx_enrollment)
       sum + (aptc_available_amount[member.applicant_id.to_s] || 0)
@@ -119,7 +124,7 @@ class TaxHousehold
   def deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
     deduct_aptc_available_amount = 0
-    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    applicant_ids = hbx_applicant_ids(hbx_enrollment)
     family_member_ids = hbx_enrollment.household.family_members.collect(&:id)
     unenrolled = family_member_ids - applicant_ids
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -175,7 +180,7 @@ class TaxHousehold
   def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc, used_calculated_max_aptc = false)
     # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
     aptc_available_amount_hash_for_enrollment = {}
-    applicant_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+    applicant_ids = hbx_applicant_ids(hbx_enrollment)
     total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
     elected_pct = total_aptc_available_amount > 0 ? (elected_aptc.to_f / total_aptc_available_amount.to_f) : 0
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
