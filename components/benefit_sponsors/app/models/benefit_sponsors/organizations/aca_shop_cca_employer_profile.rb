@@ -6,8 +6,6 @@ module BenefitSponsors
 
       field :sic_code,                type: String
 
-      embeds_one  :employer_attestation
-
       # TODO use SIC code validation
       validates_presence_of :sic_code
 

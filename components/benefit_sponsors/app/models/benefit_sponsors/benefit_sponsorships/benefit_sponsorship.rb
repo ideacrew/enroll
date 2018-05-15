@@ -97,6 +97,8 @@ module BenefitSponsors
                   inverse_of: :benefit_sponsorship_docs,
                   class_name: "BenefitSponsors::Documents::Document"
 
+      embeds_one :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
+
 
       validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
