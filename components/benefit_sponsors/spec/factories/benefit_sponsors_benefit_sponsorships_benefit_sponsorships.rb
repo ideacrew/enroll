@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :benefit_sponsors_benefit_sponsorship, class: 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship' do
     benefit_market { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "MA Health SHOP", site_urn: :cca) }
-    profile_id { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile) }
+    profile { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile) }
     organization { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
 
     trait :with_benefit_market do

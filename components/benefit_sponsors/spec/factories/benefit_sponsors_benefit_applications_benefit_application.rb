@@ -29,7 +29,12 @@ FactoryGirl.define do
     recorded_rating_area   { ::BenefitMarkets::Locations::RatingArea.new }
 
     trait :with_benefit_sponsor_catalog do
-      benefit_sponsor_catalog { ::BenefitMarkets::BenefitSponsorCatalog.new }
+      after(:build) do |benefit_application, evaluator|
+        if benefit_sponsorship = benefit_application.benefit_sponsorship
+          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
+        end
+        benefit_application.benefit_sponsor_catalog = (benefit_sponsor_catalog || ::BenefitMarkets::BenefitSponsorCatalog.new)
+      end
     end
   end
 end
