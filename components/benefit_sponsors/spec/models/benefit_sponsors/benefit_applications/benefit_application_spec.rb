@@ -200,19 +200,48 @@ module BenefitSponsors
     end
 
 
-    describe "Scopes" do
+    describe "Scopes", :dbclean => :after_each do
+      let(:this_year)                       { TimeKeeper.date_of_record.year }
+      let(:march_effective_date)            { Date.new(this_year,3,1) }
+      let(:march_open_enrollment_begin_on)  { march_effective_date - 1.month }
+      let(:march_open_enrollment_end_on)    { march_open_enrollment_begin_on + 9.days }
+      let(:april_effective_date)            { Date.new(this_year,4,1) }
+      let(:april_open_enrollment_begin_on)  { april_effective_date - 1.month }
+      let(:april_open_enrollment_end_on)    { april_open_enrollment_begin_on + 9.days }
 
-      let(:this_year)         { TimeKeeper.date_of_record.year }
-      let(:march)             { Date.new(this_year,3,1) }
+      let!(:march_sponsors)                 { FactoryGirl.create_list(:benefit_sponsors_benefit_applications, 3,
+                                              effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)) )}
+      let!(:april_sponsors)                 { FactoryGirl.create_list(:benefit_sponsors_benefit_applications, 2,
+                                              effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)) )}
 
-      it "should find applications in renewing status"
+      before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
+      it "should find applications by Effective date start" do
+        expect(BenefitApplications::BenefitApplication.all.size).to eq 5
+        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(march_effective_date).to_a).to eq march_sponsors
+        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(april_effective_date).to_a).to eq april_sponsors
+      end
 
+      it "should find applications by Open Enrollment begin" do
+        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(march_open_enrollment_begin_on)).to eq march_sponsors
+        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(april_open_enrollment_begin_on)).to eq april_sponsors
+      end
 
-      it "should find applications by Effective date start"
-      it "should find applications by Open Enrollment end"
+      it "should find applications by Open Enrollment end" do
+        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(march_open_enrollment_end_on)).to eq march_sponsors
+        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(april_open_enrollment_end_on)).to eq april_sponsors
+      end
 
-      it "should find applications in Plan Draft status"
+      it "should find applications in Plan Draft status" do
+        expect(BenefitApplications::BenefitApplication.plan_design_draft).to eq march_sponsors + april_sponsors
+      end
+
+      it "should find applications with chained scopes" do
+        expect(BenefitApplications::BenefitApplication.
+                                        plan_design_draft.
+                                        open_enrollment_begin_on(april_open_enrollment_begin_on)).to eq april_sponsors
+      end
+
       it "should find applications in Plan Design Exception status"
       it "should find applications in Plan Design Approved status"
       it "should find applications in Enrolling status"
@@ -222,7 +251,25 @@ module BenefitSponsors
       it "should find applications in Terminated status"
       it "should find applications in Expired Effective status"
 
-      it "should find applications with chained scopes"
+
+      context "with an application in renewing status" do
+        let(:last_year)                       { this_year - 1 }
+        let(:last_march_effective_date)       { Date.new(last_year,3,1) }
+        let!(:initial_application)            { FactoryGirl.create(:benefit_sponsors_benefit_applications,
+                                                effective_period: (last_march_effective_date..(last_march_effective_date + 1.year - 1.day)) )}
+        let!(:renewal_application)            { FactoryGirl.create(:benefit_sponsors_benefit_applications,
+                                                effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)),
+                                                predecessor_application: initial_application)}
+
+        it "should find the renewing application" do
+          expect(BenefitApplications::BenefitApplication.is_renewing).to eq [renewal_application]
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.is_renewing?).to eq true
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application).to eq initial_application
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application.successor_applications).to eq [renewal_application]
+          expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application.is_renewing?).to eq false
+        end
+      end
+
 
     end
 

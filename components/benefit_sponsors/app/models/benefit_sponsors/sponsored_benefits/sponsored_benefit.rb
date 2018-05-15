@@ -7,9 +7,12 @@ module BenefitSponsors
       embedded_in :benefit_package, 
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
+      field :product_option_choice, type: String # carrier id / metal level
       field :product_package_kind, type: Symbol
 
-      # field :plan_option_choice , type: String # carrier id / metal level
+      # scope :by_metal_level_kind
+
+      # scope :by_issuer
 
       embeds_one  :sponsor_contribution, 
                   class_name: "::BenefitSponsors::SponsoredBenefits::SponsorContribution"
@@ -30,11 +33,9 @@ module BenefitSponsors
         #   DO NOT COPY pricing determinations        
       end
 
-      # plan_option_kind & plan_option_choice
-      # Gold/silver/Carefirst/Kaiser
-      def plan_option_choice=(choice)
-        return if choice.blank?
-        self.products = benefit_sponsor_catalog.products_for(plan_option_kind, choice)
+      def product_option_choice=(product_option_choice)
+        product_package = benefit_sponsor_catalog.product_packages.by_kind(product_package_kind).first
+        self.products = benefit_sponsor_catalog.products_for(product_package, product_option_choice)
       end
 
       def reference_plan_id=(product_id)

@@ -48,12 +48,10 @@ module BenefitMarkets
       benefit_application.effective_period.begin.year
     end
 
-    # plan_option_kind: metal_level/single_issuer/single_product
-    # plan_option_choice: <metal level name>/<issuer name>
-    def products_for(plan_option_kind, plan_option_choice)
-      product_package = product_packages.by_kind(plan_option_kind.to_sym).first
+    # product_option_choice: <metal level name>/<issuer name>
+    def products_for(product_package, product_option_choice)
       return [] unless product_package
-      product_package.products_for_plan_option_choice(plan_option_choice)
+      product_package.products_for_plan_option_choice(product_option_choice)
     end
   end
 end

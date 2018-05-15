@@ -6,8 +6,8 @@ module BenefitSponsors
       include ActiveModel::Model
 
       attribute :kind, String
-      attribute :plan_option_kind, String
-      attribute :plan_option_choice, String
+      attribute :product_option_choice, String
+      attribute :product_package_kind, String
 
       attribute :products, Array[BenefitProductForm]
       attribute :reference_plan_id, String

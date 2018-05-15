@@ -150,47 +150,100 @@ module BenefitSponsors
       def renew_benefit_application
       end
 
-
-
       # Workflow for self service
       aasm do
         state :new, initial: true
-
-        state :initial_applicant        # Sponsor's first application is submitted and approved
-        state :initial_eligible         # Sponsor members have successfully completed open enrollment and Sponsor is authorized to offer benefits
+        state :initial_application_approved # Sponsor's first application is submitted and approved     
+        state :initial_enrollment_closed    # Sponsor members have successfully completed open enrollment
+        state :initial_enrollment_ineligible       
+        state :initial_enrollment_eligible, after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
                                         #, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-        state :initial_approved         # Sponsor has paid first premium in-full
-
-        state :enrolled                 # Sponsor's members are actively enrolled in coverage
+        state :active                   # Sponsor's members are actively enrolled in coverage
         state :suspended                # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
         state :terminated               # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
         state :ineligible               # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
+        event :approve_initial_application do
+          transitions from: :new, to: :initial_application_approved
+        end
 
-        event :approve_initial_plan_design do
-          transitions from: :new, to: :initial_applicant
+        event :close_initial_enrollment do 
+          transitions from: :initial_application_approved, to: :initial_enrollment_closed
         end
 
         event :approve_initial_enrollment_eligibility do
-          transitions from: :initial_applicant, to: :initial_eligible
-          transitions from: :initial_eligible,  to: :initial_eligible
+          transitions from: :initial_enrollment_closed, to: :initial_enrollment_eligible
+          transitions from: :initial_enrollment_ineligible,  to: :initial_enrollment_eligible
         end
 
         event :deny_initial_enrollment_eligibility do
-          transitions from: :initial_applicant, to: :initial_ineligible
-          transitions from: :initial_eligible,  to: :initial_ineligible
+          transitions from: :initial_enrollment_closed, to: :initial_enrollment_ineligible
+          transitions from: :initial_enrollment_eligible,  to: :initial_enrollment_ineligible
         end
 
         event :pay_binder do
-          transitions from: :initial_eligible, to: :initial_approved
+          transitions from: :initial_enrollment_closed, to: :initial_enrollment_eligible
         end
 
         event :begin_coverage do
-          transitions from: :initial_approved, to: :enrolled
+          transitions from: :initial_enrollment_eligible, to: :active
         end
 
         event :revert_to_new do
-          transitions from: [:new, :initial_applicant, :initial_eligible, :initial_ineligible, :initial_approved], to: :new
+          transitions from: [:new, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
+        end
+
+        event :terminate do 
+          transitions from: [:active, :suspended], to: :terminated
+        end
+
+        event :suspend do
+          transitions from: :active, to: :suspended
+        end
+
+        event :unsuspend do 
+          transitions from: :suspended, to: :active
+        end
+
+        event :reinstate do
+          transitions from: :terminated, to: :active
+        end
+
+        event :reactivate do
+          transitions from: :terminated, to: :initial_application_approved 
+        end
+
+        event :ban do
+          transitions from: [:active, :suspend, :terminated], to: :ineligible
+        end
+
+        event :cancel do
+          transitions from: [:initial_application_approved, :initial_enrollment_closed], to: :new
+        end
+      end
+
+      def publish_binder_paid
+        benefit_applications.each do |benefit_application| 
+          benefit_application.application_event_subscriber(aasm)
+        end
+      end
+
+      # BenefitApplication        BenefitSponsorship
+      # approved               -> initial_application_approved
+      # enrollment_closed      -> initial_enrollment_closed
+      # application_ineligible -> initial_enrollment_ineligible
+      # application_eligible   -> initial_enrollment_eligible
+      # active                 -> active
+      def application_event_subscriber(aasm)
+        case aasm.to_state
+        when :approved
+          approve_initial_application! if may_approve_initial_application?
+        when :enrollment_closed
+          close_initial_enrollment! if may_close_initial_enrollment?
+        when :application_ineligible
+          deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
+        when :active
+          begin_coverage! if may_begin_coverage?
         end
       end
 

@@ -102,16 +102,6 @@ module BenefitSponsors
         office && office.phone.to_s
       end
 
-      ## Class methods
-      class << self
-
-        def find(id)
-          organizations = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
-          organizations.size > 0 ? organizations.first.profiles.where(_type: /.*BrokerAgencyProfile$/, _id: id ).first: nil
-        end
-
-      end
-
       aasm do #no_direct_assignment: true do
         state :is_applicant, initial: true
         state :is_approved

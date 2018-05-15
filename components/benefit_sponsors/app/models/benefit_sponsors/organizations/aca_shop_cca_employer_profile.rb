@@ -2,7 +2,7 @@ module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile < BenefitSponsors::Organizations::Profile
       # include Concerns::AcaRatingAreaConfigConcern
-      # include Concerns::EmployerProfileConcern
+      include BenefitSponsors::Concerns::EmployerProfileConcern
 
       field :sic_code,                type: String
 

@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::OrganizationForm
+    class OrganizationForms::OrganizationForm
       include ActiveModel::Validations
       include ::Validations::Email
       include BenefitSponsors::Forms::NpnField
@@ -12,7 +12,7 @@ module BenefitSponsors
       attribute :legal_name, String
       attribute :dba, String
 
-      attribute :profile, Forms::ProfileForm
+      attribute :profile, OrganizationForms::ProfileForm
 
 
       validates :fein,
