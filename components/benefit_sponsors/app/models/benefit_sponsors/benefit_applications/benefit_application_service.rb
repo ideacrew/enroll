@@ -1,174 +1,10 @@
 module BenefitSponsors
-  class BenefitApplications::BenefitApplicationEnrollmentService
+  class BenefitApplications::BenefitApplicationService
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
     end
 
-    # validate :open_enrollment_date_checks
-    ## Trigger events can be dates or from UI
-    def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)
-      # query all benefit_applications in OE state with open_enrollment_period.max < date
-      @benefit_applications = BenefitSponsors::BenefitApplications::BenefitApplication.by_open_enrollment_end_date
-
-      @benefit_applications.each do |application|
-        if application && application.may_advance_date?
-          application.advance_date!
-        end
-      end
-    end
-
-    def begin_open_enrollment
-      if @benefit_application.may_advance_date?
-        @benefit_application.advance_date!
-        active_census_employees.each do |census_employee|
-          census_employee.renew
-        end
-      end
-    end
-
-    def close_open_enrollment
-      if @benefit_application.may_advance_date?
-        @benefit_application.advance_date!
-      end
-    end
-
-    def cancel_open_enrollment(benefit_application)
-
-    end
-
-    # Exempt exception handling situation
-    def extend_open_enrollment(benefit_application, new_end_date)
-
-    end
-
-    # Exempt exception handling situation
-    def retroactive_open_enrollment(benefit_application)
-
-    end
-    
-    def renew
-      @benefit_application.renew
-    end
-
-    # benefit_market_catalog - ?
-    # benefit_sponsor_catalog
-    def terminate
-    end
-
-    def reinstate
-    end
-
-    def benefit_sponsorship
-      @benefit_application.benefit_sponsorship
-    end
-
-    def active_census_employees
-      benefit_sponsorship.census_employees.non_terminated
-    end
-
-    def effectuate
-      if @benefit_application.may_activate_enrollment?
-        @benefit_application.activate_enrollment!
-        active_census_employees.each do |census_employee|
-          census_employee.effectuate_coverage
-        end
-      end
-    end
-
-    def expire
-      if @benefit_application.may_expire?
-        @benefit_application.expire!
-        active_census_employees.each do |census_employee|
-          census_employee.expire_coverage
-        end
-      end
-    end
-
-    def member_participation_percent
-      return "-" if eligible_to_enroll_count == 0
-      "#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
-    end
-
-    def member_participation_percent_based_on_summary
-      return "-" if eligible_to_enroll_count == 0
-      "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
-    end
-
-    # TODO: Fix this method
-    def minimum_employer_contribution
-      unless benefit_packages.size == 0
-        benefit_packages.map do |benefit_package|
-          if benefit_package#.sole_source?
-            OpenStruct.new(:premium_pct => 100)
-          else
-            benefit_package.relationship_benefits.select do |relationship_benefit|
-              relationship_benefit.relationship == "employee"
-            end.min_by do |relationship_benefit|
-              relationship_benefit.premium_pct
-            end
-          end
-        end.map(&:premium_pct).first
-      end
-    end
-
-    def filter_active_enrollments_by_date(date)
-      enrollment_proxies = BenefitApplicationEnrollmentsQuery.new(self).call(Family, date)
-      return [] if (enrollment_proxies.count > 100)
-      enrollment_proxies.map do |ep|
-        OpenStruct.new(ep)
-      end
-    end
-
-    def hbx_enrollments_by_month(date)
-      BenefitApplicationEnrollmentsMonthlyQuery.new(self).call(date)
-    end
-
-    private
-
-    def due_date_for_publish
-      if benefit_sponsorship.benefit_applications.renewing.any?
-        Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
-      else
-        Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
-      end
-    end
-
-    def is_application_eligible?
-      application_eligibility_warnings.blank?
-    end
-
-    def is_publish_date_valid?
-      event_name = aasm.current_event.to_s.gsub(/!/, '')
-      event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
-    end
-
-    #TODO: FIX this
-    def assigned_census_employees_without_owner
-      benefit_packages#.flat_map(){ |benefit_package| benefit_package.census_employees.active.non_business_owner }
-    end
-
-    def open_enrollment_date_errors
-      errors = {}
-
-      if is_renewing?
-        minimum_length = Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
-        enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
-      else
-        minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
-        enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
-      end
-
-      if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
-        log_message(errors) {{open_enrollment_period: "Open Enrollment period is shorter than minimum (#{minimum_length} days)"}}
-      end
-
-      if open_enrollment_end_on > Date.new(start_on.prev_month.year, start_on.prev_month.month, enrollment_end)
-        log_message(errors) {{open_enrollment_period: "Open Enrollment must end on or before the #{enrollment_end.ordinalize} day of the month prior to effective date"}}
-      end
-
-      errors
-    end
 
     # Check plan year for violations of model integrity relative to publishing
     def application_errors
@@ -285,5 +121,8 @@ module BenefitSponsors
         end
       end
     end
+
+
+
   end
 end

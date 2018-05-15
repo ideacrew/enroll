@@ -3,9 +3,8 @@ module BenefitSponsors
     class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
+      # include BenefitSponsors::Concerns::RecordTransition
       include AASM
-      include BenefitApplicationStateMachineHelper
-      include BenefitSponsors::Concerns::RecordTransition
 
       PLAN_DESIGN_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
       PLAN_DESIGN_DRAFT_STATES      = [:draft] + PLAN_DESIGN_EXCEPTION_STATES.freeze
@@ -49,14 +48,16 @@ module BenefitSponsors
 
 
       # Create a doubly-linked list of application chain:
-      # predecessor_application is nil if it's the first in an application chain without
-      # gaps in dates.  Otherwise, it references the preceding application that it replaces
-      # successor_application is nil if this is the last in an application chain without
-      # gaps in dates.  Otherwise, it references the application which immediately follows
-      has_one     :predecessor_application, inverse_of: :successor_application,
+      #   predecessor_application is nil if it's the first in an application chain without
+      #   gaps in dates.  Otherwise, it references the preceding application that it replaces
+      #   successor_applications are nil if this is the last in an application chain without
+      #   gaps in dates.  Otherwise, it references the applications which immediately follow.
+      #   An application may have multiple successors, but only one may be active at once
+      belongs_to  :predecessor_application, inverse_of: :successor_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      belongs_to  :successor_application, inverse_of: :predecessor_application,
+      has_many    :successor_applications, inverse_of: :predecessor_application,
+                  counter_cache: true,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       belongs_to  :recorded_rating_area,
@@ -77,7 +78,7 @@ module BenefitSponsors
 
       validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_area, :recorded_rating_area
 
-      index({ "aasm" => 1 })
+      index({ "aasm_state" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
 
@@ -93,8 +94,8 @@ module BenefitSponsors
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
-      scope :is_renewing,                     ->{ exists?(:predecessor_application => true,
-                                                          :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
+      scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
+                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
                                                             }
 
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -107,6 +108,9 @@ module BenefitSponsors
       scope :open_enrollment_period_cover,    ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"opem_enrollment_period.min".gte => compare_date,
                                                               :"opem_enrollment_period.max".lte => compare_date)
+                                                            }
+      scope :open_enrollment_begin_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                              :"open_enrollment_period.min" => compare_date)
                                                             }
       scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"open_enrollment_period.max" => compare_date)
@@ -210,7 +214,7 @@ module BenefitSponsors
       end
 
       def is_renewing?
-        predecessor_application.present? && PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES.include?(aasm_state)
+        predecessor_application.present? && (PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
       end
 
       # TODO Refactor -- use the new state: :open_enrollment_closed
@@ -277,7 +281,7 @@ module BenefitSponsors
         state :appealing            # request reversal of negative determination
         ## End optional states for exception processing
 
-        state :enrollment_open,       :after_enter => :send_employee_invites          # Approved application has entered open enrollment period
+        state :enrollment_open      #,       :after_enter => :send_employee_invites          # Approved application has entered open enrollment period
         # state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
 
         state :enrollment_closed
@@ -297,6 +301,8 @@ module BenefitSponsors
         state :expired              # Non-published plans are expired following their end on date
         state :canceled             # Application closed prior to coverage taking effect
 
+        after_all_transitions :publish_state_transition
+
         event :import do
           transitions from: :draft, to: :imported
         end
@@ -306,7 +312,7 @@ module BenefitSponsors
           transitions from: :enrollment_eligible,                   to: :active,                 guard:   :is_event_date_valid?
           transitions from: :approved,                              to: :enrollment_open,        guard:   :is_event_date_valid?
           transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_eligible,    guards:  [:is_open_enrollment_closed?, :is_enrollment_valid?]
-          transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+          transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed? #, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
           transitions from: :enrollment_open,                       to: :enrollment_closed,      guard:   :is_event_date_valid?
 
           transitions from: :active,                                to: :terminated,             guard:   :is_event_date_valid?
@@ -434,6 +440,15 @@ module BenefitSponsors
         end
       end
 
+      def publish_state_transition
+        benefit_sponsorship.application_event_subscriber(aasm)
+      end
+
+      def benefit_sponsorship_event_subscriber(aasm)
+        if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
+          approve_enrollment_eligiblity!
+        end
+      end
 
       private
 

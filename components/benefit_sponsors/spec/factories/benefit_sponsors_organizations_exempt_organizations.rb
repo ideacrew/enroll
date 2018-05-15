@@ -9,7 +9,8 @@ FactoryGirl.define do
     # end
 
     # association :profiles, factory: :benefit_sponsors_organizations_hbx_profile
-    profiles { [ build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) ] }
+    # profiles { [ build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) ] }
+    profiles { [ build(:benefit_sponsors_organizations_hbx_profile) ] }
 
     trait :with_site do
       before :build do |organization, evaluator|

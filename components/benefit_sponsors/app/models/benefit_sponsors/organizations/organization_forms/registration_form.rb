@@ -1,20 +1,20 @@
 module BenefitSponsors
   module Organizations
-    class Forms::RegistrationForm
+    class OrganizationForms::RegistrationForm
       include ActiveModel::Validations
       include Virtus.model
 
       attribute :current_user_id, String
       attribute :profile_type, String
       attribute :profile_id, String
-      attribute :staff_roles, Array[Forms::StaffRoleForm]
-      attribute :organization, Forms::OrganizationForm
+      attribute :staff_roles, Array[OrganizationForms::StaffRoleForm]
+      attribute :organization, OrganizationForms::OrganizationForm
 
       validate :registration_form
 
       def staff_roles_attributes=(attrs)
         self.staff_roles = attrs.values.inject([]) do |result, role|
-          result << Forms::StaffRoleForm.new(role)
+          result << OrganizationForms::StaffRoleForm.new(role)
           result
         end
       end
