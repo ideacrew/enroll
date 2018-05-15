@@ -3,7 +3,7 @@ module BenefitSponsors
     class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
-      include BenefitSponsors::Concerns::RecordTransition
+      # include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
       PLAN_DESIGN_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
@@ -48,14 +48,16 @@ module BenefitSponsors
 
 
       # Create a doubly-linked list of application chain:
-      # predecessor_application is nil if it's the first in an application chain without
-      # gaps in dates.  Otherwise, it references the preceding application that it replaces
-      # successor_application is nil if this is the last in an application chain without
-      # gaps in dates.  Otherwise, it references the application which immediately follows
-      has_one     :predecessor_application, inverse_of: :successor_application,
+      #   predecessor_application is nil if it's the first in an application chain without
+      #   gaps in dates.  Otherwise, it references the preceding application that it replaces
+      #   successor_applications are nil if this is the last in an application chain without
+      #   gaps in dates.  Otherwise, it references the applications which immediately follow.
+      #   An application may have multiple successors, but only one may be active at once
+      belongs_to  :predecessor_application, inverse_of: :successor_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      belongs_to  :successor_application, inverse_of: :predecessor_application,
+      has_many    :successor_applications, inverse_of: :predecessor_application,
+                  counter_cache: true,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       belongs_to  :recorded_rating_area,
@@ -92,8 +94,8 @@ module BenefitSponsors
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
-      scope :is_renewing,                     ->{ exists?(:predecessor_application => true,
-                                                          :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
+      scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
+                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
                                                             }
 
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -437,7 +439,7 @@ module BenefitSponsors
           transitions from: [:suspended, :terminated], to: :active, after: :reset_termination_and_end_date
         end
       end
-     
+
       def publish_state_transition
         benefit_sponsorship.application_event_subscriber(aasm)
       end
