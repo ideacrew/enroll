@@ -48,6 +48,8 @@ module BenefitMarkets
       benefit_market_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
     end
 
+    # TODO: move this as BenefitMarketCatalog#benefit_sponsor_catalog_for(service_areas)
+
     def benefit_sponsor_catalog_for(service_areas, effective_date = ::TimeKeeper.date_of_record)
       benefit_catalog = benefit_market_catalog_effective_on(effective_date)
       BenefitSponsorCatalogFactory.call(effective_date, benefit_catalog, service_areas)
