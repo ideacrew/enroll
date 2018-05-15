@@ -16,7 +16,7 @@ module BenefitSponsors
       field :aasm_state, type: String, default: "submitted"
       field :reason_for_rejection, type: String
 
-      embedded_in :employer_attestation, class:"BenefitSponsors::Documents::EmployerAttestation"
+      embedded_in :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
       # embeds_many :workflow_state_transitions, as: :transitional
 
       aasm do
