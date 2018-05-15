@@ -63,6 +63,7 @@ class Person
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
+  embeds_one :inbox, as: :recipient
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
   accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
@@ -91,6 +92,8 @@ class Person
   before_save :strip_empty_fields
 
   after_validation :move_encrypted_ssn_errors
+
+  after_create :create_inbox
 
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
@@ -185,6 +188,29 @@ class Person
   end
 
   class << self
+
+    def additional_exprs(clean_str)
+      additional_exprs = []
+      if clean_str.include?(" ")
+        parts = clean_str.split(" ").compact
+        first_re = ::Regexp.new(::Regexp.escape(parts.first), true)
+        last_re = ::Regexp.new(::Regexp.escape(parts.last), true)
+        additional_exprs << {:first_name => first_re, :last_name => last_re}
+      end
+      additional_exprs
+    end
+
+    def search_first_name_last_name_npn(s_str, query=self)
+      clean_str = s_str.strip
+      s_rex = ::Regexp.new(::Regexp.escape(s_str.strip), true)
+      query.where({
+        "$or" => ([
+          {"first_name" => s_rex},
+          {"last_name" => s_rex},
+          {"broker_role.npn" => s_rex}
+          ] + additional_exprs(clean_str))
+        })
+    end
 
     def match_existing_person(personish)
       return nil if personish.ssn.blank?
@@ -294,6 +320,14 @@ class Person
   end
 
   private
+
+  def create_inbox
+    welcome_subject = "Welcome to #{Settings.site.short_name}"
+    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    mailbox = Inbox.create(recipient: self)
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{Settings.site.short_name}")
+  end
+
   def is_ssn_composition_correct?
     # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
