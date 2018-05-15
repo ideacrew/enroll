@@ -127,7 +127,7 @@
                     td = number_to_currency(bg.monthly_min_employee_cost('dental'))
                     td = number_to_currency(bg.monthly_max_employee_cost('dental'))
       - if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1
-        = render partial: 'ui-components/v1/modals/custom_dental_offered_plans_modal', locals: { bg: bg }
+        = render partial: 'shared/custom_dental_offered_plans_modal', locals: { bg: bg }
         
 
 javascript:
@@ -135,15 +135,7 @@ javascript:
     $('#showhidebutton').text('Show Details ').append('<i class="fa fa-chevron-down fa-lg"></i>')
   })
   
-  $('#collapseDental').on('hide.bs.collapse', function () {
-    $('#showhidebuttonDental').text('Show Details ').append('<i class="fa fa-chevron-down fa-lg"></i>')
-  })
-  
   $('#collapseHealth').on('show.bs.collapse', function () {
     $('#showhidebutton').text('Hide Details ').append('<i class="fa fa-chevron-up fa-lg"></i>')
-  })
-  
-  $('#collapseDental').on('show.bs.collapse', function () {
-    $('#showhidebuttonDental').text('Hide Details ').append('<i class="fa fa-chevron-up fa-lg"></i>')
   })
             
