@@ -1,0 +1,20 @@
+<table class="total_table address" border="0">
+  <tbody>
+    <tr><td><br><br></td></tr>
+    <tr>
+      <td class="fssize1 "><%= recipient.first_name %> <%= recipient.last_name %></td>
+    </tr>
+    <tr>
+       <td class="fssize1"><%= recipient.mailing_address.street_1 %></td>
+    </tr>
+    <% if recipient.mailing_address.street_2.present? %>
+    <tr>
+      <td class="fssize1"><%= recipient.mailing_address.street_2 %></td>
+    </tr>
+    <% end %>
+    <tr>
+      <td class="fssize1"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
+       <td align="right" style="padding-right: 15px"><%= notice_number %></td>
+    </tr>
+  </tbody>
+</table>

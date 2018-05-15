@@ -12,8 +12,11 @@ class LawfulPresenceDetermination
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
   embeds_many :vlp_responses, class_name:"EventResponse"
-  embeds_many :ssa_requests, class_name:"EventRequest"
-  embeds_many :vlp_requests, class_name:"EventRequest"
+  embeds_many :ssa_requests,  class_name:"EventRequest"
+  embeds_many :vlp_requests,  class_name:"EventRequest"
+  embeds_many :ssa_verification_responses 
+  embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :dhs_verification_responses, class_name:"DhsVerificationResponse"
 
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
@@ -21,7 +24,6 @@ class LawfulPresenceDetermination
   field :citizen_status, type: String
   field :citizenship_result, type: String
   field :aasm_state, type: String
-  embeds_many :workflow_state_transitions, as: :transitional
 
   track_history   :on => [:vlp_verified_at,
                           :vlp_authority,
@@ -37,23 +39,33 @@ class LawfulPresenceDetermination
     state :verification_pending, initial: true
     state :verification_outstanding
     state :verification_successful
+    state :expired
 
     event :authorize, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_successful, after: :record_approval_information
       transitions from: :verification_outstanding, to: :verification_successful, after: :record_approval_information
       transitions from: :verification_successful, to: :verification_successful, after: :record_approval_information
+      transitions from: :expired, to: :verification_successful
     end
 
     event :deny, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_successful, to: :verification_outstanding, after: :record_denial_information
+      transitions from: :expired, to: :verification_outstanding
     end
 
     event :revert, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_pending, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_pending, after: :record_denial_information
+      transitions from: :expired, to: :verification_pending
       transitions from: :verification_successful, to: :verification_pending
+    end
+
+    event :expired, :after => :record_transition do
+      transitions from: :verification_pending, to: :expired
+      transitions from: :verification_outstanding, to: :expired
+      transitions from: :expired, to: :expired
     end
   end
 

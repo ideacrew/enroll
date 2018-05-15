@@ -7,6 +7,7 @@ class Plan
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
+  INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
   DENTAL_METAL_LEVEL_KINDS = %w[high low]
 
@@ -170,7 +171,6 @@ class Plan
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
-
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -391,10 +391,6 @@ class Plan
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
   end
 
-  def deductible_integer
-    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
-  end
-
   def hsa_plan?
     name = self.name
     regex = name.match("HSA")
@@ -403,6 +399,10 @@ class Plan
     else
       return false
     end
+  end
+
+  def deductible_integer
+    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
   end
 
   def renewal_plan_type

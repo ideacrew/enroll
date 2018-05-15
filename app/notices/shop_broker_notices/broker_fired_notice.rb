@@ -32,6 +32,7 @@ class ShopBrokerNotices::BrokerFiredNotice < ShopBrokerNotice
     notice.primary_fullname = broker.full_name.titleize
     notice.first_name = broker.first_name.titleize
     notice.last_name = broker.last_name.titleize
+    notice.broker_email = broker.work_email_or_best
     notice.hbx_id = broker.hbx_id
     notice.mpi_indicator = self.mpi_indicator
     notice.employer_name = employer_profile.legal_name.titleize

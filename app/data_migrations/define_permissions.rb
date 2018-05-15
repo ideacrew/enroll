@@ -27,6 +27,7 @@ class DefinePermissions < MigrationTask
   	permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
+
   def build_test_roles
     User.where(email: /themanda.*dc.gov/).delete_all
     Person.where(last_name: /^amanda\d+$/).delete_all
@@ -51,20 +52,55 @@ class DefinePermissions < MigrationTask
     HbxStaffRole.create!( person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p6, permission_id: Permission.hbx_csr_tier2.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
   end
+
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes!(can_update_ssn: true)
   end
+
+  def hbx_admin_csr_view_personal_info_page
+    Permission.hbx_staff.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_csr_supervisor.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_csr_tier2.update_attributes!(view_personal_info_page: true)
+    Permission.hbx_csr_tier1.update_attributes!(view_personal_info_page: true)
+  end
+
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
   end
+
   def hbx_admin_can_add_sep
     Permission.hbx_staff.update_attributes!(can_add_sep: true)
   end
+
   def hbx_admin_can_view_username_and_email
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
+  end
+
+  def hbx_admin_can_view_application_types
+    Permission.hbx_staff.update_attributes!(can_view_application_types: true)
+  end
+
+  def hbx_admin_can_access_new_consumer_application_sub_tab
+    Permission.hbx_staff.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_supervisor.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_tier1.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+    Permission.hbx_csr_tier2.update_attributes!(can_access_new_consumer_application_sub_tab: true)
+  end
+
+  def hbx_admin_can_access_identity_verification_sub_tab
+    Permission.hbx_staff.update_attributes!(can_access_identity_verification_sub_tab: true)
+  end
+
+  def hbx_admin_can_access_outstanding_verification_sub_tab
+    Permission.hbx_staff.update_attributes!(can_access_outstanding_verification_sub_tab: true)
+    Permission.hbx_read_only.update_attributes!(can_access_outstanding_verification_sub_tab: true)
+  end
+
+  def hbx_admin_can_transition_family_members
+   Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
   end
 end

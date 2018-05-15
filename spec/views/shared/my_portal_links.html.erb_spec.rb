@@ -49,7 +49,8 @@ describe "shared/_my_portal_links.html.haml" do
       all_er_profile = FactoryGirl.create(:employer_profile)
       all_er_profile.organization.update_attributes(legal_name: 'Second Company') # not always Turner
       all_census_ee = FactoryGirl.create(:census_employee, employer_profile: all_er_profile)
-      EmployerStaffRole.create(person:person, employer_profile_id: all_er_profile.id)
+      employer_staff_role=EmployerStaffRole.create(person:person, employer_profile_id: all_er_profile.id)
+      employer_staff_role.approve!
       person.employee_roles.first.census_employee = all_census_ee
       person.employee_roles.first.save!
       sign_in(user)

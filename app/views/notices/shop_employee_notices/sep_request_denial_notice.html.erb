@@ -1,6 +1,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.primary_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -20,13 +29,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You recently requested a special enrollment period due to experiencing a qualifying event, #{notice.sep.title}. Upon review of the information you provided on #{notice.sep.qle_on}, your request has been denied. The date you submitted does not qualify you for a special enrollment period. You had through #{notice.sep.end_on} to report the event, based on the date you experienced this event, #{notice.sep.qle_on}. Qualifying events cannot be reported prior to the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. If you believe this decision is the result of an error, please contact the #{Settings.site.short_name} Contact Center at #{notice.hbe.phone} [TTY 711] for additional assistance."} %>
+  content: "You recently requested a special enrollment period due to experiencing a qualifying event, #{notice.sep.title}. Upon review of the information you provided on #{TimeKeeper.date_of_record}, your request has been denied. The date you submitted does not qualify you for a special enrollment period.Based on the date you experienced this event, you can only report this event between <strong>#{notice.sep.start_on}</strong> through <strong>#{notice.sep.end_on}</strong>. Qualifying events cannot be reported prior to the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. If you believe this decision is the result of an error, please contact the #{Settings.site.short_name} Contact Center at #{notice.hbe.phone} [TTY 711] for additional assistance."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This means that, although you may be eligible to participate in #{Settings.site.short_name}, you are not eligible to enroll in or make changes to your current plan through a special enrollment period. This is because the annual open enrollment period is closed and you reported your qualifying event more than 30 days after you experienced the qualifying event or before the qualifying event occurred."} %>
+  content: "This means that, although you may be eligible to participate in #{Settings.site.short_name}, you are not eligible to enroll in or make changes to your current plan through a special enrollment period. This is because the annual open enrollment period is closed and you reported your qualifying event after #{notice.sep.end_on} or before the qualifying event occurred."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Please note that your employer’s annual Open Enrollment for Plan Year 2017 closed on #{notice.plan_year.open_enrollment_end_on}. Open enrollment occurs for a period of time each year when eligible employees can enroll into a plan for the first time, add or drop family members, change their plan, or terminate coverage. Once open enrollment ends each year, employees must meet certain criteria to be able to enroll, terminate, or make other changes to their coverage. This is called a Special Enrollment Period. Circumstances that allow employees to enroll in health plans through a Special Enrollment Period include the following, when reported promptly (usually within 30 days)."} %>
+content: "Please note that your employer’s annual Open Enrollment for Plan Year #{notice.plan_year.open_enrollment_start_on.year} closed on #{notice.plan_year.open_enrollment_end_on}. Open enrollment occurs for a period of time each year when eligible employees can enroll into a plan for the first time, add or drop family members, change their plan, or terminate coverage. Once open enrollment ends each year, employees must meet certain criteria to be able to enroll, terminate, or make other changes to their coverage. This is called a special enrollment period. Circumstances that allow employees to enroll in health plans through a special enrollment period include the following, <u>when reported promptly</u> (usually within 30 days)."} %>
 
   <table class="total_table" border="0">
     <tbody>
@@ -139,7 +148,7 @@ content: "Please note that your employer’s annual Open Enrollment for Plan Yea
 content: "Though your request was denied, you can still request a special enrollment period at any time during the year if you meet any of the requirements listed above. You may submit a new request for a special enrollment period at any time, with new information, by calling #{Settings.site.short_name} Contact Center at 1-855-532-5465 [TTY 711]."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>If you have a complaint related to your health/dental company you can file a complaint with the DC Department of Insurance, Securities and Banking (DISB)</strong>, which regulates insurers and insurance brokers in the #{Settings.aca.state_name}. You can file a complaint with DISB at the following link: <a href='http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0'>http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0</a>, by email at disb.complaints@dc.gov, or by calling 202-727-8000."} %>
+content: "<strong>If you have a complaint related to your health/dental company you can file a complaint with the DC Department of Insurance, Securities and Banking (DISB)</strong>, which regulates insurers and insurance brokers in the #{Settings.aca.state_name}. You can file a complaint with DISB at the following link: <a href='http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0'>http://dcforms.dc.gov/webform/consumer-complaint-form-disb-0</a>, by email at <a href='mailto:disb.complaints@dc.gov'>disb.complaints@dc.gov</a>, or by calling 202-727-8000."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Other Coverage You May Have</strong>"} %>
@@ -187,24 +196,24 @@ content: "The enrollment period for Medicaid never closes. A person can apply fo
 content: "<strong>Annual Open Enrollment Period</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not qualify for a new Special Enrollment Period, your next opportunity to enroll in employer-sponsored coverage through #{Settings.site.short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.start_on}."} %>
+content: "If you do not qualify for a new special enrollment period, your next opportunity to enroll in employer-sponsored coverage through #{Settings.site.short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective <strong>#{notice.plan_year.start_on}</strong>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Individual Market Enrollment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period you can enroll in individual market coverage through #{Settings.site.short_name} if you live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. If you live outside the #{Settings.aca.state_name}, you can apply during open enrollment through the health insurance exchange operating in your state."} %>
+content: "If you do not qualify to enroll in employer-sponsored coverage or other coverage before then, the annual individual market open enrollment period begins on November 1st of each year. During this period you can enroll in individual market coverage through #{Settings.site.short_name} if you live in the #{Settings.aca.state_name}. If you live outside the #{Settings.aca.state_name}, you can apply during open enrollment through the health insurance exchange operating in your state."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If you are a #{Settings.aca.state_name} resident and think you might be eligible for an individual market Special Enrollment Period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a Special Enrollment Period."} %>
+content: "There are separate eligibility rules for special enrollment periods into individual market coverage. If you are a #{Settings.aca.state_name} resident and think you might be eligible for an individual market special enrollment period, you can contact #{Settings.site.short_name} to see if you are eligible to enroll through a special enrollment period."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
-  heading: 'For Questions or Assistance:', sub_heading: ''} %>
+  heading: '<strong>For Questions or Assistance:</strong>', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
-  listings: ["By calling #{notice.hbe.phone}.",
+  listings: ["By calling #{notice.hbe.phone}",
             "TTY: #{Settings.contact_center.tty}",
             "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 

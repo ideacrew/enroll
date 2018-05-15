@@ -321,10 +321,43 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
+    let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
     before :each do
       allow(person).to receive(:csr_role).and_return(double("csr_role", cac: false))
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
+    end
+
+    it "should notice user disabled" do
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(response).to have_http_status(:success)
+       expect(flash[:notice]).to match(/Disabled user/)
+    end
+
+    it "should set is_disabled to true" do
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(family.reload.is_disabled).to be_truthy
+    end
+
+    it "should notice user Enabled" do
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(response).to have_http_status(:success)
+       expect(flash[:notice]).to match(/Enabled user/)
+    end
+
+    it "should set is_disabled to false" do
+       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+       family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
+       @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
+       xhr :get, :enable_or_disable_link, @params
+       expect(family.reload.is_disabled).to be_falsey
     end
 
     it "renders the 'families index' template for hbx_staff" do
@@ -534,6 +567,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "POST reinstate_enrollment" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: '', format: :js
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+    end
+  end
+
   describe "GET get_user_info" do
     let(:user) { double("User", :has_hbx_staff_role? => true)}
     let(:person) { double("Person", id: double)}
@@ -544,44 +592,65 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     before do
       sign_in user
       allow(Person).to receive(:find).with("#{person.id}").and_return person
+      xhr :get, :get_user_info, family_actions_id: family_id, person_id: person.id
     end
 
-    context "when action called through families datatable" do
+    it "should populate the person instance variable" do
+      expect(assigns(:person)).to eq person
+    end
 
-      before do
-        xhr :get, :get_user_info, family_actions_id: family_id, person_id: person.id
-      end
+    it "should populate the row id to instance variable" do
+      expect(assigns(:element_to_replace_id)).to eq "#{family_id}"
+    end
+  end
 
-      it "should populate the person instance variable" do
-        expect(assigns(:person)).to eq person
-      end
+  describe "POST reinstate_enrollment" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
 
-      it "should populate the row id to instance variable" do
-        expect(assigns(:element_to_replace_id)).to eq "#{family_id}"
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: '', format: :js
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+    end
+  end
+
+  describe "POST cancel_initial_plan_year" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :with_enrollment_members, { household: family.households.first })}
+    let(:plan_year) { FactoryGirl.create(:plan_year, {aasm_state: 'enrolling'}) }
+    let(:employer_profile) { plan_year.employer_profile }
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(employer_profile).to receive(:published_plan_year).and_return(plan_year)
+      allow_any_instance_of(PlanYear).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      sign_in user
+    end
+
+    context "success" do
+      it "should returns http success" do
+        allow_any_instance_of(EventsHelper).to receive(:is_initial_or_conversion_employer?).with(employer_profile).and_return(true)
+        allow(controller).to receive(:process_cancel_initial_plan_year).with([hbx_enrollment], employer_profile)
+
+        xhr :get, :cancel_initial_plan_year, format: :js, id:employer_profile.id
+        expect(response).to have_http_status(200)
+        expect(flash.notice).to match(/Initial plan year cancelled for employer/)
+        expect(employer_profile.applicant?).to be_truthy
       end
     end
 
-    context "when action called through employers datatable" do
-
-      before do
-        allow(Organization).to receive(:find).and_return organization
-        xhr :get, :get_user_info, employers_action_id: employer_id, people_id: [person.id]
-      end
-
-      it "should not populate the person instance variable" do
-        expect(assigns(:person)).to eq nil
-      end
-
-      it "should populate the people instance variable" do
-        expect(assigns(:people).class).to eq Mongoid::Criteria
-      end
-
-      it "should populate the employer_actions instance variable" do
-        expect(assigns(:employer_actions)).to eq true
-      end
-
-      it "should populate the row id to instance variable" do
-        expect(assigns(:element_to_replace_id)).to eq "#{employer_id}"
+    context "failure" do
+      it "should returns http status 500 with error message" do
+        allow_any_instance_of(EventsHelper).to receive(:is_initial_or_conversion_employer?).with(employer_profile).and_return(false)
+        xhr :get, :cancel_initial_plan_year, format: :js, id:employer_profile.id
+        expect(response).to have_http_status(500)
+        expect(flash["error"]).to match(/Could not cancel initial plan year for employer/)
       end
     end
   end

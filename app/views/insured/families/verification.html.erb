@@ -1,16 +1,22 @@
 <% content_for :navigation do %>
     <%= render 'navigation' %>
 <% end %>
-<h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
-<div class="documents-tab">
-  <% if @person && @person.consumer_role %>
-     <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
+<div class="module">
+  <div class="vertically-aligned-row">
+    <h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
+    <span class='text-right'>
+      <%= link_to "Download Tax Documents", download_tax_documents_form_insured_families_path(), class: "btn   btn-primary" if show_download_tax_documents_button_on_documents_page? %>
+    </span>
+  </div>
+  <div class="documents-tab">
+    <% if @person && @family_members.present? %>
+       <h4 class="starter"><%= l10n("insured.verification_information") %></h4>
+        <%= render 'insured/families/verification/verification' %>
+    <% end %>
+  </div>
+  &nbsp;
 
-      <%= render 'insured/families/verification/verification' %>
-  <% end %>
-</div>
-&nbsp;
-
-<div>
-  <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for Medicaid and tax credit savings, view additional documents"} %>
+  <div>
+    <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: "If you applied for   Medicaid and tax credit savings, view additional documents"} %>
+  </div>
 </div>

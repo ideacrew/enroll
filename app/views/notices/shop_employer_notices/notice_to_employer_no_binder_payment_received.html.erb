@@ -1,0 +1,54 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><b>Email notification sent to:</b> <%= notice.employer_email %></td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>NO PAYMENT FOR GROUP HEALTH COVERAGE ON <%= Settings.site.short_name.upcase %></h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.employer_name %>:</td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}. However, our records show we did not receive the payment of <strong>#{number_to_currency(notice.plan_year.binder_payment_total, precision: 2)}</strong> for the first month of coverage for your employees. The deadline for payment was <strong>#{notice.plan_year.binder_payment_due_date}</strong>. As a result of this non-payment, your group and all employees cannot obtain employer-sponsored coverage beginning on <strong>#{notice.plan_year.start_on}</strong> through #{Settings.site.short_name}.", top_margin: '7px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "If you would like to obtain health coverage through the Small Business Marketplace you may re-apply for coverage starting on later start date. The earliest date you are eligible to apply for at this time is <strong>#{notice.plan_year.start_on.next_month}</strong>. The deadline for completing an employer application for coverage starting on <strong>#{notice.plan_year.start_on.next_month}</strong> is <strong>#{notice.plan_year.start_on}</strong>. You can find all deadlines for initial employer applications <a href = '#{Settings.aca.shop_market.employer_application_deadline_link}' >here</a>.", top_margin: '7px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "If you believe you have made an initial payment, please call us at #{Settings.contact_center.phone_number}.", top_margin: '7px', bottom_margin: '7px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+   ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<% end %>

@@ -1,3 +1,5 @@
+<% valid = dependent_valid?(dependent) %>
+<% consumer_role ||= false %>
 <li id="add_member_list_<%= dependent.id %>" class="dependent_list">
   <div id="add_info_<%= dependent.id %>">
     <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -21,7 +23,7 @@
           <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.last_name %></span>
           <div class="text-right">
             <%=
-              link_to edit_insured_family_member_path(dependent), remote: true, class: 'close close-2' do
+              link_to edit_insured_family_member_path(dependent), remote: true, class: 'close close-2', id: "dependent-#{dependent.id}" do
                 '<i class="fa fa-pencil"></i>'.html_safe
               end
             %>
@@ -129,5 +131,7 @@
   </div>
   <script>
     Freebies.floatlabels();
+    DependentsValidationFields.check_dependent(<%= valid %>, <%= consumer_role %> ,'<%= dependent.id %>');
   </script>
 </li>
+

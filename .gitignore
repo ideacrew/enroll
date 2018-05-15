@@ -61,3 +61,6 @@ plan_xmls.zip
 
 # Ignore .idea
 .idea
+
+# Ignore Wells Fargo Key
+config/ssl

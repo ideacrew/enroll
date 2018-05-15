@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><b>Email notification sent to:</b> <%= notice.employer_email %></td>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
     </tr>
   </tbody>
 </table>
@@ -52,7 +52,6 @@
   ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
-
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>

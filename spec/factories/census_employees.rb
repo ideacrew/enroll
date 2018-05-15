@@ -6,7 +6,7 @@ FactoryGirl.define do
     gender "male"
     employee_relationship "self"
     hired_on "2015-04-01".to_date
-    sequence(:ssn) { |n| 222222220 + n }
+    sequence(:ssn) { |n| 222111220 + n }
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
@@ -14,6 +14,12 @@ FactoryGirl.define do
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+    end
+
+    after :build do |obj, evaluator|
+      if ssn_validator obj
+        stubbed_census_employee_ssn(obj, evaluator)
+      end
     end
 
     transient do
@@ -52,7 +58,7 @@ FactoryGirl.define do
 
     factory :census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee) 
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

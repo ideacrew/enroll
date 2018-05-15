@@ -34,7 +34,6 @@ module PdfTemplates
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :employee_email, String
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
-    attribute :enrollment, PdfTemplates::Enrollment
     attribute :employee, PdfTemplates::EmployeeNotice
 
     def shop?
@@ -52,6 +51,5 @@ module PdfTemplates
     def general_agency?
       false
     end
-
   end
 end

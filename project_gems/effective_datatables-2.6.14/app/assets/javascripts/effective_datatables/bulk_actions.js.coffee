@@ -9,20 +9,16 @@ $(document).on 'mouseover', "#effective_datatable_wrapper", ->
 
 $(document).on 'change', "input[data-role='bulk-actions-resource']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
-  
+
   $wrapper.find("input[data-role='bulk-actions-all']").prop('checked', false)
   toggleClosestBulkActionsButton($wrapper)
 
 $(document).on 'change', "input[data-role='bulk-actions-all']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
   $resources = $wrapper.find("input[data-role='bulk-actions-resource']")
-  
+
   if $(event.currentTarget).is(':checked')
-    $resources.each (index, element) ->
-      status = $(element).data("status")
-      
-      if (status == "Eligible")
-        $(element).prop('checked', true)
+    $resources.prop('checked', true)
   else
     $resources.prop('checked', false)
 

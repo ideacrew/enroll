@@ -171,6 +171,25 @@ RSpec.describe SamlController do
         expect(response).to redirect_to(SamlInformation.iam_login_url)
       end
     end
+
+    context "when admin/broker handling user account" do
+      let(:user) { FactoryGirl.create(:user, :hbx_staff)}
+
+      shared_examples_for "redirect to curam URL" do |trait_val|
+        let(:user) { FactoryGirl.create(:user, trait_val.to_sym)}
+
+      it "should redirect to curam URL" do
+        sign_in user
+        expect(controller).to receive(:actual_user).and_return nil
+        get :navigate_to_assistance
+        expect(response).to redirect_to(SamlInformation.curam_landing_page_url)
+      end
+
+      end
+
+      it_behaves_like "redirect to curam URL", :broker_with_person
+      it_behaves_like "redirect to curam URL", :hbx_staff
+    end
   end
 
 end

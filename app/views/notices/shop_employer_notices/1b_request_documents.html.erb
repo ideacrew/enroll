@@ -1,6 +1,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -38,7 +47,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have <strong><u>30 days from the date of this notification</u></strong> to provide supporting documentation related to your application to offer coverage in #{Settings.site.short_name}. Supporting documentation can be provided by:"], heading: 'What If I Think I Am Eligible?', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                  ["Email: 	#{notice.hbe.email}",
+                                                                  ["Email: 	<a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>",
                                                                    "Fax: 	#{notice.hbe.fax}",
    "Mail:  	#{Settings.site.short_name}<br>
    			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -63,7 +72,7 @@
    "Calling #{Settings.site.short_name} Contact Center at #{notice.hbe.phone}",
    ["Completing a Request for Hearing form and sending it via fax or email:",
     ["Fax: #{notice.hbe.fax}",
-     "Email: #{notice.hbe.email}"]],
+     "Email: <a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>"]],
    "Going to any Department of Human Services Service Center (locations found at www.dhs.dc.gov) and filling out a Request for Hearing.",
    "Going to the Office of Administrative Hearings Resource Center, located at 441 4th Street NW, Suite 450-North, and filling out a Request for Hearing."] } %>
 
@@ -118,8 +127,8 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                  ["Online at #{notice.hbe.url};",
-                                                                   "By email at #{notice.hbe.email}; or",
+                                                                  ["Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>;",
+                                                                   "By email at <a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>; or",
                                                                    "By calling #{notice.hbe.phone}."] } %>
 
 <% if notice.broker.present? %>

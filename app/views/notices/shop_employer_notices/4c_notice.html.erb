@@ -1,6 +1,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -50,8 +59,8 @@ employers who do not have existing #{Settings.site.short_name} coverage or whose
   heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                  ["Online at #{notice.hbe.url};",
-                                                                   "By email at #{notice.hbe.email}; or",
+                                                                  ["Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>;",
+                                                                   "By email at <a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>; or",
                                                                    "By calling #{notice.hbe.phone}."] } %>
 
 <% if notice.broker.present? %>

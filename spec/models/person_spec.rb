@@ -204,7 +204,8 @@ describe Person do
         it "should fail validation" do
           person = Person.new(**params)
           person.valid?
-          expect(person.errors[:ssn]).to eq ["SSN must be 9 digits"]
+          expect(person.errors[:ssn]).to eq ["must be 9 digits"]
+          expect(person.errors.full_messages).to eq ["Ssn must be 9 digits"]
         end
       end
 
@@ -406,18 +407,22 @@ describe Person do
         it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
       end
 
-      context "has_active_consumer_role?" do
+      context "is_consumer_role_active?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:consumer_role) {double(is_active?: true)}
 
         it "should return true" do
           allow(person).to receive(:consumer_role).and_return(consumer_role)
-          expect(person.has_active_consumer_role?).to eq true
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
+          expect(person.is_consumer_role_active?).to eq true
         end
 
         it "should return false" do
           allow(person).to receive(:consumer_role).and_return(nil)
-          expect(person.has_active_consumer_role?).to eq false
+          allow(person).to receive(:is_consumer_role_active?).and_return(false)
+
+          expect(person.is_consumer_role_active?).to eq false
         end
       end
 
@@ -460,8 +465,8 @@ describe Person do
   describe '.match_by_id_info' do
     before(:all) do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
-      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
-      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
+      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888127654")
+      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "661332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
       @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
@@ -1249,6 +1254,31 @@ describe Person do
     end
   end
 
+  describe "#is_ssn_composition_correct?" do
+    let(:person) { FactoryGirl.create(:person)}
+
+    shared_examples_for "invalid SSN" do |input, result|
+      display_text = result ? "valid" : "invalid"
+      it "should return #{result} when received #{display_text} SSN" do
+        person.ssn = input
+        expect(person.save).to eq result
+      end
+    end
+
+    it_behaves_like "invalid SSN", "999786567", true
+    it_behaves_like "invalid SSN", "000786567", false
+    it_behaves_like "invalid SSN", "666786567", false
+    it_behaves_like "invalid SSN", "945786567", true
+    it_behaves_like "invalid SSN", "123006567", false
+    it_behaves_like "invalid SSN", "123000000", false
+    it_behaves_like "invalid SSN", "123456000", false
+    it_behaves_like "invalid SSN", "812345600", false
+    it_behaves_like "invalid SSN", "811111197", false
+    it_behaves_like "invalid SSN", "111111997", false
+    it_behaves_like "invalid SSN", "811111897", true
+    it_behaves_like "invalid SSN", "812345800", true
+
+  end
 
   describe "staff_for_employer" do
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }

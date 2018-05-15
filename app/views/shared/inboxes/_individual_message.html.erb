@@ -8,13 +8,6 @@
     <td>
       <%= message.try(:subject) %>
     </td>
-    <%- if @folder != 'Deleted' %>
-    <td class="  <%=pundit_class(Family, :updateable?)%>">
-      <span onclick='event.stopPropagation();deleteMessage("<%=retrieve_show_path(provider, message) %>&url=<%=retrieve_inbox_path(provider)%>");' class='pull-right'>
-        <i aria-hidden="true" class="fa fa-trash-o fa-lg <%=pundit_class Family, :updateable?%>" title="Delete" data-toggle="tooltip"></i>
-      </span>
-    </td>
-    <% end %>
   </td>
 </tr>
 <script>

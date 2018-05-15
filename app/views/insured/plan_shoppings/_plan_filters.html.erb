@@ -53,14 +53,16 @@
           </label>
         </div>
       </li>
-      <li>
-        <div class="checkbox">
-          <label>
-            <input id="plan-metal-level-catastrophic" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-catastrophic" type="checkbox" data-plan-metal-level-filter="catastrophic">
-            <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_catastrophic_title_info') %>"><%= l10n("catastrophic") %></span></label>
-          </label>
-        </div>
-      </li>
+      <% if @market_kind == "individual" %>
+        <li>
+          <div class="checkbox">
+            <label>
+              <input id="plan-metal-level-catastrophic" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-catastrophic" type="checkbox" data-plan-metal-level-filter="catastrophic">
+              <label for="plan-metal-level-catastrophic" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_catastrophic_title_info') %>"><%= l10n("catastrophic") %></span></label>
+            </label>
+          </div>
+        </li>
+      <% end %>
           <!--<li>
             <div class="checkbox">
               <label>
@@ -162,7 +164,7 @@
           <%= hidden_field_tag :max_deductible, (@max_deductible || 5000) %>
         </div>
       </div>
-      <% if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
+      <% if @person.is_consumer_role_active? && @tax_household.present? && @market_kind == "individual" %>
       <div class="aptc">
         <hr />
         <div class="row">

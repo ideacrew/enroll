@@ -59,6 +59,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @enrollment.ee_plan_selection_confirmation_sep_new_hire
 
+    IvlNoticesNotifierJob.perform_later(@person.id.to_s ,"enrollment_notice") unless @enrollment.is_shop?
+
     @enrollment.mid_year_plan_change_notice
 
     send_receipt_emails if @person.emails.first
@@ -67,6 +69,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
@@ -116,7 +119,6 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
-
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
@@ -147,6 +149,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_admin_bookmark_url if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
@@ -181,6 +184,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def plans
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     set_plans_by(hbx_enrollment_id: params.require(:id))
     if @person.primary_family.active_household.latest_active_tax_household.present?
       if is_eligibility_determined_and_not_csr_100?(@person)
@@ -234,6 +238,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
@@ -247,7 +252,7 @@ class Insured::PlanShoppingsController < ApplicationController
       elsif @hbx_enrollment.is_coverall?
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
 
       build_same_plan_premiums

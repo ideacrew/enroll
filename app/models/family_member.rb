@@ -54,6 +54,7 @@ class FamilyMember
   delegate :is_incarcerated, to: :person, allow_nil: true
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
+  delegate :is_physically_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
   delegate :indian_tribe_member, to: :person, allow_nil: true
   delegate :naturalized_citizen, to: :person, allow_nil: true

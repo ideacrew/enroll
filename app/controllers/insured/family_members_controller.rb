@@ -6,6 +6,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def index
     set_bookmark_url
+    set_admin_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
     if (params[:resident_role_id].present? && params[:resident_role_id])
@@ -52,7 +53,7 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
+    @dependents = @family.active_family_members.reject(&:is_primary_applicant) if @family
   end
 
   def new
@@ -119,7 +120,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
+    if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
           format.html { render 'show_resident' }
@@ -128,9 +129,11 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
+
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-    consumer_role.check_for_critical_changes(params[:dependent], @family) if consumer_role
+    @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+      consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
       respond_to do |format|
         format.html { render 'show' }
@@ -149,6 +152,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def resident_index
     set_bookmark_url
+    set_admin_bookmark_url
     @resident_role = @person.resident_role
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''

@@ -1,6 +1,9 @@
 %policy
   %id
     %id= hbx_enrollment.hbx_id
+  - if !hbx_enrollment.predecessor_enrollment_id.blank?
+    %previous_policy_id
+      %id= hbx_enrollment.parent_enrollment.hbx_id
   - if hbx_enrollment.broker_agency_account
     = render :partial => "events/shared/broker", :object => hbx_enrollment, as: :hbx_enrollment
   %enrollees

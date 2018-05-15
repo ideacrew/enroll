@@ -14,8 +14,8 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
   end
 
   describe "given an responsible party enrollment with no active subscribers" do
-    let(:dependent_1) { FactoryGirl.create(:person, hbx_id: 1, dob: TimeKeeper.date_of_record - 1.week, ssn: '555555551') }
-    let(:dependent_2) { FactoryGirl.create(:person, hbx_id: 2, dob: TimeKeeper.date_of_record - 1.year, ssn: '555555552') }
+    let(:dependent_1) { FactoryGirl.create(:person, hbx_id: 1, dob: TimeKeeper.date_of_record - 1.week) }
+    let(:dependent_2) { FactoryGirl.create(:person, hbx_id: 2, dob: TimeKeeper.date_of_record - 1.year) }
     let(:family_relationships) { [
       PersonRelationship.new(relative: dependent_1, kind: "child"),
       PersonRelationship.new(relative: dependent_2, kind: "child")]
@@ -24,7 +24,7 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
       :person,
       person_relationships: family_relationships,
       dob: TimeKeeper.date_of_record - 30.years,
-      ssn: '555555550')
+      ssn: '123356779')
     }
     let(:family_members) { [subscriber, dependent_1, dependent_2] }
     let(:family) { FactoryGirl.create(:family, :with_family_members, person: subscriber, people: family_members) }

@@ -9,14 +9,12 @@
 # Family is a top level physical MongoDB Collection.
 
 class Family
-  require 'autoinc'
 
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   # include Mongoid::Versioning
   include Sortable
-  include Mongoid::Autoinc
   include DocumentsVerificationStatus
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
@@ -24,8 +22,7 @@ class Family
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
 
-  field :hbx_assigned_id, type: Integer
-  increments :hbx_assigned_id, seed: 9999
+  field :hbx_assigned_id, type: String
 
   field :e_case_id, type: String # Eligibility system foreign key
   field :e_status_code, type: String
@@ -36,6 +33,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :is_disabled, type: Boolean, default: false
   field :min_verification_due_date, type: Date, default: nil
   field :vlp_documents_status, type: String
 
@@ -51,14 +49,16 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  embeds_one :initial_application_snapshot
 
   after_initialize :build_household
   before_save :clear_blank_fields
+  before_save :generate_family_id
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
-  # index({hbx_assigned_id: 1}, {unique: true})
+  index({hbx_assigned_id: 1}, {unique: true})
   index({e_case_id: 1}, { sparse: true })
   index({submitted_at: 1})
   index({person_id: 1})
@@ -180,7 +180,7 @@ class Family
 
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
-  scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
+  scope :all_enrollments_by_writing_agent_id  , ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
@@ -269,6 +269,11 @@ class Family
     end
 
     primary_family_member
+  end
+
+  def terminated_enrollments
+    return [] if  latest_household.blank?
+    enrollments.order_by(:created_at => "DESC").select{|h| h.aasm_state == "coverage_terminated"}
   end
 
   # @deprecated Use {primary_applicant}
@@ -557,6 +562,10 @@ class Family
   # @return [ SpecialEnrollmentPeriod ] The SEP eligibility active on today's date with latest end on date
   def current_sep
     active_seps.max { |sep| sep.end_on }
+  end
+
+  def generate_family_id
+    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_family_id) if hbx_assigned_id.blank?
   end
 
   def build_from_employee_role(employee_role)
@@ -855,13 +864,19 @@ class Family
     person = family_member.person
     return if person.consumer_role.present?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
+    transition = IndividualMarketTransition.new
+    transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    person.individual_market_transitions << transition
     person.save!
   end
 
   def check_for_consumer_role
-    if primary_applicant.person.consumer_role.present?
+    if primary_applicant.person.is_consumer_role_active?
       active_family_members.each do |family_member|
-        build_consumer_role(family_member)
+        build_consumer_role(family_member) if family_member.person.is_consumer_role_active?
       end
     end
   end
@@ -870,13 +885,19 @@ class Family
     person = family_member.person
     return if person.resident_role.present?
     person.build_resident_role({:is_applicant => false}.merge(opts))
+    transition = IndividualMarketTransition.new
+    transition.role_type = "resident"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_resident_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    person.individual_market_transitions << transition
     person.save!
   end
 
   def check_for_resident_role
-    if primary_applicant.person.resident_role.present?
+    if primary_applicant.person.is_resident_role_active?
       active_family_members.each do |family_member|
-        build_resident_role(family_member)
+        build_resident_role(family_member) if family_member.person.is_resident_role_active?
       end
     end
   end
@@ -996,7 +1017,8 @@ class Family
 
   def contingent_enrolled_active_family_members
     enrolled_family_members = []
-    family_members.active.each do |family_member|
+    family_members = active_family_members.collect { |member| member if member.person.is_consumer_role_active? }.compact
+    family_members.each do |family_member|
       if enrolled_policy(family_member).present?
         enrolled_family_members << family_member
       end
@@ -1049,6 +1071,14 @@ class Family
     end
   end
 
+  def has_active_consumer_family_members
+    self.active_family_members.select { |member| member if member.person.consumer_role.present?}
+  end
+
+  def has_active_resident_family_members
+    self.active_family_members.select { |member| member if member.person.is_resident_role_active? }
+  end
+
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
   end
@@ -1056,6 +1086,18 @@ class Family
   def has_valid_e_case_id?
     return false if !e_case_id
     e_case_id.split('#').last.scan(/\D/).empty?
+  end
+
+  def take_application_snapshot
+    initialize_application_snapshot unless self.initial_application_snapshot.present?
+  end
+
+  def initialize_application_snapshot
+    self.initial_application_snapshot = InitialApplicationSnapshot.new
+    family_members.each do |family_member|
+      self.initial_application_snapshot.take_family_member_snapshot(family_member)
+      save!
+    end
   end
 
 private

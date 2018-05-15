@@ -4,8 +4,9 @@ class TaxHouseholdMember
   include BelongsToFamilyMember
   include ApplicationHelper
 
+  include BelongsToFamilyMember
+
   embedded_in :tax_household
-  embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
   field :is_ia_eligible, type: Boolean, default: false

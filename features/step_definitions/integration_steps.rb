@@ -38,7 +38,7 @@ def people
       first_name: 'Broker',
       last_name: 'Assisted',
       dob: "05/02/1976",
-      ssn: "761234567",
+      ssn: "761234467",
       email: 'broker.assisted@dc.gov',
       password: 'aA1!aA1!aA1!'
     },
@@ -46,7 +46,7 @@ def people
       first_name: 'Fred',
       last_name: 'Thirteen',
       dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
-      ssn: defined?(@u) ? @u.ssn : "761234567",
+      ssn: defined?(@u) ? @u.ssn : "761234467",
       email: defined?(@u) ? @u.email : 'fred@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -54,7 +54,7 @@ def people
       first_name: 'Megan',
       last_name: 'Smith',
       dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
-      ssn: defined?(@u) ? @u.ssn : "761234567",
+      ssn: defined?(@u) ? @u.ssn : "761234467",
       email: defined?(@u) ? @u.email : 'megan@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -91,7 +91,7 @@ def people
       legal_name: "Turner Agency, Inc",
       dba: "Turner Agency, Inc",
       fein: defined?(@u) ? @u.fein : '123123123',
-      ssn: defined?(@u) ? @u.ssn : "761234567",
+      ssn: defined?(@u) ? @u.ssn : "761234467",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -99,7 +99,7 @@ def people
       first_name: "Jack",
       last_name: "Cobra",
       dob: "08/10/1960",
-      ssn: "196008107",
+      ssn: "887788766",
       email: "jack@cobra.com",
       password: 'aA1!aA1!aA1!'
     },
@@ -107,7 +107,7 @@ def people
       first_name: "Jack",
       last_name: "Employee",
       dob: "08/10/1960",
-      ssn: "196008111",
+      ssn: "887788789",
       email: "jack@employee.com",
       password: 'aA1!aA1!aA1!'
     },
@@ -248,7 +248,7 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
@@ -590,7 +590,6 @@ Then(/^Employee (.+) should see coverage effective date/) do |named_person|
 end
 
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
-
   # Sometimes bombs due to overlapping modal
   # TODO: fix this bombing issue
   wait_for_ajax
@@ -650,6 +649,7 @@ end
 
 Then(/^.+ should see the new dependent form$/) do
 
+  expect(page).to have_content('Lives with primary subscriber')
   expect(page).to have_content('Confirm Member')
 end
 
@@ -712,6 +712,15 @@ end
 Then(/^.+ should see the list of plans$/) do
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
+end
+
+Then(/^I should( not)? see the (.*?) metal level$/) do |negate, element|
+  sleep 1
+    if negate
+      expect(page).to have_no_css("#plan-metal-level-#{element.downcase}")
+    else
+      expect(page.find("#plan-metal-level-#{element.downcase}", visible: :all)).not_to be_nil
+    end
 end
 
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|

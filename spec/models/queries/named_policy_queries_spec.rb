@@ -214,6 +214,32 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
             expect(result.sort).to eq termed_enrollments.map(&:hbx_id).sort
           end
         end
+
+
+        context 'When Cobra EE created waiver' do
+
+          let!(:cobra_employee_enrollments) {
+            cobra_employees.inject([]) do |enrollments, ce|
+              employee_role = create_person(ce, renewing_employer)
+              enrollments << create_enrollment(family: employee_role.person.primary_family, kind:"employer_sponsored_cobra", benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 20.days)
+              enrollments << create_enrollment(family: employee_role.person.primary_family, kind:"employer_sponsored_cobra", benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: employee_role, status: 'auto_renewing', submitted_at: effective_on - 20.days)
+            end
+          }
+
+          let!(:cobra_employee_waivers) {
+            cobra_employees.inject([]) do |enrollments, ce|
+              enrollment= create_enrollment(family: ce.employee_role.person.primary_family, kind:"employer_sponsored_cobra", benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'shopping')
+              enrollment.waive_coverage!
+              enrollments << enrollment
+            end
+          }
+
+          it 'should return their previous cobra enrollments as terminations' do
+            termed_enrollments = cobra_employee_waivers.collect{|en| en.family.active_household.hbx_enrollments.where(:effective_on => effective_on.prev_year).first}
+            result = Queries::NamedPolicyQueries.shop_monthly_terminations(feins, effective_on)
+            expect(result.sort).to eq termed_enrollments.map(&:hbx_id).sort
+          end
+        end
       end
     end
   end

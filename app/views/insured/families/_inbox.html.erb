@@ -2,18 +2,20 @@
   <div class="row">
     <div class="inboxes" id="inbox_form">
       <div class="pull-right">
-        <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted'), class: 'pull-right') do %>
-        <% if @folder == 'Deleted' %>
-        <strong>
-          <%= l10n("deleted") %>
-        </strong>
-        <% else %>
-          <%= l10n("deleted") %>
-        <% end %>
-        <% end %>
-        <span class="pull-right">
+        <% if @provider.inbox && @provider.inbox.messages && @provider.inbox.deleted_messages.present? %>
+          <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted'), class: 'pull-right') do %>
+          <% if @folder == 'Deleted'%>
+          <strong>
+            <%= l10n("archived") %>
+          </strong>
+          <% else %>
+            <%= l10n("archived") %>
+          <% end %>
+          <% end %>
+          <span class="pull-right">
           &nbsp;|&nbsp;
-        </span>
+          </span>
+        <% end %>
         <%= link_to(inbox_insured_families_path(@provider), class: 'pull-right') do %>
         <% if @folder == 'Inbox' %>
         <strong>
@@ -51,9 +53,6 @@
               <%= l10n("date") %>
             </th>
             <th><%= l10n("subject") %></th>
-            <%- if @folder != 'Deleted' %>
-            <th></th>
-            <%- end %>
           </tr>
         </thead>
         <tbody>

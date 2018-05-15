@@ -1,0 +1,80 @@
+<div id="payments-table">
+  <h4><strong>Payment History</strong> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Payments made within the past year are displayed below.  If you have questions about payments made more than a year ago, please contact customer service."></i>
+  </h4>
+  <% if @wf_url %>
+    <p>
+      Allow up to 2-3 business days for online or phone payments to be reflected below.  Allow up to 2 weeks for mailed payments to be reflected below.  For fastest processing, click on
+      <%= link_to 'Pay My Bill', @wf_url, id: :sso_enabled, target: :_blank %> to make an online payment now.
+    </p>
+  <% else %>
+    <p>
+      Allow up to 2-3 business days for online or phone payments to be reflected below.  Allow up to 2 weeks for mailed payments to be reflected below.  For fastest processing, click on
+      <%= link_to 'Pay My Bill', @wf_url, id: :sso_disabled, target: :_blank %> to make an online payment now.
+    </p>
+  <% end %>
+
+<% if @employer_profile.has_premium_payments? %>
+
+  <table class="table" id="payments-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Method</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @payments == nil %>
+      <tr>
+        <td></td>
+        <td>There are no payments in your history.</td>
+        <td></td>
+      </tr>
+      <% else %>
+        <% @payments.each do |payment| %>
+          <tr>
+            <td><%= payment.paid_on %></td>
+            <td><%= number_to_currency(payment.amount) %></td>
+            <% if payment.method_kind == "SCN" %>
+              <td>CHK</td>
+            <% else %>
+              <td><%= payment.method_kind %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <!-- pagination UI -->
+
+  <div class="container-flid text-center">
+    <div class="btn-group" role="group" aria-label="...">
+      <% num_of_payments = @employer_profile_account.try(:premium_payments).size %>
+      <% if num_of_payments > 10 %>
+        <% num_of_pages = (1..paginate_upper_bound(num_of_payments)).to_a %>
+        <% num_of_pages.each do |page_num|%>
+          <div class="btn-group" role="group">
+            <% if @page_num.nil? && page_num == 1 %>
+              <%= link_to "<button class='btn btn-default active' id='page-num-1'>1</button>".html_safe, employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: "1"), :remote => true %>
+            <% elsif page_num == @page_num.to_i %>
+              <%= link_to "<button class='btn btn-default active' id='page-num-#{page_num}'>#{page_num}</button>".html_safe, employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: page_num), :remote => true %>
+            <% else %>
+            <%= link_to "<button class='btn btn-default' id='page-num-#{page_num}'>#{page_num}</button>".html_safe, employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: page_num), :remote => true %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  <!-- end pagination UI -->
+
+  <% end %>
+
+</div>
+
+<script>
+  $('#sso_disabled').click(function(e){
+    e.preventDefault();
+  });
+</script>

@@ -1,15 +1,24 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <% case notice.notification_type %>
 <% when "initial_employer_first_reminder_to_publish_plan_year" %>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+  <% subject = "Action Required to Complete Employer Application" %>
 <% when "initial_employer_second_reminder_to_publish_plan_year" %>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name} – Deadline Extended" %>
+  <% subject = "Action Required to Complete Employer Application – Deadline Extended" %>
 <% when "initial_employer_final_reminder_to_publish_plan_year" %>
-  <% subject = "Final Reminder – Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+  <% subject = "Final Reminder – Action Required to Complete Employer Application" %>
 <% end %>
 
 <table class="total_table" border="0">
@@ -121,7 +130,7 @@
             TTY: 711
           </li>
           <li style="margin-top: 5px;">
-            Online at <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>
+            Online at <a href=<%="#{Settings.site.home_url}"%>><%="#{Settings.site.website_name}"%></a>
           </li>
         </ul>
       </td>

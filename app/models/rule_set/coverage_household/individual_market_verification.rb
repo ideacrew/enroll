@@ -12,7 +12,7 @@ module RuleSet
       end
 
       def roles_for_determination
-        coverage_household.active_individual_enrollments.flat_map(&:hbx_enrollment_members).map(&:person).map(&:consumer_role)
+        coverage_household.active_individual_enrollments.flat_map(&:hbx_enrollment_members).map(&:person).map(&:consumer_role).compact
       end
 
       def determine_next_state

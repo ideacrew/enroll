@@ -17,6 +17,7 @@ class InsuredEligibleForBenefitRule
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
+    @market_kind = options[:market_kind]
   end
 
   def setup
@@ -38,13 +39,22 @@ class InsuredEligibleForBenefitRule
   end
 
   def satisfied?
+    #binding.pry
     if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
-        if self.public_send("is_#{element}_satisfied?")
+        if @market_kind == "shop" && !("#{element}" == "active_consumer")
+          if self.public_send("is_#{element}_satisfied?")
+            true && eligible
+          end
+        elsif self.public_send("is_#{element}_satisfied?")
           true && eligible
         else
-          @errors << ["eligibility failed on #{element}"]
+          if "#{element}" == "active_consumer"
+             @errors << ["eligibility failed on market kind"]
+          else
+            @errors << ["eligibility failed on #{element}"]
+          end
           false
         end
       end
@@ -153,6 +163,11 @@ class InsuredEligibleForBenefitRule
     is_verification_satisfied? || is_person_vlp_verified?
   end
 
+  def is_active_individual_role_satisfied?
+    return (@role.person.is_resident_role_active? || @role.person.is_consumer_role_active?) if @market_kind == "coverall"
+    return @role.person.is_consumer_role_active? if @market_kind == "individual"
+  end
+
   def determination_results
     @errors
   end
@@ -172,8 +187,9 @@ class InsuredEligibleForBenefitRule
 
   def age_on_next_effective_date(dob)
     today = TimeKeeper.date_of_record
-    today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
-    age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
+    effective_date = @benefit_package.benefit_coverage_period.earliest_effective_date
+    # today.day <= 15 ? effective_date = today.end_of_month + 1.day : effective_date = (today + 1.month).end_of_month + 1.day
+    effective_date.year - dob.year - ((effective_date.month > dob.month || (effective_date.month == dob.month && effective_date.day >= dob.day)) ? 0 : 1)
   end
 
   private

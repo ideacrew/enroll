@@ -1,4 +1,5 @@
 class UserMailer < ApplicationMailer
+  include ApplicationHelper
 
   def welcome(user)
     if user.email.present?
@@ -26,13 +27,9 @@ class UserMailer < ApplicationMailer
 
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
     plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
-    if email.present?
+    if email.present? && (census_employee.hired_on <= TimeKeeper.date_of_record) && (plan_years.any?{|py| py.employees_are_matchable?})
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
-        if census_employee.hired_on > TimeKeeper.date_of_record
-          format.html { render "invitation_email", :locals => { :person_name => census_employee.full_name, :invitation => invitation }}
-        elsif census_employee.hired_on <= TimeKeeper.date_of_record && plan_years.any?{|py| py.employees_are_matchable?}
-          format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
-        end
+        format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
       end
     end
   end
@@ -111,8 +108,9 @@ class UserMailer < ApplicationMailer
     files_to_attach.each do |file_name, file_path|
       attachments["#{file_name}"] = File.read(file_path)
     end
-    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
-      format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
+    phone_number = phone_number_format(Settings.contact_center.phone_number)
+    message = mail({to: email, subject: "Important new letter for you from #{Settings.site.short_name}", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject, phone_number: phone_number}}
     end
   end
 

@@ -114,6 +114,7 @@ RSpec.describe CensusEmployeeImport, :type => :model do
         expect(subject.instance_variable_get("@terminate_queue").length).to eq(1)
       end
     end
+
   end
 
   context "#assign_census_employee_attributes" do

@@ -4,6 +4,9 @@
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
 
       <% if dependent.errors.any? %>
+            <script>
+                DependentsValidationFields.disable_continue();
+            </script>
         <div class="alert alert-error">
           <h4>
             <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
@@ -24,19 +27,19 @@
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *" %>
+              <%= f.text_field :first_name, :autocomplete => :off, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *" %>
             </div>
           </div>
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase%>
+              <%= f.text_field :middle_name, :autocomplete => :off, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase%>
             </div>
           </div>
 
           <div class="col-md-4 col-sm-4 no-pd">
             <div class="form-group form-group-lg">
-              <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
+              <%= f.text_field :last_name, :autocomplete => :off, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
               <div class="text-right">
                 <% if !dependent.persisted? %>
                   <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
@@ -100,11 +103,11 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>            
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
           </div>
 
 
-          <% if @person.has_active_consumer_role? %>
+          <% if has_active_consumer_dependent?(@person,@dependent) %>
             <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
               <span id="is_applying_coverage_value_dep">Is <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> applying for coverage?</span>
             </div>
@@ -113,31 +116,26 @@
           <% end %>
         </div>
 
-        <% if @person.has_active_consumer_role? %>
+        <% if has_active_consumer_dependent?(@person,@dependent) %>
           <%= render 'shared/ssn_coverage_msg' %>
         <% end %>
 
-        <% if @person.has_active_consumer_role? %>
+        <% if has_active_consumer_dependent?(@person,@dependent) %>
           <br>
           <div id="consumer_fields_sets">
           <%= render 'shared/consumer_fields', f: f %>
-          </div>
-          <div id="dependent-address">
-            <div class="row row-form-wrapper no-buffer">
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
-                <%= f.check_box :same_with_primary, {}, "true", "false" %>
-                <label for="dependent_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
-              </div>
-            </div>
-            <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-              <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
-            </div>
-          </div>
-        <% elsif @person.has_active_employee_role? %>
-          <%= f.hidden_field :same_with_primary, value: 'false' %>
-          <%= render 'shared/address_fields_for_dependent', f: f %>
         <% end %>
-
+        <div id="dependent-address">
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
+              <%= f.check_box :same_with_primary, {}, "true", "false" %>
+              <label for="dependent_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
+            </div>
+          </div>
+          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
+            <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+          </div>
+        </div>
         <%= f.hidden_field :family_id %>
         <div id="remove_confirm" class="hidden"></div>
       </div>
@@ -157,7 +155,7 @@
           <%= l10n("confirm_member") %>
         <% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.checkRequiredFields($(this));">
           <%= l10n("confirm_member") %>
         </span>
       </div>

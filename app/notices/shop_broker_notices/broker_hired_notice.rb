@@ -40,6 +40,7 @@ class ShopBrokerNotices::BrokerHiredNotice < ShopBrokerNotice
 
     })
     notice.primary_fullname = broker.full_name
+    notice.broker_email = broker.work_email_or_best
     notice.broker_agency = employer_profile.broker_agency_profile.legal_name.titleize
     organization = employer_profile.broker_agency_profile.organization
     address = organization.primary_mailing_address.present? ? organization.primary_mailing_address : organization.primary_office_location.address

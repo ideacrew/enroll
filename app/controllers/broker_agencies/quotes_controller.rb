@@ -3,7 +3,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   include BrokerAgencies::QuoteHelper
 
   before_action :validate_roles, :set_broker_role
-  before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote]
+  before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote, :dental_plans_data]
   before_action :format_date_params  , :only => [:update,:create]
   before_action :employee_relationship_map
   before_action :set_qhp_variables, :only => [:plan_comparison, :download_pdf]
@@ -34,7 +34,7 @@ class BrokerAgencies::QuotesController < ApplicationController
     end
   end
 
-  def show 
+  def show
     @q = Quote.find(params[:id])
     @benefit_groups = @q.quote_benefit_groups
     @quote_benefit_group = (params[:benefit_group_id] && @q.quote_benefit_groups.find(params[:benefit_group_id])) || @benefit_groups.first
@@ -455,7 +455,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   end
 
   def employees_list
- 
+
     employer_profile = EmployerProfile.find(params[:employer_profile_id])
     quote = Quote.find(params[:quote_id])
     @quote_benefit_group_dropdown = quote.quote_benefit_groups
@@ -478,9 +478,9 @@ class BrokerAgencies::QuotesController < ApplicationController
       @employee_present = false
     end
     respond_to do |format|
-      # format.html 
+      # format.html
       format.js
-    end  
+    end
   end
 
   def employee_type
@@ -669,8 +669,8 @@ private
   end
 
   def set_dental_plans
-    @dental_plans = Plan.shop_dental_by_active_year(2017)
-    @dental_plans_count = Plan.shop_dental_by_active_year(2017).count
+    @dental_plans = Plan.shop_dental_by_active_year(@quote.start_on.year)
+    @dental_plans_count = @dental_plans.count
     carrier = params[:carrier_id].nil? ? [] : params[:carrier_id]
     dental_level = params[:dental_level].nil? ? [] : params[:dental_level]
     plan_type = params[:plan_type].nil? ? [] : params[:plan_type]

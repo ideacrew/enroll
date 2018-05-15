@@ -11,8 +11,6 @@ describe ChangeEnrollmentDetails do
       term_enrollment.terminated_on
     when "termination_submitted_on"
       term_enrollment.termination_submitted_on
-    when "termination_submitted_on"
-      term_enrollment.generate_hbx_signature
     end
   end
 
@@ -38,12 +36,12 @@ describe ChangeEnrollmentDetails do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return("#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}")
-      allow(ENV).to receive(:[]).with("new_effective_on").and_return(hbx_enrollment.effective_on + 1.month)
-      allow(ENV).to receive(:[]).with("action").and_return "change_effective_date"
     end
 
     it "should change effective on date" do
       effective_on = hbx_enrollment.effective_on
+      allow(ENV).to receive(:[]).with("new_effective_on").and_return(hbx_enrollment.effective_on + 1.month)
+      allow(ENV).to receive(:[]).with("action").and_return "change_effective_date"
       subject.migrate
       hbx_enrollment.reload
       hbx_enrollment2.reload
@@ -59,6 +57,13 @@ describe ChangeEnrollmentDetails do
       hbx_enrollment2.reload
       expect(hbx_enrollment.aasm_state).to eq "coverage_enrolled"
       expect(hbx_enrollment2.aasm_state).to eq "coverage_enrolled"
+    end
+
+    it "should expire enrollment" do
+      allow(ENV).to receive(:[]).with("action").and_return "expire_coverage"
+      subject.migrate
+      hbx_enrollment.reload
+      expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
     end
 
     context "revert enrollment termination" do

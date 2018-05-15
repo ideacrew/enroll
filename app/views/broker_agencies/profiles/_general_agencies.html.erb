@@ -55,7 +55,7 @@
                 <div class="ga_status"><%= l10n("broker_agencies.profiles.default_ga")%></div>
               <% else %>
                 <%= pundit_span HbxProfile, :modify_admin_tabs? %>
-                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
+                  <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, type: 'fire'), method: :post, remote: true, class: 'btn btn-min' %>
                 </span>
               <% end %>
             </td>

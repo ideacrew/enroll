@@ -1,6 +1,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.primary_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -24,7 +33,6 @@ content: "Congratulations!  You successfully enrolled in <strong>#{notice.enroll
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Please note that your monthly premium contribution will be <strong>#{number_to_currency(notice.enrollment.employee_cost, precision: 2)}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium."} %>
-
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Thank you for enrolling into employer-sponsored coverage through #{Settings.site.short_name}."} %>
 

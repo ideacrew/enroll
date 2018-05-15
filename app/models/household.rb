@@ -85,15 +85,14 @@ class Household
     if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
-
       if tax_households.present?
         latest_tax_household = tax_households.where(effective_ending_on: nil).last
         latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
       end
-
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
+        curam_import_end_date: verified_tax_household.end_date,
         is_eligibility_determined: true,
         submitted_at: verified_tax_household.submitted_at
       )
@@ -101,7 +100,8 @@ class Household
       th.tax_household_members.build(
         family_member: primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
+        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false,
+        is_medicaid_chip_eligible: verified_primary_tax_household_member.is_medicaid_chip_eligible ? verified_primary_tax_household_member.is_medicaid_chip_eligible : false
       )
 
       # verified_primary_family_member.financial_statements.each do |fs|
@@ -132,7 +132,6 @@ class Household
         csr_percent_as_integer: latest_eligibility_determination.csr_percent,
         determined_on: latest_eligibility_determination.determination_date
       )
-
       th.save!
     end
   end
@@ -142,7 +141,8 @@ class Household
     th.tax_household_members.build(
       family_member: family_member,
       is_subscriber: false,
-      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
+      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible,
+      is_medicaid_chip_eligible: verified_tax_household_member.is_medicaid_chip_eligible
     )
     th.save!
   end

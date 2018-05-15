@@ -1,0 +1,68 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Change to your Insurance Coverage</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>,</td>
+    </tr>
+  </tbody>
+</table>
+
+<% if notice.enrollment.is_congress %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This notice is to inform you that your dependent, <strong>#{notice.enrollment.dependents.join(', ')}</strong>, recently turned 26 and their coverage as a dependent on your employer-sponsored insurance through <strong>#{notice.employer_name}</strong> will terminate automatically on <strong>#{notice.enrollment.terminated_on}</strong>. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the month in which they turn 26 and automatically terminates on the last day of that month."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This notice is to inform you that your dependent, <strong>#{notice.enrollment.dependents.join(', ')}</strong>, recently turned 26 and their coverage as a dependent on your employer-sponsored insurance with <strong>#{notice.employer_name}</strong> will terminate automatically on December 31<sup>st</sup> of this year. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on December 31<sup>st</sup> of that year."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "This means that, although your dependent child may be eligible to participate in #{Settings.site.short_name}, they are not eligible to remain active on your policy as a dependent. This is because they are no longer eligible to enroll as a dependent child due to their age."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Dependent children with disabilities may be eligible to remain covered by their parents’ policy regardless of their age. Please contact the #{Settings.site.short_name} Contact Center at #{Settings.contact_center.phone_number} [TTY #{Settings.contact_center.tty}] regarding adult children with disabilities that need to remain enrolled on an employee’s plan beyond age 26 or if you believe this decision is the result of an error."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "<strong>Individual Market Enrollment</strong><br><br>"} %>
+
+<%= render partial: 'notices/shared/paragraph_without_page_break', :locals => {
+content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, your dependent may be able to enroll in individual market coverage through #{Settings.site.short_name} if they live in the #{Settings.aca.state_name}. The open enrollment period for the individual marketplace begins on November 1st of each year. Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance. Your dependent child can create a #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside the #{Settings.aca.state_name}, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href=#{Settings.site.healthcare_url}>#{Settings.site.healthcare_name}</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If your dependent is a #{Settings.aca.state_name} resident and thinks they might be eligible for an individual market Special Enrollment Period, they can contact #{Settings.site.short_name} to see if they are eligible to enroll through a Special Enrollment Period.", top_margin: '10px', bottom_margin: '10px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+  heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', locals: {
+ content: "You can contact #{Settings.site.short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["By calling #{notice.hbe.phone}",
+    "TTY: #{Settings.contact_center.tty}",
+    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
+
+<% if !notice.enrollment.is_congress %>
+  <% if notice.broker.present? %>
+    <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+  <% else %>
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+  <% end %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "This notice is being provided in accordance with 45 C.F.R. §155.735(d)."} %>
+ 

@@ -78,7 +78,7 @@ class SamlController < ApplicationController
         current_user.oim_id,
         current_user.email,
         ::IdpAccountManager::CURAM_NAVIGATION_FLAG
-      )
+      ) if actual_user
       # redirect_to destroy_user_session_path
       redirect_to SamlInformation.curam_landing_page_url
     else

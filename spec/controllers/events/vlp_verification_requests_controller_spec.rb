@@ -29,6 +29,11 @@ describe Events::VlpVerificationRequestsController do
     it "should send out a message to the bus with the request to validate ssa" do
       expect(@event_name).to eq outbound_event_name
       expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
+      expect(person.consumer_role.lawful_presence_determination.vlp_requests.count).to eq(1)
+    end
+
+    it "should store request in consumer role" do
+      expect(person.consumer_role.lawful_presence_determination.vlp_requests.count).to eq(1)
     end
 
     it "stores verification history element" do

@@ -142,7 +142,6 @@ RSpec.describe TimeHelper, :type => :helper do
       it "returns maximum range as nil when market kind is nil" do
         expect(helper.sep_optional_date(family, 'max', nil)).to eq nil
       end
-
     end
 
     context "for person with no consumer or active employee roles" do

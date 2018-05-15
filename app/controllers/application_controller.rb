@@ -244,14 +244,48 @@ class ApplicationController < ActionController::Base
     end
 
     def save_bookmark (role, bookmark_url)
-      if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
-        role.bookmark_url = bookmark_url
-        role.try(:save!)
-      elsif bookmark_url.match('/families/home') && @person.present?
-        @person.consumer_role.update_attribute(:bookmark_url, family_account_path) if (@person.consumer_role.present? && @person.consumer_role.bookmark_url != family_account_path)
-        @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
+      if hbx_staff_and_consumer_role(role)
+        if prior_ridp_bookmark_urls(bookmark_url)
+          @person.consumer_role.update_attribute(:bookmark_url, bookmark_url)
+        end
+      else
+        if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+          role.bookmark_url = bookmark_url
+          role.try(:save!)
+        elsif bookmark_url.match('/families/home') && @person.present?
+          @person.consumer_role.update_attribute(:bookmark_url, family_account_path) if (@person.consumer_role.present? && @person.consumer_role.bookmark_url != family_account_path)
+          @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
+        end
       end
     end
+
+    def prior_ridp_bookmark_urls(url)
+      url.match('/edit') ||
+      url.match('/upload_ridp_document') ||
+      url.match('/ridp_agreement') ||
+      url.match('/interactive_identity_verifications') ||
+      url.match('/service_unavailable')
+    end
+
+    # Used for certain RIDP cases when we need to track Admins and the Consumers bookmark separatelty.
+    # There are cases based on the completeness of Verification types as to where the Consumer vs Admin lands on logging in.
+
+    def set_admin_bookmark_url
+      set_current_person
+      bookmark_url = request.original_url
+      role = current_user.has_hbx_staff_role?
+      @person.consumer_role.update_attributes(:admin_bookmark_url => bookmark_url) if role != nil && !prior_ridp_bookmark_urls(bookmark_url) && @person.has_consumer_role?
+    end
+
+    def hbx_staff_and_consumer_role(role)
+      hbx_staff = current_user.has_hbx_staff_role?
+      if role.present?
+        hbx_staff.present? && role.class.name == 'ConsumerRole'
+      else
+        hbx_staff.present? && @person.has_consumer_role? && !@person.has_active_employee_role?
+      end
+    end
+
     def set_bookmark_url(url=nil)
       set_current_person
       bookmark_url = url || request.original_url

@@ -1,6 +1,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -39,7 +48,7 @@
   { contents: ["You have <strong><u>30 days from the date of this notification</u></strong> to provide supporting documentation related to your application to offer coverage in #{Settings.site.short_name}. Supporting documentation can be provided to:"], heading: 'What If I Think I Am Eligible?', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Email:  <a href='#{notice.hbe.email}'>#{notice.hbe.email}</a>",
+  ["Email:  <a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>",
     "Mail:    #{Settings.site.short_name}<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Attn: Employer Eligibility Review<br>
@@ -63,7 +72,7 @@
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                    ["By calling #{notice.hbe.phone}.",
                                                                     "TTY: 771",
-                                                                    "Online at <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>"] } %>
+                                                                    "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"] } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>

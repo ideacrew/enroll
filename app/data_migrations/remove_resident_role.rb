@@ -2,7 +2,6 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 require "csv"
 
 class RemoveResidentRole < MongoidMigrationTask
-
   # this script will remove the resident role from any person who is not in the
   # explicit list of people who should have received the resident role and have a
   # corresponding coverall enrollment. For people not in this group this rake task
@@ -106,5 +105,4 @@ class RemoveResidentRole < MongoidMigrationTask
     c_role.person = r_role.person
     c_role.save!
   end
-
 end

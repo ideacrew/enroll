@@ -15,6 +15,7 @@ class Insured::FamiliesController < FamiliesController
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
+    set_admin_bookmark_url
     @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -41,8 +42,9 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
+    set_admin_bookmark_url
     @family_members = @family.active_family_members
-    @resident = @person.has_active_resident_role?
+    @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -74,11 +76,23 @@ class Insured::FamiliesController < FamiliesController
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
+    @family.take_application_snapshot if (params[:add_snapshot].to_s == "true" && @family.present? && @market_kind == 'individual')
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
     render :layout => 'application'
   end
+
+  # def generate_out_of_pocket_url
+  #   @person = Person.find(params[:id])
+  #   if @person && @person.has_active_employee_role?
+  #     census_employee=@person.active_employee_roles.first.census_employee
+  #     cs= ::CheckbookServices::PlanComparision.new(census_employee)
+  #     url = cs.generate_url
+  #     redirect_to url
+  #   else
+  #   end
+  # end
 
   def record_sep
     if params[:qle_id].present?
@@ -102,10 +116,10 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
 
     @family_members = @family.active_family_members
-    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
-    @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
-    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
-    @resident = @person.resident_role.present?
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
+    @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
+    @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
+    @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
     end
@@ -119,11 +133,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
-    @family_members = @person.primary_family.family_members.active
+    @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
   def upload_application
-    @family_members = @person.primary_family.family_members.active
+    @family_members = @person.primary_family.has_active_resident_family_members
   end
 
   def check_qle_date
@@ -149,7 +163,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date)
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
       sep_request_denial_notice
     elsif is_ee_sep_request_accepted?
       ee_sep_request_accepted_notice
@@ -233,6 +247,24 @@ class Insured::FamiliesController < FamiliesController
     @notices = @person.documents.where(subject: 'notice')
   end
 
+  def download_tax_documents_form
+
+  end
+
+  def download_tax_documents
+   if params[:identifier].split("tax_documents#")[1].present?
+     uri = params[:identifier].split("tax_documents#")[1]
+     send_data Aws::S3Storage.find(uri), filename: params[:title]
+
+   elsif params[:identifier].present?
+     uri = params[:identifier]
+     send_data Aws::S3Storage.find(uri)
+   else
+     flash[:error] = "File does not exist or you are not authorized to access it."
+     redirect_to download_tax_documents_form_insured_families_path
+   end
+ end
+
   def delete_consumer_broker
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
@@ -242,7 +274,7 @@ class Insured::FamiliesController < FamiliesController
 
   def sep_request_denial_notice
     begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
     rescue Exception => e
       log("#{e.message}; person_id: #{@person.id}")
     end
@@ -260,6 +292,29 @@ class Insured::FamiliesController < FamiliesController
       rescue Exception => e
         Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
       end
+    end
+  end
+
+  def transition_family_members
+    @row_id = params[:family_actions_id]
+    @family_members = @family.active_family_members
+    @non_shop_market_kinds = Person::NON_SHOP_ROLES
+    respond_to do |format|
+      format.js { render "insured/families/transition_family_members" }
+    end
+  end
+
+  def transition_family_members_update
+    @row_id = params[:family_actions_id]
+
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.transition_family_members
+
+    respond_to do |format|
+      format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
     end
   end
 
@@ -305,24 +360,25 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role == "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+        if @manually_picked_role == "individual_market_events"
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        end
       end
     else
       if @person.active_employee_roles.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-        end
+        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
       else @person.consumer_role.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_without_transition_member_action
         else
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
         end
       end
     end
@@ -333,13 +389,20 @@ class Insured::FamiliesController < FamiliesController
       if @person.addresses.blank?
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
-    elsif @person.has_active_consumer_role?
+    elsif @person.is_consumer_role_active?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified?
+      elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
+  end
+
+  def ridp_redirection
+    return false if current_user.has_hbx_staff_role?
+    consumer = @person.consumer_role
+    not_verified = ((@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified?) ? false : true
+    @person.user && not_verified
   end
 
   def update_changing_hbxs(hbxs)

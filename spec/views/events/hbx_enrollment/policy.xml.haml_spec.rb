@@ -30,7 +30,6 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
   end
 
   context "cobra enrollment" do
-    
     before do
       allow(hbx_enrollment).to receive(:kind).and_return("employer_sponsored_cobra")
       render :template=>"events/hbx_enrollment/policy", :locals=>{hbx_enrollment: hbx_enrollment}

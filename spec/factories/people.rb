@@ -1,3 +1,4 @@
+include Helpers::FactoryHelper
 FactoryGirl.define do
   factory :person do
     # name_pfx 'Mr'
@@ -24,7 +25,13 @@ FactoryGirl.define do
     end
 
     trait :with_ssn do
-      sequence(:ssn) { |n| 222222220 + n }
+      sequence(:ssn) { |n| 898999887 + n }
+
+      after(:build) do |obj, evaluator|
+        if ssn_validator obj
+          stubbed_person_ssn(obj, evaluator)
+        end
+      end
     end
 
     trait :with_work_email do
@@ -104,6 +111,18 @@ FactoryGirl.define do
     trait :with_csr_role do
       after(:create) do |p, evaluator|
         create_list(:csr_role, 1, person: p)
+      end
+    end
+
+    trait :with_active_consumer_role do
+      after(:create) do |person|
+        transition = FactoryGirl.create :individual_market_transition, person: person
+      end
+    end
+
+    trait :with_active_resident_role do
+      after(:create) do |person|
+        transition = FactoryGirl.create :individual_market_transition, :resident, person: person
       end
     end
 

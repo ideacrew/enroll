@@ -12,4 +12,3 @@ namespace :migrations do
   desc "remove incorrectly assigned resident role to person id"
   RemoveResidentRole.define_task :remove_resident_role => :environment
 end
-

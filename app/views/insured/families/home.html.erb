@@ -12,7 +12,7 @@
   <div class="my-account-page">
     <h1><%= l10n("my_site_short_name", site_short_name: Settings.site.short_name) %></h1>
   </div>
-
+  <br/>
   <div class="row">
     <div class="col-md-8">
       <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>

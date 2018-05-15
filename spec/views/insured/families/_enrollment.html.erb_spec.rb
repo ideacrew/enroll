@@ -24,6 +24,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('employer_sponsored')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
 
     it "when kind is employer_sponsored_cobra" do
@@ -36,6 +37,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('individual')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
   end
 
@@ -77,6 +79,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
@@ -194,6 +197,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
@@ -240,6 +244,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
       allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
       allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
@@ -259,6 +264,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
+    end
+
+    it "should show plan contact information" do
+      expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+    end
+
+    it "should not show carrier contact information" do
+      expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
     end
   end
 

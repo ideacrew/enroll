@@ -2,10 +2,15 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
   include ErrorBubble
+  include Acapi::Notifiers
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
+
+  # generate initial individual_market_transition as a placeholder for initial enrollment in IVL
+  after_action :create_initial_market_transition, only: [:create]
+
 
   def ssn_taken
   end
@@ -113,7 +118,6 @@ class Insured::ConsumerRolesController < ApplicationController
             end
             return
           end
-
           found_person = @consumer_candidate.match_person
           if found_person.present?
             format.html { render 'match' }
@@ -203,13 +207,17 @@ class Insured::ConsumerRolesController < ApplicationController
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
+      @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if is_new_paper_application?(current_user, session[:original_application_type])
-          redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
+        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+          redirect_to upload_ridp_document_insured_consumer_role_index_path
+        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+          redirect_to  @consumer_role.admin_bookmark_url.present? ?  @consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
         end
@@ -232,10 +240,29 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def ridp_agreement
     set_current_person
-    if @person.completed_identity_verification?
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    consumer = @person.consumer_role
+    if @person.completed_identity_verification? || consumer.identity_verified?
+      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
+    end
+  end
+
+  def upload_ridp_document
+    set_consumer_bookmark_url
+    set_current_person
+    @person.consumer_role.move_identity_documents_to_outstanding
+  end
+
+  def update_application_type
+    set_current_person
+    application_type = params[:consumer_role][:family][:application_type]
+    @person.primary_family.update_attributes(application_type: application_type)
+    if @person.primary_family.has_curam_or_mobile_application_type?
+      @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    else
+      redirect_to :back
     end
   end
 
@@ -274,6 +301,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :gender,
       :language_code,
       :is_incarcerated,
+      :is_physically_disabled,
       :is_disabled,
       :race,
       :is_consumer_role,
@@ -299,9 +327,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def check_consumer_role
     set_current_person(required: false)
     # need this check for cover all
-    if @person.try(:has_active_resident_role?)
+    if @person.try(:is_resident_role_active?)
       redirect_to @person.resident_role.bookmark_url || family_account_path
-    elsif @person.try(:has_active_consumer_role?)
+    elsif @person.try(:is_consumer_role_active?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
@@ -310,9 +338,23 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def create_initial_market_transition
+    transition = IndividualMarketTransition.new
+    transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.user_id = current_user.id
+    @person.individual_market_transitions << transition
+  end
+
   def set_error_message(message)
     if message.include? "year too big to marshal"
       return "Date of birth cannot be more than 110 years ago"
+    elsif message.downcase.include? "execution error"
+      id = @person.present? ? @person.id : nil
+      log("#19441 person_id: #{id}, message: #{message}, params: #{params}", {:severity => "error"})
+      return message
     else
       return message
     end

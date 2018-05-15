@@ -8,7 +8,7 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
                             :notice_template => 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
                             :notice_builder => 'ShopEmployerNotices::LowEnrollmentNotice',
                             :event_name => 'low_enrollment_notice_for_employer',
-                            :mpi_indicator => 'MPI_DAG015',
+                            :mpi_indicator => 'SHOP_D015',
                             :title => "Notice of Low Enrollment - Action Needed"})
                           }
     let(:valid_params) {{

@@ -46,7 +46,7 @@ Feature: Create Employee Roster
     And the broker clicks Delete Quote
     Then the quote should be deleted
     And Broker logs out
-    
+
   Scenario: Broker should be able to assign benefit group to a family
     Given that a broker exists
     And the broker is signed in

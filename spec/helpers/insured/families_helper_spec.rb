@@ -223,6 +223,26 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
+  context "build consumer role" do
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+
+    it "should build consumer role for a person" do
+      helper.build_consumer_role(person,family)
+      expect(person.consumer_role.present?). to eq true
+    end
+  end
+
+  context "build resident role " do
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+
+    it "should build consumer role for a person" do
+      helper.build_resident_role(person,family)
+      expect(person.resident_role.present?). to eq true
+    end
+  end
+
   describe "show_download_tax_documents_button?" do
     let(:person) { FactoryGirl.create(:person)}
 
@@ -280,5 +300,124 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       end
     end
 
+  end
+
+  describe "show_download_tax_documents_button_on_documents_page?" do
+    let(:person) { FactoryGirl.create(:person)}
+    before do
+      helper.instance_variable_set(:@person, person)
+    end
+
+    context "current user is hbx staff" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['hbx_staff'], :person => person) }
+      before do
+        sign_in current_user
+      end
+
+      context "person is consumer role" do
+        let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+        before do
+            person.consumer_role = consumer_role
+        end
+
+        context "has SSN" do
+          before do
+            person.ssn = '123456789'
+          end
+          it "should not display the download tax documents button" do
+            expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+          end
+        end
+
+        context "has no SSN" do
+          before do
+            person.ssn = ''
+          end
+          it "should display the download tax documents button" do
+            expect(helper.show_download_tax_documents_button_on_documents_page?).to eq true
+          end
+        end
+      end
+
+      context "person is employee role" do
+        let(:employee_role) {FactoryGirl.build(:employee_role)}
+        before do
+          person.employee_roles = [employee_role]
+          person.ssn = ''
+        end
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+    end
+
+    context "current user is consumer" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['consumer_role'], :person => person) }
+      let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+      before do
+        sign_in current_user
+        person.consumer_role = consumer_role
+      end
+      context "has SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+
+      context "has no SSN" do
+        before do
+          person.ssn = ''
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+    end
+
+    context "current user is employee and not a consumer" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['employee_role'], :person => person) }
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
+      before do
+        sign_in current_user
+        person.employee_roles = [employee_role]
+      end
+
+      context "has SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+
+    end
+
+    context "current user is consumer and employee" do
+      let(:current_user) { FactoryGirl.create(:user, :roles => ['consumer_role', 'employee_role'], :person => person) }
+      let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
+      before do
+        sign_in current_user
+        person.consumer_role = consumer_role
+        person.employee_roles = [employee_role]
+      end
+
+      context "has SSN" do
+        before do
+          person.ssn = '123456789'
+        end
+
+        it "should not display the download tax documents button" do
+          expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
+        end
+      end
+    end
   end
 end

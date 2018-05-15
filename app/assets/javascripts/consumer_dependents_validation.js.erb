@@ -1,0 +1,46 @@
+var DependentsValidationFields = (function(){
+
+    function CheckConsumerFields(valid, consumer, dep){
+        if (!valid && consumer){
+            showErrorMessage(dep);
+        }
+    }
+
+    function ErrorExists(){
+        return document.body.textContent.indexOf("Missing fields. Click \"Edit\" and provide required family member's info.") > -1
+    }
+
+    function showErrorMessage(dep){
+        $('#add_member_list_'+dep).prepend("<p class='alert alert-danger'>Missing fields. Click \"Edit\" and provide required family member's info.</p>");
+    }
+
+    function disableContinueButton(){
+        $('#btn-continue').addClass('disabled');
+    }
+
+    function ValidationFails() {
+        $(document).ready(function(){
+            return $('.alert-error')[0];
+        })
+    }
+
+    function enableContinueButton(){
+        $('#btn-continue').removeClass('disabled');
+    }
+
+    function CheckContinue(){
+        if (ErrorExists() || ValidationFails()) {
+            disableContinueButton();
+        }
+        else {
+            enableContinueButton();
+        }
+    }
+
+    return {
+        check_dependent: CheckConsumerFields,
+        check_continue_button: CheckContinue,
+        show_dependent_error: showErrorMessage,
+        disable_continue: disableContinueButton
+    }
+})();

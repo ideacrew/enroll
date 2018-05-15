@@ -27,6 +27,14 @@ FactoryGirl.define do
       effective_on_kinds ["first_of_next_month"]
       tool_tip "Enroll or add a family member because of marriage"
     end
+    
+    trait :death_of_dependent do
+      title "A family member has died"
+      edi_code "03-DEATH"
+      reason "death"
+      effective_on_kinds ["first_of_next_month"]
+      tool_tip "Remove a family member due to death"
+    end
 
     trait :effective_on_event_date_and_first_month do
       title "Had a baby"

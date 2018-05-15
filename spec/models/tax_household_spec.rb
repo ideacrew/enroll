@@ -237,3 +237,28 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 end
+
+describe TaxHousehold, "generate_tax_household_id if hbx_assigned_id blank", dbclean: :after_each do
+  let(:person) { FactoryGirl.create(:person)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:tax_household) { TaxHousehold.new(household: family.households.first) }
+  let(:tax_household1) { TaxHousehold.new(household: family.households.first) }
+  let(:tax_household2) { TaxHousehold.new(household: family.households.first) }
+
+  it "generate_tax_household_id" do
+    expect(tax_household.hbx_assigned_id).to eq nil
+    tax_household.save
+    expect(tax_household.hbx_assigned_id).not_to eq nil
+  end
+
+  it "should generate hbx_id" do
+    expect(tax_household1.generate_tax_household_id).not_to be nil
+  end
+
+  it "should not generate a new hbx_id if one exists" do
+    tax_household2.save
+    family.save
+    expect(tax_household2.hbx_assigned_id).not_to be eq nil
+    expect(tax_household2.generate_tax_household_id).to be nil
+  end
+end

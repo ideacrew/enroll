@@ -29,6 +29,10 @@ describe Events::SsaVerificationRequestsController do
       expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
     end
 
+    it "should store request in consumer role" do
+      expect(person.consumer_role.lawful_presence_determination.ssa_requests.count).to eq(1)
+    end
+
     it "stores verification history element" do
       expect(person.consumer_role.lawful_presence_determination.ssa_requests.count).to be > 0
     end
@@ -46,5 +50,4 @@ describe Events::SsaVerificationRequestsController do
           person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.event_request_record_id)
     end
   end
-
 end

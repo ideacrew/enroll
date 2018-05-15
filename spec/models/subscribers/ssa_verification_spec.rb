@@ -22,6 +22,7 @@ describe Subscribers::SsaVerification do
     let(:history_elements_citizen) {person.verification_types.where(type_name: "Citizenship").first.type_history_elements}
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
+    let(:response_data) { Parsers::Xml::Cv::SsaVerificationResultParser.parse(xml) }
 
     before :each do
       consumer_role.aasm_state="ssa_pending"
@@ -69,8 +70,46 @@ describe Subscribers::SsaVerification do
         expect(consumer_role.lawful_presence_determination.ssa_responses.count).to eq(1)
         expect(consumer_role.lawful_presence_determination.ssa_responses.first.body).to eq(payload[:body])
       end
-    end
+      
+      it "should create ssa verification response record" do
+        allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.count).to eq(1)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.response_code).to eq(response_data.response_code)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.response_text).to eq(response_data.response_text)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.ssn_verification_failed).to eq(response_data.ssn_verification_failed)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.death_confirmation).to eq(response_data.death_confirmation)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.ssn_verified).to eq(response_data.ssn_verified)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.citizenship_verified).to eq(response_data.citizenship_verified)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.incarcerated).to eq(response_data.incarcerated)
+        
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.ssn).to eq(response_data.individual.person_demographics.ssn)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.sex).to eq(response_data.individual.person_demographics.sex)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.birth_date).to eq(response_data.individual.person_demographics.birth_date.to_date)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.is_state_resident).to eq(response_data.individual.person_demographics.is_state_resident)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.citizen_status).to eq(response_data.individual.person_demographics.citizen_status)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.marital_status).to eq(response_data.individual.person_demographics.marital_status)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.death_date).to eq(response_data.individual.person_demographics.death_date)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.race).to eq(response_data.individual.person_demographics.race)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.is_state_resident).to eq(response_data.individual.person_demographics.is_state_resident)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.ethnicity).to eq(response_data.individual.person_demographics.ethnicity)
 
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.person_id).to eq(response_data.individual.person.id)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.first_name).to eq(response_data.individual.person.name_first)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.last_name).to eq(response_data.individual.person.name_last)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.name_pfx).to eq(response_data.individual.person.name_pfx)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.name_sfx).to eq(response_data.individual.person.name_sfx)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.middle_name).to eq(response_data.individual.person.name_middle)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.full_name).to eq(response_data.individual.person.name_full)
+        
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.individual_address.length).to eq(1)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.individual_email.length).to eq(1)
+        expect(person.consumer_role.lawful_presence_determination.ssa_verification_responses.first.individual_phone.length).to eq(1)
+
+      end
+    end
+  
     context "ssn_verified and citizenship_verified=false" do
       it "should approve lawful presence and set citizen_status to not_lawfully_present_in_us" do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash3)

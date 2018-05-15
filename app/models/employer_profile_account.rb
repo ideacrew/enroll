@@ -8,17 +8,35 @@ class EmployerProfileAccount
 
   field :next_premium_due_on, type: Date
   field :next_premium_amount, type: Money
+
+  field :message, type: String
+  field :past_due, type: Money
+  field :previous_balance, type: Money
+  field :new_charges, type: Money
+  field :adjustments, type: Money
+  field :payments, type: Money
+  field :total_due, type: Money
+  field :current_statement_date, type: Date
+
   field :aasm_state, type: String, default: "binder_pending"
 
   embeds_many :premium_payments
+  embeds_many :current_statement_activity
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :premium_payments
 
-  validates_presence_of :next_premium_due_on, :next_premium_amount
+  #validates_presence_of :next_premium_due_on, :next_premium_amount
 
   scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
 
+  def payments_since_last_invoice
+    current_statement_date.present? ? (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Payments")).to_a : []
+  end
+
+  def adjustments_since_last_invoice
+    current_statement_date.present? ? (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Adjustments")).to_a : []
+  end
 
   def last_premium_payment
     return premium_payments.first if premium_payments.size == 1
@@ -60,6 +78,12 @@ class EmployerProfileAccount
     event :allocate_binder_payment, :after => :record_transition do
       transitions from: :binder_pending, to: :binder_paid
     end
+
+    event :invoice  do
+      transitions from: :binder_pending, to: :invoiced
+    end
+
+
 
     # A new billing period begins the first day of each month
     event :advance_billing_period, :guard => :first_day_of_month?, :after => :record_transition do

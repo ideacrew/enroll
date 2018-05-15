@@ -11,6 +11,8 @@ module Forms
     attr_accessor :dob_check
     attr_accessor :is_applying_coverage
 
+    validates_with Validations::SocialSecurityValidator
+
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
@@ -20,7 +22,7 @@ module Forms
 
     validate :does_not_match_a_different_users_person
     validates :ssn,
-              length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
+              length: {minimum: 9, maximum: 9, message: "must be 9 digits"},
               numericality: true
     validate :dob_not_in_future
 

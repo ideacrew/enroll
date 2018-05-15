@@ -4,14 +4,14 @@ module Effective
     class FamilyDataTable < Effective::MongoidDatatable
       datatable do
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => Proc.new { |row| row.primary_applicant.person.primary_family.is_disabled? ? row.primary_applicant.person.full_name : (link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))}, :filter => false, :sortable => false
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :active_enrollments, :label => 'Active Enrollments?', :proc => Proc.new { |row| row.active_household.hbx_enrollments.active.enrolled_and_renewing.present? ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :registered?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.user.present? ? "Yes" : "No"} , :filter => false, :sortable => false
-        table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
+        table_column :consumer?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.is_consumer_role_active?  ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :employee?, :width => '100px', :proc => Proc.new { |row| row.primary_applicant.person.active_employee_roles.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
@@ -25,9 +25,13 @@ module Effective
            ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
            ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
             aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
+           ['Reinstate', view_terminated_hbx_enrollments_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
+           ['Enable / Disable', enable_or_disable_link_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), enable_disable_link_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax'],
-           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
-           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
+           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'disabled'],
+           ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static'],
+           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
+           ['Transition Family Members', transition_family_members_insured_families_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?))]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -62,12 +66,20 @@ module Effective
         allow ? 'ajax' : 'disabled'
       end
 
+      def enable_disable_link_type(family,allow)
+        allow ? 'ajax' : 'disabled'
+      end
+
       def cancel_enrollment_type(family, allow)
         (family.all_enrollments.cancel_eligible.present? && allow) ? 'ajax' : 'disabled'
       end
 
       def terminate_enrollment_type(family, allow)
         (family.all_enrollments.can_terminate.present? && allow) ? 'ajax' : 'disabled'
+      end
+
+      def transition_family_members_link_type(row, allow)
+        allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition

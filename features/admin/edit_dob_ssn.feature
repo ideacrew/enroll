@@ -14,7 +14,6 @@ Feature: Update DOB and SSN
             Then Hbx Admin should see the edit form being rendered again with a validation error message
             And Hbx Admin logs out
 
-
     Scenario: Admin enters valid DOB and SSN
         Given Hbx Admin exists
             When Hbx Admin logs on to the Hbx Portal

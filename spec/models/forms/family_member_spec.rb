@@ -234,6 +234,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
+      :is_physically_disabled => "no",
       :tribal_id => "test",
       :no_dc_address => nil,
       :no_dc_address_reason => nil
@@ -343,47 +344,55 @@ describe "checking validations on family member object" do
     expect(subject.valid?).to eq false
   end
 
-  it "should return errors with citizen status, native american / alaskan native and incarceration status" do
+  it "should return errors with citizen status, native american / alaskan native, incarceration and Physically disabled status" do
     subject.save
-    expect(subject.errors.full_messages).to eq ["Citizenship status is required", "native american / alaskan native status is required", "Incarceration status is required"]
+    expect(subject.errors.full_messages).to eq ["Citizenship status is required", "native american / alaskan native status is required", "Incarceration status is required", "Physically disabled status is required"]
   end
 
   context "user answered for citizen status question" do
     context "when user answered us citizen as true" do
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true"})) }
-      it "should return errors with naturalization, native american / alaskan native and incarceration status" do
+      it "should return errors with naturalization, native american / alaskan native, incarceration, Physically disabled status" do
         subject.save
-        expect(subject.errors.full_messages).to eq ["Naturalized citizen is required", "native american / alaskan native status is required", "Incarceration status is required"]
+        expect(subject.errors.full_messages).to eq ["Naturalized citizen is required", "native american / alaskan native status is required", "Incarceration status is required", "Physically disabled status is required"]
       end
     end
 
     context "when user answered us citizen as false" do
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
-      it "should return errors with Eligible immigration, native american / alaskan native and incarceration status" do
+      it "should return errors with Eligible immigration, native american / alaskan native, incarceration, Physically disabled status" do
         subject.save
-        expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaskan native status is required", "Incarceration status is required"]
+        expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaskan native status is required", "Incarceration status is required", "Physically disabled status is required"]
       end
     end
   end
 
   context "when user answered for citizen & naturalization" do
     subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false"})) }
-    it "should return errors with native american / alaskan native and incarceration status" do
+    it "should return errors with native american / alaskan native, incarceration status and Physically disabled status" do
       subject.save
-      expect(subject.errors.full_messages).to eq ["native american / alaskan native status is required", "Incarceration status is required"]
+      expect(subject.errors.full_messages).to eq ["native american / alaskan native status is required", "Incarceration status is required", "Physically disabled status is required"]
     end
   end
 
   context "when user not answered for incarceration status" do
-    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false"})) }
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_physically_disabled"=>"false"})) }
     it "should return errors with incarceration status" do
       subject.save
       expect(subject.errors.full_messages).to eq ["Incarceration status is required"]
     end
   end
 
-  context "when satisfied with all the validations" do
+  context "when user not answered for physically disabled status" do
     subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_incarcerated"=>"false"})) }
+    it "should return errors with physically disabled status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["Physically disabled status is required"]
+    end
+  end
+
+  context "when satisfied with all the validations" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_incarcerated"=>"false", "is_physically_disabled"=>"false"})) }
     it "should return true" do
       expect(subject.valid?).to eq true
     end
@@ -410,6 +419,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
+      :is_physically_disabled => "no",
       tribal_id: "test"
     }
   }

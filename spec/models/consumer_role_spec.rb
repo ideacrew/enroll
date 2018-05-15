@@ -18,7 +18,7 @@ describe ConsumerRole, dbclean: :after_each do
   it { should validate_presence_of :dob }
 
   let(:address)       {FactoryGirl.build(:address)}
-  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
+  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "887776665")}
   let(:saved_person_no_ssn)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '1')}
   let(:saved_person_no_ssn_invalid)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '0')}
   let(:is_applicant)          { true }
@@ -140,6 +140,58 @@ describe "#find_vlp_document_by_key" do
   end
 end
 
+describe "#move_identity_documents_to_outstanding" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+
+  context "move to outstanding if initial state is unverified" do
+
+    it "successfully updates identity and application to outstanding" do
+      consumer = person.consumer_role
+      consumer.move_identity_documents_to_outstanding
+      expect(consumer.identity_validation). to eq 'outstanding'
+      expect(consumer.application_validation). to eq 'outstanding'
+    end
+
+    it "should not update dentity and application to outstanding" do
+      consumer = person.consumer_role
+      consumer.identity_validation = 'valid'
+      consumer.application_validation = 'valid'
+      consumer.move_identity_documents_to_outstanding
+      expect(consumer.identity_validation). to eq 'valid'
+      expect(consumer.application_validation). to eq 'valid'
+    end
+  end
+end
+
+describe "#find_ridp_document_by_key" do
+  let(:person) {Person.new}
+  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:key) {"sample-key"}
+  let(:ridp_document) {RidpDocument.new({subject: "Driver License", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+
+  context "has a ridp_document without a file uploaded" do
+    before do
+      consumer_role.ridp_documents.build({subject: "Driver License"})
+    end
+
+    it "return no document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to be_nil
+    end
+  end
+
+  context "has a ridp_document with a file uploaded" do
+    before do
+      consumer_role.ridp_documents << ridp_document
+    end
+
+    it "returns ridp_document document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to eql(ridp_document)
+    end
+  end
+end
+
 describe "#build_nested_models_for_person" do
   let(:person) {FactoryGirl.create(:person)}
   let(:consumer_role) {ConsumerRole.new}
@@ -213,6 +265,32 @@ context "Verification process and notices" do
     end
   end
 
+  describe "#has_ridp_docs_for_type?" do
+    before do
+      person.consumer_role.ridp_documents=[]
+    end
+    context "ridp exist but document is NOT uploaded" do
+      it "returns false for ridp doc without uploaded copy" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil )
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+      it "returns false for Identity type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil, :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+    end
+    context "ridp with uploaded copy" do
+      it "returns true if person has uploaded documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
+      end
+      it "returns false if person has NO documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
+      end
+    end
+  end
+
   describe "Native American verification" do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
@@ -239,6 +317,8 @@ context "Verification process and notices" do
     let(:verification_types) { consumer.verification_types }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx", :five_year_bar => true, :is_barred => true, :bar_met => true })}
+    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
     shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
       before do
@@ -394,6 +474,14 @@ context "Verification process and notices" do
         consumer.aasm_state = "dhs_pending"
         consumer.fail_dhs! verification_attr
         expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
+      end
+
+      it "stores 5 year bar response" do
+        consumer.aasm_state="dhs_pending"
+        consumer.fail_dhs!(verification_attr)
+        expect(consumer.is_barred).to be true
+        expect(consumer.five_year_bar).to be true
+        expect(consumer.bar_met).to be true
       end
     end
 
@@ -569,7 +657,7 @@ context "Verification process and notices" do
         else
           expect(subject).to_not receive(:redetermine_verification!)
         end
-        subject.check_for_critical_changes(params, family)
+        subject.check_for_critical_changes(family, info_changed: subject.sensitive_information_changed?(params))
       end
     end
     mask_hash.each do |field, action|
@@ -676,7 +764,7 @@ describe "#build_nested_models_for_person" do
   end
 end
 
-describe "can_trigger_residency?" do
+describe "can_trigger_residency?" do # triggers after changes updated
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -689,62 +777,56 @@ describe "can_trigger_residency?" do
     end
 
     it "should return true if there is a change in address from non-dc to dc" do
-      person.update_attributes(no_dc_address: true)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
     end
 
     it "should return false if there is a change in address from dc to non-dc" do
-      person.update_attributes(no_dc_address: false)
-      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: false)).to eq false
     end
 
     it "should return false if there is a change in address from dc to dc" do
-      person.update_attributes(no_dc_address: false)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: false)).to eq false
     end
 
     it "should return false if there is a change in address from non-dc to non-dc" do
-      person.update_attributes(no_dc_address: true)
-      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq false
     end
   end
 
   context "when has an active coverage & address change from non-dc to dc", dbclean: :after_each do
 
     before do
-      person.update_attributes(no_dc_address: true)
       allow(family).to receive(:person_has_an_active_enrollment?).and_return true
     end
 
     it "should return true if age > 18" do
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
     end
 
     it "should return false if age = 18" do
       person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
 
     it "should return false if age < 18" do
       consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
   end
 
   context "when age > 18 & address change from non-dc to dc" do
     before do
-      person.update_attributes(no_dc_address: true)
       allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
     end
 
     it "should return true if has an active coverage" do
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
     end
 
     it "should return false if no active coverage" do
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
   end
 end
@@ -815,5 +897,19 @@ describe "Verification Tracker" do
       person.reload
       expect(person.consumer_role.history_action_trackers.last.tracking_record).to be_a(HistoryTracker)
     end
+  end
+end
+
+describe "#add_type_history_element" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:attr) { {verification_type: "verification_type",
+                action: "action",
+                modifier: "actor",
+                update_reason: "reason"} }
+
+  it "creates verification history record" do
+    person.consumer_role.verification_type_history_elements.delete_all
+    person.consumer_role.add_type_history_element(attr)
+    expect(person.consumer_role.verification_type_history_elements.size).to be > 0
   end
 end

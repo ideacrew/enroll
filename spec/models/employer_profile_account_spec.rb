@@ -43,21 +43,6 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
       end
     end
 
-    context "with no next_premium_due_on" do
-      let(:params) {valid_params.except(:next_premium_due_on)}
-
-      it "should fail validation" do
-        expect(EmployerProfileAccount.create(**params).errors[:next_premium_due_on].any?).to be_truthy
-      end
-    end
-
-    context "with no next_premium_amount" do
-      let(:params) {valid_params.except(:next_premium_amount)}
-
-      it "should fail validation" do
-        expect(EmployerProfileAccount.create(**params).errors[:next_premium_amount].any?).to be_truthy
-      end
-    end
 
     context "with all valid parameters" do
       let(:params) { valid_params }
@@ -285,7 +270,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
       end
 
       # Commented due initial ER plan year cancellation issues ticket 16300
-      
+
       # context "and employer doesn't pay the premium binder before effective date" do
       #   before do
       #     TimeKeeper.set_date_of_record(plan_year.start_on)

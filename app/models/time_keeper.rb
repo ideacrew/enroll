@@ -1,5 +1,4 @@
 class TimeKeeper
-  include Mongoid::Document
   include Singleton
   include Acapi::Notifiers
   extend Acapi::Notifiers
@@ -90,6 +89,10 @@ class TimeKeeper
     HbxEnrollment.advance_day(self.date_of_record)
     CensusEmployee.advance_day(self.date_of_record)
     ConsumerRole.advance_day(self.date_of_record)
+  end
+
+  def push_date_change_event
+    ModelEvents::PlanYear.date_change_event(self.date_of_record)
   end
 
   def self.with_cache

@@ -10,6 +10,7 @@ require 'rspec/expectations'
 require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
+require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
@@ -79,3 +80,4 @@ Capybara.register_driver :poltergeist do |app|
   }
   Capybara::Poltergeist::Driver.new(app, options)
 end
+Capybara.default_max_wait_time = 10 # will not change the default_max_wait in my_session

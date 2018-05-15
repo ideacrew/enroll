@@ -9,8 +9,8 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"), inbox: double(messages: double(build: double("inbox"))))}
     before do
       sign_in user
-      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(BrokerAgencyProfile).to receive(:where).and_return(inbox_provider)
+      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:_id).and_return('xxx')
@@ -30,8 +30,8 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
     before do
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
-      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(BrokerAgencyProfile).to receive(:where).and_return(inbox_provider)
+      allow(Person).to receive(:find).and_return(inbox_provider)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(inbox_provider).to receive(:inbox).and_return(inbox)
       allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)

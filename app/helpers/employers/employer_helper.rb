@@ -210,4 +210,14 @@ module Employers::EmployerHelper
     (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
   end
 
+  def get_invoices_for_year(invoices, year)
+    results = []
+    invoices.each do |invoice|
+      if invoice.date.year == year.to_i
+        results << invoice
+      end
+    end
+    results
+  end
+
 end

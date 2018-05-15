@@ -12,6 +12,8 @@ module Forms
     attr_accessor :dob_check #hidden input filed for one time DOB warning
     attr_accessor :is_applying_coverage
 
+    validates_with Validations::SocialSecurityValidator
+
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil

@@ -3,7 +3,7 @@ module Forms
     def self.included(base)
       base.class_eval do
         attr_accessor :race, :ethnicity, :language_code, :citizen_status, :tribal_id
-        attr_accessor :is_incarcerated, :is_disabled, :citizen_status
+        attr_accessor :is_incarcerated, :is_disabled, :citizen_status, :is_physically_disabled
 
         def us_citizen=(val)
           @us_citizen = (val.to_s == "true")
@@ -15,7 +15,11 @@ module Forms
         end
 
         def indian_tribe_member=(val)
-          @indian_tribe_member = (val.to_s == "true")
+          if val.to_s.present?
+          @indian_tribe_member =  (val.to_s == "true")
+          else
+            @indian_tribe_member = nil
+          end
         end
 
         def eligible_immigration_status=(val)
@@ -35,6 +39,7 @@ module Forms
         end
 
         def indian_tribe_member
+          return nil if (@us_citizen.nil? || @indian_tribe_member.nil?)
           return @indian_tribe_member if !@indian_tribe_member.nil?
           return nil if @indian_tribe_member.nil?
           @indian_tribe_member ||= (@indian_tribe_member == true)

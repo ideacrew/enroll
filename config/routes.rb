@@ -1,15 +1,24 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
-#  mount Resque::Server, at: '/jobs'
+
+  #mount TransportGateway::Engine, at: "/transport_gateway"
+  #mount TransportProfiles::Engine, at: "/transport_profiles"
+  mount Notifier::Engine, at: "/notifier" 
+  #mount RocketJobMissionControl::Engine => 'rocketjob'
+
+  require 'resque/server'
+  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
 
+  match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+
+  post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -44,7 +53,9 @@ Rails.application.routes.draw do
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
+
       collection do
+        post :reinstate_enrollment
         get :family_index
         get :family_index_dt
         get :outstanding_verification_dt
@@ -79,6 +90,14 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :enable_or_disable_link
+        post :cancel_initial_plan_year
+        post :cancel_initial_plan_year_form
+        get :view_terminated_hbx_enrollments
+        get :get_user_info
+        get :identity_verification
+        post :identity_verification_datatable
+        get :view_terminated_hbx_enrollments
         get :get_user_info
       end
 
@@ -126,6 +145,11 @@ Rails.application.routes.draw do
     get 'paper_applications/upload', to: 'paper_applications#upload'
     post 'paper_applications/upload', to: 'paper_applications#upload'
     get 'paper_applications/download/:key', to: 'paper_applications#download'
+    get 'ridp_documents/upload', to: 'ridp_documents#upload'
+    post 'ridp_documents/upload', to: 'ridp_documents#upload'
+    get 'ridp_documents/download/:key', to: 'ridp_documents#download'
+    resources :ridp_documents, only: [:destroy]
+
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -140,7 +164,12 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update]
+    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+        get 'service_unavailable'
+      end
+    end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
@@ -169,6 +198,10 @@ Rails.application.routes.draw do
         get 'family'
         get 'upload_notice_form'
         post 'upload_notice'
+        get 'download_tax_documents_form'
+        get 'download_tax_documents'
+        get 'transition_family_members'
+        post 'transition_family_members_update'
       end
 
       resources :people do
@@ -185,6 +218,8 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      post :update_application_type
+      get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
@@ -208,7 +243,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -228,6 +263,7 @@ Rails.application.routes.draw do
     resources :employer_staff_roles, :only => [:create, :destroy] do
       member do
         get :approve
+        put :make_primary_poc
       end
     end
 
@@ -250,7 +286,11 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        get 'show_invoice'
         post 'generate_checkbook_urls'
+        get "show_invoice"
+        get "wells_fargo_sso"
+
       end
       collection do
         get 'welcome'
@@ -494,11 +534,13 @@ Rails.application.routes.draw do
       put :change_person_aasm_state
       get :show_docs
       put :update_verification_type
+      put :update_ridp_verification_type
       get :enrollment_verification
       put :extend_due_date
       post :fed_hub_request
     end
   end
+
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

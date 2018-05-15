@@ -42,7 +42,6 @@ module Subscribers
         end
 
         xml_hash = xml_to_hash(xml)
-
         update_consumer_role(consumer_role, xml_hash)
       rescue => e
         notify("acapi.error.application.enroll.remote_listener.ssa_responses", {
@@ -73,6 +72,7 @@ module Subscribers
         consumer_role.ssn_valid_citizenship_invalid!(args)
       end
       consumer_role.save
+      save_ssa_verification_responses(consumer_role)
     end
 
     def xml_to_hash(xml)
@@ -81,6 +81,50 @@ module Subscribers
 
     def find_person(person_hbx_id)
       Person.where(hbx_id:person_hbx_id).first
+    end
+
+    def save_ssa_verification_responses(consumer_role)
+      data = Parsers::Xml::Cv::SsaVerificationResultParser.parse(consumer_role.lawful_presence_determination.ssa_responses.last.body)
+      consumer_role.lawful_presence_determination.ssa_verification_responses <<
+      SsaVerificationResponse.new(
+        response_code: data.response_code,
+        response_text: data.response_text,
+        ssn_verification_failed: data.ssn_verification_failed,
+        death_confirmation: data.death_confirmation,
+        ssn_verified: data.ssn_verified,
+        citizenship_verified: data.citizenship_verified,
+        incarcerated: data.incarcerated,
+        ssn: data.individual.person_demographics.ssn,
+        sex: data.individual.person_demographics.sex,
+        birth_date: data.individual.person_demographics.birth_date,
+        is_state_resident: data.individual.person_demographics.is_state_resident,
+        citizen_status: data.individual.person_demographics.citizen_status,
+        marital_status: data.individual.person_demographics.marital_status,
+        death_date: data.individual.person_demographics.death_date,
+        race: data.individual.person_demographics.race,
+        ethnicity: data.individual.person_demographics.ethnicity,
+        person_id: data.individual.person.id,
+        first_name: data.individual.person.name_first,
+        last_name: data.individual.person.name_last,
+        name_pfx: data.individual.person.name_pfx,
+        name_sfx: data.individual.person.name_sfx,
+        middle_name: data.individual.person.name_middle,
+        full_name: data.individual.person.name_full
+
+        )
+        data.individual.person.addresses.each do |address|
+         consumer_role.lawful_presence_determination.ssa_verification_responses.last.individual_address << Address.new({kind: address.type, address_1:  address.address_line_1, address_2:  address.address_line_2, city:  address.location_city_name,
+                           state:  address.location_state, zip:  address.location_postal_code, location_state_code: address.location_state_code,
+                           full_text: address.address_full_text, country_name: address.location_country_name })
+        end
+        data.individual.person.emails.each do |email|
+         consumer_role.lawful_presence_determination.ssa_verification_responses.last.individual_email << Email.new(kind: email.type, address:  email.email_address)
+        end
+        data.individual.person.phones.each do |phone|
+         consumer_role.lawful_presence_determination.ssa_verification_responses.last.individual_phone << Phone.new(kind: phone.type,country_code: phone.country_code,area_code: phone.area_code,
+                            number: phone.phone_number,extension: phone.extension,primary: phone.is_preferred,full_phone_number: phone.full_phone_number)
+        end
+
     end
   end
 end

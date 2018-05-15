@@ -657,10 +657,30 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
-          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/fewer full time equivalent employees/)
-          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/Number of full time equivalents/)
+          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/Number of full time equivalents/)
+          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/Number of full time equivalents/)
+        end
+
+        it "and plan year should be in publish pending state" do
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "publish_pending"
+        end
+      end
+
+      context "and the number of employees count is zero" do
+        before do
+          workflow_plan_year_with_benefit_group.fte_count = 0
+          workflow_plan_year_with_benefit_group.publish
+        end
+
+        it "application should not be valid" do
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
+        end
+
+        it "and should provide relevent warning message" do
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -1004,7 +1024,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   end
 
                   context "greater than 200 employees " do
-                    let(:employee_count)    { 201 }
+                    let(:employee_count)    { Settings.aca.shop_market.small_market_active_employee_limit + 1 }
                     before do
                       allow(workflow_plan_year_with_benefit_group).to receive_message_chain(:enrolled_by_bga, :count).and_return 25
                     end
@@ -1807,8 +1827,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context '.hbx_enrollments_by_month' do
     let!(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.date_of_record) }
+    let!(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn) }
 
     let!(:employee_role) {
       person.employee_roles.create(
@@ -2177,6 +2197,7 @@ describe PlanYear, "which has the concept of export eligibility" do
           employer_profile: employer_profile,
           start_on: valid_plan_year_start_on,
           end_on: valid_plan_year_end_on,
+          fte_count: 3,
           open_enrollment_start_on: valid_open_enrollment_start_on,
           open_enrollment_end_on: valid_open_enrollment_end_on
           })
@@ -2471,6 +2492,107 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
       census_employee.reload
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
+    end
+  end
+end
+
+describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
+  let!(:benefit_group) { employer_profile.plan_years.first.benefit_groups.first}
+  let!(:census_employee){
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+    employee
+  }
+  let!(:plan_year1) { employer_profile.plan_years.first }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
+
+  it "should trigger renewal_employee_enrollment_confirmation job in queue" do
+    census_employee.renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+    hbx_enrollment.save!
+    ActiveJob::Base.queue_adapter = :test
+    ActiveJob::Base.queue_adapter.enqueued_jobs = []
+    plan_year1.renewal_employee_enrollment_confirmation
+    queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+      job_info[:job] == ShopNoticesNotifierJob
+    end
+    expect(queued_job[:args]).to eq [census_employee.id.to_s, 'renewal_employee_enrollment_confirmation']
+  end
+end
+describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all do
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+  context 'initial employer profile' do
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: aasm_state, start_on: start_on) }
+    let(:plan_year) { employer_profile.plan_years.where(aasm_state: aasm_state)[0]}
+    let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
+    let(:quiet_period_end) { 
+      quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months)
+      TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.initial_application.quiet_period.mday))
+    }
+
+    context 'when enrolling' do
+      let(:aasm_state) { 'enrolling' }
+
+      it 'should return initial employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+
+    context 'when plan year active' do
+      let(:aasm_state) { 'active' }
+
+      it 'should return initial employer quiet period' do 
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+  end
+
+  context 'renewing employer profile' do 
+    let!(:employer_profile) {
+      create(:employer_with_renewing_planyear, start_on: start_on, 
+        renewal_plan_year_state: aasm_state
+      )
+    }
+
+    let!(:plan_year) { 
+      plan_year = employer_profile.plan_years.where(aasm_state: aasm_state)[0]
+      plan_year.workflow_state_transitions.build(from_state: :renewing_draft, to_state: :renewing_enrolling)
+      employer_profile.plan_years.detect{|py| py.active?}.update(aasm_state: 'expired')
+      plan_year.update(aasm_state: 'active')
+      plan_year
+    }
+
+    let(:quiet_period_begin) { TimeKeeper.start_of_exchange_day_from_utc(plan_year.open_enrollment_end_on.next_day) }
+    let(:quiet_period_end) { 
+      quiet_period_month = plan_year.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months)
+      TimeKeeper.end_of_exchange_day_from_utc(Date.new(quiet_period_month.year, quiet_period_month.month, Settings.aca.shop_market.renewal_application.quiet_period.mday))
+    }
+
+    context "when plan year renewing" do
+      let(:aasm_state) { 'renewing_enrolling' }
+
+      it 'should return renewing employer quiet period' do 
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
+    end
+
+    context "when plan year active" do
+      let(:aasm_state) { 'renewing_enrolled' }
+
+      it 'should return renewing employer quiet period' do
+        quiet_period = plan_year.enrollment_quiet_period
+        expect(quiet_period.begin).to eq (quiet_period_begin)
+        expect(quiet_period.end).to eq (quiet_period_end)
+      end
     end
   end
 end

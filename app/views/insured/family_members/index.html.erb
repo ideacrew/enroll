@@ -1,3 +1,4 @@
+<% invalid = any_dependent_invalid?(@dependents) %>
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
@@ -48,8 +49,8 @@
         <br>
         <div class="row no-buffer">
           <ul class="" id="dependent_ul">
-            <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-              <%= render "dependent", dependent: dependent, person: @person %>
+            <% @dependents.each do |dependent| %>
+              <%= render "dependent", dependent: dependent, person: @person, consumer_role: @consumer_role.present? %>
             <% end %>
           </ul>
         </div>
@@ -57,7 +58,8 @@
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
             <%= link_to l10n('add_member'), new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
-            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
+            <% group_selection_url = new_insured_group_selection_path(add_snapshot: true, person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
+
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 
             <% if @change_plan.present? %>
@@ -71,7 +73,7 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan,change_plan_date: @change_plan_date)%>
+        <% find_sep_url = find_sep_insured_families_path(add_snapshot: true, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan,change_plan_date: @change_plan_date)%>
         <% if @change_plan.present? %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
         <% elsif @type == "employee" %>
@@ -89,3 +91,9 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(document).ready(function(){
+      DependentsValidationFields.check_continue_button('<%= invalid && @consumer_role.present? %>');
+  });
+</script>

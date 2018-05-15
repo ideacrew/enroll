@@ -14,15 +14,9 @@ module Queries
 
     def person_search search_string
       return Family if search_string.blank?
-
-
     end
 
     def build_scope()
-
-      #return Family if @search_string.blank?
-      #person_id = Person.search(@search_string).limit(5000).pluck(:_id)
-      #family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
       family = Family.where("is_active" => true)
       person = Person
       if @custom_attributes['families'] == 'by_enrollment_individual_market'

@@ -5,14 +5,16 @@ site:
   copyright_period_start: "2013"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
+  notice_logo: "dchealthlink.jpg"
   home_url: "https://www.dchealthlink.com/"
+  login_url: "https://app.dchealthlink.com/"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
+  exchange_hbx_id: "DC0"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
-  exchange_hbx_id: "DC0"
 
   social_media:
     facebook_url: ""
@@ -25,6 +27,12 @@ contact_center:
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
+  mailing_address: "PO Box 97022"
+  city_state_zip: "Washington, DC 20090"
+
+
+  mailing_address:
+    name: "DC Health Link"
 
 aca:
   state_name: "District of Columbia"
@@ -53,6 +61,7 @@ aca:
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
+    small_market_active_employee_limit: 150
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -63,6 +72,7 @@ aca:
 
     retroactive_coverage_termination_maximum:
       days: -60
+    employer_application_deadline_link: "https://www.dchealthlink.com/smallbusiness/employer-coverage-deadlines"
 
     initial_application:
       publish_due_day_of_month: 5
@@ -73,7 +83,9 @@ aca:
       # After submitting an ineligible plan year application, time period an Employer must wait
       ineligible_period_after_application_denial:
         days: 90
-      quiet_period_end_on: 28
+      quiet_period:
+        month_offset: -1
+        mday: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
@@ -84,7 +96,9 @@ aca:
       open_enrollment:
         minimum_length:
           days: 3
-      quiet_period_end_on: 15
+      quiet_period:
+        month_offset: -1
+        mday: 15
 
     benefit_period:
       length_minimum:
@@ -108,9 +122,18 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    employer_profiles:
+      minimum_invoice_display_year: 2015
+
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+
+notices:
+  shop:
+    attachments:
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "taglines.pdf"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook

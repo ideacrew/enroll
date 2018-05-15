@@ -6,6 +6,7 @@ class Address
   embedded_in :person
   embedded_in :office_location
   embedded_in :census_member, class_name: "CensusMember"
+  embedded_in :ssa_verification_response, class_name: "SsaVerificationResponse"
 
   KINDS = %W(home work mailing)
   OFFICE_KINDS = %W(primary mailing branch)

@@ -6,7 +6,7 @@ module Services
 
       attr_accessor :hbx_enrollment,:is_congress
 
-      BASE_URL =   Rails.application.config.checkbook_services_base_url
+      BASE_URL =   Settings.checkbook_services.base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
 
       def initialize(hbx_enrollment, is_congress=false)
@@ -62,7 +62,6 @@ module Services
       def filter_value
         case @hbx_enrollment.benefit_group.plan_option_kind
         when "single_plan"
-          # binding.pry
           # @hbx_enrollment.benefit_group.reference_plan_id.to_s
           @hbx_enrollment.benefit_group.reference_plan.hios_id.to_s
         when "metal_level"

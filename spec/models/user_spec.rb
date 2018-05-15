@@ -10,7 +10,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       password: gen_pass,
       password_confirmation: gen_pass,
       approved: true,
-      person: {first_name: "john", last_name: "doe", ssn: "123456789"}
+      person: {first_name: "john", last_name: "doe"}
     }
   end
 
@@ -163,7 +163,8 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
         expect(User.create(**params).errors[:person].any?).to be_truthy
         expect(User.create(**params).errors[:person]).to eq ["is invalid"]
         expect(User.create(**params).person.errors[:ssn].any?).to be_truthy
-        expect(User.create(**params).person.errors[:ssn]).to eq ["SSN must be 9 digits"]
+        expect(User.create(**params).person.errors[:ssn]).to eq ["must be 9 digits"]
+        expect(User.create(**params).person.errors.full_messages).to eq ["Ssn must be 9 digits"]
       end
     end
     context "roles" do

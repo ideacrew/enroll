@@ -52,7 +52,7 @@ module Effective
           ],
           employer_types: [
             {scope: 'all', label: 'All'},
-            # {scope: 'client', label: 'Client', subfilter: :states},
+            {scope: 'client', label: 'Client', subfilter: :states},
             {scope: 'prospect', label: 'Prospect', subfilter: :states},
           ],
         }

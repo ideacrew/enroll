@@ -4,6 +4,8 @@ class PlanYear
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::PlanYear
 
   embedded_in :employer_profile
 
@@ -32,13 +34,13 @@ class PlanYear
   field :is_conversion, type: Boolean, default: false
 
   # Number of full-time employees
-  field :fte_count, type: Integer, default: 0
+  field :fte_count, type: Integer
 
   # Number of part-time employess
-  field :pte_count, type: Integer, default: 0
+  field :pte_count, type: Integer
 
   # Number of Medicare Second Payers
-  field :msp_count, type: Integer, default: 0
+  field :msp_count, type: Integer
 
   # Calculated Fields for DataTable
   field :enrolled_summary, type: Integer, default: 0
@@ -96,7 +98,18 @@ class PlanYear
     )
   }
 
+  scope :published_or_renewing_published_plan_years_by_date, ->(date) {
+    where(
+      "$and" => [
+        {:aasm_state.in => (PUBLISHED + RENEWING_PUBLISHED_STATE) },
+        {:"start_on".lte => date, :"end_on".gte => date}
+      ]
+    )
+  }
+
   after_update :update_employee_benefit_packages
+
+  after_save :notify_on_save
 
   def update_employee_benefit_packages
     if self.start_on_changed?
@@ -153,7 +166,7 @@ class PlanYear
       }},
       {"$match" => {"aasm_state" => {"$nin" => HbxEnrollment::WAIVED_STATUSES}}}
     ])
-    return [] if (enrollment_proxies.count > 100)
+    return [] if (enrollment_proxies.count > Settings.aca.shop_market.small_market_active_employee_limit)
     enrollment_proxies.map do |ep|
       OpenStruct.new(ep)
     end
@@ -164,7 +177,7 @@ class PlanYear
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
       :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-      }).limit(100)
+      }).limit(Settings.aca.shop_market.small_market_active_employee_limit)
 
     families.inject([]) do |enrollments, family|
       valid_enrollments = family.active_household.hbx_enrollments.where({
@@ -253,6 +266,34 @@ class PlanYear
   def open_enrollment_start_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:open_enrollment_start_on, new_date.beginning_of_day)
+  end
+
+  def has_renewal_history?
+    workflow_state_transitions.where(:to_state.in => PlanYear::RENEWING).any?
+  end
+
+  def enrollment_quiet_period
+    PlanYear.enrollment_quiet_period(start_on: start_on, open_enrollment_end_on: open_enrollment_end_on, is_renewing: has_renewal_history?)
+  end
+
+  def self.enrollment_quiet_period(start_on:, open_enrollment_end_on: nil, is_renewing: false)
+    if open_enrollment_end_on.blank?
+      prev_month = start_on.prev_month
+      quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+    else
+      quiet_period_start = open_enrollment_end_on + 1.day
+    end
+
+    quiet_period_end = is_renewing ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
+    TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+  end
+
+  def self.initial_quiet_period_end(start_on)
+    start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+  end
+
+  def self.renewal_quiet_period_end(start_on)
+    start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
   end
 
   def open_enrollment_end_on=(new_date)
@@ -459,8 +500,8 @@ class PlanYear
     end
 
     # Maximum company size at time of initial registration on the HBX
-    if !(is_renewing?) && (fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
-      warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
+    if !(is_renewing?) && (fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
+      warnings.merge!({ fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})" })
     end
 
     # Exclude Jan 1 effective date from certain checks
@@ -564,7 +605,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    if self.employer_profile.census_employees.active.count < 200
+    if self.employer_profile.census_employees.active.count <= Settings.aca.shop_market.small_market_active_employee_limit
       #enrolled.count
       enrolled_by_bga.count
     else
@@ -860,7 +901,7 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
@@ -1042,6 +1083,19 @@ class PlanYear
     self.employer_profile.is_conversion? && self.is_conversion
   end
 
+  def renewal_employee_enrollment_confirmation
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        enrollment = ce.renewal_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && (enrollment.effective_on == self.start_on)
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+        end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
+      end
+    end
+  end
+
   def link_census_employees
     self.employer_profile.census_employees.eligible_without_term_pending.each do |census_employee|
       census_employee.save # This assigns default benefit package if none
@@ -1150,6 +1204,15 @@ class PlanYear
       self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
+  end
+
+  def initial_employer_open_enrollment_begins
+    return true if (benefit_groups.any?{|bg| bg.is_congress?})
+    begin
+      self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial open enrollment notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 

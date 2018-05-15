@@ -37,6 +37,17 @@ module VerificationHelper
     end
   end
 
+  def ridp_type_class(type, person)
+    case ridp_type_status(type, person)
+      when 'valid'
+        'success'
+      when 'in review'
+        'warning'
+      when 'outstanding'
+        'danger'
+    end
+  end
+
   def unverified?(person)
     person.consumer_role.aasm_state != "fully_verified"
   end
@@ -151,27 +162,41 @@ module VerificationHelper
     end
   end
 
+  def show_ridp_type(ridp_type, person)
+    case ridp_type_status(ridp_type, person)
+      when 'in review'
+        "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
+      when 'valid'
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      else
+        "&nbsp;&nbsp;Outstanding&nbsp;&nbsp;".html_safe
+    end
+  end
+
+  def text_center(v_type, person)
+    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+  end
+
   # returns vlp_documents array for verification type
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
+  end
+
+  # returns ridp_documents array for ridp verification type
+  def ridp_documents_list(person, ridp_type)
+    person.consumer_role.ridp_documents.select{|doc| doc.identifier && doc.ridp_verification_type == ridp_type } if person.consumer_role
   end
 
   def admin_actions(v_type, f_member)
     options_for_select(build_admin_actions_list(v_type, f_member))
   end
 
-  def mod_attr(attr, val)
-      attr.to_s + " => " + val.to_s
+  def ridp_admin_actions(ridp_type, person)
+    options_for_select(build_ridp_admin_actions_list(ridp_type, person))
   end
 
-  def build_admin_actions_list(v_type, f_member)
-    if f_member.consumer_role.aasm_state == 'unverified'
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
-    elsif v_type.validation_status == 'outstanding'
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
-    else
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
-    end
+  def mod_attr(attr, val)
+    attr.to_s + " => " + val.to_s
   end
 
   def build_reject_reason_list(v_type)
@@ -187,8 +212,20 @@ module VerificationHelper
     end
   end
 
+  def build_ridp_admin_actions_list(ridp_type, person)
+    if ridp_type_status(ridp_type, person) == 'outstanding'
+      ::RidpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == 'Reject'}
+    else
+      ::RidpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
   def type_unverified?(v_type, person)
     !["verified", "valid", "attested"].include?(verification_type_status(v_type, person))
+  end
+
+  def ridp_type_unverified?(ridp_type, person)
+    ridp_type_status(ridp_type, person) != 'valid'
   end
 
   def request_response_details(person, record, v_type)
@@ -224,4 +261,33 @@ module VerificationHelper
     raw_request = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
     raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no response record"
   end
+
+  def has_active_consumer_or_resident_members?(family_members)
+    family_members.present? && (family_members.map(&:person).any?(&:is_consumer_role_active?) || family_members.map(&:person).any?(&:is_resident_role_active?))
+  end
+
+  def has_active_consumer_dependent?(person,dependent)
+    !person.has_active_employee_role? && (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_consumer_role_active?)
+  end
+
+  def has_active_resident_dependent?(person,dependent)
+    (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
+  end
+
+  def move_types_to_expired(person)
+    person.consumer_role.outstanding_verification_types.each do |v_type|
+      case v_type
+        when "DC Residency"
+          person.consumer_role.update_attributes(:residency_update_reason => "Moved to Coverall", :local_residency_validation => "expired",  residency_rejected: true)
+        when "Social Security Number"
+          person.consumer_role.update_attributes(:ssn_validation => "expired", :ssn_update_reason => "Moved to Coverall", ssn_rejected: true)
+        when "American Indian Status"
+          person.consumer_role.update_attributes(:native_validation => "expired", :native_update_reason => "Moved to Coverall", native_rejected: true)
+        else
+          person.consumer_role.lawful_presence_determination.expired!
+          person.consumer_role.update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => "Moved to Coverall"}, :lawful_presence_rejected => true )
+      end
+    end
+  end
+
 end

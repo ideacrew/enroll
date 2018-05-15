@@ -1,24 +1,27 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
+  include Acapi::Notifiers
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :set_vars_for_market, only: [:new]
+  before_action :convert_individual_members_to_resident, only: [:create]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
     set_bookmark_url
     hbx_enrollment = build_hbx_enrollment
     @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
+    set_admin_bookmark_url
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
-    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
+    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @person.try(:is_resident_role_active?) || @resident
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
         pre_hbx.update_current(changing: true) if pre_hbx.present?
       end
-
+      @family.take_application_snapshot if (params[:add_snapshot].to_s == "true" && @family.present?)
       correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
     end
@@ -29,10 +32,7 @@ class Insured::GroupSelectionController < ApplicationController
     @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
     @benefit_group = select_benefit_group(@qle, @employee_role)
     @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
-
     generate_coverage_family_members_for_cobra
-    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
-    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
@@ -44,6 +44,7 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
+
     hbx_enrollment = build_hbx_enrollment
     if (keep_existing_plan && @hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
@@ -68,7 +69,10 @@ class Insured::GroupSelectionController < ApplicationController
 
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
-
+    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
+    if invalid_member_exist
+      raise "Please select valid enrolling members"
+    end
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
@@ -86,6 +90,11 @@ class Insured::GroupSelectionController < ApplicationController
     end
   rescue Exception => error
     flash[:error] = error.message
+
+    if error.message.downcase.include? "execution error"
+      log("#19441 person_id: #{@person.id}, message: #{error.message}, params: #{params}", {:severity => "error"})
+    end
+
     logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
@@ -177,7 +186,7 @@ class Insured::GroupSelectionController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+    @shop_for_plans = params[:shop_for_plans].present? ? params[:shop_for_plans] : ''
     @optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
   end
 
@@ -188,7 +197,13 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     if @hbx_enrollment.present? && @change_plan == "change_plan"
-      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
       @mc_coverage_kind = @hbx_enrollment.coverage_kind
     end
   end
@@ -201,4 +216,54 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
   end
+
+  # This method converts active consumers to residents for a household with a family with family member who has a transition to converall
+  def convert_individual_members_to_resident
+    # no need to do anything if shopping in IVL
+    if (params[:market_kind] == "coverall")
+      family = @person.primary_family
+      family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
+        BSON::ObjectId.from_string(family_member_id)
+      end
+      family_member_ids.each do |fm|
+        person = FamilyMember.find(fm).person
+        # Need to create new invididual market transition instance and resident role if none
+        if person.is_consumer_role_active?
+          # Need to terminate current individual market transition and create new one
+          current_transition = person.current_individual_market_transition
+          current_transition.update_attributes!(effective_ending_on: TimeKeeper.date_of_record)
+          # create resident role if it doesn't exist
+          if person.resident_role.nil?
+            #check for primary_person
+            family.build_resident_role(FamilyMember.find(fm), get_values_to_generate_resident_role(person))
+            if (person.id == @person.id)
+              # need to reload db
+              person = Person.find(person.id)
+              person.resident_role.update_attributes!(is_applicant: true)
+            end
+          else
+            transition = IndividualMarketTransition.new
+            transition.role_type = "resident"
+            transition.submitted_at = TimeKeeper.datetime_of_record
+            transition.reason_code = "generating_resident_role"
+            transition.effective_starting_on = TimeKeeper.datetime_of_record
+            person.individual_market_transitions << transition
+            person.save!
+          end
+        end
+      end
+    end
+  end
+
+  def get_values_to_generate_resident_role(person)
+    options = {}
+    options[:is_applicant] = person.consumer_role.is_applicant
+    options[:bookmark_url] = person.consumer_role.bookmark_url
+    options[:is_state_resident] = person.consumer_role.is_state_resident
+    options[:residency_determined_at] = person.consumer_role.residency_determined_at
+    options[:contact_method] = person.consumer_role.contact_method
+    options[:language_preference] = person.consumer_role.language_preference
+    options
+  end
+
 end

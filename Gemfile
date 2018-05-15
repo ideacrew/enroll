@@ -1,4 +1,3 @@
-source 'https://rubygems.org'
 
 gem 'aasm', '~> 4.8.0'
 gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.0.0'
@@ -9,9 +8,11 @@ gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-slider-rails', '6.0.17'
 gem 'bson', '3.2.6'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
+gem 'ckeditor'
 gem 'coffee-rails', '~> 4.1.0'
 gem 'combine_pdf'
 gem 'config', '~> 1.0.0'
+gem 'curl'
 gem 'devise', '~> 3.4.1'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'font-awesome-rails', '4.5.0.1'
@@ -33,24 +34,27 @@ gem 'money-rails', '~> 1.3.0'
 gem 'mongo', '2.1.2'
 gem 'mongo_session_store-rails4', '~> 6.0.0'
 gem 'mongoid', '5.0.1'
-gem 'mongoid-autoinc'
 gem 'mongoid-enum'
 gem 'mongoid-history'
 gem 'mongoid-versioning'
 gem 'mongoid_userstamp'
 gem 'nokogiri', '1.6.7.2'
+gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem 'nokogiri-happymapper', :require => 'happymapper'
+gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2', git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 gem 'pundit', '~> 1.0.1'
 gem 'rails', '4.2.7.1'
 gem 'rails-i18n', '4.0.8'
 gem 'recaptcha', '1.1.0'
+gem 'redcarpet', '3.4.0'
 gem 'redis-rails'
 gem 'resque'
 gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
+gem 'slim', '3.0.8'
 gem 'slim-rails'
 gem 'sprockets' , '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
@@ -103,8 +107,8 @@ group :development, :test do
   gem 'rspec_junit_formatter', '0.2.3'
   gem 'ruby-progressbar', '1.6.0'
   gem 'spring', '1.6.3'
-  gem 'yard', '~> 0.9.5'
-  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'yard', '~> 0.9.5', require: false
+  gem 'yard-mongoid', '~> 0.1.0', require: false
 end
 
 group :test do
@@ -127,4 +131,3 @@ group :production do
   gem 'newrelic_rpm'
   gem 'unicorn', '~> 4.8.3'
 end
-

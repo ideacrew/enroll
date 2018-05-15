@@ -285,6 +285,13 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "phone_number_format" do
+    it "should return phone number with brackets" do
+      number = Settings.contact_center.phone_number
+      expect(phone_number_format(number)).to eq "(855) 532-5465"
+    end
+  end
+
   describe "disable_purchase?" do
     it "should return true when disabled is true" do
       expect(helper.disable_purchase?(true, nil)).to eq true
@@ -423,7 +430,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should not return next year" do
       expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
-end
+  end
 
   describe ".notify_employer_when_employee_terminate_coverage" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}

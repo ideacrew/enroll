@@ -1,0 +1,56 @@
+<html>
+<head>
+  <title><%= Settings.site.short_name %> Confirmation</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+  <meta content="telephone=no" name="format-detection" />
+
+  <style type="text/css">
+
+  @font-face {
+    font-family: 'NimbusTimesRoman';
+    font-style: normal;
+    font-weight: 300;
+    src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
+  }
+
+  body {
+    width:100%!important;
+    -webkit-text-size-adjust:100%;
+    -ms-text-size-adjust:100%;
+    margin:0;
+    padding:0;
+    mso-line-height-rule:exactly
+    font-size:10px;
+    color:rgb(0,0,0);
+    font-family: "NimbusTimesRoman", Times, serif;
+    margin-top: 17px;
+  }
+
+  table td {
+    border-collapse:collapse;
+    font-size:10px;
+    font-family: "NimbusTimesRoman", Times, serif;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  table td {
+    border-collapse: collapse;
+  }
+  </style>
+
+</head>
+
+<body onload="subst()">
+  <table class="footer-section" align="center" width="100%" border="0">
+    <tr>
+      <td>____________________________________________________________________________________________________</td>
+    </tr>
+    <tr>
+      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call <%= Settings.site.short_name %> at <%= contact_center_phone_number %>/TTY: <%= Settings.contact_center.tty %>, or go to <a href=<%= Settings.site.home_url %>><%= Settings.site.website_name %></a>.</td>
+    </tr>
+  </table>
+</body>
+</html>

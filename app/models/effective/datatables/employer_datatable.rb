@@ -2,8 +2,10 @@
 module Effective
   module Datatables
     class EmployerDatatable < Effective::MongoidDatatable
-      datatable do
+      include EventsHelper
+      include Exchanges::HbxProfilesHelper
 
+      datatable do
 
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
@@ -36,24 +38,40 @@ module Effective
           @latest_plan_year.try(:start_on)
           }, :filter => false, :sortable => true
         table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
-#        table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
-#        table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
 
-#          enrolled = @latest_plan_year.try(:enrolled_summary)
-#          waived = @latest_plan_year.try(:waived_summary)
-#          enrolled.to_s + "/" + waived.to_s
-#          }, :filter => false, :sortable => false
+        # Hotfix 17882
+        # Tony Schaffert: Removing these fields from the EMPLOYER datatable as these are calculated fields and requires significatn processing and delays rendering of the overall table_column
+
+        # table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
+        # table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
+        #   enrolled = @latest_plan_year.try(:enrolled_summary)
+        #   waived = @latest_plan_year.try(:waived_summary)
+        #   enrolled.to_s + "/" + waived.to_s
+        #   }, :filter => false, :sortable => false
+
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
-           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
+           ['Cancel Initial Plan Year', cancel_initial_plan_year_form_exchanges_hbx_profiles_path(id: row), cancel_initial_plan_year_link_type(row)],
+           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: get_pocs(row), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
 
+      end
+
+      def get_pocs(row)
+        Person.collection.aggregate([
+            {"$unwind" => "$employer_staff_roles"},
+            {"$match" => {"employer_staff_roles.employer_profile_id" => row.employer_profile._id}},
+            {"$match" => {"employer_staff_roles.aasm_state" => "is_active"}},
+            {"$group" => { "_id" => "$_id"}},
+          ]).map do |record|
+          record["_id"]
+        end
       end
 
       def generate_invoice_link_type(row)
@@ -159,6 +177,11 @@ module Effective
         top_scope: :employers
         }
 
+      end
+
+      def cancel_initial_plan_year_link_type(row)
+        employer_profile= row.employer_profile
+        is_initial_or_conversion_employer?(employer_profile) && can_cancel_employer_plan_year?(employer_profile) ? 'post_ajax' : 'disabled'
       end
     end
   end

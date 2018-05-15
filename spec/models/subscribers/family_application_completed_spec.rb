@@ -78,7 +78,7 @@ describe Subscribers::FamilyApplicationCompleted do
               "name_pfx" => primary.person.name_pfx,
               "name_sfx" => primary.person.name_sfx,
               "dob" => primary.person_demographics.birth_date,
-              "ssn" => primary.person_demographics.ssn,
+              "ssn" => (primary.person_demographics.ssn == "999999999" ? "" : primary.person_demographics.ssn),
               "no_ssn" => "1",
               "gender" => primary.person_demographics.sex.split('#').last
             }
@@ -147,6 +147,57 @@ describe Subscribers::FamilyApplicationCompleted do
           subject.call(nil, nil, nil, nil, message)
         end
       end
+
+      context "with a valid single person family with a valid email" do
+
+        let(:message) { { "body" => xml } }
+        let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_1_member_with_email.xml")) }
+        let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_1_member_with_email.xml"))).first }
+        let(:user) { FactoryGirl.create(:user) }
+
+        let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+        let(:ua_params) do
+          {
+            addresses: [],
+            phones: [],
+            emails: [],
+            person: {
+              "first_name" => primary.person.name_first.upcase,
+              "last_name" => primary.person.name_last.downcase,
+              "middle_name" => primary.person.name_middle,
+              "name_pfx" => primary.person.name_pfx,
+              "name_sfx" => primary.person.name_sfx,
+              "dob" => primary.person_demographics.birth_date,
+              "ssn" => primary.person_demographics.ssn,
+              "no_ssn" => "1",
+              "gender" => primary.person_demographics.sex.split('#').last
+            }
+          }
+        end
+
+        let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+        let(:family) { consumer_role.person.primary_family }
+
+        before do
+          allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
+        end
+
+        after do
+          Family.delete_all
+        end
+
+        it "should succesfully save the work email" do
+          expect(consumer_role.person.emails.map(&:kind).include?("work")).to be_falsey
+          expect(consumer_role.person.emails.count).to eq 1
+          family.update_attribute(:e_case_id, nil)
+          expect(subject).not_to receive(:log)
+          subject.call(nil, nil, nil, nil, message)
+          consumer_role.person.reload
+          expect(consumer_role.person.emails.count).to eq 2
+          expect(consumer_role.person.emails.map(&:kind).include?("work")).to be_truthy
+        end
+      end
+
     end
   end
 

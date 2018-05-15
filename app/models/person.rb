@@ -48,6 +48,8 @@ class Person
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
   VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
+  NON_SHOP_ROLES = ['Individual','Coverall']
+
   field :hbx_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
@@ -65,6 +67,11 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
+  field :is_incarcerated_pending_charge_disposition, type: Boolean
+  field :is_incarcerated_in_dc, type: Boolean
+  field :incarceration_date, type: Date
+  field :expected_release_date, type: Date
+  field :is_physically_disabled, type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -81,6 +88,7 @@ class Person
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
+
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
@@ -104,6 +112,8 @@ class Person
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :resident_role, cascade_callbacks: true, validate: true
+  embeds_many :individual_market_transitions, cascade_callbacks: true, validate: true
+
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
@@ -132,18 +142,20 @@ class Person
   accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
   accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| Email.new(addy).blank? }
 
+  validates_with Validations::SocialSecurityValidator
+
   validates_presence_of :first_name, :last_name
   validate :date_functional_validations
   validate :no_changing_my_user, :on => :update
 
   validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+    length: { minimum: 9, maximum: 9, message: "must be 9 digits" },
     numericality: true,
     allow_blank: true
 
   validates :encrypted_ssn, uniqueness: true, allow_blank: true
 
-  validate :is_ssn_composition_correct?
+  validate :is_only_one_individual_role_active?
 
   validates :gender,
     allow_blank: true,
@@ -211,6 +223,7 @@ class Person
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
+  scope :all_individual_market_transitions,  -> { exists(individual_market_transitions: true) }
 
   #scope :all_responsible_party_roles, -> { exists(responsible_party_role: true) }
   scope :all_broker_roles,            -> { exists(broker_role: true) }
@@ -237,6 +250,10 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
+  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
+  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
+  scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
+
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
@@ -445,6 +462,14 @@ class Person
     verification_types.find_by(:type_name => type)
   end
 
+# collect all ridp_verification_types user in case of unsuccessful ridp
+  def ridp_verification_types
+    ridp_verification_types = []
+    ridp_verification_types << 'Identity' if consumer_role  && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Application' if consumer_role && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types
+  end
+
   def relatives
     person_relationships.reject do |p_rel|
       p_rel.relative_id.to_s == self.id.to_s
@@ -536,11 +561,27 @@ class Person
   end
 
   def has_active_consumer_role?
-    consumer_role.present? and consumer_role.is_active?
+     consumer_role.present? && consumer_role.is_active?
   end
 
   def has_active_resident_role?
-    resident_role.present? and resident_role.is_active?
+    resident_role.present? && resident_role.is_active?
+  end
+
+  def has_active_resident_member?
+    if self.primary_family.present?
+      active_resident_member = self.primary_family.active_family_members.detect { |member| member.person.is_resident_role_active? }
+      return true if active_resident_member.present?
+    end
+    return false
+  end
+
+  def has_active_consumer_member?
+    if self.primary_family.present?
+      active_consumer_member = self.primary_family.active_family_members.detect { |member| member.person.is_consumer_role_active? }
+      return true if active_consumer_member.present?
+    end
+    return false
   end
 
   def can_report_shop_qle?
@@ -592,6 +633,34 @@ class Person
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
     return false
+  end
+
+  def current_individual_market_transition
+    if self.individual_market_transitions.present?
+      self.individual_market_transitions.last
+    else
+      nil
+    end
+  end
+
+  def active_individual_market_role
+    if current_individual_market_transition.present? && current_individual_market_transition.role_type
+      current_individual_market_transition.role_type
+    else
+      nil
+    end
+  end
+
+  def has_consumer_or_resident_role?
+    is_consumer_role_active? || is_resident_role_active?
+  end
+
+  def is_consumer_role_active?
+    self.active_individual_market_role == "consumer" ? true : false
+  end
+
+  def is_resident_role_active?
+     self.active_individual_market_role == "resident" ? true : false
   end
 
   class << self
@@ -757,6 +826,7 @@ class Person
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
       employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role.approve! if !employer_staff_role.present?
       employer_staff_role.save
       return true, person.first
     end
@@ -895,27 +965,23 @@ class Person
       user.ridp_by_paper_application
     end
   end
+  # Makes user the primary poc
+  def make_primary(role)
+    self.active_employer_staff_roles.update(primary_poc: role)
+  end
+
+  def is_primary_poc
+    if active_employer_staff_roles.present?
+      active_employer_staff_roles.first.primary_poc
+    end
+  end
 
   private
-  def is_ssn_composition_correct?
-    # Invalid compositions:
-    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
-    #   00 in the group number (fourth and fifth digit); or
-    #   0000 in the serial number (last four digits)
 
-    if ssn.present?
-      invalid_area_numbers = %w(000 666)
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+  def is_only_one_individual_role_active?
+    if self.is_consumer_role_active? && self.is_resident_role_active?
+      self.errors.add(:base, "Resident role and Consumer role can't both be active at the same time.")
     end
-
     true
   end
 
@@ -995,5 +1061,9 @@ class Person
 
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
+  end
+
+  def family_member
+    primary_family.family_members.find_by(person_id: id)
   end
 end

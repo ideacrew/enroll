@@ -3,6 +3,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.primary_email %></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -28,7 +37,7 @@
   { content: "<strong>Your Current Plan Election Will Automatically Renew</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Since you already enrolled in employer-sponsored coverage through #{Settings.site.short_name}, your current plan selection will automatically be renewed as #{notice.plan.plan_name}. Your cost will be #{notice.enrollment.employee_cost} per month to cover #{notice.enrollment.enrollees.join(", ")}. This plan will begin on #{notice.plan_year.start_on} unless you change your plan prior to #{notice.plan_year.open_enrollment_end_on}."} %>
+  { content: "Since you already enrolled in employer-sponsored coverage through #{Settings.site.short_name}, your current plan selection will automatically be renewed as #{notice.plan.plan_name}. Your cost will be #{notice.enrollment.employee_cost} per month to cover #{notice.enrollment.enrollees.map(&:full_name).join(", ")}. This plan will begin on #{notice.plan_year.start_on} unless you change your plan prior to #{notice.plan_year.open_enrollment_end_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "<strong>You Are Able to Change Your Plan Selection during Open Enrollment</strong>"} %>
