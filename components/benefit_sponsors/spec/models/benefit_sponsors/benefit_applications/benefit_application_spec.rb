@@ -209,9 +209,9 @@ module BenefitSponsors
       let(:april_open_enrollment_begin_on)  { april_effective_date - 1.month }
       let(:april_open_enrollment_end_on)    { april_open_enrollment_begin_on + 9.days }
 
-      let!(:march_sponsors)                 { FactoryGirl.create_list(:benefit_sponsors_benefit_applications, 3,
+      let!(:march_sponsors)                 { FactoryGirl.create_list(:benefit_sponsors_benefit_application, 3,
                                               effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)) )}
-      let!(:april_sponsors)                 { FactoryGirl.create_list(:benefit_sponsors_benefit_applications, 2,
+      let!(:april_sponsors)                 { FactoryGirl.create_list(:benefit_sponsors_benefit_application, 2,
                                               effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)) )}
 
       before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
@@ -255,9 +255,9 @@ module BenefitSponsors
       context "with an application in renewing status" do
         let(:last_year)                       { this_year - 1 }
         let(:last_march_effective_date)       { Date.new(last_year,3,1) }
-        let!(:initial_application)            { FactoryGirl.create(:benefit_sponsors_benefit_applications,
+        let!(:initial_application)            { FactoryGirl.create(:benefit_sponsors_benefit_application,
                                                 effective_period: (last_march_effective_date..(last_march_effective_date + 1.year - 1.day)) )}
-        let!(:renewal_application)            { FactoryGirl.create(:benefit_sponsors_benefit_applications,
+        let!(:renewal_application)            { FactoryGirl.create(:benefit_sponsors_benefit_application,
                                                 effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)),
                                                 predecessor_application: initial_application)}
 
@@ -322,6 +322,14 @@ module BenefitSponsors
     #     expect(plan_year.open_enrollment_end_on).to eq benefit_application.open_enrollment_period.end
     #   end
     # end
+
+    describe ".renew" do
+      context "when renewal benefit sponsor catalog available" do
+        
+        it "should generate renewal application" do 
+        end
+      end
+    end
 
     context "a BenefitApplication class" do
       let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
