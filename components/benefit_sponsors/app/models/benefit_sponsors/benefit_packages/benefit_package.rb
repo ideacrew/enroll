@@ -11,6 +11,7 @@ module BenefitSponsors
       field :description, type: String, default: ""
       field :probation_period_kind, type: Symbol
       field :is_default, type: Boolean, default: false
+      field :is_active, type: Boolean, default: true
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
@@ -70,6 +71,32 @@ module BenefitSponsors
             new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
           end
         end
+      end
+
+      def disable_benefit_package
+        self.benefit_application.benefit_sponsorship.census_employees.each do |census_employee|
+          benefit_package_assignments = census_employee.benefit_package_assignments.where(benefit_package_id: self.id)
+
+          if benefit_package_assignments.present?
+            benefit_package_assignments.each do |benefit_package_assignment|
+              benefit_package_assignment.hbx_enrollments.each do |enrollment|
+                enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+              end
+              benefit_package_assignment.update(is_active: false) unless self.benefit_application.is_renewing?
+            end
+
+            other_benefit_package = self.benefit_application.benefit_packages.detect{ |benefit_package| benefit_package.id != self.id }
+
+            # TODO: Add methods on census employee
+            if self.benefit_application.is_renewing?
+              # census_employee.add_renew_benefit_group_assignment(other_benefit_package)
+            else
+              # census_employee.find_or_create_benefit_group_assignment([other_benefit_package])
+            end
+          end
+        end
+
+        self.is_active = false
       end
 
       def build_relationship_benefits
