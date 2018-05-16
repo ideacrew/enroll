@@ -16,6 +16,8 @@ module BenefitSponsors
       TERMINATED_STATES             = [:denied, :suspended, :terminated, :canceled, :expired].freeze
       EXPIRED_STATES                = [:expired].freeze
 
+      PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + PLAN_DESIGN_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
+
       # APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
       # INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
 
@@ -95,7 +97,7 @@ module BenefitSponsors
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
       scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
-                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
+                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
                                                             }
 
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -115,6 +117,9 @@ module BenefitSponsors
       scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"open_enrollment_period.max" => compare_date)
                                                             }
+      # TODO
+      scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
+      scope :renewing,                        ->{ is_renewing } # Deprecate it in future
 
       # scope :by_effective_date_range,         ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
       # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
@@ -215,6 +220,14 @@ module BenefitSponsors
 
       def is_renewing?
         predecessor_application.present? && (PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+      end
+
+      def is_renewal_enrolling?
+        predecessor_application.present? && (ENROLLING_STATES).include?(aasm_state)
+      end
+
+      def open_enrollment_contains?(date)
+        open_enrollment_period.cover?(date)
       end
 
       # TODO Refactor -- use the new state: :open_enrollment_closed
@@ -461,6 +474,10 @@ module BenefitSponsors
         end
       end
 
+      def cancel_enrollments
+        # TODO
+      end
+
       def publish_state_transition
         return unless benefit_sponsorship.present?
         benefit_sponsorship.application_event_subscriber(aasm)
@@ -470,6 +487,20 @@ module BenefitSponsors
         if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
           approve_enrollment_eligiblity!
         end
+      end
+
+      def is_published?
+        PUBLISHED_STATES.include?(aasm_state)
+      end
+
+      def benefit_groups # Deprecate in future
+        warn "[Deprecated] Instead use benefit_packages" unless Rails.env.test?
+        benefit_packages
+      end
+
+      def employees_are_matchable? # Deprecate in future
+        warn "[Deprecated] Instead use is_published?" unless Rails.env.test?
+        is_published?
       end
 
       private

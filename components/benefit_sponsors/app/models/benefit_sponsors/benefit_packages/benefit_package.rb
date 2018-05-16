@@ -22,6 +22,8 @@ module BenefitSponsors
 
       delegate :rate_schedule_date, to: :benefit_application
 
+      delegate :start_on, :end_on, to: :benefit_application
+
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range
  
@@ -38,6 +40,16 @@ module BenefitSponsors
       # returns a roster
       def new_hire_effective_on(roster)
         
+      end
+
+      def eligible_on(date_of_hire)
+        # TODO
+        Date.today
+      end
+
+      def effective_on_for(date_of_hire)
+        # TODO
+        Date.today
       end
 
       # TODO: there can be only one sponsored benefit of each kind
@@ -92,6 +104,13 @@ module BenefitSponsors
           sponsored_benefit = sponsored_benefits.build
           sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
         end
+      end
+
+      # Deprecate below methods in future
+
+      def plan_year
+        warn "[Deprecated] Instead use benefit_application" unless Rails.env.test?
+        benefit_application
       end
     end
   end

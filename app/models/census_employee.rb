@@ -71,7 +71,7 @@ class CensusEmployee < CensusMember
   validates :expected_selection,
     inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   after_update :update_hbx_enrollment_effective_on_by_hired_on
-  after_save :assign_default_benefit_package
+  after_save :assign_benefit_packages
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
@@ -128,7 +128,8 @@ class CensusEmployee < CensusMember
   scope :order_by_last_name,    -> { order(:"census_employee.last_name".asc) }
   scope :order_by_first_name,   -> { order(:"census_employee.first_name".asc) }
 
-  scope :by_employer_profile_id,          ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+  # scope :by_employer_profile_id,          ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+  scope :by_employer_profile_id,          ->(benefit_sponsors_employer_profile_id) { where(benefit_sponsors_employer_profile_id: benefit_sponsors_employer_profile_id) }
   scope :non_business_owner,              ->{ where(is_business_owner: false) }
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
@@ -187,15 +188,26 @@ class CensusEmployee < CensusMember
     self.employment_terminated_on.next_month.beginning_of_month
   end
 
+  # def employer_profile=(new_employer_profile)
+  #   raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
+  #   self.employer_profile_id = new_employer_profile._id
+  #   @employer_profile = new_employer_profile
+  # end
+
+  # def employer_profile
+  #   return @employer_profile if defined? @employer_profile
+  #   @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+  # end
+
   def employer_profile=(new_employer_profile)
-    raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
-    self.employer_profile_id = new_employer_profile._id
+    raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
+    self.benefit_sponsors_employer_profile_id = new_employer_profile._id
     @employer_profile = new_employer_profile
   end
 
   def employer_profile
     return @employer_profile if defined? @employer_profile
-    @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+    @employer_profile = self.benefit_sponsorship.organization.employer_profile
   end
 
   # This performs employee summary count for waived and enrolled in the latest plan year
@@ -211,7 +223,7 @@ class CensusEmployee < CensusMember
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
     # Guard against linking employee roles with different employer/identifying information
-    if (self.employer_profile_id == new_employee_role.employer_profile._id)
+    if (self.benefit_sponsors_employer_profile_id == new_employee_role.benefit_sponsors_employer_profile_id)
       self.employee_role_id = new_employee_role._id
       @employee_role = new_employee_role
       self.link_employee_role! if self.may_link_employee_role?
@@ -238,7 +250,8 @@ class CensusEmployee < CensusMember
   end
 
   def renewal_benefit_group_assignment
-    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+    # benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
   end
 
   def inactive_benefit_group_assignments
@@ -258,14 +271,14 @@ class CensusEmployee < CensusMember
     result
   end
 
-  def add_default_benefit_group_assignment
-    if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
-      add_benefit_group_assignment(plan_year.benefit_groups.first)
-      if self.employer_profile.renewing_plan_year.present?
-        add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
-      end
-    end
-  end
+  # def add_default_benefit_group_assignment # Deprecated
+  #   if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
+  #     add_benefit_group_assignment(plan_year.benefit_groups.first)
+  #     if self.employer_profile.renewing_plan_year.present?
+  #       add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
+  #     end
+  #   end
+  # end
 
   def active_benefit_group
     if active_benefit_group_assignment.present?
@@ -429,27 +442,62 @@ class CensusEmployee < CensusMember
     "employee"
   end
 
-  def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
-    if benefit_group_id.present?
-      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+  # Deprecated
+  # def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
+    # if benefit_group_id.present?
+    #   benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
 
-      if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
-        find_or_create_benefit_group_assignment([benefit_group])
-      end
+    #   if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
+    #     find_or_create_benefit_group_assignment([benefit_group])
+    #   end
+    # end
+
+    # if renewal_benefit_group_id.present?
+    #   benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
+    #   if renewal_benefit_group_assignment.blank? || (renewal_benefit_group_assignment.benefit_group_id != benefit_group.id)
+    #     add_renew_benefit_group_assignment(benefit_group)
+    #   end
+    # end
+  # end
+
+  def assign_benefit_packages
+    # These will assign deafult benefit packages if not present
+    self.active_benefit_group_assignment = nil
+    self.renewal_benefit_group_assignment = nil
+  end
+
+  def active_benefit_group_assignment=(benefit_package_id)
+    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => benefit_package_id
+    ).first || employer_profile.active_benefit_sponsorship.current_benefit_application
+
+    if benefit_application.present?
+      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
     end
 
-    if renewal_benefit_group_id.present?
-      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
-      if renewal_benefit_group_assignment.blank? || (renewal_benefit_group_assignment.benefit_group_id != benefit_group.id)
-        add_renew_benefit_group_assignment(benefit_group)
-      end
+    if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
+      find_or_create_benefit_group_assignment(benefit_packages)
+    end
+  end
+
+  def renewal_benefit_group_assignment=(renewal_package_id)
+    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => renewal_package_id
+    ).first || employer_profile.active_benefit_sponsorship.renewal_benefit_application
+
+    if benefit_application.present?
+      benefit_packages = renewal_package_id.present? ? [benefit_application.benefit_packages.find(renewal_package_id)] : benefit_application.benefit_packages
+    end
+
+    if benefit_packages.present? && (renewal_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(renewal_benefit_group_assignment.benefit_package.id))
+      add_renew_benefit_group_assignment(benefit_packages)
     end
   end
 
   def send_invite!
     if has_benefit_group_assignment?
       plan_year = active_benefit_group_assignment.benefit_group.plan_year
-      if plan_year.employees_are_matchable?
+      if plan_year.is_published?
         Invitation.invite_employee_for_open_enrollment!(self)
         return true
       end
@@ -490,6 +538,7 @@ class CensusEmployee < CensusMember
     active_benefit_group_assignment.present? && active_benefit_group_assignment.initialized?
   end
 
+  # Deprecated in Main app
   def has_active_health_coverage?(plan_year) # Related code is commented out
     benefit_group_ids = plan_year.benefit_groups.map(&:id)
 
@@ -653,8 +702,11 @@ class CensusEmployee < CensusMember
       end
     end
 
+    # Deprecate in future
+
     def find_all_by_employer_profile(employer_profile)
-      unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
+      return unscoped.where(employer_profile_id: employer_profile._id).order_name_asc if employer_profile.is_a?(EmployerProfile)
+      employer_profile.census_employees.order_name_asc
     end
 
     alias_method :find_by_employer_profile, :find_all_by_employer_profile
@@ -671,7 +723,13 @@ class CensusEmployee < CensusMember
 
       if employer_profiles.size > 0
         employer_profile_ids = employer_profiles.map(&:_id)
-        query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
+        # query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
+        #                             where(
+        #                               :employment_terminated_on.gte => date_range.first,
+        #                               :employment_terminated_on.lte => date_range.last
+        #                             )
+
+        query = unscoped.terminated.any_in(benefit_sponsors_employer_profile_id: employer_profile_ids).
                                     where(
                                       :employment_terminated_on.gte => date_range.first,
                                       :employment_terminated_on.lte => date_range.last
@@ -1026,7 +1084,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_census_employee_is_unique
-    potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
+    potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(benefit_sponsors_employer_profile_id).active
     if potential_dups.detect { |dup| dup.id != self.id  }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
@@ -1063,6 +1121,15 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
+  end
+
+  def past_enrollments
+    if employee_role.present?
+      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.where({
+        :"aasm_state".in => ["coverage_terminated", "coverage_termination_pending"],
+        :"benefit_group_assignment_id".in => benefit_group_assignments.map(&:id)
+      })
+    end
   end
 
   def notify_terminated

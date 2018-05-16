@@ -142,6 +142,20 @@ module BenefitSponsors
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?
       end
+      # If there is a gap, it will fall under a new benefit sponsorship
+      # Renewal_benefit_application's predecessor_application is always current benefit application
+      # Latest benefit_application will always be their current benefit_application if no renewal
+      def current_benefit_application
+        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : benefit_applications.order_by(:"created_at".desc).first
+      end
+
+      def renewal_benefit_application
+        benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
+      end
+
+      def renewing_published_benefit_application # TODO -recheck
+        benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
+      end
 
       # TODO Refactor (moved from PlanYear)
       # def overlapping_published_plan_years
