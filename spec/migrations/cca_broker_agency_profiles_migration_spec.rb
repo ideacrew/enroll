@@ -38,7 +38,10 @@ describe "CcaBrokerAgencyProfilesMigration" do
     end
 
     it "should match total migrated organizations with employer profiles" do
-      Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      silence_stream(STDOUT) do
+        Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      end
+
       expect(@migrated_organizations.count).to eq @old_organizations.count
     end
 
@@ -103,5 +106,9 @@ describe "CcaBrokerAgencyProfilesMigration" do
                                                                hbx_id: old_organization.hbx_id, home_page: old_organization.home_page, legal_name: old_organization.legal_name,
                                                                dba: old_organization.dba)
     end
+  end
+
+  after(:all) do
+    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//cca_broker_profile_migration_*"])
   end
 end

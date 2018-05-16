@@ -19,14 +19,32 @@ module BenefitSponsors
           application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
         )}
 
-        let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
+        let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
           benefit_market: benefit_market, 
           title: "SHOP Benefits for #{renewal_effective_date.year}", 
           application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
         )}
 
-        let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
-        let(:initial_application) { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
+        let!(:map_renewal_products) {
+          current_benefit_market_catalog.product_packages.each do |product_package|
+            if renewal_product_package = renewal_benefit_market_catalog.product_packages.detect{ |p| 
+              p.kind == product_package.kind && p.product_kind == product_package.product_kind }
+
+              renewal_product_package.products.each_with_index do |renewal_product, i|
+                current_product = product_package.products[i]
+                current_product.update(renewal_product_id: renewal_product.id)
+              end
+            end
+          end
+        }
+
+        let(:benefit_sponsorship) { 
+          create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, benefit_market: benefit_market) 
+        }
+
+        let(:initial_application) { 
+          create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period)
+        }
 
         let(:renewal_benefit_sponsor_catalog) { 
           benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) 
@@ -37,14 +55,17 @@ module BenefitSponsors
         }
 
         let(:single_issuer_product_package) {
-          initial_application.benefit_sponsor_catalog.product_packages.detect{|package| package.kind == :single_issuer}
+          initial_application.benefit_sponsor_catalog.product_packages.detect{|package| 
+            package.kind == :single_issuer
+          }
         }
 
         let(:current_benefit_package) { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package) }
         let(:renewal_benefit_package) { renewal_application.benefit_packages.build }
 
-        it "should build renewal benefit package" do
 
+        it "should build renewal benefit package" do
+          current_benefit_package.renew(renewal_benefit_package)
         end 
       end
     end

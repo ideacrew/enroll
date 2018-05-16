@@ -41,7 +41,10 @@ describe "CcaEmployerProfilesMigration" do
     end
 
     it "should match total migrated organizations" do
-      Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      silence_stream(STDOUT) do
+        Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      end
+
       expect(@migrated_organizations.count).to eq 1
     end
 
@@ -112,8 +115,11 @@ describe "CcaEmployerProfilesMigration" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
       ce = CensusEmployee.where(employer_profile_id: old_profile.id).first
-      nce = CensusEmployee.where(benefit_sponsor_employer_profile_id: migrated_profile.id).first
+      nce = CensusEmployee.where(benefit_sponsors_employer_profile_id: migrated_profile.id).first
       expect(ce).to eq(nce)
     end
+  end
+  after(:all) do
+    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//employer_profiles_migration_*"])
   end
 end

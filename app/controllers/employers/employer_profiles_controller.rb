@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
-  include Config::AcaConcern
+  include ::Config::AcaConcern
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]

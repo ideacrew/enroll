@@ -35,7 +35,10 @@ describe "CcaCarrierProfilesMigration" do
     end
 
     it "should match total migrated organizations with carrier profiles" do
-      Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      silence_stream(STDOUT) do
+        Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
+      end
+
       expect(@migrated_organizations.count).to eq 9
     end
 
@@ -58,6 +61,9 @@ describe "CcaCarrierProfilesMigration" do
     it "should match phone" do
       expect(@migrated_organizations.first.issuer_profile.office_locations.first.phone.full_phone_number).to eq @old_organizations.first.office_locations.first.phone.full_phone_number
     end
+  end
+  after(:all) do
+    FileUtils.rm_rf(Dir["#{Rails.root}//hbx_report//carrier_profile_migration_*"])
   end
 end
 
