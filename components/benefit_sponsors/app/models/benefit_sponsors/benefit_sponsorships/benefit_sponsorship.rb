@@ -43,7 +43,6 @@ module BenefitSponsors
 
       field :hbx_id,              type: String
       field :profile_id,          type: BSON::ObjectId
-      field :contact_method,      type: Symbol, default: :paper_and_electronic
 
       # Effective begin/end are the date period during which this benefit sponsorship is active
       # Date when initial application coverage starts for this sponsor
@@ -103,10 +102,6 @@ module BenefitSponsors
 
       validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
-      validates :contact_method,
-        inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
-        allow_blank: false
-
       validates :source_kind,
         inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
         allow_blank: false
@@ -160,9 +155,9 @@ module BenefitSponsors
       # Workflow for self service
       aasm do
         state :new, initial: true
-        state :initial_application_approved # Sponsor's first application is submitted and approved     
+        state :initial_application_approved # Sponsor's first application is submitted and approved
         state :initial_enrollment_closed    # Sponsor members have successfully completed open enrollment
-        state :initial_enrollment_ineligible       
+        state :initial_enrollment_ineligible
         state :initial_enrollment_eligible, after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
                                         #, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
         state :active                   # Sponsor's members are actively enrolled in coverage
@@ -174,7 +169,7 @@ module BenefitSponsors
           transitions from: :new, to: :initial_application_approved
         end
 
-        event :close_initial_enrollment do 
+        event :close_initial_enrollment do
           transitions from: :initial_application_approved, to: :initial_enrollment_closed
         end
 
@@ -200,7 +195,7 @@ module BenefitSponsors
           transitions from: [:new, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
         end
 
-        event :terminate do 
+        event :terminate do
           transitions from: [:active, :suspended], to: :terminated
         end
 
@@ -208,7 +203,7 @@ module BenefitSponsors
           transitions from: :active, to: :suspended
         end
 
-        event :unsuspend do 
+        event :unsuspend do
           transitions from: :suspended, to: :active
         end
 
@@ -217,7 +212,7 @@ module BenefitSponsors
         end
 
         event :reactivate do
-          transitions from: :terminated, to: :initial_application_approved 
+          transitions from: :terminated, to: :initial_application_approved
         end
 
         event :ban do
@@ -230,7 +225,7 @@ module BenefitSponsors
       end
 
       def publish_binder_paid
-        benefit_applications.each do |benefit_application| 
+        benefit_applications.each do |benefit_application|
           benefit_application.application_event_subscriber(aasm)
         end
       end

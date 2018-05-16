@@ -14,7 +14,7 @@ module BenefitSponsors
     let!(:broker_role2) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id, person: person2) }
     let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: employer_profile.organization) }
+    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: employer_profile.organization, profile: employer_profile) }
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::Forms::BrokerManagementForm }
 
     before :each do
