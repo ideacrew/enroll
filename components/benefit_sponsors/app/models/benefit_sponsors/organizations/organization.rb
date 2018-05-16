@@ -156,6 +156,10 @@ module BenefitSponsors
         self.profiles.where(_type: /.*HbxProfile$/).first
       end
 
+      def issuer_profile
+        self.profiles.where(_type: /.*IssuerProfile$/).first
+      end
+
       def is_an_issuer_profile?
         self.profiles.where(_type: /.*IssuerProfile$/).present?
       end
@@ -182,10 +186,19 @@ module BenefitSponsors
           }
         end
 
+        def search_agencies_by_criteria(search_params)
+          query_params = build_query_params(search_params)
+          if query_params.any?
+            self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({ "$and" => build_query_params(search_params) })
+          else
+            self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
+          end
+        end
+
         def broker_agencies_with_matching_agency_or_broker(search_params)
           if search_params[:q].present?
-            orgs2 = self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
-              "broker_agency_profile._id" => {
+            orgs2 = self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
+              :"profiles._id" => {
                 "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
               }
             })
@@ -207,7 +220,7 @@ module BenefitSponsors
 
         def filter_brokers_by_agencies(agencies, brokers)
           agency_ids = agencies.map{|org| org.broker_agency_profile.id}
-          brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
+          brokers.select{ |broker| agency_ids.include?(broker.broker_role.benefit_sponsors_broker_agency_profile_id) }
         end
 
         def build_query_params(search_params)

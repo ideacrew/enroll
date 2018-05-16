@@ -5,7 +5,7 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    let(:staff_class) { BenefitSponsors::Organizations::Forms::StaffRoleForm }
+    let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
     let!(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let!(:new_benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}

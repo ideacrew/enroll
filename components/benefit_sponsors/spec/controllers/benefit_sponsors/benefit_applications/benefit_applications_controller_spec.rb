@@ -9,21 +9,25 @@ module BenefitSponsors
     let(:user) { FactoryGirl.create :user}
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog, :dc) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization,benefit_market: site.benefit_markets[0]) }
+    let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: site.benefit_markets[0], employer_attestation: employer_attestation) }
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
+    let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+    let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
+
 
     let(:benefit_application_params) {
 
       {
         :start_on => effective_period_start_on,
         :end_on => effective_period_end_on,
-        :fte_count => "1",
-        :pte_count => "1",
-        :msp_count => "1",
+        :fte_count => "5",
+        :pte_count => "5",
+        :msp_count => "5",
         :open_enrollment_start_on => open_enrollment_period_start_on,
         :open_enrollment_end_on => open_enrollment_period_end_on,
         :benefit_sponsorship_id => benefit_sponsorship_id
@@ -31,6 +35,7 @@ module BenefitSponsors
     }
 
     before do
+      benefit_sponsorship.save
       benefit_sponsorship.benefit_market.update_attributes!(:site_urn => site.site_key)
     end
 
@@ -106,10 +111,16 @@ module BenefitSponsors
 
       let(:params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
+            open_enrollment_period: open_enrollment_period,
+            fte_count: "5",
+            pte_count: "5",
+            msp_count: "5",
           }
         }
+
       let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
 
       before do
@@ -141,10 +152,18 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
+            open_enrollment_period: open_enrollment_period,
+            fte_count: "5",
+            pte_count: "5",
+            msp_count: "5",
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
 
       before do
@@ -199,10 +218,18 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
+            open_enrollment_period: open_enrollment_period,
+            fte_count: "5",
+            pte_count: "5",
+            msp_count: "5",
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
 
       before do
@@ -212,14 +239,14 @@ module BenefitSponsors
         benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
       end
 
-      def sign_in_and_publish
+      def sign_in_and_submit_application
         sign_in user
-        post :publish, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "benefit application published sucessfully" do
         it "should redirect with success message" do
-          sign_in_and_publish
+          sign_in_and_submit_application
           expect(flash[:notice]).to eq "Benefit Application successfully published."
         end
       end
@@ -227,36 +254,36 @@ module BenefitSponsors
       context "benefit application published sucessfully but with warning" do
 
         before do
-          allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive_message_chain('assigned_census_employees_without_owner.present?').and_return(false)
+          allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive_message_chain('assigned_census_employees_without_owner.present?').and_return(false)
         end
 
         it "should redirect with success message" do
-          sign_in_and_publish
+          sign_in_and_submit_application
           expect(flash[:notice]).to eq "Benefit Application successfully published."
           expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
         end
       end
 
-      context "benefit application did not publish due to warnings" do
+      context "benefit application is not submitted due to warnings" do
 
         before :each do
           allow_any_instance_of(BenefitSponsors::Organizations::AcaShopDcEmployerProfile).to receive(:is_primary_office_local?).and_return(false)
         end
 
         it "should display warnings" do
-          sign_in_and_publish
-          expect(flash[:error]).to match(/Primary office location Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}/)
+          sign_in_and_submit_application
+          expect(flash[:error]).to match(/Is a small business located in #{Settings.aca.state_name}/)
         end
       end
 
-      context "benefit application did not publish due to errors" do
+      context "benefit application is not submitted" do
         before :each do
-          ben_app.benefit_packages.destroy
+          ben_app.update_attributes!(aasm_state: "pending")
         end
 
         it "should redirect with errors" do
-          sign_in_and_publish
-          expect(flash[:error]).to match(/Benefit Application failed to publish/)
+          sign_in_and_submit_application
+          expect(flash[:error]).to match(/Benefit Application failed to submit/)
         end
       end
     end
@@ -268,8 +295,13 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
+            open_enrollment_period: open_enrollment_period,
+            fte_count: "5",
+            pte_count: "5",
+            msp_count: "5",
           }
         }
       let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
@@ -312,10 +344,18 @@ module BenefitSponsors
 
       let(:ben_app_params) {
           {
+            recorded_rating_area: rating_area,
+            recorded_service_area: service_area,
             effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
+            open_enrollment_period: open_enrollment_period,
+            fte_count: "5",
+            pte_count: "5",
+            msp_count: "5",
           }
         }
+
+      let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+      let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
       let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
 
       before do

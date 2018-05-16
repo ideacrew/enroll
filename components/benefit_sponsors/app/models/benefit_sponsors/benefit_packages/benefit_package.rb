@@ -49,18 +49,26 @@ module BenefitSponsors
         sponsored_benefits.delete(sponsored_benefit)
       end
 
-      # new_benefit_package...new instance or existing instance
       def renew(new_benefit_package)
-        # new ?
-        # copy common attributes
-        # renew sponsored benefits
+        new_benefit_package.assign_attributes({
+          title: title,
+          description: description,
+          probation_period_kind: probation_period_kind,
+          is_default: is_default
+        })
         
         sponsored_benefits.each do |sponsored_benefit|
-          # product package from catalog
-          # validate renewal products available (outside information)
+          product_package = new_benefit_package.benefit_sponsor_catalog.product_packages.detect do |product_package|
+            product_package.kind == sponsored_benefit.product_option_kind
+          end
 
-          new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
-          new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
+          next if product_package.blank?
+          renewal_products = product_package.products.collect{|product| product.renewal_product}.compact
+
+          if (product_package.products & renewal_products).any?
+            new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
+            new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
+          end
         end
       end
 

@@ -3,7 +3,7 @@ module BenefitSponsors
     class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
-      include BenefitSponsors::Concerns::RecordTransition
+      # include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
       PLAN_DESIGN_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
@@ -48,14 +48,16 @@ module BenefitSponsors
 
 
       # Create a doubly-linked list of application chain:
-      # predecessor_application is nil if it's the first in an application chain without
-      # gaps in dates.  Otherwise, it references the preceding application that it replaces
-      # successor_application is nil if this is the last in an application chain without
-      # gaps in dates.  Otherwise, it references the application which immediately follows
-      has_one     :predecessor_application, inverse_of: :successor_application,
+      #   predecessor_application is nil if it's the first in an application chain without
+      #   gaps in dates.  Otherwise, it references the preceding application that it replaces
+      #   successor_applications are nil if this is the last in an application chain without
+      #   gaps in dates.  Otherwise, it references the applications which immediately follow.
+      #   An application may have multiple successors, but only one may be active at once
+      belongs_to  :predecessor_application, inverse_of: :successor_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      belongs_to  :successor_application, inverse_of: :predecessor_application,
+      has_many    :successor_applications, inverse_of: :predecessor_application,
+                  counter_cache: true,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       belongs_to  :recorded_rating_area,
@@ -76,7 +78,7 @@ module BenefitSponsors
 
       validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_area, :recorded_rating_area
 
-      index({ "aasm" => 1 })
+      index({ "aasm_state" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
 
@@ -92,8 +94,8 @@ module BenefitSponsors
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
-      scope :is_renewing,                     ->{ exists?(:predecessor_application => true,
-                                                          :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
+      scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
+                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
                                                             }
 
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -212,7 +214,7 @@ module BenefitSponsors
       end
 
       def is_renewing?
-        predecessor_application.present? && PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES.include?(aasm_state)
+        predecessor_application.present? && (PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
       end
 
       # TODO Refactor -- use the new state: :open_enrollment_closed
@@ -233,7 +235,7 @@ module BenefitSponsors
       # BenefitApplication instance's effective_period
       # @return [ BenefitApplication ] The built renewal application instance and submodels
       def renew(benefit_sponsor_catalog)
-        if benefit_sponsor_catalog.effective_date.min != end_on + 1.day
+        if benefit_sponsor_catalog.effective_date != end_on + 1.day
           raise StandardError, "effective period must begin on #{end_on + 1.day}"
         end
 
@@ -242,7 +244,7 @@ module BenefitSponsors
             pte_count:                pte_count,
             msp_count:                msp_count,
             benefit_sponsor_catalog:  benefit_sponsor_catalog,
-            preceding_application:    self,
+            predecessor_application:    self,
             recorded_service_area:    benefit_sponsorship.service_area,
             recorded_rating_area:     benefit_sponsorship.rating_area,
             effective_period:         benefit_sponsor_catalog.effective_period,
@@ -250,13 +252,31 @@ module BenefitSponsors
           )
 
         benefit_packages.each do |benefit_package|
-          new_benefit_package = renewal_application.benefit_packages.new
+          new_benefit_package = renewal_application.benefit_packages.build
           benefit_package.renew(new_benefit_package)
         end
 
         renewal_application
       end
 
+      def is_event_date_valid?
+        today = TimeKeeper.date_of_record
+
+        valid = case aasm_state
+        when "approved", "draft"
+          today >= open_enrollment_period.begin
+        when "enrollment_open"
+          today > open_enrollment_period.end
+        when "enrollment_closed"
+          today >= effective_period.begin
+        when "active"
+          today > effective_period.end
+        else
+          false
+        end
+
+        valid
+      end
 
       aasm do
         state :draft, initial: true
@@ -327,9 +347,8 @@ module BenefitSponsors
 
         # Submit plan year application
         event :submit_application do
-          transitions from: :draft, to: :draft,           guard:  :is_application_unpublishable?
-          transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
-          transitions from: :draft, to: :approved,        guard:  :is_application_eligible?#, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
+          transitions from: :draft, to: :enrollment_open, guard:  [:is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
+          transitions from: :draft, to: :approved #, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
 
           ## TODO update these renewal transitions
           # transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
@@ -363,6 +382,10 @@ module BenefitSponsors
         # Upon review, application ineligible status overturned and deemed eligible
         event :approve_application do
           transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :approved
+        end
+
+        event :submit_for_review do
+          transitions from: :draft, to: :pending
         end
 
         # Upon review, submitted application ineligible status verified ineligible
@@ -437,8 +460,9 @@ module BenefitSponsors
           transitions from: [:suspended, :terminated], to: :active, after: :reset_termination_and_end_date
         end
       end
-     
+
       def publish_state_transition
+        return unless benefit_sponsorship.present?
         benefit_sponsorship.application_event_subscriber(aasm)
       end
 

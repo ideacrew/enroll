@@ -21,6 +21,7 @@ module BenefitMarkets
     field :description,           type: String, default: ""
     field :issuer_profile_id,     type: BSON::ObjectId
     field :product_package_kinds, type: Array, default: []
+    field :_type,                 type: String
 
 
     belongs_to  :service_area,

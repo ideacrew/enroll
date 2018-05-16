@@ -3,9 +3,7 @@ require 'rails_helper'
 describe "CcaEmployerProfilesMigration" do
 
   before :all do
-    # Dir[Rails.root.join("components/benefit_sponsors/spec/factories/benefit_sponsors_*.rb")].each do |f|
-    #   require f
-    # end
+    DatabaseCleaner.clean
 
     Dir[Rails.root.join('db', 'migrate', '*_cca_employer_profiles_migration.rb')].each do |f|
       @path = f
@@ -16,16 +14,24 @@ describe "CcaEmployerProfilesMigration" do
   describe ".up" do
 
     before :all do
-      site = FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)
+      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)
+
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
-      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
+      FactoryGirl.create(:broker_agency_profile, organization: organization)
+
       organization1 = FactoryGirl.create(:organization, legal_name: "Delta Dental")
-      carrier_profile = FactoryGirl.create(:carrier_profile, organization: organization1)
-      @employer_profile = FactoryGirl.create(:employer_profile)
-      # @employer_profile.organization.home_page = nil
-      inbox = FactoryGirl.create(:inbox, :with_message, recipient: @employer_profile)
-      employer_staff_role = FactoryGirl.create(:employer_staff_role, employer_profile_id: @employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
-      employee_role = FactoryGirl.create(:employee_role, employer_profile: @employer_profile)
+      FactoryGirl.create(:carrier_profile, organization: organization1)
+
+      employer_profile = FactoryGirl.create(:employer_profile)
+      document1 = FactoryGirl.build(:document)
+      document2 = FactoryGirl.build(:document)
+      employer_profile.organization.documents << document1
+      employer_profile.documents << document2
+      # employer_profile.organization.home_page = nil
+      FactoryGirl.create(:inbox, :with_message, recipient: employer_profile)
+      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
+      FactoryGirl.create(:employee_role, employer_profile: employer_profile)
+      FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)
 
       @migrated_organizations = BenefitSponsors::Organizations::Organization.employer_profiles
       @old_organizations = Organization.all_employer_profiles
@@ -34,9 +40,9 @@ describe "CcaEmployerProfilesMigration" do
       @test_version = @path.split("/").last.split("_").first
     end
 
-    it "should match total migrated organizations with employer profiles" do
+    it "should match total migrated organizations" do
       Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
-      expect(@migrated_organizations.count).to eq @old_organizations.count
+      expect(@migrated_organizations.count).to eq 1
     end
 
     it "should not migrate organizations with broker agency profile" do
@@ -55,7 +61,7 @@ describe "CcaEmployerProfilesMigration" do
 
     it "should match office locations" do
       migrated_profile = @migrated_organizations.first.employer_profile
-      expect(migrated_profile.office_locations.count).to eq @old_organizations.first.office_locations.count
+      expect(migrated_profile.office_locations.count).to eq 2
     end
 
     it "should match all migrated attributes for address" do
@@ -80,8 +86,9 @@ describe "CcaEmployerProfilesMigration" do
 
     it "should be same person with old profile id and migrated profile id" do
       migrated_profile = @migrated_organizations.first.employer_profile
+      old_profile = @old_organizations.first.employer_profile
       person_with_old_profile_id = Person.where(:employer_staff_roles => {'$elemMatch' => {benefit_sponsor_employer_profile_id: migrated_profile.id}}).first
-      person_with_migrated_profile_id = Person.where(:employer_staff_roles => {'$elemMatch' => {employer_profile_id: @employer_profile.id}}).first
+      person_with_migrated_profile_id = Person.where(:employer_staff_roles => {'$elemMatch' => {employer_profile_id: old_profile.id}}).first
       expect(person_with_old_profile_id).to eq person_with_migrated_profile_id
     end
 
@@ -99,6 +106,14 @@ describe "CcaEmployerProfilesMigration" do
       expect(@migrated_organizations.first).to have_attributes(entity_kind: @old_organizations.first.employer_profile.entity_kind.to_sym, created_at: old_organization.created_at,
                                                                hbx_id: old_organization.hbx_id, home_page: old_organization.home_page, legal_name: old_organization.legal_name,
                                                                dba: old_organization.dba, fein: old_organization.fein)
+    end
+
+    it "should match all migrated attributes for census employee" do
+      migrated_profile = @migrated_organizations.first.employer_profile
+      old_profile = @old_organizations.first.employer_profile
+      ce = CensusEmployee.where(employer_profile_id: old_profile.id).first
+      nce = CensusEmployee.where(benefit_sponsor_employer_profile_id: migrated_profile.id).first
+      expect(ce).to eq(nce)
     end
   end
 end

@@ -3,7 +3,7 @@ require_dependency "benefit_sponsors/application_controller"
 module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
 
-    include Concerns::ProfileRegistration
+    include BenefitSponsors::Concerns::ProfileRegistration
     include Pundit
 
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized

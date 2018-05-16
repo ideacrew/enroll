@@ -108,6 +108,15 @@ module BenefitSponsors
           expect(valid_create_benefit_sponsorships.valid?).to be_truthy
         end
       end
+
+      context "when benefit sponsorship is CCA SHOP employer" do
+        let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
+
+        it "should be valid" do
+          expect(benefit_sponsorship.valid?).to be true
+        end
+
+      end
     end
 
     context "Working with subclassed parent Profiles" do

@@ -71,15 +71,15 @@ module BenefitSponsors
         id.present?
       end
 
-      def publish
-        save_result, persisted_object = service.publish(self)
+      def submit_application
+        save_result, persisted_object = service.submit_application(self)
         @show_page_model = persisted_object
         return false unless save_result
         true
       end
 
-      def force_publish
-        save_result, persisted_object = service.force_publish(self)
+      def force_submit_application
+        save_result, persisted_object = service.force_submit_application(self)
         @show_page_model = persisted_object
         true
       end

@@ -1,7 +1,6 @@
 module BenefitSponsors
   module Profiles
     class Employers::BrokerAgencyController < ApplicationController
-      include Acapi::Notifiers
       before_action :find_employer
       before_action :find_broker_agency, :except => [:index, :active_broker]
       before_action :updateable?, only: [:create, :terminate]
@@ -45,36 +44,21 @@ module BenefitSponsors
       def create
         @broker_managenement_form = BenefitSponsors::Organizations::Forms::BrokerManagementForm.for_create(params)
         @broker_managenement_form.save
-
         flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
         redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: 'brokers')
       rescue => e
         error_msgs = @broker_managenement_form.errors.map(&:full_messages) if @broker_managenement_form.errors
         redirect_to(:back, :flash => {error: error_msgs})
-        log("#4095 #{e.message}; employer_profile: #{@broker_managenement_form.employer_profile_id}; #{error_msgs}", {:severity => "error"})
       end
 
       def terminate
         @broker_managenement_form = BenefitSponsors::Organizations::Forms::BrokerManagementForm.for_terminate(params)
-        result = @broker_managenement_form.terminate
 
-        respond_to do |format|
-          format.js {
-            if result
-              flash[:notice] = "Broker terminated successfully."
-              render text: true
-            else
-              render text: false
-            end
-          }
-          format.all {
-            flash[:notice] = "Broker terminated successfully."
-            if @broker_managenement_form.direct_terminate
-              redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: "brokers")
-            else
-              redirect_to profiles_employers_employer_profile_path(@employer_profile)
-            end
-          }
+        if @broker_managenement_form.terminate && @broker_managenement_form.direct_terminate
+          flash[:notice] = "Broker terminated successfully."
+          redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: "brokers")
+        else
+          redirect_to profiles_employers_employer_profile_path(@employer_profile)
         end
       end
 
@@ -85,12 +69,16 @@ module BenefitSponsors
       end
 
       def find_employer
-        @employer_profile = BenefitSponsors::Organizations::Profile.find(params["employer_profile_id"])
+        @employer_profile = find_profile(params["employer_profile_id"])
       end
 
       def find_broker_agency
         id = params[:id] || params[:broker_agency_id]
-        @broker_agency_profile = BrokerAgencyProfile.find(id)
+        @broker_agency_profile = find_profile(id)
+      end
+
+      def find_profile(id)
+        BenefitSponsors::Organizations::Profile.find(id)
       end
     end
   end

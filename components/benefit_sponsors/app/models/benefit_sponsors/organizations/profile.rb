@@ -1,5 +1,5 @@
 # Profile
-# Base class with attributes, validations and constraints common to all Profile classes 
+# Base class with attributes, validations and constraints common to all Profile classes
 # embedded in an Organization
 module BenefitSponsors
   module Organizations
@@ -11,14 +11,15 @@ module BenefitSponsors
 
       # Profile subclass may sponsor benefits
       field :is_benefit_sponsorship_eligible, type: Boolean, default: false
-      field :contact_method
+
+      # TODO: Add logic to manage benefit sponsorships for Gapped coverage, early termination, banned employers
 
       # Share common attributes across all Profile kinds
       delegate :hbx_id,                                 to: :organization, allow_nil: false
       delegate :legal_name,               :legal_name=, to: :organization, allow_nil: false
       delegate :dba,                      :dba=,        to: :organization, allow_nil: true
       delegate :fein,                     :fein=,       to: :organization, allow_nil: true
-  
+
       embeds_many :office_locations,
                   class_name:"BenefitSponsors::Locations::OfficeLocation"
 
@@ -53,6 +54,7 @@ module BenefitSponsors
       #   write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
       #   @benefit_sponsorship = benefit_sponsorship
       # end
+
 
       def primary_office_location
         office_locations.detect(&:is_primary?)

@@ -1,21 +1,21 @@
 class BenefitApplicationMigration < Mongoid::Migration
 
   def self.up
-    site_key = "dc"
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-    file_name = "#{Rails.root}/hbx_report/benefit_application_status#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-    field_names = %w( organization_id benefit_sponsor_organization_id status)
-    logger = Logger.new("#{Rails.root}/log/benefit_application_migration.log")
-    logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
-    CSV.open(file_name, 'w') do |csv|
-      csv << field_names
-      status = create_benefit_application(site_key, csv, logger)
-      if status
-        puts "Check the report and logs for futher information"
-      else
-        puts "Data migration failed"
-      end
-    end
+    # site_key = "dc"
+    # Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    # file_name = "#{Rails.root}/hbx_report/benefit_application_status#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
+    # field_names = %w( organization_id benefit_sponsor_organization_id status)
+    # logger = Logger.new("#{Rails.root}/log/benefit_application_migration.log")
+    # logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
+    # CSV.open(file_name, 'w') do |csv|
+    #   csv << field_names
+    #   status = create_benefit_application(site_key, csv, logger)
+    #   if status
+    #     puts "Check the report and logs for futher information"
+    #   else
+    #     puts "Data migration failed"
+    #   end
+    # end
   end
 
   def self.down

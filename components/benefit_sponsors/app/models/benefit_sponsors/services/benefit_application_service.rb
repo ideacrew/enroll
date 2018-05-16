@@ -29,15 +29,18 @@ module BenefitSponsors
         store(form, benefit_application)
       end
 
+      # TODO: needs to be reviewed due to benefit_application state machine changes
       def revert(form)
         benefit_application = find_model_by_id(form.id)
-        if benefit_application.may_revert_renewal?
-          if benefit_application.revert_renewal!
-            return [true, benefit_application]
-          else
-            get_application_errors_for_revert(benefit_application, form)
-          end
-        elsif benefit_application.may_revert_application?
+
+        # if benefit_application.may_revert_renewal?
+        #   if benefit_application.revert_renewal!
+        #     return [true, benefit_application]
+        #   else
+        #     get_application_errors_for_revert(benefit_application, form)
+        #   end
+
+        if benefit_application.may_revert_application?
           if benefit_application.revert_application!
             return [true, benefit_application]
           else
@@ -48,34 +51,24 @@ module BenefitSponsors
         [false, benefit_application]
       end
 
-      def force_publish(form)
+      def force_submit_application(form)
         benefit_application = find_model_by_id(form.id)
-        benefit_application.force_publish!
+        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+        service.force_submit_application
         [true, benefit_application]
       end
 
-      def publish(form)
+      def submit_application(form)
         benefit_application = find_model_by_id(form.id)
-        if benefit_application.may_publish? && !benefit_application.is_application_eligible?
-          benefit_application.application_eligibility_warnings.each do |k, v|
+        enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+        saved_result, benefit_application, errors = enrollment_service.submit_application
+
+        if errors.present?
+          errors.each do |k, v|
             form.errors.add(k, v)
           end
-          return [false, benefit_application]
-        else
-          benefit_application.publish! if benefit_application.may_publish?
-          if (benefit_application.published? || benefit_application.enrolling? || benefit_application.renewing_published? || benefit_application.renewing_enrolling?)
-            unless benefit_application.assigned_census_employees_without_owner.present?
-              form.errors.add(:base, "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?")
-            end
-            return [true, benefit_application]
-          else
-            errors = benefit_application.application_errors.merge(benefit_application.open_enrollment_date_errors)
-            errors.each do |k, v|
-              form.errors.add(k, v)
-            end
-            return [false, benefit_application]
-          end
         end
+        [saved_result, benefit_application]
       end
      
       def update(form) 
@@ -137,6 +130,7 @@ module BenefitSponsors
         if valid_according_to_factory
           benefit_sponsorship = benefit_application.benefit_sponsorship || find_benefit_sponsorship(form)
           benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
+          assign_rating_and_service_area(benefit_application)
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
@@ -147,6 +141,12 @@ module BenefitSponsors
           return [false, nil]
         end
         [true, benefit_application]
+      end
+
+      #TODO: FIX this method once countzips are loaded
+      def assign_rating_and_service_area(benefit_application)
+        benefit_application.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.new
+        benefit_application.recorded_service_area = ::BenefitMarkets::Locations::ServiceArea.new
       end
 
       def map_errors_for(benefit_application, onto:)

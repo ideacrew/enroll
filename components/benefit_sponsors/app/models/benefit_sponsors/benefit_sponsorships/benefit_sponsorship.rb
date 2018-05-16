@@ -17,6 +17,7 @@ module BenefitSponsors
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
+      include Config::AcaModelConcern
       # include Concerns::Observable
       include AASM
 
@@ -99,6 +100,8 @@ module BenefitSponsors
                   inverse_of: :benefit_sponsorship_docs,
                   class_name: "BenefitSponsors::Documents::Document"
 
+      embeds_one :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
+
 
       validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
@@ -135,6 +138,10 @@ module BenefitSponsors
         benefit_market.benefit_sponsor_catalog_for([], effective_date)
       end
 
+      def is_attestation_eligible?
+        return true unless enforce_employer_attestation?
+        employer_attestation.present? && employer_attestation.is_eligible?
+      end
 
       # TODO Refactor (moved from PlanYear)
       # def overlapping_published_plan_years

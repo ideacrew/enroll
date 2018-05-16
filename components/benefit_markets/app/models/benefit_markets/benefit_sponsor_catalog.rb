@@ -43,17 +43,37 @@ module BenefitMarkets
     # def is_product_package_update_available?
     #   product_packages.any?{|product_package| benefit_market_catalog.is_product_package_updated?(product_package) }
     # end
+
+
+ 
+
+    #FIX ME: Use configuration from benefit market
+    def open_enrollment_start
+      effective_date - 2.months
+    end
+
+    # FIX ME: Use configuration from benefit market
+    def open_enrollment_end
+      open_enrollment_month = effective_date.prev_month
+      Date.new(open_enrollment_month.year, open_enrollment_month.month, 20)
+    end
+    
+    def effective_period
+      effective_date..effective_date.next_year.prev_day
+    end
+
+    def open_enrollment_period
+      open_enrollment_start..open_enrollment_end
+    end
     
     def product_active_year
       benefit_application.effective_period.begin.year
     end
 
-    # plan_option_kind: metal_level/single_issuer/single_product
-    # plan_option_choice: <metal level name>/<issuer name>
-    def products_for(plan_option_kind, plan_option_choice)
-      product_package = product_packages.by_kind(plan_option_kind.to_sym).first
+    # product_option_choice: <metal level name>/<issuer name>
+    def products_for(product_package, product_option_choice)
       return [] unless product_package
-      product_package.products_for_plan_option_choice(plan_option_choice)
+      product_package.products_for_plan_option_choice(product_option_choice)
     end
   end
 end
