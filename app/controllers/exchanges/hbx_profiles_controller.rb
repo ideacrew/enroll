@@ -1,5 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  include DataTablesAdapter
+  include ::DataTablesAdapter
   include DataTablesSearch
   include Pundit
   include SepAll

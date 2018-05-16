@@ -9,6 +9,7 @@ module BenefitSponsors
       def create
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
         if @benefit_package_form.save
+          flash[:notice] = "Benefit Package successfully created."
           redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.service.benefit_application, @benefit_package_form.show_page_model)
         else
           flash[:error] = error_messages(@benefit_package_form)
@@ -28,6 +29,16 @@ module BenefitSponsors
           flash[:error] = error_messages(@benefit_package_form)
           render :edit
         end
+      end
+
+      def destroy
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.fetch(params.permit(:id, :benefit_application_id))
+        if @benefit_package_form.destroy
+          flash[:notice] = "Benefit Package successfully deleted."
+          benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+        else
+          falsh[:error] = error_messages(@benefit_package_form)
+          # render :
       end
 
       private
