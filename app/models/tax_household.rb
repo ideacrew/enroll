@@ -130,7 +130,7 @@ class TaxHousehold
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-    hbx_enrollment.household.tax_households.last.tax_household_members.in(applicant_id: unenrolled).each do |member|
+    hbx_enrollment.household.latest_active_tax_household.tax_household_members.in(applicant_id: unenrolled).each do |member|
       deduct_aptc_available_amount += slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date) || 0
     end
     deduct_aptc_available_amount
@@ -164,7 +164,7 @@ class TaxHousehold
         benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
         benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
         slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-        household.tax_households.last.tax_household_members.in(applicant_id: uncoverage_applicant_ids).each do |member|
+        household.latest_active_tax_household.tax_household_members.in(applicant_id: uncoverage_applicant_ids).each do |member|
           aptc_available_amount_hash[member.applicant_id.to_s] = slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date) || 0
         end
       end
