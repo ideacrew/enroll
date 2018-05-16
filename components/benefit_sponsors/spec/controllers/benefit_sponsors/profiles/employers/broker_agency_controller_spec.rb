@@ -15,7 +15,7 @@ module BenefitSponsors
     let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
     let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: employer_profile.organization, profile_id: employer_profile.id) }
-    let(:broker_managenement_form_class) { BenefitSponsors::Organizations::Forms::BrokerManagementForm }
+    let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
     before :each do
       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
@@ -207,7 +207,7 @@ module BenefitSponsors
         end
 
         it 'should redirect to show page' do
-          expect(response).to redirect_to(redirect_to profiles_employers_employer_profile_path(employer_profile, tab: 'brokers'))
+          expect(response).to redirect_to(profiles_employers_employer_profile_path(employer_profile, tab: 'brokers'))
         end
 
         it 'should flash a message with the following text on sucessful broker assignment' do
@@ -241,7 +241,7 @@ module BenefitSponsors
         end
 
         it 'should redirect to show page' do
-          expect(response).to redirect_to(redirect_to profiles_employers_employer_profile_path(employer_profile, tab: 'brokers'))
+          expect(response).to redirect_to(profiles_employers_employer_profile_path(employer_profile, tab: 'brokers'))
         end
 
         it 'should flash a message with the following text on sucessful broker assignment' do

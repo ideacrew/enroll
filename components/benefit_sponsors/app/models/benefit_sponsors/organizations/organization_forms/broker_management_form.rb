@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Forms::BrokerManagementForm
+    class OrganizationForms::BrokerManagementForm
       include ActiveModel::Validations
       include Virtus.model
 
