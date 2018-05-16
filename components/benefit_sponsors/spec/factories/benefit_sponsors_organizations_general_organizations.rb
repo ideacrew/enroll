@@ -19,8 +19,9 @@ FactoryGirl.define do
     # profiles { [ build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) ] }
 
     trait :with_site do
-      before :build do |organization, evaluator|
-        create(:benefit_sponsors_site, :with_owner_general_organization, :with_benefit_market)
+      after :build do |organization, evaluator|
+        site = create(:benefit_sponsors_site, :with_owner_general_organization, :with_benefit_market)
+        site.site_organizations << organization
       end
     end
 
