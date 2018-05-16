@@ -26,7 +26,21 @@ class Admin::Aptc < ApplicationController
       end
       previous_available_aptc_hash = {}
       current_available_aptc_hash = {}
-      if max_aptc.present?
+      months = []
+      date = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date
+      offset_month = TimeKeeper.datetime_of_record.day <= 15 ? 1 : 2
+      if offset_month == 1
+        months = [date.strftime('%b')]
+      elsif offset_month == 2
+        months = [date.last_month.strftime('%b'), date.last_month.last_month.strftime('%b')]
+      end
+      eligibility_determination = family.active_household.latest_active_tax_household.latest_eligibility_determination
+      if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
+      current_max_aptc = eligibility_determination.max_aptc.to_f
+    else
+      current_max_aptc = 0
+    end
+      if max_aptc.present? && current_max_aptc != max_aptc
         max_aptc_vals.each do |key, value|
           if value.to_f == max_aptc
             current_available_aptc_hash[key] = value
@@ -38,7 +52,11 @@ class Admin::Aptc < ApplicationController
         current_available_aptc_value = current_available_aptc_hash.values.first.to_f * 12
         available_aptc_value = (current_available_aptc_value - previous_available_aptc_value) / current_available_aptc_hash.count
         max_aptc_vals.each do |key, value|
-          max_aptc_vals[key] = '%.2f' % available_aptc_value if value.to_f == max_aptc
+          if months.include?(key)
+            max_aptc_vals[key] = '%.2f' % 0
+          else 
+            max_aptc_vals[key] = '%.2f' % available_aptc_value if value.to_f == max_aptc
+          end
         end
       else
         #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
