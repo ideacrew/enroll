@@ -1003,8 +1003,8 @@ class Family
   def contingent_enrolled_family_members_due_dates
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
-      family_member.person.verification_types.active.each do |v_type|
-        due_dates << v_type.verif_due_date
+      family_member.person.consumer_role.verification_types.each do |v_type|
+        due_dates << document_due_date(v_type)
       end
     end
     due_dates.compact!
@@ -1058,10 +1058,10 @@ class Family
   def all_persons_vlp_documents_status
     outstanding_types = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
+      outstanding_types = outstanding_types + member.person.consumer_role.verification_types.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
-    fully_uploaded = outstanding_types.all?{ |type| (type.vlp_documents.any? && !type.rejected) }
-    partially_uploaded = outstanding_types.any?{ |type| (type.vlp_documents.any? && !type.rejected)}
+    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.vlp_documents.any? && !type.rejected) } : nil
+    partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.vlp_documents.any? && !type.rejected)} : nil
     if fully_uploaded
       "Fully Uploaded"
     elsif partially_uploaded
@@ -1081,6 +1081,10 @@ class Family
 
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
+  end
+
+  def has_curam_or_mobile_application_type?
+    ['Curam', 'Mobile'].include? application_type
   end
 
   def has_valid_e_case_id?

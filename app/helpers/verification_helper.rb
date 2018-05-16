@@ -37,6 +37,28 @@ module VerificationHelper
     end
   end
 
+  def ridp_type_status(type, person)
+    consumer = person.consumer_role
+    case type
+    when 'Identity'
+      if consumer.identity_verified?
+        consumer.identity_validation
+      elsif consumer.has_ridp_docs_for_type?(type) && !consumer.identity_rejected
+        'in review'
+      else
+        'outstanding'
+      end
+    when 'Application'
+      if consumer.application_verified?
+        consumer.application_validation
+      elsif consumer.has_ridp_docs_for_type?(type) && !consumer.application_rejected
+        'in review'
+      else
+        'outstanding'
+      end
+    end
+  end
+
   def ridp_type_class(type, person)
     case ridp_type_status(type, person)
       when 'valid'
@@ -197,6 +219,16 @@ module VerificationHelper
 
   def mod_attr(attr, val)
     attr.to_s + " => " + val.to_s
+  end
+
+  def build_admin_actions_list(v_type, f_member)
+    if f_member.consumer_role.aasm_state == 'unverified'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
+    elsif verification_type_status(v_type, f_member) == 'outstanding'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
+    else
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
   end
 
   def build_reject_reason_list(v_type)

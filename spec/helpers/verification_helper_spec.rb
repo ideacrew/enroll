@@ -182,27 +182,17 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#build_admin_actions_list" do
-    shared_examples_for "build_admin_actions_list method" do |action, no_action, aasm_state, validation_status|
+    shared_examples_for "build_admin_actions_list method" do |action, aasm_state, validation_status|
       before do
         person.consumer_role.aasm_state = aasm_state
         type.validation_status = validation_status
       end
       it "list includes #{action}" do
         expect(helper.build_admin_actions_list(type, person)).to include action
-      it 'returns outstanding for residency outstanding' do
-        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return false
-        person.consumer_role.local_residency_validation = 'outstanding'
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Outstanding")
-      end
-      it 'returns processing if consumer has pending state and no response from hub less than 24hours' do
-        allow_any_instance_of(ConsumerRole).to receive(:residency_verified?).and_return false
-        allow_any_instance_of(ConsumerRole).to receive(:residency_pending?).and_return true
-        allow_any_instance_of(ConsumerRole).to receive(:processing_residency_24h?).and_return true
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq("Processing")
       end
     end
+    it_behaves_like "build_admin_actions_list method", "Verify", "unverified", "any"
+    it_behaves_like "build_admin_actions_list method", "Reject", "unverified", "any"
   end
 
   describe '#show_ridp_type' do
@@ -234,21 +224,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         person.consumer_role.application_validation = 'valid'
         expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
       end
-
-      it 'returns outstanding if identity_validation is outstanding' do
-        person.consumer_role.application_validation = 'outstanding'
-        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
-        person.consumer_role.is_state_resident = false
-        person.consumer_role.vlp_documents = []
-        expect(helper.show_v_type('DC Residency', person).gsub('&nbsp;', '')).to eq('Outstanding')
-      end
-      it "list not includes #{no_action}" do
-        expect(helper.build_admin_actions_list(type, person)).not_to include no_action
-      end
     end
-    it_behaves_like "build_admin_actions_list method", "Verify", "Call Hub", "unverified", "any"
-    it_behaves_like "build_admin_actions_list method", "Reject", "Call Hub", "unverified", "any"
-
   end
 
   describe "#documents_list" do

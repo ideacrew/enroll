@@ -136,9 +136,8 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable do #move to verification type
   embeds_many :ridp_documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable do
+  embeds_many :vlp_documents, as: :documentable do #move to verification type
     def uploaded
       @target.select{|document| document.identifier }
     end
@@ -882,21 +881,6 @@ class ConsumerRole
 
   def indian_conflict?
     citizen_status == "indian_tribe_member"
-  end
-
-  def mark_doc_type_uploaded(v_type)
-    case v_type
-      when "Social Security Number"
-        update_attributes(:ssn_rejected => false)
-      when "Citizenship"
-        update_attributes(:lawful_presence_rejected => false)
-      when "Immigration status"
-        update_attributes(:lawful_presence_rejected => false)
-      when "American Indian Status"
-        update_attributes(:native_rejected => false)
-      when "DC Residency"
-        update_attributes(:residency_rejected => false)
-    end
   end
 
   def mark_ridp_doc_uploaded(ridp_type)
