@@ -105,6 +105,7 @@ class LawfulPresenceDetermination
         if self.ivl_role.person
           unless self.ivl_role.person.ssn.blank?
             self.ivl_role.ssn_validation = "valid"
+            self.ivl_role.person.verification_types.active.where(type_name:"Social Security Number").first.validation_status = "verified"
           end
         end
       end

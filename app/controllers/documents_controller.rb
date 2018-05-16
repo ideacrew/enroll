@@ -1,6 +1,7 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
+  before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
   respond_to :html, :js
@@ -32,13 +33,12 @@ class DocumentsController < ApplicationController
   end
 
   def update_verification_type
-    v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
     family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
-      verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
+      verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
       update_documents_status(family_member) if family_member
@@ -92,14 +92,14 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    if params[:verification_type] == 'DC Residency'
+    if @verification_type.type_name == 'DC Residency'
       @person.consumer_role.invoke_residency_verification!
     else
       @person.consumer_role.redetermine_verification!(verification_attr)
     end
     respond_to do |format|
       format.html {
-        hub =  params[:verification_type] == 'DC Residency' ? 'Local Residency' : 'FedHub'
+        hub =  @verification_type.type_name == 'DC Residency' ? 'Local Residency' : 'FedHub'
         flash[:success] = "Request was sent to #{hub}."
         redirect_to :back
       }
@@ -120,25 +120,17 @@ class DocumentsController < ApplicationController
 
   def extend_due_date
     @family_member = FamilyMember.find(params[:family_member_id])
-    v_type = params[:verification_type]
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
       add_type_history_element
-      sv = @family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
-      if sv.present?
-        new_date = sv.due_date.to_date + 30.days
+      if @verification_type.due_date
+        new_date = @verification_type.due_date + 30.days
         flash[:success] = "Special verification period was extended for 30 days."
       else
-        new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days
+        new_date = TimeKeeper.date_of_record + 30.days
         flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"
       end
-
-      # special_verification_period is the day we send notices
-
-      # enrollment.update_attributes!(:special_verification_period => new_date)
-      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id, type: "admin")
-      @family_member.person.consumer_role.special_verifications << sv
-      @family_member.person.consumer_role.save!
+      @verification_type.update_attributes(:due_date => new_date)
       set_min_due_date_on_family
     else
       flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
@@ -147,40 +139,32 @@ class DocumentsController < ApplicationController
   end
 
   def destroy
-    @document.delete
-    family_member = FamilyMember.find(params[:family_member_id])
-    family_member.family.update_family_document_status!
+    @document.delete if @verification_type.type_unverified?
+    if @document.destroyed?
+      if (@verification_type.vlp_documents - [@document]).empty?
+        @verification_type.update_attributes(:validation_status => "outstanding", :update_reason => "all documents deleted")
+        flash[:danger] = "All documents were deleted. Action needed"
+      else
+        flash[:success] = "Document deleted."
+      end
+    else
+      flash[:danger] = "Document can not be deleted because type is verified."
+    end
     respond_to do |format|
       format.html { redirect_to verification_insured_families_path }
-      format.js
-    end
-
-  end
-
-  def update
-    if params[:comment]
-      @document.update_attributes(:status => params[:status],
-                                  :comment => params[:person][:vlp_document][:comment])
-    else
-      @document.update_attributes(:status => params[:status])
-    end
-    respond_to do |format|
-      format.html {redirect_to verification_insured_families_path, notice: "Document Status Updated"}
       format.js
     end
   end
 
   def add_type_history_element
     actor = current_user ? current_user.email : "external source or script"
-    verification_type = params[:verification_type]
     action = params[:admin_action] || params[:action]
     action = "Delete #{params[:doc_title]}" if action == "destroy"
     reason = params[:verification_reason]
-    if @person
-      @person.consumer_role.add_type_history_element(verification_type: verification_type,
-                                                     action: action.split('_').join(' '),
-                                                     modifier: actor,
-                                                     update_reason: reason)
+    if @verification_type
+      @verification_type.add_type_history_element(action: action.split('_').join(' '),
+                                                  modifier: actor,
+                                                  update_reason: reason)
     end
   end
 
@@ -208,12 +192,17 @@ class DocumentsController < ApplicationController
   end
 
   def set_document
-    set_person
-    @document = @person.consumer_role.vlp_documents.find(params[:id])
+    set_verification_type
+    @document = @verification_type.vlp_documents.find(params[:id])
   end
 
   def set_person
     @person = Person.find(params[:person_id]) if params[:person_id]
+  end
+
+  def set_verification_type
+    set_person
+    @verification_type = @person.verification_types.active.find(params[:verification_type]) if params[:verification_type]
   end
 
   def verification_attr

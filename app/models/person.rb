@@ -132,6 +132,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
+  embeds_many :verification_types, as: :verifiable
 
   attr_accessor :effective_date
 
@@ -443,18 +444,23 @@ class Person
     is_active
   end
 
-  # collect all verification types user can have based on information he provided
-  def verification_types
-    verification_types = []
-    verification_types << 'DC Residency'
-    verification_types << 'Social Security Number' if ssn
-    verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
-    if self.us_citizen
-      verification_types << 'Citizenship'
-    else
-      verification_types << 'Immigration status' if !(us_citizen.nil?)
+  def deactivate_types(types)
+    types.each do |type|
+      verification_type_by_name(type).update_attributes(:inactive => true) unless verification_type_by_name(type).inactive
     end
-    verification_types
+  end
+
+  def add_new_verification_type(new_type)
+    default_status = (new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : "unverified"
+    if verification_types.map(&:type_name).include? new_type
+      verification_type_by_name(new_type).update_attributes(:inactive => false)
+    else
+      verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status )
+    end
+  end
+
+  def verification_type_by_name(type)
+    verification_types.find_by(:type_name => type)
   end
 
 # collect all ridp_verification_types user in case of unsuccessful ridp
