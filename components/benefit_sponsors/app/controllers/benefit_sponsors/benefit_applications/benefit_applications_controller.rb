@@ -35,23 +35,23 @@ module BenefitSponsors
         end
       end
 
-      def publish
+      def submit_application
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :updateable?
-        if @benefit_application_form.publish
+        if @benefit_application_form.submit_application
           flash[:notice] = "Benefit Application successfully published."
           flash[:error] = error_messages(@benefit_application_form)
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         else
-          flash[:error] = "Benefit Application failed to publish. #{error_messages(@benefit_application_form)}"
+          flash[:error] = "Benefit Application failed to submit. #{error_messages(@benefit_application_form)}"
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         end
       end
 
-      def force_publish
+      def force_submit_application
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :updateable?
-        if @benefit_application_form.force_publish
+        if @benefit_application_form.force_submit_application
           flash[:error] = "As submitted, this application is ineligible for coverage under the #{Settings.site.short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         end

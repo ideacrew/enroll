@@ -17,6 +17,7 @@ module BenefitSponsors
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
+      include Config::AcaModelConcern
       # include Concerns::Observable
       include AASM
 

@@ -48,22 +48,24 @@ module BenefitSponsors
         [false, benefit_application]
       end
 
-      def force_publish(form)
+      def force_submit_application(form)
         benefit_application = find_model_by_id(form.id)
-        benefit_application.force_publish!
+        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+        service.force_submit_application
         [true, benefit_application]
       end
 
-      def publish(form)
+      def submit_application(form)
         benefit_application = find_model_by_id(form.id)
-        serivce = BenefitApplicationEnrollmentService.new(benefit_application)
+        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
         saved, benefit_application, errors = service.submit_application
 
-        unless save
+        if errors.present?
           errors.each do |k, v|
             form.errors.add(k, v)
           end
         end
+        [saved, benefit_application]
       end
      
       def update(form) 
