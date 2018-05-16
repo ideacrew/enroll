@@ -5,5 +5,19 @@ FactoryGirl.define do
     kind :single_issuer
     title 'Single Issuer'
     description 'Products offered under single issuer'
+
+    transient do
+      number_of_products 5
+    end
+
+    after(:build) do |product_package, evaluator|
+      if product_package.product_kind == :health
+        product_package.products = create_list(:benefit_markets_products_health_products_health_product,
+          evaluator.number_of_products, 
+          application_period: product_package.application_period,
+          product_package_kinds: [ product_package.kind ],
+          metal_level_kind: :gold)
+      end
+    end
   end
 end

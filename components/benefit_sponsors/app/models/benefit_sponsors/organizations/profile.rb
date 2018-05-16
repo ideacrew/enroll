@@ -13,6 +13,8 @@ module BenefitSponsors
       field :is_benefit_sponsorship_eligible, type: Boolean, default: false
       field :contact_method
 
+      # TODO: Add logic to manage benefit sponsorships for Gapped coverage, early termination, banned employers
+
       # Share common attributes across all Profile kinds
       delegate :hbx_id,                                 to: :organization, allow_nil: false
       delegate :legal_name,               :legal_name=, to: :organization, allow_nil: false
@@ -35,7 +37,7 @@ module BenefitSponsors
       # @abstract profile subclass is expected to implement #initialize_profile
       # @!method initialize_profile
       # Initialize settings for the abstract profile
-      after_initialize :initialize_profile, :build_nested_models
+      after_initialize :initialize_profile, :build_nested_models#, :add_benefit_sponsorship
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
@@ -52,6 +54,7 @@ module BenefitSponsors
       #   write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
       #   @benefit_sponsorship = benefit_sponsorship
       # end
+
 
       def primary_office_location
         office_locations.detect(&:is_primary?)

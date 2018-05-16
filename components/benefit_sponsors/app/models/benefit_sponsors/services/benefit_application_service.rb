@@ -29,15 +29,18 @@ module BenefitSponsors
         store(form, benefit_application)
       end
 
+      # TODO: needs to be reviewed due to benefit_application state machine changes
       def revert(form)
         benefit_application = find_model_by_id(form.id)
-        if benefit_application.may_revert_renewal?
-          if benefit_application.revert_renewal!
-            return [true, benefit_application]
-          else
-            get_application_errors_for_revert(benefit_application, form)
-          end
-        elsif benefit_application.may_revert_application?
+
+        # if benefit_application.may_revert_renewal?
+        #   if benefit_application.revert_renewal!
+        #     return [true, benefit_application]
+        #   else
+        #     get_application_errors_for_revert(benefit_application, form)
+        #   end
+
+        if benefit_application.may_revert_application?
           if benefit_application.revert_application!
             return [true, benefit_application]
           else
@@ -57,15 +60,15 @@ module BenefitSponsors
 
       def submit_application(form)
         benefit_application = find_model_by_id(form.id)
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        saved, benefit_application, errors = service.submit_application
+        enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+        saved_result, benefit_application, errors = enrollment_service.submit_application
 
         if errors.present?
           errors.each do |k, v|
             form.errors.add(k, v)
           end
         end
-        [saved, benefit_application]
+        [saved_result, benefit_application]
       end
      
       def update(form) 

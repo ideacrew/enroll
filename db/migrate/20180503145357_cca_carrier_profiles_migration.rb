@@ -20,7 +20,7 @@ class CcaCarrierProfilesMigration < Mongoid::Migration
       if status
         puts "Rake Task execution completed, check carrier_profile_migration_data logs & carrier_profile_migration_status csv for additional information." unless Rails.env.test?
       else
-        puts "Script execution failed for empty site" unless Rails.env.test?
+        puts "Script execution failed" unless Rails.env.test?
       end
     end
 
@@ -44,7 +44,6 @@ class CcaCarrierProfilesMigration < Mongoid::Migration
 
     #get main app organizations for migration
     old_organizations = Organization.unscoped.exists("carrier_profile" => true)
-    return false unless old_organizations.present?
 
     #counters
     total_organizations = old_organizations.count

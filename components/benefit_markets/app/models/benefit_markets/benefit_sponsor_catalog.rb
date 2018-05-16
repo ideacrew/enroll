@@ -43,6 +43,28 @@ module BenefitMarkets
     # def is_product_package_update_available?
     #   product_packages.any?{|product_package| benefit_market_catalog.is_product_package_updated?(product_package) }
     # end
+
+
+ 
+
+    #FIX ME: Use configuration from benefit market
+    def open_enrollment_start
+      effective_date - 2.months
+    end
+
+    # FIX ME: Use configuration from benefit market
+    def open_enrollment_end
+      open_enrollment_month = effective_date.prev_month
+      Date.new(open_enrollment_month.year, open_enrollment_month.month, 20)
+    end
+    
+    def effective_period
+      effective_date..effective_date.next_year.prev_day
+    end
+
+    def open_enrollment_period
+      open_enrollment_start..open_enrollment_end
+    end
     
     def product_active_year
       benefit_application.effective_period.begin.year

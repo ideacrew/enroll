@@ -1,9 +1,11 @@
 require 'rails_helper'
 
-describe "CarrierProfilesMigration" do
+describe "CcaCarrierProfilesMigration" do
 
   before :all do
-    Dir[Rails.root.join('db', 'migrate', '*_carrier_profiles_migration.rb')].each do |f|
+    DatabaseCleaner.clean
+
+    Dir[Rails.root.join('db', 'migrate', '*_cca_carrier_profiles_migration.rb')].each do |f|
       @path = f
       require f
     end
@@ -12,15 +14,17 @@ describe "CarrierProfilesMigration" do
   describe ".up" do
 
     before :all do
-      site = FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)
+      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
-      broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
-      organization1 = FactoryGirl.create(:organization, legal_name: "Delta Dental")
-      carrier_profile = FactoryGirl.create(:carrier_profile, organization: organization1)
+      FactoryGirl.create(:broker_agency_profile, organization: organization)
+
+
+      create_list(:carrier_profile, 9)
+
       @employer_profile = FactoryGirl.create(:employer_profile)
-      inbox = FactoryGirl.create(:inbox, :with_message, recipient: @employer_profile)
-      employer_staff_role = FactoryGirl.create(:employer_staff_role, employer_profile_id: @employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
-      employee_role = FactoryGirl.create(:employee_role, employer_profile: @employer_profile)
+      FactoryGirl.create(:inbox, :with_message, recipient: @employer_profile)
+      FactoryGirl.create(:employer_staff_role, employer_profile_id: @employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
+      FactoryGirl.create(:employee_role, employer_profile: @employer_profile)
 
       @migrated_organizations = BenefitSponsors::Organizations::Organization.issuer_profiles
       @old_organizations = Organization.exists(carrier_profile: true)
@@ -32,14 +36,14 @@ describe "CarrierProfilesMigration" do
 
     it "should match total migrated organizations with carrier profiles" do
       Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
-      expect(@migrated_organizations.count).to eq @old_organizations.count
+      expect(@migrated_organizations.count).to eq 9
     end
 
     it "should not migrate organizations with broker agency profile" do
       expect(BenefitSponsors::Organizations::Organization.broker_agency_profiles.count).to eq 0
     end
 
-    it "should match FEIN" do
+    it "should match attribute" do
       expect(@migrated_organizations.first.issuer_profile.issuer_hios_ids.first).to eq @old_organizations.first.carrier_profile.issuer_hios_ids.first
     end
 
