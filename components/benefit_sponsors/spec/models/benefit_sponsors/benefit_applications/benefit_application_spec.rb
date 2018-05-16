@@ -1,14 +1,17 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitApplications::BenefitApplication, type: :model do
+  RSpec.describe BenefitApplications::BenefitApplication, dbclean: :after_each, type: :model do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
+    # let(:profile)               { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile)  }
+    let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
+
     # let(:date_range) { (Date.today..1.year.from_now) }
-    let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new }
-    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
-    let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
-    let(:benefit_market)            { create :benefit_markets_benefit_market, site: site, kind: 'aca_shop' }
+    # let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new() }
+    # let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
+    # let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
+    # let(:benefit_market)            { create :benefit_markets_benefit_market, site: site, kind: 'aca_shop' }
 
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -24,7 +27,8 @@ module BenefitSponsors
 
     let(:params) do
       {
-        effective_period: effective_period,
+        benefit_sponsorship:    benefit_sponsorship,
+        effective_period:       effective_period,
         open_enrollment_period: open_enrollment_period,
         recorded_service_area:  recorded_service_area,
         recorded_rating_area:   recorded_rating_area,
@@ -41,12 +45,12 @@ module BenefitSponsors
      it { is_expected.to have_field(:msp_count).of_type(Integer).with_default_value_of(0)}
 
      it { is_expected.to embed_many(:benefit_packages)}
-     it { is_expected.to belong_to(:successor_application).as_inverse_of(:predecessor_application)}
+     # it { is_expected.to belong_to(:successor_applications).as_inverse_of(:predecessor_application)}
 
-      before do
-        site.owner_organization = owner_organization
-        benefit_market.save!
-      end
+      # before do
+      #   site.owner_organization = owner_organization
+      #   benefit_market.save!
+      # end
 
       context "with no arguments" do
         subject { described_class.new }
@@ -343,17 +347,17 @@ module BenefitSponsors
         # let(:benefit_market) { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
 
         # let(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
-        #   title: "SHOP Benefits for #{current_effective_date.year}", 
+        #   title: "SHOP Benefits for #{current_effective_date.year}",
         #   application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
         # )}
 
-        # let(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, 
-        #   title: "SHOP Benefits for #{renewal_effective_date.year}", 
+        # let(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
+        #   title: "SHOP Benefits for #{renewal_effective_date.year}",
         #   application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
         # )}
 
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
-        
+
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period) }
         let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date) }
 
