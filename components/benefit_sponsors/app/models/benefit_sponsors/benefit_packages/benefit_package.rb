@@ -58,18 +58,25 @@ module BenefitSponsors
         })
         
         sponsored_benefits.each do |sponsored_benefit|
-          product_package = new_benefit_package.benefit_sponsor_catalog.product_packages.detect do |product_package|
-            product_package.kind == sponsored_benefit.product_option_kind
+          new_product_package = new_benefit_package.benefit_sponsor_catalog.product_packages.detect do |product_package|
+            product_package.kind == sponsored_benefit.product_package_kind && product_package.product_kind == sponsored_benefit.product_kind
           end
 
-          next if product_package.blank?
-          renewal_products = product_package.products.collect{|product| product.renewal_product}.compact
+          next if new_product_package.blank?
 
-          if (product_package.products & renewal_products).any?
+          reference_product = sponsored_benefit.reference_product
+          next if reference_product.present? && reference_product.renewal_product.blank?
+          
+          renewal_products = sponsored_benefit.products.collect{|product| product.renewal_product}.compact
+          next if renewal_products.empty?
+
+          if (new_product_package.products & renewal_products).any?
             new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
             new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
           end
         end
+
+        new_benefit_package
       end
 
       def build_relationship_benefits

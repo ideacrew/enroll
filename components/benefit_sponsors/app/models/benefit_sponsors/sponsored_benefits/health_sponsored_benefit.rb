@@ -13,6 +13,11 @@ module BenefitSponsors
                   class_name: "::BenefitMarkets::Products::HealthProducts::HealthProduct"
       embeds_many :products, 
                   class_name: "::BenefitMarkets::Products::HealthProducts::HealthProduct"
+
+
+      def product_kind
+        :health
+      end
     end
   end
 end
