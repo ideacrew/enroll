@@ -15,6 +15,7 @@ module Config::AcaModelConcern
     delegate :constrain_service_areas?, to: :class
     delegate :transmit_employers_immediately?, to: :class
     delegate :enforce_employer_attestation?, to: :class
+    delegate :employer_attestation_is_enabled?, to: :class
     delegate :employee_participation_ratio_minimum, to: :class
     delegate :non_owner_participation_count_minimum, to: :class
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
@@ -75,6 +76,10 @@ module Config::AcaModelConcern
 
     def enforce_employer_attestation?
       @@enforce_employer_attestation ||= (Settings.aca.enforce_employer_attestation.to_s.downcase == "true")
+    end
+
+    def employer_attestation_is_enabled?
+      @@employer_attestation ||= Settings.aca.employer_attestation
     end
 
     def employee_participation_ratio_minimum
