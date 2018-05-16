@@ -72,19 +72,25 @@ class MigrateMaProducts < Mongoid::Migration
               premium_tables: premium_tables
             }
             if product_kind.to_s.downcase == "health"
-              begin
-                hp = BenefitMarkets::Products::HealthProducts::HealthProduct.new({
-                  health_plan_kind: plan.plan_type.downcase,
-                  metal_level_kind: plan.metal_level,
-                  ehb: plan.ehb
-                }.merge(shared_attributes))
-                hp.save!
-              rescue Exception => e
-                raise(( hp.premium_tables.reject { |pt| pt.valid? }.first.errors ).inspect)
+              product_package_kinds = []
+              if plan.is_horizontal?
+                product_package_kinds << :metal_level
               end
+              if plan.is_vertical?
+                product_package_kinds << :single_issuer
+              end
+              if plan.is_sole_source?
+                product_package_kinds << :single_product
+              end
+              BenefitMarkets::Products::HealthProducts::HealthProduct.create!({
+                health_plan_kind: plan.plan_type.downcase,
+                metal_level_kind: plan.metal_level,
+                product_package_kinds: product_package_kinds,
+                ehb: plan.ehb
+              }.merge(shared_attributes))
             else
-              BenefitMarkets::Products::HealthProducts::DentalProduct.create!({
-
+              BenefitMarkets::Products::DentalProducts::DentalProduct.create!({
+                product_package_kinds: ::BenefitMarkets::DentalProducts::PRODUCT_PACKAGE_KINDS
               }.merge(shared_attributes))
             end
           end
