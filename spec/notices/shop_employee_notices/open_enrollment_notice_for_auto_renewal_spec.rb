@@ -71,11 +71,12 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
       renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
       enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
+      total_employee_cost = ActiveSupport::NumberHelper.number_to_currency(enrollment.total_employee_cost)
       @employee_notice.append_data
       expect(@employee_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
       expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewing_plan_year.open_enrollment_end_on
       expect(@employee_notice.notice.plan.plan_name).to eq renewal_plan.name
-      expect(@employee_notice.notice.enrollment.employee_cost).to eq enrollment.total_employee_cost.to_s
+      expect(@employee_notice.notice.enrollment.employee_cost).to eq total_employee_cost
       expect(@employee_notice.notice.enrollment.enrollees).to eq enrollment.hbx_enrollment_members.map(&:person).map(&:full_name)
     end
   end
