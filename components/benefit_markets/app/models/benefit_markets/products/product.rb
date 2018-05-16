@@ -22,6 +22,7 @@ module BenefitMarkets
     field :issuer_profile_id,     type: BSON::ObjectId
     field :product_package_kinds, type: Array, default: []
     field :_type,                 type: String
+    field :premium_ages,          type: Range
 
 
     belongs_to  :service_area,

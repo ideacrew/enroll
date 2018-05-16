@@ -1,10 +1,5 @@
 require 'rails_helper'
 
-module DataTablesAdapter
-end
-module Config::AcaConcern
-end
-
 USER_ROLES = [:with_hbx_staff_role, :without_hbx_staff_role]
 
 module SponsoredBenefits

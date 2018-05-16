@@ -59,6 +59,18 @@ module BenefitSponsors
         form
       end
 
+      def self.fetch(params)
+        form = self.new(params)
+        form
+      end
+
+      def destroy
+        save_result, persisted_object = service.disable_benefit_package(self)
+        @show_page_model = persisted_object
+        return false unless save_result
+        true
+      end
+
       def persist(update: false)
         return false unless self.valid?
         save_result, persisted_object = (update ? service.update(self) : service.save(self))

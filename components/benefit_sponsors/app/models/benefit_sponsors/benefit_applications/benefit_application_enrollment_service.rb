@@ -18,12 +18,16 @@ module BenefitSponsors
       end
     end
 
+    def is_application_invalid?
+      application_errors.present?
+    end
+
     def is_application_ineligible?
       application_eligibility_warnings.present?
     end
 
     def force_submit_application
-      if is_application_ineligible?
+      if is_application_invalid? || is_application_ineligible?
         @benefit_application.submit_for_review! if @benefit_application.may_submit_for_review?
       else
         @benefit_application.submit_application! if @benefit_application.may_submit_application?
@@ -159,6 +163,11 @@ module BenefitSponsors
     end
 
     private
+
+    def log_message(errors)
+      msg = yield.first
+      (errors[msg[0]] ||= []) << msg[1]
+    end
 
     def due_date_for_publish
       if benefit_sponsorship.benefit_applications.is_renewing.any?

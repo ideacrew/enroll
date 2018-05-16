@@ -11,6 +11,7 @@ module BenefitSponsors
       field :description, type: String, default: ""
       field :probation_period_kind, type: Symbol
       field :is_default, type: Boolean, default: false
+      field :is_active, type: Boolean, default: true
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
@@ -58,18 +59,51 @@ module BenefitSponsors
         })
         
         sponsored_benefits.each do |sponsored_benefit|
-          product_package = new_benefit_package.benefit_sponsor_catalog.product_packages.detect do |product_package|
-            product_package.kind == sponsored_benefit.product_option_kind
+          new_product_package = new_benefit_package.benefit_sponsor_catalog.product_packages.detect do |product_package|
+            product_package.kind == sponsored_benefit.product_package_kind && product_package.product_kind == sponsored_benefit.product_kind
           end
 
-          next if product_package.blank?
-          renewal_products = product_package.products.collect{|product| product.renewal_product}.compact
+          next if new_product_package.blank?
 
-          if (product_package.products & renewal_products).any?
+          reference_product = sponsored_benefit.reference_product
+          next if reference_product.present? && reference_product.renewal_product.blank?
+          
+          renewal_products = sponsored_benefit.products.collect{|product| product.renewal_product}.compact
+          next if renewal_products.empty?
+
+          if (new_product_package.products & renewal_products).any?
             new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
             new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
           end
         end
+
+        new_benefit_package
+      end
+
+      def disable_benefit_package
+        self.benefit_application.benefit_sponsorship.census_employees.each do |census_employee|
+          benefit_package_assignments = census_employee.benefit_package_assignments.where(benefit_package_id: self.id)
+
+          if benefit_package_assignments.present?
+            benefit_package_assignments.each do |benefit_package_assignment|
+              benefit_package_assignment.hbx_enrollments.each do |enrollment|
+                enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+              end
+              benefit_package_assignment.update(is_active: false) unless self.benefit_application.is_renewing?
+            end
+
+            other_benefit_package = self.benefit_application.benefit_packages.detect{ |benefit_package| benefit_package.id != self.id }
+
+            # TODO: Add methods on census employee
+            if self.benefit_application.is_renewing?
+              # census_employee.add_renew_benefit_group_assignment(other_benefit_package)
+            else
+              # census_employee.find_or_create_benefit_group_assignment([other_benefit_package])
+            end
+          end
+        end
+
+        self.is_active = false
       end
 
       def build_relationship_benefits
