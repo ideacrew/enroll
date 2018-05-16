@@ -7,7 +7,7 @@ module BenefitSponsors
     embeds_many :contribution_levels,
                 class_name: "BenefitSponsors::SponsoredBenefits::ContributionLevel"
 
-    validate :validate_contribution_levels
+    # validate :validate_contribution_levels
 
     def validate_contribution_levels
     end
