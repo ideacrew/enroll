@@ -13,7 +13,6 @@ FactoryGirl.define do
     trait :with_organization_dc_profile do
       after :build do |benefit_sponsorship, evaluator|
         profile = build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile, organization: benefit_sponsorship.organization)
-        benefit_sponsorship.organization.profiles << profile
         benefit_sponsorship.profile = profile
       end
     end
@@ -21,7 +20,6 @@ FactoryGirl.define do
     trait :with_organization_cca_profile do
       after :build do |benefit_sponsorship, evaluator|
         profile = build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: benefit_sponsorship.organization)
-        benefit_sponsorship.organization.profiles << profile
         benefit_sponsorship.profile = profile
       end
     end
