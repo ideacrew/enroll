@@ -1,6 +1,6 @@
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
-  include Config::AcaConcern
+  include ::Config::AcaConcern
   include DataTablesAdapter
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
