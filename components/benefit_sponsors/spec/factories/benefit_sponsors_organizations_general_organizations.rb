@@ -103,9 +103,6 @@ FactoryGirl.define do
           :with_expired_and_active_benefit_application,
           profile: organization.employer_profile
         )]
-=======
-        build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization)
->>>>>>> 70e2d96729873dd4eaeababbac6e5e1c6f5a1946
       end
     end
 
