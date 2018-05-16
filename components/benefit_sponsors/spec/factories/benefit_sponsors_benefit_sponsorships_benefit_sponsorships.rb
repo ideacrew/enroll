@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :benefit_sponsors_benefit_sponsorship, class: 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship' do
 
-    contact_method  { :paper_and_electronic }
     source_kind     { :self_serve }
     benefit_market  { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "MA Health SHOP", site_urn: :cca) }
     organization    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }

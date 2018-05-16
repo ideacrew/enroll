@@ -59,7 +59,7 @@ module BenefitSponsors
           expect(invalid_application_form.errors.count).to eq 4
           service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
           expect(service_obj.store(invalid_application_form, invalid_benefit_application)).to eq [false, nil]
-          expect(invalid_application_form.errors.count).to eq 6
+          expect(invalid_application_form.errors.count).to eq 8
         end
       end
     end

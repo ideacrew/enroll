@@ -48,6 +48,10 @@ module BenefitSponsors
       # Sponsor self-reported number of Medicare Second Payers
       field :msp_count,               type: Integer, default: 0
 
+      # Sponsor's Standard Industry Classification code for period covered by this
+      # applciation
+      field :recorded_sic_code,       type: String
+
 
       # Create a doubly-linked list of application chain:
       #   predecessor_application is nil if it's the first in an application chain without
@@ -83,6 +87,15 @@ module BenefitSponsors
       index({ "aasm_state" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
       index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
+
+      # Load the
+      # after_initialize :set_values
+
+      def set_values
+        recorded_sic_code     = benefit_sponsorship.sic_code unless recorded_sic_code.present?
+        recorded_rating_area  = benefit_sponsorship.rating_area unless recorded_rating_area.present?
+        recorded_service_area = benefit_sponsorship.service_area unless recorded_service_area.present?
+      end
 
       # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
       scope :plan_design_draft,               ->{ any_in(aasm_state: PLAN_DESIGN_DRAFT_STATES) }

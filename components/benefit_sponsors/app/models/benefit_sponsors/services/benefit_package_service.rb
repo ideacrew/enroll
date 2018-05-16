@@ -25,6 +25,17 @@ module BenefitSponsors
         attributes_to_form_params(benefit_package, form)
       end
 
+      def disable_benefit_package(form)
+        benefit_application = find_benefit_application(form)
+        benefit_package = find_model_by_id(form.id)
+        if benefit_package.disable_benefit_package
+          return [true, benefit_package]
+        else
+          map_errors_for(benefit_package, onto: form)
+          return [false, nil]
+        end
+      end
+
       def save(form)
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)
@@ -33,6 +44,7 @@ module BenefitSponsors
       end
 
       def update(form)
+        benefit_application = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
         model_attributes = form_params_to_attributes(form)
         benefit_package.assign_attributes(model_attributes)

@@ -40,7 +40,6 @@ site:
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
-  website_name: "www.DCHealthLink.com"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
