@@ -4,10 +4,10 @@
   - if billing_date.present? && plan_year.present?
     - bill_query = Queries::EmployerShowPageBill.new(@employer_profile)
     - bill = bill_query.execute
-    
+
     .panel.panel-default.premium-reports-widget.widget
       .panel-heading
-        | Enrollment Report - 
+        | Enrollment Report
         span = billing_date.beginning_of_month 
         | - 
         = billing_date.end_of_month
