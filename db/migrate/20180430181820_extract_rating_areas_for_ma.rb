@@ -22,6 +22,11 @@ class ExtractRatingAreasForMa < Mongoid::Migration
             county_zip._id
           end
           ::BenefitMarkets::Locations::RatingArea.create!({
+             active_year: 2017,
+             exchange_provided_code: rating_area_name,
+             county_zip_ids: location_ids
+          })
+          ::BenefitMarkets::Locations::RatingArea.create!({
              active_year: 2018,
              exchange_provided_code: rating_area_name,
              county_zip_ids: location_ids
