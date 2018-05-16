@@ -190,7 +190,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
-    census_employees_with_old_id.update_all(benefit_sponsor_employer_profile_id: @new_profile.id)
+    census_employees_with_old_id.update_all(benefit_sponsors_employer_profile_id: @new_profile.id)
   end
 
   def self.find_site(site_key)

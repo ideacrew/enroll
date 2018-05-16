@@ -59,29 +59,9 @@ module BenefitSponsors
         end
       end
 
-      # Contact method set by default in the model
-      context "with no contact_method" do
-        subject { described_class.new(params.except(:contact_method)) }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to be_valid
-        end
-      end
-
       context "with all required arguments" do
         subject { described_class.new(params) }
 
-        context "and contact method is invalid" do
-          let(:invalid_contact_method)  { :snapchat }
-
-          before { subject.contact_method = invalid_contact_method }
-
-          it "should not be valid" do
-            subject.validate
-            expect(subject).to_not be_valid
-          end
-        end
 
         context "and all arguments are valid" do
           it "should reference the correct profile_id" do
@@ -107,6 +87,15 @@ module BenefitSponsors
           expect(valid_build_benefit_sponsorships.valid?).to be_truthy
           expect(valid_create_benefit_sponsorships.valid?).to be_truthy
         end
+      end
+
+      context "when benefit sponsorship is CCA SHOP employer" do
+        let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
+
+        it "should be valid" do
+          expect(benefit_sponsorship.valid?).to be true
+        end
+
       end
     end
 
