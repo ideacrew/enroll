@@ -58,21 +58,25 @@ module BenefitSponsors
         })
         
         sponsored_benefits.each do |sponsored_benefit|
-          new_product_package = new_benefit_package.benefit_sponsor_catalog.product_packages.detect do |product_package|
-            product_package.kind == sponsored_benefit.product_package_kind && product_package.product_kind == sponsored_benefit.product_kind
-          end
 
-          next if new_product_package.blank?
+          new_benefit_sponsor_catalog = new_benefit_package.benefit_sponsor_catalog
+          new_product_package = new_benefit_sponsor_catalog.product_packages
+                  .by_kind(sponsored_benefit.product_package_kind)
+                  .by_product_kind(sponsored_benefit.product_kind)[0]
 
-          reference_product = sponsored_benefit.reference_product
-          next if reference_product.present? && reference_product.renewal_product.blank?
-          
-          renewal_products = sponsored_benefit.products.collect{|product| product.renewal_product}.compact
-          next if renewal_products.empty?
 
-          if (new_product_package.products & renewal_products).any?
-            new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
-            new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
+          if new_product_package.present?
+            reference_product = sponsored_benefit.reference_product
+            if reference_product && reference_product.renewal_product.present?
+
+              # product_package = sponsored_benefit.product_package
+              # renewal_products = product_package.active_products.collect{|product| product.renewal_product}.compact
+
+              # if renewal_products.present? && (new_product_package.products & renewal_products).any?
+              new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
+              new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
+              # end
+            end
           end
         end
 

@@ -134,36 +134,36 @@ module BenefitSponsors
       # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
       # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
 
-      scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
-        where(
-          "$and" => [
-            {:aasm_state.in => APPROVED_STATES },
-            {"$or" => [
-              { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
-              { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
-            ]
-          }
-        ]
-        )
-      }
+      # scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
+      #   where(
+      #     "$and" => [
+      #       {:aasm_state.in => APPROVED_STATES },
+      #       {"$or" => [
+      #         { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
+      #         { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
+      #       ]
+      #     }
+      #   ]
+      #   )
+      # }
 
-      scope :published_plan_years_by_date, ->(date) {
-        where(
-          "$and" => [
-            {:aasm_state.in => APPROVED_STATES },
-            {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
-          ]
-          )
-      }
+      # scope :published_plan_years_by_date, ->(date) {
+      #   where(
+      #     "$and" => [
+      #       {:aasm_state.in => APPROVED_STATES },
+      #       {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+      #     ]
+      #     )
+      # }
 
-      scope :published_and_expired_plan_years_by_date, ->(date) {
-        where(
-          "$and" => [
-            {:aasm_state.in => APPROVED_STATES + ['expired'] },
-            {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
-          ]
-          )
-      }
+      # scope :published_and_expired_plan_years_by_date, ->(date) {
+      #   where(
+      #     "$and" => [
+      #       {:aasm_state.in => APPROVED_STATES + ['expired'] },
+      #       {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+      #     ]
+      #     )
+      # }
 
       def effective_period=(new_effective_period)
         effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
@@ -235,8 +235,6 @@ module BenefitSponsors
       #   ::TimeKeeper.date_of_record > open_enrollment_period.end unless open_enrollment_period.blank?
       # end
 
-
-
       # Build a new [BenefitApplication] instance along with all associated child model instances, for the
       # benefit period immediately following this application's, applying the renewal settings
       # specified in the passed [BenefitSponsorCatalog]
@@ -247,8 +245,8 @@ module BenefitSponsors
       # @param [ BenefitSponsorCatalog ] The catalog valid for the effective_period immediately following this
       # BenefitApplication instance's effective_period
       # @return [ BenefitApplication ] The built renewal application instance and submodels
-      def renew(benefit_sponsor_catalog)
-        if benefit_sponsor_catalog.effective_date != end_on + 1.day
+      def renew(new_benefit_sponsor_catalog)
+        if new_benefit_sponsor_catalog.effective_date != end_on + 1.day
           raise StandardError, "effective period must begin on #{end_on + 1.day}"
         end
 
@@ -256,12 +254,12 @@ module BenefitSponsors
             fte_count:                fte_count,
             pte_count:                pte_count,
             msp_count:                msp_count,
-            benefit_sponsor_catalog:  benefit_sponsor_catalog,
-            predecessor_application:    self,
+            benefit_sponsor_catalog:  new_benefit_sponsor_catalog,
+            predecessor_application:  self,
             recorded_service_area:    benefit_sponsorship.service_area,
             recorded_rating_area:     benefit_sponsorship.rating_area,
-            effective_period:         benefit_sponsor_catalog.effective_period,
-            open_enrollment_period:   benefit_sponsor_catalog.open_enrollment_period
+            effective_period:         new_benefit_sponsor_catalog.effective_period,
+            open_enrollment_period:   new_benefit_sponsor_catalog.open_enrollment_period
           )
 
         benefit_packages.each do |benefit_package|
