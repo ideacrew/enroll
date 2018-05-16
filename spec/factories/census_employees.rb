@@ -11,15 +11,18 @@ FactoryGirl.define do
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
-    association :employer_profile, strategy: :build
+    association :employer_profile, factory: :benefit_sponsors_organizations_aca_shop_dc_employer_profile, strategy: :build
+    association :benefit_sponsorship, factory: [:benefit_sponsors_benefit_sponsorship, :with_market_profile], strategy: :build
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
     end
 
     transient do
-      benefit_group { build(:benefit_group) }
-      renewal_benefit_group { build(:benefit_group) }
+      # benefit_group { build(:benefit_group) }
+      benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
+      # renewal_benefit_group { build(:benefit_group) }
+      renewal_benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
       create_with_spouse false
     end
 
