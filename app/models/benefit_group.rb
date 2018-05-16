@@ -536,7 +536,8 @@ class BenefitGroup
         other_benefit_group = self.plan_year.benefit_groups.detect{ |bg| bg.id != self.id}
 
         if self.plan_year.is_renewing?
-          ce.add_renew_benefit_group_assignment(other_benefit_group)
+          # ce.add_renew_benefit_group_assignment(other_benefit_group)
+          ce.add_renew_benefit_group_assignment([other_benefit_group])
         else
           ce.find_or_create_benefit_group_assignment([other_benefit_group])
         end

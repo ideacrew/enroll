@@ -8,6 +8,7 @@ class BenefitGroupAssignment
   embedded_in :census_employee
 
   field :benefit_group_id, type: BSON::ObjectId
+  field :benefit_package_id, type: BSON::ObjectId # Engine Benefit Package
 
   # Represents the most recent completed enrollment
   field :hbx_enrollment_id, type: BSON::ObjectId
@@ -21,7 +22,9 @@ class BenefitGroupAssignment
 
   embeds_many :workflow_state_transitions, as: :transitional
 
-  validates_presence_of :benefit_group_id, :start_on, :is_active
+  validates_presence_of :start_on, :is_active
+  # validates_presence_of :benefit_group_id
+  # validates_presence_of :benefit_package_id
   validate :date_guards, :model_integrity
 
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
@@ -50,7 +53,13 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    benefit_group.plan_year if benefit_group
+    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
+    # benefit_group.plan_year if benefit_group
+    benefit_application
+  end
+
+  def benefit_application
+    benefit_package.benefit_application
   end
 
   def belongs_to_offexchange_planyear?
@@ -59,15 +68,33 @@ class BenefitGroupAssignment
   end
 
   def benefit_group=(new_benefit_group)
-    raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
-    self.benefit_group_id = new_benefit_group._id
-    @benefit_group = new_benefit_group
+    warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
+    # raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
+    # self.benefit_group_id = new_benefit_group._id
+    # @benefit_group = new_benefit_group
+    self.benefit_package=(new_benefit_group)
   end
 
   def benefit_group
-    return @benefit_group if defined? @benefit_group
-    return nil if benefit_group_id.blank?
-    @benefit_group = BenefitGroup.find(self.benefit_group_id)
+    warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
+    # return @benefit_group if defined? @benefit_group
+    # return nil if benefit_group_id.blank?
+    # @benefit_group = BenefitGroup.find(self.benefit_group_id)
+    benefit_package
+  end
+
+  def benefit_package=(new_benefit_package)
+    raise ArgumentError.new("expected BenefitGroup") unless new_benefit_package.class.to_s.match(/BenefitPackage/)
+    self.benefit_package_id = new_benefit_package._id
+    @benefit_package = new_benefit_package
+  end
+
+  def benefit_package
+    return @benefit_package if defined? @benefit_package
+    return nil if benefit_package_id.blank?
+    @benefit_package = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => benefit_package_id
+    ).first.benefit_packages.find(benefit_package_id)
   end
 
   def hbx_enrollment=(new_hbx_enrollment)

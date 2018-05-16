@@ -9,7 +9,9 @@ module Queries
 
     def initialize(attributes)
       @custom_attributes = attributes
-      @employer_profile = EmployerProfile.find(@custom_attributes[:id])
+      @employer_profile = BenefitSponsors::Organizations::Organization.employer_profiles.where(
+        :"profiles._id" => BSON::ObjectId.from_string(@custom_attributes[:id])
+      ).first.employer_profile
     end
 
     def build_scope()
