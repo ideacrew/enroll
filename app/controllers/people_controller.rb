@@ -388,6 +388,6 @@ private
 
   def clean_duplicate_addresses
     @old_addresses = @person.addresses
-    @person.addresses = [] #fix unexpected duplicates issue
+    @person.update_attributes(addresses: []) #fix unexpected duplicates issue
   end
 end
