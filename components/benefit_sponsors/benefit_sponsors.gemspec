@@ -39,7 +39,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'capybara'
-  s.add_development_dependency 'factory_girl_rails', '4.6.0'
+  s.add_development_dependency 'factory_girl_rails', '4.9.0'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'pry-rails'
   s.add_development_dependency 'pry-stack_explorer'
