@@ -640,6 +640,9 @@ class ConsumerRole
       new_types.each do |new_type|
         person.add_new_verification_type(new_type)
       end
+      person.families.each do |family|
+        family.update_family_document_status!
+      end
     end
   end
 
