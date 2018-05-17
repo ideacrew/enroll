@@ -8,7 +8,8 @@ module BenefitSponsors
       field :aasm_state, type: String, default: "unsubmitted"
 
       embedded_in :benefit_sponsorship, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-      embeds_many :employer_attestation_documents, class_name: "BenefitSponsors::Documents::EmployerAttestationDocument", as: :documentable
+
+      embeds_many :employer_attestation_documents, class_name: "BenefitSponsors::Documents::EmployerAttestationDocument", store_as: :documentable
 
       aasm do
         state :unsubmitted, initial: true
@@ -57,10 +58,10 @@ module BenefitSponsors
       private
 
       def record_transition
-        self.workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: aasm.from_state,
-            to_state: aasm.to_state
-        )
+        # self.workflow_state_transitions << WorkflowStateTransition.new(
+        #     from_state: aasm.from_state,
+        #     to_state: aasm.to_state
+        # )
       end
 
     end

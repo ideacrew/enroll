@@ -93,6 +93,8 @@ module BenefitSponsors
       embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
                   validate: true
 
+      embeds_one :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
+
       has_many    :documents,
                   inverse_of: :benefit_sponsorship_docs,
                   class_name: "BenefitSponsors::Documents::Document"

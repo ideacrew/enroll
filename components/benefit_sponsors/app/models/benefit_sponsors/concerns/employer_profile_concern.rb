@@ -36,18 +36,18 @@ module BenefitSponsors
         # Workflow attributes
         field :aasm_state, type: String, default: "applicant"
 
-        field :profile_source, type: String, default: "self_serve"
-        field :entity_kind, type: Symbol
-        field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+        # field :profile_source, type: String, default: "self_serve"
+        # field :entity_kind, type: Symbol
+        # field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
         field :xml_transmitted_timestamp, type: DateTime
 
-        validates :entity_kind,
-          inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
-          allow_blank: false
-
-        validates :profile_source,
-          inclusion: { in: PROFILE_SOURCE_KINDS },
-          allow_blank: false
+        # validates :entity_kind,
+        #   inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+        #   allow_blank: false
+        #
+        # validates :profile_source,
+        #   inclusion: { in: PROFILE_SOURCE_KINDS },
+        #   allow_blank: false
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
