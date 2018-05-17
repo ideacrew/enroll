@@ -17,7 +17,7 @@ module BenefitMarkets
     APPLICATION_INTERVAL_KINDS  = [:monthly, :annual, :annual_with_midyear_initial]
 
 
-    CONTACT_METHOD_KINDS        = [:paper_and_electronic, :paper_only]
+    CONTACT_METHOD_KINDS        = [:paper_and_electronic, :paper_only, :electronic_only]
 
 
     class << self
