@@ -9,7 +9,7 @@ module BenefitSponsors
         attr_accessor :profile_id, :profile_type, :organization, :current_user, :claimed, :pending
         attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
         attr_accessor :area_code, :number, :extension
-        cattr_accessor :profile_type
+        attr_accessor :profile_type
 
         delegate :is_employer_profile?, :is_broker_profile?, to: :class
 

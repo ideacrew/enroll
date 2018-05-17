@@ -174,7 +174,7 @@ class CensusEmployee < CensusMember
   end
 
   def employer_profile=(new_employer_profile)
-    raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
+    raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
     self.employer_profile_id = new_employer_profile._id
     @employer_profile = new_employer_profile
   end
