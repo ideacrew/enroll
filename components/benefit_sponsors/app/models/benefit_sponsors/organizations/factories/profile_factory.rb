@@ -353,32 +353,6 @@ module BenefitSponsors
           profile_type == "benefit_sponsor"
         end
 
-        def get_market_place
-          if site_key == :dc
-            dc_shop_market_place
-          elsif site_key == :cca
-            cca_shop_market_place
-          end
-        end
-
-        def dc_shop_market_place
-          benefit_market_class.where(
-            site_urn: :dc,
-            kind: :aca_shop
-          ).first
-        end
-
-        def cca_shop_market_place
-          benefit_market_class.where(
-            site_urn: :cca,
-            kind: :aca_shop
-          ).first
-        end
-
-        def benefit_market_class
-          ::BenefitMarkets::BenefitMarket
-        end
-
         def add_person_contact_info
           if is_broker_profile?
             person.add_work_email(email)
