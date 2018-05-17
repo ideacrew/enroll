@@ -155,15 +155,15 @@ module BenefitSponsors
       # Workflow for self service
       aasm do
         state :new, initial: true
-        state :initial_application_approved # Sponsor's first application is submitted and approved
-        state :initial_enrollment_closed    # Sponsor members have successfully completed open enrollment
+        state :initial_application_approved     # Sponsor's first application is submitted and approved
+        state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
         state :initial_enrollment_ineligible
-        state :initial_enrollment_eligible, after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
-                                        #, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-        state :active                   # Sponsor's members are actively enrolled in coverage
-        state :suspended                # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
-        state :terminated               # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
-        state :ineligible               # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
+        state :initial_enrollment_eligible,   after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
+        state :binder_reversed,               after_enter: :publish_binder_reversed
+        state :active                           # Sponsor's members are actively enrolled in coverage
+        state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
+        state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
+        state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
         event :approve_initial_application do
           transitions from: :new, to: :initial_application_approved
@@ -183,8 +183,12 @@ module BenefitSponsors
           transitions from: :initial_enrollment_eligible,  to: :initial_enrollment_ineligible
         end
 
-        event :pay_binder do
+        event :credit_binder do
           transitions from: :initial_enrollment_closed, to: :initial_enrollment_eligible
+        end
+
+        event :reverse_binder do
+          transitions from: :initial_enrollment_eligible, to: :initial_enrollment_closed
         end
 
         event :begin_coverage do
