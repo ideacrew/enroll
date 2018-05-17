@@ -166,10 +166,10 @@ GEM
     equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.7.0)
-    factory_girl (4.5.0)
+    factory_girl (4.9.0)
       activesupport (>= 3.0.0)
-    factory_girl_rails (4.6.0)
-      factory_girl (~> 4.5.0)
+    factory_girl_rails (4.9.0)
+      factory_girl (~> 4.9.0)
       railties (>= 3.0.0)
     ffi (1.9.23)
     forgery (0.7.0)
@@ -377,7 +377,7 @@ DEPENDENCIES
   capybara
   database_cleaner
   effective_datatables!
-  factory_girl_rails (= 4.6.0)
+  factory_girl_rails (= 4.9.0)
   forgery
   mongoid-rspec
   pry
