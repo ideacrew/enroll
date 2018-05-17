@@ -87,6 +87,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
   describe "document_due_date", dbclean: :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilderWithDateRange.new(person.consumer_role, valid_params)
     end
@@ -130,6 +131,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
   describe "min_notice_due_date", dbclean: :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilderWithDateRange.new(person.consumer_role, valid_params)
     end
@@ -179,6 +181,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
   describe "#attach_required_documents" do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilderWithDateRange.new(person.consumer_role, valid_params)
     end
@@ -216,6 +219,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
   describe "render template and generate pdf" do
     before do
       allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilderWithDateRange.new(person.consumer_role, valid_params)
     end
