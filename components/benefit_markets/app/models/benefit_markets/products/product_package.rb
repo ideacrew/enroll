@@ -33,6 +33,11 @@ module BenefitMarkets
     scope :by_kind,             ->(kind){ where(kind: kind) }
     scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
 
+
+    def effective_date
+      packagable.effective_date || application_period.min
+    end
+
     def benefit_market_kind
       packagable.benefit_market_kind
     end
@@ -41,14 +46,18 @@ module BenefitMarkets
       multiplicity ? :multiple : :single
     end
 
+    def active_products
+      products.active_on(effective_date)
+    end
+
     def issuer_profiles
       return @issuer_profiles if defined?(@issuer_profiles)
-      @issuer_profiles = products.select { |product| product.issuer_profile }.uniq!
+      @issuer_profiles = active_products.select { |product| product.issuer_profile }.uniq!
     end
 
     def issuer_profile_products_for(issuer_profile)
       return @issuer_profile_products if defined?(@issuer_profile_products)
-      @issuer_profile_products = products.by_issuer_profile(issuer_profile)
+      @issuer_profile_products = active_products.by_issuer_profile(issuer_profile)
     end
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria

@@ -56,9 +56,9 @@ module BenefitSponsors
       #   @benefit_sponsorship = benefit_sponsorship
       # end
 
-      # validates :contact_method,
-      #   inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
-      #   allow_blank: false
+       validates :contact_method,
+         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
+         allow_blank: false
 
       def primary_office_location
         office_locations.detect(&:is_primary?)
