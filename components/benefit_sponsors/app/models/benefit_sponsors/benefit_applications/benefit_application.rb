@@ -270,6 +270,19 @@ module BenefitSponsors
         renewal_application
       end
 
+      def refresh(new_benefit_sponsor_catalog)
+        if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
+
+          benefit_packages.each do |benefit_package|
+            benefit_package.refresh(new_benefit_sponsor_catalog)
+          end
+
+          self.benefit_sponsor_catalog = new_benefit_sponsor_catalog
+        end
+
+        self
+      end
+
       def is_event_date_valid?
         today = TimeKeeper.date_of_record
 

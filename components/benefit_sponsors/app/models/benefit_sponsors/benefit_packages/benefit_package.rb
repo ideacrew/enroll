@@ -58,30 +58,31 @@ module BenefitSponsors
           is_default: is_default
         })
         
-        sponsored_benefits.each do |sponsored_benefit|
-
-          new_benefit_sponsor_catalog = new_benefit_package.benefit_sponsor_catalog
-          new_product_package = new_benefit_sponsor_catalog.product_packages
-                  .by_kind(sponsored_benefit.product_package_kind)
-                  .by_product_kind(sponsored_benefit.product_kind)[0]
-
-
-          if new_product_package.present?
-            reference_product = sponsored_benefit.reference_product
-            if reference_product && reference_product.renewal_product.present?
-
-              # product_package = sponsored_benefit.product_package
-              # renewal_products = product_package.active_products.collect{|product| product.renewal_product}.compact
-
-              # if renewal_products.present? && (new_product_package.products & renewal_products).any?
-              new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
-              new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
-              # end
-            end
-          end
+        sponsored_benefits.each do |sponsored_benefit| 
+          new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
 
         new_benefit_package
+      end
+
+      # Scenario 1: sponsored_benefit is missing (because product not available during renewal)
+      def refresh
+
+      end 
+
+      #  Scenario 2: sponsored_benefit is present
+      def refresh!(new_benefit_sponsor_catalog)
+        # construct sponsored benefits again 
+        # compare them with old ones
+
+        sponsored_benefits.each do |sponsored_benefit|
+          current_product_package = sponsored_benefit.product_package
+          new_product_package = new_benefit_sponsor_catalog.product_package_for(sponsored_benefit)
+
+          if current_product_package != new_product_package
+            sponsored_benefit.refresh
+          end
+        end
       end
 
       def disable_benefit_package
