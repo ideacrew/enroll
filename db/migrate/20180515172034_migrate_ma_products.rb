@@ -68,6 +68,9 @@ class MigrateMaProducts < Mongoid::Migration
               csr_variant_id: plan.csr_variant_id,
               application_period: (Date.new(plan.active_year, 1, 1)..Date.new(plan.active_year, 12, 31)),
               service_area_id: mapped_service_area_id,
+              provider_directory_url: plan.provider_directory_url,
+              sbc_document: plan.sbc_document,
+              is_reference_plan_eligible: true,
               premium_ages: (plan.minimum_age..plan.maximum_age),
               premium_tables: premium_tables
             }
@@ -86,7 +89,9 @@ class MigrateMaProducts < Mongoid::Migration
                 health_plan_kind: plan.plan_type.downcase,
                 metal_level_kind: plan.metal_level,
                 product_package_kinds: product_package_kinds,
-                ehb: plan.ehb
+                ehb: plan.ehb,
+                is_standard_plan: plan.is_standard_plan,
+                rx_formulary_url: plan.rx_formulary_url,
               }.merge(shared_attributes))
             else
               BenefitMarkets::Products::DentalProducts::DentalProduct.create!({
@@ -97,6 +102,27 @@ class MigrateMaProducts < Mongoid::Migration
         end
 
         say_with_time("Migrate catastrophic and renewal reference plan data") do
+          products = BenefitMarkets::Products::Product.all
+          products.each do |product|
+            year = product.application_period.first.year
+            if year == 2017 # because we dont have any mappings from 2018 to 2019
+              plan = Plan.where(active_year: year, hios_id: product.hios_id).first
+
+              renewal_plan_hios_id = plan.renewal_plan.hios_id
+              catastrophic_plan_hios_id = plan.cat_age_off_renewal_plan_id.present? ? plan.cat_age_off_renewal_plan.hios_id : nil
+
+              renewal_product_2018 = BenefitMarkets::Products::Product.where(hios_id: renewal_plan_hios_id).sort_by{|a| a.application_period.first.year}.last
+
+              catastrophic_product_2018 = if catastrophic_plan_hios_id.present?
+                BenefitMarkets::Products::Product.where(hios_id: catastrophic_plan_hios_id).sort_by{|a| a.application_period.first.year}.last
+              else
+                nil
+              end
+              product.renewal_product = renewal_product_2018
+              product.catastrophic_age_off_product = catastrophic_product_2018
+              product.save
+            end
+          end
           # Now that all the plans moved over, cross-map the catastropic, age-off,
           # and renewal plans from the original data
         end

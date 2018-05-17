@@ -42,7 +42,7 @@ module BenefitSponsors
       end
 
       def create
-        @broker_managenement_form = BenefitSponsors::Organizations::Forms::BrokerManagementForm.for_create(params)
+        @broker_managenement_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_create(params)
         @broker_managenement_form.save
         flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
         redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: 'brokers')
@@ -52,7 +52,7 @@ module BenefitSponsors
       end
 
       def terminate
-        @broker_managenement_form = BenefitSponsors::Organizations::Forms::BrokerManagementForm.for_terminate(params)
+        @broker_managenement_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_terminate(params)
 
         if @broker_managenement_form.terminate && @broker_managenement_form.direct_terminate
           flash[:notice] = "Broker terminated successfully."

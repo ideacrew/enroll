@@ -30,7 +30,6 @@ module BenefitSponsors
         health_sponsored_benefit = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
         health_sponsored_benefit.benefit_package = @benefit_package
         health_sponsored_benefit.assign_attributes(args[0].except(:kind))
-        health_sponsored_benefit.load_sponsor_products
         health_sponsored_benefit
       end
 
