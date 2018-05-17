@@ -66,7 +66,7 @@ module BenefitSponsors
 
       def send_broker_successfully_associated_email broker_role_id
         broker_person = Person.where(:'broker_role._id' => get_bson_id(broker_role_id)).first
-        body = "You have been selected as a broker by #{@employer_profile.try(:legal_name)}"
+        body = "You have been selected as a broker by #{@employer_profile.legal_name}"
 
         message_params = {
           sender_id: @employer_profile.try(:id),
