@@ -16,13 +16,12 @@ module BenefitSponsors
             organization.create_employer_profile(employer_profile_prams)
           else
             new_organization = BenefitSponsors::Organizations::Organization.new(form_organizational_params)
-            employer_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(employer_profile_prams.merge(:organization => new_organization))
-            binding.pry
 
-            new_organization.profiles << employer_profile
+            employer_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(employer_profile_prams.merge(:organization => new_organization))
 
             benefit_sponsorship = employer_profile.add_benefit_sponsorship
-            benefit_sponsorship.update_attributes!(registered_on: registred_on, origin_kind: :conversion)
+
+            benefit_sponsorship.update_attributes!(registered_on: registered_on, source_kind: :conversion)
 
             set_attestation_to_true(benefit_sponsorship)
 

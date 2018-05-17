@@ -30,7 +30,7 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
   }
 
   let!(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :cca, :with_owner_exempt_organization)}
+  let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :cca, :with_owner_exempt_organization, :with_benefit_market)}
 
   let!(:fein) { record_attrs[:fein] }
 
@@ -50,9 +50,10 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
       expect(employer_profile.sic_code).to eq record_attrs[:sic_code]
       expect(employer_profile.legal_name).to eq record_attrs[:legal_name]
       expect(employer_profile.dba).to eq record_attrs[:dba]
+      sponsorship =employer_profile.organization.benefit_sponsorships.first
       # expect(employer_profile.benefit_sponsorships.first.issuer_assigned_id). to eq record_attrs[:assigned_employer_id]
-      # expect(employer_profile.benefit_sponsorships.first.source_kind).to eq "conversion"
-      # expect(employer_profile.benefit_sponsorships.first.employer_attestation.approved?).to be_truthy
+      expect(sponsorship.source_kind).to eq :conversion
+      expect(sponsorship.employer_attestation.approved?).to be_truthy
     end
 
     it "should create primary office location" do

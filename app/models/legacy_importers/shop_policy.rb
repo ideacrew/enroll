@@ -8,7 +8,6 @@ module LegacyImporters
     end
 
     def save
-      binding.pry
       basic_props = extract_policy_properties
       ret_val = true
       sc = ShortCircuit.new(:missing_object) do |mo_message|

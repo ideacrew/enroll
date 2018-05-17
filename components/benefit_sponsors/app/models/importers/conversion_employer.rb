@@ -106,7 +106,7 @@ module Importers
 
     def fetch_entity_kind
       # In excel we do not have that field we are making default to "c-corporation"
-      "c_corporation"
+      :c_corporation
     end
 
     def map_poc(emp)

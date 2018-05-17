@@ -1,4 +1,3 @@
-=begin
 module Importers::ConversionEmployerCarrierValue
 
   def self.included(base)
@@ -11,7 +10,6 @@ module Importers::ConversionEmployerCarrierValue
   end
 
   def carrier=(val)
-    binding.pry
     if val.blank?
       @carrier = nil
       return val
@@ -20,7 +18,6 @@ module Importers::ConversionEmployerCarrierValue
   end
 
   def validate_carrier
-    binding.pry
     found_carrier = find_carrier
     if found_carrier.nil?
       errors.add(:carrier, "invalid carrier specified (not one of #{self.class::CARRIER_MAPPING.keys.join(", ")})")
@@ -28,11 +25,9 @@ module Importers::ConversionEmployerCarrierValue
   end
 
   def find_carrier
-    binding.pry
     org = Organization.where("carrier_profile.abbrev" => carrier).first
     return nil unless org
     org.carrier_profile
   end
 
 end
-=end
