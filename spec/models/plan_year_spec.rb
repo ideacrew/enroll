@@ -487,16 +487,16 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context 'should return correct benefit group assignments for an employee' do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
     let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
     let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
     let(:open_enrollment_end_on) { open_enrollment_start_on + 12.days }
     let(:effective_date)         { plan_year_start_on }
-    let(:census_employee) { FactoryGirl.create(:census_employee,
+    let!(:census_employee) { FactoryGirl.create(:census_employee,
                                                   employer_profile: employer_profile
                             ) }
-    let(:plan_year)                     { py = FactoryGirl.create(:plan_year,
+    let!(:plan_year)                     { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: open_enrollment_start_on,
@@ -510,7 +510,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                                     py.save(:validate => false)
                                                     py
                                                   }
-    let(:benefit_group_assignment) {
+    let!(:benefit_group_assignment) {
       BenefitGroupAssignment.create({
         census_employee: census_employee,
         benefit_group: plan_year.benefit_groups.first,
@@ -518,7 +518,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       })
     }
 
-    let(:renewal_benefit_group_assignment) {
+    let!(:renewal_benefit_group_assignment) {
       BenefitGroupAssignment.create({
         census_employee: census_employee,
         benefit_group: plan_year.benefit_groups.first,
@@ -527,13 +527,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     }
     it 'should return renewing benefit group assignment' do
       # This spec/method should be moved to Census Employee Model if needed, can't test as CE only work with New Profiles
-      # expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq renewal_benefit_group_assignment
+      expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq renewal_benefit_group_assignment
     end
 
     it 'should retrun active benefit_group_assignment' do
       # This spec/method should be moved to Census Employee Model if needed, can't test as CE only work with New Profiles
-      # plan_year.update_attributes(:'aasm_state' => 'active')
-      # expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq census_employee.benefit_group_assignments.first
+      plan_year.update_attributes(:'aasm_state' => 'active')
+      expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq census_employee.benefit_group_assignments.first
     end
   end
 
@@ -576,12 +576,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:plan_year1) { FactoryGirl.create(:renewing_plan_year)}
 
       context "and at least one employee is present on the roster sans assigned benefit group" do
-        let(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+        let!(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
         it "census employee has no benefit group assignment and employer profile is the same as plan year's" do
           # This spec/method should be in Census Employee Model if needed, can't test as CE only work with New Profiles
-          # expect(census_employee_no_benefit_group.benefit_group_assignments).to eq []
-          # expect(census_employee_no_benefit_group.employer_profile).to eq workflow_plan_year_with_benefit_group.employer_profile
+          expect(census_employee_no_benefit_group.benefit_group_assignments).to eq []
+          expect(census_employee_no_benefit_group.employer_profile).to eq workflow_plan_year_with_benefit_group.employer_profile
         end
 
         it "application should NOT be publishable" do

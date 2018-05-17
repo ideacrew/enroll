@@ -75,8 +75,8 @@ describe ".coverage_effective_on" do
     let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 9.days }
 
     let!(:census_employees){
-      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship
-      FactoryGirl.create :census_employee, employer_profile: employer_profile, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship
+      FactoryGirl.create :benefit_sponsors_census_employee, :owner, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship
+      FactoryGirl.create :benefit_sponsors_census_employee, employer_profile: employer_profile, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship
     }
 
     let(:ce) { employer_profile.census_employees.non_business_owner.first }
@@ -527,7 +527,7 @@ describe EmployeeRole, dbclean: :after_each do
     })
   }
 
-  let(:census_employee) {FactoryGirl.create(:census_employee,
+  let(:census_employee) {FactoryGirl.create(:benefit_sponsors_census_employee,
     benefit_sponsorship: employer_profile.active_benefit_sponsorship,
     employer_profile: employer_profile,
     created_at: middle_of_prev_year,
@@ -613,7 +613,7 @@ describe EmployeeRole, dbclean: :after_each do
     context 'when new hire open enrollment period available' do
       # let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
 
-      let(:census_employee) {FactoryGirl.create(:census_employee,
+      let(:census_employee) {FactoryGirl.create(:benefit_sponsors_census_employee,
         benefit_sponsorship: employer_profile.active_benefit_sponsorship,
         employer_profile: employer_profile,
         created_at: (plan_year_start_on + 10.days),
@@ -633,7 +633,7 @@ describe EmployeeRole, dbclean: :after_each do
 
     context 'when new roster entry enrollment period available' do
       # let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: middle_of_prev_year) }
-      let(:census_employee) {FactoryGirl.create(:census_employee,
+      let(:census_employee) {FactoryGirl.create(:benefit_sponsors_census_employee,
         benefit_sponsorship: employer_profile.active_benefit_sponsorship,
         employer_profile: employer_profile,
         created_at: (plan_year_start_on + 10.days),
@@ -652,7 +652,7 @@ describe EmployeeRole, dbclean: :after_each do
 
     context 'when outside new hire enrollment period and employer open enrolment' do
       # let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: (plan_year_start_on + 10.days), updated_at: (plan_year_start_on + 10.days), hired_on: (plan_year_start_on + 10.days)) }
-      let(:census_employee) {FactoryGirl.create(:census_employee,
+      let(:census_employee) {FactoryGirl.create(:benefit_sponsors_census_employee,
         benefit_sponsorship: employer_profile.active_benefit_sponsorship,
         employer_profile: employer_profile,
         created_at: (plan_year_start_on + 10.days),
@@ -686,7 +686,7 @@ describe EmployeeRole, dbclean: :after_each do
 
   context "is_cobra_status?" do
     let(:employee_role) { FactoryGirl.build(:employee_role) }
-    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:census_employee) { FactoryGirl.build(:benefit_sponsors_census_employee) }
 
     it "should return false when without census_employee" do
       allow(employee_role).to receive(:census_employee).and_return nil
@@ -726,7 +726,7 @@ describe "#benefit_group", dbclean: :after_each do
     sep
   }
 
-  let(:census_employee) { FactoryGirl.create(:census_employee,
+  let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee,
     first_name: person.first_name,
     last_name: person.last_name,
     dob: person.dob,

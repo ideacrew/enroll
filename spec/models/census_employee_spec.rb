@@ -581,7 +581,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       #                                         hired_on: "2014-08-12".to_date
       #                                       )}
 
-      let!(:existing_census_employee)     { FactoryGirl.create(:census_employee,
+      let!(:existing_census_employee)     { FactoryGirl.create(:benefit_sponsors_census_employee,
         employer_profile: employer_profile,
         benefit_sponsorship: employer_profile.active_benefit_sponsorship
       )}
@@ -685,7 +685,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "validation for employment_terminated_on" do
-    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year - 50.days)}
+    let(:census_employee) {FactoryGirl.build(:benefit_sponsors_census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year - 50.days)}
 
     it "should fail when terminated date before than hired date" do
       census_employee.employment_terminated_on = census_employee.hired_on - 10.days
@@ -707,7 +707,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "validation for census_dependents_relationship" do
-    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:census_employee) { FactoryGirl.build(:benefit_sponsors_census_employee) }
     let(:spouse1) { FactoryGirl.build(:census_dependent, employee_relationship: "spouse") }
     let(:spouse2) { FactoryGirl.build(:census_dependent, employee_relationship: "spouse") }
     let(:partner1) { FactoryGirl.build(:census_dependent, employee_relationship: "domestic_partner") }
@@ -744,21 +744,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "scope employee_name" do
     # let(:employer_profile) {FactoryGirl.create(:employer_profile)}
-    let(:census_employee1) {FactoryGirl.create(:census_employee,
+    let(:census_employee1) {FactoryGirl.create(:benefit_sponsors_census_employee,
       benefit_sponsorship: employer_profile.active_benefit_sponsorship,
       employer_profile: employer_profile,
       first_name: "Amy",
       last_name: "Frank"
     )}
 
-    let(:census_employee2) {FactoryGirl.create(:census_employee,
+    let(:census_employee2) {FactoryGirl.create(:benefit_sponsors_census_employee,
       benefit_sponsorship: employer_profile.active_benefit_sponsorship,
       employer_profile: employer_profile,
       first_name: "Javert",
       last_name: "Burton"
     )}
     
-    let(:census_employee3) {FactoryGirl.create(:census_employee,
+    let(:census_employee3) {FactoryGirl.create(:benefit_sponsors_census_employee,
       benefit_sponsorship: employer_profile.active_benefit_sponsorship,
       employer_profile: employer_profile,
       first_name: "Burt",
@@ -795,7 +795,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     # include_context "BradyWorkAfterAll"
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     # let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
-    let(:census_employee) {FactoryGirl.create(:census_employee,
+    let(:census_employee) {FactoryGirl.create(:benefit_sponsors_census_employee,
       benefit_sponsorship: employer_profile.active_benefit_sponsorship,
       employer_profile: employer_profile,
       employee_role_id: employee_role.id
@@ -862,7 +862,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   context "construct_employee_role_for_match_person" do
     # let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     # let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -874,7 +874,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       ssn: census_employee.ssn,
       gender: census_employee.gender
     )}
-    let(:census_employee1) { FactoryGirl.build(:census_employee) }
+    let(:census_employee1) { FactoryGirl.build(:benefit_sponsors_census_employee) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
@@ -907,7 +907,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "newhire_enrollment_eligible" do
     # let(:census_employee) { FactoryGirl.build(:census_employee) }
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -969,7 +969,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "generate_and_deliver_checkbook_url" do
     # let(:census_employee) { FactoryGirl.create(:census_employee) }
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1021,7 +1021,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "change the aasm state & populates terminated on of enrollments" do
       # let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-      let(:census_employee) { FactoryGirl.create :census_employee,
+      let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
         employer_profile: employer_profile,
         benefit_sponsorship: organization.active_benefit_sponsorship
       }
@@ -1339,7 +1339,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       :with_aca_shop_dc_employer_profile_renewal_application
     )}
 
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: benefit_sponsorship
     }
@@ -1490,7 +1490,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "existing_cobra" do
     # let(:census_employee) { FactoryGirl.create(:census_employee) }
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1506,7 +1506,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   context "have_valid_date_for_cobra?" do
     let(:hired_on) { TimeKeeper.date_of_record }
     # let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: hired_on) }
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship,
       hired_on: hired_on
@@ -1560,7 +1560,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "can_elect_cobra?" do
     # let(:census_employee) { FactoryGirl.build(:census_employee) }
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship,
       hired_on: hired_on
@@ -1585,7 +1585,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "without coverage_terminated_on" do
       # let(:census_employee) { FactoryGirl.build(:census_employee) }
 
-      let(:census_employee) { FactoryGirl.build :census_employee,
+      let(:census_employee) { FactoryGirl.build :benefit_sponsors_census_employee,
         employer_profile: employer_profile,
         benefit_sponsorship: organization.active_benefit_sponsorship,
         hired_on: hired_on
@@ -1602,7 +1602,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with coverage_terminated_on" do
       # let(:census_employee) { FactoryGirl.build(:census_employee, coverage_terminated_on: TimeKeeper.date_of_record) }
 
-      let(:census_employee) { FactoryGirl.create :census_employee,
+      let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
         employer_profile: employer_profile,
         benefit_sponsorship: organization.active_benefit_sponsorship,
         coverage_terminated_on: TimeKeeper.date_of_record
@@ -1626,7 +1626,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "is_cobra_coverage_eligible?" do
     # let(:census_employee) { FactoryGirl.build(:census_employee) }
-    let(:census_employee) { FactoryGirl.build :census_employee,
+    let(:census_employee) { FactoryGirl.build :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1648,7 +1648,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "cobra_eligibility_expired?" do
     # let(:census_employee) { FactoryGirl.build(:census_employee) }
-    let(:census_employee) { FactoryGirl.build :census_employee,
+    let(:census_employee) { FactoryGirl.build :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1679,7 +1679,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "is_linked?" do
     # let(:census_employee) { FactoryGirl.build(:census_employee) }
-    let(:census_employee) { FactoryGirl.build :census_employee,
+    let(:census_employee) { FactoryGirl.build :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1710,7 +1710,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     )}
 
     let(:census_employee) {
-      ce = FactoryGirl.create(:census_employee,
+      ce = FactoryGirl.create(:benefit_sponsors_census_employee,
         employer_profile: organization.employer_profile,
         benefit_sponsorship: organization.active_benefit_sponsorship,
         dob: TimeKeeper.date_of_record - 30.years
@@ -1821,7 +1821,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     # let(:census_employee)     { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1977-01-01'.to_date, ssn: '123456789') }
     # let(:person)              { FactoryGirl.create(:person,          first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '314159265') }
 
-    let(:census_employee) { FactoryGirl.create :census_employee,
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1856,7 +1856,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   context "check_hired_on_before_dob" do
     # let(:census_employee) { FactoryGirl.build(:census_employee) }
 
-    let(:census_employee) { FactoryGirl.build :census_employee,
+    let(:census_employee) { FactoryGirl.build :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
@@ -1875,19 +1875,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     # let!(:enrolling_employee) { create(:census_employee, expected_selection: 'enroll') }
     # let!(:invalid_waive) { create(:census_employee, expected_selection: 'will_not_participate' )}
 
-    let!(:valid_waived_employee) { FactoryGirl.create :census_employee,
+    let!(:valid_waived_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship,
       expected_selection: 'waive'
     }
 
-    let!(:enrolling_employee) { FactoryGirl.create :census_employee,
+    let!(:enrolling_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship,
       expected_selection: 'enroll'
     }
 
-    let!(:invalid_waive) { FactoryGirl.create :census_employee,
+    let!(:invalid_waive) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship,
       expected_selection: 'will_not_participate'
@@ -1911,7 +1911,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "when active employeees opt to waive" do
     # let(:census_employee) { FactoryGirl.build(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
-    let(:census_employee) { FactoryGirl.build :census_employee,
+    let(:census_employee) { FactoryGirl.build :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
       benefit_sponsorship: organization.active_benefit_sponsorship,
       benefit_group_assignments: [benefit_group_assignment]
@@ -1976,7 +1976,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:plan_year)                       { benefit_application }
     # let(:benefit_group)                   { plan_year.benefit_packages.first }
     let(:benefit_group_assignment)        { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: civil_servant) }
-    let(:civil_servant)                   { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+    let(:civil_servant)                   { FactoryGirl.build(:benefit_sponsors_census_employee, employer_profile: employer_profile_congressional) }
     let(:initial_state)                   { "eligible" }
     let(:eligible_state)                  { "newly_designated_eligible" }
     let(:linked_state)                    { "newly_designated_linked" }
@@ -2012,7 +2012,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context "and multiple newly designated employees are present in database" do
-      let(:second_civil_servant)  { FactoryGirl.build(:census_employee, employer_profile: employer_profile_congressional) }
+      let(:second_civil_servant)  { FactoryGirl.build(:benefit_sponsors_census_employee, employer_profile: employer_profile_congressional) }
 
       before do
         civil_servant.benefit_group_assignments = [benefit_group_assignment]
@@ -2058,7 +2058,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   describe "#trigger_notice" do
-    let(:census_employee){FactoryGirl.build(:census_employee)}
+    let(:census_employee){FactoryGirl.build(:benefit_sponsors_census_employee)}
     let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
     it "should trigger job in queue" do
       ActiveJob::Base.queue_adapter = :test

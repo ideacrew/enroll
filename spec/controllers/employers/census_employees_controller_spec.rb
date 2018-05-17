@@ -14,7 +14,7 @@ RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile) { organization.employer_profile }
   let(:employer_profile_id) { employer_profile.id }
 
-  let(:census_employee) { FactoryGirl.create(:census_employee,
+  let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee,
     employer_profile: employer_profile,
     benefit_sponsorship: employer_profile.active_benefit_sponsorship,
     employment_terminated_on: TimeKeeper::date_of_record - 45.days,
@@ -220,7 +220,7 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
     let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:census_employee1) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
+    let(:census_employee1) { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
     let(:current_employer_term_enrollment) do
       FactoryGirl.create(:hbx_enrollment,

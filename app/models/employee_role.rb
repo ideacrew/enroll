@@ -74,17 +74,34 @@ class EmployeeRole
   #   @employer_profile = EmployerProfile.find(self.employer_profile_id)
   # end
 
+  def is_env_test?
+    return @is_env_test if defined? @is_env_test
+    @is_env_test = Rails.env.test?
+  end
+
+  def is_case_old?
+    self.employer_profile_id.present? && is_env_test?
+  end
+
   def employer_profile=(new_employer_profile)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
-    self.benefit_sponsors_employer_profile_id = new_employer_profile._id
+    if new_employer_profile.is_a?(EmployerProfile) && is_env_test?
+      self.employer_profile_id = new_employer_profile._id
+    else
+      self.benefit_sponsors_employer_profile_id = new_employer_profile._id
+    end
     @employer_profile = new_employer_profile
   end
 
   def employer_profile
     return @employer_profile if defined? @employer_profile
-    @employer_profile =  BenefitSponsors::Organizations::Organization.employer_profiles.where(
-      :"profiles._id" => BSON::ObjectId.from_string(benefit_sponsors_employer_profile_id)
-    ).first.employer_profile
+    if is_case_old?
+      @employer_profile = EmployerProfile.find(self.employer_profile_id)
+    else
+      @employer_profile =  BenefitSponsors::Organizations::Organization.employer_profiles.where(
+        :"profiles._id" => BSON::ObjectId.from_string(benefit_sponsors_employer_profile_id)
+      ).first.employer_profile
+    end
   end
 
   def benefit_group(qle: false)

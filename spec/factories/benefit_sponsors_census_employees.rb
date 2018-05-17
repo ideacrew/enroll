@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :census_employee do
+  factory :benefit_sponsors_census_employee, class: 'CensusEmployee' do
     first_name "Eddie"
     sequence(:last_name) {|n| "Vedder#{n}" }
     dob "1964-10-23".to_date
@@ -11,15 +11,16 @@ FactoryGirl.define do
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
-    association :employer_profile, strategy: :build
+    association :employer_profile, factory: :benefit_sponsors_organizations_aca_shop_dc_employer_profile, strategy: :build
+    association :benefit_sponsorship, factory: [:benefit_sponsors_benefit_sponsorship, :with_market_profile], strategy: :build
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
     end
 
     transient do
-      benefit_group { build(:benefit_group) }
-      renewal_benefit_group { build(:benefit_group) }
+      benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
+      renewal_benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
       create_with_spouse false
     end
 
@@ -67,13 +68,13 @@ FactoryGirl.define do
       end
     end
 
-    factory :census_employee_with_active_assignment do
+    factory :benefit_sponsors_census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
         create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 
-    factory :census_employee_with_active_and_renewal_assignment do
+    factory :benefit_sponsors_census_employee_with_active_and_renewal_assignment do
       after(:create) do |census_employee, evaluator|
         create(:census_employee_with_active_assignment)
         create(:benefit_group_assignment, benefit_group: evaluator.renewal_benefit_group, census_employee: census_employee, is_active: false)

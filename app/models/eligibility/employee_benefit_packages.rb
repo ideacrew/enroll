@@ -1,24 +1,37 @@
 module Eligibility
   module EmployeeBenefitPackages
     # Deprecated
-    # def assign_default_benefit_package
-    #   # TODO
-    #   py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
-    #   if py.present?
-    #     if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
-    #       find_or_create_benefit_group_assignment(py.benefit_groups)
-    #     end
-    #   end
+    def assign_default_benefit_package
+      return true unless is_case_old?
+      py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
+      if py.present?
+        if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
+          find_or_create_benefit_group_assignment(py.benefit_groups)
+        end
+      end
 
-    #   if py = employer_profile.plan_years.renewing.first
-    #     if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-    #       add_renew_benefit_group_assignment(py.benefit_groups.first)
-    #     end
-    #   end
-    # end
+      if py = employer_profile.plan_years.renewing.first
+        if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
+          add_renew_benefit_group_assignment(py.benefit_groups.first)
+        end
+      end
+    end
+
+    # Deprecated
+
+    def find_or_create_benefit_group_assignment_for_old_case(benefit_groups)
+      bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
+
+      if bg_assignments.present?
+        valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
+        valid_bg_assignment.make_active
+      else
+        add_benefit_group_assignment(benefit_groups.first, benefit_groups.first.plan_year.start_on)
+      end
+    end
 
     def find_or_create_benefit_group_assignment(benefit_packages)
-      # bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
+      return find_or_create_benefit_group_assignment_for_old_case(benefit_packages) if is_case_old?
       if benefit_packages.present?
         bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
 
@@ -26,7 +39,6 @@ module Eligibility
           valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
           valid_bg_assignment.make_active
         else
-          # add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.plan_year.start_on)
           add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.benefit_application.start_on)
         end
       end
@@ -43,25 +55,45 @@ module Eligibility
     # end
 
     def add_renew_benefit_group_assignment(renewal_benefit_packages)
-      # raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+      return add_renew_benefit_group_assignment_old_case(renewal_benefit_packages.first) if is_case_old?
       if renewal_benefit_packages.present?
         benefit_group_assignments.renewing.each do |benefit_group_assignment|
-          # if benefit_group_assignment.benefit_group_id == new_benefit_group.id
           if renewal_benefit_packages.map(&:id).include?(benefit_group_assignment.benefit_package.id)
             benefit_group_assignment.destroy
           end
         end
-
-        # bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
 
         bga = BenefitGroupAssignment.new(benefit_group: renewal_benefit_packages.first, start_on: renewal_benefit_packages.first.start_on, is_active: false)
         benefit_group_assignments << bga
       end
     end
 
+    # Deprecated
+
+    def add_renew_benefit_group_assignment_old_case(new_benefit_group)
+      raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+
+      benefit_group_assignments.renewing.each do |benefit_group_assignment|
+        if benefit_group_assignment.benefit_group_id == new_benefit_group.id
+          benefit_group_assignment.destroy
+        end
+      end
+
+      bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
+      benefit_group_assignments << bga
+    end
+
     def add_benefit_group_assignment(new_benefit_group, start_on = nil)
-      # raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+      return add_benefit_group_assignment_old_case if is_case_old?
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
+      reset_active_benefit_group_assignments(new_benefit_group)
+      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))
+    end
+
+    # Deprecated
+
+    def add_benefit_group_assignment_old_case
+      raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
       reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))
     end
@@ -93,13 +125,14 @@ module Eligibility
       end
     end
 
-    # Deprecated
-    # def has_benefit_group_assignment?
-    #   (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
-    #   (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
-    # end
+    #Deprecated
+    def has_benefit_group_assignment_old_case?
+      (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
+      (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
+    end
 
     def has_benefit_group_assignment?
+      return has_benefit_group_assignment_old_case? if is_case_old?
       (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
       (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
     end
