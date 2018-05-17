@@ -30,6 +30,11 @@ module BenefitMarkets
       :shop
     end
 
+    def product_package_for(sponsored_benefit)
+      product_packages.by_kind(sponsored_benefit.product_package_kind)
+                      .by_product_kind(sponsored_benefit.product_kind)[0]
+    end
+
     # TODO: check for late rate updates
     
     # def update_product_packages
@@ -44,8 +49,6 @@ module BenefitMarkets
     #   product_packages.any?{|product_package| benefit_market_catalog.is_product_package_updated?(product_package) }
     # end
 
-
- 
 
     #FIX ME: Use configuration from benefit market
     def open_enrollment_start

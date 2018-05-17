@@ -34,19 +34,30 @@ module BenefitSponsors
         pricing_determinations.sort_by(&:created_at).last
       end
 
-      def renew(new_product_package)
-        new_sponsored_benefit = self.class.new(
-          product_package_kind: product_package_kind,
-          product_option_choice: product_option_choice,
-          reference_product: reference_product.renewal_product
-        )
+      def renew(new_benefit_package)
+        new_benefit_sponsor_catalog = new_benefit_package.benefit_sponsor_catalog
+        new_product_package = new_benefit_sponsor_catalog.product_package_for(self)
 
+        if new_product_package.present? && reference_product.present?
+          if reference_product.renewal_product.present? && new_product_package.active_products.include?(reference_product.renewal_product)
+            self.class.new(
+              product_package_kind: product_package_kind,
+              product_option_choice: product_option_choice,
+              reference_product: reference_product.renewal_product,
+              sponsor_contribution: renew_sponsor_contribution(new_product_package),
+              pricing_determinations: renew_pricing_determinations(new_product_package)
+            )
+          end
+        end
+      end
+
+      def renew_sponsor_contribution(new_product_package)
         # Test following service
         # new_sponsor_contribution = sponsor_contribution_service.build_sponsor_contribution(new_product_package)        
         # new_sponsored_benefit.sponsor_contribution = new_sponsor_contribution
+      end
 
-        # new_sponsored_benefit.pricing_determinations =
-        new_sponsored_benefit
+      def renew_pricing_determinations(new_product_package)
       end
 
       def sponsor_contribution_service
