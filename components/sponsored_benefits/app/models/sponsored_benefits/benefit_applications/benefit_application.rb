@@ -10,7 +10,7 @@ module SponsoredBenefits
       delegate :rating_area, to: :benefit_sponsorship
       delegate :census_employees, to: :benefit_sponsorship
       delegate :plan_design_organization, to: :benefit_sponsorship
-      
+
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date
@@ -142,7 +142,9 @@ module SponsoredBenefits
         copied_benefit_groups = []
         benefit_groups.each do |benefit_group|
           benefit_group.attributes.delete("_type")
-          copied_benefit_groups << ::BenefitGroup.new(benefit_group.attributes)
+          new_benefit_group = ::BenefitGroup.new(benefit_group.attributes)
+          new_benefit_group.relationship_benefits = benefit_group.relationship_benefits
+          copied_benefit_groups << new_benefit_group
         end
 
         ::PlanYear.new(
@@ -171,7 +173,6 @@ module SponsoredBenefits
         end
 
         def enrollment_timetable_by_effective_date(effective_date)
-
           effective_date            = effective_date.to_date.beginning_of_month
           effective_period          = effective_date..(effective_date + 1.year - 1.day)
           open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)

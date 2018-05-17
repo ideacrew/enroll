@@ -5,7 +5,7 @@ module BenefitSponsors
       include Pundit
 
       def new
-        @staff = BenefitSponsors::Organizations::Forms::StaffRoleForm.for_new
+        @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
         respond_to do |format|
           format.html
           format.js
@@ -13,7 +13,7 @@ module BenefitSponsors
       end
 
       def create
-        @staff = BenefitSponsors::Organizations::Forms::StaffRoleForm.for_create(staff_params)
+        @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(staff_params)
         authorize @staff
         begin
           @status , @result = @staff.save
@@ -31,7 +31,7 @@ module BenefitSponsors
       #new person registered with existing organization is pending for staff role approval
       #below action is triggered from employer to approve for staff role
       def approve
-        @staff = BenefitSponsors::Organizations::Forms::StaffRoleForm.for_approve(staff_params)
+        @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(staff_params)
         authorize @staff
         @status , @result = @staff.approve
         unless @status
@@ -44,7 +44,7 @@ module BenefitSponsors
 
       # For this person find an employer_staff_role that match this employer_profile_id and mark the role inactive
       def destroy
-        @staff = BenefitSponsors::Organizations::Forms::StaffRoleForm.for_destroy(staff_params)
+        @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_destroy(staff_params)
         authorize @staff
         @status , @result = @staff.destroy!
         unless @status

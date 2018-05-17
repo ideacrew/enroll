@@ -21,34 +21,18 @@ module BenefitSponsors
         end
       end
 
-      # Benefit Sponsor Catalog
       def self.contribution_levels
-        [
-          {
-            display_name: 'employee',
+        # TODO: query contribution model based on market
+        contribution_model = BenefitMarkets::ContributionModels::ContributionModel.all.first
+        return [] unless contribution_model
+        contribution_model.contribution_units.inject([]) do |data, unit|
+          data << { display_name: unit.display_name,
             is_offered: true,
-            order: 0,
-            contribution_factor: 0.75,
-            min_contribution_factor: 0.50,
-            contribution_cap: 1.0
-          },
-          {
-            display_name: 'spouse',
-            is_offered: true,
-            order: 1,
-            contribution_factor: 0.75,
-            min_contribution_factor: 0.50,
-            contribution_cap: 1.0
-          },
-          {
-            display_name: 'dependent',
-            is_offered: true,
-            order: 2,
-            contribution_factor: 0.75,
-            min_contribution_factor: 0.50,
-            contribution_cap: 1.0
-          }
-        ]
+            order: unit.order,
+            min_contribution_factor: unit.minimum_contribution_factor,
+            contribution_factor: unit.default_contribution_factor, 
+          }  
+        end
       end
     end
   end

@@ -8,15 +8,16 @@ module BenefitSponsors
     let(:dba)               { "Offworld Enterprises" }
     let(:fein)              { "100001001" }
     let(:entity_kind)       { :c_corporation }
+    let(:contact_method)    { :paper_and_electronic }
 
     let!(:site)             { BenefitSponsors::Site.new(site_key: :dc) }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                   site: site,
-                                  hbx_id: hbx_id, 
-                                  legal_name: legal_name, 
-                                  dba: dba, 
-                                  entity_kind: entity_kind, 
-                                  fein: fein, 
+                                  hbx_id: hbx_id,
+                                  legal_name: legal_name,
+                                  dba: dba,
+                                  entity_kind: entity_kind,
+                                  fein: fein,
                                 )}
 
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
@@ -25,10 +26,11 @@ module BenefitSponsors
     let(:office_locations)  { [office_location] }
 
 
-    let(:params) do 
+    let(:params) do
       {
         organization: organization,
         office_locations: office_locations,
+        contact_method: contact_method,
       }
     end
 
@@ -39,6 +41,27 @@ module BenefitSponsors
         it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
+        end
+      end
+
+      # Contact method set by default in the model
+      context "with no contact_method" do
+        subject { described_class.new(params.except(:contact_method)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to be_valid
+        end
+
+        context "or contact method is invalid" do
+          let(:invalid_contact_method)  { :snapchat }
+
+          before { subject.contact_method = invalid_contact_method }
+
+          it "should not be valid" do
+            subject.validate
+            expect(subject).to_not be_valid
+          end
         end
       end
 
@@ -57,7 +80,7 @@ module BenefitSponsors
 
         subject { described_class.new(office_locations: [invalid_office_location] ) }
 
-        it "should not be valid" 
+        it "should not be valid"
       end
 
       context "with all required arguments", dbclean: :after_each do
@@ -68,7 +91,7 @@ module BenefitSponsors
         end
 
         context "and all arguments are valid" do
-          before { 
+          before {
               site.byline = 'test'
               site.long_name = 'test'
               site.short_name = 'test'
@@ -108,7 +131,7 @@ module BenefitSponsors
         let(:changed_dba)           { "Offworld Adventures" }
         let(:changed_fein)          { "200002002" }
 
-        before do 
+        before do
           subject.legal_name  = changed_legal_name
           subject.dba         = changed_dba
           subject.fein        = changed_fein
@@ -118,7 +141,7 @@ module BenefitSponsors
           expect(subject.organization.legal_name).to eq changed_legal_name
           expect(subject.organization.dba).to eq changed_dba
           expect(subject.organization.fein).to eq changed_fein
-        end            
+        end
       end
     end
 

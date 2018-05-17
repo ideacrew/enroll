@@ -18,8 +18,8 @@ module BenefitMarkets
         end
         BenefitMarkets::Products::Product.each do |product|
           $product_rate_age_bounding_cache[product.id] = {
-            maximum: 66, 
-            minimum: 19
+            maximum: product.premium_ages.min, 
+            minimum: product.premium_ages.max
           }
           product.premium_tables.each do |pt|
             r_area_tag = rating_area_cache[pt.rating_area_id]

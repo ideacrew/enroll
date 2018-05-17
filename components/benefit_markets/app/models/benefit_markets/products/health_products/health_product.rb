@@ -34,11 +34,11 @@ module BenefitMarkets
       field :rx_formulary_url,            type: String
 
 
-      has_one     :health_product, as: :renewal_product,
+      belongs_to  :renewal_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct"
 
-      has_one     :health_product, as: :catastrophic_age_off_product,
+      belongs_to  :catastrophic_age_off_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct"
 

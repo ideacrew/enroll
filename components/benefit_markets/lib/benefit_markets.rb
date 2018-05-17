@@ -6,7 +6,7 @@ require 'config'
 
 module BenefitMarkets
 
-    BENEFIT_MARKET_KINDS    = [:aca_shop, :aca_individual, :medicaid, :medicare]
+    BENEFIT_MARKET_KINDS    = [:aca_shop, :aca_individual, :fehb, :medicaid, :medicare]
     PRODUCT_KINDS           = [:health, :dental, :term_life, :short_term_disability, :long_term_disability]
     PROBATION_PERIOD_KINDS  = [:first_of_month_before_15th, :date_of_hire, :first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
 
@@ -16,7 +16,7 @@ module BenefitMarkets
     #   :annual_with_midyear_initial - may start mid-year and renew at subsequent annual effective date month
     APPLICATION_INTERVAL_KINDS  = [:monthly, :annual, :annual_with_midyear_initial]
 
-    
+
     CONTACT_METHOD_KINDS        = [:paper_and_electronic, :paper_only]
 
 
@@ -38,6 +38,21 @@ module BenefitMarkets
 
     class Configuration
       attr_accessor :settings
+    end
+
+
+    # Constructs a symbol using an input string, stripping leading numbers and special characters, limiting
+    # length, and leaving only lower case letters
+    def self.string_to_symbol_key(string_value, max_length = 15)
+      strip_leading_numbers(string_value.to_s).parameterize.gsub(/[-_]/,'').slice(0, max_length).to_sym
+    end
+
+    # Using an input string, return version of string with only non-numbers as first character
+    def self.strip_leading_numbers(string_value)
+      while string_value.chr.numeric? do
+        string_value = string_value.slice!(1, string_value.length - 1)
+      end
+      string_value
     end
 
 

@@ -69,6 +69,10 @@ module BenefitSponsors
         @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
       end
 
+      def active_broker_roles
+        @active_broker_roles = BrokerRole.find_active_by_broker_agency_profile(self)
+      end
+
       def employer_clients
       end
 
@@ -96,16 +100,6 @@ module BenefitSponsors
       def phone
         office = primary_office_location
         office && office.phone.to_s
-      end
-
-      ## Class methods
-      class << self
-
-        def find(id)
-          organizations = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(id)).to_a
-          organizations.size > 0 ? organizations.first.profiles.where(_type: /.*BrokerAgencyProfile$/, _id: id ).first: nil
-        end
-
       end
 
       aasm do #no_direct_assignment: true do

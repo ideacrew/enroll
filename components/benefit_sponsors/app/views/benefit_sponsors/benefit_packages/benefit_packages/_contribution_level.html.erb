@@ -4,7 +4,7 @@
     <div class="col-xs-6 form-group form-group-lg">
       <div class="checkbox">
         <label>
-          <%= f.check_box :is_offered, {class: "contribution_handler", disabled: (f.object.display_name == 'employee' ? true:false)}, "true", "false" %>
+          <%= f.check_box :is_offered, {class: "contribution_handler"}, "true", "false" %>
           <%= f.label :is_offered do %>
 
           <i class="fa fa-check-square-o fa-2x"></i>

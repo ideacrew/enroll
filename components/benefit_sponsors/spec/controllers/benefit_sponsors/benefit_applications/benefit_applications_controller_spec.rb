@@ -9,32 +9,57 @@ module BenefitSponsors
     let(:user) { FactoryGirl.create :user}
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog, :dc) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization,benefit_market: site.benefit_markets[0]) }
+    let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: site.benefit_markets[0], employer_attestation: employer_attestation) }
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
+    let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+    let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
+
 
     let(:benefit_application_params) {
 
       {
         :start_on => effective_period_start_on,
         :end_on => effective_period_end_on,
-        :fte_count => "1",
-        :pte_count => "1",
-        :msp_count => "1",
+        :fte_count => "5",
+        :pte_count => "5",
+        :msp_count => "5",
         :open_enrollment_start_on => open_enrollment_period_start_on,
         :open_enrollment_end_on => open_enrollment_period_end_on,
         :benefit_sponsorship_id => benefit_sponsorship_id
       }
     }
 
+    shared_context "shared_stuff", :shared_context => :metadata do
+      let(:effective_period)                { effective_period_start_on..effective_period_end_on }
+      let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
+
+      let(:params) {
+        {
+          recorded_rating_area: rating_area,
+          recorded_service_area: service_area,
+          effective_period: effective_period,
+          open_enrollment_period: open_enrollment_period,
+          fte_count: "5",
+          pte_count: "5",
+          msp_count: "5",
+        }
+      }
+
+      let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
+    end
+
     before do
+      benefit_sponsorship.save
       benefit_sponsorship.benefit_market.update_attributes!(:site_urn => site.site_key)
     end
 
     describe "GET new", dbclean: :after_each do
+      include_context 'shared_stuff'
 
       it "should initialize the form" do
         sign_in_and_do_new
@@ -58,6 +83,7 @@ module BenefitSponsors
     end
 
     describe "POST create", dbclean: :after_each do
+      include_context 'shared_stuff'
 
       it "should redirect" do
         sign_in_and_do_create
@@ -66,7 +92,7 @@ module BenefitSponsors
 
       it "should redirect to benefit packages new" do
         sign_in_and_do_create
-        expect(response.location.include?("benefit_packages/new")).to eq true
+        expect(response.location.include?("benefit_packages/new")).to be_truthy
       end
 
       it "should initialize form" do
@@ -100,17 +126,7 @@ module BenefitSponsors
     end
 
     describe "GET edit", dbclean: :after_each do
-
-      let(:effective_period)                { effective_period_start_on..effective_period_end_on }
-      let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
-      let(:params) {
-          {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
-          }
-        }
-      let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
+      include_context 'shared_stuff'
 
       before do
         ben_app.save
@@ -136,16 +152,7 @@ module BenefitSponsors
     end
 
     describe "POST update" do
-      let(:effective_period)                { effective_period_start_on..effective_period_end_on }
-      let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
-      let(:ben_app_params) {
-          {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
-          }
-        }
-      let(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
+      include_context 'shared_stuff'
 
       before do
         benefit_sponsorship.benefit_applications = [ben_app]
@@ -164,7 +171,7 @@ module BenefitSponsors
 
       it "should redirect to benefit packages index" do
         sign_in_and_do_update
-        expect(response.location.include?("benefit_packages")).to eq true
+        expect(response.location.include?("benefit_packages")).to be_truthy
       end
 
       context "when update fails" do
@@ -193,17 +200,7 @@ module BenefitSponsors
     end
 
     describe "POST publish" do
-
-      let(:effective_period)                { effective_period_start_on..effective_period_end_on }
-      let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
-      let(:ben_app_params) {
-          {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
-          }
-        }
-      let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
+      include_context 'shared_stuff'
 
       before do
         benefit_sponsorship.benefit_applications = [ben_app]
@@ -212,14 +209,14 @@ module BenefitSponsors
         benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
       end
 
-      def sign_in_and_publish
+      def sign_in_and_submit_application
         sign_in user
-        post :publish, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "benefit application published sucessfully" do
         it "should redirect with success message" do
-          sign_in_and_publish
+          sign_in_and_submit_application
           expect(flash[:notice]).to eq "Benefit Application successfully published."
         end
       end
@@ -227,96 +224,73 @@ module BenefitSponsors
       context "benefit application published sucessfully but with warning" do
 
         before do
-          allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive_message_chain('assigned_census_employees_without_owner.present?').and_return(false)
+          allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive_message_chain('assigned_census_employees_without_owner.present?').and_return(false)
         end
 
         it "should redirect with success message" do
-          sign_in_and_publish
+          sign_in_and_submit_application
           expect(flash[:notice]).to eq "Benefit Application successfully published."
           expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
         end
       end
 
-      context "benefit application did not publish due to warnings" do
+      context "benefit application is not submitted due to warnings" do
 
         before :each do
           allow_any_instance_of(BenefitSponsors::Organizations::AcaShopDcEmployerProfile).to receive(:is_primary_office_local?).and_return(false)
         end
 
         it "should display warnings" do
-          sign_in_and_publish
-          expect(flash[:error]).to match(/Primary office location Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}/)
+          sign_in_and_submit_application
+          expect(flash[:error]).to match(/Is a small business located in #{Settings.aca.state_name}/)
         end
       end
 
-      context "benefit application did not publish due to errors" do
+      context "benefit application is not submitted" do
         before :each do
-          ben_app.benefit_packages.destroy
+          ben_app.update_attributes!(aasm_state: "pending")
         end
 
         it "should redirect with errors" do
-          sign_in_and_publish
-          expect(flash[:error]).to match(/Benefit Application failed to publish/)
+          sign_in_and_submit_application
+          expect(flash[:error]).to match(/Benefit Application failed to submit/)
         end
       end
     end
 
     describe "POST force publish", dbclean: :after_each do
-
-      let(:effective_period)                { effective_period_start_on..effective_period_end_on }
-      let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
-      let(:ben_app_params) {
-          {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
-          }
-        }
-      let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
+      include_context 'shared_stuff'
 
       before do
         benefit_sponsorship.benefit_applications = [ben_app]
-        ben_app.benefit_packages.build
         ben_app.save
         benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
       end
 
-      def sign_in_and_force_publish
+      def sign_in_and_force_submit_application
         sign_in user
-        post :force_publish, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :force_submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       it "should redirect" do
-        sign_in_and_force_publish
+        sign_in_and_force_submit_application
         expect(response).to have_http_status(:redirect)
       end
 
-      it "should expect benefit application state to be publish_pending" do
-        allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:is_application_eligible?).and_return(false)
-        sign_in_and_force_publish
+      it "should expect benefit application state to be pending" do
+        sign_in_and_force_submit_application
         ben_app.reload
-        expect(ben_app.aasm_state).to eq "publish_pending"
+        expect(ben_app.aasm_state).to eq :pending
       end
 
       it "should display errors" do
-        allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:is_application_eligible?).and_return(false)
-        sign_in_and_force_publish
+        sign_in_and_force_submit_application
         expect(flash[:error]).to match(/this application is ineligible for coverage/)
       end
     end
 
     describe "POST revert", dbclean: :after_each do
-
-      let(:effective_period)                { effective_period_start_on..effective_period_end_on }
-      let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
-      let(:ben_app_params) {
-          {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period
-          }
-        }
-      let!(:ben_app)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(ben_app_params) }
+      include_context 'shared_stuff'
 
       before do
         benefit_sponsorship.benefit_applications = [ben_app]
@@ -345,18 +319,18 @@ module BenefitSponsors
       context "when there is an eligible application to revert" do
 
         before do
-          ben_app.update_attributes(:aasm_state => "enrolled")
+          ben_app.update_attributes(:aasm_state => "approved")
         end
 
         it "should revert benefit application" do
           sign_in_and_revert
           ben_app.reload
-          expect(ben_app.aasm_state).to eq "draft"
+          expect(ben_app.aasm_state).to eq :draft
         end
 
         it "should redirect to employer profiles benefits tab" do
           sign_in_and_revert
-          expect(response.location.include?("tab=benefits")).to eq true
+          expect(response.location.include?("tab=benefits")).to be_truthy
         end
       end
     end

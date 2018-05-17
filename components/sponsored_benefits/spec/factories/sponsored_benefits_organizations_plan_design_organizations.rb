@@ -10,7 +10,7 @@ FactoryGirl.define do
     sequence :owner_profile_id do |n|
       "52345#{n}"
     end
-    
+
     fein do
       Forgery('basic').text(:allow_lower   => false,
         :allow_upper   => false,

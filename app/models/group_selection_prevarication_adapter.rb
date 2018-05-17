@@ -32,7 +32,7 @@ class GroupSelectionPrevaricationAdapter
 			optional_effective_on: optional_effective_on
 		)
 		if params[:hbx_enrollment_id].present?
-			record.previous_hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+			record.previous_hbx_enrollment = ::HbxEnrollment.find(params[:hbx_enrollment_id])
 		end
 		record.check_shopping_roles(params)
 		record
@@ -56,8 +56,22 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def if_changing_ivl?(params)
-		params[:hbx_enrollment_id].present?
+		can_ivl_shop?(params) && params[:hbx_enrollment_id].present?
 	end
+
+	def if_employee_role_unset_but_can_be_derived(e_role_value)
+    return if e_role_value.present?
+		if @person.has_active_employee_role?
+			@person.active_employee_roles.first
+		end
+	end
+
+  def if_previous_enrollment_was_special_enrollment
+    return nil unless @previous_hbx_enrollment.present?
+    if @previous_hbx_enrollment.is_special_enrollment?
+      yield
+    end
+  end
 
 	def possible_employee_role
 		if @employee_role.nil? && @person.has_active_employee_role?
@@ -82,6 +96,15 @@ class GroupSelectionPrevaricationAdapter
 		yield person.consumer_role
 	end
 
+  def keep_existing_plan?(params)
+    params[:commit] == "Keep existing plan"
+  end
+
+	def benefit_group_assignment_by_plan_year(employee_role, benefit_group, change_plan)
+		benefit_group.plan_year.is_renewing? ?
+			employee_role.census_employee.renewal_benefit_group_assignment : (benefit_group.plan_year.aasm_state == "expired" && (change_plan == 'change_by_qle' or enrollment_kind == 'sep')) ? employee_role.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first : employee_role.census_employee.active_benefit_group_assignment
+	end
+
 	def set_mc_variables
 		if @previous_hbx_enrollment.present? && @change_plan == "change_plan"
 			m_kind = @previous_hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
@@ -96,19 +119,19 @@ class GroupSelectionPrevaricationAdapter
 		end
 	end
 
-  def ivl_benefit
-    correct_effective_on = calculate_ivl_effective_on
-    HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
-  end
+	def ivl_benefit
+		correct_effective_on = calculate_ivl_effective_on
+		HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
+	end
 
 	def calculate_ivl_effective_on
 		calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
 	end
 
-  def calculate_new_effective_on(params)
-    benefit_group = select_benefit_group(params)
-    calculate_effective_on(market_kind: select_market(params), employee_role: possible_employee_role, benefit_group: benefit_group)
-  end
+	def calculate_new_effective_on(params)
+		benefit_group = select_benefit_group(params)
+		calculate_effective_on(market_kind: select_market(params), employee_role: possible_employee_role, benefit_group: benefit_group)
+	end
 
 	def calculate_effective_on(market_kind:, employee_role:, benefit_group:)
 		HbxEnrollment.calculate_effective_on_from(
@@ -120,39 +143,36 @@ class GroupSelectionPrevaricationAdapter
 			benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
 	end
 
-  def if_qle_with_date_option_selected(params)
-    if params[:effective_on_option_selected].present?
-      yield Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y')
-    end
-  end
-
-  def generate_coverage_family_members_for_cobra(params)
-    if (select_market(params) == 'shop') && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
-      hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
-      if hbx_enrollment.present?
-        yield(hbx_enrollment.hbx_enrollment_members.map(&:family_member))
-      end
-    end
-  end
-
-	def ensure_previous_shop_sep_enrollment_if_not_provided(params)
-		if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @previous_hbx_enrollment.blank?
-			@previous_hbx_enrollment = selected_enrollment(@family, possible_employee_role)
-      @can_waive = @previous_hbx_enrollment.can_complete_shopping?
+	def if_qle_with_date_option_selected(params)
+		if params[:effective_on_option_selected].present?
+			yield Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y')
 		end
 	end
 
-  def is_qle?
-    (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-  end
+	def if_should_generate_coverage_family_members_for_cobra(params)
+		if (select_market(params) == 'shop') && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
+			hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+			if hbx_enrollment.present?
+				yield(hbx_enrollment.hbx_enrollment_members.map(&:family_member))
+			end
+		end
+	end
 
-  def can_waive?(params)
-    @can_waive
-  end
+	def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment)
+		if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && enrollment.blank?
+			prev_enrollment = selected_enrollment(@family, possible_employee_role)
+			waivable_value = prev_enrollment.can_complete_shopping?
+			yield prev_enrollment,waivable_value
+		end
+	end
+
+	def is_qle?
+		(@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+	end
 
 	def select_benefit_group(params)
-		if (select_market(params) == "shop") && @employee_role.present?
-			@employee_role.benefit_group(qle: is_qle?)
+		if (select_market(params) == "shop") && possible_employee_role.present?
+			possible_employee_role.benefit_group(qle: is_qle?)
 		else
 			nil
 		end
@@ -199,4 +219,47 @@ class GroupSelectionPrevaricationAdapter
 			nil
 		end
 	end
+
+	def create_action_market_kind(params)
+		params[:market_kind].present? ? params[:market_kind] : 'shop'
+	end
+
+  # SHOP enrollment creation adapters
+  def build_shop_change_enrollment(
+    controller_employee_role,
+    controller_change_plan
+  )
+    benefit_group = nil
+    benefit_group_assignment = nil
+    if controller_employee_role == previous_hbx_enrollment.employee_role
+      benefit_group = previous_hbx_enrollment.benefit_group
+      benefit_group_assignment = previous_hbx_enrollment.benefit_group_assignment
+    else
+      benefit_group = controller_employee_role.benefit_group(qle: is_qle?)
+      benefit_group_assignment = benefit_group_assignment_by_plan_year(controller_employee_role, benefit_group, controller_change_plan)
+    end
+    change_enrollment = coverage_household.household.new_hbx_enrollment_from(
+      employee_role: controller_employee_role,
+      resident_role: person.resident_role,
+      coverage_household: coverage_household,
+      benefit_group: benefit_group,
+      benefit_group_assignment: benefit_group_assignment,
+      qle: is_qle?,
+      opt_effective_on: optional_effective_on)
+    change_enrollment.predecessor_enrollment_id = previous_hbx_enrollment.id
+    change_enrollment
+  end
+
+  def build_new_shop_enrollment(
+    controller_employee_role
+  )
+    coverage_household.household.new_hbx_enrollment_from(
+      employee_role: controller_employee_role,
+      resident_role: person.resident_role,
+      coverage_household: coverage_household,
+      benefit_group: nil,
+      benefit_group_assignment: nil,
+      qle: is_qle?,
+      opt_effective_on: optional_effective_on)
+  end
 end

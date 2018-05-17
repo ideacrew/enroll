@@ -109,9 +109,11 @@ module BenefitSponsors
       scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
 
-      scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where(:"profiles._id" => broker_agency_profile_id)}
-      scope :by_broker_role, ->(broker_role_id) { broker_agency_profiles.where(:"profiles.primary_broker_role_id" => broker_role_id)}
-      scope :by_employer_profile,->(profile_id){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
+      scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
+      scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
+      scope :by_broker_agency_profile,        ->(broker_agency_profile_id) { broker_agency_profiles.where(:"profiles._id" => broker_agency_profile_id)}
+      scope :by_broker_role,                  ->(broker_role_id) { broker_agency_profiles.where(:"profiles.primary_broker_role_id" => broker_role_id)}
+      scope :by_employer_profile,             ->(profile_id){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
@@ -152,6 +154,10 @@ module BenefitSponsors
         self.profiles.where(_type: /.*HbxProfile$/).first
       end
 
+      def issuer_profile
+        self.profiles.where(_type: /.*IssuerProfile$/).first
+      end
+
       def is_an_issuer_profile?
         self.profiles.where(_type: /.*IssuerProfile$/).present?
       end
@@ -178,10 +184,61 @@ module BenefitSponsors
           }
         end
 
-      end
+        def search_agencies_by_criteria(search_params)
+          query_params = build_query_params(search_params)
+          if query_params.any?
+            self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({ "$and" => build_query_params(search_params) })
+          else
+            self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
+          end
+        end
 
-      def primary_office_location
-        office_locations.detect(&:is_primary?)
+        def broker_agencies_with_matching_agency_or_broker(search_params)
+          if search_params[:q].present?
+            orgs2 = self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
+              :"profiles._id" => {
+                "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
+              }
+            })
+
+            brokers = BrokerRole.brokers_matching_search_criteria(search_params[:q])
+            if brokers.any?
+              search_params.delete(:q)
+              if search_params.empty?
+                return filter_brokers_by_agencies(orgs2, brokers)
+              else
+                agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
+                return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
+              end
+            end
+          end
+
+          self.search_agencies_by_criteria(search_params)
+        end
+
+        def filter_brokers_by_agencies(agencies, brokers)
+          agency_ids = agencies.map{|org| org.broker_agency_profile.id}
+          brokers.select{ |broker| agency_ids.include?(broker.broker_role.benefit_sponsors_broker_agency_profile_id) }
+        end
+
+        def build_query_params(search_params)
+          query_params = []
+
+          if !search_params[:q].blank?
+            q = ::Regexp.new(::Regexp.escape(search_params[:q].strip), true)
+            query_params << { "legal_name" => q }
+          end
+
+          if !search_params[:languages].blank?
+            query_params << { :"profiles.languages_spoken" => { "$in" => search_params[:languages]} }
+          end
+
+          if !search_params[:working_hours].blank?
+            query_params << { :"profiles.working_hours" => eval(search_params[:working_hours])}
+          end
+
+          query_params
+        end
       end
 
       private
@@ -189,8 +246,6 @@ module BenefitSponsors
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
       end
-
-
     end
   end
 end

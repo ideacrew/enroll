@@ -48,7 +48,7 @@ class Family
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
-  # embeds_many :broker_agency_accounts
+  # embeds_many :broker_agency_accounts #depricated
   embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
@@ -148,7 +148,7 @@ class Family
   scope :all_tax_households,                ->{ exists(:"households.tax_households" => true) }
 
   scope :by_writing_agent_id,               ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
-  scope :by_broker_agency_profile_id,       ->(broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, is_active: true}})}
+  scope :by_broker_agency_profile_id,       ->(broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {is_active: true, "$or": [{broker_agency_profile_id: broker_agency_profile_id},{benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id}]}})}
   scope :by_general_agency_profile_id,      ->(general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
 
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
@@ -683,7 +683,8 @@ class Family
   def hire_broker_agency(broker_role_id)
     return unless broker_role_id
     existing_agency = current_broker_agency
-    broker_agency_profile_id = BrokerRole.find(broker_role_id).benefit_sponsors_broker_agency_profile_id
+    broker_role = BrokerRole.find(broker_role_id)
+    broker_agency_profile_id = broker_role.benefit_sponsors_broker_agency_profile_id.present? ? broker_role.benefit_sponsors_broker_agency_profile_id : broker_role.broker_agency_profile_id
     terminate_broker_agency if existing_agency
     start_on = Time.now
     broker_agency_account =  BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)

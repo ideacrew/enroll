@@ -1,7 +1,7 @@
 
-<% selected_kind_carrier = f.object.plan_option_kind == 'single_issuer' %>
-<% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
-<% selected_kind_plan = f.object.plan_option_kind == 'single_product' %>
+<% selected_kind_carrier = f.object.product_option_choice == 'single_issuer' %>
+<% selected_kind_metal_level = f.object.product_option_choice == 'metal_level' %>
+<% selected_kind_plan = f.object.product_option_choice == 'single_product' %>
 
 <% if @benefit_package_form.new_record? %>
   <h1>Select Your Plan Offering</h1>
@@ -30,24 +30,24 @@
       <div class="product-options-tab">
         <ul class="nav nav-tabs row">
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "single_issuer" %>
-            <%= f.label :plan_option_kind_single_issuer, class: "elected_plan" do %>
+            <%= f.radio_button :product_package_kind, "single_issuer" %>
+            <%= f.label :product_package_kind_single_issuer, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             By carrier
             <% end %>
           </li>
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "metal_level" %>
-            <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
+            <%= f.radio_button :product_package_kind, "metal_level" %>
+            <%= f.label :product_package_kind_metal_level, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             By metal level
           </li>
           <% end %>
           <li role="presentation" class="col-xs-4">
-            <%= f.radio_button :plan_option_kind, "single_product", selected: f.object.plan_option_kind %>
-            <%= f.label :plan_option_kind_single_product, class: "elected_plan" do %>
+            <%= f.radio_button :product_package_kind, "single_product"%>
+            <%= f.label :product_package_kind_single_product, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
             Single plan
@@ -57,6 +57,8 @@
       </div>
 
       <div class="col-xs-12 plan-options">
+
+        <%= f.hidden_field :kind, value: "health" %>
         <div class="col-xs-12 carriers-tab" style="display: none;">
           <br><br>
           <h4>Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</h4>
@@ -64,10 +66,10 @@
           <% @benefit_package_form.catalog.carrier_names.each do |ck| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_issuer", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, product_option_choice: "#{cv}", carrier_id: "#{ck}", product_option_choice: "single_issuer", benefit_group:f.object.id ), remote: true do %>
               <div class="col-xs-3">
-                <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-                <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+                <%= f.radio_button :product_option_choice, "#{ck}" %>
+                <%= f.label "product_option_choice_#{ck}" do %>
                 <i class="fa fa-circle-o"></i>
                 <i class="fa fa-dot-circle-o"></i>
                 <% end %>
@@ -91,11 +93,11 @@
           <% @benefit_package_form.catalog.metal_levels.each do |kind| %>
           <div class="col-xs-3 metals">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, product_option_choice: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
 
               <div class="col-xs-3">
-                <%= f.radio_button :metal_level_for_elected_plan, kind %>
-                <%= f.label "metal_level_for_elected_plan_#{kind}" do %>
+                <%= f.radio_button :product_option_choice, kind %>
+                <%= f.label "product_option_choice_#{kind}" do %>
                 <i class="fa fa-circle-o"></i>
                 <i class="fa fa-dot-circle-o"></i>
                 <% end %>
@@ -123,14 +125,15 @@
           <br><br>
           <h4>Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</h4>
           <br/>
+          <% binding.pry %>
           <% @benefit_package_form.catalog.single_product_options.each do |ck| %>
           <div class="col-xs-3 carriers">
             <div class="col-xs-12 row">
-              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_product", benefit_group:f.object.id ), remote: true do %>
+              <%#= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, product_option_choice: "#{cv}", carrier_id: "#{ck}", product_option_choice: "single_product", benefit_group:f.object.id ), remote: true do %>
 
               <div class="col-xs-3">
-                <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-                <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+                <%= f.radio_button :product_option_choice, "#{ck}" %>
+                <%= f.label "product_option_choice_#{ck}" do %>
                 <i class="fa fa-circle-o"></i>
                 <i class="fa fa-dot-circle-o"></i>
                 <% end %>
@@ -171,11 +174,11 @@
     });
 
     $(document).on('click', '.plan-options input[type=radio]', function(event)  {
-      var plan_option_kind = $('.product-options-tab input[type=radio]:checked').val();
+      var product_option_kind = $('.product-options-tab input[type=radio]:checked').val();
       var selected_radio = event.target.value;
 
       var plan_options = <%= @benefit_package_form.catalog.plan_options.to_json.html_safe %>;
-      var filtered_products = plan_options[plan_option_kind][selected_radio];
+      var filtered_products = plan_options[product_option_kind][selected_radio];
 
       var location_id = $(this).closest('.benefit-group-fields').attr('id');
       initPlanOptions(filtered_products, location_id);
@@ -191,7 +194,7 @@
       var productHtml = '<div class="col-xs-4">\
         <div class="col-xs-12 reference-plan">\
           <div class="col-xs-2">\
-            <input type="radio" value="' + product["id"] + '" name="forms_benefit_package_form[sponsored_benefits_attributes][0][reference_plan_id]">\
+            <input type="radio" value="' + product["id"] + '" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]">\
             <label for="' + location_id + '_reference_plan_id">\
               <i class="fa fa-circle-o"></i>\
               <i class="fa fa-dot-circle-o"></i>\

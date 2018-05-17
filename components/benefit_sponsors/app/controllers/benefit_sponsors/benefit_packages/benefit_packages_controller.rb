@@ -9,6 +9,7 @@ module BenefitSponsors
       def create
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
         if @benefit_package_form.save
+          flash[:notice] = "Benefit Package successfully created."
           redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.service.benefit_application, @benefit_package_form.show_page_model)
         else
           flash[:error] = error_messages(@benefit_package_form)
@@ -17,6 +18,27 @@ module BenefitSponsors
       end
 
       def edit
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.permit(:id, :benefit_application_id))
+      end
+
+      def update
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(params.permit(:id, :benefit_application_id))
+        if @benefit_package_form.update_attributes(benefit_package_params)
+          redirect_to benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+        else
+          flash[:error] = error_messages(@benefit_package_form)
+          render :edit
+        end
+      end
+
+      def destroy
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.fetch(params.permit(:id, :benefit_application_id))
+        if @benefit_package_form.destroy
+          flash[:notice] = "Benefit Package successfully deleted."
+          benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+        else
+          falsh[:error] = error_messages(@benefit_package_form)
+          # render :
       end
 
       private
@@ -26,9 +48,9 @@ module BenefitSponsors
       end
 
       def benefit_package_params
-        params.require(:forms_benefit_package_form).permit(
+        params.require(:benefit_package).permit(
           :title, :description, :probation_period_kind, :benefit_application_id,
-          :sponsored_benefits_attributes => [ :plan_option_kind, :carrier_for_elected_plan, :metal_level_for_elected_plan, :reference_plan_id,
+          :sponsored_benefits_attributes => [:kind, :product_option_choice, :product_package_kind, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
               :contribution_levels_attributes => [ :is_offered, :display_name, :contribution_factor]
             ]

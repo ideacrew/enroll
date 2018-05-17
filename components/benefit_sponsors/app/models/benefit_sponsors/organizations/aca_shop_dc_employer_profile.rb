@@ -1,9 +1,8 @@
 module BenefitSponsors
   module Organizations
     class AcaShopDcEmployerProfile < BenefitSponsors::Organizations::Profile
-#      include BenefitSponsors::Employers::EmployerHelper
-      include Concerns::EmployerProfileConcern
-
+      # include BenefitSponsors::Employers::EmployerHelper
+      include BenefitSponsors::Concerns::EmployerProfileConcern
 
       def rating_area
         # FIX this
@@ -11,10 +10,6 @@ module BenefitSponsors
 
       def sic_code
         # Fix this
-      end
-
-      def broker_agency_profile
-        # organization.active_benefit_sponsorship.present? ? organization.active_benefit_sponsorship.active_broker_agency_account.broker_agency_profile : nil
       end
 
       def active_broker

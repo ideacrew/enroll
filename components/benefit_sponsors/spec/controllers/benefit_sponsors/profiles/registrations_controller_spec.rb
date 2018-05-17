@@ -5,7 +5,7 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    let(:agency_class) { BenefitSponsors::Organizations::Forms::RegistrationForm }
+    let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
     let(:person) { FactoryGirl.create(:person) }
     let(:edit_user) { FactoryGirl.create(:user, :person => person)}
@@ -48,7 +48,7 @@ module BenefitSponsors
       {
         :entity_kind => :tax_exempt_organization,
         :office_locations_attributes => office_locations_attributes,
-        :contact_method => "Only Electronic communications"
+        :contact_method => :paper_and_electronic
       }
     }
 
@@ -57,7 +57,7 @@ module BenefitSponsors
         :entity_kind => :s_corporation,
         :market_kind => :individual,
         :office_locations_attributes => office_locations_attributes,
-        :contact_method => "Only Electronic communications"
+        :contact_method => :paper_and_electronic
       }
     }
 

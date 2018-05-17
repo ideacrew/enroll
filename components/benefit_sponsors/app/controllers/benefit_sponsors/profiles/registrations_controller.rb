@@ -3,7 +3,7 @@ require_dependency "benefit_sponsors/application_controller"
 module BenefitSponsors
   class Profiles::RegistrationsController < ApplicationController
 
-    include Concerns::ProfileRegistration
+    include BenefitSponsors::Concerns::ProfileRegistration
     include Pundit
 
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -11,7 +11,7 @@ module BenefitSponsors
     layout 'single_column', :only => :edit
 
     def new
-      @agency= BenefitSponsors::Organizations::Forms::RegistrationForm.for_new(profile_type: profile_type)
+      @agency= BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type)
       authorize @agency
       authorize @agency, :redirect_home?
       respond_to do |format|
@@ -21,7 +21,7 @@ module BenefitSponsors
     end
 
     def create
-      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_create(registration_params)
+      @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create(registration_params)
       authorize @agency
       begin
         saved, result_url = @agency.save
@@ -45,12 +45,12 @@ module BenefitSponsors
     end
 
     def edit
-      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_edit(profile_id: params[:id])
+      @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
       authorize @agency
     end
 
     def update
-      @agency = BenefitSponsors::Organizations::Forms::RegistrationForm.for_update(registration_params)
+      @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(registration_params)
       authorize @agency
       sanitize_office_locations_params
       updated, result_url = @agency.update

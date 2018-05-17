@@ -21,6 +21,8 @@ module BenefitMarkets
     field :description,           type: String, default: ""
     field :issuer_profile_id,     type: BSON::ObjectId
     field :product_package_kinds, type: Array, default: []
+    field :_type,                 type: String
+    field :premium_ages,          type: Range
 
 
     belongs_to  :service_area,
@@ -69,9 +71,10 @@ module BenefitMarkets
 
     scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
 
-    scope :by_issuer,             ->(issuer_profile_id){ where(issuer_profile_id: issuer_profile_id) }
-    scope :by_metal_level,        ->(metal_level){ where(metal_level: /#{metal_level}/i) }
-   
+    scope :by_metal_level_kind,   ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
+    scope :by_issuer_profile,     ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
+    scope :active_on,             ->(effective_date){ where(:"premium_tables.effective_period.min".gte => effective_date, :"premium_tables.effective_period.max".lte => effective_date) }
+
     def issuer_profile
       return @issuer_profile if defined?(@issuer_profile)
       @issuer_profile = ::BenefitSponsors::Organizations::IssuerProfile.find(self.issuer_profile_id)

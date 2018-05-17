@@ -13,5 +13,12 @@ module BenefitSponsors
       super(opts)
     end
 
+    def clone_for_coverage
+      self.class.new({
+       member_id: @member_id,
+       coverage_eligibility_on: @coverage_eligibility_on
+      })
+    end
+
   end
 end

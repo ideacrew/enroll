@@ -59,7 +59,7 @@ module BenefitSponsors
           expect(invalid_application_form.errors.count).to eq 4
           service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
           expect(service_obj.store(invalid_application_form, invalid_benefit_application)).to eq [false, nil]
-          expect(invalid_application_form.errors.count).to eq 6
+          expect(invalid_application_form.errors.count).to eq 8
         end
       end
     end
@@ -76,7 +76,7 @@ module BenefitSponsors
 
     describe ".load_form_params_from_resource" do
       let(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
       let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
 
@@ -93,7 +93,7 @@ module BenefitSponsors
 
     # describe ".publish" do
     #   let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
-    #   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship: benefit_sponsorship) }
+    #   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship) }
     #   let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
     #   let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
     #

@@ -10,7 +10,7 @@ module BenefitSponsors
       include Virtus.model
 
       attribute :id, String
-      attribute :office_locations, [BenefitSponsors::Organizations::Forms::OfficeLocationForm]
+      attribute :office_locations, [BenefitSponsors::Organizations::OrganizationForms::OfficeLocationForm]
 
       def primary_office_location
         office_locations.find(&:is_primary?)
@@ -22,7 +22,7 @@ module BenefitSponsors
 
       def office_locations_attributes=(office_locations)
         self.office_locations = office_locations.map do |key, office_location|
-          BenefitSponsors::Organizations::Forms::OfficeLocationForm.new office_location
+          BenefitSponsors::Organizations::OrganizationForms::OfficeLocationForm.new office_location
         end
       end
     end

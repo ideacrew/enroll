@@ -45,18 +45,30 @@ module BenefitSponsors
         form
       end
 
-      def self.for_edit(id)
-        form = self.new(id: id)
+      def self.for_edit(params)
+        form = self.new(params)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
       end
 
-      def self.for_update(id)
-        form = self.new(id: id)
+      def self.for_update(params)
+        form = self.new(params)
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
+      end
+
+      def self.fetch(params)
+        form = self.new(params)
+        form
+      end
+
+      def destroy
+        save_result, persisted_object = service.disable_benefit_package(self)
+        @show_page_model = persisted_object
+        return false unless save_result
+        true
       end
 
       def persist(update: false)
@@ -71,7 +83,12 @@ module BenefitSponsors
         persist
       end
 
-         def new_record?
+      def update_attributes(params)
+        self.attributes = params
+        persist(update: true)
+      end
+
+      def new_record?
         true
       end
     end

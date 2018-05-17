@@ -50,43 +50,43 @@ module BenefitSponsors
       end
     end
 
-    describe ".publish" do
+    describe ".submit_application" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
-      context "has to publish and" do
+      context "has to submit application and" do
         it "should return true if service has no application errors" do
           allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
-          allow(service_object).to receive(:publish).with(benefit_application_form).and_return([true, benefit_application])
-          expect(benefit_application_form.publish).to be_truthy
+          allow(service_object).to receive(:submit_application).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.submit_application).to be_truthy
         end
 
         it "should return false if service has application errors" do
           allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
-          allow(service_object).to receive(:publish).with(benefit_application_form).and_return([false, benefit_application])
-          expect(benefit_application_form.publish).to be_falsy
+          allow(service_object).to receive(:submit_application).with(benefit_application_form).and_return([false, benefit_application])
+          expect(benefit_application_form.submit_application).to be_falsy
         end
       end
     end
 
-    describe ".force_publish" do
+    describe ".force_submit_application" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
-      context "has to force publish and" do
+      context "has to force submit application and" do
         it "should return true" do
           allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
-          allow(service_object).to receive(:force_publish).with(benefit_application_form).and_return([true, benefit_application])
-          expect(benefit_application_form.force_publish).to be_truthy
+          allow(service_object).to receive(:force_submit_application).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.force_submit_application).to be_truthy
         end
       end
     end
 
     describe ".revert" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to revert back and" do
@@ -107,7 +107,7 @@ module BenefitSponsors
 
     describe ".persist" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
       let!(:service_object) { double("BenefitApplicationService")}
       context "save request received" do

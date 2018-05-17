@@ -4,7 +4,7 @@ module BenefitSponsors
       field :reference_product_id, type: BSON::ObjectId
       
       # Return the reference product for calculation.
-      # @return [::BenefitMarket::Products::Product] the reference product
+      # @return [::BenefitMarkets::Products::Product] the reference product
       def reference_product
         @reference_product
       end

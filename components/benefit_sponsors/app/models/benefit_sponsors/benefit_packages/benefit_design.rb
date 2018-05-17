@@ -13,7 +13,7 @@ module BenefitSponsors
       field :reference_plan_id, type: String
       field :benefit_rating_kind,  type: Symbol  # e.g. :list_bill, :composite
           
-      embed_on :contribution_model
+      embeds_one :contribution_model
 
     end
   end

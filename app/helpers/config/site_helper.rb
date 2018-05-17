@@ -96,12 +96,20 @@ module Config::SiteHelper
     Settings.site.main_web_address
   end
 
+  def site_main_web_address_url
+    Settings.site.main_web_address_url
+  end
+
   def site_main_web_link
     link_to site_website_name, site_main_web_address_url
   end
 
   def site_make_their_premium_payments_online
     Settings.site.make_their_premium_payments_online
+  end
+
+  def link_to_make_their_premium_payments_online
+    link_to "make your premium payments online", site_make_their_premium_payments_online
   end
 
   def health_care_website
@@ -114,10 +122,6 @@ module Config::SiteHelper
 
   def ivl_login_url
     Settings.site.ivl_login_url
-  end
-
-  def site_main_web_address_url
-     Settings.site.main_web_address_url
   end
 
   def site_uses_default_devise_path?
@@ -148,6 +152,11 @@ module Config::SiteHelper
     Settings.site.employer_application_deadline_link
   end
 
+
+  def site_guidance_for_business_owners_url
+    Settings.site.guidance_for_business_owners_url
+  end
+
   def site_non_discrimination_complaint_url
     link_to non_discrimination_complaint_url, non_discrimination_complaint_url
   end
@@ -158,5 +167,9 @@ module Config::SiteHelper
 
   def site_invoice_bill_url
     Settings.site.invoice_bill_url
+  end
+
+  def mail_address
+    Settings.site.mail_address
   end
 end

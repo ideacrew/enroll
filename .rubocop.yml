@@ -1,5 +1,5 @@
-AllCops:
-  RunRailsCops: true
+Rails:
+  Enabled: true
 
 Metrics/LineLength:
   Max: 300
@@ -10,5 +10,8 @@ Style/HashSyntax:
 Style/StringLiterals:
   Enabled: false
 
-Style/TrailingBlankLines:
-  Enabled: false
+# Deprecated
+# Style/TrailingBlankLines:
+#   Enabled: false
+# AllCops:
+#   RunRailsCops: true
