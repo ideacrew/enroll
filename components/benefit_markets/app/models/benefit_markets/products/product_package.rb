@@ -42,12 +42,9 @@ module BenefitMarkets
       packagable.benefit_market_kind
     end
 
-    def product_multiplicity
-      multiplicity ? :multiple : :single
-    end
-
+    # Returns only products for which rates available
     def active_products
-      products.active_on(effective_date)
+      products.effective_with_premiums_on(effective_date)
     end
 
     def issuer_profiles
