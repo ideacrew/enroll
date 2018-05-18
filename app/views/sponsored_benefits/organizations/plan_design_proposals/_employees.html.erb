@@ -44,9 +44,9 @@
   </div>
 
   <div class="col-sm-12 employee-btns">
-    <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe,new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id, modal: 'upload'), remote: 'true', class: "btn btn-default", :onclick=>"validateQuote(); return false;" %>
+    <%= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe,new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id, modal: 'upload'), remote: 'true', class: "btn btn-default", :onclick=>"return false;" %>
     <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe,export_plan_design_employees_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal.proposal.id, format: :csv), class: "download-employees btn btn-default #{@plan_design_proposal.proposal.persisted? ? '' : 'disabled'}" %>
-    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id), :remote => true, class: "btn btn-default pull-right", :onclick=>"validateQuote(); return false;" %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id), :remote => true, class: "btn btn-default pull-right", :onclick=>"return false;" %>
   </div>
 </div>
 
