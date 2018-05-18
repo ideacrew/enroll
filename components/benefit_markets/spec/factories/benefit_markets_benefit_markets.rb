@@ -25,5 +25,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_benefit_catalog_and_product_packages do
+
+      after :build do |benefit_market, evaluator|
+        benefit_market.benefit_catalogs << build(:benefit_markets_benefit_catalog, :with_product_packages)
+      end
+    end
+
   end
 end

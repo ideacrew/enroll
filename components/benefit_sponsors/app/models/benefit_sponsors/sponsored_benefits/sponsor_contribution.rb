@@ -17,8 +17,8 @@ module BenefitSponsors
     end
 
     def contribution_levels=(contribution_level_attrs)
-      contribution_level_attrs.each do |contribution_level_attrs|
-        self.contribution_levels.build(contribution_level_attrs.attributes)
+      contribution_level_attrs.each do |contribution_level_attr|
+        self.contribution_levels.build(contribution_level_attr)
       end
     end
 
