@@ -137,7 +137,7 @@ module Employers::EmployerHelper
     # TODO
     plan_years = @employer_profile.plan_years.select{|py| (PlanYear::PUBLISHED + ['draft']).include?(py.aasm_state) && py.end_on > TimeKeeper.date_of_record}
     benefit_groups = plan_years.flat_map(&:benefit_groups)
-    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewal_benefit_application.present?
+    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year.present?
     return benefit_groups, (renewing_benefit_groups || [])
   end
 
@@ -177,8 +177,8 @@ module Employers::EmployerHelper
     return false if employer_profile.blank?
 
     # TODO
-    # plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
-    plan_year = nil
+    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
+
     return false if plan_year.blank?
     return false if plan_year.is_renewing? && !employer_profile.is_converting?
 

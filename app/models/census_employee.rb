@@ -1063,6 +1063,15 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def past_enrollments
+    if employee_role.present?
+      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.where({
+        :"aasm_state".in => ["coverage_terminated", "coverage_termination_pending"],
+        :"benefit_group_assignment_id".in => benefit_group_assignments.map(&:id)
+      })
+    end
+  end
+
   private
 
   def record_transition
@@ -1150,15 +1159,6 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
-  end
-
-  def past_enrollments
-    if employee_role.present?
-      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.where({
-        :"aasm_state".in => ["coverage_terminated", "coverage_termination_pending"],
-        :"benefit_group_assignment_id".in => benefit_group_assignments.map(&:id)
-      })
-    end
   end
 
   def notify_terminated
