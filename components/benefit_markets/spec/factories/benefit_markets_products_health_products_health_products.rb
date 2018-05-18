@@ -7,12 +7,13 @@ FactoryGirl.define do
 
     sequence(:title)     { |n| "BlueChoice Silver#{n} 2,000" }
     description          "Highest rated and highest value"
-    service_area         BenefitMarkets::Locations::ServiceArea.new
     health_plan_kind     :pos
     ehb                  0.9943
+    metal_level_kind     BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS.sample
 
     product_package_kinds { [:single_product, :single_issuer, :metal_level] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
+    association :service_area, factory: :benefit_markets_locations_service_area, strategy: :create
 
 
     after(:build) do |product, evaluator|

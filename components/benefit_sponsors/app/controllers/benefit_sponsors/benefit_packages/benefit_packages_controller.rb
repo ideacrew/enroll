@@ -39,6 +39,7 @@ module BenefitSponsors
         else
           falsh[:error] = error_messages(@benefit_package_form)
           # render :
+        end
       end
 
       private

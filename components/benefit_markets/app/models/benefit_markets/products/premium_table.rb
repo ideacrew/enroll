@@ -10,7 +10,7 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :product, class_name: "Products::Product"
+    embedded_in :product, class_name: "BenefitMarkets::Products::Product"
 
     field       :effective_period,  type: Range
 

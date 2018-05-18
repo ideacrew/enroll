@@ -1,6 +1,12 @@
 FactoryGirl.define do
   factory :benefit_markets_products_product_package, class: 'BenefitMarkets::Products::ProductPackage' do
     
+    application_period do
+      start_on  = TimeKeeper.date_of_record.end_of_month + 1.day + 1.month
+      end_on    = start_on + 1.year - 1.day
+      start_on..end_on
+    end
+
     product_kind :health
     kind :single_issuer
     title 'Single Issuer'
