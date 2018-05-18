@@ -205,13 +205,14 @@ class EmployeeRole
     end
 
     # Deprecated
-    # def find_by_employer_profile(employer_profile)
-    #   Person.where("employee_roles.employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
-    #     list << person.employee_roles.detect { |ee| ee.employer_profile_id == employer_profile.id }
-    #   end
-    # end
+    def find_by_old_employer_profile(employer_profile)
+      Person.where("employee_roles.employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
+        list << person.employee_roles.detect { |ee| ee.employer_profile_id == employer_profile.id }
+      end
+    end
 
     def find_by_employer_profile(employer_profile)
+      return find_by_old_employer_profile(employer_profile) if employer_profile.is_a?(EmployerProfile)
       Person.where("employee_roles.benefit_sponsors_employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
         list << person.employee_roles.detect { |ee| ee.benefit_sponsors_employer_profile_id == employer_profile.id }
       end

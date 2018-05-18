@@ -129,12 +129,13 @@ class CensusEmployee < CensusMember
   scope :order_by_last_name,    -> { order(:"census_employee.last_name".asc) }
   scope :order_by_first_name,   -> { order(:"census_employee.first_name".asc) }
 
-  # scope :by_employer_profile_id,          ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
-  scope :by_employer_profile_id,          ->(benefit_sponsors_employer_profile_id) { where(benefit_sponsors_employer_profile_id: benefit_sponsors_employer_profile_id) }
+  scope :by_old_employer_profile_id,          ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+  scope :by_benefit_sponsor_employer_profile_id,          ->(benefit_sponsors_employer_profile_id) { where(benefit_sponsors_employer_profile_id: benefit_sponsors_employer_profile_id) }
   scope :non_business_owner,              ->{ where(is_business_owner: false) }
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
+  scope :by_employer_profile_id,          ->(employer_profile_id) { scoped_profile(employer_profile_id) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
@@ -212,8 +213,11 @@ class CensusEmployee < CensusMember
 
   def employer_profile=(new_employer_profile)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
-    self.benefit_sponsors_employer_profile_id = new_employer_profile._id
-    self.employer_profile_id = new_employer_profile._id if is_case_old?(new_employer_profile)
+    if is_case_old?(new_employer_profile)
+      self.employer_profile_id = new_employer_profile._id
+    else
+      self.benefit_sponsors_employer_profile_id = new_employer_profile._id
+    end
     @employer_profile = new_employer_profile
   end
 
@@ -613,6 +617,14 @@ class CensusEmployee < CensusMember
   end
 
   class << self
+
+    def scoped_profile(employer_profile_id)
+      if EmployerProfile.find(employer_profile_id).is_a?(EmployerProfile)
+        by_old_employer_profile_id(employer_profile_id)
+      else
+        by_benefit_sponsor_employer_profile_id(employer_profile_id)
+      end
+    end
 
     def enrolled_count(benefit_group)
 

@@ -11,7 +11,7 @@ module Queries
       @custom_attributes = attributes
       @employer_profile = BenefitSponsors::Organizations::Organization.employer_profiles.where(
         :"profiles._id" => BSON::ObjectId.from_string(@custom_attributes[:id])
-      ).first.employer_profile
+      ).first.try(:employer_profile) || EmployerProfile.find(@custom_attributes[:id]) # Remove try when you deprecate old ER profile
     end
 
     def build_scope()

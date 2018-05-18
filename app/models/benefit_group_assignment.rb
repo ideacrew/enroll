@@ -87,6 +87,7 @@ class BenefitGroupAssignment
   end
 
   def benefit_group
+    return @benefit_group if defined? @benefit_group
     warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
     # return @benefit_group if defined? @benefit_group
     # return nil if benefit_group_id.blank?
