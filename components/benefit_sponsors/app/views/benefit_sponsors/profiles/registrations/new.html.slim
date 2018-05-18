@@ -5,7 +5,7 @@
     
     = flash_messages
 
-    = form_for @agency, as: :agency, url: {action: "create"}, html: { class: "needs-validation", id:'broker_registration_form', novalidate:true } do |f|
+    = form_for @agency, as: :agency, url: {action: "create"}, html: { class: "needs-validation s508", id:'broker_registration_form', novalidate:true } do |f|
     
       = f.hidden_field :profile_type, value: params[:profile_type]
       
@@ -14,10 +14,12 @@
         = render partial: './ui-components/v1/forms/broker_registration/personal_information', locals: {f: f}
       
       = f.fields_for :organization, f.object.organization, errors: {}, field_set: false do |f|
-        = render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f}
-        = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
-          = render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f}
-          = render partial: './ui-components/v1/forms/office_locations/office_locations', locals: {f: f}
+        fieldset
+          legend Broker Agency Information:
+          = render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f}
+          = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
+            = render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f}
+            = render partial: './ui-components/v1/forms/office_locations/office_locations', locals: {f: f}
 
         = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right'
 - else

@@ -99,10 +99,23 @@ describe "CcaEmployerProfilesMigration" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
       expect(migrated_profile).to have_attributes(entity_kind: old_profile.entity_kind.to_sym, created_at: old_profile.created_at,
-                                                  updated_at: old_profile.updated_at, contact_method: old_profile.contact_method,
+                                                  updated_at: old_profile.updated_at,
                                                   aasm_state: old_profile.aasm_state, profile_source: old_profile.profile_source,
                                                   registered_on: old_profile.registered_on)
     end
+
+    it "should match all migrated attributes for employer profile" do
+      migrated_profile = @migrated_organizations.first.employer_profile
+      old_profile = @old_organizations.first.employer_profile
+      if old_profile.contact_method == "Only Electronic communications"
+        expect(migrated_profile.contact_method).to eq :electronic_only
+      elsif old_profile.contact_method == "Paper and Electronic communications"
+        expect(migrated_profile.contact_method).to eq :paper_and_electronic
+      elsif old_profile.contact_method == "Only Paper communication"
+        expect(migrated_profile.contact_method).to eq :paper_only
+      end
+    end
+
 
     it "should match all migrated attributes for organization" do
       old_organization = @old_organizations.first

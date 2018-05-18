@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitApplications::BenefitApplication, dbclean: :after_each, type: :model do
+  RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
     # let(:profile)               { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile)  }
@@ -121,7 +121,7 @@ module BenefitSponsors
       end
     end
 
-    describe "Extending a BenefitApplication's open_enrollment_period" do
+    describe "Extending a BenefitApplication's open_enrollment_period", :dbclean => :after_each do
       let(:benefit_application)   { described_class.new(**params) }
 
       context "and the application can transition to open enrollment state" do
@@ -203,7 +203,6 @@ module BenefitSponsors
       end
     end
 
-
     describe "Scopes", :dbclean => :after_each do
       let(:this_year)                       { TimeKeeper.date_of_record.year }
       let(:march_effective_date)            { Date.new(this_year,3,1) }
@@ -232,6 +231,7 @@ module BenefitSponsors
       end
 
       it "should find applications by Open Enrollment end" do
+        # binding.pry
         expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(march_open_enrollment_end_on)).to eq march_sponsors
         expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(april_open_enrollment_end_on)).to eq april_sponsors
       end

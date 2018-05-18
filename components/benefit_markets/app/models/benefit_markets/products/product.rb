@@ -69,11 +69,11 @@ module BenefitMarkets
     scope :aca_shop_market,       ->{ where(benefit_market_kind: :aca_shop) }
     scope :aca_individual_market, ->{ where(benefit_market_kind: :aca_individual) }
 
-    scope :by_application_date,   ->(date){ where(:"application_period.min".gte => date, :"application_period.max".lte => date) }
-
     scope :by_metal_level_kind,   ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
     scope :by_issuer_profile,     ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
-    scope :active_on,             ->(effective_date){ where(:"premium_tables.effective_period.min".gte => effective_date, :"premium_tables.effective_period.max".lte => effective_date) }
+    
+    scope :by_application_period, ->(application_period){ where(:application_period => application_period) }
+    scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date, :"premium_tables.effective_period.max".gte => effective_date) }
 
     def issuer_profile
       return @issuer_profile if defined?(@issuer_profile)
