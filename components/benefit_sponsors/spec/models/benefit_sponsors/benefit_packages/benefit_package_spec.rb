@@ -76,7 +76,7 @@ module BenefitSponsors
         end
 
         it "should renew sponsored benefits" do
-          # expect(renewal_benefit_package.sponsored_benefits.size).to eq current_benefit_package.sponsored_benefits.size
+          expect(renewal_benefit_package.sponsored_benefits.size).to eq current_benefit_package.sponsored_benefits.size
         end
 
         it "should reference to renewal product package" do

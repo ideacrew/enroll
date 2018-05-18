@@ -73,7 +73,7 @@ module BenefitMarkets
     scope :by_issuer_profile,     ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
     
     scope :by_application_period, ->(application_period){ where(:application_period => application_period) }
-    scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".gte => effective_date, :"premium_tables.effective_period.max".lte => effective_date) }
+    scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date, :"premium_tables.effective_period.max".gte => effective_date) }
 
     def issuer_profile
       return @issuer_profile if defined?(@issuer_profile)
