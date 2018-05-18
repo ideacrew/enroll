@@ -97,9 +97,6 @@ module BenefitSponsors
 
       def build_nested_models
       end
-
-      def build_benefit_sponsorship
-      end
     end
   end
 end

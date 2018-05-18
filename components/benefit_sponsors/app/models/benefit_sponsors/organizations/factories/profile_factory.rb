@@ -199,7 +199,9 @@ module BenefitSponsors
           profile = if is_broker_profile?
                       build_broker_profile(attrs)
                     elsif is_employer_profile?
-                      build_sponsor_profile(attrs)
+                      profile = build_sponsor_profile(attrs)
+                      profile.add_benefit_sponsorship
+                      profile
                     end
           profile.office_locations << build_office_locations if profile.office_locations.empty?
           self.profile_id = profile.id

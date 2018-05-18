@@ -54,13 +54,6 @@ module BenefitSponsors
         delegate :legal_name, :end_on, to: :organization
       end
 
-      def build_benefit_sponsorship
-        self.organization.benefit_sponsorships << BenefitSponsorships::BenefitSponsorship.new({
-          profile_id: id,
-          benefit_market: site.benefit_markets.first
-        })
-      end
-
       def parent
         self.organization
       end
@@ -88,6 +81,10 @@ module BenefitSponsors
 
       def benefit_applications
         parent.active_benefit_sponsorship.benefit_applications
+      end
+
+      def active_benefit_application
+        benefit_applications.where(:aasm_state => :active).first
       end
 
       def current_benefit_application
@@ -169,6 +166,8 @@ module BenefitSponsors
         renewing_published_benefit_application || current_benefit_application
       end
 
+      # Deprecate below methods in future
+
       def renewing_plan_year
         warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
         renewal_benefit_application
@@ -179,9 +178,23 @@ module BenefitSponsors
         published_benefit_application
       end
 
-      def plan_years # Deprecate in future
+      def renewing_plan_year
+        warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
+        renewal_benefit_application
+      end
+
+      def plan_years
         warn "[Deprecated] Instead use benefit_applications" unless Rails.env.test?
         benefit_applications
+      end
+
+      def active_plan_year
+        active_benefit_application
+      end
+
+      def published_plan_year
+        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        published_benefit_application
       end
 
       alias_method :broker_agency_profile=, :hire_broker_agency
