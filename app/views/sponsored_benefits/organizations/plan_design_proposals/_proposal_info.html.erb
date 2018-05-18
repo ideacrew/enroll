@@ -57,30 +57,4 @@ $(function() {
   })
 });
 
-
-$(function() {
-  
-  var date = $('#effectiveDate').val().split('-');
-  plansForDate(date[2]+'/'+date[1]+'/'+date[0]);
-
-  function plansForDate(date) {
-      $.ajax({
-        type: "GET",
-        data:{
-          start_on_date: date
-        },
-        success: function(res) {
-          if (res != true) { // late rate scenario
-            $('.interaction-click-control-select-health-benefits').hide();
-            $('.alert-info').removeClass('hide');
-          } else if (res == true) {
-           $('.interaction-click-control-select-health-benefits').show();
-          }
-        },
-        url: "/employers/employer_profiles/1/plan_years/2/late_rates_check"
-      });
-    }
-})
-
-
 </script>
