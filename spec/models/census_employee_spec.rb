@@ -1672,7 +1672,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       })
     }
 
-
     let!(:expired_health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
       household: shop_family.latest_household,
       coverage_kind: "health",

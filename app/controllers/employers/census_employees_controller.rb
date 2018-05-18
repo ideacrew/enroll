@@ -182,7 +182,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @status = params[:status] || ''
   end
 
