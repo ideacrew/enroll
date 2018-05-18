@@ -2,13 +2,14 @@ module BenefitMarkets
   class BenefitSponsorCatalog
     include Mongoid::Document
     include Mongoid::Timestamps
+    include Comparable
 
     embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
-    field :effective_date,          type: Date 
+    field :effective_date,          type: Date
     field :probation_period_kinds,  type: Array, default: []
-
-    delegate :benefit_market_catalog, to: :benefit_application
+    field :effective_period,        type: Range
+    field :open_enrollment_period,  type: Range
 
     belongs_to  :service_area,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
@@ -36,7 +37,7 @@ module BenefitMarkets
     end
 
     # TODO: check for late rate updates
-    
+
     # def update_product_packages
     #   if is_product_package_update_available?
     #     product_packages.each do |product_package|
@@ -49,34 +50,23 @@ module BenefitMarkets
     #   product_packages.any?{|product_package| benefit_market_catalog.is_product_package_updated?(product_package) }
     # end
 
-
-    #FIX ME: Use configuration from benefit market
-    def open_enrollment_start
-      effective_date - 2.months
+    def comparable_attrs
+      [:effective_date, :service_area, :sponsor_market_policy, :member_market_policy]
     end
 
-    # FIX ME: Use configuration from benefit market
-    def open_enrollment_end
-      open_enrollment_month = effective_date.prev_month
-      Date.new(open_enrollment_month.year, open_enrollment_month.month, 20)
-    end
-    
-    def effective_period
-      effective_date..effective_date.next_year.prev_day
-    end
-
-    def open_enrollment_period
-      open_enrollment_start..open_enrollment_end
-    end
-    
-    def product_active_year
-      benefit_application.effective_period.begin.year
+    # Define Comparable operator
+    # If instance attributes are the same, compare ProductPackages
+    def <=>(other)
+      if comparable_attrs.all? { |attr| eval(attr.to_s) == eval("other.#{attr.to_s}")  }
+        if product_packages == other.product_packages
+          0
+        else
+          product_packages <=> other.product_packages
+        end
+      else
+        updated_on < other.updated_on ? -1 : 1
+      end
     end
 
-    # product_option_choice: <metal level name>/<issuer name>
-    def products_for(product_package, product_option_choice)
-      return [] unless product_package
-      product_package.products_for_plan_option_choice(product_option_choice)
-    end
   end
 end
