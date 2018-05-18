@@ -24,6 +24,8 @@ FactoryGirl.define do
           product_package_kinds: [ product_package.kind ],
           metal_level_kind: :gold)
       end
+
+      product_package.contribution_model = create(:benefit_markets_contribution_models_contribution_model, :with_contribution_units)
     end
   end
 end

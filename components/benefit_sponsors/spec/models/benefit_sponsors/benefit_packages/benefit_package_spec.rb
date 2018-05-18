@@ -20,7 +20,7 @@ module BenefitSponsors
         )}
 
         let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-          benefit_market: benefit_market, 
+          benefit_market: benefit_market,
           title: "SHOP Benefits for #{renewal_effective_date.year}", 
           application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
         )}
@@ -93,7 +93,17 @@ module BenefitSponsors
           end
         end
 
-        it "should renew sponsor contributions" do 
+        it "should renew sponsor contributions" do
+          renewal_benefit_package.sponsored_benefits.each_with_index do |sponsored_benefit, i|
+            expect(sponsored_benefit.sponsor_contribution).to be_present
+
+            current_sponsored_benefit = current_benefit_package.sponsored_benefits[i]
+            current_sponsored_benefit.sponsor_contribution.contribution_levels.each_with_index do |current_contribution_level, i|
+              new_contribution_level = sponsored_benefit.sponsor_contribution.contribution_levels[i]
+              expect(new_contribution_level.is_offered).to eq current_contribution_level.is_offered
+              expect(new_contribution_level.contribution_factor).to eq current_contribution_level.contribution_factor
+            end
+          end
         end
 
         it "should renew pricing determinations" do 

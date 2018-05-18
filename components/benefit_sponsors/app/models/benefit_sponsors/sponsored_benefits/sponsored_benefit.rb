@@ -44,24 +44,14 @@ module BenefitSponsors
               product_package_kind: product_package_kind,
               product_option_choice: product_option_choice,
               reference_product: reference_product.renewal_product,
-              sponsor_contribution: renew_sponsor_contribution(new_product_package),
+              sponsor_contribution: sponsor_contribution.renew(new_product_package),
               pricing_determinations: renew_pricing_determinations(new_product_package)
             )
           end
         end
       end
 
-      def renew_sponsor_contribution(new_product_package)
-        # Test following service
-        # new_sponsor_contribution = sponsor_contribution_service.build_sponsor_contribution(new_product_package)        
-        # new_sponsored_benefit.sponsor_contribution = new_sponsor_contribution
-      end
-
       def renew_pricing_determinations(new_product_package)
-      end
-
-      def sponsor_contribution_service
-        BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
       end
 
       def benefit_sponsor_catalog
