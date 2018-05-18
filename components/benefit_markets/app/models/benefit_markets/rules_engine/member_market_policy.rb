@@ -4,7 +4,7 @@ module BenefitMarkets
 
 
     # We can define policies as a macro inside class similar to Mongoid 'field'
-    policy(:enrollment_group)
+    policy(:enrollment_group) do
       rule :child_age_off_policy,
             validate: lambda {|v, fact| v.child_age_off_policy == fact.age_on(Date.today) },
             success:  lambda {|v, fact| puts "is of child age" },
@@ -19,9 +19,9 @@ module BenefitMarkets
 
 
 
-    policy(:enrollment_group).rules           # => [<RulesEngine::Rule child_age_off_policy>, ,RulesEngine::Rule age_range_policy>]
-    policy_satisfied? = policy(:enrollment_group).process_rules   # executes rules that returns boolean result
-    object = policy(:enrollment_group).process_rules   # executes rules that returns object result
+    #policy(:enrollment_group).rules           # => [<RulesEngine::Rule child_age_off_policy>, ,RulesEngine::Rule age_range_policy>]
+    #policy_satisfied? = policy(:enrollment_group).process_rules   # executes rules that returns boolean result
+    #object = policy(:enrollment_group).process_rules   # executes rules that returns object result
 
   end
 end
