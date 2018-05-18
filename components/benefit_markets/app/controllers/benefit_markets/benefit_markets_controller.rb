@@ -1,6 +1,6 @@
 module BenefitMarkets
   class BenefitMarketsController < ApplicationController
-    layout 'benefit_markets/application'
+    layout 'benefit_markets/application.html.slim'
     before_filter :set_site_id
 
     def index

@@ -1,8 +1,8 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include ::DataTablesAdapter
-  include DataTablesSearch
-  include Pundit
-  include SepAll
+  include ::DataTablesSearch
+  include ::Pundit
+  include ::SepAll
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]

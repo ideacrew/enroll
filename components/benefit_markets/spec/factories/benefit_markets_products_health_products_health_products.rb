@@ -17,7 +17,7 @@ FactoryGirl.define do
 
 
     after(:build) do |product, evaluator|
-      product.premium_tables << build_list(:benefit_markets_products_premium_table, 1)
+      product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period)
     end
 
   end
