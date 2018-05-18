@@ -6,14 +6,12 @@ describe FixCitizenStatus, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:person3) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:verification_type) { FactoryGirl.build(:verification_type, :type_name => "Immigration status")}
 
   shared_examples_for 'fix_citizen_status' do |old_state, new_state, result|
     before do
       person.consumer_role.lawful_presence_determination.update_attributes!( citizen_status: old_state)
       person2.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: new_state)
       person3.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: new_state)
-      person.verification_types << verification_type
       allow(subject). to receive(:get_people).and_return([person])
       allow(person).to receive(:versions).and_return([person2, person3])
       subject.migrate

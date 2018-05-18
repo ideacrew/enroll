@@ -26,7 +26,9 @@ class MoveDueDateToVerificationTypeLevel < MongoidMigrationTask
               next
             elsif due_date.present?
               # this is the notice sent out date.
-              v_type.update_attributes(due_date: due_date, type: "notice")
+              role.special_verifications << SpecialVerification.new(due_date: due_date,
+              verification_type: v_type,
+              type: "notice")
               if role.save!
                 puts "special verification created for #{person.full_name} On family of #{family.primary_applicant.person.full_name}" unless Rails.env.test?
               end

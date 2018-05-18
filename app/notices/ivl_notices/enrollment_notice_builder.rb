@@ -98,7 +98,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.types_include_to_notices.present?
+      if person.consumer_role.outstanding_verification_types.present?
         outstanding_people << person
         update_individual_due_date(person, date)
       end
@@ -129,7 +129,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     due_dates = []
     family.contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.each do |v_type|
-        due_dates << family.document_due_date(v_type)
+        due_dates << family.document_due_date(family_member, v_type)
       end
     end
     due_dates.compact!
@@ -142,9 +142,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def update_individual_due_date(person, date)
-    person.consumer_role.types_include_to_notices.each do |verification_type|
-      unless verification_type.due_date && verification_type.due_date_type
-        verification_type.update_attributes(due_date:(date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
+    person.consumer_role.outstanding_verification_types.each do |verification_type|
+      unless person.consumer_role.special_verifications.where(:"verification_type" => verification_type).present?
+        special_verification = SpecialVerification.new(due_date: (date + Settings.aca.individual_market.verification_due.days), verification_type: verification_type, type: "notice")
+        person.consumer_role.special_verifications << special_verification
         person.consumer_role.save!
       end
     end
@@ -153,7 +154,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def append_unverified_individuals(people)
     people.each do |person|
       person.consumer_role.outstanding_verification_types.each do |verification_type|
-        case verification_type.type_name
+        case verification_type
         when "Social Security Number"
           notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         when "Immigration status"
@@ -170,7 +171,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def document_due_date(person, verification_type)
-    person.consumer_role.verification_types.by_name(verification_type.type_name).first.due_date
+    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
+    special_verification.present? ? special_verification.due_date : nil
   end
 
   def phone_number(legal_name)

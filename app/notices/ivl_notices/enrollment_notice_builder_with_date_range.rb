@@ -95,7 +95,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.types_include_to_notices.present?
+      if person.consumer_role.outstanding_verification_types.present?
         outstanding_people << person
         update_individual_due_date(person, date)
       end
@@ -118,7 +118,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     due_dates = []
     family.contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.each do |v_type|
-        due_dates << family.document_due_date(v_type)
+        due_dates << family.document_due_date(family_member, v_type)
       end
     end
     due_dates.compact!
@@ -131,32 +131,33 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def update_individual_due_date(person, date)
-    person.consumer_role.types_include_to_notices.each do |verification_type|
-      unless verification_type.due_date
-        verification_type.update_attributes(due_date: (date + Settings.aca.individual_market.verification_due.days), due_date_type: "notice")
+    person.consumer_role.outstanding_verification_types.each do |verification_type|
+      unless person.consumer_role.special_verifications.where(:"verification_type" => verification_type).present?
+        special_verification = SpecialVerification.new(due_date: (date + Settings.aca.individual_market.verification_due.days), verification_type: verification_type, type: "notice")
+        person.consumer_role.special_verifications << special_verification
         person.consumer_role.save!
       end
     end
   end
 
   def ssn_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?("Social Security Number")
+    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
   end
 
   def lawful_presence_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('Citizenship')
+    person.consumer_role.outstanding_verification_types.include?('Citizenship')
   end
 
   def immigration_status_outstanding?(person)
-   person.consumer_role.types_include_to_notices.include?('Immigration status')
+   person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
   def american_indian_status_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('American Indian Status')
+    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.types_include_to_notices.include?('DC Residency')
+    person.consumer_role.outstanding_verification_types.include?('DC Residency')
   end
 
   def append_unverified_individuals(people)
@@ -184,7 +185,8 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def document_due_date(person, verification_type)
-    person.consumer_role.verification_types.by_name(verification_type).first.due_date
+    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
+    special_verification.present? ? special_verification.due_date : nil
   end
 
   def phone_number(legal_name)

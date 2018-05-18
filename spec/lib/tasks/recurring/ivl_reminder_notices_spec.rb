@@ -14,13 +14,13 @@ describe 'recurring:ivl_reminder_notices', :dbclean => :after_each do
 
   context "for unassisted individuals", :dbclean => :after_each do
 
-    # it "should send reminder notice when due date is great than or eq to 30 days" do
-    #   special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+30.days, verification_type: "Social Security Number", type: "notice")
-    #   person.consumer_role.special_verifications << special_verification
-    #   person.consumer_role.save!
-    #   expect(IvlNoticesNotifierJob).to receive(:perform_later)
-    #   Rake::Task["recurring:ivl_reminder_notices"].invoke
-    # end
+    it "should send reminder notice when due date is great than or eq to 30 days" do
+      special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+30.days, verification_type: "Social Security Number", type: "notice")
+      person.consumer_role.special_verifications << special_verification
+      person.consumer_role.save!
+      expect(IvlNoticesNotifierJob).to receive(:perform_later)
+      Rake::Task["recurring:ivl_reminder_notices"].invoke
+    end
 
     it "should NOT send reminder notice when due date is less than 30 days" do
       special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+1.days, verification_type: "Citizenship", type: "notice")

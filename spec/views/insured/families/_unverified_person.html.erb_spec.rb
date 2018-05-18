@@ -2,10 +2,10 @@ require 'rails_helper'
 
 describe "insured/families/verification/_unverified_person.html.erb" do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:family) { FactoryGirl.build(:family, :with_primary_family_member, :person => person) }
+  let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
 
   before do
-    allow(person).to receive(:primary_family).and_return family
+    allow_any_instance_of(Person).to receive(:primary_family).and_return family
     allow(view).to receive(:unverified?)
     allow(view).to receive(:text_center).and_return true
     allow(view).to receive(:show_v_type).and_return "in review"
@@ -23,7 +23,7 @@ describe "insured/families/verification/_unverified_person.html.erb" do
     end
 
     it "shows verification type" do
-      expect(rendered).to match /Citizenship/
+      expect(rendered).to match /Immigration status/
     end
 
     it "shows verification type status" do
@@ -36,7 +36,7 @@ describe "insured/families/verification/_unverified_person.html.erb" do
       allow(view).to receive(:unverified?).and_return true
     end
     it "shows verification type" do
-      expect(rendered).to match /Citizenship/
+      expect(rendered).to match /Immigration status/
     end
 
     it "shows verification type status" do

@@ -164,15 +164,15 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
 
   shared_examples_for "consumer verification status" do |action, old_status, new_status|
-    xit "#{action} #{old_status} in #{new_status}" do
+    it "#{action} #{old_status} in #{new_status}" do
       expect(person.consumer_role.aasm_state).to eq new_status
     end
   end
 
   shared_examples_for "consumer verification types" do |action, v_type, status|
-    xit "#{action} #{v_type} as #{status}" do
+    it "#{action} #{v_type} as #{status}" do
       if v_type == 'Social Security Number'
-        expect(person.verification_types.active.where(type_name:v_type).first.validation_status).to eq status
+        expect(person.consumer_role.ssn_validation).to eq status
       elsif v_type == 'Citizenship' || v_type == 'Immigration status'
         expect(person.consumer_role.lawful_presence_determination.aasm_state).to eq status
       end
@@ -180,8 +180,8 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
   end
 
   shared_examples_for "person has correct verification types" do |v_types|
-    xit "returns correct verification types for person" do
-      expect(person.verification_types.active.map(&:type_name)).to eq v_types
+    it "returns correct verification types for person" do
+      expect(person.verification_types).to eq v_types
     end
   end
 

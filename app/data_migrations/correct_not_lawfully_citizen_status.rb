@@ -22,7 +22,7 @@ class CorrectNotLawfullyCitizenStatus < MongoidMigrationTask
     people = get_members(enrollment)
     people.each do |person|
       old_status = person.citizen_status
-      if person.verification_types.active.map(&:type_name).include?('Immigration status') && ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include?(person.citizen_status)
+      if person.verification_types.include?('Immigration status') && ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include?(person.citizen_status)
         lpd(person).update_attributes!(:citizen_status => 'alien_lawfully_present')
         puts "Person HBX_ID: #{person.hbx_id} citizen status was changed from #{old_status} to ==> #{person.citizen_status}" unless Rails.env.test?
       end

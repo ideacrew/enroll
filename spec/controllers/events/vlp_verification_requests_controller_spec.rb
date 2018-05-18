@@ -41,12 +41,12 @@ describe Events::VlpVerificationRequestsController do
     end
 
     it "stores verification history element with proper verification type" do
-      expect(person.consumer_role.verification_types.by_name("Citizenship").first.type_history_elements.first.action).to eq "DHS Hub Request"
+      expect(person.consumer_role.verification_type_history_elements.first.verification_type).to eq "Immigration status"
     end
 
     it "stores reference to event_request document" do
       expect(person.consumer_role.lawful_presence_determination.vlp_requests.first.id).to eq BSON::ObjectId.from_string(
-          person.consumer_role.verification_types.by_name("Citizenship").first.type_history_elements.first.event_request_record_id)
+          person.consumer_role.verification_type_history_elements.first.event_request_record_id)
     end
   end
 end
