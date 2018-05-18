@@ -231,7 +231,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           end
 
           context "and the employee is assigned a benefit group" do
-            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee) }
+            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee) }
 
             before do
               initial_census_employee.benefit_group_assignments = [benefit_group_assignment]
@@ -256,7 +256,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
               context "and a roster match by SSN and DOB is performed" do
                 context "using non-matching ssn and dob" do
-                  let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
+                  let(:invalid_employee_role)   { FactoryGirl.build(:benefit_sponsors_employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
                   it "should return an empty array" do
                     expect(CensusEmployee.matchable(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
@@ -264,7 +264,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 end
 
                 context "using matching ssn and dob" do
-                  let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
+                  let(:valid_employee_role)     { FactoryGirl.build(:benefit_sponsors_employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
                   let!(:user)     { FactoryGirl.create(:user, person: valid_employee_role.person) }
 
                   it "should return the roster instance" do
@@ -273,7 +273,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                   context "and a link employee role request is received" do
                     context "and the provided employee role identifying information doesn't match a census employee" do
-                      let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
+                      let(:invalid_employee_role)   { FactoryGirl.build(:benefit_sponsors_employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
                       it "should raise an error" do
                         initial_census_employee.employee_role = invalid_employee_role
@@ -542,7 +542,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should find all employers" do
-        expect(BenefitSponsors::Organizations::Organization.all.size).to eq employer_count
+        expect(BenefitSponsors::Organizations::Organization.all.employer_profiles.size).to eq employer_count
       end
 
       it "should find all employees" do
@@ -623,7 +623,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           end
 
           context "and assign existing census employee to benefit group" do
-            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: existing_census_employee) }
+            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: existing_census_employee) }
 
             let!(:saved_census_employee) do
               ee = CensusEmployee.find(existing_census_employee.id)
@@ -793,7 +793,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "update_hbx_enrollment_effective_on_by_hired_on" do
     # include_context "BradyWorkAfterAll"
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role) }
     # let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
     let(:census_employee) {FactoryGirl.create(:benefit_sponsors_census_employee,
       benefit_sponsorship: employer_profile.active_benefit_sponsorship,
@@ -912,7 +912,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       benefit_sponsorship: organization.active_benefit_sponsorship
     }
 
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_sponsors_benefit_group_assignment) }
     before do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
@@ -1026,7 +1026,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         benefit_sponsorship: organization.active_benefit_sponsorship
       }
 
-      let(:employee_role)     { FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile )}
+      let(:employee_role)     { FactoryGirl.build(:benefit_sponsors_employee_role, employer_profile: organization.employer_profile )}
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
 
       let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id) }
@@ -1221,7 +1221,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   context '.new_hire_enrollment_period' do
 
     let(:census_employee) { CensusEmployee.new(**valid_params) }
-    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
 
     before do
       census_employee.benefit_group_assignments = [benefit_group_assignment]
@@ -1283,7 +1283,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     # end
 
     let(:census_employee) { CensusEmployee.new(**valid_params) }
-    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
 
     before do
       census_employee.benefit_group_assignments = [benefit_group_assignment]
@@ -1385,8 +1385,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context 'when benefit group assignment with benefit group already exists' do
-      let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }
-      let!(:white_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true) }
+      let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }
+      let!(:white_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true) }
 
       it 'should activate existing benefit_group_assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 2
@@ -1398,10 +1398,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context 'when multiple benefit group assignments with benefit group exists' do
-      let!(:blue_collar_benefit_group_assignment1)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 2.days, is_active: false) }
-      let!(:blue_collar_benefit_group_assignment2)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 1.day, is_active: false) }
-      let!(:blue_collar_benefit_group_assignment3)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }
-      let!(:white_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true) }
+      let!(:blue_collar_benefit_group_assignment1)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 2.days, is_active: false) }
+      let!(:blue_collar_benefit_group_assignment2)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, created_at: TimeKeeper.date_of_record - 1.day, is_active: false) }
+      let!(:blue_collar_benefit_group_assignment3)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: false) }
+      let!(:white_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: white_collar_benefit_group, census_employee: census_employee, is_active: true) }
 
       before do
         blue_collar_benefit_group_assignment1.aasm_state = 'coverage_selected'
@@ -1422,7 +1422,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context 'when none present with given benefit group' do
-      let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: true) }
+      let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: true) }
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 1
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
@@ -1717,7 +1717,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       )
 
       person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+      employee_role = FactoryGirl.build(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
       ce.update_attributes({employee_role: employee_role})
       family = Family.find_or_build_from_employee_role(employee_role)
       ce
@@ -1829,7 +1829,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person)}
 
     let(:user)          { double("user") }
-    let(:employee_role) {FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile )}
+    let(:employee_role) {FactoryGirl.build(:benefit_sponsors_employee_role, employer_profile: organization.employer_profile )}
 
 
     it 'should allow Admins to edit a CensusEmployee SSN/DOB that is in a linked status' do
@@ -1916,7 +1916,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       benefit_sponsorship: organization.active_benefit_sponsorship,
       benefit_group_assignments: [benefit_group_assignment]
     }
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived") }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived") }
     
     it "returns true when employees waive the coverage" do
       expect(census_employee.waived?).to be_truthy
@@ -1929,7 +1929,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "when active employeees has renewal benifit group" do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
-    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
     
     before do
       benefit_group_assignment.update_attribute(:updated_at, benefit_group_assignment.updated_at + 1.day)
@@ -1955,8 +1955,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     )}
     let(:employer_profile) { organization.employer_profile }
     let(:census_employee) { CensusEmployee.new(**valid_params) }
-    let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
-    let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
     
     before do
       benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
@@ -1975,7 +1975,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     # let(:plan_year)                       { FactoryGirl.create(:next_month_plan_year, :with_benefit_group_congress) }
     let(:plan_year)                       { benefit_application }
     # let(:benefit_group)                   { plan_year.benefit_packages.first }
-    let(:benefit_group_assignment)        { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: civil_servant) }
+    let(:benefit_group_assignment)        { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: civil_servant) }
     let(:civil_servant)                   { FactoryGirl.build(:benefit_sponsors_census_employee, employer_profile: employer_profile_congressional) }
     let(:initial_state)                   { "eligible" }
     let(:eligible_state)                  { "newly_designated_eligible" }
@@ -2059,7 +2059,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   describe "#trigger_notice" do
     let(:census_employee){FactoryGirl.build(:benefit_sponsors_census_employee)}
-    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+    let(:employee_role){FactoryGirl.build(:benefit_sponsors_employee_role, :census_employee => census_employee)}
     it "should trigger job in queue" do
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []

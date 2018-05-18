@@ -2447,7 +2447,7 @@ describe PlanYear, "plan year schedule changes" do
 
         let(:census_employee){
           employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
-          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups.first
+          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups
           employee
         }
 

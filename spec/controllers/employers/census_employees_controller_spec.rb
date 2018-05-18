@@ -28,7 +28,7 @@ RSpec.describe Employers::CensusEmployeesController do
      "gender" => "male",
      "is_business_owner" => true,
      "hired_on" => "05/02/2015",
-     "employer_profile_id" => employer_profile_id} }
+     "employer_profile" => employer_profile} }
 
   let(:person) { FactoryGirl.create(:person, first_name: "aqzz", last_name: "White", dob: "11/11/1992", ssn: "123123123", gender: "male", employer_profile_id: employer_profile.id, hired_on: "2014-11-11")}
   describe "GET new" do
@@ -133,7 +133,7 @@ RSpec.describe Employers::CensusEmployeesController do
         "gender" => "male",
         "is_business_owner" => true,
         "hired_on" => "05/02/2015",
-        "employer_profile_id" => employer_profile_id,
+        "employer_profile" => employer_profile,
         "census_dependents_attributes" => [
           {
             "id" => child1.id,
@@ -151,7 +151,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
     let!(:user) { create(:user, person: person)}
     let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 123123714) }
-    let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
+    let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person)}
     # let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, employer_profile_id: employer.id, hired_on: "2014-11-11", first_name: "aqzz", last_name: "White", dob: "11/11/1990", ssn: "123123123", gender: "male", benefit_group: benefit_group) }
 
     before do
@@ -162,7 +162,7 @@ RSpec.describe Employers::CensusEmployeesController do
     end
 
     it "should be redirect when valid" do
-      allow(census_employee).to receive(:save).and_return(true)
+      # allow(census_employee).to receive(:save).and_return(true)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       # post :update, :id => census_employee.id, :employer_profile_id => employer.id, census_employee: census_employee_params
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: census_employee_params
@@ -215,11 +215,11 @@ RSpec.describe Employers::CensusEmployeesController do
 
     let(:person) { FactoryGirl.create(:person)}
     # let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
+    let(:employee_role1) {FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile)}
     let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
     let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group)}
+    let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group)}
     let(:census_employee1) { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
     let(:current_employer_term_enrollment) do

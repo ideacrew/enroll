@@ -83,7 +83,7 @@ describe ".coverage_effective_on" do
 
     let(:employee_role) {
       person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-      FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+      FactoryGirl.create(:benefit_sponsors_employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
     }
 
 
@@ -671,7 +671,7 @@ describe EmployeeRole, dbclean: :after_each do
   end
 
   context "can_select_coverage?" do
-    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:employee_role) { FactoryGirl.build(:benefit_sponsors_employee_role) }
 
     it "should return true when hired_on is less than two monthes ago" do
       employee_role.hired_on = TimeKeeper.date_of_record - 15.days
@@ -685,7 +685,7 @@ describe EmployeeRole, dbclean: :after_each do
   end
 
   context "is_cobra_status?" do
-    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:employee_role) { FactoryGirl.build(:benefit_sponsors_employee_role) }
     let(:census_employee) { FactoryGirl.build(:benefit_sponsors_census_employee) }
 
     it "should return false when without census_employee" do

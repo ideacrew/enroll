@@ -224,6 +224,7 @@ class CensusEmployee < CensusMember
   def employer_profile
     return @employer_profile if defined? @employer_profile
     return @employer_profile = EmployerProfile.find(self.employer_profile_id) if self.employer_profile_id.present? && is_env_test?
+    return nil if is_env_test? && self.benefit_sponsorship.blank? # Need this for is_case_old?
     @employer_profile = self.benefit_sponsorship.organization.employer_profile
   end
 
@@ -754,7 +755,7 @@ class CensusEmployee < CensusMember
                                     where(
                                       :employment_terminated_on.gte => date_range.first,
                                       :employment_terminated_on.lte => date_range.last
-                                    ) if is_case_old?
+                                    ) if employer_profiles[0].is_a?(EmployerProfile)
 
         query ||= unscoped.terminated.any_in(benefit_sponsors_employer_profile_id: employer_profile_ids).
                                     where(
@@ -1111,7 +1112,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_census_employee_is_unique
-    potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(benefit_sponsors_employer_profile_id).active if is_case_old?
+    potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active if is_case_old?
     potential_dups ||= CensusEmployee.by_ssn(ssn).by_employer_profile_id(benefit_sponsors_employer_profile_id).active
     if potential_dups.detect { |dup| dup.id != self.id  }
       message = "Employee with this identifying information is already active. "\
