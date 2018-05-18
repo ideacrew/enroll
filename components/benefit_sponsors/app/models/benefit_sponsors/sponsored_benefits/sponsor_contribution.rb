@@ -21,5 +21,22 @@ module BenefitSponsors
         self.contribution_levels.build(contribution_level_attrs.attributes)
       end
     end
+
+    def sponsor_contribution_for(new_product_package)
+      contribution_service = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
+      contribution_service.build_sponsor_contribution(new_product_package)
+    end
+
+    def renew(new_product_package)
+      new_sponsor_contribution = sponsor_contribution_for(new_product_package)  
+      new_sponsor_contribution.contribution_levels.each do |new_contribution_level|
+        current_contribution_level = contribution_levels.detect{|cl| cl.display_name == new_contribution_level.display_name}
+        if current_contribution_level.present?
+          new_contribution_level.is_offered = current_contribution_level.is_offered
+          new_contribution_level.contribution_factor = current_contribution_level.contribution_factor
+        end
+      end
+      new_sponsor_contribution
+    end
   end
 end
