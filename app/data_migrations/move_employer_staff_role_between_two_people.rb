@@ -1,4 +1,3 @@
-
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
@@ -20,6 +19,8 @@ class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
       from_person.employer_staff_roles.each do |i|
         to_person.employer_staff_roles << i
       end
+      from_person.employer_staff_roles.clear
+      from_person.save!
       to_person.save!
       puts "transfer employer staff roles from hbx_id: #{from_hbx_id} to hbx_id: #{to_hbx_id}" unless Rails.env.test?
     rescue => e
@@ -27,6 +28,3 @@ class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
     end
   end
 end
-
-
-

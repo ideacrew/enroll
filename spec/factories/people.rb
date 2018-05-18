@@ -9,7 +9,9 @@ FactoryGirl.define do
     is_incarcerated false
     is_active true
     gender "male"
-
+    # us_citizen "true"
+    # indian_tribe_member "false"
+    # naturalized_citizen "false"
     #association :employee_role, strategy: :build
 
     after(:create) do |p, evaluator|
@@ -17,6 +19,10 @@ FactoryGirl.define do
       create_list(:phone, 2, person: p)
       create_list(:email, 2, person: p)
       #create_list(:employee_role, 1, person: p)
+    end
+
+    trait :with_mailing_address do
+      addresses { [FactoryGirl.build(:address, :mailing_kind)]}
     end
 
     trait :with_ssn do
@@ -87,7 +93,7 @@ FactoryGirl.define do
 
     trait :with_resident_role do
       after(:create) do |p, evaluator|
-        create_list(:resident_role, 1, person: p)
+        create_list(:resident_role, 1, person: p, dob: p.dob)
       end
     end
 

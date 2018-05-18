@@ -4,20 +4,20 @@
     <div class="top-pd" id="inbox_provider_form">
       <span class="flash_message"></span>
       <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
-
-
       <div class="module">
         <table class="table table-striped" id="Broker-Employer-dataTable">
           <thead>
           <tr>
             <th><%= check_box_tag 'BrokerAgencyProfile-check-all' %></th>
-            <th>FEIN</th>
-            <th>Legal Name</th>
-            <th>EE Count</th>
-            <th>ER State</th>
-            <th>Effective Date</th>
-            <th>Broker</th>
-            <th>General Agency</th>
+            <th><%= l10n("fein")%></th>
+            <th><%= l10n("legal_name")%></th>
+            <th><%= l10n("broker_agencies.profiles.ee_count")%></th>
+            <th><%= l10n("broker_agencies.profiles.er_state")%></th>
+            <th><%= l10n("effective_date")%></th>
+            <th><%= l10n("broker")%></th>
+            <% if general_agency_enabled? %>
+              <th><%= l10n("general_agency")%></th>
+            <%end%>
           </tr>
           </thead>
           <tbody>
@@ -53,10 +53,12 @@
               { data: 'er_state'},
               { data: 'effective_date'},
               { data: 'broker'},
+              <% if general_agency_enabled? %>
               { data: 'general_agency'},
+              <%end%>
 	      ],
         columnDefs: [
-          { targets: [0,1,3,5,6,7], orderable: false}
+            { targets: <%= general_agency_enabled? ? [0,1,3,5,6,7] : [0,1,3,5,6] %>, orderable: false}
       ],
   'dom': "<'row'" +
             "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
@@ -87,14 +89,15 @@
 
       </script>
 
-
+      <% if general_agency_enabled? %>
         <div class="col-md-4">
-          <h3>General Agencies</h3>
+          <h3><%= l10n("general_agencies")%></h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
           <%= hidden_field_tag :from_assign, false %>
-          <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-          <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
+          <%= submit_tag l10n("assign"), class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
+          <%= submit_tag l10n("clear_assignment"), class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
         </div>
+        <% end %>
       <% end %>
     </div>
   </div>

@@ -7,6 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
+  include ApplicationHelper
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
@@ -57,6 +58,16 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    employee_mid_year_plan_change(@person, @change_plan)
+    # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
+    # @enrollment.mid_year_plan_change_notice #mirror notice
+
+    # send accepted SEP QLE event notice to enrolled employee
+    if @market_kind == "shop" && @enrollment.employee_role_id.present? && @change_plan == "change_by_qle"
+       emp_role_id = @enrollment.employee_role_id.to_s
+       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id }
+       sep_qle_request_accept_notice_ee(@employee_role.census_employee.id.to_s, @enrollment)
+    end
 
     send_receipt_emails if @person.emails.first
   end
@@ -77,7 +88,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment.reset_dates_on_previously_covered_members(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
-    
+
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -113,6 +124,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
@@ -125,6 +137,28 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
   end
 
+    def employee_mid_year_plan_change(person,change_plan)
+     begin
+      ce = person.active_employee_roles.first.census_employee
+      if change_plan.present? or ce.new_hire_enrollment_period.present?
+        trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer')
+      end
+     rescue Exception => e
+       log("#{e.message}; person_id: #{person.id}")
+     end
+    end
+
+  def sep_qle_request_accept_notice_ee(employee_id, enrollment)
+    sep = enrollment.special_enrollment_period
+    options = { :sep_qle_end_on => sep.end_on.to_s, :sep_qle_title => sep.title, :sep_qle_on => sep.qle_on.to_s }
+    begin
+      ShopNoticesNotifierJob.perform_later(employee_id, "notify_employee_of_special_enrollment_period", :sep => options)
+    rescue Exception => e
+      logger.debug("Exception raised in %s" % e.backtrace)
+      raise "Unable to trigger sep_qle_request_accept_notice_ee"
+    end
+  end
+
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
@@ -133,7 +167,6 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      
       redirect_to family_account_path
     else
       redirect_to :back
@@ -159,6 +192,10 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
+    if params[:market_kind] == 'shop' && plan_match_dc
+      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
+      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+    end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
@@ -266,7 +303,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
-    
+
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan

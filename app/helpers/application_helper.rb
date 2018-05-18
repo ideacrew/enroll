@@ -23,7 +23,12 @@ module ApplicationHelper
   end
 
   def copyright_notice
-    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
+    if TimeKeeper.date_of_record.year.to_s == Settings.site.copyright_period_start.to_s
+      copyright_attribution = "#{Settings.site.copyright_period_start} #{Settings.site.long_name}"
+    else
+      copyright_attribution = "#{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+    end
+    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end
 
   def menu_tab_class(a_tab, current_tab)
@@ -381,20 +386,17 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
-    return "" if !plan.carrier_profile.extract_value.present?
-    hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case hios_id
-    when "75753DC"
-      "oci"
-    when "21066DC"
-      "uhcma"
-    when "41842DC"
-      "uhic"
-    else
-      plan.carrier_profile.legal_name.extract_value
-    end
+    return "" if !plan.carrier_profile.legal_name.extract_value.present?
+    carrier_name = plan.carrier_profile.legal_name.extract_value
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
+
+  def display_carrier_pdf_logo(plan, options = {:width => 50})
+    return "" if !plan.carrier_profile.legal_name.extract_value.present?
+    carrier_name = plan.carrier_profile.legal_name.extract_value
+    image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  end
+
 
   def dob_in_words(age, dob)
     return age if age > 0
@@ -438,7 +440,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
-    return if plan_year.employer_profile.census_employees.count > 100
+    return if plan_year.employer_profile.census_employees.active.count > 200
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -446,7 +448,6 @@ module ApplicationHelper
     covered = plan_year.covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
-
     unless eligible.zero?
       condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
       condition = false if covered == 0 && waived > 0
@@ -464,7 +465,7 @@ module ApplicationHelper
           concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;")
         end
 
-        if eligible > 2
+        if eligible >= 2
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
@@ -494,7 +495,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+      return (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
     end
   end
 
@@ -514,7 +515,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.try(:under_open_enrollment?)
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_enrollment_effective_date
@@ -537,13 +538,17 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"
     end
+  end
+
+  def trigger_notice_observer(recipient, event_object, notice_event)
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
   end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
@@ -558,12 +563,12 @@ module ApplicationHelper
   end
 
   def env_bucket_name(bucket_name)
-    aws_env = ENV['AWS_ENV'] || "local"
-    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+    aws_env = ENV['AWS_ENV'] || "qa"
+    "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
-    return plan.metal_level.humanize if plan.coverage_kind == "health"
+    return plan.metal_level.titleize if plan.coverage_kind == "health"
     (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
   end
 
@@ -649,5 +654,26 @@ module ApplicationHelper
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
-end
+  def load_captcha_widget?
+    !Rails.env.test?
+  end
 
+  def previous_year
+    TimeKeeper.date_of_record.prev_year.year
+  end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
+  end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
+  def exchange_icon_path(icon)
+    site_key = Settings.site.key
+      "icons/#{site_key}-#{icon}"
+  end
+end

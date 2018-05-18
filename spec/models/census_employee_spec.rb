@@ -15,6 +15,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
   let(:employer_profile) { plan_year.employer_profile }
 
+  let!(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
+
   let(:first_name){ "Lynyrd" }
   let(:middle_name){ "Rattlesnake" }
   let(:last_name){ "Skynyrd" }
@@ -65,6 +67,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
+      end
+    end
+
+    context "validates expected_selection" do
+      let(:params_expected_selection) {valid_params.merge(expected_selection: "enroll")}
+      let(:params_in_valid) {valid_params.merge(expected_selection: "rspec-mock")}
+
+      it "should have a valid value" do
+        expect(CensusEmployee.create(**params_expected_selection).valid?).to be_truthy
+      end
+
+      it "should have a valid value" do
+        expect(CensusEmployee.create(**params_in_valid).valid?).to be_falsey
       end
     end
 
@@ -226,7 +241,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
             end
 
             context "and the benefit group plan year is published" do
-              before { plan_year.publish! }
+              before {
+                plan_year.publish!
+              }
 
               it "the employee census record should be ready for linking" do
                 expect(initial_census_employee.may_link_employee_role?).to be_truthy
@@ -243,6 +260,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 context "using matching ssn and dob" do
                   let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
+                  let!(:user)     { FactoryGirl.create(:user, person: valid_employee_role.person) }
 
                   it "should return the roster instance" do
                     expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
@@ -259,7 +277,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { initial_census_employee.employee_role = valid_employee_role }
+                      before { 
+                        initial_census_employee.employee_role = valid_employee_role 
+                      }
 
                       it "should link the roster instance and employer role" do
                         expect(initial_census_employee.employee_role_linked?).to be_truthy
@@ -456,7 +476,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:terminated_employee_count)      { er1_terminated_employee_count + er2_terminated_employee_count }
       let(:termed_status_employee_count)   { terminated_employee_count + er1_rehired_employee_count }
 
-      let(:employer_count)                 { 2 }
+      let(:employer_count)                 { 3 }
       let(:employer_profile_1)             { FactoryGirl.create(:employer_profile) }
       let(:employer_profile_2)             { FactoryGirl.create(:employer_profile) }
 
@@ -557,6 +577,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                                               dob: existing_census_employee.dob,
                                               gender: existing_census_employee.gender
                                             )}
+      let!(:user) { create(:user, person: person)}
       let!(:employee_role)                { EmployeeRole.create(
                                               person: person,
                                               hired_on: existing_census_employee.hired_on,
@@ -822,6 +843,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                                     hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
+
+    # it "should return true when match person has no active employee roles for current census employee" do
+    #   person.employee_roles.create!(ssn: census_employee.ssn,
+    #                                 employer_profile_id: census_employee.employer_profile.id,
+    #                                 hired_on: census_employee.hired_on)
+    #   expect(census_employee).to receive(:trigger_notices)
+    #   census_employee.construct_employee_role_for_match_person
+    # end
   end
 
   context "newhire_enrollment_eligible" do
@@ -875,7 +904,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "generate_and_deliver_checkbook_url" do 
+  context "generate_and_deliver_checkbook_url" do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
@@ -893,25 +922,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       allow(notice_trigger).to receive_message_chain(:notice_builder,:camelize,:constantize,:new).and_return(builder)
       allow(notice_trigger).to receive_message_chain(:notice_trigger_element_group,:notice_peferences).and_return({})
       allow(ApplicationEventKind).to receive_message_chain(:where,:first).and_return(double("ApplicationEventKind",{:notice_triggers => notice_triggers,:title => "title",:event_name => "OutOfPocketNotice"}))
-      allow_any_instance_of(CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
+      allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("fake_url")
     end
-    context "#generate_and_deliver_checkbook_url" do 
+    context "#generate_and_deliver_checkbook_url" do
       it "should create a builder and deliver without expection" do
         expect{census_employee.generate_and_deliver_checkbook_url}.not_to raise_error
       end
-     
-      it 'should trigger deliver' do 
+
+      it 'should trigger deliver' do
         expect(builder).to receive(:deliver)
         census_employee.generate_and_deliver_checkbook_url
       end
     end
 
-    context "#generate_and_save_to_temp_folder " do 
+    context "#generate_and_save_to_temp_folder " do
       it "should builder and save without expection" do
         expect{census_employee.generate_and_save_to_temp_folder}.not_to raise_error
       end
 
-       it 'should not trigger deliver' do 
+       it 'should not trigger deliver' do
         expect(builder).not_to receive(:deliver)
         census_employee.generate_and_save_to_temp_folder
       end
@@ -922,15 +951,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context "change the aasm state & populates terminated on of enrollments" do
       let(:census_employee) { FactoryGirl.create(:census_employee) }
+      let(:employee_role)     { FactoryGirl.create(:employee_role)}
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
 
-      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health') }
-      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental') }
-      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived') }
+      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health', employee_role_id: employee_role.id) }
+      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental', employee_role_id: employee_role.id) }
+      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived', employee_role_id: employee_role.id) }
 
       before do
         allow(census_employee).to receive(:active_benefit_group_assignment).and_return(double)
         allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return([hbx_enrollment, hbx_enrollment_two, hbx_enrollment_three], [])
+        employee_role.update_attributes(census_employee_id: census_employee.id)
       end
 
       termination_dates = [TimeKeeper.date_of_record - 5.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 5.days]
@@ -1459,10 +1490,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "is_cobra_coverage_eligible?" do 
+  context "is_cobra_coverage_eligible?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:hbx_enrollment) { HbxEnrollment.new aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record , coverage_kind: 'health'}
-  
+
     it "should return true when employement is terminated and " do
       allow(Family).to receive(:where).and_return([hbx_enrollment])
       allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
@@ -1476,16 +1507,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "cobra_eligibility_expired?" do 
+  context "cobra_eligibility_expired?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
-  
+
     it "should return true when coverage is terminated more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months)
       expect(census_employee.cobra_eligibility_expired?).to be_truthy
     end
 
     it "should return false when coverage is terminated not more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months)
       expect(census_employee.cobra_eligibility_expired?).to be_falsey
     end
 
@@ -1662,6 +1693,58 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "expected to enroll" do
+    let!(:valid_waived_employee) { create(:census_employee, expected_selection: 'waive') }
+    let!(:enrolling_employee) { create(:census_employee, expected_selection: 'enroll') }
+    let!(:invalid_waive) { create(:census_employee, expected_selection: 'will_not_participate' )}
+
+    it "returns true for enrolling employees" do
+      expect(enrolling_employee.expected_to_enroll?).to be_truthy
+    end
+
+    it "returns false for non enrolling employees" do
+      expect(valid_waived_employee.expected_to_enroll?).to be_falsey
+      expect(invalid_waive.expected_to_enroll?).to be_falsey
+    end
+
+    it "counts waived and enrollees when considering group size" do
+      expect(valid_waived_employee.expected_to_enroll_or_valid_waive?).to be_truthy
+      expect(enrolling_employee.expected_to_enroll_or_valid_waive?).to be_truthy
+      expect(invalid_waive.expected_to_enroll_or_valid_waive?).to be_falsey
+    end
+  end
+
+  context "when active employeees opt to waive" do
+    let(:census_employee) { FactoryGirl.build(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived") }
+    
+    it "returns true when employees waive the coverage" do
+      expect(census_employee.waived?).to be_truthy
+    end
+    it "returns false for employees who are enrolling" do
+      benefit_group_assignment.aasm_state = "coverage_selected"
+      expect(census_employee.waived?).to be_falsey
+    end
+  end
+
+  context "when active employeees has renewal benifit group" do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    
+    before do
+      benefit_group_assignment.update_attribute(:updated_at, benefit_group_assignment.updated_at + 1.day)
+      benefit_group_assignment.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+    end
+
+    it "returns true when employees waive the coverage" do
+      expect(census_employee.waived?).to be_falsey
+    end
+    it "returns false for employees who are enrolling" do
+      benefit_group_assignment.aasm_state = "coverage_waived"
+      expect(census_employee.waived?).to be_truthy
+    end
+  end
+
   context '.renewal_benefit_group_assignment' do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
     let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
@@ -1762,6 +1845,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
 
   end
+
+  describe "#trigger_notice" do
+    let(:census_employee){FactoryGirl.build(:census_employee)}
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+    it "should trigger job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      census_employee.trigger_notice("ee_sep_request_accepted_notice")
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_sep_request_accepted_notice']
+    end
+  end
+
   describe "search_hash" do
     context 'census search query' do
 
@@ -1779,6 +1877,31 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(result).to eq expected_result
       end
 
+    end
+  end
+
+  describe "#has_no_hbx_enrollments?" do
+    let(:census_employee) { FactoryGirl.create :census_employee_with_active_assignment}
+
+    it "should return true if no employee role linked" do
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
+    end
+
+    it "should return true if employee role present & no enrollment present" do
+      allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
+    end
+
+    it "should return true if employee role present & no active enrollment present" do
+      allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return double("HbxEnrollment", aasm_state: "coverage_canceled")
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
+    end
+
+    it "should return false if employee role present & active enrollment present" do
+      allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return double("HbxEnrollment", aasm_state: "coverage_selected")
+      expect(census_employee.send(:has_no_hbx_enrollments?)).to eq false
     end
   end
 end

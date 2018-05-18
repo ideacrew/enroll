@@ -1,32 +1,37 @@
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
+  include ApplicationHelper
+
   before_action :find_employer
-  before_action :find_borker_agency, :except => [:index, :active_broker]
+  before_action :find_broker_agency, :except => [:index, :active_broker]
   before_action :updateable?, only: [:create, :terminate]
 
   def index
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
-
     if @filter_criteria.empty?
       @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
       if params[:page].present?
-        page_no = cur_page_no(@page_alphabets.first)
-        @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+        @page_alphabet = cur_page_no(@page_alphabets.first)
+        @organizations = @orgs.where("legal_name" => /^#{@page_alphabet}/i)
       else
-        @organizations = @orgs.to_a.first(10)
+        @organizations = @orgs.limit(12).to_a
       end
-      @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
+      @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
     else
       results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
       if results.first.is_a?(Person)
         @filtered_broker_roles  = results.map(&:broker_role)
-        @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
+        @broker_agency_profiles = Kaminari.paginate_array(results.map{|broker| broker.broker_role.broker_agency_profile}.uniq).page(params[:organization_page] || 1).per(10)
       else
-        @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
+        @broker_agency_profiles = Kaminari.paginate_array(results.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
       end
     end
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def show
@@ -40,18 +45,20 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
-
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
       if broker_agency_profile.default_general_agency_profile.present?
         @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
+        broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
+      trigger_notice_observer(broker_agency_profile.primary_broker_role, @employer_profile, "broker_hired_notice_to_broker")
+      @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer") 
+      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
     end
-
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
@@ -61,7 +68,6 @@ class Employers::BrokerAgencyController < ApplicationController
     end
     log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
   end
-
 
   def terminate
     authorize EmployerProfile, :updateable?
@@ -123,9 +129,9 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def send_broker_assigned_msg(employer_profile, broker_agency_profile)
-    broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on DC Health Link"
+    broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on the #{site_short_name}"
     broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone).to_s}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
-    employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on DC Health Link."
+    employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on the #{site_short_name} site."
     employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone.to_s}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
     secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
     secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
@@ -135,7 +141,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])
   end
 
-  def find_borker_agency
+  def find_broker_agency
     id = params[:id] || params[:broker_agency_id]
     @broker_agency_profile = BrokerAgencyProfile.find(id)
   end

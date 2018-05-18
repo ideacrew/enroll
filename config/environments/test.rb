@@ -43,11 +43,19 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
   config.acapi.app_id = "enroll"
   HbxIdGenerator.slug!
+  config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+  config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
-  config.action_mailer.default_url_options = { 
+  config.action_mailer.default_url_options = {
     :host => "127.0.0.1",
     :port => 3000
   }
+
+  #Environment URL stub
+  config.checkbook_services_base_url = Settings.checkbook_services.base_url
+
+  #Queue adapter
+  config.active_job.queue_adapter = :test
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

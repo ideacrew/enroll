@@ -61,10 +61,10 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
     describe "file upload" do
       let(:file) { [:temp_file] }
-      let(:person) { instance_double(Person) }
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: {consumer_role: ''}, file: file} }
+      let(:params) { {person: {consumer_role: person.consumer_role}, file: file} }
       let(:bucket_name) { 'id-verification' }
       let(:doc_uri) { "doc_uri" }
       let(:file_path) { 'temp_file' } # a sample file path
@@ -110,7 +110,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).with('sample-key').and_return(VlpDocument.new)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:send_data).with(nil, {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:send_data).with('', {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
                                                                              @controller.render nothing: true # to prevent a 'missing template' error
                                                                            }
         sign_in user

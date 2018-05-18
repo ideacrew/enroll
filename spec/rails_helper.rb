@@ -4,7 +4,12 @@ require 'spec_helper'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
+require 'webmock/rspec'
+
+WebMock.allow_net_connect!
+
 require 'kaminari'
+require File.expand_path('app/models/services/checkbook_services')
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -42,6 +47,8 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
+  load Rails.root + "db/seedfiles/english_translations_seed.rb"
+  DatabaseCleaner.strategy = :truncation, {:except => %w[translations]}
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
@@ -61,6 +68,8 @@ RSpec.configure do |config|
   config.extend ControllerMacros, :type => :controller #real logins for integration testing
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
+  config.include FederalHolidaysHelper
+  config.include Config::AcaModelConcern
 
   config.infer_spec_type_from_file_location!
 

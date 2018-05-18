@@ -1,4 +1,3 @@
-require "acapi/subscribers/edi"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -43,12 +42,21 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  config.action_mailer.default_url_options = { 
+  config.action_mailer.default_url_options = {
     :host => "127.0.0.1",
     :port => 3000
   }
 
+  #Environment URL stub
+  config.checkbook_services_base_url = Settings.checkbook_services.base_url
+
+  #Queue adapter
+  config.active_job.queue_adapter = :resque
+
   HbxIdGenerator.slug!
+  config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+  config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
+
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

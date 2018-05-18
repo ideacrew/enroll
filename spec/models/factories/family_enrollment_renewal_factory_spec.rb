@@ -19,24 +19,24 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
       let(:renewing_employer) {
         if coverage_kind == 'dental'
-          FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on, 
-            renewal_plan_year_state: 'renewing_enrolling', 
-            dental_reference_plan_id: plan.id, 
+          FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on,
+            renewal_plan_year_state: 'renewing_enrolling',
+            dental_reference_plan_id: plan.id,
             dental_renewal_reference_plan_id: renewal_plan.id,
             with_dental: true
           )
         else
-          FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on, 
-            renewal_plan_year_state: 'renewing_enrolling', 
-            reference_plan_id: plan.id, 
+          FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on,
+            renewal_plan_year_state: 'renewing_enrolling',
+            reference_plan_id: plan.id,
             renewal_reference_plan_id: renewal_plan.id,
             )
         end
       }
 
       let(:renewing_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
-          benefit_group: renewing_employer.active_plan_year.benefit_groups.first, 
+        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+          benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
           renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first)
       }
 
@@ -52,7 +52,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       context 'Renewing employer exists with published plan year' do
 
         let(:current_family) { current_employee.person.primary_family }
-    
+
         context 'when family have active coverage' do
           let(:employee_A) {
             ce = renewing_employees[0]
@@ -94,6 +94,36 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
               passive_waiver = current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').first
               expect(passive_waiver.present?).to be_falsey
             end
+
+            context 'when an employee has metlife/delta dental plan in 2017-2018' do
+              let!(:organization) { FactoryGirl.create(:organization, legal_name: "Delta Dental") }
+              let!(:carrier_profile) {FactoryGirl.create(:carrier_profile, organization: organization, abbrev: "DDPA")}
+              let!(:plan) {
+                FactoryGirl.create(:plan, :with_premium_tables, name: "Delta Dental PPO Basic Plan for Families", market: 'shop', metal_level: plan_metal_level, active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: coverage_kind, dental_level: dental_level, carrier_profile: carrier_profile)
+              }
+
+              it 'should trigger dental carrier exiting notice' do
+                factory = Factories::FamilyEnrollmentRenewalFactory.new
+                factory.family = current_employee.person.primary_family.reload
+                factory.census_employee = current_employee.census_employee.reload
+                factory.employer = renewing_employer.reload
+                factory.renewing_plan_year = renewing_employer.renewing_plan_year.reload
+                # expect(factory).to receive(:trigger_notice_dental) if coverage_kind == 'dental'
+                factory.renew
+              end
+            end
+
+            context 'when an employee has NON - metlife/delta dental plan' do
+              it 'should not trigger dental carrier exiting notice' do
+                factory = Factories::FamilyEnrollmentRenewalFactory.new
+                factory.family = current_employee.person.primary_family.reload
+                factory.census_employee = current_employee.census_employee.reload
+                factory.employer = renewing_employer.reload
+                factory.renewing_plan_year = renewing_employer.renewing_plan_year.reload
+                expect(factory).not_to receive(:trigger_notice_dental)
+                factory.renew
+              end
+            end
           end
         end
 
@@ -105,7 +135,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
           let!(:employee_B_enrollments) {
             create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B, submitted_at: effective_on.prev_year, coverage_kind: coverage_kind)
-            create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.renewal_benefit_group_assignment, employee_role: employee_B, submitted_at: effective_on - 20.days, status: 'coverage_selected', coverage_kind: coverage_kind) 
+            create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.renewal_benefit_group_assignment, employee_role: employee_B, submitted_at: effective_on - 20.days, status: 'coverage_selected', coverage_kind: coverage_kind)
           }
 
           let(:current_employee) {
@@ -133,7 +163,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
           let!(:employee_C_enrollments) {
             create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: effective_on.prev_year, coverage_kind: coverage_kind)
-            create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.renewal_benefit_group_assignment, employee_role: employee_C, submitted_at: effective_on - 20.days, status: 'auto_renewing', coverage_kind: coverage_kind) 
+            create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.renewal_benefit_group_assignment, employee_role: employee_C, submitted_at: effective_on - 20.days, status: 'auto_renewing', coverage_kind: coverage_kind)
           }
 
           let(:current_employee) {
@@ -163,8 +193,8 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
           it 'should generate not passive waiver' do
             generate_renewal
-            expect(current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').empty?).to be_truthy            
-          end 
+            expect(current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').empty?).to be_truthy
+          end
         end
       end
 
