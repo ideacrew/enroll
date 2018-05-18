@@ -19,9 +19,9 @@ module BenefitMarkets
 
 
 
-    policy(:enrollment_group).rules           # => [<RulesEngine::Rule child_age_off_policy>, ,RulesEngine::Rule age_range_policy>]
-    policy_satisfied? = policy(:enrollment_group).process_rules   # executes rules that returns boolean result
-    object = policy(:enrollment_group).process_rules   # executes rules that returns object result
+    #policy(:enrollment_group).rules           # => [<RulesEngine::Rule child_age_off_policy>, ,RulesEngine::Rule age_range_policy>]
+    #policy_satisfied? = policy(:enrollment_group).process_rules   # executes rules that returns boolean result
+    #object = policy(:enrollment_group).process_rules   # executes rules that returns object result
 
   end
 end
