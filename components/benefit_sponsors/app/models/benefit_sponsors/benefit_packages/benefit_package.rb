@@ -12,6 +12,7 @@ module BenefitSponsors
       field :probation_period_kind, type: Symbol
       field :is_default, type: Boolean, default: false
       field :is_active, type: Boolean, default: true
+      field :predecessor_id, type: BSON::ObjectId
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
@@ -20,8 +21,9 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
 
       delegate :benefit_sponsor_catalog, to: :benefit_application
-
-      delegate :rate_schedule_date, to: :benefit_application
+      delegate :rate_schedule_date,      to: :benefit_application
+      delegate :effective_period,        to: :benefit_application
+      delegate :predecessor_application, to: :benefit_application
 
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range
@@ -50,6 +52,16 @@ module BenefitSponsors
         sponsored_benefits.delete(sponsored_benefit)
       end
 
+      def predecessor
+        return @predecessor if defined? @predecessor
+        @predecessor = predecessor_application.benefit_packages.find(predecessor_id)
+      end
+
+      def predecessor=(benefit_package)
+        predecessor_id = benefit_package.id
+        @predecessor   = benefit_package
+      end
+
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
           title: title,
@@ -57,12 +69,22 @@ module BenefitSponsors
           probation_period_kind: probation_period_kind,
           is_default: is_default
         })
+
+        new_benefit_package.predecessor = self
         
         sponsored_benefits.each do |sponsored_benefit| 
           new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
 
         new_benefit_package
+      end
+
+      def census_employees
+        CensusEmployee.by_benefit_package(self).non_terminated
+      end
+
+      def assigned_census_employees_on(effective_date)
+        census_employees.by_benefit_package_assignment_on(effective_date)
       end
 
       # Scenario 1: sponsored_benefit is missing (because product not available during renewal)

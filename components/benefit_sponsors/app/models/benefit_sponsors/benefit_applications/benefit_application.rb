@@ -270,6 +270,39 @@ module BenefitSponsors
         renewal_application
       end
 
+      def renew_benefit_package_assignments
+        benefit_packages.each do |benefit_package|
+          predecessor_benefit_package = benefit_package.predecessor
+          # should not fetch inactive benefit package assignments
+          # is_active flag set to true
+          predecessor_benefit_package.assigned_census_employees_on(effective_period.min).each  do |employee|
+
+            if benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
+              if benefit_package_assignment.benefit_package != benefit_package
+                assign_to_benefit_package(benefit_package, census_employee)
+              end
+            end
+          end
+        end
+
+        # This is assign default benefit package to employees who're unassigned
+        benefit_sponsorship.census_employees.non_terminated.by_benefit_packages(benefit_packages).each do |employee|
+          assign_default_benefit_package(census_employee)
+        end
+      end
+
+      def assign_to_benefit_package(benefit_package, census_employee, assignment_on = effective_period.min)
+        census_employee.benefit_group_assignments.build(
+          start_on: assignment_on,
+          end_on:   effective_period.max,
+          benefit_package: benefit_package
+        )
+      end
+
+      def assign_to_default_benefit_package(census_employee, assignment_on = effective_period.min)
+        assign_to_benefit_package(default_benefit_package, census_employee, assignment_on)
+      end
+
       def refresh(new_benefit_sponsor_catalog)
         if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
 
