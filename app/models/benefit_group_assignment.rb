@@ -24,7 +24,9 @@ class BenefitGroupAssignment
   validates_presence_of :benefit_group_id, :start_on, :is_active
   validate :date_guards, :model_integrity
 
-  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
+  scope :renewing,       -> { any_in(aasm_state: RENEWING) }
+  scope :active,         -> { where(:is_active => true) }
+  scope :effective_on,   ->(effective_date) { where(:start_on.lte => effective_date, :end_on.gte => effective_date) }
 
   def self.by_benefit_group_id(bg_id)
     census_employees = CensusEmployee.where({

@@ -132,6 +132,9 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
+  scope :by_benefit_package,              ->(benefit_package) { where(:"benefit_group_assignments" => {:$elemMatch => { :benefit_package_id => benefit_package.id, :is_active => true }}) }
+  scope :by_benefit_package_assignment_on,->(effective_on) { where(:"benefit_group_assignments" => {:$elemMatch => { :start_on.lte => effective_on, :end_on.gte => effective_on }}) }
+
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
     benefit_group_assignment_ids = matched.flat_map() do |ee|
@@ -165,6 +168,10 @@ class CensusEmployee < CensusMember
         cd.unset(:encrypted_ssn)
       end
     end
+  end
+
+  def benefit_package_assignment_on(effective_date)
+    benefit_group_assignments.effective_on(effective_date).active.first
   end
 
   def update_hbx_enrollment_effective_on_by_hired_on
