@@ -195,32 +195,3 @@ fieldset[disabled] .btn-default.active {
   color: #337ab7;
   background-color: $secondary-button-background;
 }
-
-.panel-heading {
-  color:$mhc-orange !important;
-  font-weight: 600;
-  font-size: 18px;
-  text-transform: uppercase;
-  font-family: "Roboto Slab", serif;
-}
-.plan-year-heading, .benefit-group-heading {
-  color:$primary-table-heading;
-  font-size: 12px;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-.plan-year-status {
-  color:$primary-green;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.borderless td, .borderless th {
-  border: none !important;
-}
-.broker-icon {
-  color:$mhc-dark-blue;
-}
-.offered {
-  color:$primary-green;
-}
