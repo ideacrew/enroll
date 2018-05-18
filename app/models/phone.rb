@@ -87,6 +87,10 @@ class Phone
     self.full_phone_number = to_s
   end
 
+  def kind_for_transmission
+    (self.kind == 'phone main') ? 'main' : self.kind
+  end
+
 private
   def filter_non_numeric(str)
     str.to_s.gsub(/\D/,'') if str.present? 
