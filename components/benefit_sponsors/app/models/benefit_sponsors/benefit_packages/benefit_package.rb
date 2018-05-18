@@ -54,12 +54,13 @@ module BenefitSponsors
 
       def predecessor
         return @predecessor if defined? @predecessor
-        @predecessor = predecessor_application.benefit_packages.find(predecessor_id)
+        @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
       end
 
-      def predecessor=(benefit_package)
-        predecessor_id = benefit_package.id
-        @predecessor   = benefit_package
+      def predecessor=(old_benefit_package)
+        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+        self.predecessor_id = old_benefit_package._id
+        @predecessor = old_benefit_package
       end
 
       def renew(new_benefit_package)
@@ -79,12 +80,19 @@ module BenefitSponsors
         new_benefit_package
       end
 
-      def census_employees
-        CensusEmployee.by_benefit_package(self).non_terminated
+      def assigned_census_employees_on(effective_date)
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_terminated
       end
 
-      def assigned_census_employees_on(effective_date)
-        census_employees.by_benefit_package_assignment_on(effective_date)
+      def self.find(id)
+        ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
+          
+          if benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(:"benefit_packages._id" => id).first
+            benefit_application.benefit_packages.find(id)
+          else
+            nil
+          end
+        end
       end
 
       # Scenario 1: sponsored_benefit is missing (because product not available during renewal)

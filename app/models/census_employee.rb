@@ -132,8 +132,12 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
-  scope :by_benefit_package,              ->(benefit_package) { where(:"benefit_group_assignments" => {:$elemMatch => { :benefit_package_id => benefit_package.id, :is_active => true }}) }
-  scope :by_benefit_package_assignment_on,->(effective_on) { where(:"benefit_group_assignments" => {:$elemMatch => { :start_on.lte => effective_on, :end_on.gte => effective_on }}) }
+  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) { 
+    where(:"benefit_group_assignments" => { :$elemMatch => { 
+      :start_on.lte => effective_on, :end_on.gte => effective_on, 
+      :benefit_package_id => benefit_package.id, :is_active => true 
+    }})
+  }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })

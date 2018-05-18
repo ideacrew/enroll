@@ -55,9 +55,8 @@ module BenefitSponsors
       if @benefit_application.may_advance_date?
         @benefit_application.advance_date!
 
-        @benefit_application.benefit_packages.each do |benefit_package|
-          benefit_package.renew_employees
-          benefit_package.renew_employee_coverages
+        if @benefit_application.predecessor_application.present?
+          @benefit_application.renew_employee_coverages
         end
       end
     end

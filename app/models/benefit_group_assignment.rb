@@ -8,6 +8,7 @@ class BenefitGroupAssignment
   embedded_in :census_employee
 
   field :benefit_group_id, type: BSON::ObjectId
+  field :benefit_package_id, type: BSON::ObjectId
 
   # Represents the most recent completed enrollment
   field :hbx_enrollment_id, type: BSON::ObjectId
@@ -58,6 +59,17 @@ class BenefitGroupAssignment
   def belongs_to_offexchange_planyear?
     employer_profile = plan_year.employer_profile
     employer_profile.is_conversion? && plan_year.is_conversion
+  end
+
+  def benefit_package=(new_benefit_package)
+    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+    self.benefit_package_id = new_benefit_package._id
+    @benefit_package = new_benefit_package
+  end
+
+  def benefit_package
+    return @benefit_package if defined? @benefit_package
+    @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(self.benefit_package_id)
   end
 
   def benefit_group=(new_benefit_group)
@@ -226,6 +238,10 @@ class BenefitGroupAssignment
     end
 
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
+  end
+
+  def renew_employee_enrollments
+
   end
 
   private
