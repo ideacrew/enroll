@@ -20,11 +20,11 @@ module BenefitMarkets
 
     field :hbx_id,                type: String
     field :title,                 type: String
-    field :description,           type: String, default: ""
+    field :description,           type: String,         default: ""
     field :issuer_profile_id,     type: BSON::ObjectId
-    field :product_package_kinds, type: Array, default: []
-    field :_type,                 type: String
-    field :premium_ages,          type: Range
+    field :product_package_kinds, type: Array,          default: []
+    field :kind,                  type: Symbol,         default: ->{ product_kind }
+    field :premium_ages,          type: Range,          default: 0..65
 
 
     belongs_to  :service_area,
@@ -46,37 +46,46 @@ module BenefitMarkets
 
     index({ hbx_id: 1 })
     index({ "benefit_market_kind" => 1,
+            "kind" => 1,
+            "product_package_kinds" => 1,
             "application_period.min" => 1,
             "application_period.max" => 1,
-            "product_package_kinds" => 1,
-            "_type" => 1 },
-            {name: "product_package"})
+            },
+            {name: "product_package"}
+          )
 
     index({ "premium_tables.rating_area" => 1,
             "premium_tables.effective_period.min" => 1,
             "premium_tables.effective_period.max" => 1 },
-            {name: "premium_tables"})
+            {name: "premium_tables"}
+          )
 
     scope :by_product_package,    ->(product_package) { where(
                 :"benefit_market_kind"          => product_package.benefit_market_kind,
+                :"kind"                         => /#{product_package.product_kind}/i,
+                :"product_package_kinds"        => /#{product_package.kind}/,
                 :"application_period.min"       => product_package.application_period.min,
                 :"application_period.max"       => product_package.application_period.max,
-                :"product_package_kinds"        => /#{product_package.kind}/,
-                :"_type"                        => /#{product_package.product_kind}/i
-      )
-    }
+              )
+            }
 
-    scope :by_service_area,       ->(service_area){ where(service_area: service_area) }
+    scope :aca_shop_market,             ->{ where(benefit_market_kind: :aca_shop) }
+    scope :aca_individual_market,       ->{ where(benefit_market_kind: :aca_individual) }
+    scope :by_issuer_profile,           ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
+    scope :by_kind,                     ->(kind){ where(kind: kind) }
+    scope :by_service_area,             ->(service_area){ where(service_area: service_area) }
 
-    scope :aca_shop_market,       ->{ where(benefit_market_kind: :aca_shop) }
-    scope :aca_individual_market, ->{ where(benefit_market_kind: :aca_individual) }
+    scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
 
-    scope :by_metal_level_kind,   ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
-    scope :by_issuer_profile,     ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
+    scope :by_application_period,       ->(application_period){ where(:application_period => application_period) }
+    scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
+                                                                  :"premium_tables.effective_period.max".gte => effective_date) }
 
-    scope :by_application_period, ->(application_period){ where(:application_period => application_period) }
-    scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date, :"premium_tables.effective_period.max".gte => effective_date) }
 
+    def product_kind
+      kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
+      kind_string.present? ? kind_string.to_sym : :product_base_class
+    end
 
     def comparable_attrs
       [
