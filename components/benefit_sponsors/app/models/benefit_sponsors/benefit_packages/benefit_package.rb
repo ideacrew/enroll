@@ -92,6 +92,10 @@ module BenefitSponsors
         new_benefit_package
       end
 
+      def sponsored_benefit_for(coverage_kind)
+        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind}
+      end
+
       def assigned_census_employees_on(effective_date)
         CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_terminated
       end

@@ -52,7 +52,7 @@ module BenefitMarkets
           products <=> other.products
         end
       else
-        updated_on < other.updated_on ? -1 : 1
+        other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
       end
     end
 
@@ -81,7 +81,7 @@ module BenefitMarkets
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
     def load_embedded_products(service_area, effective_date)
-      products = benefit_market_products_available_for(service_area, effective_date)
+      benefit_market_products_available_for(service_area, effective_date)
     end
 
     # Query products from database applicable to this product package

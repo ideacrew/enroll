@@ -33,6 +33,15 @@ class Household
 
   # after_build :build_irs_group
 
+  def renew_coverage(current_benefit_package_assignment, new_benefit_package_assignment)
+    enrollments = hbx_enrollments.by_benefit_package_assignment(current_benefit_package_assignment).enrolled_and_waived
+
+    HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
+      enrollment = enrollments.by_coverage_kind(coverage_kind).first
+      enrollment.renew(new_benefit_package_assignment)
+    end
+  end
+
   def active_hbx_enrollments
     actives = hbx_enrollments.collect() do |list, enrollment|
       if enrollment.plan.present? &&

@@ -3,7 +3,7 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :premium_table, 
+    embedded_in :premium_table,
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
     field :age,   type: Integer
