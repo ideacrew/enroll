@@ -176,7 +176,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def assign_to_benefit_package(benefit_package, assignment_on = effective_period.min)
+  def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
     benefit_group_assignments.create(
