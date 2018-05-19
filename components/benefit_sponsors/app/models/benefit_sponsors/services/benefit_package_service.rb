@@ -105,6 +105,7 @@ module BenefitSponsors
       def sponsored_benefits_attributes_to_form_params(benefit_package)
         benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << Forms::SponsoredBenefitForm.new({
+            id: sponsored_benefit.id,
             product_option_choice: sponsored_benefit.product_option_choice,
             product_package_kind: sponsored_benefit.product_package_kind,
             reference_plan_id: sponsored_benefit.reference_product.id,
@@ -116,6 +117,7 @@ module BenefitSponsors
       def sponsored_contribution_attributes_to_form_params(sponsored_benefit)
         contribution_levels = sponsored_benefit.sponsor_contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
           contribution_levels << Forms::ContributionLevelForm.new({
+            id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
             is_offered: contribution_level.is_offered
@@ -137,6 +139,7 @@ module BenefitSponsors
       def sponsored_benefits_attributes(form)
         form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << {
+            id: sponsored_benefit.id,
             kind: sponsored_benefit.kind,
             product_package_kind: sponsored_benefit.product_package_kind,
             product_option_choice: sponsored_benefit.product_option_choice,
@@ -150,6 +153,7 @@ module BenefitSponsors
         contribution = sponsored_benefit.sponsor_contribution
         contribution_levels = contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
           contribution_levels << {
+            id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
             is_offered: contribution_level.is_offered

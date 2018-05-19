@@ -6,6 +6,7 @@
       <h4>Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.</h4>
       </div>
     </span>
+    <%= f.hidden_field :id, value: f.object.id if f.object.id.present? %>
     <% unless @benefit_package_form.new_record? %>
     <div class="col-xs-3">
     <span class="pull-right">
