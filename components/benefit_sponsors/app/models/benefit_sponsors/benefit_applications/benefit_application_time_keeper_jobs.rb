@@ -32,8 +32,8 @@ module BenefitSponsors
         end
       end
 
-      def coverage_begin;
-      def coverage_end;
+      def coverage_begin; end
+      def coverage_end; end
 
       private
 

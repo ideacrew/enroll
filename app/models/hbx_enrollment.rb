@@ -184,14 +184,17 @@ class HbxEnrollment
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
-  scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]) }
+  scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]).order(created_at: :desc) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
-  scope :non_expired_and_non_terminated,            -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
+  scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
+  
+  scope :by_benefit_package_assignment,   -> (benefit_package_assignment) { where(:benefit_group_assignment_id => benefit_package_assignment.id) }
+
   embeds_many :workflow_state_transitions, as: :transitional
 
   embeds_many :hbx_enrollment_members
@@ -253,6 +256,31 @@ class HbxEnrollment
       to_state: aasm.to_state,
       event: aasm.current_event
     )
+  end
+
+  def renew(new_benefit_package_assignment)
+    benefit_package = new_benefit_package_assignment.benefit_package
+
+    if is_coverage_waived?
+      renew_waiver(new_benefit_package_assignment)
+    else
+      if sponsored_benefit = benefit_package.sponsored_benefit_for(self.coverage_kind)
+        product_package = sponsored_benefit.product_package
+        if product_package.products.include?(self.product.renewal_product)
+          
+          renew_coverage(new_benefit_package_assignment)
+          # renew enrollment
+        end
+      end
+    end
+  end
+
+  def renew_waiver(new_benefit_package_assignment)
+    
+  end
+
+  def renew_coverage(new_benefit_package_assignment)
+
   end
 
   class << self

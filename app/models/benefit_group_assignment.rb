@@ -8,6 +8,7 @@ class BenefitGroupAssignment
   embedded_in :census_employee
 
   field :benefit_group_id, type: BSON::ObjectId
+  field :benefit_package_id, type: BSON::ObjectId
 
   # Represents the most recent completed enrollment
   field :hbx_enrollment_id, type: BSON::ObjectId
@@ -24,7 +25,9 @@ class BenefitGroupAssignment
   validates_presence_of :benefit_group_id, :start_on, :is_active
   validate :date_guards, :model_integrity
 
-  scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
+  scope :renewing,       -> { any_in(aasm_state: RENEWING) }
+  scope :active,         -> { where(:is_active => true) }
+  scope :effective_on,   ->(effective_date) { where(:start_on.lte => effective_date, :end_on.gte => effective_date) }
 
   def self.by_benefit_group_id(bg_id)
     census_employees = CensusEmployee.where({
@@ -56,6 +59,23 @@ class BenefitGroupAssignment
   def belongs_to_offexchange_planyear?
     employer_profile = plan_year.employer_profile
     employer_profile.is_conversion? && plan_year.is_conversion
+  end
+
+  def benefit_package=(new_benefit_package)
+    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+    self.benefit_package_id = new_benefit_package._id
+    @benefit_package = new_benefit_package
+  end
+
+  def benefit_package
+    return @benefit_package if defined? @benefit_package
+    @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(self.benefit_package_id)
+  end
+
+  def renew_employee_coverage(new_benefit_package_assignment)
+    covered_families.each do |family|
+      family.active_household.renew_coverage(self, new_benefit_package_assignment)
+    end
   end
 
   def benefit_group=(new_benefit_group)
@@ -224,6 +244,10 @@ class BenefitGroupAssignment
     end
 
     update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
+  end
+
+  def renew_employee_enrollments
+
   end
 
   private
