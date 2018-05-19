@@ -51,9 +51,9 @@ module BenefitSponsors
       def benefit_package_params
         params.require(:benefit_package).permit(
           :title, :description, :probation_period_kind, :benefit_application_id,
-          :sponsored_benefits_attributes => [:kind, :product_option_choice, :product_package_kind, :reference_plan_id,
+          :sponsored_benefits_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
-              :contribution_levels_attributes => [ :is_offered, :display_name, :contribution_factor]
+              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor]
             ]
           ]
         )
