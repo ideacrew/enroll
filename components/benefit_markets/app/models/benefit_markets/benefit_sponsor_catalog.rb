@@ -7,9 +7,9 @@ module BenefitMarkets
     embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
     field :effective_date,          type: Date
-    field :probation_period_kinds,  type: Array, default: []
     field :effective_period,        type: Range
     field :open_enrollment_period,  type: Range
+    field :probation_period_kinds,  type: Array, default: []
 
     belongs_to  :service_area,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
@@ -24,12 +24,8 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::Products::ProductPackage"
 
 
-    def benefit_kinds
-    end
-
-    def product_market_kind
-      :shop
-    end
+    validates_presence_of :effective_date, :probation_period_kinds, :effective_period, :open_enrollment_period,
+                          :service_area, :sponsor_market_policy, :member_market_policy, :product_packages
 
     def product_package_for(sponsored_benefit)
       product_packages.by_kind(sponsored_benefit.product_package_kind)
