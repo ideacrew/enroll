@@ -5,7 +5,8 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    let!(:employer_profile) { FactoryGirl.create(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_dc_employer_profile)}
+    let(:employer_profile) { organization.employer_profile }
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'both', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
@@ -14,7 +15,6 @@ module BenefitSponsors
     let!(:broker_role2) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id, person: person2) }
     let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: employer_profile.organization, profile_id: employer_profile.id) }
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
     before :each do
@@ -22,6 +22,7 @@ module BenefitSponsors
       broker_agency_profile1.approve!
       broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role2.id)
       broker_agency_profile2.approve!
+      organization.reload
     end
 
     after :all do
