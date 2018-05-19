@@ -72,6 +72,12 @@ class BenefitGroupAssignment
     @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(self.benefit_package_id)
   end
 
+  def renew_employee_coverage(new_benefit_package_assignment)
+    covered_families.each do |family|
+      family.active_household.renew_coverage(self, new_benefit_package_assignment)
+    end
+  end
+
   def benefit_group=(new_benefit_group)
     raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id

@@ -139,6 +139,8 @@ class CensusEmployee < CensusMember
     }})
   }
 
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments._id".nin => benefit_application.benefit_packages.pluck(&:_id)) }
+
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
     benefit_group_assignment_ids = matched.flat_map() do |ee|
@@ -172,6 +174,20 @@ class CensusEmployee < CensusMember
         cd.unset(:encrypted_ssn)
       end
     end
+  end
+
+  def assign_to_benefit_package(benefit_package, assignment_on = effective_period.min)
+    return if benefit_package.blank?
+
+    benefit_group_assignments.create(
+      start_on: assignment_on,
+      end_on:   effective_period.max,
+      benefit_package: benefit_package
+    )
+  end
+
+  def renew_coverage(predecessor_benefit_package_assignment, new_benefit_package_assignment)
+    predecessor_benefit_package_assignment.renew_employee_coverage(new_benefit_package_assignment)
   end
 
   def benefit_package_assignment_on(effective_date)
