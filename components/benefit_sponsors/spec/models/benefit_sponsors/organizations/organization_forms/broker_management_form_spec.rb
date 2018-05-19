@@ -7,11 +7,12 @@ module BenefitSponsors
     subject { broker_management_form_class.new }
 
     let(:model_attributes) { [:employer_profile_id, :broker_agency_profile_id, :broker_role_id, :termination_date, :direct_terminate] }
-    let!(:employer_profile) { FactoryGirl.create(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'both', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: employer_profile.organization, profile_id: employer_profile.id) }
+
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_dc_employer_profile)}
+    let(:employer_profile) { organization.employer_profile }
 
     let(:create_params) {
       {
@@ -64,6 +65,7 @@ module BenefitSponsors
     describe 'save/persist!' do
       before :each do
         broker_management_form_create.save
+        organization.reload
       end
 
       it 'should return true once it sucessfully assigns broker agency to the employer_profile' do
@@ -93,6 +95,7 @@ module BenefitSponsors
     describe 'terminate/terminate!' do
       before :each do
         broker_management_form_create.save
+        organization.reload
       end
 
       it 'should return true once it sucessfully terminates broker agency of the employer_profile' do
