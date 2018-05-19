@@ -6,7 +6,7 @@ module BenefitSponsors
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
-        attr_accessor :profile_id, :profile_type, :organization, :current_user, :claimed, :pending
+        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending
         attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
         attr_accessor :area_code, :number, :extension
         cattr_accessor :profile_type
@@ -177,6 +177,7 @@ module BenefitSponsors
             unless claimed
               if existing_org.employer_profile.blank?
                 existing_org.profiles << build_profile(profile_attributes(attributes))
+                self.profile.add_benefit_sponsorship
               end
             end
             existing_org
@@ -189,6 +190,7 @@ module BenefitSponsors
           if profile_id.blank?
             self.organization = build_organization_class.new(organization_attributes(attrs))
             self.organization.profiles << build_profile(profile_attributes(attrs))
+            self.profile.add_benefit_sponsorship if is_employer_profile?
             self.organization
           else
             get_organization
@@ -199,13 +201,11 @@ module BenefitSponsors
           profile = if is_broker_profile?
                       build_broker_profile(attrs)
                     elsif is_employer_profile?
-                      profile = build_sponsor_profile(attrs)
-                      profile.add_benefit_sponsorship
-                      profile
+                      build_sponsor_profile(attrs)
                     end
           profile.office_locations << build_office_locations if profile.office_locations.empty?
           self.profile_id = profile.id
-          profile
+          self.profile = profile
         end
 
         def build_office_locations
