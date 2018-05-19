@@ -147,7 +147,7 @@ module BenefitMarkets
           expect(base_catalog).to_not eq compare_catalog
         end
 
-        it "the base_catalog should be lest than the compare_catalog" do
+        it "the base_catalog should be less than the compare_catalog" do
           expect(base_catalog <=> compare_catalog).to eq -1
         end
       end
