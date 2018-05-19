@@ -270,6 +270,44 @@ module BenefitSponsors
         renewal_application
       end
 
+      def renew_benefit_package_assignments
+        benefit_packages.each do |benefit_package|
+          predecessor_benefit_package = benefit_package.predecessor
+          predecessor_effective_date  = predecessor_application.effective_period.min
+
+          predecessor_benefit_package.assigned_census_employees_on(predecessor_effective_date).each  do |employee|
+            new_benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
+            if new_benefit_package_assignment.blank? || (benefit_package_assignment.benefit_package != benefit_package)
+              census_employee.assign_to_benefit_package(benefit_package, effective_period.min)
+            end
+          end
+        end
+
+        benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |employee|
+          assign_default_benefit_package(census_employee)
+        end
+      end
+
+      def assign_to_default_benefit_package(census_employee, assignment_on = effective_period.min)
+        census_employee.assign_to_benefit_package(default_benefit_package, assignment_on)
+      end
+
+      def renew_employee_coverages
+        benefit_packages.each do |current_benefit_package|
+          predecessor_benefit_package = benefit_package.predecessor
+          predecessor_effective_date  = predecessor_application.effective_period.min
+
+          predecessor_benefit_package.assigned_census_employees_on(predecessor_effective_date).each  do |census_employee|
+
+            if predessor_benefit_package_assignment = employee.benefit_package_assignment_on(predecessor_effective_date)
+              if new_benefit_package_assignment = employee.benefit_package_assignment_on(predecessor_effective_date)
+                census_employee.renew_coverage(predecessor_benefit_package_assignment, new_benefit_package_assignment)
+              end
+            end
+          end
+        end
+      end
+
       def refresh(new_benefit_sponsor_catalog)
         if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
 

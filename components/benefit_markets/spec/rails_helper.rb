@@ -12,6 +12,7 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'forgery'
 require 'factory_girl_rails'
+require "pry"
 
 FactoryGirl.definition_file_paths = [
 # File.expand_path(File.join(File.dirname(__FILE__),'factories')),
