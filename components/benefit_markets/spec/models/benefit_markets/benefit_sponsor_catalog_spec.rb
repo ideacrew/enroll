@@ -10,11 +10,24 @@ module BenefitMarkets
     let(:effective_period)        { effective_date..(effective_date + 1.year - 1.day) }
     let(:open_enrollment_period)  { (effective_date - 1.month)..(effective_date - 1.month + 9.days) }
     let(:probation_period_kinds)  { [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days] }
-    let(:service_area)            { BenefitMarkets::Locations::ServiceArea.new }
+    # let(:service_area)            { BenefitMarkets::Locations::ServiceArea.new }
+    let(:service_area)            { FactoryGirl.build(:benefit_markets_locations_service_area) }
     let(:sponsor_market_policy)   { BenefitMarkets::MarketPolicies::SponsorMarketPolicy.new }
     let(:member_market_policy)    { BenefitMarkets::MarketPolicies::MemberMarketPolicy.new }
     let(:product_packages)        { [FactoryGirl.build(:benefit_markets_products_product_package)] }
 
+    let(:params) do
+      {
+        effective_date: effective_date,
+        effective_period: effective_period,
+        open_enrollment_period: open_enrollment_period,
+        probation_period_kinds: probation_period_kinds,
+        service_area: service_area,
+        sponsor_market_policy: sponsor_market_policy,
+        member_market_policy: member_market_policy,
+        product_packages: product_packages,
+      }
+    end
 
     context "A new model instance" do
 
@@ -26,20 +39,6 @@ module BenefitMarkets
      # it { is_expected.to embeds_one(:member_market_policy) }
      # it { is_expected.to embeds_many(:benefit_packages) }
      # it { is_expected.to belongs_to(:service_area) }
-
-
-      let(:params) do
-        {
-          effective_date: effective_date,
-          effective_period: effective_period,
-          open_enrollment_period: open_enrollment_period,
-          probation_period_kinds: probation_period_kinds,
-          service_area: service_area,
-          sponsor_market_policy: sponsor_market_policy,
-          member_market_policy: member_market_policy,
-          product_packages: product_packages,
-        }
-      end
 
       context "with no effective_date" do
         subject { described_class.new(params.except(:effective_date)) }
@@ -123,6 +122,51 @@ module BenefitMarkets
       end
     end
 
+    context "Comparing catalogs" do
+      let(:base_catalog)                 { described_class.new(**params) }
+
+      context "and they are the same" do
+        let(:compare_catalog)              { described_class.new(**params) }
+
+        it "they should be different instances" do
+          expect(base_catalog.id).to_not eq compare_catalog.id
+        end
+
+        it "should match" do
+          expect(base_catalog <=> compare_catalog).to eq 0
+          expect(base_catalog).to eq compare_catalog
+        end
+      end
+
+      context "and the attributes are different" do
+        let(:compare_catalog)              { described_class.new(**params) }
+
+        before { compare_catalog.effective_date = effective_date + 1.month }
+
+        it "should not match" do
+          expect(base_catalog).to_not eq compare_catalog
+        end
+
+        it "the base_catalog should be lest than the compare_catalog" do
+          expect(base_catalog <=> compare_catalog).to eq -1
+        end
+      end
+
+      context "and the product_packages are different" do
+        let(:compare_catalog)     { described_class.new(**params) }
+        let(:new_product_package) { FactoryGirl.build(:benefit_markets_products_product_package) }
+
+        before { compare_catalog.product_packages << new_product_package }
+
+        it "should not match" do
+          expect(base_catalog).to_not eq compare_catalog
+        end
+
+        it "the base_catalog should be lest than the compare_catalog" do
+          expect(base_catalog <=> compare_catalog).to eq -1
+        end
+      end
+    end
 
   end
 end

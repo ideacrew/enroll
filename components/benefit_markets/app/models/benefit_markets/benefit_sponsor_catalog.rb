@@ -60,7 +60,7 @@ module BenefitMarkets
           product_packages <=> other.product_packages
         end
       else
-        updated_on < other.updated_on ? -1 : 1
+        other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
       end
     end
 
