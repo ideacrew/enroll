@@ -23,8 +23,8 @@ class BenefitGroupAssignment
   embeds_many :workflow_state_transitions, as: :transitional
 
   validates_presence_of :start_on, :is_active
-  # validates_presence_of :benefit_group_id
-  # validates_presence_of :benefit_package_id
+  validates_presence_of :benefit_group_id, :if => Proc.new {|obj| obj.benefit_package_id.blank? }
+  validates_presence_of :benefit_package_id, :if => Proc.new {|obj| obj.benefit_group_id.blank? }
   validate :date_guards, :model_integrity
 
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }

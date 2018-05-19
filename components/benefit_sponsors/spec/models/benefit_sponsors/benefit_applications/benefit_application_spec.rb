@@ -221,23 +221,23 @@ module BenefitSponsors
 
       it "should find applications by Effective date start" do
         expect(BenefitApplications::BenefitApplication.all.size).to eq 5
-        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(march_effective_date).to_a).to eq march_sponsors
-        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(april_effective_date).to_a).to eq april_sponsors
+        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(march_effective_date).to_a.sort).to eq march_sponsors.sort
+        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(april_effective_date).to_a.sort).to eq april_sponsors.sort
       end
 
       it "should find applications by Open Enrollment begin" do
-        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(march_open_enrollment_begin_on)).to eq march_sponsors
-        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(april_open_enrollment_begin_on)).to eq april_sponsors
+        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(march_open_enrollment_begin_on).to_a.sort).to eq march_sponsors.sort
+        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(april_open_enrollment_begin_on).to_a.sort).to eq april_sponsors.sort
       end
 
       it "should find applications by Open Enrollment end" do
         # binding.pry
-        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(march_open_enrollment_end_on)).to eq march_sponsors
-        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(april_open_enrollment_end_on)).to eq april_sponsors
+        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(march_open_enrollment_end_on).to_a.sort).to eq march_sponsors.sort
+        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(april_open_enrollment_end_on).to_a.sort).to eq april_sponsors.sort
       end
 
       it "should find applications in Plan Draft status" do
-        expect(BenefitApplications::BenefitApplication.plan_design_draft).to eq march_sponsors + april_sponsors
+        expect(BenefitApplications::BenefitApplication.plan_design_draft.to_a.sort).to eq (march_sponsors + april_sponsors).sort
       end
 
       it "should find applications with chained scopes" do

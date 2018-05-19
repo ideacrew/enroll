@@ -2267,7 +2267,7 @@ context "non business owner criteria" do
 
   let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
   let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile )}
-  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
   let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, aasm_state: "coverage_selected") }
   let(:census_employee) { FactoryGirl.build(:census_employee, is_business_owner:false, aasm_state: "employee_role_linked",expected_selection: "enroll",benefit_group_assignments: [benefit_group_assignment]) }
 
