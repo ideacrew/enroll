@@ -56,6 +56,10 @@ module BenefitSponsors
         end
       end
 
+      def pricing_determination_builder
+        CompositeTierPrecalculator
+      end
+
       def calculate_price_for(pricing_model, benefit_roster_entry, sponsor_contribution)
         pricing_determination = sponsor_contribution.sponsored_benefit.latest_pricing_determination
         r_coverage = benefit_roster_entry.group_enrollment
