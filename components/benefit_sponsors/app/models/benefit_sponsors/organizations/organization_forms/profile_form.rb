@@ -21,6 +21,7 @@ module BenefitSponsors
       attribute :contact_method_options, Hash
       attribute :profile_type, String
       attribute :sic_code, String
+      attribute :inbox, OrganizationForms::InboxForm
       attribute :parent, OrganizationForms::OrganizationForm
 
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]

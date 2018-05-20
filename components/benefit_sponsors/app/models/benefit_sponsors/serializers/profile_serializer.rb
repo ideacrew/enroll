@@ -18,6 +18,7 @@ module BenefitSponsors
       attribute :id, if: :is_persisted?
 
       has_many :office_locations
+      has_one :inbox
 
       def is_persisted?
         object.persisted?
