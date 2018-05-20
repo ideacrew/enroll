@@ -36,6 +36,10 @@ module BenefitSponsors
         end
       end
 
+      def sign_up_url
+        main_app.new_user_registration_path
+      end
+
       def method_missing(name, *args, &block)
         if name.to_s.match(/@/)
           method_name, attribute = name.to_s.split("@")

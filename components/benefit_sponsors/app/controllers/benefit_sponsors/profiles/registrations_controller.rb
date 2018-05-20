@@ -112,11 +112,17 @@ module BenefitSponsors
     end
 
     def user_not_authorized(exception)
-      if exception.query == :redirect_home?
+      action = exception.query.to_sym
+
+      case action
+      when :redirect_home?
         redirect_to self.send(:agency_home_url, exception.record.profile_id)
-        return
+      when :new?
+        session[:portal] = url_for(params)
+        redirect_to self.send(:sign_up_url)
+      else
+        super
       end
-      super
     end
   end
 end
