@@ -67,8 +67,11 @@ module BenefitMarkets
         end
       end
       true
-    end
+    end        
 
+    def benefit_sponsor_catalog_for(service_area: nil, effective_date: ::TimeKeeper.date_of_record)
+      BenefitSponsorCatalogFactory.call(effective_date, self, service_area)
+    end
 
     # Remove this and delegate properly once Products are implemented
     def product_market_kind

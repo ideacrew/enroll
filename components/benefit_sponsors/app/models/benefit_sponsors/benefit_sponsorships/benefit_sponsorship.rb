@@ -129,8 +129,8 @@ module BenefitSponsors
       end
 
       def benefit_sponsor_catalog_for(effective_date)
-        return [] if benefit_market.blank?
-        benefit_market.benefit_sponsor_catalog_for([], effective_date)
+        benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+        benefit_market_catalog.benefit_sponsor_catalog_for(service_area: service_area, effective_date: effective_date)
       end
 
       def is_attestation_eligible?

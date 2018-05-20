@@ -11,8 +11,8 @@ FactoryGirl.define do
     kind                  :single_issuer
     title                 "2018 Single Issuer Health Products"
 
-    # association :contribution_model, factory: :benefit_markets_contribution_models_contribution_model
-    # association :pricing_model, factory: :benefit_markets_pricing_models_pricing_model
+    contribution_model { create(:benefit_markets_contribution_models_contribution_model) }
+    # pricing_model { create(:benefit_markets_pricing_models_pricing_model) }
 
     transient do
       number_of_products 5
@@ -20,14 +20,12 @@ FactoryGirl.define do
 
     after(:build) do |product_package, evaluator|
       if product_package.product_kind == :health
-        product_package.products = build_list(:benefit_markets_products_health_products_health_product,
+        product_package.products = create_list(:benefit_markets_products_health_products_health_product,
           evaluator.number_of_products,
           application_period: product_package.application_period,
           product_package_kinds: [ product_package.kind ],
           metal_level_kind: :gold)
       end
     end
-
-
   end
 end

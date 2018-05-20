@@ -5,6 +5,9 @@ FactoryGirl.define do
     benefit_market  { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "MA Health SHOP", site_urn: :cca) }
     organization    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
 
+    rating_area     { create(:benefit_markets_locations_rating_area) }
+    service_area    { create(:benefit_markets_locations_service_area) }
+
 
     trait :with_benefit_market do
       benefit_market { FactoryGirl.build :benefit_markets_benefit_market}
