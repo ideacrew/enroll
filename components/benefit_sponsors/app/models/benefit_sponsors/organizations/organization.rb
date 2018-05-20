@@ -36,6 +36,9 @@ module BenefitSponsors
       # Business structure or entity type 
       field :entity_kind, type: Symbol
 
+      # Federal Employer ID Number
+      field :fein, type: String
+
       # TODO -- track history on changes
       # field :updated_by, type: Symbol
 
@@ -93,6 +96,8 @@ module BenefitSponsors
       accepts_nested_attributes_for :profiles
 
       validates_presence_of :legal_name, :site, :profiles
+
+      validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
 
       before_save :generate_hbx_id
 
@@ -245,6 +250,10 @@ module BenefitSponsors
 
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
+      end
+
+      def is_benefit_sponsor?
+        employer_profile.present?
       end
     end
   end

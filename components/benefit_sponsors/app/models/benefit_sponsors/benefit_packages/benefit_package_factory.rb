@@ -27,10 +27,28 @@ module BenefitSponsors
 
       # Building only health sponsored benefit for now.
       def build_sponsored_benefits(args)
-        health_sponsored_benefit = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
-        health_sponsored_benefit.benefit_package = @benefit_package
-        health_sponsored_benefit.assign_attributes(args[0].except(:kind))
-        health_sponsored_benefit
+        sponsored_benefit = new_sponsored_benefit_for(args[0][:kind])
+        sponsored_benefit.benefit_package = @benefit_package
+        sponsored_benefit.assign_attributes(args[0].except(:kind, :sponsor_contribution))
+        sponsored_benefit.sponsor_contribution = build_sponsor_contribution(sponsored_benefit ,args[0][:sponsor_contribution])
+        sponsored_benefit
+      end
+
+      def build_sponsor_contribution(sponsored_benefit, attrs)
+        sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
+        attrs[:contribution_levels].each do |contribution_level_hash|
+          contribution_level = sponsor_contribution.contribution_levels.where(display_name: contribution_level_hash[:display_name]).first
+          contribution_level.assign_attributes(contribution_level_hash.except(:display_name))
+        end
+        sponsor_contribution
+      end
+
+      def new_sponsored_benefit_for(kind)
+        if kind == "health"
+          BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
+        elsif kind == "dental"
+          BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
+        end
       end
 
       def benefit_package

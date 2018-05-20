@@ -32,8 +32,8 @@ module BenefitSponsors
       (a_tab == current_tab) ? raw(" class=\"active\"") : ""
     end
 
-    def get_header_text(controller_name)
-        portal_display_name(controller_name)
+    def get_benefit_sponsors_header_text(controller_name)
+      benefit_sponsors_portal_display_name(controller_name)
     end
 
     def user_first_name_last_name_and_suffix

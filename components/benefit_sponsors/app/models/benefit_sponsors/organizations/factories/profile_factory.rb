@@ -6,7 +6,7 @@ module BenefitSponsors
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
-        attr_accessor :profile_id, :profile_type, :organization, :current_user, :claimed, :pending
+        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending
         attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
         attr_accessor :area_code, :number, :extension
         cattr_accessor :profile_type
@@ -177,6 +177,7 @@ module BenefitSponsors
             unless claimed
               if existing_org.employer_profile.blank?
                 existing_org.profiles << build_profile(profile_attributes(attributes))
+                self.profile.add_benefit_sponsorship
               end
             end
             existing_org
@@ -189,6 +190,7 @@ module BenefitSponsors
           if profile_id.blank?
             self.organization = build_organization_class.new(organization_attributes(attrs))
             self.organization.profiles << build_profile(profile_attributes(attrs))
+            self.profile.add_benefit_sponsorship if is_employer_profile?
             self.organization
           else
             get_organization
@@ -203,7 +205,7 @@ module BenefitSponsors
                     end
           profile.office_locations << build_office_locations if profile.office_locations.empty?
           self.profile_id = profile.id
-          profile
+          self.profile = profile
         end
 
         def build_office_locations
@@ -215,7 +217,6 @@ module BenefitSponsors
 
         def build_broker_profile(attrs = {})
           Organizations::BrokerAgencyProfile.new(attrs)
-
         end
 
         def build_sponsor_profile(attrs = {})
@@ -225,7 +226,7 @@ module BenefitSponsors
         def build_sponsor_profile_class
           if site_key == :dc
             Organizations::AcaShopDcEmployerProfile
-          elsif site_key == :cca
+          elsif site_key == :mhc
             Organizations::AcaShopCcaEmployerProfile
           end
         end
@@ -332,13 +333,14 @@ module BenefitSponsors
         end
 
         def get_organization
-          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+          self.organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         protected
 
         def site
-          BenefitSponsors::ApplicationController::current_site
+          return @site if defined? @site
+          @site = BenefitSponsors::ApplicationController::current_site
         end
 
         def site_key

@@ -71,9 +71,11 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      has_many    :census_employees,
-                  counter_cache: true,
-                  class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+      has_many    :census_employees
+
+      # has_many    :census_employees,
+      #             counter_cache: true,
+      #             class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
 
       belongs_to  :benefit_market,
                   counter_cache: true,
@@ -127,13 +129,27 @@ module BenefitSponsors
       end
 
       def benefit_sponsor_catalog_for(effective_date)
-        return [] if benefit_market.blank?
-        benefit_market.benefit_sponsor_catalog_for([], effective_date)
+        benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+        benefit_market_catalog.benefit_sponsor_catalog_for(service_area: service_area, effective_date: effective_date)
       end
 
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?
+      end
+      # If there is a gap, it will fall under a new benefit sponsorship
+      # Renewal_benefit_application's predecessor_application is always current benefit application
+      # Latest benefit_application will always be their current benefit_application if no renewal
+      def current_benefit_application
+        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : benefit_applications.order_by(:"created_at".desc).first
+      end
+
+      def renewal_benefit_application
+        benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
+      end
+
+      def renewing_published_benefit_application # TODO -recheck
+        benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
       end
 
       # TODO Refactor (moved from PlanYear)

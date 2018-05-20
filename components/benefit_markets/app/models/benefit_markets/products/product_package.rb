@@ -1,6 +1,6 @@
-# ProductPackage provides the composite package for Benefits that may be purchased.  Site 
-# exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses 
-# all Products via ProductPackage. 
+# ProductPackage provides the composite package for Benefits that may be purchased.  Site
+# exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses
+# all Products via ProductPackage.
 # ProductPackage functions:
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
@@ -8,6 +8,7 @@ module BenefitMarkets
   class Products::ProductPackage
     include Mongoid::Document
     include Mongoid::Timestamps
+    include Comparable
 
     embedded_in :packagable, polymorphic: true
 
@@ -21,10 +22,10 @@ module BenefitMarkets
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
 
-    embeds_one  :contribution_model, 
+    embeds_one  :contribution_model,
                 class_name: "BenefitMarkets::ContributionModels::ContributionModel"
 
-    embeds_one  :pricing_model, 
+    embeds_one  :pricing_model,
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
     validates_presence_of :product_kind, :kind, :application_period
@@ -33,6 +34,27 @@ module BenefitMarkets
     scope :by_kind,             ->(kind){ where(kind: kind) }
     scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
 
+
+    def comparable_attrs
+      [
+        :application_period, :product_kind, :kind, :title, :description, :multiplicity,
+        :contribution_model, :pricing_model
+        ]
+    end
+
+    # Define Comparable operator
+    # If instance attributes are the same, compare Products
+    def <=>(other)
+      if comparable_attrs.all? { |attr| eval(attr.to_s) == eval("other.#{attr.to_s}") }
+        if products == other.products
+          0
+        else
+          products <=> other.products
+        end
+      else
+        other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
+      end
+    end
 
     def effective_date
       packagable.effective_date || application_period.min
@@ -59,7 +81,7 @@ module BenefitMarkets
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
     def load_embedded_products(service_area, effective_date)
-      products = benefit_market_products_available_for(service_area, effective_date)
+      benefit_market_products_available_for(service_area, effective_date)
     end
 
     # Query products from database applicable to this product package

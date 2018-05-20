@@ -526,10 +526,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       })
     }
     it 'should return renewing benefit group assignment' do
+      # This spec/method should be moved to Census Employee Model if needed, can't test as CE only work with New Profiles
       expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq renewal_benefit_group_assignment
     end
 
     it 'should retrun active benefit_group_assignment' do
+      # This spec/method should be moved to Census Employee Model if needed, can't test as CE only work with New Profiles
       plan_year.update_attributes(:'aasm_state' => 'active')
       expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq census_employee.benefit_group_assignments.first
     end
@@ -577,6 +579,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         let!(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
         it "census employee has no benefit group assignment and employer profile is the same as plan year's" do
+          # This spec/method should be in Census Employee Model if needed, can't test as CE only work with New Profiles
           expect(census_employee_no_benefit_group.benefit_group_assignments).to eq []
           expect(census_employee_no_benefit_group.employer_profile).to eq workflow_plan_year_with_benefit_group.employer_profile
         end
@@ -2264,7 +2267,7 @@ context "non business owner criteria" do
 
   let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
   let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile )}
-  let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+  let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
   let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, aasm_state: "coverage_selected") }
   let(:census_employee) { FactoryGirl.build(:census_employee, is_business_owner:false, aasm_state: "employee_role_linked",expected_selection: "enroll",benefit_group_assignments: [benefit_group_assignment]) }
 
@@ -2444,7 +2447,7 @@ describe PlanYear, "plan year schedule changes" do
 
         let(:census_employee){
           employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
-          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups.first
+          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups
           employee
         }
 

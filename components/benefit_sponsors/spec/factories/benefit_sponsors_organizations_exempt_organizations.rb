@@ -17,16 +17,10 @@ FactoryGirl.define do
         build(:benefit_sponsors_site, owner_organization: organization, site_organizations: [organization])
       end
     end
-
-    trait :with_hbx_profile do
-      after :build do |organization, evaluator|
-        build(:benefit_sponsors_organizations_hbx_profile)
-      end
-    end
     
     trait :with_hbx_profile do
       after :build do |organization, evaluator|
-        organization.profiles << build(:benefit_sponsors_organizations_hbx_profile)
+        organization.profiles = [build(:benefit_sponsors_organizations_hbx_profile)]
       end
     end
 

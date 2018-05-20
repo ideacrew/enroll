@@ -5,6 +5,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Model
 
+      attribute :id, String
       attribute :display_name, String
       attribute :contribution_unit_id, String
       attribute :is_offered, Boolean

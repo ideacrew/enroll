@@ -9,7 +9,6 @@ module BenefitSponsors
       # TODO use SIC code validation
       validates_presence_of :sic_code
 
-
       private
 
       def initialize_profile

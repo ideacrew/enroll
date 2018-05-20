@@ -24,7 +24,7 @@ FactoryGirl.define do
 
     trait :with_benefit_market do
       after :build do |site, evaluator|
-        site.benefit_markets << build(:benefit_markets_benefit_market, kind: evaluator.kind)
+        site.benefit_markets << create(:benefit_markets_benefit_market, kind: evaluator.kind)
       end
     end
 

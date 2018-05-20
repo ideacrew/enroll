@@ -54,8 +54,9 @@ module BenefitSponsors
     def begin_open_enrollment
       if @benefit_application.may_advance_date?
         @benefit_application.advance_date!
-        active_census_employees.each do |census_employee|
-          census_employee.renew
+
+        if @benefit_application.predecessor_application.present?
+          @benefit_application.renew_employee_coverages
         end
       end
     end
@@ -85,7 +86,11 @@ module BenefitSponsors
       benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end.next_day)
       
       if benefit_sponsor_catalog
-        @benefit_application.renew(benefit_sponsor_catalog)
+        new_benefit_application = @benefit_application.renew(benefit_sponsor_catalog)
+
+        if new_benefit_application.save
+          new_benefit_application.renew_benefit_package_assignments
+        end
       end
     end
 

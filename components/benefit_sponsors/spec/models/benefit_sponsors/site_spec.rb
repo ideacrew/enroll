@@ -165,10 +165,8 @@ module BenefitSponsors
 
       let!(:site)               { FactoryGirl.create(:benefit_sponsors_site, :owner_organization => owner_organization, site_organizations: [ owner_organization ]) }
       let(:owner_organization)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: owner_legal_name, profiles: [hbx_profile]) }
-      let!(:loony_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: loony_legal_name, site: site, profiles: [employer_profile]) }
-      let!(:acme_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, legal_name: itune_legal_name, site: site, profiles: [employer_profile]) }
-
-      let(:employer_profile)    { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
+      let!(:loony_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: loony_legal_name, site: site) }
+      let!(:acme_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: itune_legal_name, site: site) }
 
       # let(:hbx_profile)         { BenefitSponsors::Organizations::HbxProfile.new(office_locations: office_locations) }
       let(:hbx_profile)       { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
@@ -211,8 +209,8 @@ module BenefitSponsors
           let(:ivl_benefit_market_2)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) } 
 
           let(:owner_organization_1)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile]) }
-          let(:owner_organization_2)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_2, profiles: [employer_profile]) }
-          let(:owner_organization_3)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_3, profiles: [employer_profile]) }
+          let(:owner_organization_2)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: legal_name_2) }
+          let(:owner_organization_3)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: legal_name_3) }
 
           let(:shop_only_site)        { FactoryGirl.build(:benefit_sponsors_site, :owner_organization => owner_organization_1, site_organizations: [ owner_organization_1 ], benefit_markets: [shop_benefit_market_1]) }
           let(:ivl_only_site)         { FactoryGirl.build(:benefit_sponsors_site, :owner_organization => owner_organization_2, site_organizations: [ owner_organization_2 ], benefit_markets: [ivl_benefit_market_1]) }

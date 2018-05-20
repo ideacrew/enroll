@@ -24,6 +24,7 @@ module BenefitSponsors
               @benefit_applications = @employer_profile.benefit_applications
             when 'documents'
             when 'employees'
+              @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
               # @current_plan_year = @employer_profile.show_plan_year
               # paginate_employees
             when 'brokers'

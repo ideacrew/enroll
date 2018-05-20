@@ -13,7 +13,12 @@ module BenefitMarkets
       @effective_date  = effective_date
 
       @benefit_sponsor_catalog = ::BenefitMarkets::BenefitSponsorCatalog.new
+
       @benefit_sponsor_catalog.effective_date = effective_date
+      @benefit_sponsor_catalog.effective_period = benefit_market_catalog.effective_period_on(effective_date)
+      @benefit_sponsor_catalog.open_enrollment_period = benefit_market_catalog.open_enrollment_period_on(effective_date)
+      @benefit_sponsor_catalog.service_area_id = service_area.id
+
       add_probation_period_kinds
       add_sponsor_market_policy
       add_member_market_policy
@@ -31,7 +36,7 @@ module BenefitMarkets
     def add_member_market_policy
       @benefit_sponsor_catalog.member_market_policy = benefit_market_catalog.member_market_policy
     end
-    
+
     def add_product_packages
       # TODO: Optimize the code
       # benefit_market_catalog.product_packages.collect do |product_package|

@@ -24,7 +24,7 @@ module BenefitSponsors
       attribute :newly_designated, String
 
       attribute :email, Forms::EmailForm
-      attribute :address, Organizations::Forms::AddressForm
+      attribute :address, BenefitSponsors::Organizations::OrganizationForms::AddressForm
 
       validates_presence_of :employee_relationship, :email
     end
