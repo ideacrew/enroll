@@ -15,7 +15,7 @@ class GenerateCcaSite < Mongoid::Migration
         new_profile = initialize_hbx_profile
         owner_organization = initialize_exempt_organization(new_profile)
         owner_organization.save!
-        binding.pry
+
         update_hbx_staff_roles(new_profile) # updates person hbx_staff_role with new profile id
         @site.owner_organization = owner_organization
         @site.save!
