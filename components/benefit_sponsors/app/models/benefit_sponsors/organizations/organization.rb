@@ -36,6 +36,9 @@ module BenefitSponsors
       # Business structure or entity type 
       field :entity_kind, type: Symbol
 
+      # Federal Employer ID Number
+      field :fein, type: String
+
       # TODO -- track history on changes
       # field :updated_by, type: Symbol
 
