@@ -228,14 +228,9 @@ class CensusEmployee < CensusMember
   #   @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   # end
 
-  def is_env_test?
-    return @is_env_test if defined? @is_env_test
-    @is_env_test = Rails.env.test?
-  end
-
   def is_case_old?(employer_profile=nil)
     employer_profile = employer_profile || self.employer_profile
-    is_env_test? && employer_profile.present? && employer_profile.is_a?(EmployerProfile)
+    employer_profile.present? && employer_profile.is_a?(EmployerProfile)
   end
 
   def employer_profile=(new_employer_profile)
@@ -250,8 +245,8 @@ class CensusEmployee < CensusMember
 
   def employer_profile
     return @employer_profile if defined? @employer_profile
-    return @employer_profile = EmployerProfile.find(self.employer_profile_id) if self.employer_profile_id.present? && is_env_test?
-    return nil if is_env_test? && self.benefit_sponsorship.blank? # Need this for is_case_old?
+    return @employer_profile = EmployerProfile.find(self.employer_profile_id) if self.employer_profile_id.present?
+    return nil if self.benefit_sponsorship.blank? # Need this for is_case_old?
     @employer_profile = self.benefit_sponsorship.organization.employer_profile
   end
 

@@ -55,13 +55,8 @@ class BenefitGroupAssignment
     end
   end
 
-  def is_env_test?
-    return @is_env_test if defined? @is_env_test
-    @is_env_test = Rails.env.test?
-  end
-
   def is_case_old?
-    is_env_test? && self.benefit_group_id.present?
+    self.benefit_group_id.present?
   end
 
   def plan_year
@@ -99,7 +94,7 @@ class BenefitGroupAssignment
   def benefit_group=(new_benefit_group)
     warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
     # raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
-    if is_env_test? && new_benefit_group.is_a?(BenefitGroup)
+    if new_benefit_group.is_a?(BenefitGroup)
       self.benefit_group_id = new_benefit_group._id
       return @benefit_group = new_benefit_group
     end
