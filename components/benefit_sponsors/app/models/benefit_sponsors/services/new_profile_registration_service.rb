@@ -100,7 +100,7 @@ module BenefitSponsors
 
       def profile_attributes(form)
         if is_broker_profile?
-          form.attributes.slice(:entity_kind, :contact_method, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
+          form.attributes.slice(:entity_kind, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
         elsif is_sponsor_profile?
           if is_cca_sponsor_profile?
             form.attributes.slice(:entity_kind, :contact_method, :id, :sic_code)
