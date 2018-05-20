@@ -74,18 +74,13 @@ class EmployeeRole
   #   @employer_profile = EmployerProfile.find(self.employer_profile_id)
   # end
 
-  def is_env_test?
-    return @is_env_test if defined? @is_env_test
-    @is_env_test = Rails.env.test?
-  end
-
   def is_case_old?
-    self.employer_profile_id.present? && is_env_test?
+    self.employer_profile_id.present?
   end
 
   def employer_profile=(new_employer_profile)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
-    if new_employer_profile.is_a?(EmployerProfile) && is_env_test?
+    if new_employer_profile.is_a?(EmployerProfile)
       self.employer_profile_id = new_employer_profile._id
     else
       self.benefit_sponsors_employer_profile_id = new_employer_profile._id

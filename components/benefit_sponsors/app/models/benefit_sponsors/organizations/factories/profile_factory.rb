@@ -333,7 +333,7 @@ module BenefitSponsors
         end
 
         def get_organization
-          self.organization = build_organization_class.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+          self.organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
         protected

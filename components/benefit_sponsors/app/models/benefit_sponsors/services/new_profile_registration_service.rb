@@ -100,9 +100,21 @@ module BenefitSponsors
 
       def profile_attributes(form)
         if is_broker_profile?
-          form.attributes.slice(:entity_kind, :contact_method, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
+          form.attributes.slice(:entity_kind, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
         elsif is_sponsor_profile?
-          form.attributes.slice(:entity_kind, :contact_method, :id)
+          if is_cca_sponsor_profile?
+            form.attributes.slice(:entity_kind, :contact_method, :id, :sic_code)
+          else
+            form.attributes.slice(:entity_kind, :contact_method, :id)
+          end
+        end
+      end
+
+      def staff_role_params(staff_roles)
+        return [{}] if staff_roles.blank?
+        [staff_roles].flatten.inject([]) do |result, role|
+          result << Serializers::StaffRoleSerializer.new(role, profile_id:profile_id, profile_type: profile_type).to_hash
+          result
         end
       end
 
@@ -114,12 +126,21 @@ module BenefitSponsors
         profile_type == "benefit_sponsor"
       end
 
-      def staff_role_params(staff_roles)
-        return [{}] if staff_roles.blank?
-        [staff_roles].flatten.inject([]) do |result, role|
-          result << Serializers::StaffRoleSerializer.new(role, profile_id:profile_id, profile_type: profile_type).to_hash
-          result
-        end
+      def is_cca_sponsor_profile?
+        is_sponsor_profile? && site_key == :cca
+      end
+
+      def is_dc_sponsor_profile?
+        is_sponsor_profile? && site_key == :dc
+      end
+
+      def site
+        return @site if defined? @site
+        @site = BenefitSponsors::ApplicationController::current_site
+      end
+
+      def site_key
+        site.site_key
       end
 
       def store!(form)
