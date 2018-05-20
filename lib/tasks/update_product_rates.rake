@@ -63,5 +63,8 @@ namespace :import do
       product.premium_tables = premium_tables
 
     end
+
+    puts "plan to product import finished" unless Rails.env.test?
+    puts "*"*80 unless Rails.env.test?
   end
 end

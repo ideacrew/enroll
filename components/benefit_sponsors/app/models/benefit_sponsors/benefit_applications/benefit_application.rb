@@ -291,7 +291,7 @@ module BenefitSponsors
           predecessor_benefit_package.assigned_census_employees_on(predecessor_effective_date).each  do |employee|
             new_benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
             if new_benefit_package_assignment.blank? || (benefit_package_assignment.benefit_package != benefit_package)
-              census_employee.assign_to_benefit_package(benefit_package)
+              census_employee.assign_to_benefit_package(benefit_package, effective_period.min)
             end
           end
         end

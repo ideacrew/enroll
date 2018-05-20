@@ -4,15 +4,7 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
-    # let(:profile)               { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile)  }
     let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
-
-    # let(:date_range) { (Date.today..1.year.from_now) }
-    # let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new() }
-    # let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
-    # let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
-    # let(:benefit_market)            { create :benefit_markets_benefit_market, site: site, kind: 'aca_shop' }
-
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
@@ -20,7 +12,6 @@ module BenefitSponsors
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
 
     let(:recorded_service_area)     { ::BenefitMarkets::Locations::ServiceArea.new }
     let(:recorded_rating_area)      { ::BenefitMarkets::Locations::RatingArea.new }
@@ -34,7 +25,6 @@ module BenefitSponsors
         recorded_rating_area:   recorded_rating_area,
       }
     end
-
 
     context "A new model instance" do
      it { is_expected.to be_mongoid_document }

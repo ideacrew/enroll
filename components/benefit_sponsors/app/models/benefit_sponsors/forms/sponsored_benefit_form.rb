@@ -5,6 +5,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Model
 
+      attribute :id, String
       attribute :kind, String
       attribute :product_option_choice, String
       attribute :product_package_kind, String
