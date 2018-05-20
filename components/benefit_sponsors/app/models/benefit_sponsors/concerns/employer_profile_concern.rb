@@ -31,8 +31,6 @@ module BenefitSponsors
 
         ENROLLED_STATE ||= %w(enrolled suspended)
 
-        CONTACT_METHODS ||= ["Only Electronic communications", "Paper and Electronic communications"]
-
         # Workflow attributes
         field :aasm_state, type: String, default: "applicant"
 
@@ -64,10 +62,6 @@ module BenefitSponsors
 
       def entity_kinds
         ENTITY_KINDS
-      end
-
-      def contact_methods
-        CONTACT_METHODS
       end
 
       def policy_class

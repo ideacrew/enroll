@@ -76,6 +76,14 @@ module BenefitSponsors
         organization.benefit_sponsorships.collect { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
       end
 
+      def contact_methods
+        ::BenefitMarkets::CONTACT_METHODS_HASH
+      end
+
+      def active_broker
+        # TODO
+      end
+
       class << self
         def find(id)
           organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).first
