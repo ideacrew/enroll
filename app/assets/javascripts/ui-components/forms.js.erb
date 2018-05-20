@@ -1,9 +1,3 @@
-// Initalize Datepickers for elements
-$(function() {
-  // Pass element ID, minDate, maxDate for datepicker options
-  initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-90.years %>'),new Date('<%= Date.today.end_of_month-18.years %>'));
-});
-
 function validateForm() {
   'use strict';
   window.addEventListener('load', function() {

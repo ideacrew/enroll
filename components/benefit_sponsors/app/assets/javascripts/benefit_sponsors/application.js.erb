@@ -10,30 +10,15 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require benefit_sponsors/jquery
-//= require jquery_ujs
-//= require benefit_sponsors/jquery-ui
-//= require benefit_sponsors/tether
-//= require benefit_sponsors/bootstrap
-//= require benefit_sponsors/fontawesome
-//= require benefit_sponsors/forms
-//= require benefit_sponsors/validators
-//= require benefit_sponsors/sliders
+//= require ui-components/components
 //= require_tree .
 
-  function initDatepicker(id,minDate,maxDate,allowFutureDate) {
-    $("#"+id).datepicker({
-      dateFormat:'mm/dd/yy',
-      changeYear: true,
-      yearRange: minDate.getFullYear()+':'+maxDate.getFullYear(),
-      minDate:minDate,
-      maxDate:maxDate
-    })
-    // Callbacks for datepicker
-    .on("change", function (e) {
-      validateDate(e, minDate, maxDate)
-    });
-  }
+// Initalize Datepickers for elements
+$(function() {
+  // Pass element ID, minDate, maxDate for datepicker options
+  initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-90.years %>'),new Date('<%= Date.today.end_of_month-18.years %>'));
+});
+
 
 $(document).on('change', "input#jq_datepicker_ignore_benefit_application_open_enrollment_start_on", function() {
   var date = $(this).val();

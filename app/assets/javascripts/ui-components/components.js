@@ -1,3 +1,11 @@
+//= require jquery
+//= require jquery_ujs
+//= require jquery-ui
+//= require ./tether
 //= require ./sidebars/plan_filters
-//= require ./validators
 //= require ./services
+//= require ./forms
+//= require ./datepicker
+//= require ./sliders
+//= require ./validators
+//= require ./fontawesome
