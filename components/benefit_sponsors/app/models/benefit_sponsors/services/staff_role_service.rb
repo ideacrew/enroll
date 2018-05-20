@@ -10,7 +10,8 @@ module BenefitSponsors
       end
 
       def find_profile(form)
-        BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first.employer_profile
+        organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first
+        organization.employer_profile if organization.present?
       end
 
       def add_profile_representative!(form)
