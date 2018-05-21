@@ -34,6 +34,8 @@ module BenefitMarkets
     scope :by_kind,             ->(kind){ where(kind: kind) }
     scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
 
+    delegate :pricing_calculator, to: :pricing_model, allow_nil: true
+    delegate :contribution_calculator, to: :contribution_model, allow_nil: true
 
     def comparable_attrs
       [
