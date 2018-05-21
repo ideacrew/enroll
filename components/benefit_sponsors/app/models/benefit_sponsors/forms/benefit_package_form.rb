@@ -54,8 +54,6 @@ module BenefitSponsors
 
       def self.for_update(params)
         form = self.new(params)
-        form.service.load_form_params_from_resource(form)
-        form.service.load_form_metadata(form)
         form
       end
 
@@ -83,8 +81,7 @@ module BenefitSponsors
         persist
       end
 
-      def update_attributes(params)
-        self.attributes = params
+      def update
         persist(update: true)
       end
 

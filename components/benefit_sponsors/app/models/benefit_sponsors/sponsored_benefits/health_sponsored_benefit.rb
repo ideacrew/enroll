@@ -1,6 +1,6 @@
 module BenefitSponsors
   module SponsoredBenefits
-    class HealthSponsoredBenefit < SponsoredBenefit
+    class HealthSponsoredBenefit < BenefitSponsors::SponsoredBenefits::SponsoredBenefit
 
       FILTER_MAP =  { 
                       issuer_profiles: -> { products.issuer_profiles },
