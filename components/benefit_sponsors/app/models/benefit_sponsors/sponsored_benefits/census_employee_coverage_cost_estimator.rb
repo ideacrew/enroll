@@ -89,8 +89,8 @@ module BenefitSponsors
       end
 
       def calculate(sponsored_benefit, reference_product, p_package)
-        pricing_model = sponsored_benefit.pricing_model
-        contribution_model = sponsored_benefit.contribution_model
+        pricing_model = p_package.pricing_model
+        contribution_model = p_package.contribution_model
         p_calculator = pricing_model.pricing_calculator
         c_calculator = contribution_model.contribution_calculator
         p_determination_builder = p_calculator.pricing_determination_builder
