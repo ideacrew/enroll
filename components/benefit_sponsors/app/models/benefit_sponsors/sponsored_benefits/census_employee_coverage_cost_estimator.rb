@@ -88,13 +88,13 @@ module BenefitSponsors
         @coverage_start = c_start
       end
 
-      def calculate(sponsored_benefit, pricing_model, contribution_model, reference_product, p_package)
+      def calculate(sponsored_benefit, reference_product, p_package)
+        pricing_model = sponsored_benefit.pricing_model
+        contribution_model = sponsored_benefit.contribution_model
         p_calculator = pricing_model.pricing_calculator
         c_calculator = contribution_model.contribution_calculator
         p_determination_builder = p_calculator.pricing_determination_builder
-        cm_builder = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
-        sponsor_contribution = cm_builder.build_sponsor_contribution(p_package)
-        sponsor_contribution.sponsored_benefit = sponsored_benefit
+        sponsor_contribution = construct_sponsor_contribution_if_needed(sponsored_benefit, p_package)
         roster_eligibility_optimizer = RosterEligibilityOptimizer.new(contribution_model)
         price = 0.00
         contribution = 0.00
@@ -124,6 +124,16 @@ module BenefitSponsors
           roster_eligibility_optimizer
         )
         [sponsor_contribution, price, contribution]
+      end
+
+      protected
+
+      def construct_sponsor_contribution_if_needed(sponsored_benefit, product_package)
+        return sponsored_benefit.sponsor_contribution if sponsored_benefit.sponsor_contribution.present?
+        cm_builder = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
+        sponsor_contribution = cm_builder.build_sponsor_contribution(p_package)
+        sponsor_contribution.sponsored_benefit = sponsored_benefit
+        sponsor_contribution
       end
 
       def precalculate_costs(
