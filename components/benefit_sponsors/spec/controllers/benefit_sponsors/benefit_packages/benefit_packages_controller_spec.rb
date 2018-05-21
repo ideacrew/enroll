@@ -18,7 +18,7 @@ module BenefitSponsors
     let!(:benefit_application_id) { benefit_application.id.to_s }
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile }
     let!(:product_package_kind) { :single_issuer }
-    let!(:product_package) { benefit_market_catalog.product_packages.where(kind: product_package_kind).first }
+    let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
     let!(:product) { product_package.products.first }
 
     let(:benefit_package_params) {

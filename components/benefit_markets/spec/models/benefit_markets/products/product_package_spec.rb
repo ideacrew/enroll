@@ -8,7 +8,7 @@ module BenefitMarkets
 
     let(:benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog) }
     let(:product_kind)            { :health }
-    let(:kind)                    { :single_issuer }
+    let(:package_kind)            { :single_issuer }
     let(:title)                   { "SafeCo Issuer Health" }
     let(:description)             { "All products offered by a single issuer" }
     let(:products)                { FactoryGirl.build_list(:benefit_markets_products_product, 5) }
@@ -19,7 +19,7 @@ module BenefitMarkets
     let(:params) do
         {
           product_kind:           product_kind,
-          kind:                   kind,
+          package_kind:           package_kind,
           title:                  title,
           description:            description,
           products:               products,
@@ -73,12 +73,12 @@ module BenefitMarkets
         end
 
         context "that's missing kind" do
-          subject { described_class.new(params.except(:kind)) }
+          subject { described_class.new(params.except(:package_kind)) }
 
           it "should be invalid" do
             subject.validate
             expect(subject).to_not be_valid
-            expect(subject.errors[:kind]).to include("can't be blank")
+            expect(subject.errors[:package_kind]).to include("can't be blank")
           end
         end
       end

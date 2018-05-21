@@ -20,11 +20,11 @@ FactoryGirl.define do
     trait :with_product_packages do
 
       after(:build) do |benefit_market_catalog, evaluator|
-        evaluator.product_package_kinds.each do |kind|
+        evaluator.product_package_kinds.each do |package_kind|
           evaluator.product_kinds.each do |product_kind|
             build(:benefit_markets_products_product_package, 
               packagable: benefit_market_catalog, 
-              kind: kind, 
+              package_kind: package_kind, 
               product_kind: product_kind,
               title: "#{kind.to_s.humanize} #{product_kind}",
               description: "#{kind.to_s.humanize} #{product_kind}",

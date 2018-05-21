@@ -105,7 +105,7 @@ module BenefitSponsors
                         .by_enrollment_period(predecessor_benefit_package.effective_period)
                         .enrolled_and_waived
 
-        sponsored_benefits.map(&:product_kind).each |product_kind|
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
           enrollment = enrollments.by_coverage_kind(product_kind).first
           
           if is_renewal_benefit_available?(enrollment)

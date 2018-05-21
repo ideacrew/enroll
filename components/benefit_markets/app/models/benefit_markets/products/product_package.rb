@@ -38,7 +38,7 @@ module BenefitMarkets
 
     def comparable_attrs
       [
-        :application_period, :product_kind, :kind, :title, :description, :multiplicity,
+        :application_period, :product_kind, :package_kind, :title, :description, :product_multiplicity,
         :contribution_model, :pricing_model
         ]
     end
