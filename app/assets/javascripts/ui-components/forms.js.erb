@@ -1,3 +1,8 @@
+// Disables kind for first Address and sets kind to primary
+window.onload = function() {
+  setPrimaryOfficeLocation()
+}
+
 function validateForm() {
   'use strict';
   window.addEventListener('load', function() {
@@ -16,11 +21,43 @@ function validateForm() {
   }, false);
 }
 
-function removeAddress(e) {
-  var id = $(e).attr('id');
-  $('#'+id).closest('fieldset').fadeTo(700,0.01, function() {
-    $('#'+id).closest('fieldset').slideUp(150, function() {
-      $('#'+id).closest('fieldset').remove();
-    });
-  });
+count = 0;
+
+function addOfficeLocation(element) {
+  // Makes a new node for existing office location
+  var officeField = document.querySelector('#officeLocations');
+  var oFs = document.querySelectorAll('#officeLocations')
+  console.log(oFs.length)
+  var newOfficeField = document.importNode(officeField, true)
+  count ++;
+  currentCount = count - 1;
+  officeField.querySelectorAll('input').forEach(function(input) {
+    var name = input.getAttribute('name').replace('['+currentCount+']', '['+count+']')
+    input.setAttribute('name', name)
+  })
+  // Appends new office location to empty newOfficeLocation div
+  document.querySelector('#newOfficeLocations').appendChild(newOfficeField).setAttribute("data-id", count)
+  // Unhides trash can icon for new office location fields
+  var doc = document.querySelectorAll('[data-id')[count-1]
+  doc.children[0].classList.remove("hidden")
+  // Enables select options for kind
+  var selectKindOption = doc.querySelector("#kindSelect")
+  selectKindOption.value = " ";
+  // Removes primary from select as its set by default for first office location
+  selectKindOption.remove(1)
+  selectKindOption.removeAttribute("disabled");
+}
+
+function removeOfficeLocation() {
+  var doc = document.querySelectorAll('#removeAddress')[count]
+  doc.closest('#officeLocations').remove()
+  count --;
+}
+
+function setPrimaryOfficeLocation() {
+  var selectKindOption = document.querySelector("#kindSelect");
+  if (selectKindOption) {
+    selectKindOption.value = "primary";
+    selectKindOption.setAttribute("disabled", true);
+  }
 }
