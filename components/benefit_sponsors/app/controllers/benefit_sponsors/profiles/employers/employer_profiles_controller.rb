@@ -3,7 +3,7 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :bulk_employee_upload]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload]
 
         #New person registered with existing organization and approval request submitted to employer
         def show_pending
