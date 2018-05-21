@@ -45,7 +45,6 @@ function addOfficeLocation(element) {
   selectKindOption.value = " ";
   // Removes primary from select as its set by default for first office location
   selectKindOption.remove(1)
-  selectKindOption.removeAttribute("disabled");
 }
 
 function removeOfficeLocation() {
@@ -58,6 +57,5 @@ function setPrimaryOfficeLocation() {
   var selectKindOption = document.querySelector("#kindSelect");
   if (selectKindOption) {
     selectKindOption.value = "primary";
-    selectKindOption.setAttribute("disabled", true);
   }
 }
