@@ -1,11 +1,22 @@
 import { Controller } from "stimulus"
 
 export default class extends Controller {
-  static targets = ['endOn']
+  static targets = ['healthPackageKind', 'dentalPackageKind', 'defaultPackageKind']
 
-  startChange(event) {
-    const yearLater = new Date(event.currentTarget.value)
-    yearLater.setFullYear(yearLater.getFullYear() + 1)
-    this.endOnTarget.value = yearLater.toISOString().replace(/T.*$/, '')
+  kindChange(event) {
+    document.querySelectorAll('.js-package-kind').forEach(element => {
+      element.classList.add('hidden')
+    })
+
+    switch (event.currentTarget.value) {
+      case 'health':
+        this.healthPackageKindTarget.classList.remove('hidden')
+        break
+      case 'dental':
+        this.dentalPackageKindTarget.classList.remove('hidden')
+        break
+      default:
+        this.defaultPackageKindTarget.classList.remove('hidden')
+    }
   }
 }
