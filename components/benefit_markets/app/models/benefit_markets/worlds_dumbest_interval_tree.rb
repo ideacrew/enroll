@@ -7,6 +7,7 @@ module BenefitMarkets
   # specific to our usage of this tree:
   # - Intervals will not overlap
   # - Insertion and deletion performance doesn't matter
+  # - Deletion isn't even supported
   # - Querying must be at least O(log n)
   class WorldsDumbestIntervalTree
     class DumbNode
