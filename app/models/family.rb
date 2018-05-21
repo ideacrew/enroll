@@ -1058,7 +1058,7 @@ class Family
   def all_persons_vlp_documents_status
     outstanding_types = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.consumer_role.verification_types.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
+      outstanding_types = outstanding_types + member.person.verification_types.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
     fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.vlp_documents.any? && !type.rejected) } : nil
     partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.vlp_documents.any? && !type.rejected)} : nil
