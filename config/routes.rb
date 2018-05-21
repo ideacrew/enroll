@@ -444,6 +444,18 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :vue do
+    get 'load_plans'
+    collection do
+      get   'app'
+      get   'carriers'
+      post  'save'
+      get   'plans'
+      get   'employers'
+      post  'calc'
+    end
+  end
+
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
@@ -501,6 +513,8 @@ Rails.application.routes.draw do
       post :fed_hub_request
     end
   end
+
+
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

@@ -1,13 +1,19 @@
 import Vue from 'vue/dist/vue.esm'
 import VueResource from 'vue-resource'
 import TurbolinksAdapter from 'vue-turbolinks';
+import BootstrapVue from 'bootstrap-vue';
 Vue.use(VueResource);
-Vue.use(TurbolinksAdapter)
+Vue.use(TurbolinksAdapter);
+Vue.use(BootstrapVue);
 
-import App from '../app.vue'
-import Py from '../py.vue'
-import Plan from '../plan.vue'
-import PlanDetail from '../plan_detail.vue'
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+// import App from '../app.vue'
+// import Py from '../py.vue'
+// import Plan from '../plan.vue'
+// import PlanDetail from '../plan_detail.vue'
 import OfficeLocation from '../office_location.vue'
 import OfficeLocations from '../office_locations.vue'
 

@@ -1,6 +1,7 @@
 <template>
   <div>
     <h3>Office Locations</h3>
+    <b-alert variant="success" show>Success Alert</b-alert>
     <office-location v-for="(row, index) in rows"
                       :office="row.address"
                       :key="index"
@@ -10,13 +11,12 @@
       <button @click="addRow"> Add Address </button>
       <button @click="save"> Save Data </button>
     </div>
-    </br>
     <pre>{{rows}}</pre>
 </div>
 </template>
 
 <script>
-console.log('office locations ...');
+//console.log('office locations ...');
 export default {
   data: function() {
     return {
@@ -26,12 +26,12 @@ export default {
   },
   created: function () {
     console.log('Loading data ...')
-    this.$http.get(this.$root.office_location_path).then(response => {
-      console.log('Response: ' + response.body);
-      this.rows = response.body;
-    }, response => {
-      console.log('Error occurred trying to fetch office locations');
-    });
+    // this.$http.get(this.$root.office_location_path).then(response => {
+    //   console.log('Response: ' + response.body);
+    //   this.rows = response.body;
+    // }, response => {
+    //   console.log('Error occurred trying to fetch office locations');
+    // });
   },
   methods: {
       addRow(){

@@ -116,6 +116,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
+    binding.pry
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
@@ -168,6 +169,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def calc_employer_contributions
+
+    #binding.pry
+
     @benefit_group_index = params[:benefit_group_index].to_i
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })

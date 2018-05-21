@@ -1,11 +1,13 @@
 {
   "dependencies": {
-    "@rails/webpacker": "3.4",
+    "@rails/webpacker": "3.5",
+    "bootstrap-vue": "^2.0.0-rc.10",
     "vue": "^2.5.16",
-    "vue-loader": "^14.2.2",
+    "vue-loader": "14.2.2",
     "vue-resource": "^1.5.0",
     "vue-template-compiler": "^2.5.16",
-    "vue-turbolinks": "^2.0.3"
+    "vue-turbolinks": "^2.0.3",
+    "vuetify": "^1.0.18"
   },
   "devDependencies": {
     "webpack-dev-server": "2.11.2"

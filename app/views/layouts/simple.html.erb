@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= favicon_link_tag 'favicon.ico', :rel => 'shortcut icon', :type => 'image/vnd.microsoft.icon' %>
+
+    <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{Settings.site.short_name} | #{Settings.site.short_name}" %></title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <%= javascript_include_tag "application" %>
+    <%= javascript_pack_tag    "hbx" %>
+    <%= stylesheet_pack_tag    "hbx" %>
+    <%= csrf_meta_tags %>
+
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+
+    <style>
+    .tabs__slider{
+          // the .toolbar li class has a height of 100%, so we have to re-set the value back to the specified 4px;
+          height: 3px;
+    }
+    </style>
+
+  </head>
+  <body>
+        <%= yield %>
+
+
+  </body>
+ </html>

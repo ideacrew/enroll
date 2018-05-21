@@ -1,0 +1,25 @@
+  <% props = {
+    office_location_path: '/vue',
+    office_location_save_path: '/vue/save',
+    link: 'hbx'
+    }.to_json
+  %>
+  <div id="hbx" data="<%= props %>">
+    <v-app>
+      <v-toolbar color="blue darken-4" dark fixed app>
+        <v-spacer></v-spacer>
+        <v-toolbar-items>
+          <v-btn flat v-on:click="link = 'hbx'">Plan Browser</v-btn>
+          <v-btn flat v-on:click="link = 'plan-cost'">Plan Cost Estimator</v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <v-content>
+        <v-container fluid>
+          <component v-bind:is="cmp"></component>
+          <!--<hbx></hbx>-->
+          <!--<plan-cost></plan-cost>-->
+        </v-container>
+      </v-content>
+      <v-footer app></v-footer>
+    </v-app>
+  </div>

@@ -2,19 +2,6 @@
   <div id="address_info" class="row focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
         <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-            <button class="btn btn-new-address" onclick="return false;">ADDRESS</button>
-          </div>
-
-          <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
-            <div class="form-group form-group-lg">
-              <div class="row" style="margin: 0;">
-                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-                  <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-                </div>
-              </div>
-            </div>
-
             <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group no-pd">
               <button class="btn btn-new-address" v-on:click="info">INFO</button><button class="btn btn-new-address" v-on:click="remove">REMOVE</button>
             </div>
@@ -41,7 +28,7 @@
               </div>
           </div>
       </div>
-      <div class="row"></div>
+      </br></br>
   </div>
 </template>
 

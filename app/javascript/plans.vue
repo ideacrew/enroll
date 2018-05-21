@@ -19,4 +19,9 @@ export default {
 </script>
 
 <style scoped>
+.plan {
+  border: 1px solid #777;
+  font-size: 2em;
+  text-align: center;
+}
 </style>
