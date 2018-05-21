@@ -1,5 +1,5 @@
 require "rails_helper"
- require File.join(Rails.root, "app", "data_migrations", "cancel_plan_years_group")
+require File.join(Rails.root, "app", "data_migrations", "cancel_plan_years_group")
 
 describe "Importing data", dbclean: :after_each do
     let!(:given_task_name)    {"cancel_plan_years_group"}
@@ -15,7 +15,7 @@ describe "Importing data", dbclean: :after_each do
     let!(:plan_year2)         { FactoryGirl.create(:plan_year, aasm_state: "active", employer_profile: employer_profile_1 )}
     let!(:plan_year3)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on, employer_profile: employer_profile_2) }
     let!(:plan_year4)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on_1, employer_profile: employer_profile_2) }
-    let!(:plan_year5)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "active", start_on: start_on, employer_profile: employer_profile_2) }
+    let!(:plan_year5)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "publish_pending", start_on: start_on, employer_profile: employer_profile_2) }
   	subject { CancelPlanYearsGroup.new(given_task_name, double(:current_scope => nil)) }
     
     before :each do   
@@ -48,7 +48,7 @@ describe "Importing data", dbclean: :after_each do
     end
 
     it "should not cancel the plan year for all the valid details" do
-      expect(plan_year5.aasm_state).to eq("active")
+      expect(plan_year5.aasm_state).to eq("publish_pending")
       subject.migrate
       plan_year5.reload
       expect(plan_year5.aasm_state).to eq("canceled")
