@@ -28,7 +28,7 @@ module BenefitMarkets
                           :service_area, :sponsor_market_policy, :member_market_policy, :product_packages
 
     def product_package_for(sponsored_benefit)
-      product_packages.by_kind(sponsored_benefit.product_package_kind)
+      product_packages.by_package_kind(sponsored_benefit.product_package_kind)
                       .by_product_kind(sponsored_benefit.product_kind)[0]
     end
 

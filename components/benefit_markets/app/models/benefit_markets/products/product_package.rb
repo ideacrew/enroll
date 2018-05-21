@@ -30,7 +30,8 @@ module BenefitMarkets
     validates_presence_of :product_kind, :benefit_kind, :package_kind, :application_period
     validates_presence_of :title, :allow_blank => false
 
-    scope :by_kind,             ->(kind){ where(benefit_kind: kind) }
+    scope :by_benefit_kind,     ->(kind){ where(benefit_kind: kind) }
+    scope :by_package_kind,     ->(package_kind) { where(package_kind: package_kind) }
     scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
 
     delegate :pricing_calculator, to: :pricing_model, allow_nil: true
@@ -95,7 +96,7 @@ module BenefitMarkets
 
     # Query products from database applicable to this product package
     def all_benefit_market_products
-      raise StandardError, "Product package is invalid" unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
+      raise StandardError, "Product package is invalid" unless benefit_market_kind.present? && application_period.present? && product_kind.present? && package_kind.present?
       return @all_benefit_market_products if defined?(@all_benefit_market_products)
       @all_benefit_market_products = BenefitMarkets::Products::Product.by_product_package(self)
     end
@@ -116,7 +117,7 @@ module BenefitMarkets
     end
 
     def products_for_plan_option_choice(product_option_choice)
-      if kind == :metal_level
+      if package_kind == :metal_level
         products.by_metal_level(product_option_choice)
       else
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(product_option_choice)

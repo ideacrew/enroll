@@ -32,7 +32,7 @@ module BenefitSponsors
 
       def product_package
         return @product_package if defined? @product_package
-        @product_package = benefit_sponsor_catalog.product_packages.by_kind(product_package_kind).by_product_kind(product_kind)[0]
+        @product_package = benefit_sponsor_catalog.product_packages.by_package_kind(product_package_kind).by_product_kind(product_kind)[0]
       end
 
       def latest_pricing_determination

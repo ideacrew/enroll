@@ -19,7 +19,7 @@ module BenefitSponsors
                                                       application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
                                                     )}
 
-        let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+        let!(:renewal_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                                         benefit_market: benefit_market,
                                                         title: "SHOP Benefits for #{renewal_effective_date.year}",
                                                         application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
@@ -33,7 +33,7 @@ module BenefitSponsors
 
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
-        let(:single_issuer_product_package)   { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.kind == :single_issuer } }
+        let(:single_issuer_product_package)   { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == :single_issuer } }
         
         let(:current_benefit_package)         { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package) }
         let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
@@ -78,7 +78,7 @@ module BenefitSponsors
         it "should reference to renewal product package" do
           renewal_benefit_package.sponsored_benefits.each_with_index do |sponsored_benefit, i|
             current_sponsored_benefit = current_benefit_package.sponsored_benefits[i]
-            expect(sponsored_benefit.product_package).to eq renewal_benefit_sponsor_catalog.product_packages.by_kind(current_sponsored_benefit.product_package_kind).by_product_kind(current_sponsored_benefit.product_kind)[0]
+            expect(sponsored_benefit.product_package).to eq renewal_benefit_sponsor_catalog.product_packages.by_package_kind(current_sponsored_benefit.product_package_kind).by_product_kind(current_sponsored_benefit.product_kind)[0]
           end
         end
 
