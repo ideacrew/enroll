@@ -3,10 +3,11 @@ module BenefitSponsors
     class ProfileSerializer < ActiveModel::Serializer
       attributes :id, :entity_kind, :contact_method, :sic_code, :entity_kind_options,
                    :languages_spoken, :working_hours, :accept_new_clients, :profile_type, :market_kind_options,
-                    :market_kind, :language_options, :home_page
+                    :market_kind, :language_options, :home_page, :grouped_sic_code_options
       attribute :contact_method_options
       # attribute :rating_area_id, if: :is_cca_employer_profile?
       attribute :sic_code, if: :is_cca_employer_profile?
+      attribute :grouped_sic_code_options, if: :is_cca_employer_profile?
       attribute :languages_spoken, if: :is_broker_profile?
       attribute :working_hours, if: :is_broker_profile?
       attribute :accept_new_clients, if: :is_broker_profile?
@@ -50,6 +51,11 @@ module BenefitSponsors
 
       def contact_method_options
         object.contact_methods
+      end
+
+      def grouped_sic_code_options
+        return @grouped_sic_codes if defined? @grouped_sic_codes
+        @grouped_sic_codes = Caches::SicCodesCache.load
       end
 
       def profile_type
