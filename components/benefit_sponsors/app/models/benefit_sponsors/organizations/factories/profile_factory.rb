@@ -226,7 +226,7 @@ module BenefitSponsors
         def build_sponsor_profile_class
           if site_key == :dc
             Organizations::AcaShopDcEmployerProfile
-          elsif site_key == :mhc
+          elsif site_key == :cca
             Organizations::AcaShopCcaEmployerProfile
           end
         end

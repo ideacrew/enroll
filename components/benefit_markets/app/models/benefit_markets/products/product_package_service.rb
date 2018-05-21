@@ -17,12 +17,15 @@ module BenefitMarkets
       # @param form [Object] the form to load the data into
       # @return [Object] the form object populated with the metadata
       def load_form_metadata(form)
-        form.allowed_benefit_option_kinds = benefit_option_kinds
+        form.allowed_benefit_kinds = benefit_kinds
         form.available_pricing_models = options_for_pricing_model_id(form)
         form.available_contribution_models = options_for_contribution_model_id
         form.available_benefit_catalogs = options_for_benefit_catalog_id
-        form.available_benefit_option_kinds = options_for_benefit_option_kinds
+        form.available_benefit_kinds = options_for_benefit_kinds
         form.available_product_kinds = options_for_product_kinds
+        form.available_health_package_kinds = options_for_health_package_kinds
+        form.available_dental_package_kinds = options_for_dental_package_kinds
+        form.available_default_package_kinds = options_for_default_package_kinds
         form
       end
 
@@ -71,13 +74,11 @@ module BenefitMarkets
       def attributes_to_form_params(product_package, form)
         form.attributes = {
           id: product_package.persisted? ? product_package.id : nil,
-          multiplicity: product_package.multiplicity,
-          benefit_option_kind: product_package.kind,
-          product_kind: product_package.product_kind,
-          start_on: on_date_for(product_package, :first),
-          end_on: on_date_for(product_package, :last),
-          benefit_catalog_id: product_package.packagable.try(:id),
           title: product_package.title,
+          benefit_kind: product_package.benefit_kind,
+          package_kind: product_package.package_kind,
+          product_kind: product_package.product_kind,
+          benefit_catalog_id: product_package.packagable.try(:id),
           contribution_model_id: product_package.contribution_model.try(:id),
           pricing_model_id: product_package.pricing_model.try(:id)
         }
@@ -87,11 +88,10 @@ module BenefitMarkets
 
       def form_params_to_attributes(form, product_package)
         model_attributes = {
-          multiplicity: form.multiplicity,
           title: form.title,
-          kind: form.benefit_option_kind,
-          application_period: application_period_for(form),
+          benefit_kind: form.benefit_kind,
           product_kind: product_package.product_kind,
+          package_kind: package_kind_for(form),
           contribution_model: contribution_model_for(form),
           pricing_model: pricing_model_for(form)
         }
@@ -123,8 +123,6 @@ module BenefitMarkets
       end
 
       def options_for_pricing_model_id(form)
-        multiplicity = form.multiplicity ? :multiple : :single
-        BenefitMarkets::PricingModels::PricingModel.where(:product_multiplicities.in => [ multiplicity ]).pluck(:name, :id)
         BenefitMarkets::PricingModels::PricingModel.all.pluck(:name, :id)
       end
 
@@ -140,20 +138,52 @@ module BenefitMarkets
         end
       end
 
-      def options_for_benefit_option_kinds
-        ['ACA Shop', 'ACA Individual', 'Medicaid', 'Medicare'].zip benefit_option_kinds
+      def options_for_benefit_kinds
+        raise 'New benefit option kind added' if benefit_kinds.count > 5
+        ['ACA Shop', 'ACA Individual', 'Federal Employee Health Benefits', 'Medicaid', 'Medicare'].zip benefit_kinds
       end
 
       def options_for_product_kinds
         BenefitMarkets::PRODUCT_KINDS.map(&:to_s).map(&:humanize).map(&:titleize).zip BenefitMarkets::PRODUCT_KINDS
       end
 
-      def benefit_option_kinds
-        BenefitMarkets::BENEFIT_MARKET_KINDS.map(&:to_s)
+      def options_for_health_package_kinds
+        health_package_kinds.map(&:to_s).map(&:humanize).map(&:titleize).zip health_package_kinds
+      end
+
+      def options_for_dental_package_kinds
+        dental_package_kinds.map(&:to_s).map(&:humanize).map(&:titleize).zip dental_package_kinds
+      end
+
+      def options_for_default_package_kinds
+        [['Single Product', :single_product], ['Multi Product', :multi_product]]
+      end
+
+      def health_package_kinds
+        @health_package_kinds ||= BenefitMarkets::Products::HealthProducts::HealthProduct::PRODUCT_PACKAGE_KINDS
+      end
+
+      def dental_package_kinds
+        @dental_package_kinds ||= BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+      end
+
+      def benefit_kinds
+        @benefit_kinds ||= BenefitMarkets::BENEFIT_MARKET_KINDS.map(&:to_s)
       end
 
       def package_product_multiplicity_for(form)
-        ::BenefitMarkets::Products::ProductPackage.subclass_for(form.benefit_option_kind).new.product_multiplicity
+        ::BenefitMarkets::Products::ProductPackage.subclass_for(form.benefit_kind).new.product_multiplicity
+      end
+
+      def package_kind_for(form)
+        case form.product_kind
+        when 'health'
+          form.health_package_kind
+        when 'dental'
+          form.dental_package_kind
+        else
+          form.package_kind
+        end
       end
 
       # We can cheat here because our form and our model are so
@@ -170,18 +200,13 @@ module BenefitMarkets
 
       def build_product_package(form)
         @factory_class.call(
-          form.attributes.extract!(:benefit_option_kind, :multiplicity, :product_kind, :title).merge(
-            application_period: application_period_for(form),
+          form.attributes.extract!(:benefit_kind, :product_kind, :title).merge(
             benefit_catalog: benefit_catalog_for(form),
             contribution_model: contribution_model_for(form),
             pricing_model: pricing_model_for(form),
-            benefit_option_kind: form.benefit_option_kind
+            package_kind: package_kind_for(form)
           )
         )
-      end
-
-      def application_period_for(form)
-        Date.parse(form.start_on)..Date.parse(form.end_on) rescue nil
       end
 
       def contribution_model_for(form)
@@ -190,10 +215,6 @@ module BenefitMarkets
 
       def pricing_model_for(form)
         @pricing_model_for ||= ::BenefitMarkets::PricingModels::PricingModel.where(id: form.pricing_model_id).first
-      end
-
-      def on_date_for(product_package, direction)
-        product_package.application_period.try(direction).try(:strftime, '%F')
       end
     end
   end

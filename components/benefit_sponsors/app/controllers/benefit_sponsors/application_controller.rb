@@ -11,7 +11,7 @@ module BenefitSponsors
       site_key = Settings.site.key
       case site_key
       when :cca
-        BenefitSponsors::Site.by_site_key(:mhc).first
+        BenefitSponsors::Site.by_site_key(:cca).first
       when :dc
         BenefitSponsors::Site.by_site_key(:dc).first
       end

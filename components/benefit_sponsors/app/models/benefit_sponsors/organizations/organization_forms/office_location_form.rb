@@ -21,6 +21,11 @@ module BenefitSponsors
 
       def address_attributes=(address)
         self.address = ::BenefitSponsors::Organizations::OrganizationForms::AddressForm.new(address)
+        set_is_primary_field(self.address) if self.address
+      end
+
+      def set_is_primary_field(address_form)
+        self.is_primary = address_form.kind == "primary" ? true : false
       end
     end
   end

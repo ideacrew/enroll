@@ -1,6 +1,6 @@
-# ProductPackage provides the composite package for Benefits that may be purchased.  Site
-# exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses
-# all Products via ProductPackage.
+# ProductPackage provides the composite package for Benefits that may be purchased.  Site 
+# exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses 
+# all Products via ProductPackage. 
 # ProductPackage functions:
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
@@ -8,32 +8,33 @@ module BenefitMarkets
   class Products::ProductPackage
     include Mongoid::Document
     include Mongoid::Timestamps
-    include Comparable
 
     embedded_in :packagable, polymorphic: true
 
     field :application_period,      type: Range
-    field :product_kind,            type: Symbol
-    field :kind,                    type: Symbol
+    field :benefit_kind,            type: Symbol #, default: :aca_individual  # => :aca_shop
+    field :product_kind,            type: Symbol # [ :health, :dental, :etc ]
+    field :package_kind,            type: Symbol # [:single_issuer, :metal_level, :single_product]
     field :title,                   type: String, default: ""
     field :description,             type: String, default: ""
-    field :multiplicity,            type: Boolean, default: true
 
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
 
-    embeds_one  :contribution_model,
+    embeds_one  :contribution_model, 
                 class_name: "BenefitMarkets::ContributionModels::ContributionModel"
 
-    embeds_one  :pricing_model,
+    embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    validates_presence_of :product_kind, :kind, :application_period
+    validates_presence_of :product_kind, :benefit_kind, :package_kind, :application_period
     validates_presence_of :title, :allow_blank => false
 
-    scope :by_kind,             ->(kind){ where(kind: kind) }
+    scope :by_kind,             ->(kind){ where(benefit_kind: kind) }
     scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
 
+    delegate :pricing_calculator, to: :pricing_model, allow_nil: true
+    delegate :contribution_calculator, to: :contribution_model, allow_nil: true
 
     def comparable_attrs
       [
@@ -53,6 +54,14 @@ module BenefitMarkets
         end
       else
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
+      end
+    end
+
+    def product_multiplicity
+      if [:single_issuer, :metal_level, :multi_product].include? :package_kind
+        :multiple
+      else
+        :single
       end
     end
 
