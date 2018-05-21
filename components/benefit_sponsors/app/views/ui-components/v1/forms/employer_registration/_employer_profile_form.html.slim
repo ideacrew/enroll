@@ -1,4 +1,13 @@
-fieldset
+.row.mt-2
+  .alert.alert-info
+    h4 Thank you for logging into your #{Settings.site.short_name} employer account.
+  
+    p.starter
+      |
+        Before we get started, we need to confirm the primary point of contact for your business. Please confirm that the name and email address listed below are correct, update the information or provide the name and email address for your primary point of contact. When you're finished, select 'Confirm'.
+        If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
+      
+fieldset.mt-2
   legend Employer Information:
   
   = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
@@ -20,11 +29,19 @@ fieldset
             Please provide a fein.
             
     = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
-      label for="inputEntityKind"  Kind *
       .col-md-4.pl-0
-        = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, { :class => 'form-control'} )
+        label for="inputEntityKind"  Kind *
+        = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, { :class => 'form-control mb-1'} )
       - if display_sic_field_for_employer?
-        = f.select(:sic_code, grouped_options_for_select(f.object.grouped_sic_code_options, f.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
+        .col-md-4.pl-0
+          label for="inputSIC"  SIC Code *
+          = f.select(:sic_code, grouped_options_for_select(f.object.grouped_sic_code_options, f.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
+          .invalid-feedback
+            |
+              Please provide a SIC code.
+        
+      br
+      br
       br
       br
       = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f}
