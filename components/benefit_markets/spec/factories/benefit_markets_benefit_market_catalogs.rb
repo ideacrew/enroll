@@ -26,8 +26,8 @@ FactoryGirl.define do
               packagable: benefit_market_catalog, 
               package_kind: package_kind, 
               product_kind: product_kind,
-              title: "#{kind.to_s.humanize} #{product_kind}",
-              description: "#{kind.to_s.humanize} #{product_kind}",
+              title: "#{package_kind.to_s.humanize} #{product_kind}",
+              description: "#{package_kind.to_s.humanize} #{product_kind}",
               application_period: benefit_market_catalog.application_period,
               number_of_products: evaluator.number_of_products
               )
