@@ -8,10 +8,6 @@
         If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
       
 fieldset.mt-2
-  = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
-    = render partial: './ui-components/v1/forms/employer_registration/staff_role_information', locals: {f: f}
-
-fieldset.mt-2
   legend Employer Information:
   
   = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
