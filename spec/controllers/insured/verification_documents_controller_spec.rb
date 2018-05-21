@@ -73,6 +73,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       before do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:find_docs_owner).and_return(person)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:add_type_history_element)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:set_current_person).and_return(person)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_uri)

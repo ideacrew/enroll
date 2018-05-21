@@ -38,12 +38,16 @@ describe Events::SsaVerificationRequestsController do
     end
 
     it "stores verification history element with proper verification type" do
-      expect(person.consumer_role.verification_type_history_elements.map(&:verification_type)).to eq ["Social Security Number", "Citizenship"]
+      expect(person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.count).to eq 1
+    end
+
+    it "stores verification history element with proper verification type" do
+      expect(person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.action).to eq "SSA Hub Request"
     end
 
     it "stores reference to event_request document" do
       expect(person.consumer_role.lawful_presence_determination.ssa_requests.first.id).to eq BSON::ObjectId.from_string(
-          person.consumer_role.verification_type_history_elements.first.event_request_record_id)
+          person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.event_request_record_id)
     end
   end
 end

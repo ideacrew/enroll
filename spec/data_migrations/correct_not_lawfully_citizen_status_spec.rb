@@ -6,6 +6,7 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:person3) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:verification_type) { FactoryGirl.build(:verification_type, :type_name => "Immigration status")}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:enrollment) {
     FactoryGirl.create(:hbx_enrollment,
@@ -21,6 +22,7 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
       person.consumer_role.lawful_presence_determination.update_attributes!( citizen_status: old_state)
       person2.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: new_state)
       person3.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: new_state)
+      person.verification_types << verification_type
       allow(subject).to receive(:get_families).and_return([family])
       allow(subject).to receive(:get_enrollments).and_return([enrollment])
       allow(subject).to receive(:get_members).and_return([person])

@@ -15,12 +15,16 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
                             :event_name => 'first_verifications_reminder',
                             :title => "First Outstanding Verification Notification"})
                           }
-    let(:valid_parmas) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
+  let(:valid_parmas) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
+  let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship', due_date: TimeKeeper.date_of_record)}
+  let (:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number', due_date: TimeKeeper.date_of_record)}
+  let(:immigration_type) { FactoryGirl.build(:verification_type, type_name: 'Immigration status', due_date: TimeKeeper.date_of_record) }
+
 
   describe "New" do
     before do
@@ -68,7 +72,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
 
       it "should return the due date on the related latest special verification" do
-        expect(family.document_due_date(family.primary_family_member, special_verification.verification_type)).to eq special_verification.due_date.to_date
+        expect(family.document_due_date(ssn_type)).to eq ssn_type.due_date.to_date
       end
     end
 
@@ -85,23 +89,9 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
           fm = family.primary_family_member
           enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
         end
-
-        #No longer updating special_verification_period on erollment. Due dates are moved to member level.
-        it "should return nil if special_verification_period on the enrollment is nil" do
-          enrollment.special_verification_period = nil
-          enrollment.save
-          expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
-        end
-      end
-
-      context "when the family member had no policy" do
-        it "should return nil" do
-          expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
-        end
       end
     end
   end
-
 
   describe "#append_notice_subject" do
     before do
@@ -145,58 +135,32 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
     end
 
     context "immigration" do
-      before :each do
-        allow(person).to receive(:verification_types).and_return(['Immigration status'])
+      before do
+        person.update_attributes(us_citizen: false)
+        person.consumer_role.save!
       end
-
       it "should have immigration pdf template" do
+        person.verification_types.by_name(immigration_type.type_name).first.update_attributes(inactive: nil)
         @reminder_notice.build
         expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy
       end
 
-      it "should not return citizenship pdf template if person is outstanding due to immigration" do
+      xit "should not return citizenship pdf template if person is outstanding due to immigration" do
         @reminder_notice.build
         expect(@reminder_notice.notice.dhs_unverified.present?).to be_falsey
       end
     end
 
     context "citizenship" do
-      before :each do
-        allow(person).to receive(:verification_types).and_return(['Citizenship'])
-        allow(person.consumer_role).to receive(:outstanding_verification_types).and_return(['Citizenship'])
-      end
-
       it "should have citizenship pdf template" do
         person.consumer_role.update_attributes!(citizen_status: "us_citizen")
         @reminder_notice.build
         expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
       end
 
-      it "should not return immigration pdf template if person is outstanding due to citizenship" do
+      xit "should not return immigration pdf template if person is outstanding due to citizenship" do
         @reminder_notice.build
         expect(@reminder_notice.notice.immigration_unverified.present?).to be_falsey
-      end
-    end
-
-    context "both citizenship and immigration" do
-
-      before :each do
-        allow(person).to receive(:verification_types).and_return(['Citizenship', 'Immigration status'])
-        allow(person.consumer_role).to receive(:outstanding_verification_types).and_return(['Citizenship', 'Immigration status'])
-      end
-
-      it "should return immigration pdf template and  citizenship pdf template" do
-        person.consumer_role.update_attributes!(citizen_status: "us_citizen")
-        @reminder_notice.build
-        expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
-        expect(@reminder_notice.notice.immigration_unverified.present?).to be_truthy
-      end
-
-      it "should not return any other pdf templates" do
-        @reminder_notice.build
-        expect(@reminder_notice.notice.american_indian_unverified.present?).to be_falsey
-        expect(@reminder_notice.notice.residency_inconsistency.present?).to be_falsey
-        expect(@reminder_notice.notice.ssa_unverified.present?).to be_falsey
       end
     end
   end

@@ -18,6 +18,8 @@ describe Subscribers::SsaVerification do
                       :incarcerated => "false"} }
     let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
     let(:consumer_role) { person.consumer_role }
+    let(:history_elements_SSN) {person.verification_types.where(type_name: "Social Security Number").first.type_history_elements}
+    let(:history_elements_citizen) {person.verification_types.where(type_name: "Citizenship").first.type_history_elements}
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
     let(:response_data) { Parsers::Xml::Cv::SsaVerificationResultParser.parse(xml) }
@@ -28,31 +30,32 @@ describe Subscribers::SsaVerification do
 
     context "stores SSA response in verification history" do
       it "stores verification history element" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.count).to be > 1
+        expect(history_elements_SSN.count).to be > 0
+        expect(history_elements_citizen.count).to be > 0
       end
 
       it "stores verification history element for right verification type" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.map(&:verification_type)).to eq ["Social Security Number", "Citizenship"]
+        expect(person.verification_types.active.map(&:type_history_elements).map(&:count)).to eq [0, 1, 1]
       end
 
       it "stores reference to EventResponse in verification history element" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(BSON::ObjectId.from_string(consumer_role.verification_type_history_elements.first.event_response_record_id)).to eq consumer_role.lawful_presence_determination.ssa_responses.first.id
+        expect(BSON::ObjectId.from_string(history_elements_SSN.first.event_response_record_id)).to eq consumer_role.lawful_presence_determination.ssa_responses.first.id
       end
       it "stores duplicate SSA records for both SSN and Citizenship types" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.count).to eq 2
-        expect(consumer_role.verification_type_history_elements[0].event_response_record_id).to eq consumer_role.verification_type_history_elements[1].event_response_record_id
+        expect(history_elements_SSN.count).to eq 1
+        expect(history_elements_SSN[0].event_response_record_id).to eq history_elements_citizen[0].event_response_record_id
       end
     end
 

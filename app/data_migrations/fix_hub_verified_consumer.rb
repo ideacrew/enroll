@@ -14,21 +14,9 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
   end
 
   def update_verification_type(person, v_type)
-    case v_type
-      when "Social Security Number"
-        person.consumer_role.update_attributes(:ssn_validation => "valid",
-                                               :ssn_update_reason => "data_fix_hub_response")
-      when "American Indian Status"
-        person.consumer_role.update_attributes(:native_validation => "valid",
-                                               :native_update_reason => "data_fix_hub_response")
-      when "DC Residency"
-        # handle local residency
-      else
-        person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr)
-        person.consumer_role.update_attributes(:lawful_presence_update_reason =>
-                                                   {:v_type => v_type,
-                                                    :update_reason => "data_fix_hub_response"
-                                                   } )
+    v_type.update_attributes(:validation_status => "valid", :update_reason => "data_fix_hub_response")
+    if ["Citizenship", "Immigration status"].include? v_type.type_name
+      person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr)
     end
 
     if person.all_types_verified? && !person.consumer_role.fully_verified?

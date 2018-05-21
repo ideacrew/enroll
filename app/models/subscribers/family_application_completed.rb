@@ -105,8 +105,7 @@ module Subscribers
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
       begin
         verified_verifications = verified_primary_family_member.verifications
-        consumer_role.import
-        consumer_role.pass_ssn
+        consumer_role.import(authority:"curam")
         consumer_role.vlp_authority = "curam"
         consumer_role.residency_determined_at = verified_primary_family_member.created_at
         consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
