@@ -1,6 +1,6 @@
 class GenerateCcaSite < Mongoid::Migration
   def self.up
-    if Settings.site.key.to_s == "mhc"
+    if Settings.site.key.to_s == "cca"
       say_with_time("Creating CCA Site") do
         @site = BenefitSponsors::Site.new(
           site_key: :mhc,

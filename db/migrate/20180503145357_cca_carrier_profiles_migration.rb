@@ -1,8 +1,8 @@
 class CcaCarrierProfilesMigration < Mongoid::Migration
   def self.up
 
-    if Settings.site.key.to_s == "mhc"
-    site_key = "mhc"
+    if Settings.site.key.to_s == "cca"
+    site_key = "cca"
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/carrier_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
