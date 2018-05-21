@@ -305,21 +305,4 @@ module VerificationHelper
   def has_active_resident_dependent?(person,dependent)
     (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
   end
-
-  def move_types_to_expired(person)
-    person.consumer_role.outstanding_verification_types.each do |v_type|
-      case v_type
-        when "DC Residency"
-          person.consumer_role.update_attributes(:residency_update_reason => "Moved to Coverall", :local_residency_validation => "expired",  residency_rejected: true)
-        when "Social Security Number"
-          person.consumer_role.update_attributes(:ssn_validation => "expired", :ssn_update_reason => "Moved to Coverall", ssn_rejected: true)
-        when "American Indian Status"
-          person.consumer_role.update_attributes(:native_validation => "expired", :native_update_reason => "Moved to Coverall", native_rejected: true)
-        else
-          person.consumer_role.lawful_presence_determination.expired!
-          person.consumer_role.update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => "Moved to Coverall"}, :lawful_presence_rejected => true )
-      end
-    end
-  end
-
 end

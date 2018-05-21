@@ -288,10 +288,6 @@ class ConsumerRole
     self.ssn_validation == "pending"
   end
 
-  def ssn_expired?
-    self.ssn_validation == "expired"
-  end
-
   def ssn_outstanding?
     self.ssn_validation == "outstanding"
   end
@@ -640,6 +636,9 @@ class ConsumerRole
       new_types.each do |new_type|
         person.add_new_verification_type(new_type)
       end
+      person.families.each do |family|
+        family.update_family_document_status!
+      end
     end
   end
 
@@ -851,10 +850,6 @@ class ConsumerRole
     (!is_state_resident.nil?) && (!is_state_resident)
   end
 
-  def residency_expired?
-    self.local_residency_validation == "expired"
-  end
-
   def residency_verified?
     is_state_resident? || residency_attested?
   end
@@ -869,10 +864,6 @@ class ConsumerRole
 
   def native_verified?
     native_validation == "valid"
-  end
-
-  def native_expired?
-    native_validation == 'expired'
   end
 
   def native_outstanding?

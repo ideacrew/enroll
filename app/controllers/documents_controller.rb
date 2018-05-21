@@ -141,6 +141,7 @@ class DocumentsController < ApplicationController
   def destroy
     @document.delete if @verification_type.type_unverified?
     if @document.destroyed?
+      @person.save!
       if (@verification_type.vlp_documents - [@document]).empty?
         @verification_type.update_attributes(:validation_status => "outstanding", :update_reason => "all documents deleted")
         flash[:danger] = "All documents were deleted. Action needed"

@@ -132,7 +132,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
-  embeds_many :verification_types, as: :verifiable
+  embeds_many :verification_types, cascade_callbacks: true, validate: true
 
   attr_accessor :effective_date
 
@@ -455,7 +455,7 @@ class Person
     if verification_types.map(&:type_name).include? new_type
       verification_type_by_name(new_type).update_attributes(:inactive => false)
     else
-      verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status )
+      verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status ) if !(us_citizen.nil?)
     end
   end
 
