@@ -14,7 +14,7 @@ describe "CcaBrokerAgencyProfilesMigration" do
   describe ".up" do
 
     before :all do
-      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)
+      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
 
       organization = FactoryGirl.create(:broker)
       FactoryGirl.create(:message1, inbox: organization.broker_agency_profile.inbox)

@@ -68,6 +68,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
             benefit_sponsorship = @new_profile.add_benefit_sponsorship
             benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
+            benefit_sponsorship.save!
 
             raise Exception unless new_organization.valid?
             new_organization.save!
