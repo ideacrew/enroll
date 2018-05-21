@@ -87,7 +87,7 @@ module BenefitMarkets
       def validate_product_package_kinds
         if !product_package_kinds.is_a?(Array) || product_package_kinds.detect { |pkg| !PRODUCT_PACKAGE_KINDS.include?(pkg) }
           errors.add(:product_package_kinds, :invalid)
-        end      
+        end
       end
 
     end

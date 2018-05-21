@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitPackages::BenefitPackage, type: :model do
+  RSpec.describe BenefitPackages::BenefitPackage, type: :model, :dbclean => :after_each do
     pending "add some examples to (or delete) #{__FILE__}"
 
     describe ".renew" do
@@ -25,7 +25,25 @@ module BenefitSponsors
                                                         application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
                                                       )}
 
-        let!(:map_renewal_products)   {
+        let(:benefit_sponsorship)             { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                        benefit_market: benefit_market) }
+
+        let(:initial_application)             { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+                                                        benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
+
+        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
+        let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
+        let(:single_issuer_product_package)   { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.kind == :single_issuer } }
+        
+        let(:current_benefit_package)         { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package) }
+        let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
+
+        before do
+          map_products
+          current_benefit_package.renew(renewal_benefit_package)
+        end
+
+        def map_products
           current_benefit_market_catalog.product_packages.each do |product_package|
             if renewal_product_package = renewal_benefit_market_catalog.product_packages.detect{ |p|
               p.kind == product_package.kind && p.product_kind == product_package.product_kind }
@@ -36,32 +54,14 @@ module BenefitSponsors
               end
             end
           end
-        }
-
-        let(:benefit_sponsorship)             { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
-                                                        benefit_market: benefit_market) }
-
-        let(:initial_application)             { build(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
-                                                        benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
-
-        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
-        let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
-        let(:single_issuer_product_package)   { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.kind == :single_issuer } }
-        let(:current_benefit_package)         { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package) }
-        let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
-
-        before do
-          current_benefit_package.renew(renewal_benefit_package)
         end
 
         it "applications should be valid" do
           initial_application.validate
           renewal_application.validate
-
           expect(initial_application).to be_valid
           expect(renewal_application).to be_valid
         end
-
 
         it "should renew benefit package" do
           expect(renewal_benefit_package).to be_present
