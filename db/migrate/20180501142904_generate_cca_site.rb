@@ -3,7 +3,7 @@ class GenerateCcaSite < Mongoid::Migration
     if Settings.site.key.to_s == "cca"
       say_with_time("Creating CCA Site") do
         @site = BenefitSponsors::Site.new(
-          site_key: :mhc,
+          site_key: :cca,
           byline: "The Right Place for the Right Plan",
           short_name: "Health Connector",
           domain_name: "hbxshop.org",
@@ -18,7 +18,6 @@ class GenerateCcaSite < Mongoid::Migration
 
         update_hbx_staff_roles(new_profile) # updates person hbx_staff_role with new profile id
         @site.owner_organization = owner_organization
-        @site.save!
       end
 
       say_with_time("Creating CCA ACA SHOP Benefit Market") do
@@ -28,15 +27,26 @@ class GenerateCcaSite < Mongoid::Migration
           renewal_application_configuration: renweal_app_config,
           binder_due_dom: 15,
           rating_areas: [ '1' ]
-        benefit_market = BenefitMarkets::BenefitMarket.new kind: :aca_shop,
+        @benefit_market = BenefitMarkets::BenefitMarket.new kind: :aca_shop,
           site_urn: 'cca',
-          site: @site,
           title: 'ACA SHOP',
           description: 'CCA ACA Shop Market',
           configuration: configuration
-        benefit_market.valid?
-        puts benefit_market.configuration.errors.full_messages.inspect
-        benefit_market.save!
+      end
+
+      @site.benefit_markets << @benefit_market
+
+      if @site.valid?
+        @site.save!
+      else
+        puts @site.configuration.errors.full_messages.inspect
+      end
+
+      if @benefit_market.valid?
+        @benefit_market.site = @site
+        @benefit_market.save!
+      else
+        puts @benefit_market.configuration.errors.full_messages.inspect
       end
     end
   end
