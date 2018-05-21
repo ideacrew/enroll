@@ -20,18 +20,17 @@ module BenefitSponsors
 
       def initialize_benefit_package(args)
         @benefit_package = @benefit_application.benefit_packages.build
-        @benefit_package.sponsored_benefits << build_sponsored_benefits(args[:sponsored_benefits])
         @benefit_package.assign_attributes(args.except(:sponsored_benefits))
+        build_sponsored_benefits(args[:sponsored_benefits])
         @benefit_package.save
       end
 
-      # Building only health sponsored benefit for now.
       def build_sponsored_benefits(args)
         sponsored_benefit = new_sponsored_benefit_for(args[0][:kind])
         sponsored_benefit.benefit_package = @benefit_package
-        sponsored_benefit.assign_attributes(args[0].except(:kind, :sponsor_contribution))
+        sponsored_benefit.assign_attributes(args[0].except(:id, :kind, :sponsor_contribution))
         sponsored_benefit.sponsor_contribution = build_sponsor_contribution(sponsored_benefit ,args[0][:sponsor_contribution])
-        sponsored_benefit
+        sponsored_benefit.to_a
       end
 
       def build_sponsor_contribution(sponsored_benefit, attrs)
