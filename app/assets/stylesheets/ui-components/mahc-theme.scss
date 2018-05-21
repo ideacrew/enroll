@@ -195,3 +195,9 @@ fieldset[disabled] .btn-default.active {
   color: #337ab7;
   background-color: $secondary-button-background;
 }
+.fa-trash {
+  color:$mhc-dark-blue;
+}
+.fa-trash:hover {
+  cursor:pointer;
+}

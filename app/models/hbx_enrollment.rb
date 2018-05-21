@@ -96,7 +96,6 @@ class HbxEnrollment
   # We will need to re-visit these names possibly, as we implement sponsored benefits.
   field :benefit_package_id, type: BSON::ObjectId
   field :benefit_coverage_period_id, type: BSON::ObjectId
-  field :rating_area_id, type: BSON::ObjectId
 
   # Fields for new model
   field :benefit_sponsorship_id, type: BSON::ObjectId

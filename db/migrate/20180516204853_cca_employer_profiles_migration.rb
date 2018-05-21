@@ -1,8 +1,8 @@
 class CcaEmployerProfilesMigration < Mongoid::Migration
   def self.up
 
-    if Settings.site.key.to_s == "mhc"
-      site_key = "mhc"
+    if Settings.site.key.to_s == "cca"
+      site_key = "cca"
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/employer_profiles_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
@@ -65,6 +65,10 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
+
+            benefit_sponsorship = @new_profile.add_benefit_sponsorship
+            benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
+            benefit_sponsorship.save!
 
             raise Exception unless new_organization.valid?
             new_organization.save!
@@ -177,8 +181,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
   def self.link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
     person_records_with_old_staff_roles.each do |person|
-      old_employer_staff_role = person.employer_staff_roles.where(employer_profile_id: @old_profile.id).first
-      old_employer_staff_role.update_attributes(benefit_sponsor_employer_profile_id: @new_profile.id) if old_employer_staff_role.present?
+      person.employer_staff_roles.where(employer_profile_id: @old_profile.id).update_all(benefit_sponsor_employer_profile_id: @new_profile.id)
     end
   end
 
@@ -188,8 +191,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
   def self.link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
     person_records_with_old_employee_roles.each do |person|
-      old_employee_role = person.employee_roles.where(employer_profile_id: @old_profile.id).first
-      old_employee_role.update_attributes(benefit_sponsors_employer_profile_id: @new_profile.id) if old_employee_role.present?
+      person.employee_roles.where(employer_profile_id: @old_profile.id).update_all(benefit_sponsors_employer_profile_id: @new_profile.id)
     end
   end
 

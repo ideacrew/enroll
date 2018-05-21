@@ -48,6 +48,10 @@ module BenefitSponsors
           return false, 'No matching employer staff role'
         end
       end
+
+      def display_sic_field_for_employer?
+        Settings.aca.employer_has_sic_field
+      end
     end
   end
 end

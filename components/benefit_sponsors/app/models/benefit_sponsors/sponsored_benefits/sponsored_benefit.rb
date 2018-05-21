@@ -21,6 +21,11 @@ module BenefitSponsors
 
       delegate :rate_schedule_date, to: :benefit_package
 
+      delegate :contribution_model, to: :product_package, allow_nil: true
+      delegate :pricing_model, to: :product_package, allow_nil: true
+      delegate :pricing_calculator, to: :product_package, allow_nil: true
+      delegate :contribution_calculator, to: :product_package, allow_nil: true
+
       def product_kind
         self.class.name.demodulize.split('SponsoredBenefit')[0].downcase.to_sym
       end

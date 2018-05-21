@@ -17,6 +17,7 @@ module BenefitSponsors
       attribute :contact_method, String
       attribute :entity_kind_options, Array
       attribute :market_kind_options, Hash
+      attribute :grouped_sic_code_options, Hash
       attribute :language_options, Array
       attribute :contact_method_options, Hash
       attribute :profile_type, String
