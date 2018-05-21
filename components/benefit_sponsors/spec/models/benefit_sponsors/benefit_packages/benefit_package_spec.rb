@@ -46,7 +46,7 @@ module BenefitSponsors
         def map_products
           current_benefit_market_catalog.product_packages.each do |product_package|
             if renewal_product_package = renewal_benefit_market_catalog.product_packages.detect{ |p|
-              p.kind == product_package.kind && p.product_kind == product_package.product_kind }
+              p.package_kind == product_package.package_kind && p.product_kind == product_package.product_kind }
 
               renewal_product_package.products.each_with_index do |renewal_product, i|
                 current_product = product_package.products[i]

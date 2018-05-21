@@ -18,8 +18,8 @@ module BenefitSponsors
       attribute :home_page, if: :is_broker_profile?
       attribute :id, if: :is_persisted?
 
-      has_many :office_locations
-      has_one :inbox
+      has_many :office_locations, serializer: ::BenefitSponsors::Serializers::OfficeLocationSerializer
+      has_one :inbox, serializer: ::BenefitSponsors::Serializers::InboxSerializer
 
       def is_persisted?
         object.persisted?

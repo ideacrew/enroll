@@ -191,10 +191,13 @@ class HbxEnrollment
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
-  
-  scope :by_benefit_package_assignment,   -> (benefit_package_assignment) { where(:benefit_group_assignment_id => benefit_package_assignment.id) }
+  scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
+  scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
 
   embeds_many :workflow_state_transitions, as: :transitional
+
+  belongs_to  :benefit_sponsorship,
+              class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -257,23 +260,8 @@ class HbxEnrollment
     )
   end
 
-  def renew(new_benefit_package_assignment)
-    benefit_package = new_benefit_package_assignment.benefit_package
-
-    if is_coverage_waived?
-      renew_coverage(new_benefit_package_assignment)
-    else
-      if sponsored_benefit = benefit_package.sponsored_benefit_for(self.coverage_kind)
-        product_package = sponsored_benefit.product_package
-        if product_package.products.include?(self.product.renewal_product)
-          renew_coverage(new_benefit_package_assignment)
-        end
-      end
-    end
-  end
-
-  def renew_coverage(new_benefit_package_assignment)
-    enrollment = BenefitSponsors::Enrollments::EnrollmentRenewalFactory.call(self, new_benefit_package_assignment)
+  def renew_benefit(new_benefit_package)
+    enrollment = BenefitSponsors::Enrollments::EnrollmentRenewalFactory.call(self, new_benefit_package)
     enrollment.save
   end
 

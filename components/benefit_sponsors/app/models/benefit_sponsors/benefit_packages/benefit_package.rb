@@ -93,6 +93,34 @@ module BenefitSponsors
         new_benefit_package
       end
 
+      def renew_employee_benefits
+        assigned_census_employees_on(effective_period.min).each do |census_employee|
+          renew_employee_benefit(census_employee)
+        end
+      end
+
+      def renew_employee_benefit(census_employee)
+        predecessor_benefit_package = benefit_package.predecessor
+
+        enrollments = census_employee.enrollments.by_benefit_sponsorship(benefit_sponsorship)
+                        .by_enrollment_period(predecessor_benefit_package.effective_period)
+                        .enrolled_and_waived
+
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
+          enrollment = enrollments.by_coverage_kind(product_kind).first
+          
+          if is_renewal_benefit_available?(enrollment)
+            enrollment.renew_benefit(self, enrollment.product.renewal_product)
+          end
+        end
+      end
+
+      def is_renewal_benefit_available?(enrollment)
+        return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
+        sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
+        sponsored_benefit.product_package.products.include?(enrollment.product.renewal_product)
+      end
+
       def sponsored_benefit_for(coverage_kind)
         sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind}
       end

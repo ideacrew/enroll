@@ -3,7 +3,7 @@ module BenefitSponsors
     class InboxSerializer < ActiveModel::Serializer
       attributes :access_key
 
-      has_many :messages
+      has_many :messages, serializer: ::BenefitSponsors::Serializers::MessageSerializer
 
       def is_persisted?
         object.persisted?
