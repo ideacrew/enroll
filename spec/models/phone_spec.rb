@@ -70,6 +70,14 @@ describe Phone, type: :model do
     it "valid with proper value" do
       expect(Phone.create(kind: "work").errors[:kind].any?).to eq false
     end
+
+    it "returns main with the kind_for_transmission method when using phone main" do 
+      expect(Phone.create(kind: "phone main").kind_for_transmission).to eq 'main'
+    end
+
+    it "returns whatever the phone kind is when the phone kind is not phone main" do 
+      expect(Phone.create(kind: "home").kind_for_transmission).to eq 'home'
+    end
   end
 
   let(:person) {FactoryGirl.create(:person)}
