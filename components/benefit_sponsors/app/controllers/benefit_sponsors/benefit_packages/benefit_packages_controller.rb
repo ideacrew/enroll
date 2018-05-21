@@ -22,8 +22,8 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(params.permit(:id, :benefit_application_id))
-        if @benefit_package_form.update_attributes(benefit_package_params)
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
+        if @benefit_package_form.update
           redirect_to benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
         else
           flash[:error] = error_messages(@benefit_package_form)

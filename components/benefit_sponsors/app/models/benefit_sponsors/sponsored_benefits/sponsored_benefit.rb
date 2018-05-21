@@ -68,8 +68,8 @@ module BenefitSponsors
         self.reference_product = product_package.products.where(id: product_id).first
       end
 
-      def sponsor_contributions=(sponsor_contribution_attrs)
-        build_sponsor_contribution(sponsor_contribution_attrs)
+      def sponsor_contribution_attributes=(sponsor_contribution_attrs)
+        # build_sponsor_contribution(sponsor_contribution_attrs)
       end
     end
   end

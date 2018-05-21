@@ -1,12 +1,17 @@
 module BenefitSponsors
   class SponsoredBenefits::SponsorContribution
+
     include Mongoid::Document
+    include Mongoid::Timestamps
+    include Mongoid::Attributes::Dynamic
 
     embedded_in :sponsored_benefit,
       class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
     embeds_many :contribution_levels,
                 class_name: "BenefitSponsors::SponsoredBenefits::ContributionLevel"
 
+
+    accepts_nested_attributes_for :contribution_levels
     # validate :validate_contribution_levels
 
     # def validate_contribution_levels
@@ -15,12 +20,6 @@ module BenefitSponsors
 
     def sic_code
       # Needs to return the most recent SIC CODE value recorded for this sponsorship
-    end
-
-    def contribution_levels=(contribution_level_attrs)
-      contribution_level_attrs.each do |contribution_level_attr|
-        self.contribution_levels.build(contribution_level_attr)
-      end
     end
 
     def self.sponsor_contribution_for(new_product_package)

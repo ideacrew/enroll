@@ -19,6 +19,7 @@ module BenefitSponsors
 
       embeds_many :sponsored_benefits,
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
+      accepts_nested_attributes_for :sponsored_benefits
 
       delegate :benefit_sponsor_catalog, to: :benefit_application
       delegate :rate_schedule_date,      to: :benefit_application
