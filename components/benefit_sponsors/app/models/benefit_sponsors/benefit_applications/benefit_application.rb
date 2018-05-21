@@ -305,20 +305,8 @@ module BenefitSponsors
         census_employee.assign_to_benefit_package(default_benefit_package, assignment_on)
       end
 
-      def renew_employee_coverages
-        benefit_packages.each do |current_benefit_package|
-          predecessor_benefit_package = benefit_package.predecessor
-          predecessor_effective_date  = predecessor_application.effective_period.min
-
-          predecessor_benefit_package.assigned_census_employees_on(predecessor_effective_date).each  do |census_employee|
-
-            if predessor_benefit_package_assignment = employee.benefit_package_assignment_on(predecessor_effective_date)
-              if new_benefit_package_assignment = employee.benefit_package_assignment_on(predecessor_effective_date)
-                census_employee.renew_coverage(predecessor_benefit_package_assignment, new_benefit_package_assignment)
-              end
-            end
-          end
-        end
+      def renew_employee_benefits
+        benefit_packages.each{ |benefit_package| benefit_package.renew_employee_benefits }
       end
 
       def refresh(new_benefit_sponsor_catalog)

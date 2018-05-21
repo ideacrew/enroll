@@ -2,12 +2,20 @@ module BenefitSponsors
   module Enrollments
     class EnrollmentRenewalFactory
 
-      def self.call(base_enrollment, new_benefit_package_assignment)
-        new(base_enrollment, new_benefit_package_assignment).renewal_enrollment
+      def self.call(base_enrollment, new_benefit_package)
+        new(base_enrollment, new_benefit_package).renewal_enrollment
       end
 
-      def initialize(base_enrollment, new_benefit_package_assignment)
+      def initialize(base_enrollment, new_benefit_package)
         @base_enrollment = base_enrollment
+
+        benefit_group_assignment = base_enrollment.benefit_group_assignment
+        return if benefit_group_assignment.blank?
+
+        census_employee = benefit_group_assignment.census_employee
+        new_benefit_package_assignment = census_employee.benefit_group_assignment_for(benefit_package)
+        return if new_benefit_package_assignment.blank?
+
         @new_benefit_package_assignment = new_benefit_package_assignment
         @new_effective_on = @new_benefit_package_assignment.start_on
 

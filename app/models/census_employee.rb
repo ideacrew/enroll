@@ -191,8 +191,10 @@ class CensusEmployee < CensusMember
     )
   end
 
-  def renew_coverage(predecessor_benefit_package_assignment, new_benefit_package_assignment)
-    predecessor_benefit_package_assignment.renew_employee_coverage(new_benefit_package_assignment)
+  def benefit_package_assignment_for(benefit_package)
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect{ |assignment| 
+      assignment.benefit_package_id == benefit_package.id
+    }
   end
 
   def benefit_package_assignment_on(effective_date)
