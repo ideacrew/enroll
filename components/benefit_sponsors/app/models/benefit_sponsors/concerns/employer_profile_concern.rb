@@ -93,6 +93,10 @@ module BenefitSponsors
         active_benefit_sponsorship.renewing_published_benefit_application
       end
 
+      def latest_benefit_application
+        renewal_benefit_application || current_benefit_application
+      end
+
       def active_benefit_sponsorship
         organization.active_benefit_sponsorship rescue nil
       end
