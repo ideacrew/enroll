@@ -52,9 +52,9 @@ module BenefitMarkets
 
       validate :product_package_kinds
 
-      index({ hios_id: 1, "active_period.min": 1, "active_period.max": 1, name: 1 })
-      index({ "active_period.min": 1, "active_period.max": 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
-      index({ csr_variant_id: 1}, {sparse: true})
+      index({ hios_id: 1, "active_period.min": 1, "active_period.max": 1, name: 1 }, {name: "products_health_product_hios_active_period_name_index"})
+      index({ "active_period.min": 1, "active_period.max": 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 }, {name: "product_health_product_active_market_coverage_kind_nationwide_name_index"})
+      index({ csr_variant_id: 1}, {sparse: true, name: "product_health_products_csr_variant_index"})
 
       scope :standard_plans,      ->{ where(is_standard_plan: true) }
 
