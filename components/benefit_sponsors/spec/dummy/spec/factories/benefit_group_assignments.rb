@@ -1,12 +1,7 @@
 FactoryGirl.define do
   factory :benefit_group_assignment, class: 'BenefitGroupAssignment' do
-    benefit_group
-    start_on { benefit_group.plan_year.start_on }
+    benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
+    start_on { benefit_group.effective_period.min }
     is_active true
-
-    trait :coverage_selected do
-      hbx_enrollment
-      aasm_state "coverage_selected"
-    end
   end
 end

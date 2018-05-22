@@ -16,10 +16,6 @@ FactoryGirl.define do
     association :employer_profile, factory: :benefit_sponsors_organizations_aca_shop_dc_employer_profile, strategy: :build
     association :benefit_sponsorship, factory: [:benefit_sponsors_benefit_sponsorship, :with_market_profile], strategy: :build
 
-    before(:create) do |instance|
-      FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
-    end
-
     transient do
       benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
       renewal_benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
@@ -44,6 +40,7 @@ FactoryGirl.define do
     trait :blank_email do
       email nil
     end
+
     trait :termination_details do
       # aasm_state "employment_terminated"
       employment_terminated_on {TimeKeeper.date_of_record.last_month}
@@ -69,16 +66,16 @@ FactoryGirl.define do
       end
     end
 
-    factory :benefit_sponsors_census_employee_with_active_assignment do
-      after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
+    trait :with_active_assignment do
+      after(:build) do |census_employee, evaluator|
+        build(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 
-    factory :benefit_sponsors_census_employee_with_active_and_renewal_assignment do
+    trait :with_active_and_renewal_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
-        create(:benefit_group_assignment, benefit_group: evaluator.renewal_benefit_group, census_employee: census_employee, is_active: false)
+        build(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
+        build(:benefit_group_assignment, benefit_group: evaluator.renewal_benefit_group, census_employee: census_employee, is_active: false)
       end
     end
   end

@@ -18,6 +18,11 @@ class BenefitGroupAssignment
   field :is_active, type: Boolean, default: true
   field :activated_at, type: DateTime
 
+
+  def benefit_group=(benefit_package)
+    self.benefit_group_id = benefit_package.id
+  end
+
   aasm do
     state :initialized, initial: true
     state :coverage_selected
