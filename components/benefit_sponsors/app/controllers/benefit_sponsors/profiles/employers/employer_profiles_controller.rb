@@ -24,6 +24,8 @@ module BenefitSponsors
             when 'benefits'
               @benefit_applications = @employer_profile.benefit_applications
             when 'documents'
+              @datatable = Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
+              load_documents
             when 'employees'
               @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
               # @current_plan_year = @employer_profile.show_plan_year
@@ -82,6 +84,14 @@ module BenefitSponsors
           @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
           @employer_profile = @organization.employer_profile
           render file: 'public/404.html', status: 404 if @employer_profile.blank?
+        end
+
+        def load_documents
+          if @employer_profile.employer_attestation.present?
+            @documents = @employer_profile.employer_attestation.employer_attestation_documents
+          else
+            @employer_profile.build_employer_attestation
+          end
         end
 
         def default_url
