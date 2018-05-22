@@ -28,9 +28,7 @@ module BenefitMarkets
       # Essential Health Benefit (EHB) percentage
       field :ehb,                         type: Float,    default: 0.0
       field :is_standard_plan,            type: Boolean,  default: false
-      field :is_reference_plan_eligible,  type: Boolean,  default: false
 
-      field :provider_directory_url,      type: String
       field :rx_formulary_url,            type: String
 
 

@@ -26,6 +26,14 @@ module BenefitSponsors
       delegate :pricing_calculator, to: :product_package, allow_nil: true
       delegate :contribution_calculator, to: :product_package, allow_nil: true
 
+      validate :product_package_exists
+
+      def product_package_exists
+        if product_package.blank?
+          self.errors.add(:base => "Unable to find mappable product package")
+        end
+      end
+
       def product_kind
         self.class.name.demodulize.split('SponsoredBenefit')[0].downcase.to_sym
       end

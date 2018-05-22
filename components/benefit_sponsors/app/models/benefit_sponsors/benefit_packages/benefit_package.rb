@@ -102,6 +102,7 @@ module BenefitSponsors
       def renew_employee_benefit(census_employee)
         predecessor_benefit_package = benefit_package.predecessor
 
+        # Check if already renewed
         enrollments = census_employee.enrollments.by_benefit_sponsorship(benefit_sponsorship)
                         .by_enrollment_period(predecessor_benefit_package.effective_period)
                         .enrolled_and_waived
@@ -110,7 +111,7 @@ module BenefitSponsors
           enrollment = enrollments.by_coverage_kind(product_kind).first
           
           if is_renewal_benefit_available?(enrollment)
-            enrollment.renew_benefit(self, enrollment.product.renewal_product)
+            enrollment.renew_benefit(self)
           end
         end
       end
