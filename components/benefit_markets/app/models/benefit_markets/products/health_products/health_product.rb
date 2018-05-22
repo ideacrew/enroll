@@ -40,10 +40,6 @@ module BenefitMarkets
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct"
 
-      embeds_one  :sbc_document, as: :documentable,
-                  :class_name => "::Document"
-
-
       validates_presence_of :hios_id, :health_plan_kind, :ehb
 
       validates_numericality_of :ehb, greater_than: 0.0, less_than_or_equal_to: 1.0, allow_nil: false
