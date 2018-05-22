@@ -52,6 +52,10 @@ module BenefitSponsors
       def display_sic_field_for_employer?
         Settings.aca.employer_has_sic_field
       end
+
+      def employer_attestation_is_enabled?
+        Settings.aca.employer_attestation
+      end
     end
   end
 end

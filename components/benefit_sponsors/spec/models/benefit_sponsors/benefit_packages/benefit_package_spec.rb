@@ -1,62 +1,24 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitPackages::BenefitPackage, type: :model, :dbclean => :after_each do
-    pending "add some examples to (or delete) #{__FILE__}"
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
 
     describe ".renew" do
-      context "when a valid new benefit package passed to an existing benefit package for renewal" do
-
-        let(:renewal_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-        let(:current_effective_date)  { renewal_effective_date.prev_year }
-        let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
-
-        let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
-
-        let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                                      benefit_market: benefit_market,
-                                                      title: "SHOP Benefits for #{current_effective_date.year}",
-                                                      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
-                                                    )}
-
-        let!(:renewal_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                                        benefit_market: benefit_market,
-                                                        title: "SHOP Benefits for #{renewal_effective_date.year}",
-                                                        application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
-                                                      )}
-
-        let(:benefit_sponsorship)             { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
-                                                        benefit_market: benefit_market) }
-
-        let(:initial_application)             { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
-                                                        benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
-
+      context "when passed renewal benefit package to current benefit package for renewal" do
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
-        let(:single_issuer_product_package)   { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == :single_issuer } }
-        
-        let(:current_benefit_package)         { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package) }
-        let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
+        let!(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
 
         before do
-          map_products
           current_benefit_package.renew(renewal_benefit_package)
         end
 
-        def map_products
-          current_benefit_market_catalog.product_packages.each do |product_package|
-            if renewal_product_package = renewal_benefit_market_catalog.product_packages.detect{ |p|
-              p.package_kind == product_package.package_kind && p.product_kind == product_package.product_kind }
-
-              renewal_product_package.products.each_with_index do |renewal_product, i|
-                current_product = product_package.products[i]
-                current_product.update(renewal_product_id: renewal_product.id)
-              end
-            end
-          end
-        end
-
-        it "applications should be valid" do
+        it "should have valid applications" do
           initial_application.validate
           renewal_application.validate
           expect(initial_application).to be_valid
@@ -105,6 +67,20 @@ module BenefitSponsors
         it "should renew pricing determinations" do
         end
       end
+    end
+
+    describe '.is_renewal_benefit_available?' do 
+    end
+
+    describe '.sponsored_benefit_for' do 
+    end
+
+    describe '.assigned_census_employees_on' do 
+    end
+
+    describe '.renew_employee_benefits' do
+      include_context "setup employees with benefits"
+
     end
   end
 end

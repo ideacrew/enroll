@@ -476,7 +476,7 @@
       </h4>
       <br/>
       <%=pundit_span EmployerProfile, :updateable?%>
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
       </span>
   <% end %>
   </div>

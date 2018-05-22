@@ -3,14 +3,17 @@ module BenefitSponsors
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
       include SetCurrentUser
       include AASM
+      include ::Config::AcaModelConcern
 
-      MARKET_KINDS = [:individual, :shop, :both]
+      MARKET_KINDS = individual_market_is_enabled? ? [:individual, :shop, :both] : [:shop]
 
-      MARKET_KINDS_OPTIONS = {
+      ALL_MARKET_KINDS_OPTIONS = {
         "Individual & Family Marketplace ONLY" => "individual",
         "Small Business Marketplace ONLY" => "shop",
         "Both – Individual & Family AND Small Business Marketplaces" => "both"
       }
+
+      MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
       field :entity_kind, type: Symbol
       field :market_kind, type: Symbol
@@ -80,7 +83,7 @@ module BenefitSponsors
       end
 
       def market_kinds
-        BrokerAgencyProfile::MARKET_KINDS_OPTIONS
+        MARKET_KINDS_OPTIONS
       end
 
       def language_options

@@ -1,0 +1,9 @@
+--- !ruby/object:BenefitMarkets::Locations::CountyZip
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROGXIhPTb5Zo0E
+  zip: 01583
+  county_name: Worcester
+  state: MA
+__selected_fields: 

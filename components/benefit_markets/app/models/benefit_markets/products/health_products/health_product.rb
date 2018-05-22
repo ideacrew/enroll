@@ -28,9 +28,7 @@ module BenefitMarkets
       # Essential Health Benefit (EHB) percentage
       field :ehb,                         type: Float,    default: 0.0
       field :is_standard_plan,            type: Boolean,  default: false
-      field :is_reference_plan_eligible,  type: Boolean,  default: false
 
-      field :provider_directory_url,      type: String
       field :rx_formulary_url,            type: String
 
 
@@ -41,10 +39,6 @@ module BenefitMarkets
       belongs_to  :catastrophic_age_off_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct"
-
-      embeds_one  :sbc_document, as: :documentable,
-                  :class_name => "::Document"
-
 
       validates_presence_of :hios_id, :health_plan_kind, :ehb
 

@@ -214,5 +214,8 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
 puts "importing security questions complete"
 puts "*"*80
 
+if Settings.site.key.to_s == "cca"
+  require File.join(File.dirname(__FILE__),'seedfiles', 'cca','cca_seed')
+end
 
 puts "End of Seed Data"

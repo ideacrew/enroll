@@ -95,7 +95,7 @@ class MigrateMaProducts < Mongoid::Migration
               }.merge(shared_attributes))
             else
               BenefitMarkets::Products::DentalProducts::DentalProduct.create!({
-                product_package_kinds: ::BenefitMarkets::DentalProducts::PRODUCT_PACKAGE_KINDS
+                product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
               }.merge(shared_attributes))
             end
           end
