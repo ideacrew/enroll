@@ -297,7 +297,7 @@ module BenefitSponsors
         end
 
         benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |employee|
-          assign_default_benefit_package(census_employee)
+          assign_to_default_benefit_package(census_employee)
         end
       end
 
