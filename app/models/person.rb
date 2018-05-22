@@ -133,7 +133,7 @@ class Person
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
-  accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
+  accepts_nested_attributes_for :addresses, allow_destroy: true
   accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| Email.new(addy).blank? }
 
   validates_presence_of :first_name, :last_name
