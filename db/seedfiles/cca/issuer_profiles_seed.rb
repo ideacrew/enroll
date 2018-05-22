@@ -5,6 +5,7 @@ Mongoid::Migration.say_with_time("Load MA Issuer Profiles") do
     loaded_class = ::BenefitSponsors::Organizations::ExemptOrganization
     yaml_str = File.read(f_name)
     data = YAML.load(yaml_str)
+    data.new_record = true
     data.save!
   end
 end
