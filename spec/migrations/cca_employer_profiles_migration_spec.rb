@@ -135,6 +135,7 @@ describe "CcaEmployerProfilesMigration" do
       ce = CensusEmployee.where(employer_profile_id: old_profile.id).first
       nce = CensusEmployee.where(benefit_sponsors_employer_profile_id: migrated_profile.id).first
       expect(ce).to eq(nce)
+      expect(nce.benefit_sponsorship_id).to eq(@migrated_organizations.first.benefit_sponsorships.first.id)
     end
   end
   after(:all) do
