@@ -22,6 +22,7 @@ module BenefitSponsors
           else
             case @tab
             when 'benefits'
+              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
               @benefit_applications = @employer_profile.benefit_applications
             when 'documents'
             when 'employees'
