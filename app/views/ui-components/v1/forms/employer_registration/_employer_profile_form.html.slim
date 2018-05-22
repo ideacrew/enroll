@@ -6,7 +6,6 @@
       |
         Before we get started, we need to confirm the primary point of contact for your business. Please confirm that the name and email address listed below are correct, update the information or provide the name and email address for your primary point of contact. When you're finished, select 'Confirm'.
         If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
-      
 fieldset.mt-2
   = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
     = render partial: './ui-components/v1/forms/employer_registration/staff_role_information', locals: {f: f}
