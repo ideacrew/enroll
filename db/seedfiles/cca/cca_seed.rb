@@ -1,11 +1,5 @@
-puts "Loading MA sites"
-require File.join(File.dirname(__FILE__), "sites_seed")
-puts "*"*80
-
-puts "Loading MA issuer profiles"
-require File.join(File.dirname(__FILE__), "issuer_profiles_seed")
-puts "*"*80
-
-puts "Loading MA contribution models"
-require File.join(File.dirname(__FILE__),'..', 'ma_employer_pricing_and_contribution_models')
-puts "*"*80
+require File.expand_path(File.join(File.dirname(__FILE__), "site_seed"))
+require File.expand_path(File.join(File.dirname(__FILE__), "issuer_profiles_seed"))
+Mongoid::Migration.say_with_time("Loading MA Contribution and Pricing Models") do
+  require File.expand_path(File.join(File.dirname(__FILE__),'..', 'ma_employer_pricing_and_contribution_models'))
+end
