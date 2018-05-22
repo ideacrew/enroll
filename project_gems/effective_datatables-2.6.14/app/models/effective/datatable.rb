@@ -175,7 +175,11 @@ module Effective
     def global_search_string
       global_search_options = params[:search]
       return nil if global_search_options.blank?
-      global_search_options[:value]
+      if global_search_options.class == String
+      global_search_options
+      else
+      global_search_options[:value]        
+      end
     end
 
     protected
