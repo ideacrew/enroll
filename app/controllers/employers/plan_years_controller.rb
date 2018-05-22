@@ -116,7 +116,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    binding.pry
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
@@ -469,7 +468,7 @@ class Employers::PlanYearsController < ApplicationController
       "benefit_groups_attributes" =>
       {
         "0" => {
-           "title"=>"2015 Employer Benefits",
+           "title"=>"Place Holder",
            # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",
            "reference_plan_id" => params[:reference_plan_id],
            "relationship_benefits_attributes" => params[:relation_benefits],

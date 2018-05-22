@@ -8,7 +8,7 @@
       <v-flex sm4>
         <v-card class="mb-2 blue lighten-5">
           <v-card-title primary-title>
-            <h3 class="titile mb-0">{{selectedPlan.plan}}</h3>
+            <h3 class="titile mb-0">{{selectedPlan.carrier_name}} {{selectedPlan.plan}}</h3>
           </v-card-title>
           <v-card-text>
             Contribution %<br>
@@ -43,7 +43,7 @@
         </v-card>
         <v-card>
           <v-card-text>
-            <span class="text-md-center"><v-btn v-on:click="request_calc()" color="error" dark large>Show Estimated Cost</v-btn></span>
+            <span class="text-md-center"><v-btn v-show="selectedEmployer.legal_name != 'none' && selectedPlan.plan != false" v-on:click="request_calc()" color="error" dark large>Show Estimated Cost</v-btn></span>
           </v-card-text>
         </v-card>
         <v-card  class="my-2">
@@ -56,16 +56,17 @@
       </v-flex>
       <v-flex sm8>
         <v-card>
-          <v-container fluid justify-start style="max-height: 500px" class="scroll-y">
+          <v-container fluid justify-start style="max-height: 480px" class="scroll-y">
             <v-layout row wrap>
               <v-flex ma-1 v-for="(plan, index) in plan_filter"
                                 v-on:click="selectedPlan = plan; clearAllPlans(plan)"
                                 :key="index">
-                <v-card hover width="340" v-bind:class="plan.render_class">
+                <v-card hover width="340">
                   <v-card-title primary-title>
-                    <h3 class="title mb-0">{{plan.plan}}</h3>
+                    <img v-bind:src="plan.image_url" width="80px" class="pb-2">
+                    <h3 class="title mb-0">{{plan.carrier_name}} : {{plan.plan}}</h3>
                   </v-card-title>
-                  <v-card-text>
+                  <v-card-text v-bind:class="plan.render_class">
                     <p>Metal Level: {{plan.metal_level}}</p>
                     <p>Nationwide: {{plan.nationwide}}</p>
                   </v-card-text>
@@ -78,6 +79,24 @@
   </v-flex>
 </v-layout>
 </v-container>
+
+<v-layout row justify-center>
+  <v-dialog v-model="dialog" persistent max-width="600">
+    <v-card>
+      <v-card-title class="headline mb-3">Cost Estimator for&nbsp;<span class="blue--text">{{selectedEmployer.legal_name}}</span></v-card-title>
+      <v-card-text>
+        <div class="body-2 py-3">Employer Cost: ${{costs.employer_amount}}</div>
+        <span class="body-2 py-3">Min/Max Employee Cost: ${{costs.min_employee_cost}} / {{costs.max_employee_cost}}</span><br>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue darken-1" flat @click.native="dialog = false">Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</v-layout>
+
+
   </div>
 </template>
 
@@ -85,8 +104,9 @@
 export default {
   data: function() {
     return {
+      dialog: false,
       package: {
-        start_on: '2018-07-01',
+        start_on: '2018-06-01',
         plan_option_kind: 'metal_level',
         coverage_type: '.health',
         benefit_group_index: '0',
@@ -110,7 +130,8 @@ export default {
       children_contribution: 0,
       selected_class: 'blue lighten-5',
       filter_metal_level: ['Silver','Gold','Platinum'],
-      filter_nationwide: ['Yes','No']
+      filter_nationwide: ['Yes','No'],
+      costs: {}
     }
   },
   created: function () {
@@ -133,15 +154,18 @@ export default {
   },
   methods: {
       request_calc() {
-        console.log('calculate')
+        console.log('... ' + this.selectedEmployer.id)
+        this.package.employer_profile_id = this.selectedEmployer.id
+        this.package.reference_plan_id = this.selectedPlan.id
+        console.log('calculate for Employer ... ' + this.package.employer_profile_id)
         this.$http.post("/vue/calc", this.package)
         .then(response => {
-          console.log(this.tabs);
-          this.tabs = response.body
-          console.log('---')
-          console.log(this.tabs);
-        }, response => {
+          this.dialog = true
+          this.costs = response.body
           console.error(response.body);
+        }, response => {
+          console.log('error')
+          //console.error(response.body);
         });
       },
       load_carrier_names() {
