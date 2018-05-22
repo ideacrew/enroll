@@ -20,11 +20,12 @@ module BenefitSponsors
     let!(:product_package_kind) { :single_issuer }
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
     let!(:product) { product_package.products.first }
+    let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
 
     let(:benefit_package_params) {
       {
         :benefit_application_id => benefit_application.id.to_s,
-        :title => "First Benefit Package",
+        :title => "New Benefit Package",
         :description => "New Model Benefit Package",
         :probation_period_kind => "first_of_month",
         :sponsored_benefits_attributes => sponsored_benefits_params
@@ -38,7 +39,7 @@ module BenefitSponsors
           :product_package_kind => product_package_kind,
           :kind => "health",
           :product_option_choice => issuer_profile.legal_name,
-          :reference_plan_id => product.id
+          :reference_plan_id => product.id.to_s
         }
       }
     }
@@ -51,9 +52,9 @@ module BenefitSponsors
 
     let(:contribution_levels_attributes) {
       {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95.0"},
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85.0"},
-        "2" => {:is_offered => "true", :display_name => "Child", :contribution_factor => "75.0"}
+        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
+        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
+        "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
       }
     }
 
@@ -80,29 +81,140 @@ module BenefitSponsors
       end
     end
 
-    # describe "POST create", dbclean: :after_each do
+    describe "POST create", dbclean: :after_each do
 
-    #   it "should redirect" do
-    #     sign_in_and_do_create
-    #     expect(response).to have_http_status(:redirect)
-    #   end
+      context "when create is successful" do
 
-    #   it "should redirect to benefit packages new" do
-    #     sign_in_and_do_create
-    #     expect(response.location.include?("benefit_packages/new")).to be_truthy
-    #   end
+        before do
+          sign_in_and_do_create
+        end
 
-    #   it "should initialize form" do
-    #     sign_in_and_do_create
-    #     expect(assigns(:benefit_application_form).class).to eq form_class
-    #   end
+        it "should initialize form" do
+          expect(assigns(:benefit_package_form).class).to eq form_class
+        end
 
-    #   def sign_in_and_do_create
-    #     sign_in user
-    #     post :create, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :benefit_package => benefit_package_params      
-    #   end
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
 
-    # end
+        it "should redirect to benefit packages new" do
+          expect(response.location.include?("edit")).to be_truthy
+        end
 
+        it "should return flash notices" do
+          expect(flash[:notice]).to match(/Benefit Package successfully created/)
+        end
+      end
+
+      context "when create fails" do
+
+        before do
+          product.service_area.delete
+          sign_in_and_do_create
+        end
+
+        it "should redirect to new" do
+          sign_in_and_do_create
+          expect(response).to render_template("new")
+        end
+
+        it "should return error messages" do
+          sign_in_and_do_create
+          expect(flash[:error]).to match("<li>Sponsored benefits is invalid</li>")
+        end
+      end
+
+      def sign_in_and_do_create
+        sign_in user
+        post :create, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :benefit_package => benefit_package_params
+      end
+
+    end
+
+    describe "GET edit" do
+
+      def sign_in_and_do_edit
+        sign_in user
+        get :edit, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s
+      end
+
+      it "should be a success" do
+        sign_in_and_do_edit
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should initialize form" do
+        sign_in_and_do_edit
+        expect(form_class).to respond_to(:for_edit)
+      end
+
+      it "should render edit template" do
+        sign_in_and_do_edit
+        expect(response).to render_template("edit")
+      end
+    end
+
+    describe "POST update" do
+
+      let(:contribution_levels) { benefit_package.sponsored_benefits[0].sponsor_contribution.contribution_levels }
+
+      let(:contribution_levels_attributes) {
+        {
+          "0" => {:id => contribution_levels[0].id.to_s, :is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
+          "1" => {:id => contribution_levels[1].id.to_s, :is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
+          "2" => {:id => contribution_levels[2].id.to_s, :is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+        }
+      }
+
+      def sign_in_and_do_update
+        sign_in user
+        post :update, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params
+      end
+
+      before do
+        sanitize_params
+      end
+
+      def sanitize_params
+        sponsored_benefits_params["0"].merge!({
+          id: benefit_package.sponsored_benefits[0].id.to_s
+        })
+      end
+
+      context "when update is success" do
+
+        it "should be a success" do
+          sign_in_and_do_update
+          # expect(response).to have_http_status(:success)
+        end
+
+        it "should initialize the form" do
+          sign_in_and_do_update
+          expect(assigns(:benefit_package_form).class).to eq form_class
+        end
+
+        it "should redirect to benefit applications" do
+          sign_in_and_do_update
+          expect(response.location.include?("benefit_applications")).to be_truthy
+        end
+      end
+
+      context "when update fails" do
+
+        before do
+          product.service_area.delete
+        end
+
+        it "should redirect to edit" do
+          sign_in_and_do_update
+          expect(response).to render_template("edit")
+        end
+
+        it "should return error messages" do
+          sign_in_and_do_update
+          expect(flash[:error]).to match(/Sponsored benefits is invalid/)
+        end
+      end
+    end
   end
 end

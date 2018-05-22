@@ -66,9 +66,9 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
             @new_profile = initialize_new_profile(old_org, old_profile_params)
             new_organization = initialize_new_organization(old_org, site)
 
-            benefit_sponsorship = @new_profile.add_benefit_sponsorship
-            benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
-            benefit_sponsorship.save!
+            @benefit_sponsorship = @new_profile.add_benefit_sponsorship
+            @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
+            @benefit_sponsorship.save!
 
             raise Exception unless new_organization.valid?
             new_organization.save!
@@ -200,7 +200,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.link_existing_census_employees_to_new_profile(census_employees_with_old_id)
-    census_employees_with_old_id.update_all(benefit_sponsors_employer_profile_id: @new_profile.id)
+    census_employees_with_old_id.update_all(benefit_sponsors_employer_profile_id: @new_profile.id, benefit_sponsorship_id: @benefit_sponsorship.id)
   end
 
   def self.find_site(site_key)
