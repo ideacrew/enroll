@@ -31,8 +31,6 @@ module BenefitSponsors
 
         ENROLLED_STATE ||= %w(enrolled suspended)
 
-        CONTACT_METHODS ||= ["Only Electronic communications", "Paper and Electronic communications"]
-
         # Workflow attributes
         field :aasm_state, type: String, default: "applicant"
 
@@ -66,10 +64,6 @@ module BenefitSponsors
         ENTITY_KINDS
       end
 
-      def contact_methods
-        CONTACT_METHODS
-      end
-
       def policy_class
         "BenefitSponsors::EmployerProfilePolicy"
       end
@@ -81,6 +75,26 @@ module BenefitSponsors
 
       def benefit_applications
         parent.active_benefit_sponsorship.benefit_applications
+      end
+
+      def active_benefit_application
+        benefit_applications.where(:aasm_state => :active).first
+      end
+
+      def current_benefit_application
+        active_benefit_sponsorship.current_benefit_application
+      end
+
+      def renewal_benefit_application
+        active_benefit_sponsorship.renewal_benefit_application
+      end
+
+      def renewing_published_benefit_application
+        active_benefit_sponsorship.renewing_published_benefit_application
+      end
+
+      def latest_benefit_application
+        renewal_benefit_application || current_benefit_application
       end
 
       def active_benefit_sponsorship
@@ -144,6 +158,41 @@ module BenefitSponsors
         rescue Exception => e
           Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
         end
+      end
+
+      def published_benefit_application
+        renewing_published_benefit_application || current_benefit_application
+      end
+
+      # Deprecate below methods in future
+
+      def renewing_plan_year
+        warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
+        renewal_benefit_application
+      end
+
+      def show_plan_year
+        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        published_benefit_application
+      end
+
+      def renewing_plan_year
+        warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
+        renewal_benefit_application
+      end
+
+      def plan_years
+        warn "[Deprecated] Instead use benefit_applications" unless Rails.env.test?
+        benefit_applications
+      end
+
+      def active_plan_year
+        active_benefit_application
+      end
+
+      def published_plan_year
+        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        published_benefit_application
       end
 
       alias_method :broker_agency_profile=, :hire_broker_agency

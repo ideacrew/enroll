@@ -11,7 +11,7 @@ FactoryGirl.define do
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
-    association :employer_profile, strategy: :build
+    association :employer_profile, strategy: :create
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)

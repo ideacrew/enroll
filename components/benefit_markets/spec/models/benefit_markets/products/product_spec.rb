@@ -44,7 +44,7 @@ module BenefitMarkets
       context "with no arguments" do
         subject { described_class.new }
 
-        it "should not be valid" do 
+        it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
         end
@@ -125,7 +125,52 @@ module BenefitMarkets
           expect(subject).to be_valid
         end
       end
+    end
 
+
+    context "Comparing Products" do
+      let(:base_product)      { described_class.new(**params) }
+
+      context "and they are the same" do
+        let(:compare_product) { described_class.new(**params) }
+
+        it "they should be different instances" do
+          expect(base_product.id).to_not eq compare_product.id
+        end
+
+        it "should match" do
+          expect(base_product <=> compare_product).to eq 0
+        end
+      end
+
+      context "and the attributes are different" do
+        let(:compare_product)              { described_class.new(**params) }
+
+        before { compare_product.benefit_market_kind = :aca_individual }
+
+        it "should not match" do
+          expect(base_product).to_not eq compare_product
+        end
+
+        it "the base_product should be less than the compare_product" do
+          expect(base_product <=> compare_product).to eq(-1)
+        end
+      end
+
+      context "and the premium_tables are different" do
+        let(:compare_product)   { described_class.new(**params) }
+        let(:new_premium_table) { FactoryGirl.build(:benefit_markets_products_premium_table) }
+
+        before { compare_product.premium_tables << new_premium_table }
+
+        it "should not match" do
+          expect(base_product).to_not eq compare_product
+        end
+
+        it "the base_product should be lest than the compare_product" do
+          expect(base_product <=> compare_product).to eq(-1)
+        end
+      end
     end
 
 
@@ -190,11 +235,11 @@ module BenefitMarkets
                                             effective_period: quarter_2,
                                             rating_area: rating_area,
                                             premium_tuples: [premium_q2_age_20, premium_q2_age_30, premium_q2_age_40],
-                                          ) }        
+                                          ) }
         let(:effective_date_q2)         { updated_premium_table_q2.effective_period.min }
 
         it "should replace the existing premium_table" do
-          subject.update_premium_table(updated_premium_table_q2)          
+          subject.update_premium_table(updated_premium_table_q2)
           expect(subject.premium_table_effective_on(effective_date_q2).premium_tuples).to include(premium_q2_age_30)
         end
 
@@ -207,7 +252,7 @@ module BenefitMarkets
                                               effective_period: quarter_3,
                                               rating_area: rating_area,
                                               premium_tuples: [premium_q3_age_20, premium_q3_age_30, premium_q3_age_40],
-                                            ) }        
+                                            ) }
 
           let(:effective_date_q3)         { premium_table_q3.effective_period.min }
 

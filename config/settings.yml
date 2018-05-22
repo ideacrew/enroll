@@ -1,5 +1,5 @@
 site:
-  key: :mhc
+  key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
   home_url: "https://enroll.mhc.hbxshop.org"

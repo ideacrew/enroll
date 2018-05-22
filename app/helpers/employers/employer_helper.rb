@@ -134,9 +134,10 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_groups_for_census_employee
+    # TODO
     plan_years = @employer_profile.plan_years.select{|py| (PlanYear::PUBLISHED + ['draft']).include?(py.aasm_state) && py.end_on > TimeKeeper.date_of_record}
     benefit_groups = plan_years.flat_map(&:benefit_groups)
-    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
+    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year.present?
     return benefit_groups, (renewing_benefit_groups || [])
   end
 
@@ -175,6 +176,7 @@ module Employers::EmployerHelper
     return true if user && user.has_hbx_staff_role?
     return false if employer_profile.blank?
 
+    # TODO
     plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
 
     return false if plan_year.blank?

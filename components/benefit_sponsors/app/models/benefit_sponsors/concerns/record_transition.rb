@@ -3,6 +3,7 @@ module BenefitSponsors
     extend ActiveSupport::Concern
 
     included do
+      include AASM
       embeds_many :workflow_state_transitions, as: :transitional
       aasm do
         after_all_transitions :record_transition

@@ -71,9 +71,11 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      has_many    :census_employees,
-                  counter_cache: true,
-                  class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+      has_many    :census_employees
+
+      # has_many    :census_employees,
+      #             counter_cache: true,
+      #             class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
 
       belongs_to  :benefit_market,
                   counter_cache: true,
@@ -129,13 +131,27 @@ module BenefitSponsors
       end
 
       def benefit_sponsor_catalog_for(effective_date)
-        return [] if benefit_market.blank?
-        benefit_market.benefit_sponsor_catalog_for([], effective_date)
+        benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+        benefit_market_catalog.benefit_sponsor_catalog_for(service_area: service_area, effective_date: effective_date)
       end
 
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?
+      end
+      # If there is a gap, it will fall under a new benefit sponsorship
+      # Renewal_benefit_application's predecessor_application is always current benefit application
+      # Latest benefit_application will always be their current benefit_application if no renewal
+      def current_benefit_application
+        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : benefit_applications.order_by(:"created_at".desc).first
+      end
+
+      def renewal_benefit_application
+        benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
+      end
+
+      def renewing_published_benefit_application # TODO -recheck
+        benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
       end
 
       # TODO Refactor (moved from PlanYear)
@@ -157,15 +173,15 @@ module BenefitSponsors
       # Workflow for self service
       aasm do
         state :new, initial: true
-        state :initial_application_approved # Sponsor's first application is submitted and approved
-        state :initial_enrollment_closed    # Sponsor members have successfully completed open enrollment
+        state :initial_application_approved     # Sponsor's first application is submitted and approved
+        state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
         state :initial_enrollment_ineligible
-        state :initial_enrollment_eligible, after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
-                                        #, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-        state :active                   # Sponsor's members are actively enrolled in coverage
-        state :suspended                # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
-        state :terminated               # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
-        state :ineligible               # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
+        state :initial_enrollment_eligible,   after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
+        state :binder_reversed,               after_enter: :publish_binder_reversed
+        state :active                           # Sponsor's members are actively enrolled in coverage
+        state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
+        state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
+        state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
         event :approve_initial_application do
           transitions from: :new, to: :initial_application_approved
@@ -185,8 +201,12 @@ module BenefitSponsors
           transitions from: :initial_enrollment_eligible,  to: :initial_enrollment_ineligible
         end
 
-        event :pay_binder do
+        event :credit_binder do
           transitions from: :initial_enrollment_closed, to: :initial_enrollment_eligible
+        end
+
+        event :reverse_binder do
+          transitions from: :initial_enrollment_eligible, to: :initial_enrollment_closed
         end
 
         event :begin_coverage do

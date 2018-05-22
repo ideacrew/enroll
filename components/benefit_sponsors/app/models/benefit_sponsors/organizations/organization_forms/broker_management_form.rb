@@ -59,7 +59,7 @@ module BenefitSponsors
       protected
 
       def self.resolve_service
-        Services::BrokerManagementService.new
+        BenefitSponsors::Services::BrokerManagementService.new
       end
 
       def service

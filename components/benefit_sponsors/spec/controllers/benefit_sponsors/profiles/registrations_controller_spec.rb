@@ -6,7 +6,7 @@ module BenefitSponsors
     routes { BenefitSponsors::Engine.routes }
 
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
     let(:person) { FactoryGirl.create(:person) }
     let(:edit_user) { FactoryGirl.create(:user, :person => person)}
     let(:user) { FactoryGirl.create(:user) }

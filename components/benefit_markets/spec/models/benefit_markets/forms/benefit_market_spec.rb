@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  module Factories
+  module Forms
     RSpec.describe BenefitMarket, type: :model do
       shared_context "params", :shared_context => :metadata do
         let(:params) do

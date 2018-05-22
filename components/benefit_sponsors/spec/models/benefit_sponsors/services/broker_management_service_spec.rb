@@ -5,7 +5,8 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
-    let!(:employer_profile) { FactoryGirl.create(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_dc_employer_profile)}
+    let(:employer_profile) { organization.employer_profile }
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'both', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
@@ -23,6 +24,12 @@ module BenefitSponsors
                                               termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'))
                                             }
 
+    before :each do
+      broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
+      broker_agency_profile1.approve!
+      organization.reload
+    end
+
     describe 'for assign_agencies' do
       before :each do
         subject.assign_agencies(broker_management_form_create)
@@ -34,6 +41,12 @@ module BenefitSponsors
 
       it 'should succesfully assigns broker agency to the employer_profile' do
         expect(employer_profile.active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
+      end
+
+      it 'should send a message to the broker' do
+        person1.reload
+        expect(person1.inbox.messages.map(&:body)).to include("You have been selected as a broker by #{employer_profile.legal_name}")
+        expect(person1.inbox.messages.map(&:subject)).to include("You have been select as the Broker")
       end
     end
 

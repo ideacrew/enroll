@@ -12,16 +12,21 @@ module BenefitSponsors
       field :probation_period_kind, type: Symbol
       field :is_default, type: Boolean, default: false
       field :is_active, type: Boolean, default: true
+      field :predecessor_id, type: BSON::ObjectId
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
 
       embeds_many :sponsored_benefits,
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
+      accepts_nested_attributes_for :sponsored_benefits
 
       delegate :benefit_sponsor_catalog, to: :benefit_application
+      delegate :rate_schedule_date,      to: :benefit_application
+      delegate :effective_period,        to: :benefit_application
+      delegate :predecessor_application, to: :benefit_application
 
-      delegate :rate_schedule_date, to: :benefit_application
+      delegate :start_on, :end_on, to: :benefit_application
 
       # # Length of time New Hire must wait before coverage effective date
       # field :probation_period, type: Range
@@ -41,6 +46,16 @@ module BenefitSponsors
         
       end
 
+      def eligible_on(date_of_hire)
+        # TODO
+        Date.today
+      end
+
+      def effective_on_for(date_of_hire)
+        # TODO
+        Date.today
+      end
+
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
         sponsored_benefits << new_sponsored_benefit
@@ -50,6 +65,17 @@ module BenefitSponsors
         sponsored_benefits.delete(sponsored_benefit)
       end
 
+      def predecessor
+        return @predecessor if defined? @predecessor
+        @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
+      end
+
+      def predecessor=(old_benefit_package)
+        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+        self.predecessor_id = old_benefit_package._id
+        @predecessor = old_benefit_package
+      end
+
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
           title: title,
@@ -57,31 +83,82 @@ module BenefitSponsors
           probation_period_kind: probation_period_kind,
           is_default: is_default
         })
+
+        new_benefit_package.predecessor = self
         
-        sponsored_benefits.each do |sponsored_benefit|
-
-          new_benefit_sponsor_catalog = new_benefit_package.benefit_sponsor_catalog
-          new_product_package = new_benefit_sponsor_catalog.product_packages
-                  .by_kind(sponsored_benefit.product_package_kind)
-                  .by_product_kind(sponsored_benefit.product_kind)[0]
-
-
-          if new_product_package.present?
-            reference_product = sponsored_benefit.reference_product
-            if reference_product && reference_product.renewal_product.present?
-
-              # product_package = sponsored_benefit.product_package
-              # renewal_products = product_package.active_products.collect{|product| product.renewal_product}.compact
-
-              # if renewal_products.present? && (new_product_package.products & renewal_products).any?
-              new_sponsored_benefit = sponsored_benefit.renew(new_product_package)
-              new_benefit_package.add_sponsored_benefit(new_sponsored_benefit)
-              # end
-            end
-          end
+        sponsored_benefits.each do |sponsored_benefit| 
+          new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
 
         new_benefit_package
+      end
+
+      def renew_employee_benefits
+        assigned_census_employees_on(effective_period.min).each do |census_employee|
+          renew_employee_benefit(census_employee)
+        end
+      end
+
+      def renew_employee_benefit(census_employee)
+        predecessor_benefit_package = benefit_package.predecessor
+
+        # Check if already renewed
+        enrollments = census_employee.enrollments.by_benefit_sponsorship(benefit_sponsorship)
+                        .by_enrollment_period(predecessor_benefit_package.effective_period)
+                        .enrolled_and_waived
+
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
+          enrollment = enrollments.by_coverage_kind(product_kind).first
+          
+          if is_renewal_benefit_available?(enrollment)
+            enrollment.renew_benefit(self)
+          end
+        end
+      end
+
+      def is_renewal_benefit_available?(enrollment)
+        return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
+        sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
+        sponsored_benefit.product_package.products.include?(enrollment.product.renewal_product)
+      end
+
+      def sponsored_benefit_for(coverage_kind)
+        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind}
+      end
+
+      def assigned_census_employees_on(effective_date)
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_terminated
+      end
+
+      def self.find(id)
+        ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
+          
+          if benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(:"benefit_packages._id" => id).first
+            benefit_application.benefit_packages.find(id)
+          else
+            nil
+          end
+        end
+      end
+
+      # Scenario 1: sponsored_benefit is missing (because product not available during renewal)
+      def refresh
+
+      end 
+
+      #  Scenario 2: sponsored_benefit is present
+      def refresh!(new_benefit_sponsor_catalog)
+        # construct sponsored benefits again 
+        # compare them with old ones
+
+        sponsored_benefits.each do |sponsored_benefit|
+          current_product_package = sponsored_benefit.product_package
+          new_product_package = new_benefit_sponsor_catalog.product_package_for(sponsored_benefit)
+
+          if current_product_package != new_product_package
+            sponsored_benefit.refresh
+          end
+        end
       end
 
       def disable_benefit_package
@@ -130,6 +207,13 @@ module BenefitSponsors
           sponsored_benefit = sponsored_benefits.build
           sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
         end
+      end
+
+      # Deprecate below methods in future
+
+      def plan_year
+        warn "[Deprecated] Instead use benefit_application" unless Rails.env.test?
+        benefit_application
       end
     end
   end

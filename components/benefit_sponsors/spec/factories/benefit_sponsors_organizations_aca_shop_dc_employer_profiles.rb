@@ -11,6 +11,7 @@ FactoryGirl.define do
 
     after(:build) do |profile, evaluator|
       profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :primary)
+      profile.parent.benefit_sponsorships << build(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: profile.parent)
     end
   end
 end

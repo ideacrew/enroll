@@ -14,7 +14,7 @@ describe "CcaEmployerProfilesMigration" do
   describe ".up" do
 
     before :all do
-      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)
+      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization,:with_benefit_market, site_key: :cca)
 
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       FactoryGirl.create(:broker_agency_profile, organization: organization)
@@ -40,6 +40,7 @@ describe "CcaEmployerProfilesMigration" do
       @test_version = @path.split("/").last.split("_").first
     end
 
+    #TODO modify it after employer profile script is updated according to benefit sponsorship
     it "should match total migrated organizations" do
       silence_stream(STDOUT) do
         Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
@@ -124,12 +125,17 @@ describe "CcaEmployerProfilesMigration" do
                                                                dba: old_organization.dba, fein: old_organization.fein)
     end
 
+    it "should have benefit sponsorship created" do
+      expect(@migrated_organizations.first.benefit_sponsorships.count).to eq 1
+    end
+
     it "should match all migrated attributes for census employee" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
       ce = CensusEmployee.where(employer_profile_id: old_profile.id).first
       nce = CensusEmployee.where(benefit_sponsors_employer_profile_id: migrated_profile.id).first
       expect(ce).to eq(nce)
+      expect(nce.benefit_sponsorship_id).to eq(@migrated_organizations.first.benefit_sponsorships.first.id)
     end
   end
   after(:all) do

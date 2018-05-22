@@ -12,11 +12,11 @@ module BenefitMarkets
     embedded_in :packagable, polymorphic: true
 
     field :application_period,      type: Range
-    field :product_kind,            type: Symbol
-    field :kind,                    type: Symbol
+    field :benefit_kind,            type: Symbol #, default: :aca_individual  # => :aca_shop
+    field :product_kind,            type: Symbol # [ :health, :dental, :etc ]
+    field :package_kind,            type: Symbol # [:single_issuer, :metal_level, :single_product]
     field :title,                   type: String, default: ""
     field :description,             type: String, default: ""
-    field :multiplicity,            type: Boolean, default: true
 
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
@@ -27,12 +27,44 @@ module BenefitMarkets
     embeds_one  :pricing_model, 
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    validates_presence_of :product_kind, :kind, :application_period
+    validates_presence_of :product_kind, :benefit_kind, :package_kind, :application_period
     validates_presence_of :title, :allow_blank => false
 
-    scope :by_kind,             ->(kind){ where(kind: kind) }
+    scope :by_benefit_kind,     ->(kind){ where(benefit_kind: kind) }
+    scope :by_package_kind,     ->(package_kind) { where(package_kind: package_kind) }
     scope :by_product_kind,     ->(product_kind) { where(product_kind: product_kind) }
 
+    delegate :pricing_calculator, to: :pricing_model, allow_nil: true
+    delegate :contribution_calculator, to: :contribution_model, allow_nil: true
+
+    def comparable_attrs
+      [
+        :application_period, :product_kind, :package_kind, :title, :description, :product_multiplicity,
+        :contribution_model, :pricing_model
+        ]
+    end
+
+    # Define Comparable operator
+    # If instance attributes are the same, compare Products
+    def <=>(other)
+      if comparable_attrs.all? { |attr| eval(attr.to_s) == eval("other.#{attr.to_s}") }
+        if products == other.products
+          0
+        else
+          products <=> other.products
+        end
+      else
+        other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
+      end
+    end
+
+    def product_multiplicity
+      if [:single_issuer, :metal_level, :multi_product].include? :package_kind
+        :multiple
+      else
+        :single
+      end
+    end
 
     def effective_date
       packagable.effective_date || application_period.min
@@ -42,12 +74,9 @@ module BenefitMarkets
       packagable.benefit_market_kind
     end
 
-    def product_multiplicity
-      multiplicity ? :multiple : :single
-    end
-
+    # Returns only products for which rates available
     def active_products
-      products.active_on(effective_date)
+      products.effective_with_premiums_on(effective_date)
     end
 
     def issuer_profiles
@@ -62,12 +91,12 @@ module BenefitMarkets
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
     def load_embedded_products(service_area, effective_date)
-      products = benefit_market_products_available_for(service_area, effective_date)
+      benefit_market_products_available_for(service_area, effective_date)
     end
 
     # Query products from database applicable to this product package
     def all_benefit_market_products
-      raise StandardError, "Product package is invalid" unless benefit_market_kind.present? && application_period.present? && product_kind.present? && kind.present?
+      raise StandardError, "Product package is invalid" unless benefit_market_kind.present? && application_period.present? && product_kind.present? && package_kind.present?
       return @all_benefit_market_products if defined?(@all_benefit_market_products)
       @all_benefit_market_products = BenefitMarkets::Products::Product.by_product_package(self)
     end
@@ -88,7 +117,7 @@ module BenefitMarkets
     end
 
     def products_for_plan_option_choice(product_option_choice)
-      if kind == :metal_level
+      if package_kind == :metal_level
         products.by_metal_level(product_option_choice)
       else
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(product_option_choice)

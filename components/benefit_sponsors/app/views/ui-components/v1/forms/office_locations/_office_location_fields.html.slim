@@ -16,11 +16,11 @@
         |
           Please select a Address kind.
     
-    .col-md-12.mb-3
+    .col-md-12.mb-3.mt-2
       label for="inputAddress2" Address 2
       = f.text_field :address_2, id:'inputAddress2', class:'form-control'
 
-      .row.pl-3.pr-3.mt-2
+      .mt-2
         .col-md-6.pl-0
           label for="inputCity" City
           = f.text_field :city, required:'true', id:'inputCity', class:'form-control'
@@ -42,7 +42,7 @@
             |
               Please provide a valid zip.
 
-h5.enroll-lead.mb-2 Phone
+h3.mb-2 Phone
 
 = f.fields_for :phone, errors: {} do |f|
   = f.hidden_field :id, value: f.object.id if f.object.id

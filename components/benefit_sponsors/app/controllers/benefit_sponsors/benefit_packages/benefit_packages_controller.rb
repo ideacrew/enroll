@@ -22,8 +22,8 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(params.permit(:id, :benefit_application_id))
-        if @benefit_package_form.update_attributes(benefit_package_params)
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
+        if @benefit_package_form.update
           redirect_to benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
         else
           flash[:error] = error_messages(@benefit_package_form)
@@ -39,6 +39,7 @@ module BenefitSponsors
         else
           falsh[:error] = error_messages(@benefit_package_form)
           # render :
+        end
       end
 
       private
@@ -50,9 +51,9 @@ module BenefitSponsors
       def benefit_package_params
         params.require(:benefit_package).permit(
           :title, :description, :probation_period_kind, :benefit_application_id,
-          :sponsored_benefits_attributes => [:kind, :product_option_choice, :product_package_kind, :reference_plan_id,
+          :sponsored_benefits_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
-              :contribution_levels_attributes => [ :is_offered, :display_name, :contribution_factor]
+              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor]
             ]
           ]
         )

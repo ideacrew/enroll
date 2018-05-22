@@ -1,18 +1,10 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitApplications::BenefitApplication, dbclean: :after_each, type: :model do
+  RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
-    # let(:profile)               { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile)  }
     let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
-
-    # let(:date_range) { (Date.today..1.year.from_now) }
-    # let(:profile)                   { BenefitSponsors::Organizations::HbxProfile.new() }
-    # let(:site)                      { BenefitSponsors::Site.new(site_key: :dc) }
-    # let(:owner_organization)        { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: "DC", fein: 123456789, site: site, profiles: [profile])}
-    # let(:benefit_market)            { create :benefit_markets_benefit_market, site: site, kind: 'aca_shop' }
-
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
@@ -20,7 +12,6 @@ module BenefitSponsors
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
-
 
     let(:recorded_service_area)     { ::BenefitMarkets::Locations::ServiceArea.new }
     let(:recorded_rating_area)      { ::BenefitMarkets::Locations::RatingArea.new }
@@ -34,7 +25,6 @@ module BenefitSponsors
         recorded_rating_area:   recorded_rating_area,
       }
     end
-
 
     context "A new model instance" do
      it { is_expected.to be_mongoid_document }
@@ -121,7 +111,7 @@ module BenefitSponsors
       end
     end
 
-    describe "Extending a BenefitApplication's open_enrollment_period" do
+    describe "Extending a BenefitApplication's open_enrollment_period", :dbclean => :after_each do
       let(:benefit_application)   { described_class.new(**params) }
 
       context "and the application can transition to open enrollment state" do
@@ -203,7 +193,6 @@ module BenefitSponsors
       end
     end
 
-
     describe "Scopes", :dbclean => :after_each do
       let(:this_year)                       { TimeKeeper.date_of_record.year }
       let(:march_effective_date)            { Date.new(this_year,3,1) }
@@ -222,22 +211,23 @@ module BenefitSponsors
 
       it "should find applications by Effective date start" do
         expect(BenefitApplications::BenefitApplication.all.size).to eq 5
-        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(march_effective_date).to_a).to eq march_sponsors
-        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(april_effective_date).to_a).to eq april_sponsors
+        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(march_effective_date).to_a.sort).to eq march_sponsors.sort
+        expect(BenefitApplications::BenefitApplication.effective_date_begin_on(april_effective_date).to_a.sort).to eq april_sponsors.sort
       end
 
       it "should find applications by Open Enrollment begin" do
-        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(march_open_enrollment_begin_on)).to eq march_sponsors
-        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(april_open_enrollment_begin_on)).to eq april_sponsors
+        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(march_open_enrollment_begin_on).to_a.sort).to eq march_sponsors.sort
+        expect(BenefitApplications::BenefitApplication.open_enrollment_begin_on(april_open_enrollment_begin_on).to_a.sort).to eq april_sponsors.sort
       end
 
       it "should find applications by Open Enrollment end" do
-        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(march_open_enrollment_end_on)).to eq march_sponsors
-        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(april_open_enrollment_end_on)).to eq april_sponsors
+        # binding.pry
+        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(march_open_enrollment_end_on).to_a.sort).to eq march_sponsors.sort
+        expect(BenefitApplications::BenefitApplication.open_enrollment_end_on(april_open_enrollment_end_on).to_a.sort).to eq april_sponsors.sort
       end
 
       it "should find applications in Plan Draft status" do
-        expect(BenefitApplications::BenefitApplication.plan_design_draft).to eq march_sponsors + april_sponsors
+        expect(BenefitApplications::BenefitApplication.plan_design_draft.to_a.sort).to eq (march_sponsors + april_sponsors).sort
       end
 
       it "should find applications with chained scopes" do
@@ -359,7 +349,7 @@ module BenefitSponsors
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
 
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period) }
-        let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date) }
+        let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
 
         it "should generate renewal application" do
           renewal_application = initial_application.renew(benefit_sponsor_catalog)

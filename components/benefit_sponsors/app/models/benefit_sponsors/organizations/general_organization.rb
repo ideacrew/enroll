@@ -3,9 +3,6 @@ module BenefitSponsors
   module Organizations
     class GeneralOrganization < BenefitSponsors::Organizations::Organization
 
-      # Federal Employer ID Number
-      field :fein, type: String
-
       # validates_presence_of :entity_kind, :legal_name
 
       # validates :entity_kind,

@@ -183,15 +183,21 @@ class HbxEnrollment
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
-  scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]) }
+  scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]).order(created_at: :desc) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
-  scope :non_expired_and_non_terminated,            -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
+  scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
+  scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
+  scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
+
   embeds_many :workflow_state_transitions, as: :transitional
+
+  belongs_to  :benefit_sponsorship,
+              class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -252,6 +258,11 @@ class HbxEnrollment
       to_state: aasm.to_state,
       event: aasm.current_event
     )
+  end
+
+  def renew_benefit(new_benefit_package)
+    enrollment = BenefitSponsors::Enrollments::EnrollmentRenewalFactory.call(self, new_benefit_package)
+    enrollment.save
   end
 
   class << self

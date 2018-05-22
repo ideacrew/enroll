@@ -1,6 +1,6 @@
 class MigrateMaServiceAreas < Mongoid::Migration
   def self.up
-    if Settings.site.key.to_s == "mhc"
+    if Settings.site.key.to_s == "cca"
       say_with_time("Build service areas linking them with county_zips") do
 
         old_carrier_profile_map = {}

@@ -10,6 +10,8 @@ class EmployerAttestation
   embeds_many :employer_attestation_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
 
+  embedded_in :profile, class_name: "BenefitSponsors::Organizations::Profile"
+
   aasm do
     state :unsubmitted, initial: true
     state :submitted

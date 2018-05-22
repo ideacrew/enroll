@@ -1,15 +1,15 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe SponsoredBenefits::FixedPercentSponsorContribution do
+  RSpec.describe BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution do
     describe "given a contribution level with no contribution factor" do
-      let(:contribution_level) do
-        SponsoredBenefits::ContributionLevel.new(
+      let(:contribution_level) {
+        {
           :display_name => "Employee Only",
           :order => 1,
           :contribution_unit_id => 1
-        )
-      end
+        }
+      }
 
       subject do
         SponsoredBenefits::FixedPercentSponsorContribution.new(
@@ -24,15 +24,15 @@ module BenefitSponsors
     end
 
     describe "given a contribution level with no contribution < minimum" do
-      let(:contribution_level) do
-        SponsoredBenefits::ContributionLevel.new(
+      let(:contribution_level) {
+        {
           :display_name => "Employee Only",
           :order => 1,
           :contribution_unit_id => 1,
           :min_contribution_factor => 0.3,
           :contribution_factor => 0.29
-        )
-      end
+        }
+      }
 
       subject do
         SponsoredBenefits::FixedPercentSponsorContribution.new(
