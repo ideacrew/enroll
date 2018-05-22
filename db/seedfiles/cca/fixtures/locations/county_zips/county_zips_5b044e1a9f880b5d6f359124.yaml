@@ -1,0 +1,11 @@
+--- !ruby/object:BenefitMarkets::Locations::CountyZip
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROGp+IC11vNZEk
+  county_name: Berksire
+  zip: '01235'
+  state: MA
+  updated_at: 2018-05-22 17:06:34.019000000 Z
+  created_at: 2018-05-22 17:06:34.019000000 Z
+__selected_fields: 

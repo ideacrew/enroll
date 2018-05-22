@@ -1,0 +1,9 @@
+--- !ruby/object:BenefitMarkets::Locations::CountyZip
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROGXIhPTb5Zoz7
+  zip: '02561'
+  county_name: Barnstable
+  state: MA
+__selected_fields: 
