@@ -32,10 +32,11 @@ module BenefitSponsors
                                                         benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
 
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
+
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
         let(:single_issuer_product_package)   { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == :single_issuer } }
         
-        let(:current_benefit_package)         { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package) }
+        let(:current_benefit_package)         { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: single_issuer_product_package, benefit_application: initial_application) }
         let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
 
         before do
