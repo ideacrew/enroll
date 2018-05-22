@@ -150,8 +150,8 @@ module Observers
       if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
         document = new_model_event.klass_instance
         if new_model_event.event_key == :initial_employer_invoice_available
-          employer_profile = document.documentable
-          trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
+          employer_profile = document.documentable.employer_profile
+          deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
         end
       end
     end
