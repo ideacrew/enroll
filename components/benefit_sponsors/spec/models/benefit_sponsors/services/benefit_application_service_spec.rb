@@ -38,8 +38,13 @@ module BenefitSponsors
       let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
       let!(:invalid_benefit_application) { BenefitSponsors::BenefitApplications::BenefitApplication.new }
-      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
-      let(:benefit_market) {benefit_sponsorship.benefit_market}
+
+      let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+      let!(:benefit_market) { site.benefit_markets.first }
+      let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+
       let!(:benefit_application_factory) { BenefitSponsors::BenefitApplications::BenefitApplicationFactory }
 
       context "has received valid attributes" do
