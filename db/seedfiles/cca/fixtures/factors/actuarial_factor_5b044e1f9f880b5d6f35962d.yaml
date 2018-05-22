@@ -1,0 +1,39 @@
+--- !ruby/object:BenefitMarkets::Products::ActuarialFactors::CompositeRatingTierActuarialFactor
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROH5+IC11vNZYt
+  _type: BenefitMarkets::Products::ActuarialFactors::CompositeRatingTierActuarialFactor
+  active_year: 2017
+  default_factor_value: 1.0
+  issuer_profile_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROH5+IC11vNZLa
+  updated_at: 2018-05-22 17:06:39.985000000 Z
+  created_at: 2018-05-22 17:06:39.985000000 Z
+  actuarial_factor_entries:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROH5+IC11vNZYu
+    factor_key: employee_only
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROH5+IC11vNZYv
+    factor_key: employee_and_spouse
+    factor_value: 2.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROH5+IC11vNZYw
+    factor_key: employee_and_one_or_more_dependents
+    factor_value: 1.85
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROH5+IC11vNZYx
+    factor_key: family
+    factor_value: 2.85

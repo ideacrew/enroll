@@ -35,6 +35,6 @@ class ExtractCountyZipsForMa < Mongoid::Migration
   end
 
   def self.down
-    ::BenefitMarkets::Locations::CountyZip.where.delete
+    ::BenefitMarkets::Locations::CountyZip.all.delete
   end
 end
