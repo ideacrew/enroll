@@ -22,4 +22,7 @@
     %citizen_status= "urn:openhbx:terms:v1:citizen_status##{person_demographics.consumer_role.citizen_status}"
   - if person_demographics.consumer_role && person_demographics.consumer_role.is_state_resident
     %is_state_resident= person_demographics.consumer_role.is_state_resident
+  - if person_demographics.indian_tribe_member
+    %tribal_info
+      %tribal_id= person_demographics.tribal_id
   = render :partial => "events/shared/versioned_resource", :object => person_demographics
