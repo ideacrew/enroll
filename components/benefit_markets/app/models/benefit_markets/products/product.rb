@@ -25,7 +25,11 @@ module BenefitMarkets
     field :product_package_kinds, type: Array,          default: []
     field :kind,                  type: Symbol,         default: ->{ product_kind }
     field :premium_ages,          type: Range,          default: 0..65
+    field :provider_directory_url,      type: String
+    field :is_reference_plan_eligible,  type: Boolean,  default: false
 
+    embeds_one  :sbc_document, as: :documentable,
+                :class_name => "::Document"
 
     belongs_to  :service_area,
                 counter_cache: true,
