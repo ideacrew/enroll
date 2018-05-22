@@ -44,20 +44,20 @@ module BenefitMarkets
               inclusion: {in: BENEFIT_MARKET_KINDS, message: "%{value} is not a valid benefit market kind"}
 
 
-    index({ hbx_id: 1 })
+    index({ hbx_id: 1 }, {name: "products_hbx_id_index"})
     index({ "benefit_market_kind" => 1,
             "kind" => 1,
             "product_package_kinds" => 1,
             "application_period.min" => 1,
             "application_period.max" => 1,
             },
-            {name: "product_package"}
+            {name: "products_product_package_date_search_index"}
           )
 
     index({ "premium_tables.rating_area" => 1,
             "premium_tables.effective_period.min" => 1,
             "premium_tables.effective_period.max" => 1 },
-            {name: "premium_tables"}
+            {name: "products_premium_tables_search_index"}
           )
 
     scope :by_product_package,    ->(product_package) { where(
