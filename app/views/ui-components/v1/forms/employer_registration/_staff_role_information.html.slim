@@ -1,35 +1,37 @@
 - if current_user.blank? || current_user.person_id.blank?
+
+  legend Personal Information
   .row
-    .col-md-9.col-sm-9.col-xs-12
-      legend Personal Information
-      .row.no-buffer.row-form-wrapper
-        
-        .col-md-4.col-sm-4.col-xs-12.form-group-lg.no-pd
-          = f.hidden_field :person_id, value: f.object.person_id
-          = f.text_field :first_name, class: "floatlabel form-control interaction-field-control-person-first-name", required: true, placeholder: 'FIRST NAME *'
-        
-        .col-md-4.col-sm-4.col-xs-12.form-group-lg.no-pd
-          = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *'
-        
-        .col-md-4.col-sm-4.col-xs-12.form-group-lg.no-pd
-          = f.date_field :dob, {:class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yyyy', required: true, readonly: defined?(readonly)}
+    .col-md-4
+      = f.hidden_field :person_id, value: f.object.person_id
+      label for="inputFirstName"  First name *
+      = f.text_field :first_name, class: "floatlabel form-control interaction-field-control-person-first-name", required: true, placeholder: 'FIRST NAME *'
+
+    .col-md-4
+      label for="inputLastName"  Last name *
+      = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *'
+
+    .col-md-4
+      label for="inputDob"  Dob *
+      = f.date_field :dob, {:class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yyyy', required: true, readonly: defined?(readonly)}
   <br>
 
   .row
-    .col-md-9.col-sm-9.col-xs-12
-      .row.no-buffer.row-form-wrapper
-        
-        .col-md-3.col-sm-3.col-xs-12.form-group-lg.no-pd
-          = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'EMAIL'
-        
-        .col-md-3.col-sm-3.col-xs-12.form-group-lg.no-pd
-          = f.text_field :area_code, class: "floatlabel form-control interaction-field-control-person-area-code area_code", required: true, placeholder: 'AREA CODE'
-        
-        .col-md-3.col-sm-3.col-xs-12.form-group-lg.no-pd
-          = f.text_field :number, class: "floatlabel form-control interaction-field-control-person-number phone_number7", required: true, placeholder: 'NUMBER'
-        
-        .col-md-3.col-sm-3.col-xs-12.form-group-lg.no-pd
-          = f.text_field :extension, class: "floatlabel form-control interaction-field-control-person-extension", placeholder: 'EXTENSION'
+    .col-md-3
+      label for="inputEmail"  Email *
+      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'EMAIL'
+
+    .col-md-3
+      label for="inputAreaCode"  Area code *
+      = f.text_field :area_code, class: "floatlabel form-control interaction-field-control-person-area-code area_code", required: true, placeholder: 'AREA CODE'
+
+    .col-md-3.col-sm-3
+      label for="inputNumber"  Number *
+      = f.text_field :number, class: "floatlabel form-control interaction-field-control-person-number phone_number7", required: true, placeholder: 'NUMBER'
+
+    .col-md-3
+      label for="inputExtension"  Extension *
+      = f.text_field :extension, class: "floatlabel form-control interaction-field-control-person-extension", placeholder: 'EXTENSION'
 - else
   = f.hidden_field :person_id, value: current_user.person_id
 
