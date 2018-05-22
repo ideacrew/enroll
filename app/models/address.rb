@@ -2,7 +2,6 @@
 class Address
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Attributes::Dynamic
 
   embedded_in :person
   embedded_in :office_location
