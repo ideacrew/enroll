@@ -28,7 +28,6 @@ FactoryGirl.define do
     enforce_er_attest false
     stan_indus_class false
     carrier_filters_enabled false
-    rating_areas [ '1' ]
 
     after :build do |configuration|
       configuration.initial_application_configuration = build :benefit_markets_aca_shop_initial_application_configuration, configuration: configuration
