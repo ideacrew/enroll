@@ -11,6 +11,7 @@ require "sprockets/railtie"
 Bundler.require(*Rails.groups)
 require "devise"
 require "benefit_sponsors"
+require "symmetric-encryption"
 
 module Dummy
   class Application < Rails::Application

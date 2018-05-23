@@ -94,6 +94,10 @@ module BenefitSponsors
       }
     }
 
+    before :each do
+      allow(Settings.site).to receive(:key).and_return(:dc)
+    end
+
     shared_examples_for "initialize registration form" do |action, params, profile_type|
       before do
         user = self.send("#{profile_type}_user")
@@ -174,6 +178,7 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
+            site.benefit_markets.first.save!
             user = self.send("#{profile_type}_user")
             sign_in user if user
             post :create, :agency => self.send("#{profile_type}_params")

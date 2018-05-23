@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :benefit_sponsors_census_employee, class: 'CensusEmployee' do
+
     first_name "Eddie"
     sequence(:last_name) {|n| "Vedder#{n}" }
     dob "1964-10-23".to_date
@@ -9,6 +10,7 @@ FactoryGirl.define do
     hired_on "2015-04-01".to_date
     sequence(:ssn) { |n| 222222220 + n }
     is_business_owner  false
+
     association :address, strategy: :build
     association :email, strategy: :build
     association :employer_profile, factory: :benefit_sponsors_organizations_aca_shop_dc_employer_profile, strategy: :build
@@ -30,7 +32,6 @@ FactoryGirl.define do
         census_employee.census_dependents.create(employee_relationship: 'spouse')
       end
     end
-
 
     trait :owner do
       is_business_owner  true
@@ -76,7 +77,7 @@ FactoryGirl.define do
 
     factory :benefit_sponsors_census_employee_with_active_and_renewal_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:census_employee_with_active_assignment)
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
         create(:benefit_group_assignment, benefit_group: evaluator.renewal_benefit_group, census_employee: census_employee, is_active: false)
       end
     end
