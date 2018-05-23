@@ -254,10 +254,10 @@ end
 
 And /^selects the general agency from dropdown for the employer$/ do
   expect(page).to have_content('EmployerA')
-  find("input[id^='broker_dt_employer_ids_']").click
+  find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Rooxo')]").click
-  find("#assign_general_agency").click
+  find("#assign_general_agency").trigger('click')
 end
 
 Then /^the employer is assigned to general agency$/ do
@@ -354,7 +354,7 @@ end
 Then /^the ga should see the broker$/ do
   expect(page).to have_content('Acarehouse')
   expect(page).to have_selector('.disabled', text: 'Change Broker')
-  expect(page).to have_selector('.disabled', text: 'ROWSE BROKERS')
+  expect(page).to have_selector('.disabled', text: 'Browse Brokers')
 end
 
 When /^the ga click the back link$/ do
@@ -377,10 +377,10 @@ end
 
 And /^selects the GA2 from dropdown for the employer$/ do
   expect(page).to have_content('EmployerA')
-  find("input[id^='broker_dt_employer_ids_']").click
+  find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Zooxy')]").click
-  find("#assign_general_agency").click
+  find("#assign_general_agency").trigger('click')
 end
 
 Then /^the employer has assigned to GA2$/ do
