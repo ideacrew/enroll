@@ -8,6 +8,7 @@ h1 Add Benefit Package
     .form-group
       .col-md-6.col-sm-12
         label for="inputStartOn" Start on
+        = f.hidden_field :benefit_sponsorship_id
         = f.select :start_on, options_for_select(benefit_application_start_dates, selected: formatted_start_on),{:prompt => "SELECT START ON"}, class:'form-control benefit-application-start-date', onchange:'selectedDate(this)', id:'baStartDate'
       .col-md-6.col-sm-12
         label for="inputStartOn" End on
