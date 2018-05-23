@@ -365,12 +365,13 @@ module BenefitSponsors
         state :appealing            # request reversal of negative determination
         ## End optional states for exception processing
 
-        state :enrollment_open      #,       :after_enter => :send_employee_invites          # Approved application has entered open enrollment period
+        state :enrollment_open      # Approved application has entered open enrollment period
+        # :after_enter => :send_employee_invites
         # state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
 
         state :enrollment_closed
-
-        state :enrollment_eligible,   :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
+        state :enrollment_eligible  # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
+        # :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed]
         # Published plan open enrollment has ended and is eligible for coverage,
                                                                           #   but effective date is in future
         # state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
@@ -419,7 +420,9 @@ module BenefitSponsors
           ## TODO update these renewal transitions
           # transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
           # transitions from: :draft, to: :approved,        guard:  :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster]
+        end
 
+        event :review_application do
           transitions from: :draft, to: :pending
         end
 
