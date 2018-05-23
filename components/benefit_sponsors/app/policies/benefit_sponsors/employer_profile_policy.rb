@@ -35,6 +35,10 @@ module BenefitSponsors
       role.permission.modify_employer
     end
 
+    def list_enrollments?
+      premium_statements?
+    end
+
     def can_list_enrollments?
       user.person.hbx_staff_role.permission.list_enrollments
     end
