@@ -27,3 +27,19 @@ function isNumberKey(evt){
     return true;
   }
 }
+
+// Formats dates for Benefit Applications
+function getFormattedDate(date){
+  var new_date = new Date(date)
+  var dd = new_date.getUTCDate();
+  var mm = new_date.getUTCMonth()+1;
+  var yyyy = new_date.getUTCFullYear();
+  if(dd<10) {
+    dd='0'+dd
+  }
+  if(mm<10) {
+    mm='0'+mm
+  }
+  formatted_date = mm+'/'+dd+'/'+yyyy;
+  return formatted_date;
+}
