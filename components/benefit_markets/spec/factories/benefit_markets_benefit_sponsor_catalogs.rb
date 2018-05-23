@@ -8,7 +8,7 @@ FactoryGirl.define do
     effective_period        { effective_date..(effective_date + 1.year - 1.day) }
     open_enrollment_period  { (effective_date - 1.month)..(effective_date - 1.month + 9.days) }
     probation_period_kinds  { [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days] }
-    service_area            { FactoryGirl.build(:benefit_markets_locations_service_area) }
+    service_areas           { [FactoryGirl.build(:benefit_markets_locations_service_area)] }
     sponsor_market_policy   { FactoryGirl.build(:benefit_markets_market_policies_sponsor_market_policy) }
     member_market_policy    { FactoryGirl.build(:benefit_markets_market_policies_member_market_policy) }
     product_packages        { [FactoryGirl.build(:benefit_markets_products_product_package)] }
