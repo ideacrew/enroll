@@ -27,9 +27,10 @@
   <div class="pull-left">
     <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization), class:'btn btn-primary' %>
   </div>
-
-  <div class="pull-right">
-    <%= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id), remote: true, class:'btn btn-primary' %>
-  </div>
+  <% if !can_employee_shop?(f.object.effective_date.try(:to_date)) %>
+    <div class="pull-right">
+      <%= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id), remote: true, class:'btn btn-primary' %>
+    </div>
+  <% end %>
 </div>
 </div>

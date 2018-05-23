@@ -1,4 +1,4 @@
-<% if can_employee_shop?(f.object.effective_date.try(:to_date), nil) %>
+<% if can_employee_shop?(f.object.effective_date.try(:to_date)) %>
  <div class="alert alert-info" role="alert">
    <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= no_rates_error(Settings.site.exchange_name) %></strong>
  </div>
