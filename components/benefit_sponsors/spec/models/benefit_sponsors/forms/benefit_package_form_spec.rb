@@ -17,6 +17,10 @@ module BenefitSponsors
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile }
     let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
 
+    after :all do
+      DatabaseCleaner.clean
+    end
+
     shared_context "params", :shared_context => :metadata do
       let(:benefit_package_params) {
         {
