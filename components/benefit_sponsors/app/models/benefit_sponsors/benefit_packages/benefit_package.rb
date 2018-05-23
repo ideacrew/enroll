@@ -99,6 +99,17 @@ module BenefitSponsors
         end
       end
 
+
+      def probation_period_display_name
+        probation_period_display_texts = {
+          first_of_month: "First of the month following or coinciding with date of hire",
+          first_of_month_after_30_days: "First of the month following 30 days",
+          first_of_month_after_60_days: "First of the month following 60 days"
+        }
+
+        probation_period_display_texts[probation_period_kind]
+      end
+
       def renew_member_benefit(census_employee)
         predecessor_benefit_package = predecessor
 

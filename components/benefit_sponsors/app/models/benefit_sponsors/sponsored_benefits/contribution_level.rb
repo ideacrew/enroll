@@ -20,6 +20,11 @@ module BenefitSponsors
 
       validates_presence_of :display_name, :allow_blank => false
       validates_presence_of :contribution_unit_id, :allow_blank => false
+
+
+      def contribution_pct
+        (contribution_factor * 100)
+      end
     end
   end
 end
