@@ -4,6 +4,7 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :premium_statements]
+        layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
         def show_pending
