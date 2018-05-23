@@ -6,9 +6,9 @@ module BenefitSponsors
       # include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
-      PLAN_DESIGN_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
-      PLAN_DESIGN_DRAFT_STATES      = [:draft] + PLAN_DESIGN_EXCEPTION_STATES.freeze
-      PLAN_DESIGN_APPROVED_STATES   = [:approved].freeze
+      APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
+      APPLICATION_DRAFT_STATES      = [:draft] + APPLICATION_EXCEPTION_STATES.freeze
+      APPLICATION_APPROVED_STATES   = [:approved].freeze
       ENROLLING_STATES              = [:enrollment_open, :enrollment_closed].freeze
       ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible].freeze
       ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
@@ -16,7 +16,7 @@ module BenefitSponsors
       TERMINATED_STATES             = [:denied, :suspended, :terminated, :canceled, :expired].freeze
       EXPIRED_STATES                = [:expired].freeze
 
-      PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + PLAN_DESIGN_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
+      PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
 
       # APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
       # INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
@@ -40,13 +40,13 @@ module BenefitSponsors
       field :waived_summary,          type: Integer,  default: 0
 
       # Sponsor self-reported number of full-time employees
-      field :fte_count,               type: Integer, default: 0
+      field :fte_count,               type: Integer,  default: 0
 
       # Sponsor self-reported number of part-time employess
-      field :pte_count,               type: Integer, default: 0
+      field :pte_count,               type: Integer,  default: 0
 
       # Sponsor self-reported number of Medicare Second Payers
-      field :msp_count,               type: Integer, default: 0
+      field :msp_count,               type: Integer,  default: 0
 
       # Sponsor's Standard Industry Classification code for period covered by this
       # applciation
@@ -98,9 +98,9 @@ module BenefitSponsors
       end
 
       # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
-      scope :plan_design_draft,               ->{ any_in(aasm_state: PLAN_DESIGN_DRAFT_STATES) }
-      scope :plan_design_approved,            ->{ any_in(aasm_state: PLAN_DESIGN_APPROVED_STATES) }
-      scope :plan_design_exception,           ->{ any_in(aasm_state: PLAN_DESIGN_EXCEPTION_STATES) }
+      scope :plan_design_draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+      scope :plan_design_approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
+      scope :plan_design_exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
       scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
       scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
@@ -110,7 +110,7 @@ module BenefitSponsors
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
       scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
-                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
+                                                        :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
                                                             }
 
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -232,7 +232,7 @@ module BenefitSponsors
       end
 
       def is_renewing?
-        predecessor_application.present? && (PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+        predecessor_application.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
       end
 
       def is_renewal_enrolling?
@@ -322,10 +322,13 @@ module BenefitSponsors
         self
       end
 
+      def cancel_enrollments
+      end
+
       def is_event_date_valid?
         today = TimeKeeper.date_of_record
 
-        valid = case aasm_state
+        is_valid = case aasm_state
         when "approved", "draft"
           today >= open_enrollment_period.begin
         when "enrollment_open"
@@ -338,7 +341,7 @@ module BenefitSponsors
           false
         end
 
-        valid
+        is_valid
       end
 
       aasm do
@@ -444,7 +447,7 @@ module BenefitSponsors
 
         # Upon review, application ineligible status overturned and deemed eligible
         event :approve_application do
-          transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :approved
+          transitions from: APPLICATION_EXCEPTION_STATES, to: :approved
         end
 
         event :submit_for_review do
@@ -453,7 +456,7 @@ module BenefitSponsors
 
         # Upon review, submitted application ineligible status verified ineligible
         event :deny_application do
-          transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :denied
+          transitions from: APPLICATION_EXCEPTION_STATES, to: :denied
         end
 
         event :begin_open_enrollment do
@@ -462,7 +465,8 @@ module BenefitSponsors
         end
 
         event :end_open_enrollment do
-          transitions from:   :enrollment_open, to: :enrollment_closed
+          transitions from:   :enrollment_open,
+                      to:     :enrollment_closed
         end
 
         event :approve_enrollment_eligiblity do
@@ -475,8 +479,13 @@ module BenefitSponsors
                       to:     :enrollment_ineligible
         end
 
+        event :reverse_enrollment_eligiblity do
+          transitions from:   :enrollment_eligible,
+                      to:     :enrollment_closed
+        end
+
         event :revert_application do #, :after => :revert_employer_profile_application do
-          transitions from:   [:approved, :denied] + PLAN_DESIGN_EXCEPTION_STATES,
+          transitions from:   [:approved, :denied] + APPLICATION_EXCEPTION_STATES,
                       to:     :draft
         end
 
@@ -487,24 +496,22 @@ module BenefitSponsors
                                   :active,
                                 ],
                       to:     :draft,
-                      after:  [:cancel_enrollments]
+                      after:  :cancel_enrollments
         end
 
         event :activate_enrollment do
           transitions from:   [:enrollment_open, :enrollment_closed, :enrollment_eligible],
-                      to:     :active,
-                      guard:  :can_be_activated?
+                      to:     :active
         end
 
         event :expire do
           transitions from:   [:approved, :enrollment_open, :enrollment_eligible, :active],
-                      to:     :expired,
-                      guard:  :can_be_expired?
+                      to:     :expired
         end
 
         # Enrollment processed stopped due to missing binder payment
         event :cancel do
-          transitions from:   PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES,
+          transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
                       to:     :canceled
         end
 
@@ -536,6 +543,10 @@ module BenefitSponsors
       def benefit_sponsorship_event_subscriber(aasm)
         if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
           approve_enrollment_eligiblity!
+        end
+
+        if aasm.to_state == :binder_reversed
+          reverse_enrollment_eligiblity!
         end
       end
 
