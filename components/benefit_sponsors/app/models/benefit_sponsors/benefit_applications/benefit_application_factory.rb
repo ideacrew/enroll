@@ -17,11 +17,8 @@ module BenefitSponsors
       def initialize(benefit_sponsorship, args)
         @benefit_sponsorship = benefit_sponsorship
         @benefit_application = benefit_sponsorship.benefit_applications.new
-        #TODO: FIX ME
-        recorded_service_area = BenefitMarkets::Locations::ServiceArea.all.first
-        recorded_rating_area = BenefitMarkets::Locations::RatingArea.all.first
-        @benefit_application.recorded_rating_area = recorded_rating_area
-        @benefit_application.recorded_service_area = recorded_service_area
+        @benefit_application.recorded_rating_area = benefit_sponsorship.rating_area
+        @benefit_application.recorded_service_areas = benefit_sponsorship.service_areas
         assign_application_attributes(args)
       end
 

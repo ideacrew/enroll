@@ -13,8 +13,8 @@ module BenefitSponsors
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
 
-    let(:recorded_service_area)     { ::BenefitMarkets::Locations::ServiceArea.new }
-    let(:recorded_rating_area)      { ::BenefitMarkets::Locations::RatingArea.new }
+    let(:recorded_service_areas)     { benefit_sponsorship.service_areas }
+    let(:recorded_rating_area)      { benefit_sponsorship.rating_area }
     let(:benefit_sponsor_catalog)   { FactoryGirl.build(:benefit_markets_benefit_sponsor_catalog) }
 
     let(:params) do
@@ -22,7 +22,7 @@ module BenefitSponsors
         benefit_sponsorship:      benefit_sponsorship,
         effective_period:         effective_period,
         open_enrollment_period:   open_enrollment_period,
-        recorded_service_area:    recorded_service_area,
+        recorded_service_areas:   recorded_service_areas,
         recorded_rating_area:     recorded_rating_area,
         benefit_sponsor_catalog:  benefit_sponsor_catalog,
       }
@@ -71,8 +71,8 @@ module BenefitSponsors
         end
       end
 
-      context "with no recorded_service_area" do
-        subject { described_class.new(params.except(:recorded_service_area)) }
+      context "with no recorded_service_areas" do
+        subject { described_class.new(params.except(:recorded_service_areas)) }
 
         it "should not be valid" do
           subject.validate
@@ -535,7 +535,7 @@ module BenefitSponsors
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],
                               open_enrollment_period: timetable[:open_enrollment_period],
-                              recorded_service_area:  recorded_service_area,
+                              recorded_service_areas:  recorded_service_areas,
                               recorded_rating_area:   recorded_rating_area,
                             )).to be_valid
         end
