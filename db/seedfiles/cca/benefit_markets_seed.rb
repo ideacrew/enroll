@@ -1,4 +1,4 @@
-glob_pattern = File.join(File.dirname(__FILE__), "fixtures", "benefit_market_*.yaml")
+glob_pattern = File.join(File.dirname(__FILE__), "fixtures", "benefit_markets", "*.yaml")
 
 Mongoid::Migration.say_with_time("Load MA Benefit Markets") do
   Dir.glob(glob_pattern).each do |f_name|

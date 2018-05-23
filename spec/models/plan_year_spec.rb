@@ -1020,7 +1020,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   end
 
                   context "greater than 200 employees " do
-                    let(:employee_count)    { 201 }
+                    let(:employee_count)    { Settings.aca.shop_market.small_market_active_employee_limit + 1 }
                     before do
                       allow(workflow_plan_year_with_benefit_group).to receive_message_chain(:enrolled_by_bga, :count).and_return 25
                     end
