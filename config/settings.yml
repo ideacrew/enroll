@@ -119,8 +119,8 @@ aca:
   minimum_family_contribution_percentage: 30
   address_query_county: true
   broker_routing_information: true
-  recaptcha_enabled: true
-  security_questions: true
+  recaptcha_enabled: false
+  security_questions: false
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
