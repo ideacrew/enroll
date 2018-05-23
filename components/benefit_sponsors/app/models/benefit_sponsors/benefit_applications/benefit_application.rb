@@ -106,6 +106,7 @@ module BenefitSponsors
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
       scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
       scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
+      scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
