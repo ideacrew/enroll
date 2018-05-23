@@ -1,0 +1,6045 @@
+--- !ruby/object:BenefitMarkets::Products::ActuarialFactors::SicActuarialFactor
+__selected_fields: 
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROIZ+IC11vNbPM
+  _type: BenefitMarkets::Products::ActuarialFactors::SicActuarialFactor
+  active_year: 2018
+  default_factor_value: 1.0
+  issuer_profile_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROH5+IC11vNZL4
+  updated_at: 2018-05-22 17:06:41.861000000 Z
+  created_at: 2018-05-22 17:06:41.861000000 Z
+  actuarial_factor_entries:
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPN
+    factor_key: '0111'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPO
+    factor_key: '0112'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPP
+    factor_key: '0115'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPQ
+    factor_key: '0116'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPR
+    factor_key: 0119
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPS
+    factor_key: '0131'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPT
+    factor_key: '0132'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPU
+    factor_key: '0133'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPV
+    factor_key: '0134'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPW
+    factor_key: 0139
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPX
+    factor_key: '0161'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPY
+    factor_key: '0171'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPZ
+    factor_key: '0172'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPa
+    factor_key: '0173'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPb
+    factor_key: '0174'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPc
+    factor_key: '0175'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPd
+    factor_key: 0179
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPe
+    factor_key: 0181
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPf
+    factor_key: 0182
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPg
+    factor_key: 0191
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPh
+    factor_key: '0211'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPi
+    factor_key: '0212'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPj
+    factor_key: '0213'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPk
+    factor_key: '0214'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPl
+    factor_key: 0219
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPm
+    factor_key: '0241'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPn
+    factor_key: '0251'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPo
+    factor_key: '0252'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPp
+    factor_key: '0253'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPq
+    factor_key: '0254'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPr
+    factor_key: 0259
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPs
+    factor_key: '0271'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPt
+    factor_key: '0272'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPu
+    factor_key: '0273'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPv
+    factor_key: 0279
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPw
+    factor_key: 0291
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPx
+    factor_key: '0711'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPy
+    factor_key: '0721'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbPz
+    factor_key: '0722'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP0
+    factor_key: '0723'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP1
+    factor_key: '0724'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP2
+    factor_key: '0741'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP3
+    factor_key: '0742'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP4
+    factor_key: '0751'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP5
+    factor_key: '0752'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP6
+    factor_key: '0761'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP7
+    factor_key: '0762'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP8
+    factor_key: 0781
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP9
+    factor_key: 0782
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP+
+    factor_key: 0783
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbP/
+    factor_key: 0811
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQA
+    factor_key: 0831
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQB
+    factor_key: 0851
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQC
+    factor_key: 0912
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQD
+    factor_key: 0913
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQE
+    factor_key: 0919
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQF
+    factor_key: 0921
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQG
+    factor_key: 0971
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQH
+    factor_key: '1011'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQI
+    factor_key: '1021'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQJ
+    factor_key: '1031'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQK
+    factor_key: '1041'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQL
+    factor_key: '1044'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQM
+    factor_key: '1061'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQN
+    factor_key: '1081'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQO
+    factor_key: '1094'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQP
+    factor_key: '1099'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQQ
+    factor_key: '1221'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQR
+    factor_key: '1222'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQS
+    factor_key: '1231'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQT
+    factor_key: '1241'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQU
+    factor_key: '1311'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQV
+    factor_key: '1321'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQW
+    factor_key: '1381'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQX
+    factor_key: '1382'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQY
+    factor_key: '1389'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQZ
+    factor_key: '1411'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQa
+    factor_key: '1422'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQb
+    factor_key: '1423'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQc
+    factor_key: '1429'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQd
+    factor_key: '1442'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQe
+    factor_key: '1446'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQf
+    factor_key: '1455'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQg
+    factor_key: '1459'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQh
+    factor_key: '1474'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQi
+    factor_key: '1475'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQj
+    factor_key: '1479'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQk
+    factor_key: '1481'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQl
+    factor_key: '1499'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQm
+    factor_key: '1521'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQn
+    factor_key: '1522'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQo
+    factor_key: '1531'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQp
+    factor_key: '1541'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQq
+    factor_key: '1542'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQr
+    factor_key: '1611'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQs
+    factor_key: '1622'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQt
+    factor_key: '1623'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQu
+    factor_key: '1629'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQv
+    factor_key: '1711'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQw
+    factor_key: '1721'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQx
+    factor_key: '1731'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQy
+    factor_key: '1741'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQz
+    factor_key: '1742'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ0
+    factor_key: '1743'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ1
+    factor_key: '1751'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ2
+    factor_key: '1752'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ3
+    factor_key: '1761'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ4
+    factor_key: '1771'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ5
+    factor_key: '1781'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ6
+    factor_key: '1791'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ7
+    factor_key: '1793'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ8
+    factor_key: '1794'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ9
+    factor_key: '1795'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ+
+    factor_key: '1796'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbQ/
+    factor_key: '1799'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRA
+    factor_key: '2011'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRB
+    factor_key: '2013'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRC
+    factor_key: '2015'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRD
+    factor_key: '2021'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRE
+    factor_key: '2022'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRF
+    factor_key: '2023'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRG
+    factor_key: '2024'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRH
+    factor_key: '2026'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRI
+    factor_key: '2032'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRJ
+    factor_key: '2033'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRK
+    factor_key: '2034'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRL
+    factor_key: '2035'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRM
+    factor_key: '2037'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRN
+    factor_key: '2038'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRO
+    factor_key: '2041'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRP
+    factor_key: '2043'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRQ
+    factor_key: '2044'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRR
+    factor_key: '2045'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRS
+    factor_key: '2046'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRT
+    factor_key: '2047'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRU
+    factor_key: '2048'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRV
+    factor_key: '2051'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRW
+    factor_key: '2052'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRX
+    factor_key: '2053'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRY
+    factor_key: '2061'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRZ
+    factor_key: '2062'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRa
+    factor_key: '2063'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRb
+    factor_key: '2064'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRc
+    factor_key: '2066'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRd
+    factor_key: '2067'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRe
+    factor_key: '2068'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRf
+    factor_key: '2074'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRg
+    factor_key: '2075'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRh
+    factor_key: '2076'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRi
+    factor_key: '2077'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRj
+    factor_key: '2079'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRk
+    factor_key: '2082'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRl
+    factor_key: '2083'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRm
+    factor_key: '2084'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRn
+    factor_key: '2085'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRo
+    factor_key: '2086'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRp
+    factor_key: '2087'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRq
+    factor_key: '2091'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRr
+    factor_key: '2092'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRs
+    factor_key: '2095'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRt
+    factor_key: '2096'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRu
+    factor_key: '2097'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRv
+    factor_key: '2098'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRw
+    factor_key: '2099'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRx
+    factor_key: '2111'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRy
+    factor_key: '2121'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbRz
+    factor_key: '2131'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR0
+    factor_key: '2141'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR1
+    factor_key: '2211'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR2
+    factor_key: '2221'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR3
+    factor_key: '2231'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR4
+    factor_key: '2241'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR5
+    factor_key: '2251'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR6
+    factor_key: '2252'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR7
+    factor_key: '2253'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR8
+    factor_key: '2254'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR9
+    factor_key: '2257'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR+
+    factor_key: '2258'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbR/
+    factor_key: '2259'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSA
+    factor_key: '2261'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSB
+    factor_key: '2262'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSC
+    factor_key: '2269'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSD
+    factor_key: '2273'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSE
+    factor_key: '2281'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSF
+    factor_key: '2282'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSG
+    factor_key: '2284'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSH
+    factor_key: '2295'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSI
+    factor_key: '2296'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSJ
+    factor_key: '2297'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSK
+    factor_key: '2298'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSL
+    factor_key: '2299'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSM
+    factor_key: '2311'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSN
+    factor_key: '2321'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSO
+    factor_key: '2322'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSP
+    factor_key: '2323'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSQ
+    factor_key: '2325'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSR
+    factor_key: '2326'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSS
+    factor_key: '2329'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbST
+    factor_key: '2331'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSU
+    factor_key: '2335'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSV
+    factor_key: '2337'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSW
+    factor_key: '2339'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSX
+    factor_key: '2341'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSY
+    factor_key: '2342'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSZ
+    factor_key: '2353'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSa
+    factor_key: '2361'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSb
+    factor_key: '2369'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSc
+    factor_key: '2371'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSd
+    factor_key: '2381'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSe
+    factor_key: '2384'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSf
+    factor_key: '2385'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSg
+    factor_key: '2386'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSh
+    factor_key: '2387'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSi
+    factor_key: '2389'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSj
+    factor_key: '2391'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSk
+    factor_key: '2392'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSl
+    factor_key: '2393'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSm
+    factor_key: '2394'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSn
+    factor_key: '2395'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSo
+    factor_key: '2396'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSp
+    factor_key: '2397'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSq
+    factor_key: '2399'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSr
+    factor_key: '2411'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSs
+    factor_key: '2421'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSt
+    factor_key: '2426'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSu
+    factor_key: '2429'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSv
+    factor_key: '2431'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSw
+    factor_key: '2434'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSx
+    factor_key: '2435'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSy
+    factor_key: '2436'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbSz
+    factor_key: '2439'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS0
+    factor_key: '2441'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS1
+    factor_key: '2448'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS2
+    factor_key: '2449'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS3
+    factor_key: '2451'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS4
+    factor_key: '2452'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS5
+    factor_key: '2491'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS6
+    factor_key: '2493'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS7
+    factor_key: '2499'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS8
+    factor_key: '2511'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS9
+    factor_key: '2512'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS+
+    factor_key: '2514'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbS/
+    factor_key: '2515'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTA
+    factor_key: '2517'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTB
+    factor_key: '2519'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTC
+    factor_key: '2521'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTD
+    factor_key: '2522'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTE
+    factor_key: '2531'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTF
+    factor_key: '2541'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTG
+    factor_key: '2542'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTH
+    factor_key: '2591'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTI
+    factor_key: '2599'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTJ
+    factor_key: '2611'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTK
+    factor_key: '2621'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTL
+    factor_key: '2631'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTM
+    factor_key: '2652'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTN
+    factor_key: '2653'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTO
+    factor_key: '2655'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTP
+    factor_key: '2656'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTQ
+    factor_key: '2657'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTR
+    factor_key: '2671'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTS
+    factor_key: '2672'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTT
+    factor_key: '2673'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTU
+    factor_key: '2674'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTV
+    factor_key: '2675'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTW
+    factor_key: '2676'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTX
+    factor_key: '2677'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTY
+    factor_key: '2678'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTZ
+    factor_key: '2679'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTa
+    factor_key: '2711'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTb
+    factor_key: '2721'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTc
+    factor_key: '2731'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTd
+    factor_key: '2732'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTe
+    factor_key: '2741'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTf
+    factor_key: '2752'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTg
+    factor_key: '2754'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTh
+    factor_key: '2759'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTi
+    factor_key: '2761'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTj
+    factor_key: '2771'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTk
+    factor_key: '2782'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTl
+    factor_key: '2789'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTm
+    factor_key: '2791'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTn
+    factor_key: '2796'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTo
+    factor_key: '2812'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTp
+    factor_key: '2813'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTq
+    factor_key: '2816'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTr
+    factor_key: '2819'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTs
+    factor_key: '2821'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTt
+    factor_key: '2822'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTu
+    factor_key: '2823'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTv
+    factor_key: '2824'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTw
+    factor_key: '2833'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTx
+    factor_key: '2834'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTy
+    factor_key: '2835'
+    factor_value: 0.943
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbTz
+    factor_key: '2836'
+    factor_value: 0.943
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT0
+    factor_key: '2841'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT1
+    factor_key: '2842'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT2
+    factor_key: '2843'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT3
+    factor_key: '2844'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT4
+    factor_key: '2851'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT5
+    factor_key: '2861'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT6
+    factor_key: '2865'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT7
+    factor_key: '2869'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT8
+    factor_key: '2873'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT9
+    factor_key: '2874'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT+
+    factor_key: '2875'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbT/
+    factor_key: '2879'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUA
+    factor_key: '2891'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUB
+    factor_key: '2892'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUC
+    factor_key: '2893'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUD
+    factor_key: '2895'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUE
+    factor_key: '2899'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUF
+    factor_key: '2911'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUG
+    factor_key: '2951'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUH
+    factor_key: '2952'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUI
+    factor_key: '2992'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUJ
+    factor_key: '2999'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUK
+    factor_key: '3011'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUL
+    factor_key: '3021'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUM
+    factor_key: '3052'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUN
+    factor_key: '3053'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUO
+    factor_key: '3061'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUP
+    factor_key: '3069'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUQ
+    factor_key: '3081'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUR
+    factor_key: '3082'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUS
+    factor_key: '3083'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUT
+    factor_key: '3084'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUU
+    factor_key: '3085'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUV
+    factor_key: '3086'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUW
+    factor_key: '3087'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUX
+    factor_key: '3088'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUY
+    factor_key: '3089'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUZ
+    factor_key: '3111'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUa
+    factor_key: '3131'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUb
+    factor_key: '3142'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUc
+    factor_key: '3143'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUd
+    factor_key: '3144'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUe
+    factor_key: '3149'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUf
+    factor_key: '3151'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUg
+    factor_key: '3161'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUh
+    factor_key: '3171'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUi
+    factor_key: '3172'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUj
+    factor_key: '3199'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUk
+    factor_key: '3211'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUl
+    factor_key: '3221'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUm
+    factor_key: '3229'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUn
+    factor_key: '3231'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUo
+    factor_key: '3241'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUp
+    factor_key: '3251'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUq
+    factor_key: '3253'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUr
+    factor_key: '3255'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUs
+    factor_key: '3259'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUt
+    factor_key: '3261'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUu
+    factor_key: '3262'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUv
+    factor_key: '3263'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUw
+    factor_key: '3264'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUx
+    factor_key: '3269'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUy
+    factor_key: '3271'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbUz
+    factor_key: '3272'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU0
+    factor_key: '3273'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU1
+    factor_key: '3274'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU2
+    factor_key: '3275'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU3
+    factor_key: '3281'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU4
+    factor_key: '3291'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU5
+    factor_key: '3292'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU6
+    factor_key: '3295'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU7
+    factor_key: '3296'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU8
+    factor_key: '3297'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU9
+    factor_key: '3299'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU+
+    factor_key: '3312'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbU/
+    factor_key: '3313'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVA
+    factor_key: '3315'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVB
+    factor_key: '3316'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVC
+    factor_key: '3317'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVD
+    factor_key: '3321'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVE
+    factor_key: '3322'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVF
+    factor_key: '3324'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVG
+    factor_key: '3325'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVH
+    factor_key: '3331'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVI
+    factor_key: '3334'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVJ
+    factor_key: '3339'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVK
+    factor_key: '3341'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVL
+    factor_key: '3351'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVM
+    factor_key: '3353'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVN
+    factor_key: '3354'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVO
+    factor_key: '3355'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVP
+    factor_key: '3356'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVQ
+    factor_key: '3357'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVR
+    factor_key: '3363'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVS
+    factor_key: '3364'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVT
+    factor_key: '3365'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVU
+    factor_key: '3366'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVV
+    factor_key: '3369'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVW
+    factor_key: '3398'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVX
+    factor_key: '3399'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVY
+    factor_key: '3411'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVZ
+    factor_key: '3412'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVa
+    factor_key: '3421'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVb
+    factor_key: '3423'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVc
+    factor_key: '3425'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVd
+    factor_key: '3429'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVe
+    factor_key: '3431'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVf
+    factor_key: '3432'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVg
+    factor_key: '3433'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVh
+    factor_key: '3441'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVi
+    factor_key: '3442'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVj
+    factor_key: '3443'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVk
+    factor_key: '3444'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVl
+    factor_key: '3446'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVm
+    factor_key: '3448'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVn
+    factor_key: '3449'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVo
+    factor_key: '3451'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVp
+    factor_key: '3452'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVq
+    factor_key: '3462'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVr
+    factor_key: '3463'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVs
+    factor_key: '3465'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVt
+    factor_key: '3466'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVu
+    factor_key: '3469'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVv
+    factor_key: '3471'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVw
+    factor_key: '3479'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVx
+    factor_key: '3482'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVy
+    factor_key: '3483'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbVz
+    factor_key: '3484'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV0
+    factor_key: '3489'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV1
+    factor_key: '3491'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV2
+    factor_key: '3492'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV3
+    factor_key: '3493'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV4
+    factor_key: '3494'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV5
+    factor_key: '3495'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV6
+    factor_key: '3496'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV7
+    factor_key: '3497'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV8
+    factor_key: '3498'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV9
+    factor_key: '3499'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV+
+    factor_key: '3511'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbV/
+    factor_key: '3519'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWA
+    factor_key: '3523'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWB
+    factor_key: '3524'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWC
+    factor_key: '3531'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWD
+    factor_key: '3532'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWE
+    factor_key: '3533'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWF
+    factor_key: '3534'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWG
+    factor_key: '3535'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWH
+    factor_key: '3536'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWI
+    factor_key: '3537'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWJ
+    factor_key: '3541'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWK
+    factor_key: '3542'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWL
+    factor_key: '3543'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWM
+    factor_key: '3544'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWN
+    factor_key: '3545'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWO
+    factor_key: '3546'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWP
+    factor_key: '3547'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWQ
+    factor_key: '3548'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWR
+    factor_key: '3549'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWS
+    factor_key: '3552'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWT
+    factor_key: '3553'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWU
+    factor_key: '3554'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWV
+    factor_key: '3555'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWW
+    factor_key: '3556'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWX
+    factor_key: '3559'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWY
+    factor_key: '3561'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWZ
+    factor_key: '3562'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWa
+    factor_key: '3563'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWb
+    factor_key: '3564'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWc
+    factor_key: '3565'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWd
+    factor_key: '3566'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWe
+    factor_key: '3567'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWf
+    factor_key: '3568'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWg
+    factor_key: '3569'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWh
+    factor_key: '3571'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWi
+    factor_key: '3572'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWj
+    factor_key: '3575'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWk
+    factor_key: '3577'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWl
+    factor_key: '3578'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWm
+    factor_key: '3579'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWn
+    factor_key: '3581'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWo
+    factor_key: '3582'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWp
+    factor_key: '3585'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWq
+    factor_key: '3586'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWr
+    factor_key: '3589'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWs
+    factor_key: '3592'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWt
+    factor_key: '3593'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWu
+    factor_key: '3594'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWv
+    factor_key: '3596'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWw
+    factor_key: '3599'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWx
+    factor_key: '3612'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWy
+    factor_key: '3613'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbWz
+    factor_key: '3621'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW0
+    factor_key: '3624'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW1
+    factor_key: '3625'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW2
+    factor_key: '3629'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW3
+    factor_key: '3631'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW4
+    factor_key: '3632'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW5
+    factor_key: '3633'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW6
+    factor_key: '3634'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW7
+    factor_key: '3635'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW8
+    factor_key: '3639'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW9
+    factor_key: '3641'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW+
+    factor_key: '3643'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbW/
+    factor_key: '3644'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXA
+    factor_key: '3645'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXB
+    factor_key: '3646'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXC
+    factor_key: '3647'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXD
+    factor_key: '3648'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXE
+    factor_key: '3651'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXF
+    factor_key: '3652'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXG
+    factor_key: '3661'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXH
+    factor_key: '3663'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXI
+    factor_key: '3669'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXJ
+    factor_key: '3671'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXK
+    factor_key: '3672'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXL
+    factor_key: '3674'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXM
+    factor_key: '3675'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXN
+    factor_key: '3676'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXO
+    factor_key: '3677'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXP
+    factor_key: '3678'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXQ
+    factor_key: '3679'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXR
+    factor_key: '3691'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXS
+    factor_key: '3692'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXT
+    factor_key: '3694'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXU
+    factor_key: '3695'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXV
+    factor_key: '3699'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXW
+    factor_key: '3711'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXX
+    factor_key: '3713'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXY
+    factor_key: '3714'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXZ
+    factor_key: '3715'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXa
+    factor_key: '3716'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXb
+    factor_key: '3721'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXc
+    factor_key: '3724'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXd
+    factor_key: '3728'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXe
+    factor_key: '3731'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXf
+    factor_key: '3732'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXg
+    factor_key: '3743'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXh
+    factor_key: '3751'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXi
+    factor_key: '3761'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXj
+    factor_key: '3764'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXk
+    factor_key: '3769'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXl
+    factor_key: '3792'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXm
+    factor_key: '3795'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXn
+    factor_key: '3799'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXo
+    factor_key: '3812'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXp
+    factor_key: '3821'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXq
+    factor_key: '3822'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXr
+    factor_key: '3823'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXs
+    factor_key: '3824'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXt
+    factor_key: '3825'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXu
+    factor_key: '3826'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXv
+    factor_key: '3827'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXw
+    factor_key: '3829'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXx
+    factor_key: '3841'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXy
+    factor_key: '3842'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbXz
+    factor_key: '3843'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX0
+    factor_key: '3844'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX1
+    factor_key: '3845'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX2
+    factor_key: '3851'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX3
+    factor_key: '3861'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX4
+    factor_key: '3873'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX5
+    factor_key: '3911'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX6
+    factor_key: '3914'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX7
+    factor_key: '3915'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX8
+    factor_key: '3931'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX9
+    factor_key: '3942'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX+
+    factor_key: '3944'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbX/
+    factor_key: '3949'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYA
+    factor_key: '3951'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYB
+    factor_key: '3952'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYC
+    factor_key: '3953'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYD
+    factor_key: '3955'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYE
+    factor_key: '3961'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYF
+    factor_key: '3965'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYG
+    factor_key: '3991'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYH
+    factor_key: '3993'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYI
+    factor_key: '3995'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYJ
+    factor_key: '3996'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYK
+    factor_key: '3999'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYL
+    factor_key: '4011'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYM
+    factor_key: '4013'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYN
+    factor_key: '4111'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYO
+    factor_key: '4119'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYP
+    factor_key: '4121'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYQ
+    factor_key: '4131'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYR
+    factor_key: '4141'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYS
+    factor_key: '4142'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYT
+    factor_key: '4151'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYU
+    factor_key: '4173'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYV
+    factor_key: '4212'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYW
+    factor_key: '4213'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYX
+    factor_key: '4214'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYY
+    factor_key: '4215'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYZ
+    factor_key: '4221'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYa
+    factor_key: '4222'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYb
+    factor_key: '4225'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYc
+    factor_key: '4226'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYd
+    factor_key: '4231'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYe
+    factor_key: '4311'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYf
+    factor_key: '4412'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYg
+    factor_key: '4424'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYh
+    factor_key: '4432'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYi
+    factor_key: '4449'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYj
+    factor_key: '4481'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYk
+    factor_key: '4482'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYl
+    factor_key: '4489'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYm
+    factor_key: '4491'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYn
+    factor_key: '4492'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYo
+    factor_key: '4493'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYp
+    factor_key: '4499'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYq
+    factor_key: '4512'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYr
+    factor_key: '4513'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYs
+    factor_key: '4522'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYt
+    factor_key: '4581'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYu
+    factor_key: '4612'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYv
+    factor_key: '4613'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYw
+    factor_key: '4619'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYx
+    factor_key: '4724'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYy
+    factor_key: '4725'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbYz
+    factor_key: '4729'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY0
+    factor_key: '4731'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY1
+    factor_key: '4741'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY2
+    factor_key: '4783'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY3
+    factor_key: '4785'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY4
+    factor_key: '4789'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY5
+    factor_key: '4812'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY6
+    factor_key: '4813'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY7
+    factor_key: '4822'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY8
+    factor_key: '4832'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY9
+    factor_key: '4833'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY+
+    factor_key: '4841'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbY/
+    factor_key: '4899'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZA
+    factor_key: '4911'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZB
+    factor_key: '4922'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZC
+    factor_key: '4923'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZD
+    factor_key: '4924'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZE
+    factor_key: '4925'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZF
+    factor_key: '4931'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZG
+    factor_key: '4932'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZH
+    factor_key: '4939'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZI
+    factor_key: '4941'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZJ
+    factor_key: '4952'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZK
+    factor_key: '4953'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZL
+    factor_key: '4959'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZM
+    factor_key: '4961'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZN
+    factor_key: '4971'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZO
+    factor_key: '5012'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZP
+    factor_key: '5013'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZQ
+    factor_key: '5014'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZR
+    factor_key: '5015'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZS
+    factor_key: '5021'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZT
+    factor_key: '5023'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZU
+    factor_key: '5031'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZV
+    factor_key: '5032'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZW
+    factor_key: '5033'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZX
+    factor_key: '5039'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZY
+    factor_key: '5043'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZZ
+    factor_key: '5044'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZa
+    factor_key: '5045'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZb
+    factor_key: '5046'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZc
+    factor_key: '5047'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZd
+    factor_key: '5048'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZe
+    factor_key: '5049'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZf
+    factor_key: '5051'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZg
+    factor_key: '5052'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZh
+    factor_key: '5063'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZi
+    factor_key: '5064'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZj
+    factor_key: '5065'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZk
+    factor_key: '5072'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZl
+    factor_key: '5074'
+    factor_value: 0.987
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZm
+    factor_key: '5075'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZn
+    factor_key: '5078'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZo
+    factor_key: '5082'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZp
+    factor_key: '5083'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZq
+    factor_key: '5084'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZr
+    factor_key: '5085'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZs
+    factor_key: '5087'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZt
+    factor_key: '5088'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZu
+    factor_key: '5091'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZv
+    factor_key: '5092'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZw
+    factor_key: '5093'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZx
+    factor_key: '5094'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZy
+    factor_key: '5099'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZz
+    factor_key: '5111'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ0
+    factor_key: '5112'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ1
+    factor_key: '5113'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ2
+    factor_key: '5122'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ3
+    factor_key: '5131'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ4
+    factor_key: '5136'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ5
+    factor_key: '5137'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ6
+    factor_key: '5139'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ7
+    factor_key: '5141'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ8
+    factor_key: '5142'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ9
+    factor_key: '5143'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ+
+    factor_key: '5144'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbZ/
+    factor_key: '5145'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaA
+    factor_key: '5146'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaB
+    factor_key: '5147'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaC
+    factor_key: '5148'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaD
+    factor_key: '5149'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaE
+    factor_key: '5153'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaF
+    factor_key: '5154'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaG
+    factor_key: '5159'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaH
+    factor_key: '5162'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaI
+    factor_key: '5169'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaJ
+    factor_key: '5171'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaK
+    factor_key: '5172'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaL
+    factor_key: '5181'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaM
+    factor_key: '5182'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaN
+    factor_key: '5191'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaO
+    factor_key: '5192'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaP
+    factor_key: '5193'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaQ
+    factor_key: '5194'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaR
+    factor_key: '5198'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaS
+    factor_key: '5199'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaT
+    factor_key: '5211'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaU
+    factor_key: '5231'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaV
+    factor_key: '5251'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaW
+    factor_key: '5261'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaX
+    factor_key: '5271'
+    factor_value: 1.013
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaY
+    factor_key: '5311'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaZ
+    factor_key: '5331'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaa
+    factor_key: '5399'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbab
+    factor_key: '5411'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbac
+    factor_key: '5421'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbad
+    factor_key: '5431'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbae
+    factor_key: '5441'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaf
+    factor_key: '5451'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbag
+    factor_key: '5461'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbah
+    factor_key: '5499'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbai
+    factor_key: '5511'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaj
+    factor_key: '5521'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbak
+    factor_key: '5531'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbal
+    factor_key: '5541'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbam
+    factor_key: '5551'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNban
+    factor_key: '5561'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbao
+    factor_key: '5571'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbap
+    factor_key: '5599'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaq
+    factor_key: '5611'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbar
+    factor_key: '5621'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbas
+    factor_key: '5632'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbat
+    factor_key: '5641'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbau
+    factor_key: '5651'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbav
+    factor_key: '5661'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaw
+    factor_key: '5699'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbax
+    factor_key: '5712'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbay
+    factor_key: '5713'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbaz
+    factor_key: '5714'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba0
+    factor_key: '5719'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba1
+    factor_key: '5722'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba2
+    factor_key: '5731'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba3
+    factor_key: '5734'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba4
+    factor_key: '5735'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba5
+    factor_key: '5736'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba6
+    factor_key: '5812'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba7
+    factor_key: '5813'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba8
+    factor_key: '5912'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba9
+    factor_key: '5921'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba+
+    factor_key: '5932'
+    factor_value: 0.997
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNba/
+    factor_key: '5941'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbA
+    factor_key: '5942'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbB
+    factor_key: '5943'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbC
+    factor_key: '5944'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbD
+    factor_key: '5945'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbE
+    factor_key: '5946'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbF
+    factor_key: '5947'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbG
+    factor_key: '5948'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbH
+    factor_key: '5949'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbI
+    factor_key: '5961'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbJ
+    factor_key: '5962'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbK
+    factor_key: '5963'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbL
+    factor_key: '5983'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbM
+    factor_key: '5984'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbN
+    factor_key: '5989'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbO
+    factor_key: '5992'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbP
+    factor_key: '5993'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbQ
+    factor_key: '5994'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbR
+    factor_key: '5995'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbS
+    factor_key: '5999'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbT
+    factor_key: '6011'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbU
+    factor_key: '6019'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbV
+    factor_key: '6021'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbW
+    factor_key: '6022'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbX
+    factor_key: '6029'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbY
+    factor_key: '6035'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbZ
+    factor_key: '6036'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbba
+    factor_key: '6061'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbb
+    factor_key: '6062'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbc
+    factor_key: '6081'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbd
+    factor_key: '6082'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbe
+    factor_key: '6091'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbf
+    factor_key: '6099'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbg
+    factor_key: '6111'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbh
+    factor_key: '6141'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbi
+    factor_key: '6153'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbj
+    factor_key: '6159'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbk
+    factor_key: '6162'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbl
+    factor_key: '6163'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbm
+    factor_key: '6211'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbn
+    factor_key: '6221'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbo
+    factor_key: '6231'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbp
+    factor_key: '6282'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbq
+    factor_key: '6289'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbr
+    factor_key: '6311'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbs
+    factor_key: '6321'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbt
+    factor_key: '6324'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbu
+    factor_key: '6331'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbv
+    factor_key: '6351'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbw
+    factor_key: '6361'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbx
+    factor_key: '6371'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbby
+    factor_key: '6399'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbbz
+    factor_key: '6411'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb0
+    factor_key: '6512'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb1
+    factor_key: '6513'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb2
+    factor_key: '6514'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb3
+    factor_key: '6515'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb4
+    factor_key: '6517'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb5
+    factor_key: '6519'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb6
+    factor_key: '6531'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb7
+    factor_key: '6541'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb8
+    factor_key: '6552'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb9
+    factor_key: '6553'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb+
+    factor_key: '6712'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbb/
+    factor_key: '6719'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcA
+    factor_key: '6722'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcB
+    factor_key: '6726'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcC
+    factor_key: '6732'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcD
+    factor_key: '6733'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcE
+    factor_key: '6792'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcF
+    factor_key: '6794'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcG
+    factor_key: '6798'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcH
+    factor_key: '6799'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcI
+    factor_key: '7011'
+    factor_value: 0.973
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcJ
+    factor_key: '7021'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcK
+    factor_key: '7032'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcL
+    factor_key: '7033'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcM
+    factor_key: '7041'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcN
+    factor_key: '7211'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcO
+    factor_key: '7212'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcP
+    factor_key: '7213'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcQ
+    factor_key: '7215'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcR
+    factor_key: '7216'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcS
+    factor_key: '7217'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcT
+    factor_key: '7218'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcU
+    factor_key: '7219'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcV
+    factor_key: '7221'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcW
+    factor_key: '7231'
+    factor_value: 1.043
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcX
+    factor_key: '7241'
+    factor_value: 1.043
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcY
+    factor_key: '7251'
+    factor_value: 1.043
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcZ
+    factor_key: '7261'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbca
+    factor_key: '7291'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcb
+    factor_key: '7299'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcc
+    factor_key: '7311'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcd
+    factor_key: '7312'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbce
+    factor_key: '7313'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcf
+    factor_key: '7319'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcg
+    factor_key: '7322'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbch
+    factor_key: '7323'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbci
+    factor_key: '7331'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcj
+    factor_key: '7334'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbck
+    factor_key: '7335'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcl
+    factor_key: '7336'
+    factor_value: 0.99
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcm
+    factor_key: '7338'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcn
+    factor_key: '7342'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbco
+    factor_key: '7349'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcp
+    factor_key: '7352'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcq
+    factor_key: '7353'
+    factor_value: 0.997
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcr
+    factor_key: '7359'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcs
+    factor_key: '7361'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbct
+    factor_key: '7363'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcu
+    factor_key: '7371'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcv
+    factor_key: '7372'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcw
+    factor_key: '7373'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcx
+    factor_key: '7374'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcy
+    factor_key: '7375'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbcz
+    factor_key: '7376'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc0
+    factor_key: '7377'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc1
+    factor_key: '7378'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc2
+    factor_key: '7379'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc3
+    factor_key: '7381'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc4
+    factor_key: '7382'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc5
+    factor_key: '7383'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc6
+    factor_key: '7384'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc7
+    factor_key: '7389'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc8
+    factor_key: '7513'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc9
+    factor_key: '7514'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc+
+    factor_key: '7515'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbc/
+    factor_key: '7519'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdA
+    factor_key: '7521'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdB
+    factor_key: '7532'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdC
+    factor_key: '7533'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdD
+    factor_key: '7534'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdE
+    factor_key: '7536'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdF
+    factor_key: '7537'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdG
+    factor_key: '7538'
+    factor_value: 0.977
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdH
+    factor_key: '7539'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdI
+    factor_key: '7542'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdJ
+    factor_key: '7549'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdK
+    factor_key: '7622'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdL
+    factor_key: '7623'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdM
+    factor_key: '7629'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdN
+    factor_key: '7631'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdO
+    factor_key: '7641'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdP
+    factor_key: '7692'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdQ
+    factor_key: '7694'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdR
+    factor_key: '7699'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdS
+    factor_key: '7812'
+    factor_value: 1.027
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdT
+    factor_key: '7819'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdU
+    factor_key: '7822'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdV
+    factor_key: '7829'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdW
+    factor_key: '7832'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdX
+    factor_key: '7833'
+    factor_value: 1.007
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdY
+    factor_key: '7841'
+    factor_value: 1.017
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdZ
+    factor_key: '7911'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbda
+    factor_key: '7922'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdb
+    factor_key: '7929'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdc
+    factor_key: '7933'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdd
+    factor_key: '7941'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbde
+    factor_key: '7948'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdf
+    factor_key: '7991'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdg
+    factor_key: '7992'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdh
+    factor_key: '7993'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdi
+    factor_key: '7996'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdj
+    factor_key: '7997'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdk
+    factor_key: '7999'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdl
+    factor_key: '8011'
+    factor_value: 1.013
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdm
+    factor_key: '8021'
+    factor_value: 0.98
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdn
+    factor_key: '8031'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdo
+    factor_key: '8041'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdp
+    factor_key: '8042'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdq
+    factor_key: '8043'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdr
+    factor_key: '8049'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbds
+    factor_key: '8051'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdt
+    factor_key: '8052'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdu
+    factor_key: '8059'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdv
+    factor_key: '8062'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdw
+    factor_key: '8063'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdx
+    factor_key: '8069'
+    factor_value: 1.033
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdy
+    factor_key: '8071'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbdz
+    factor_key: '8072'
+    factor_value: 0.943
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd0
+    factor_key: '8082'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd1
+    factor_key: '8092'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd2
+    factor_key: '8093'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd3
+    factor_key: '8099'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd4
+    factor_key: '8111'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd5
+    factor_key: '8211'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd6
+    factor_key: '8221'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd7
+    factor_key: '8222'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd8
+    factor_key: '8231'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd9
+    factor_key: '8243'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd+
+    factor_key: '8244'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbd/
+    factor_key: '8249'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeA
+    factor_key: '8299'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeB
+    factor_key: '8322'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeC
+    factor_key: '8331'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeD
+    factor_key: '8351'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeE
+    factor_key: '8361'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeF
+    factor_key: '8399.0'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeG
+    factor_key: '8412'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeH
+    factor_key: '8422'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeI
+    factor_key: '8611'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeJ
+    factor_key: '8621'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeK
+    factor_key: '8631'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeL
+    factor_key: '8641'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeM
+    factor_key: '8651'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeN
+    factor_key: '8661'
+    factor_value: 1.01
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeO
+    factor_key: '8699'
+    factor_value: 0.983
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeP
+    factor_key: '8711'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeQ
+    factor_key: '8712'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeR
+    factor_key: '8713'
+    factor_value: 0.96
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeS
+    factor_key: '8721'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeT
+    factor_key: '8731'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeU
+    factor_key: '8732'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeV
+    factor_key: '8733'
+    factor_value: 0.94
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeW
+    factor_key: '8734'
+    factor_value: 0.95
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeX
+    factor_key: '8741'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeY
+    factor_key: '8742'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeZ
+    factor_key: '8743'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbea
+    factor_key: '8744'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeb
+    factor_key: '8748'
+    factor_value: 0.967
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbec
+    factor_key: '8811'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbed
+    factor_key: '8999'
+    factor_value: 1.0
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbee
+    factor_key: '9111'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbef
+    factor_key: '9121'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeg
+    factor_key: '9131'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeh
+    factor_key: '9199'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbei
+    factor_key: '9211'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbej
+    factor_key: '9221'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbek
+    factor_key: '9222'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbel
+    factor_key: '9223'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbem
+    factor_key: '9224'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNben
+    factor_key: '9229'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeo
+    factor_key: '9311'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbep
+    factor_key: '9411'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeq
+    factor_key: '9431'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNber
+    factor_key: '9441'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbes
+    factor_key: '9451'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbet
+    factor_key: '9511'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbeu
+    factor_key: '9512'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbev
+    factor_key: '9531'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbew
+    factor_key: '9532'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbex
+    factor_key: '9611'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbey
+    factor_key: '9621'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbez
+    factor_key: '9631'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbe0
+    factor_key: '9641'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbe1
+    factor_key: '9651'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbe2
+    factor_key: '9661'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbe3
+    factor_key: '9711'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbe4
+    factor_key: '9721'
+    factor_value: 0.993
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        WwROIZ+IC11vNbe5
+    factor_key: '9999'
+    factor_value: 1.017

@@ -22,6 +22,7 @@ module BenefitSponsors
           else
             case @tab
             when 'benefits'
+              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
               @benefit_applications = @employer_profile.benefit_applications
             when 'documents'
               @datatable = Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
