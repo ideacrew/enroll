@@ -10,7 +10,6 @@ module BenefitMarkets
   class Products::Product
     include Mongoid::Document
     include Mongoid::Timestamps
-    include Comparable
 
 
     field :benefit_market_kind,   type: Symbol
@@ -94,18 +93,18 @@ module BenefitMarkets
     def comparable_attrs
       [
         :hbx_id, :benefit_market_kind, :application_period, :title, :description,
-        :issuer_profile_id, :service_area,
-        ]
+        :issuer_profile_id, :service_area
+      ]
     end
 
     # Define Comparable operator
     # If instance attributes are the same, compare PremiumTables
     def <=>(other)
-      if comparable_attrs.all? { |attr| eval(attr.to_s) == eval("other.#{attr.to_s}") }
-        if premium_tables == other.premium_tables
-          0
+      if comparable_attrs.all? { |attr| send(attr) == other.send(attr) }
+        if premium_tables.count != other.premium_tables.count
+          premium_tables.count <=> other.premium_tables.count
         else
-          premium_tables <=> other.premium_tables
+          premium_tables.to_a <=> other.premium_tables.to_a
         end
       else
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1

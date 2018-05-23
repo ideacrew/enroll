@@ -2,7 +2,6 @@ module BenefitMarkets
   class BenefitSponsorCatalog
     include Mongoid::Document
     include Mongoid::Timestamps
-    include Comparable
 
     embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
@@ -53,11 +52,11 @@ module BenefitMarkets
     # Define Comparable operator
     # If instance attributes are the same, compare ProductPackages
     def <=>(other)
-      if comparable_attrs.all? { |attr| eval(attr.to_s) == eval("other.#{attr.to_s}")  }
-        if product_packages == other.product_packages
+      if comparable_attrs.all? { |attr| send(attr) == other.send(attr)  }
+        if product_packages.to_a == other.product_packages.to_a
           0
         else
-          product_packages <=> other.product_packages
+          product_packages.to_a <=> other.product_packages.to_a
         end
       else
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1

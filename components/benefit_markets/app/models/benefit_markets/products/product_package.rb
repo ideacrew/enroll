@@ -47,11 +47,11 @@ module BenefitMarkets
     # Define Comparable operator
     # If instance attributes are the same, compare Products
     def <=>(other)
-      if comparable_attrs.all? { |attr| eval(attr.to_s) == eval("other.#{attr.to_s}") }
-        if products == other.products
+      if comparable_attrs.all? { |attr| send(attr) == other.send(attr) }
+        if products.to_a == other.products.to_a
           0
         else
-          products <=> other.products
+          products.to_a <=> other.products.to_a
         end
       else
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1

@@ -4,7 +4,7 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:subject) { BenefitApplications::BenefitApplication.new }
 
-    let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
+    let(:benefit_sponsorship)       { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
@@ -15,14 +15,16 @@ module BenefitSponsors
 
     let(:recorded_service_area)     { ::BenefitMarkets::Locations::ServiceArea.new }
     let(:recorded_rating_area)      { ::BenefitMarkets::Locations::RatingArea.new }
+    let(:benefit_sponsor_catalog)   { FactoryGirl.build(:benefit_markets_benefit_sponsor_catalog) }
 
     let(:params) do
       {
-        benefit_sponsorship:    benefit_sponsorship,
-        effective_period:       effective_period,
-        open_enrollment_period: open_enrollment_period,
-        recorded_service_area:  recorded_service_area,
-        recorded_rating_area:   recorded_rating_area,
+        benefit_sponsorship:      benefit_sponsorship,
+        effective_period:         effective_period,
+        open_enrollment_period:   open_enrollment_period,
+        recorded_service_area:    recorded_service_area,
+        recorded_rating_area:     recorded_rating_area,
+        benefit_sponsor_catalog:  benefit_sponsor_catalog,
       }
     end
 
@@ -263,18 +265,61 @@ module BenefitSponsors
           expect(BenefitApplications::BenefitApplication.is_renewing.first.predecessor_application.is_renewing?).to eq false
         end
       end
-
-
     end
 
 
     describe "Transitioning a BenefitApplication through Plan Design states" do
       let(:benefit_application)   { described_class.new(**params) }
 
-    end
+      context "Happy path workflow" do
 
+        it "should initialize in state: :draft" do
+          expect(benefit_application.aasm_state).to eq :draft
+        end
 
-    describe "Transitioning a BenefitApplication through Enrolling states" do
+        context "and the application is submitted outside open enrollment period" do
+          before { benefit_application.submit_application }
+
+          it "should transition to state: :approved" do
+            expect(benefit_application.aasm_state).to eq :approved
+          end
+
+          context "and open enrollment period begins" do
+            before {
+                TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
+                benefit_application.begin_open_enrollment
+              }
+
+            it "should transition to state: :approved" do
+              expect(benefit_application.aasm_state).to eq :enrollment_open
+            end
+
+            context "and open enrollment period ends" do
+              before { benefit_application.end_open_enrollment }
+
+              it "should transition to state: :approved" do
+                expect(benefit_application.aasm_state).to eq :enrollment_closed
+              end
+
+              context "and binder payment is made" do
+                before { benefit_application.approve_enrollment_eligiblity }
+
+                it "should transition to state: :enrollment_eligible" do
+                  expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                end
+
+                context "and effective period begins" do
+                  before { benefit_application.activate_enrollment }
+
+                  it "should transition to state: :approved" do
+                    expect(benefit_application.aasm_state).to eq :active
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
 
     end
 
