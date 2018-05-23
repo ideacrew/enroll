@@ -5,7 +5,7 @@ module BenefitSponsors
 
     routes {BenefitSponsors::Engine.routes}
 
-    let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc)}
+    let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)}
 
     let!(:organization) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let!(:inbox) {FactoryGirl.create(:benefit_sponsors_inbox, :with_message, recipient: organization.employer_profile)}
