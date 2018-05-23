@@ -34,13 +34,8 @@ class Admin::Aptc < ApplicationController
       elsif offset_month == 2
         months = [date.last_month.strftime('%b'), date.last_month.last_month.strftime('%b')]
       end
-      eligibility_determination = family.active_household.latest_active_tax_household.latest_eligibility_determination
-      if eligibility_determination.present?
-       current_max_aptc = eligibility_determination.max_aptc.to_f
-      else
-       current_max_aptc = 0
-      end
-      if max_aptc.present?  #&& current_max_aptc != max_aptc
+      previous_max_aptc = 0
+      if max_aptc.present?  
         max_aptc_vals.each do |key, value|
           if value.to_f == max_aptc
             current_available_aptc_hash[key] = value
@@ -52,10 +47,12 @@ class Admin::Aptc < ApplicationController
         current_available_aptc_value = current_available_aptc_hash.values.first.to_f * 12
         available_aptc_value = (current_available_aptc_value - previous_available_aptc_value) / current_available_aptc_hash.count
         max_aptc_vals.each do |key, value|
-          remaining_available_aptc = current_max_aptc.to_f - total_aptc_applied_vals_for_household[key]
-          if months.include?(key)
-            max_aptc_vals[key] = '%.2f' % remaining_available_aptc
+          if months.include?(key) || previous_max_aptc == max_aptc
+            previous_max_aptc = value.to_f
+            max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
           else 
+            remaining_available_aptc = previous_max_aptc.to_f - total_aptc_applied_vals_for_household[key].to_f
+            remaining_available_aptc = remaining_available_aptc > 0 ? remaining_available_aptc : 0
             max_aptc_vals[key] = '%.2f' % (available_aptc_value + remaining_available_aptc) if value.to_f == max_aptc
           end
         end
