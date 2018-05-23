@@ -19,19 +19,26 @@
     = f.text_field :address_2, class:"form-control mb-1",  placeholder: "Address 2"
 
 .row
-  .col-md-4.col-sm-12.col-xs-12
+  .col-md-3.col-sm-12.col-xs-12
     label for="inputCity" City
     = f.text_field :city, class: "form-control mb-1", required: true, placeholder: 'CITY'
     .invalid-feedback
       | Please provide a valid city.
-  .col-md-4.col-sm-12.col-xs-12
+  .col-md-3.col-sm-12.col-xs-12
     label for="inputState" State
     = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
     .invalid-feedback
       | Please select a state.
-  .col-md-4.col-sm-12.col-xs-12
+  .col-md-3.col-sm-12.col-xs-12
     label for="inputZip" Zip
     = f.text_field :zip, required:'true', id:'inputZip', class:'form-control mb-1', maxlength:'5', onkeypress:'return isNumberKey(event)'
     .invalid-feedback
       | Please provide a valid zipcode.
+
+  - if aca_address_query_county
+    .col-md-3.col-sm-12.col-xs-12
+      label for="inputCounty" County
+      = f.select(:county, options_for_select(BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', required: true)
+      .invalid-feedback
+        | Please provide a valid county.
   

@@ -195,6 +195,14 @@ module BenefitSponsors
         published_benefit_application
       end
 
+      def billing_plan_year(billing_date=nil)
+        [] # TODO
+      end
+
+      def earliest_plan_year_start_on_date
+        # Deprecate This
+      end
+
       alias_method :broker_agency_profile=, :hire_broker_agency
     end
   end

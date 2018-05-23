@@ -43,7 +43,7 @@
       <br/>
       <!-- TODO fix this when implementing Pundit -->
       <%#= pundit_span profile, :list_enrollments? %>
-        <%= link_to 'View Enrollment Reports', main_app.employers_premium_statement_path(profile, :tab=>'profile') %>
+        <%= link_to 'View Enrollment Reports', profiles_employers_employer_profile_premium_statements_path(profile.id) %>
       </span>
     </div>
     <div class="panel-body">
