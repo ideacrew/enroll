@@ -86,7 +86,7 @@ module BenefitSponsors
       end
 
       def address_form_to_params(form)
-        attrs = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
+        attrs = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :county, :id)
         sanitize_params attrs
       end
 
