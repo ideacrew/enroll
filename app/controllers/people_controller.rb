@@ -192,7 +192,6 @@ class PeopleController < ApplicationController
     sanitize_person_params
     @person = find_person(params[:id])
     @family = @person.primary_family
-    clean_duplicate_addresses
     @person.updated_by = current_user.oim_id unless current_user.nil?
     if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
       update_vlp_documents(@person.consumer_role, 'person')
@@ -209,7 +208,6 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
-        @person.addresses = @old_addresses
         if @person.has_active_consumer_role?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
@@ -325,7 +323,7 @@ private
           params["person"]["addresses_attributes"].delete("#{key}")
         end
       end
-      params["person"]["addresses_attributes"] = person_params["addresses_attributes"].values.uniq #fix unexpected duplicate issue
+      #params["person"]["addresses_attributes"] = person_params["addresses_attributes"].values.uniq #fix unexpected duplicate issue
     end
 
     if person_params["phones_attributes"].present?
@@ -351,7 +349,7 @@ private
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
       { :phones_attributes => [:kind, :full_phone_number, :id] },
       { :emails_attributes => [:kind, :address, :id] },
       { :consumer_role_attributes => [:contact_method, :language_preference, :id]},
@@ -384,10 +382,5 @@ private
 
   def dependent_params
     params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
-  end
-
-  def clean_duplicate_addresses
-    @old_addresses = @person.addresses
-    @person.addresses = [] #fix unexpected duplicates issue
   end
 end
