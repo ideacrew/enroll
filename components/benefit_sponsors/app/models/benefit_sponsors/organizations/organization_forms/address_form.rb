@@ -11,6 +11,7 @@ module BenefitSponsors
       attribute :state, String
       attribute :zip, String
       attribute :kind, String
+      attribute :county, String
       attribute :office_kind_options, Array
       attribute :state_options, Array
 
