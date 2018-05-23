@@ -41,7 +41,7 @@ module BenefitSponsors
       let(:params) {
         {
           recorded_rating_area: rating_area,
-          recorded_service_area: service_area,
+          recorded_service_areas: [service_area],
           effective_period: effective_period,
           open_enrollment_period: open_enrollment_period,
           fte_count: "5",
