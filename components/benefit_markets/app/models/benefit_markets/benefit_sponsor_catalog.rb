@@ -33,6 +33,11 @@ module BenefitMarkets
                       .by_product_kind(sponsored_benefit.product_kind)[0]
     end
 
+    def service_areas=(service_areas)
+      self.service_area_ids = service_areas.pluck(:_id)
+      @service_areas = service_areas
+    end
+
     # TODO: check for late rate updates
 
     # def update_product_packages
