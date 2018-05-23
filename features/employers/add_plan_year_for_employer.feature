@@ -1,3 +1,4 @@
+@attestation_disabled
 Feature: Add Plan Year For Employer
   Scenario: Add plan year for employer with horizontal and vertical choice
     Given shop health plans exist for both last and this year
