@@ -1,5 +1,11 @@
 module ApplicationHelper
-  
+
+  def can_employee_shop?(date)
+    return false if date.blank?
+    date = Date.strptime(date.to_s,"%m/%d/%Y")
+    Plan.has_rates_for_all_carriers?(date) == false
+  end
+
   def no_rates_error(exchange)
     "Benefits for which you may be eligible to offer are not currently approved by the #{exchange}, please return in 24 hours."
   end
@@ -15,7 +21,7 @@ module ApplicationHelper
       plan.deductible
     end
   end
-  
+
   def draft_plan_year?(plan_year)
     if plan_year.aasm_state == "draft" && plan_year.try(:benefit_groups).empty?
       plan_year
