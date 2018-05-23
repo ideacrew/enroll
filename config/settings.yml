@@ -129,7 +129,9 @@ aca:
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["bronze", "silver", "gold", "platinum", dental"]
   carrier_hios_logo_variant:
-    '': ""
+    '75753': "oci"
+    '21066': "uhcma"
+    '41842': "uhic"
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
 
