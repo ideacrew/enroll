@@ -36,16 +36,16 @@ end
 
   describe "NoticeTrigger" do
     context "when employee terminated from the roster" do
-      subject { Observers::NoticeObserver.new }
+      subject { Observers::Observer.new }
 
       it "should trigger notice event" do
-        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+        expect(subject).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_terminated_from_roster"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'CensusEmployee'
           expect(payload[:event_object_id]).to eq census_employee.id.to_s
         end
-        subject.deliver(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
+        subject.trigger_notice(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
       end
     end
   end
