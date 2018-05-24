@@ -1,7 +1,7 @@
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationsController < ApplicationController
-      layout "two_column", except: [:new]
+      layout "two_column"
       include Pundit
 
       def new

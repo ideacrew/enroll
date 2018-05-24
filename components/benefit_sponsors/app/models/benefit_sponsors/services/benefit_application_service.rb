@@ -14,6 +14,7 @@ module BenefitSponsors
 
       def load_form_metadata(form)
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        benefit_sponsorship = find_benefit_sponsorship(form)
         form.start_on_options = schedular.start_on_options_with_schedule
       end
 
