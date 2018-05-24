@@ -38,6 +38,11 @@ module BenefitSponsors
         self.class.name.demodulize.split('SponsoredBenefit')[0].downcase.to_sym
       end
 
+      # Don't remove this. Added it to get around mass assignment
+      def kind=(kind)
+        # do nothing
+      end
+
       def product_package
         return @product_package if defined? @product_package
         @product_package = benefit_sponsor_catalog.product_packages.by_package_kind(product_package_kind).by_product_kind(product_kind)[0]
