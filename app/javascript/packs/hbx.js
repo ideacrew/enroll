@@ -16,12 +16,14 @@ import Hbx from '../hbx.vue'
 import Carrier from '../carrier.vue'
 import CarrierDatatable from '../carrier_datatable.vue'
 import PlanCost from '../plan_cost.vue'
+import EmployeeDetails from '../employee_details.vue'
 
 
 Vue.component('hbx', Hbx);
 Vue.component('carrier', Carrier);
 Vue.component('carrier-datatable', CarrierDatatable);
 Vue.component('plan-cost', PlanCost);
+Vue.component('employee-details', EmployeeDetails);
 
 $(document).on('ready page:load', function () {
   console.log('on page hbx app');

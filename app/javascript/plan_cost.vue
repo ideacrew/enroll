@@ -153,6 +153,16 @@ export default {
     }
   },
   methods: {
+      planFilter() {
+        var filtered_plans = []
+        for (var i = 0; i < this.plans.length; i++) {
+          if (   this.filter_metal_level.includes(this.plans[i].metal_level)
+              && this.filter_nationwide.includes(this.plans[i].nationwide)) {
+                filtered_plans << this.plans[i]
+              }
+        }
+        return filtered_plans
+      },
       request_calc() {
         console.log('... ' + this.selectedEmployer.id)
         this.package.employer_profile_id = this.selectedEmployer.id
@@ -162,7 +172,6 @@ export default {
         .then(response => {
           this.dialog = true
           this.costs = response.body
-          console.error(response.body);
         }, response => {
           console.log('error')
           //console.error(response.body);
