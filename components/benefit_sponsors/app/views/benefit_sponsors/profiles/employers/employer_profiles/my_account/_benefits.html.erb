@@ -55,8 +55,8 @@
           <div class="row">
             <%#= pundit_span EmployerProfile, :updateable? %>
             <% if benefit_application.draft? %>
-                <%# if benefit_application.overlapping_published_plan_years.empty? %>
-                <%#= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
+                <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
+                <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right" %>
                 <%# end %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz"%>
             <% end %>

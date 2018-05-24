@@ -18,7 +18,7 @@ module BenefitSponsors
 
       PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
 
-      # APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
+      APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
       # INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
 
 
@@ -140,18 +140,18 @@ module BenefitSponsors
       # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
       # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
 
-      # scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
-      #   where(
-      #     "$and" => [
-      #       {:aasm_state.in => APPROVED_STATES },
-      #       {"$or" => [
-      #         { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
-      #         { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
-      #       ]
-      #     }
-      #   ]
-      #   )
-      # }
+      scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
+        where(
+          "$and" => [
+            {:aasm_state.in => APPROVED_STATES },
+            {"$or" => [
+              { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
+              { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
+            ]
+          }
+        ]
+        )
+      }
 
       # scope :published_plan_years_by_date, ->(date) {
       #   where(
@@ -225,7 +225,7 @@ module BenefitSponsors
       end
 
       def sponsor_profile
-        benefit_sponsorship.benefit_sponsorable
+        benefit_sponsorship.profile
       end
 
       def default_benefit_group
@@ -282,6 +282,10 @@ module BenefitSponsors
         end
 
         renewal_application
+      end
+
+      def overlapping_published_benefit_applications
+        self.sponsor_profile.benefit_applications.published_benefit_applications_within_date_range(self.start_on, self.end_on)
       end
 
       def renew_benefit_package_assignments
