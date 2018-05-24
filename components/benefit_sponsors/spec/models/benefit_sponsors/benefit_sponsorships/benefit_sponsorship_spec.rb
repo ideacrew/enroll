@@ -176,7 +176,7 @@ module BenefitSponsors
       let(:benefit_application)     { build(:benefit_sponsors_benefit_application,
                                                 :with_benefit_sponsor_catalog,
                                                 benefit_sponsorship: benefit_sponsorship,
-                                                service_areas: benefit_sponsorship.service_areas) }
+                                                recorded_service_areas: benefit_sponsorship.service_areas) }
 
       context "Initial application happy path workflow" do
         before {
