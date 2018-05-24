@@ -52,7 +52,7 @@ module BenefitMarkets
       product_package = BenefitMarkets::Products::ProductPackage.new(package_attrs)
       product_package.application_period = @benefit_sponsor_catalog.effective_period
       product_package.contribution_model = market_product_package.contribution_model.create_copy_for_embedding
-      product_package.pricing_model = market_product_package.create_copy_for_embedding
+      product_package.pricing_model = market_product_package.pricing_model.create_copy_for_embedding
       product_package.products = market_product_package.products #construct_products(market_product_package.products)
       product_package
     end
