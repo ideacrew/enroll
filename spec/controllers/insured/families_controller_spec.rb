@@ -653,7 +653,7 @@ RSpec.describe Insured::FamiliesController do
       end
 
       context "special qle events which can not have future date" do
-        subject { Observers::NoticeObserver.new }
+        subject { Observers::Observer.new }
 
         before(:each) do
           sign_in(user)
@@ -678,7 +678,7 @@ RSpec.describe Insured::FamiliesController do
           xhr :get, :check_qle_date, qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js
           expect(assigns(:qualified_date)).to eq false
 
-          expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(subject).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_sep_denial"
             expect(payload[:event_object_kind]).to eq 'PlanYear'
             expect(payload[:event_object_id]).to eq plan_year.id.to_s
@@ -686,7 +686,7 @@ RSpec.describe Insured::FamiliesController do
             expect(payload[:notice_params][:qle_reporting_deadline]).to eq date
             expect(payload[:notice_params][:qle_event_on]).to eq date
           end
-          subject.deliver(recipient: employee_role, event_object: plan_year, notice_event: "employee_notice_for_sep_denial", notice_params: {qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date})
+          subject.trigger_notice(recipient: employee_role, event_object: plan_year, notice_event: "employee_notice_for_sep_denial", notice_params: {qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date})
         end
 
         it "should have effective_on_options" do

@@ -548,8 +548,8 @@ module ApplicationHelper
   end
 
   def trigger_notice_observer(recipient, event_object, notice_event, notice_params = nil)
-    observer = Observers::NoticeObserver.new
-    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
+    observer = Observers::Observer.new
+    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
   end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
