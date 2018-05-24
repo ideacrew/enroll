@@ -157,7 +157,7 @@ module BenefitSponsors
           contribution_levels << {
             id: contribution_level.id,
             display_name: contribution_level.display_name,
-            contribution_factor: contribution_level.contribution_factor,
+            contribution_factor: (contribution_level.contribution_factor * 0.01),
             is_offered: contribution_level.is_offered
           }
         end
