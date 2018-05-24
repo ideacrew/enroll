@@ -14,10 +14,21 @@ a {
   background-color: transparent;
 }
 
+a:visited {
+  text-decoration:none;
+}
+
+a:active {
+  text-decoration:none;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
 body {
   background-color: #f2f2f2;
-  min-height: 100%;
-  position: relative;
   padding-bottom: 70px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
@@ -28,12 +39,23 @@ body {
 }
 
 h1,h2,h3,h4,h5,h6 {
-  color: $primary-orange;
   font-family: "Roboto Slab", serif;
   font-weight: 300;
   line-height: 1.6em;
 }
 
+.heading-text {
+  color: $primary-orange;
+}
+.sub-text {
+  color: $mhc-darker-blue;
+}
+#welcome-nav-options {
+  text-align: center;
+  .btn {
+    margin-right:10px;
+  }
+}
 #header-uic {
   .fa-phone {
     color:$mhc-dark-blue;
@@ -105,6 +127,77 @@ h1,h2,h3,h4,h5,h6 {
         }
       }
     }
+  }
+}
+
+#uic-primary-nav {
+  background:$mhc-dark-blue;
+  
+  ul {
+    margin: 20px 0;
+    text-align: left;
+  }
+  
+  ul li {
+ 
+  }
+  
+  ul li a {
+    color:$primary-white;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+  ul li a:hover {
+    text-decoration:none;
+    cursor:pointer;
+    transition: all 0.3s ease 0s;
+    color:$mhc-orange;
+  }
+  
+  a:visited {
+    text-decoration:none;
+  }
+  
+  a:active {
+    text-decoration:none;
+  }
+  .fa-caret-down {
+    color:$primary-white;
+  }
+  
+  ul.dropdown-menu li a {
+    color:$primary-black;
+    padding: 3px 20px;
+    margin-bottom:5px;
+  }
+  
+  ul.dropdown-menu li a:hover {
+    color:$mhc-orange;
+    transition: all 0.3s ease 0s;
+  }
+  
+  .badge {
+    background-color: $primary-orange;
+  }
+}
+
+#footer-uic {
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #005e81;
+  padding: 15px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
+  a {
+    color:$primary-white;
+  }
+  
+  .fa-envelope {
+    color:$primary-white;
   }
 }
 
