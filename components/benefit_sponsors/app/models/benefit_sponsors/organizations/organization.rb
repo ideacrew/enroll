@@ -163,6 +163,10 @@ module BenefitSponsors
         new_sponsorship
       end
 
+      def entity_kinds
+        ENTITY_KINDS
+      end
+
       def employer_profile
         self.profiles.where(_type: /.*EmployerProfile$/).first
       end

@@ -11,7 +11,7 @@ module BenefitSponsors
     layout 'single_column', :only => :edit
 
     def new
-      @agency= BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type)
+      @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type)
       authorize @agency
       authorize @agency, :redirect_home?
       respond_to do |format|

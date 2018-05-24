@@ -63,12 +63,10 @@ module BenefitMarkets
             {name: "products_premium_tables_search_index"}
           )
 
-    scope :by_product_package,    ->(product_package) { where(
-                :"benefit_market_kind"          => product_package.benefit_market_kind,
+    scope :by_product_package,    ->(product_package) { by_application_period(product_package.application_period).where(
+                :"benefit_market_kind"          => product_package.benefit_kind,
                 :"kind"                         => /#{product_package.product_kind}/i,
-                :"product_package_kinds"        => /#{product_package.kind}/,
-                :"application_period.min"       => product_package.application_period.min,
-                :"application_period.max"       => product_package.application_period.max,
+                :"product_package_kinds"        => /#{product_package.package_kind}/
               )
             }
 
@@ -80,10 +78,17 @@ module BenefitMarkets
 
     scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
 
-    scope :by_application_period,       ->(application_period){ where(:application_period => application_period) }
     scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
                                                                   :"premium_tables.effective_period.max".gte => effective_date) }
 
+    scope :by_application_period,       ->(application_period){ 
+      where(
+        "$or" => [
+      {"application_period.min" => {"$lte" => application_period.max, "$gte" => application_period.min}},
+      {"application_period.max" => {"$lte" => application_period.max, "$gte" => application_period.min}},
+      {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
+        ])
+    }
 
     def product_kind
       kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
@@ -170,6 +175,11 @@ module BenefitMarkets
       product_packages.delete(product_package) { "not found" }
     end
 
+    def create_copy_for_embedding
+      new_product = self.class.new(self.attributes.except(:premium_tables))
+      new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
+      new_product
+    end
   end
 
 end

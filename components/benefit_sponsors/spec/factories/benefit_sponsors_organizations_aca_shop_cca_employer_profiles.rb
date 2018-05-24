@@ -2,7 +2,6 @@ FactoryGirl.define do
   factory :benefit_sponsors_organizations_aca_shop_cca_employer_profile, class: 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile' do
 
     organization  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
-    entity_kind   :c_corporation
     sic_code      "001"
 
     transient do

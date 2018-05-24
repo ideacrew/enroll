@@ -9,18 +9,6 @@ module BenefitSponsors
       attr_accessor :broker_role_id
 
       included do
-        ENTITY_KINDS ||= [
-          :tax_exempt_organization,
-          :c_corporation,
-          :s_corporation,
-          :partnership,
-          :limited_liability_corporation,
-          :limited_liability_partnership,
-          :household_employer,
-          :governmental_employer,
-          :foreign_embassy_or_consulate
-        ]
-
         ACTIVE_STATES   ||= ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
         INACTIVE_STATES ||= ["suspended", "ineligible"]
 
@@ -35,13 +23,8 @@ module BenefitSponsors
         field :aasm_state, type: String, default: "applicant"
 
         field :profile_source, type: String, default: "self_serve"
-        field :entity_kind, type: Symbol
         field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
         field :xml_transmitted_timestamp, type: DateTime
-
-        validates :entity_kind,
-          inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
-          allow_blank: false
 
         validates :profile_source,
           inclusion: { in: PROFILE_SOURCE_KINDS },
@@ -50,6 +33,7 @@ module BenefitSponsors
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
         delegate :legal_name, :end_on, to: :organization
+        delegate :roster_size, :broker_agency_accounts, to: :active_benefit_sponsorship
       end
 
       def parent
@@ -57,11 +41,7 @@ module BenefitSponsors
       end
 
       def is_conversion?
-        self.profile_source.to_s == "conversion"
-      end
-
-      def entity_kinds
-        ENTITY_KINDS
+        self.organization.active_benefit_sponsorship.source_kind == :self_serve
       end
 
       def policy_class
@@ -120,6 +100,7 @@ module BenefitSponsors
       end
 
       def hire_broker_agency(new_broker_agency, start_on = today)
+        SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self, office_locations: office_locations) if parent
         start_on = start_on.to_date.beginning_of_day
         if active_broker_agency_account.present?
           terminate_on = (start_on - 1.day).end_of_day
@@ -133,6 +114,7 @@ module BenefitSponsors
 
       def fire_broker_agency(terminate_on = today)
         return unless active_broker_agency_account
+        SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: broker_agency_profile, employer: self) if parent
         active_broker_agency_account.update_attributes!(end_on: terminate_on, is_active: false)
         # TODO fix these during notices implementation
         # employer_broker_fired
@@ -187,12 +169,18 @@ module BenefitSponsors
       end
 
       def active_plan_year
+        warn "[Deprecated] Instead use active_benefit_application" unless Rails.env.test?
         active_benefit_application
       end
 
       def published_plan_year
         warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
         published_benefit_application
+      end
+
+      def renewing_published_plan_year
+        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        renewing_published_benefit_application
       end
 
       def billing_plan_year(billing_date=nil)

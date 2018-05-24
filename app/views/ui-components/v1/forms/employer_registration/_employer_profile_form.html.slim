@@ -31,14 +31,14 @@ fieldset.mt-2
           |
             Please provide a fein.
             
-    = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
+    = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f_profile|
       .col-md-4.pl-0
         label for="inputEntityKind"  Kind *
         = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, { :class => 'form-control mb-1'} )
       - if display_sic_field_for_employer?
         .col-md-4.pl-0
           label for="inputSIC"  SIC Code *
-          = f.select(:sic_code, grouped_options_for_select(f.object.grouped_sic_code_options, f.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
+          = f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
           .invalid-feedback
             |
               Please provide a SIC code.
@@ -47,9 +47,9 @@ fieldset.mt-2
       br
       br
       br
-      = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f}
+      = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
-      = f.select :contact_method, options_for_select(f.object.contact_method_options, selected: f.object.contact_method), {}, class:'form-control'
+      = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method), {}, class:'form-control'
       = f.submit "Submit", class: "btn btn-primary pull-right mt-2"
       
       input type="hidden" name="employer_id" id="employer_id"
