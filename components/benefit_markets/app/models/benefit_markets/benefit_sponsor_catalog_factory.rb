@@ -51,24 +51,10 @@ module BenefitMarkets
 
       product_package = BenefitMarkets::Products::ProductPackage.new(package_attrs)
       product_package.application_period = @benefit_sponsor_catalog.effective_period
-      product_package.contribution_model = construct_contribution_model(market_product_package.contribution_model)
-      product_package.pricing_model = construct_pricing_model(market_product_package.pricing_model)
+      product_package.contribution_model = market_product_package.contribution_model.create_copy_for_embedding
+      product_package.pricing_model = market_product_package.create_copy_for_embedding
       product_package.products = market_product_package.products #construct_products(market_product_package.products)
       product_package
-    end
-
-    def construct_contribution_model(contribution_model)
-      contribution_units = contribution_model.contribution_units
-      contribution_model = BenefitMarkets::ContributionModels::ContributionModel.new(contribution_model.attributes.except(:contribution_units))
-      contribution_model.contribution_units = contribution_units.collect{ |contribution_unit| contribution_unit.class.new(contribution_unit.attributes) }
-      contribution_model
-    end
-
-    def construct_pricing_model(pricing_model)
-      pricing_units = pricing_model.pricing_units
-      pricing_model = BenefitMarkets::PricingModels::PricingModel.new(pricing_model.attributes.except(:pricing_units))
-      pricing_model.pricing_units = pricing_units.collect{ |pricing_unit| pricing_unit.class.new(pricing_unit.attributes) }
-      pricing_model
     end
 
     def benefit_sponsor_catalog
