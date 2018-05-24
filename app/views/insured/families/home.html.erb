@@ -1,5 +1,5 @@
 <% content_for :navigation do %>
-  <%= render 'navigation' %>
+  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
 <div class="col-xs-12">
   <div id="plan-summary"></div>
@@ -29,4 +29,4 @@
     </div>
   </div>
 </div>
-<%= render 'ui-components/v1/modals/help_with_plan' %>
+<%= render partial: 'ui-components/v1/modals/help_with_plan' %>

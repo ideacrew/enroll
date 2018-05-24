@@ -30,7 +30,7 @@ html {
 body {
   background-color: #f2f2f2;
   padding-bottom: 70px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Roboto Slab";
   font-size: 14px;
   line-height: 1.42857143;
   color: #333;
@@ -39,7 +39,6 @@ body {
 }
 
 h1,h2,h3,h4,h5,h6 {
-  font-family: "Roboto Slab", serif;
   font-weight: 300;
   line-height: 1.6em;
 }
@@ -179,6 +178,93 @@ h1,h2,h3,h4,h5,h6 {
   
   .badge {
     background-color: $primary-orange;
+  }
+}
+
+#uic-families-right-menu {
+  background-color:$mhc-dark-blue;
+  padding: 20px 0;
+  list-style-type: none;
+
+  li {
+    padding: 8px 0;
+    padding-right: 15px;
+  }
+  li a {
+    color: #cbe6ff;
+    text-align: left;
+    padding-left: 15px;
+    font-weight: 600;
+    font-size: 18px;
+    display: inline-block;
+    width: 100%;
+  }
+  li a:hover {
+    background-color: transparent;
+  }
+  .badge {
+    background-color:$primary-orange;
+  }
+  .panel {
+    border-radius: 0;
+    background-image: none;
+    border-bottom: none;
+    padding: 0 20px;
+    font-size: 14px;
+    margin-top:0;
+    padding: 0 10px;
+  }
+}
+
+.my-account-widget {
+  .panel {
+    border-radius: 0;
+    background-image: none;
+    border-bottom: none;
+    font-size: 14px;
+    margin: 0;
+  }
+  .panel-default {
+    border-color: #ddd;
+  }
+  .panel-heading {
+    background-color: $primary-white;
+    background-image: none;
+    border-bottom: none;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
+      
+    h4 {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 0;
+      max-width: 155px;
+    }
+  }
+  .panel-body {
+    font-size: 14px;
+    text-align: center;
+    padding-top:0;
+  }
+  .ttc {
+    text-transform: capitalize;
+  }
+  .ttu {
+      text-transform: uppercase;
+  }
+  .dg {
+    color: #414141;
+  }
+  .lg {
+      color: #7b7b7b;
+  }
+}
+
+#shop-for-plans-widget {
+  .image-area {
+    float: left;
+    margin-right: 20px;
   }
 }
 
