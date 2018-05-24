@@ -294,3 +294,8 @@ fieldset[disabled] .btn-default.active {
 .fa-trash:hover {
   cursor:pointer;
 }
+
+thead {
+  background-color:$mhc-dark-blue;
+  color:$primary-white;
+}
