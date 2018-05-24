@@ -22,7 +22,7 @@ module Effective
         }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
 
-        table_column :entity_kind, :proc => Proc.new { |row| row.broker_agency_profile.entity_kind.to_s.titleize }, :sortable => false, :filter => false
+        table_column :entity_kind, :proc => Proc.new { |row| row.entity_kind.to_s.titleize }, :sortable => false, :filter => false
         table_column :market_kind, :proc => Proc.new { |row| row.broker_agency_profile.market_kind.to_s.titleize }, :sortable => false, :filter => false
 
       end
