@@ -184,15 +184,15 @@ module BenefitSponsors
                     TimeKeeper.set_date_of_record_unprotected!(Date.today)
                   }
 
-        it "should initialize in state: :new" do
-          expect(benefit_application.aasm_state).to eq :new
+        it "should initialize in state: :applicant" do
+          expect(benefit_sponsorship.aasm_state).to eq :applicant
         end
 
         context "and a valid application is submitted" do
-          before { benefit_application.approve_initial_application }
+          before { benefit_sponsorship.approve_initial_application }
 
           it "should transition to state: :approved" do
-            expect(benefit_application.aasm_state).to eq :approved
+            expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
           end
 
           # context "and open enrollment period begins" do

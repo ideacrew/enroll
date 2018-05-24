@@ -57,7 +57,7 @@ module BenefitSponsors
       field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
       # This sponsorship's workflow status
-      field :aasm_state,    type: String, default: :applicant do
+      field :aasm_state,          type: Symbol, default: :applicant do
         error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
       end
 
@@ -134,7 +134,6 @@ module BenefitSponsors
       end
 
       def benefit_sponsor_catalog_for(effective_date)
-        binding.pry
         benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
         if benefit_market_catalog.present?
           benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
@@ -186,7 +185,7 @@ module BenefitSponsors
 
       # Workflow for self service
       aasm do
-        state :new, initial: true
+        state :applicant, initial: true
         state :initial_application_approved     # Sponsor's first application is submitted and approved
         state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
         state :initial_enrollment_ineligible
@@ -198,7 +197,7 @@ module BenefitSponsors
         state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
         event :approve_initial_application do
-          transitions from: :new, to: :initial_application_approved
+          transitions from: :applicant, to: :initial_application_approved
         end
 
         event :close_initial_enrollment do
@@ -227,8 +226,8 @@ module BenefitSponsors
           transitions from: :initial_enrollment_eligible, to: :active
         end
 
-        event :revert_to_new do
-          transitions from: [:new, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
+        event :revert_to_applicant do
+          transitions from: [:applicant, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
         end
 
         event :terminate do
@@ -256,7 +255,7 @@ module BenefitSponsors
         end
 
         event :cancel do
-          transitions from: [:initial_application_approved, :initial_enrollment_closed], to: :new
+          transitions from: [:initial_application_approved, :initial_enrollment_closed], to: :applicant
         end
       end
 
@@ -297,9 +296,9 @@ module BenefitSponsors
 
       def employer_profile_to_benefit_sponsor_states_map
         {
-          :applicant            => :new,
+          :applicant            => :applicant,
           :registered           => :initial_applicant,
-          :conversion_expired   => :new,
+          :conversion_expired   => :applicant,
         }
       end
 
