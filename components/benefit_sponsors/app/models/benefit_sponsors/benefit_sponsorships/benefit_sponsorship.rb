@@ -17,7 +17,7 @@ module BenefitSponsors
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
-      include Config::AcaModelConcern
+      # include Config::AcaModelConcern
       # include Concerns::Observable
       include AASM
 
@@ -71,11 +71,9 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      has_many    :census_employees
-
-      # has_many    :census_employees,
-      #             counter_cache: true,
-      #             class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+      has_many    :census_employees,
+                  counter_cache: true,
+                  class_name: "::CensusEmployee"
 
       belongs_to  :benefit_market,
                   counter_cache: true,
@@ -129,8 +127,13 @@ module BenefitSponsors
       end
 
       def benefit_sponsor_catalog_for(effective_date)
+        binding.pry
         benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_area: service_area, effective_date: effective_date)
+        if benefit_market_catalog.present?
+          benefit_market_catalog.benefit_sponsor_catalog_for(service_area: service_area, effective_date: effective_date)
+        else
+          nil
+        end
       end
 
       def is_attestation_eligible?
