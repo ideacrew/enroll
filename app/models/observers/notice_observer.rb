@@ -167,7 +167,7 @@ module Observers
       if special_enrollment_period.is_shop?
         primary_applicant = special_enrollment_period.family.primary_applicant
         if employee_role = primary_applicant.person.active_employee_roles[0]
-          trigger_notice(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted")
+          trigger_notice(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
         end
       end
     end
