@@ -1,6 +1,7 @@
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackagesController < ApplicationController
+      layout "two_column"
 
       def new
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
@@ -10,7 +11,7 @@ module BenefitSponsors
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
         if @benefit_package_form.save
           flash[:notice] = "Benefit Package successfully created."
-          redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.service.benefit_application, @benefit_package_form.show_page_model)
+          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
         else
           flash[:error] = error_messages(@benefit_package_form)
           render :new
@@ -24,7 +25,9 @@ module BenefitSponsors
       def update
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
         if @benefit_package_form.update
-          redirect_to benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+
+          flash[:notice] = "Benefit Package successfully updated."
+          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
         else
           flash[:error] = error_messages(@benefit_package_form)
           render :edit

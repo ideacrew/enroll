@@ -25,7 +25,7 @@ module BenefitSponsors
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                   site: site, 
                                   hbx_id: hbx_id, 
-                                  legal_name: legal_name, 
+                                  legal_name: legal_name,
                                   dba: dba, 
                                   fein: fein, 
                                   entity_kind: entity_kind
@@ -44,8 +44,7 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        sic_code: sic_code,
-        entity_kind:  entity_kind
+        sic_code: sic_code
       }
     end
 
@@ -124,7 +123,7 @@ module BenefitSponsors
                                       dba: dba, 
                                       entity_kind: entity_kind, 
                                       fein: "525285898", 
-                                    )} 
+                                    )}
       let(:profile)             { BenefitSponsors::Organizations::HbxProfile.new(organization: organization, office_locations: office_locations) }
 
       let(:tyrell_legal_name)   { "Tyrell Corporation" }
@@ -197,7 +196,7 @@ module BenefitSponsors
 
     context "Embedded in a Plan Design Proposal" do
       let(:title)                     { 'New proposal' }
-      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code, entity_kind:  entity_kind) }
+      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
 
       let(:plan_design_organization)  { Organizations::PlanDesignOrganization.new(fein: fein, legal_name: legal_name, sic_code: sic_code) }
       let(:plan_design_proposal)      { plan_design_organization.plan_design_proposals.build(title: title, profile: cca_employer_profile) }

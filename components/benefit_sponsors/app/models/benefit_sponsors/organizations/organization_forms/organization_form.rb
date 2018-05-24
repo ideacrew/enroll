@@ -11,14 +11,17 @@ module BenefitSponsors
       attribute :fein, String
       attribute :legal_name, String
       attribute :dba, String
+      attribute :entity_kind, Symbol, default: :s_corporation #TODO
+      attribute :entity_kind_options, Array
+      attribute :profile_type, String
 
       attribute :profile, OrganizationForms::ProfileForm
-
 
       validates :fein,
         length: { is: 9, message: "%{value} is not a valid FEIN" },
         numericality: true
 
+      validates_presence_of :entity_kind
       validates_presence_of :fein, :legal_name
 
       def persisted?
@@ -29,7 +32,7 @@ module BenefitSponsors
         legal_name = val.blank? ? nil : val.strip
         super legal_name
       end
-      
+
       # Strip non-numeric characters
       def fein=(new_fein)
         fein =  new_fein.to_s.gsub(/\D/, '') rescue nil

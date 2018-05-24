@@ -43,10 +43,9 @@ module BenefitSponsors
         }
       }
     }
-  	
+
     let(:employer_profile_attributes) {
       {
-        :entity_kind => :tax_exempt_organization,
         :office_locations_attributes => office_locations_attributes,
         :contact_method => :paper_and_electronic
       }
@@ -54,7 +53,6 @@ module BenefitSponsors
 
     let(:broker_profile_attributes) {
       {
-        :entity_kind => :s_corporation,
         :market_kind => :individual,
         :office_locations_attributes => office_locations_attributes,
         :contact_method => :paper_and_electronic
@@ -63,6 +61,7 @@ module BenefitSponsors
 
     let(:benefit_sponsor_organization) {
       {
+        :entity_kind => :tax_exempt_organization,
         :legal_name => "uweyrtuo",
         :dba=> "uweyruoy",
         :fein => "237864678",
@@ -72,6 +71,7 @@ module BenefitSponsors
 
     let(:broker_organization) {
       {
+        :entity_kind => :s_corporation,
         :legal_name => "uweyrtuo",
         :dba=> "uweyruoy",
         :fein => "237864678",

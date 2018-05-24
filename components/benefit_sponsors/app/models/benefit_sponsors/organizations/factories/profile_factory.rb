@@ -7,7 +7,7 @@ module BenefitSponsors
         include BenefitSponsors::Forms::NpnField
 
         attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending
-        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :entity_kind, :market_kind
+        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind
         attr_accessor :area_code, :number, :extension
         cattr_accessor :profile_type
 
@@ -22,7 +22,7 @@ module BenefitSponsors
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
           organization.assign_attributes(attributes[:organization])
-          factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes]
+          factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
             organization.save!
           else

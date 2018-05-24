@@ -282,8 +282,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { 
-                        initial_census_employee.employee_role = valid_employee_role 
+                      before {
+                        initial_census_employee.employee_role = valid_employee_role
                       }
 
                       it "should link the roster instance and employer role" do
@@ -757,7 +757,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       first_name: "Javert",
       last_name: "Burton"
     )}
-    
+
     let(:census_employee3) {FactoryGirl.create(:benefit_sponsors_census_employee,
       benefit_sponsorship: employer_profile.active_benefit_sponsorship,
       employer_profile: employer_profile,
@@ -896,6 +896,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
 
+    it "should send email notification for non conversion employee" do
+      allow(census_employee1).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      census_employee1.active_benefit_group_assignment.benefit_group.plan_year.update_attributes(aasm_state: 'published')
+      person.employee_roles.create!(ssn: census_employee1.ssn,
+                                    employer_profile_id: census_employee1.employer_profile.id,
+                                    hired_on: census_employee1.hired_on)
+      expect(census_employee1.send_invite!).to eq true
+    end
     # it "should return true when match person has no active employee roles for current census employee" do
     #   person.employee_roles.create!(ssn: census_employee.ssn,
     #                                 employer_profile_id: census_employee.employer_profile.id,
@@ -1364,7 +1372,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     # let!(:blue_collar_benefit_group) { FactoryGirl.create(:benefit_group, :premiums_for_2015, title: "blue collar benefit group", plan_year: plan_year) }
     # let!(:employer_profile) { plan_year.employer_profile }
     # let!(:white_collar_benefit_group) { FactoryGirl.create(:benefit_group, :premiums_for_2015, plan_year: plan_year, title: "white collar benefit group") }
-    
+
     # let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_applications,
     #   :benefit_sponsorship => organization.active_benefit_sponsorship,
     #   :aasm_state => :active
@@ -1917,7 +1925,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       benefit_group_assignments: [benefit_group_assignment]
     }
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, aasm_state: "coverage_waived") }
-    
+
     it "returns true when employees waive the coverage" do
       expect(census_employee.waived?).to be_truthy
     end
@@ -1930,7 +1938,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   context "when active employeees has renewal benifit group" do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
     let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
-    
+
     before do
       benefit_group_assignment.update_attribute(:updated_at, benefit_group_assignment.updated_at + 1.day)
       benefit_group_assignment.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
@@ -1957,7 +1965,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
     let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
     let(:benefit_group_assignment_two)  { FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
-    
+
     before do
       benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
       # benefit_group_assignment_one.plan_year.update_attribute(:aasm_state, "renewing_enrolled")

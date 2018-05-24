@@ -15,7 +15,6 @@ module BenefitSponsors
 
       MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
-      field :entity_kind, type: Symbol
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
       field :primary_broker_role_id, type: BSON::ObjectId
@@ -35,7 +34,7 @@ module BenefitSponsors
       has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
       accepts_nested_attributes_for :broker_agency_contacts, reject_if: :all_blank, allow_destroy: true
 
-      validates_presence_of :market_kind, :entity_kind #, :primary_broker_role_id
+      validates_presence_of :market_kind
 
       validates :corporate_npn,
         numericality: {only_integer: true},
@@ -45,10 +44,6 @@ module BenefitSponsors
 
       validates :market_kind,
         inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-        allow_blank: false
-
-      validates :entity_kind,
-        inclusion: { in: Organizations::Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
         allow_blank: false
 
       after_initialize :build_nested_models
