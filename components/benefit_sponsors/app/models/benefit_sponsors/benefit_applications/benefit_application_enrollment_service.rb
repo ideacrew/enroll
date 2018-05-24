@@ -6,6 +6,32 @@ module BenefitSponsors
       @benefit_application = benefit_application
     end
 
+    def begin_initial_open_enrollment
+      @benefit_application.validate_sponsor_market_policy
+      return false unless @benefit_application.is_valid?
+
+      if @benefit_application.may_begin_open_enrollment?
+        @benefit_application.begin_open_enrollment!
+      else
+        @benefit_application.errors.add(:base => "State transition failed")
+        return false
+      end
+    end
+
+    def begin_renewal_open_enrollment
+      @benefit_application.validate_sponsor_market_policy
+      return false unless @benefit_application.is_valid?
+
+      if @benefit_application.may_begin_open_enrollment?
+        @benefit_application.begin_open_enrollment!
+
+        if @benefit_application.enrollment_open?
+          @benefit_application.renew_benefit_package_members
+        else
+        end
+      end
+    end
+
     # validate :open_enrollment_date_checks
     ## Trigger events can be dates or from UI
     def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)
@@ -54,8 +80,9 @@ module BenefitSponsors
     def begin_open_enrollment
       if @benefit_application.may_advance_date?
         @benefit_application.advance_date!
-        active_census_employees.each do |census_employee|
-          census_employee.renew
+
+        if @benefit_application.predecessor_application.present?
+          @benefit_application.renew_employee_coverages
         end
       end
     end
@@ -85,7 +112,11 @@ module BenefitSponsors
       benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end.next_day)
       
       if benefit_sponsor_catalog
-        @benefit_application.renew(benefit_sponsor_catalog)
+        new_benefit_application = @benefit_application.renew(benefit_sponsor_catalog)
+
+        if new_benefit_application.save
+          new_benefit_application.renew_benefit_package_assignments
+        end
       end
     end
 

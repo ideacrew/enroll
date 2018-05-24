@@ -1,6 +1,6 @@
 module BenefitSponsors
   module BenefitApplications
-    class BenefitApplicationTimeKeeperJobs
+    class BenefitSponsorTimeKeeperJobs
 
       attr_reader :new_date
 
@@ -11,6 +11,34 @@ module BenefitSponsors
         process_applications_for { coverage_begin }
         process_applications_for { coverage_end }
       end
+
+      def may_begin_initial_open_enrollment
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_initial_open_enrollment_on(new_date)
+        begin_initial_open_enrollment(benefit_sponsorships)
+      end
+
+      def may_begin_renewal_open_enrollment
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_renewal_open_enrollment_on(new_date)
+        begin_renewal_open_enrollment(benefit_sponsorships)
+      end
+
+      def begin_initial_open_enrollment(benefit_sponsorships)
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship)
+          sponsorship_service.begin_initial_open_enrollment(new_date)
+        end
+      end
+
+      def begin_renewal_open_enrollment(benefit_sponsorships)
+        benefit_sponsorships.each do |benefit_sponsorship|
+          begin
+            sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship)
+            sponsorship_service.begin_renewal_open_enrollment(new_date)
+          rescue Exception => e 
+          end
+        end
+      end
+
 
       def open_enrollment_begin
         service = AcaShopOpenEnrollmentService.new
@@ -32,8 +60,8 @@ module BenefitSponsors
         end
       end
 
-      def coverage_begin;
-      def coverage_end;
+      def coverage_begin; end
+      def coverage_end; end
 
       private
 

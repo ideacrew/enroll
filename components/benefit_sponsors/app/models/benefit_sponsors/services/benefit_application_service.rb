@@ -14,6 +14,7 @@ module BenefitSponsors
 
       def load_form_metadata(form)
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        find_benefit_sponsorship(form)
         form.start_on_options = schedular.start_on_options_with_schedule
       end
 
@@ -24,7 +25,7 @@ module BenefitSponsors
   
       def save(form)
         model_attributes = form_params_to_attributes(form)
-        benefit_sponsorship = find_benefit_sponsorship(form)
+        find_benefit_sponsorship(form)
         benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
         store(form, benefit_application)
       end
@@ -135,6 +136,7 @@ module BenefitSponsors
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
         end
+
         save_successful = benefit_application.save
         unless save_successful 
           map_errors_for(benefit_application, onto: form)
@@ -145,8 +147,8 @@ module BenefitSponsors
 
       #TODO: FIX this method once countzips are loaded
       def assign_rating_and_service_area(benefit_application)
-        benefit_application.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.new
-        benefit_application.recorded_service_area = ::BenefitMarkets::Locations::ServiceArea.new
+        benefit_application.recorded_rating_area = benefit_application.benefit_sponsorship.rating_area
+        benefit_application.recorded_service_areas = benefit_application.benefit_sponsorship.service_areas
       end
 
       def map_errors_for(benefit_application, onto:)

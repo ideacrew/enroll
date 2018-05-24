@@ -6,7 +6,7 @@ module BenefitSponsors
     routes { BenefitSponsors::Engine.routes }
 
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
     let(:person) { FactoryGirl.create(:person) }
     let(:edit_user) { FactoryGirl.create(:user, :person => person)}
     let(:user) { FactoryGirl.create(:user) }
@@ -43,10 +43,9 @@ module BenefitSponsors
         }
       }
     }
-  	
+
     let(:employer_profile_attributes) {
       {
-        :entity_kind => :tax_exempt_organization,
         :office_locations_attributes => office_locations_attributes,
         :contact_method => :paper_and_electronic
       }
@@ -54,7 +53,6 @@ module BenefitSponsors
 
     let(:broker_profile_attributes) {
       {
-        :entity_kind => :s_corporation,
         :market_kind => :individual,
         :office_locations_attributes => office_locations_attributes,
         :contact_method => :paper_and_electronic
@@ -63,6 +61,7 @@ module BenefitSponsors
 
     let(:benefit_sponsor_organization) {
       {
+        :entity_kind => :tax_exempt_organization,
         :legal_name => "uweyrtuo",
         :dba=> "uweyruoy",
         :fein => "237864678",
@@ -72,6 +71,7 @@ module BenefitSponsors
 
     let(:broker_organization) {
       {
+        :entity_kind => :s_corporation,
         :legal_name => "uweyrtuo",
         :dba=> "uweyruoy",
         :fein => "237864678",
@@ -93,6 +93,10 @@ module BenefitSponsors
         }
       }
     }
+
+    before :each do
+      allow(Settings.site).to receive(:key).and_return(:dc)
+    end
 
     shared_examples_for "initialize registration form" do |action, params, profile_type|
       before do
@@ -174,6 +178,7 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
+            site.benefit_markets.first.save!
             user = self.send("#{profile_type}_user")
             sign_in user if user
             post :create, :agency => self.send("#{profile_type}_params")

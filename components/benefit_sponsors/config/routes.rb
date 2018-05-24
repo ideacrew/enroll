@@ -11,7 +11,7 @@ BenefitSponsors::Engine.routes.draw do
           get :messages
           get :staff_index
           get :agency_messages
-          get :broker_portal
+          get :commission_statements
         end
         member do
           post :clear_assign_for_employer
@@ -19,6 +19,8 @@ BenefitSponsors::Engine.routes.draw do
           post :update_assign
           post :family_datatable
           get :inbox
+          get :download_commission_statement
+          get :show_commission_statement
         end
       end
       resources :broker_applicants
@@ -28,6 +30,7 @@ BenefitSponsors::Engine.routes.draw do
       resources :employer_profiles, only: [:show] do
         get :export_census_employees
         post :bulk_employee_upload
+        get :premium_statements
         collection do
           get :show_pending
         end

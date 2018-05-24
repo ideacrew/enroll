@@ -5,13 +5,14 @@ module BenefitMarkets
 
     embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
-    field :effective_date,          type: Date 
+    field :effective_date,          type: Date
+    field :effective_period,        type: Range
+    field :open_enrollment_period,  type: Range
     field :probation_period_kinds,  type: Array, default: []
 
-    delegate :benefit_market_catalog, to: :benefit_application
-
-    belongs_to  :service_area,
-                class_name: "BenefitMarkets::Locations::ServiceArea"
+    has_and_belongs_to_many  :service_areas,
+                class_name: "BenefitMarkets::Locations::ServiceArea",
+                :inverse_of => nil
 
     embeds_one  :sponsor_market_policy,
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
@@ -23,15 +24,23 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::Products::ProductPackage"
 
 
-    def benefit_kinds
+    validates_presence_of :effective_date, :probation_period_kinds, :effective_period, :open_enrollment_period,
+                          :service_areas, :product_packages
+
+    # :sponsor_market_policy, :member_market_policy - commenting out the validations until we have
+    # the seed for both of these on benefit market catalog.
+    def product_package_for(sponsored_benefit)
+      product_packages.by_package_kind(sponsored_benefit.product_package_kind)
+                      .by_product_kind(sponsored_benefit.product_kind)[0]
     end
 
-    def product_market_kind
-      :shop
+    def service_areas=(service_areas)
+      self.service_area_ids = service_areas.pluck(:_id)
+      @service_areas = service_areas
     end
 
     # TODO: check for late rate updates
-    
+
     # def update_product_packages
     #   if is_product_package_update_available?
     #     product_packages.each do |product_package|
@@ -44,36 +53,23 @@ module BenefitMarkets
     #   product_packages.any?{|product_package| benefit_market_catalog.is_product_package_updated?(product_package) }
     # end
 
-
- 
-
-    #FIX ME: Use configuration from benefit market
-    def open_enrollment_start
-      effective_date - 2.months
+    def comparable_attrs
+      [:effective_date, :service_areas, :sponsor_market_policy, :member_market_policy]
     end
 
-    # FIX ME: Use configuration from benefit market
-    def open_enrollment_end
-      open_enrollment_month = effective_date.prev_month
-      Date.new(open_enrollment_month.year, open_enrollment_month.month, 20)
-    end
-    
-    def effective_period
-      effective_date..effective_date.next_year.prev_day
-    end
-
-    def open_enrollment_period
-      open_enrollment_start..open_enrollment_end
-    end
-    
-    def product_active_year
-      benefit_application.effective_period.begin.year
+    # Define Comparable operator
+    # If instance attributes are the same, compare ProductPackages
+    def <=>(other)
+      if comparable_attrs.all? { |attr| send(attr) == other.send(attr)  }
+        if product_packages.to_a == other.product_packages.to_a
+          0
+        else
+          product_packages.to_a <=> other.product_packages.to_a
+        end
+      else
+        other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
+      end
     end
 
-    # product_option_choice: <metal level name>/<issuer name>
-    def products_for(product_package, product_option_choice)
-      return [] unless product_package
-      product_package.products_for_plan_option_choice(product_option_choice)
-    end
   end
 end

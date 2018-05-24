@@ -4,6 +4,12 @@
 .fr {
   float:right;
 }
+.p0 {
+  padding:0;
+}
+.p1 {
+  padding:10%;
+}
 .pl-0 {
   padding-left:0px !important;
 }
@@ -16,9 +22,24 @@
 .pr-1 {
  padding-right:10px !important 
 }
+.mb-1 {
+  margin-bottom:10px !important;
+}
+.mb-2 {
+  margin-bottom:20px !important;
+}
 .ml-1 {
   margin-left:10px !important;
 }
+.mr-1 {
+  margin-right:10px !important;
+}
+.mr-2 {
+  margin-right:20px !important;
+}
 .mt-1 {
   margin-top:10px !important;
+}
+.mt-2 {
+  margin-top:20px !important;
 }

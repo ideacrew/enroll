@@ -1047,7 +1047,7 @@ describe HbxEnrollment, dbclean: :after_each do
 
   let(:hired_on) { middle_of_prev_year }
   let(:created_at) { middle_of_prev_year }
-  let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: created_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
+  let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, employer_profile: employer_profile, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: created_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
 
   let(:employee_role) {
       FactoryGirl.create(:employee_role, employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id)
@@ -1196,7 +1196,7 @@ describe HbxEnrollment, dbclean: :after_each do
     let(:created_at) { middle_of_prev_year }
     let(:updated_at) { middle_of_prev_year }
 
-    let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: updated_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
+    let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, employer_profile: employer_profile, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: updated_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
 
     let(:employee_role) {
       FactoryGirl.create(:employee_role, employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id)
@@ -2262,7 +2262,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
     }
 
     let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id, elected_plan_ids: elected_plans }
-    let!(:renewal_benefit_group_assignment) { employer_profile.census_employees.each{|ce| ce.add_renew_benefit_group_assignment renewal_benefit_group; ce.save!;} }
+    let!(:renewal_benefit_group_assignment) { employer_profile.census_employees.each{|ce| ce.add_renew_benefit_group_assignment [renewal_benefit_group]; ce.save!;} }
 
     let!(:generate_passive_renewal) {
       ce.update!(created_at: 2.months.ago)

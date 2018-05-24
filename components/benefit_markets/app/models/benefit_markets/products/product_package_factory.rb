@@ -5,8 +5,9 @@ module BenefitMarkets
         BenefitMarkets::Products::ProductPackage.new
       end
 
-      def self.call(benefit_catalog:, benefit_option_kind:, title:, contribution_model:, pricing_model:, **other_params)
-        benefit_catalog.product_packages.build kind: benefit_option_kind,
+      def self.call(benefit_catalog:, benefit_kind:, title:, contribution_model:, pricing_model:, **other_params)
+        benefit_catalog.product_packages.build benefit_kind: benefit_kind,
+          application_period: benefit_catalog.application_period,
           title: title,
           contribution_model: contribution_model,
           pricing_model: pricing_model,
@@ -21,25 +22,6 @@ module BenefitMarkets
       end
 
       protected
-
-      def self.build_product_package(benefit_option_kind, benefit_catalog, title, contribution_model, pricing_model, other_params = {})
-        select_model_subclass(benefit_option_kind).new(
-          build_shared_params(benefit_catalog, title, contribution_model, pricing_model).merge(other_params)
-        )
-      end
-
-      def self.select_model_subclass(benefit_option_kind)
-        ::BenefitMarkets::Products::ProductPackage.subclass_for(benefit_option_kind)
-      end
-
-      def self.build_shared_params(benefit_catalog, title, contribution_model, pricing_model)
-        {
-          benefit_catalog: benefit_catalog,
-          title: title,
-          contribution_model: contribution_model,
-          pricing_model: pricing_model
-        }
-      end
 
       def self.is_pricing_model_satisfied?(product_package)
         pricing_model = product_package.pricing_model

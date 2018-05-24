@@ -1,0 +1,9 @@
+--- !ruby/object:BenefitMarkets::Locations::CountyZip
+attributes: !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WwROGXIhPTb5Zov+
+  zip: 02188
+  county_name: Norfolk
+  state: MA
+__selected_fields: 

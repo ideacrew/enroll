@@ -45,9 +45,9 @@ module BenefitSponsors
         form
       end
 
-      def self.for_edit(id)
+      def self.for_edit(args)
         # for edit why are we creating new
-        form = self.new(id: id)
+        form = self.new(id: args[:id], benefit_sponsorship_id: args[:benefit_sponsorship_id])
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form

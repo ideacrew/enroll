@@ -5,7 +5,6 @@ module BenefitSponsors
       include ActiveModel::Validations
 
       attribute :id, String
-      attribute :entity_kind, Symbol
       attribute :profile_source, String
       attribute :market_kind, Symbol
       attribute :is_benefit_sponsorship_eligible, String
@@ -15,16 +14,17 @@ module BenefitSponsors
       attribute :accept_new_clients, Boolean
       attribute :home_page, String
       attribute :contact_method, String
-      attribute :entity_kind_options, Array
       attribute :market_kind_options, Hash
+      attribute :grouped_sic_code_options, Hash
       attribute :language_options, Array
-      attribute :contact_method_options, Array
+      attribute :contact_method_options, Hash
       attribute :profile_type, String
+      attribute :sic_code, String
+      attribute :inbox, OrganizationForms::InboxForm
       attribute :parent, OrganizationForms::OrganizationForm
 
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
-      validates_presence_of :entity_kind
       validates_presence_of :market_kind, if: :is_broker_profile?
 
       def persisted?

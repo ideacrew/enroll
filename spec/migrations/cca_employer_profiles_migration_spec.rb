@@ -14,7 +14,7 @@ describe "CcaEmployerProfilesMigration" do
   describe ".up" do
 
     before :all do
-      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)
+      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization,:with_benefit_market, site_key: :cca)
 
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       FactoryGirl.create(:broker_agency_profile, organization: organization)
@@ -40,6 +40,7 @@ describe "CcaEmployerProfilesMigration" do
       @test_version = @path.split("/").last.split("_").first
     end
 
+    #TODO modify it after employer profile script is updated according to benefit sponsorship
     it "should match total migrated organizations" do
       silence_stream(STDOUT) do
         Mongoid::Migrator.run(:up, @migrations_paths, @test_version.to_i)
@@ -99,10 +100,23 @@ describe "CcaEmployerProfilesMigration" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
       expect(migrated_profile).to have_attributes(entity_kind: old_profile.entity_kind.to_sym, created_at: old_profile.created_at,
-                                                  updated_at: old_profile.updated_at, contact_method: old_profile.contact_method,
+                                                  updated_at: old_profile.updated_at,
                                                   aasm_state: old_profile.aasm_state, profile_source: old_profile.profile_source,
                                                   registered_on: old_profile.registered_on)
     end
+
+    it "should match all migrated attributes for employer profile" do
+      migrated_profile = @migrated_organizations.first.employer_profile
+      old_profile = @old_organizations.first.employer_profile
+      if old_profile.contact_method == "Only Electronic communications"
+        expect(migrated_profile.contact_method).to eq :electronic_only
+      elsif old_profile.contact_method == "Paper and Electronic communications"
+        expect(migrated_profile.contact_method).to eq :paper_and_electronic
+      elsif old_profile.contact_method == "Only Paper communication"
+        expect(migrated_profile.contact_method).to eq :paper_only
+      end
+    end
+
 
     it "should match all migrated attributes for organization" do
       old_organization = @old_organizations.first
@@ -111,12 +125,17 @@ describe "CcaEmployerProfilesMigration" do
                                                                dba: old_organization.dba, fein: old_organization.fein)
     end
 
+    it "should have benefit sponsorship created" do
+      expect(@migrated_organizations.first.benefit_sponsorships.count).to eq 1
+    end
+
     it "should match all migrated attributes for census employee" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
       ce = CensusEmployee.where(employer_profile_id: old_profile.id).first
       nce = CensusEmployee.where(benefit_sponsors_employer_profile_id: migrated_profile.id).first
       expect(ce).to eq(nce)
+      expect(nce.benefit_sponsorship_id).to eq(@migrated_organizations.first.benefit_sponsorships.first.id)
     end
   end
   after(:all) do

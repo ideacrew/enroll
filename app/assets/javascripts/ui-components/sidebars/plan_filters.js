@@ -1,6 +1,6 @@
 //Clear filter selections on page refresh
 window.addEventListener('load', function() {
-  clearAll();
+  //clearAll();
 })
 
 // Stores values to be processed on function filterResults

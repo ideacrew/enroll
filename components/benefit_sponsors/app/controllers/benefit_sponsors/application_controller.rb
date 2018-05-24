@@ -8,10 +8,12 @@ module BenefitSponsors
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
     def self.current_site
-      if BenefitSponsors::Site.by_site_key(:dc).present?
-        BenefitSponsors::Site.by_site_key(:dc).first
-      elsif BenefitSponsors::Site.by_site_key(:cca).present?
+      site_key = Settings.site.key
+      case site_key
+      when :cca
         BenefitSponsors::Site.by_site_key(:cca).first
+      when :dc
+        BenefitSponsors::Site.by_site_key(:dc).first
       end
     end
 

@@ -1,0 +1,37 @@
+- if current_user.blank? || current_user.person_id.blank?
+
+  legend Personal Information:
+  .row
+    .col-md-4
+      = f.hidden_field :person_id, value: f.object.person_id
+      label for="inputFirstName"  First name *
+      = f.text_field :first_name, class: "form-control", required: true, placeholder: 'FIRST NAME *'
+
+    .col-md-4
+      label for="inputLastName"  Last name *
+      = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *'
+
+    .col-md-4
+      label for="inputDob"  Date of Birth *
+      = f.text_field :dob, {:class => "form-control", :placeholder => "DATE OF BIRTH *", id:'inputDOB' , required: true, readonly: defined?(readonly)}
+  <br>
+
+  .row
+    .col-md-3
+      label for="inputEmail"  Email *
+      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'EMAIL'
+
+    .col-md-3
+      label for="inputAreaCode"  Area code *
+      = f.text_field :area_code, class: "form-control", maxlength:'3', onkeypress:'return isNumberKey(event)', placeholder: 'AREA CODE', required: true
+
+    .col-md-3.col-sm-3
+      label for="inputNumber"  Number *
+      = f.text_field :number, placeholder:'1112222', required:'true', id:'inputNumber', class:'form-control', maxlength:'7', onkeypress:'return isNumberKey(event)'
+
+    .col-md-3
+      label for="inputExtension"  Extension *
+      = f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10'
+- else
+  = f.hidden_field :person_id, value: current_user.person_id
+

@@ -8,21 +8,24 @@ module BenefitMarkets
       attribute :id, String
 
       attribute :benefit_catalog_id, String
-      attribute :benefit_option_kind, String
+      attribute :benefit_kind, String
       attribute :contribution_model_id, String
-      attribute :multiplicity, Boolean
       attribute :pricing_model_id, String
       attribute :product_kind, String
+      attribute :package_kind, String
+      attribute :health_package_kind, String
+      attribute :dental_package_kind, String
       attribute :title, String
-      attribute :end_on, String
-      attribute :start_on, String
 
-      attribute :allowed_benefit_option_kinds, Array
+      attribute :allowed_benefit_kinds, Array
       attribute :available_benefit_catalogs, Array
-      attribute :available_benefit_option_kinds, Array
+      attribute :available_benefit_kinds, Array
       attribute :available_contribution_models, Array
       attribute :available_pricing_models, Array
       attribute :available_product_kinds, Array
+      attribute :available_health_package_kinds, Array
+      attribute :available_dental_package_kinds, Array
+      attribute :available_default_package_kinds, Array
 
       attr_reader :show_page_model
 
@@ -30,12 +33,12 @@ module BenefitMarkets
       validates_presence_of :pricing_model_id, :allow_blank => false
       validates_presence_of :contribution_model_id, :allow_blank => false
       validates_presence_of :benefit_catalog_id, :allow_blank => false
-      validates_inclusion_of :benefit_option_kind, :in => :allowed_benefit_option_kinds, :allow_blank => false
+      validates_inclusion_of :benefit_kind, :in => :allowed_benefit_kinds, :allow_blank => false
 
       # Create a form for the 'new' action.
       # Note that usually this method may have few parameters
       #   other than current user.
-      # @param benefit_option_kind [String] the benefit option kind
+      # @param benefit_kind [String] the benefit option kind
       # @return [ProductPackageForm] an instance of the form populated with
       #   the backing attributes resolved by the service.
       def self.for_new

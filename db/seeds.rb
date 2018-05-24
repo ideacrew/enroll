@@ -29,7 +29,9 @@ plan_tables = %w(
   plans
   products_qhps
 )
-restore_database = Mongoid.default_session.options[:database].to_s
+
+# default_session deprecated in this version
+restore_database = Mongoid.default_client.options[:database].to_s
 dump_location = File.join(File.dirname(__FILE__), 'seedfiles', 'plan_dumps')
 restore_location = File.join(dump_location, restore_database)
 plan_files = plan_tables.collect(){|table| File.join(restore_location, "#{table}.bson")}
@@ -212,5 +214,10 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
 puts "importing security questions complete"
 puts "*"*80
 
+require File.join(File.dirname(__FILE__),'seedfiles', 'sic_codes_seed')
+
+if Settings.site.key.to_s == "cca"
+  require File.join(File.dirname(__FILE__),'seedfiles', 'cca','cca_seed')
+end
 
 puts "End of Seed Data"

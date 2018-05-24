@@ -37,7 +37,7 @@ module BenefitSponsors
       # @abstract profile subclass is expected to implement #initialize_profile
       # @!method initialize_profile
       # Initialize settings for the abstract profile
-      after_initialize :initialize_profile, :build_nested_models#, :add_benefit_sponsorship
+      after_initialize :initialize_profile, :build_nested_models
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
@@ -76,8 +76,17 @@ module BenefitSponsors
         organization.benefit_sponsorships.collect { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
       end
 
+      def contact_methods
+        ::BenefitMarkets::CONTACT_METHODS_HASH
+      end
+
+      def active_broker
+        # TODO
+      end
+
       class << self
         def find(id)
+          return nil if id.blank?
           organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).first
           return unless organization
           organization.profiles.detect { |profile| profile.id.to_s == id.to_s }

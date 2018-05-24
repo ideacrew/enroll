@@ -47,9 +47,11 @@ module BenefitMarkets
 
       def package_params
         params.require(:product_package).permit(
-          :kind,
+          :package_kind,
+          :health_package_kind,
+          :dental_package_kind,
           :product_kind,
-          :benefit_option_kind,
+          :benefit_kind,
           :title,
           :multiplicity,
           :start_on,

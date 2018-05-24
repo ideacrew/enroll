@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Organizations
-    class Organization
+    class IssuerProfile
       include Mongoid::Document
     end
   end

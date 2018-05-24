@@ -24,7 +24,7 @@ FactoryGirl.define do
 
     trait :with_benefit_market do
       after :build do |site, evaluator|
-        site.benefit_markets << build(:benefit_markets_benefit_market, kind: evaluator.kind)
+        site.benefit_markets << create(:benefit_markets_benefit_market, kind: evaluator.kind)
       end
 
       after :create do |site, evaluator|
@@ -37,6 +37,13 @@ FactoryGirl.define do
         create(:benefit_markets_benefit_market_catalog, benefit_market: site.benefit_markets[0])
       end
     end
+
+    trait :with_benefit_market_catalog_and_product_packages do
+      after :create do |site, evaluator|
+        create(:benefit_markets_benefit_market_catalog, :with_product_packages, benefit_market: site.benefit_markets[0])
+      end
+    end
+
 
     trait :dc do
       site_key :dc

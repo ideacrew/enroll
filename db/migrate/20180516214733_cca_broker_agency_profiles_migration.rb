@@ -1,8 +1,8 @@
 class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
   def self.up
 
-    if Settings.site.key.to_s == "mhc"
-      site_key = "mhc"
+    if Settings.site.key.to_s == "cca"
+      site_key = "cca"
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/cca_broker_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
@@ -61,7 +61,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.broker_agency_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :aasm_state_set_on,:ach_routing_number, :ach_account_number, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on,:ach_routing_number, :ach_account_number, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = self.initialize_new_profile(old_org, old_profile_params)

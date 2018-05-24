@@ -36,6 +36,9 @@ module BenefitSponsors
       # Business structure or entity type 
       field :entity_kind, type: Symbol
 
+      # Federal Employer ID Number
+      field :fein, type: String
+
       # TODO -- track history on changes
       # field :updated_by, type: Symbol
 
@@ -48,10 +51,10 @@ module BenefitSponsors
       # org_x.agency = org_y      # org_y.divisions => [org_x]
       belongs_to  :agency, inverse_of: :divisions, counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
-       
+
       has_many    :divisions, inverse_of: :agency, autosave: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
-        
+
 
       # PlanDesignOrganization (an Organization subclass) association enables an organization 
       # or its agent to model options and costs for different benefit scenarios.  This is managed through
@@ -64,17 +67,17 @@ module BenefitSponsors
       # Under this scenario, the Employer is both the plan_design_author and the plan_design_subject
       has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, autosave: true,
                               class_name: "BenefitSponsors::Organizations::Organization"
-        
+
       has_and_belongs_to_many :plan_design_subjects, inverse_of: :plan_design_authors, autosave: true,
                               class_name: "BenefitSponsors::Organizations::Organization"
- 
+
       has_many    :plan_design_organizations, inverse_of: :plan_design_organization,
                   class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
 
       has_many    :plan_design_subject_organizations, inverse_of: :subject_organization,
                   class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
 
-        
+
       # Organizations with EmployerProfile and HbxProfile belong to a Site
       belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
                   class_name: "BenefitSponsors::Site"
@@ -85,6 +88,8 @@ module BenefitSponsors
       embeds_many :profiles, 
                   class_name: "BenefitSponsors::Organizations::Profile"
 
+      embeds_many :documents, as: :documentable
+
       # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
       has_many    :benefit_sponsorships, counter_cache: true,
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
@@ -92,7 +97,9 @@ module BenefitSponsors
 
       accepts_nested_attributes_for :profiles
 
-      validates_presence_of :legal_name, :site, :profiles
+      validates_presence_of :legal_name, :site_id, :profiles
+
+      validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
 
       before_save :generate_hbx_id
 
@@ -117,6 +124,13 @@ module BenefitSponsors
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
+      def invoices
+        documents.select{ |document| document.subject == 'invoice' }
+      end
+
+      def current_month_invoice
+        documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+      end
 
       # Strip non-numeric characters
       def fein=(new_fein)
@@ -134,12 +148,23 @@ module BenefitSponsors
             benefit_market = site.benefit_market_for(:aca_shop)
           end
 
-          new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
+          if profile.primary_office_location.address.present?
+            rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
+            service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address)
+          else
+            rating_area = nil
+            service_areas = nil
+          end
+          new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market, rating_area: rating_area, service_areas: service_areas)
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end
 
         new_sponsorship
+      end
+
+      def entity_kinds
+        ENTITY_KINDS
       end
 
       def employer_profile
@@ -169,6 +194,83 @@ module BenefitSponsors
 
 
       class << self
+
+        def by_invoice_filename(file_path)
+          hbx_id= File.basename(file_path).split("_")[0]
+          BenefitSponsors::Organizations::Organization.where(hbx_id: hbx_id).first
+        end
+
+        def invoice_date(file_path)
+          date_string= File.basename(file_path).split("_")[1]
+          Date.strptime(date_string, "%m%d%Y")
+        end
+
+        def invoice_exist?(invoice_date,org)
+          docs = org.documents.where("date" => invoice_date)
+          matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
+          return true if matching_documents.count > 0
+        end
+
+        def commission_statement_date(file_path)
+          date_string = File.basename(file_path).split("_")[1]
+          Date.strptime(date_string, "%m%d%Y")
+        end
+
+        def commission_statement_exist?(statement_date,org)
+          docs = org.documents.where("date" => statement_date)
+          matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
+          return true if matching_documents.count > 0
+        end
+
+        def upload_invoice(file_path,file_name)
+          invoice_date = invoice_date(file_path) rescue nil
+          org = by_invoice_filename(file_path) rescue nil
+          if invoice_date && org && !invoice_exist?(invoice_date,org)
+            doc_uri = Aws::S3Storage.save(file_path, "invoices", file_name)
+            if doc_uri
+              document = Document.new
+              document.identifier = doc_uri
+              document.date = invoice_date
+              document.format = 'application/pdf'
+              document.subject = 'invoice'
+              document.title = File.basename(file_path)
+              org.documents << document
+              logger.debug "associated file #{file_path} with the Organization"
+              return document
+            else
+              @errors << "Unable to upload PDF to AWS S3 for #{org.hbx_id}"
+              Rails.logger.warn("Unable to upload PDF to AWS S3")
+            end
+          else
+            logger.warn("Unable to associate invoice #{file_path}")
+          end
+        end
+
+        def upload_commission_statement(file_path,file_name)
+          statement_date = commission_statement_date(file_path) rescue nil
+          org = by_commission_statement_filename(file_path) rescue nil
+          if statement_date && org && !commission_statement_exist?(statement_date,org)
+            doc_uri = Aws::S3Storage.save(file_path, "commission-statements", file_name)
+            if doc_uri
+              document = Document.new
+              document.identifier = doc_uri
+              document.date = statement_date
+              document.format = 'application/pdf'
+              document.subject = 'commission-statement'
+              document.title = File.basename(file_path)
+              org.documents << document
+              logger.debug "associated commission statement #{file_path} with the Organization"
+              return document
+            end
+          else
+            logger.warn("Unable to associate commission statement #{file_path}")
+          end
+        end
+
+        def by_commission_statement_filename(file_path)
+          npn = File.basename(file_path).split("_")[0]
+          BrokerRole.find_by_npn(npn).broker_agency_profile.organization
+        end
 
         def default_search_order
           [[:legal_name, 1]]
@@ -245,6 +347,10 @@ module BenefitSponsors
 
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_organization_id) if hbx_id.blank?
+      end
+
+      def is_benefit_sponsor?
+        employer_profile.present?
       end
     end
   end

@@ -36,7 +36,7 @@ module BenefitSponsors
           package_products = product_package.products.collect do |product|
             Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental")
           end
-          @products[product_package.kind] = case product_package.kind
+          @products[product_package.package_kind] = case product_package.package_kind
             when :single_issuer
               package_products.group_by(&:carrier_name)
             when :metal_level

@@ -9,14 +9,26 @@ module BenefitSponsors
     let(:fein)              { "100001001" }
     let(:entity_kind)       { :s_corporation }
 
+    let(:configuration) { BenefitMarkets::Configurations::Configuration.new }
+    let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site_urn: "site_urn", description: "description") }
+    let(:benefit_sponsorship) { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new }
+
     let(:site)              { BenefitSponsors::Site.new(site_key: :cca) }
+    let(:owner_organization) { FactoryGirl.build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile,
+                                  site: site,
+                                  hbx_id: hbx_id,
+                                  legal_name: legal_name,
+                                  dba: dba,
+                                  entity_kind: entity_kind
+                                )
+                              }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                   site: site, 
                                   hbx_id: hbx_id, 
-                                  legal_name: legal_name, 
+                                  legal_name: legal_name,
                                   dba: dba, 
                                   fein: fein, 
-                                  entity_kind: entity_kind,
+                                  entity_kind: entity_kind
                                 )}
 
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
@@ -32,8 +44,7 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        sic_code: sic_code,
-        entity_kind:  entity_kind
+        sic_code: sic_code
       }
     end
 
@@ -62,15 +73,21 @@ module BenefitSponsors
 
         context "and all arguments are valid", dbclean: :after_each do
 
-          before { 
-              site.byline = 'test'
-              site.long_name = 'test'
-              site.short_name = 'test'
-              site.domain_name = 'test'
-              site.owner_organization = organization
-              site.site_organizations << organization
-              organization.profiles << subject
-            }
+          before {
+            benefit_market.configuration = configuration
+            benefit_sponsorship.profile_id = subject.id
+            benefit_sponsorship.benefit_market = benefit_market
+            benefit_sponsorship.organization = organization
+            organization.benefit_sponsorships << benefit_sponsorship
+            site.byline = 'test'
+            site.long_name = 'test'
+            site.short_name = 'test'
+            site.domain_name = 'test'
+            site.owner_organization = owner_organization
+            site.site_organizations << organization
+            organization.profiles << subject
+            organization.active_benefit_sponsorship.save!
+          }
 
           it "should be valid" do
             subject.validate
@@ -106,7 +123,7 @@ module BenefitSponsors
                                       dba: dba, 
                                       entity_kind: entity_kind, 
                                       fein: "525285898", 
-                                    )} 
+                                    )}
       let(:profile)             { BenefitSponsors::Organizations::HbxProfile.new(organization: organization, office_locations: office_locations) }
 
       let(:tyrell_legal_name)   { "Tyrell Corporation" }
@@ -179,7 +196,7 @@ module BenefitSponsors
 
     context "Embedded in a Plan Design Proposal" do
       let(:title)                     { 'New proposal' }
-      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code, entity_kind:  entity_kind) }
+      let(:cca_employer_profile)      { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code) }
 
       let(:plan_design_organization)  { Organizations::PlanDesignOrganization.new(fein: fein, legal_name: legal_name, sic_code: sic_code) }
       let(:plan_design_proposal)      { plan_design_organization.plan_design_proposals.build(title: title, profile: cca_employer_profile) }

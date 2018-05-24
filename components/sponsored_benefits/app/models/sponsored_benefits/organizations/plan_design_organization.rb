@@ -23,11 +23,11 @@ module SponsoredBenefits
 
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
-      field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
+      field :owner_profile_class_name,  type: String, default: "::BenefitSponsors::Organizations::Profile"
 
       # Plan design sponsor profile type & ID
       field :sponsor_profile_id,         type: BSON::ObjectId
-      field :sponsor_profile_class_name, type: String, default: "::EmployerProfile"
+      field :sponsor_profile_class_name, type: String, default: "::BenefitSponsors::Organizations::Profile"
 
       field :has_active_broker_relationship, type: Boolean, default: false
 
@@ -64,16 +64,15 @@ module SponsoredBenefits
 
 
       def employer_profile
-        ::EmployerProfile.find(sponsor_profile_id)
+        ::EmployerProfile.find(sponsor_profile_id) || ::BenefitSponsors::Organizations::Profile.find(sponsor_profile_id)
       end
 
       def broker_agency_profile
-        ::BrokerAgencyProfile.find(owner_profile_id)
+        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::Profile.find(owner_profile_id)
       end
 
       def general_agency_profile
-        org = Organization.by_broker_agency_profile(broker_agency_profile.id).first
-        org.try(:employer_profile).try(:active_general_agency_account)
+        self.try(:employer_profile).try(:active_general_agency_account)
       end
 
       # TODO Move this method to BenefitMarket Model

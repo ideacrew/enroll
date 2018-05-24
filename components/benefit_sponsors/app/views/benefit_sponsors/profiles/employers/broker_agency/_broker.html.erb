@@ -13,7 +13,7 @@
           <h4 class="modal-title">Broker Selection Confirmation</h4>
         </div>
 
-        <%= form_for broker_agency, {url: "/benefit_sponsors/profiles/employers/employer_profiles/#{@employer_profile.id}/broker_agency", method: :post} do |f| %>
+        <%= form_for broker_agency, {url: profiles_employers_employer_profile_broker_agency_index_path(@employer_profile.id) , method: :post} do |f| %>
           <div class="modal-body">
             <%= hidden_field_tag(:broker_agency_id, broker_agency.id) %>
             <%= hidden_field_tag(:broker_role_id, broker.id) %>

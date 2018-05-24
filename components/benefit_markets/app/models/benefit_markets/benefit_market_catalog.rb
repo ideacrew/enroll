@@ -67,8 +67,11 @@ module BenefitMarkets
         end
       end
       true
-    end
+    end        
 
+    def benefit_sponsor_catalog_for(service_areas: nil, effective_date: ::TimeKeeper.date_of_record)
+      BenefitSponsorCatalogFactory.call(effective_date, self, service_areas)
+    end
 
     # Remove this and delegate properly once Products are implemented
     def product_market_kind
@@ -86,8 +89,8 @@ module BenefitMarkets
     end
 
     # All ProductPackages that Sponsor is eligible to offer to members
-    def product_packages_for(service_area, effective_date)
-      product_packages.select{|product_package| product_package.is_available_for?(service_area, effective_date) }
+    def product_packages_for(service_areas, effective_date)
+      product_packages.select{|product_package| product_package.is_available_for?(service_areas, effective_date) }
     end
 
     def issuers_for(benefit_application)
@@ -125,7 +128,7 @@ module BenefitMarkets
       prior_month = effective_date - 1.month
 
       begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
-      end_on   = Date.new(prior_month.year, prior_month.month, @benefit_market.open_enrollment_end_on_day_of_month)
+      end_on   = Date.new(prior_month.year, prior_month.month, benefit_market.open_enrollment_end_on_day_of_month)
 
       begin_on..end_on
     end

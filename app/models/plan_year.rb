@@ -183,7 +183,7 @@ class PlanYear
       }},
       {"$match" => {"aasm_state" => {"$nin" => HbxEnrollment::WAIVED_STATUSES}}}
     ])
-    return [] if (enrollment_proxies.count > 100)
+    return [] if (enrollment_proxies.count > Settings.aca.shop_market.small_market_active_employee_limit)
     enrollment_proxies.map do |ep|
       OpenStruct.new(ep)
     end
@@ -194,7 +194,7 @@ class PlanYear
     families = Family.where({
       :"households.hbx_enrollments.benefit_group_id".in => id_list,
       :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
-      }).limit(100)
+      }).limit(Settings.aca.shop_market.small_market_active_employee_limit)
 
     families.inject([]) do |enrollments, family|
       valid_enrollments = family.active_household.hbx_enrollments.where({
@@ -642,7 +642,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    if self.employer_profile.census_employees.active.count < 200
+    if self.employer_profile.census_employees.active.count <= Settings.aca.shop_market.small_market_active_employee_limit
       #enrolled.count
       enrolled_by_bga.count
     else

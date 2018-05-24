@@ -9,6 +9,7 @@ module BenefitSponsors
       # TODO use SIC code validation
       validates_presence_of :sic_code
 
+      embeds_one  :employer_attestation
 
       private
 

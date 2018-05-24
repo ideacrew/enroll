@@ -2,7 +2,7 @@ module BenefitSponsors
   module Services
     class BenefitPackageService
 
-      attr_reader :benefit_package_factory, :benefit_application
+      attr_reader :benefit_package_factory, :benefit_application, :employer_profile
 
       def initialize(factory_kind = BenefitSponsors::BenefitPackages::BenefitPackageFactory)
         @benefit_package_factory = factory_kind
@@ -16,6 +16,7 @@ module BenefitSponsors
 
       def load_form_metadata(form)
         application  = find_benefit_application(form)
+        @employer_profile = benefit_application.benefit_sponsorship.profile
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
       end
 
@@ -45,9 +46,8 @@ module BenefitSponsors
 
       def update(form)
         benefit_application = find_benefit_application(form)
-        benefit_package = find_model_by_id(form.id)
         model_attributes = form_params_to_attributes(form)
-        benefit_package.assign_attributes(model_attributes)
+        benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
         store(form, benefit_package)
       end
 
@@ -105,6 +105,7 @@ module BenefitSponsors
       def sponsored_benefits_attributes_to_form_params(benefit_package)
         benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << Forms::SponsoredBenefitForm.new({
+            id: sponsored_benefit.id,
             product_option_choice: sponsored_benefit.product_option_choice,
             product_package_kind: sponsored_benefit.product_package_kind,
             reference_plan_id: sponsored_benefit.reference_product.id,
@@ -116,6 +117,7 @@ module BenefitSponsors
       def sponsored_contribution_attributes_to_form_params(sponsored_benefit)
         contribution_levels = sponsored_benefit.sponsor_contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
           contribution_levels << Forms::ContributionLevelForm.new({
+            id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
             is_offered: contribution_level.is_offered
@@ -126,37 +128,40 @@ module BenefitSponsors
 
       def form_params_to_attributes(form)
         attributes = {
+          id: form.id,
           title: form.title,
           description: form.description,
           probation_period_kind: form.probation_period_kind
         }
-        attributes[:sponsored_benefits] = sponsored_benefits_attributes(form)
+        attributes[:sponsored_benefits_attributes] = sponsored_benefits_attributes(form)
         attributes
       end
 
       def sponsored_benefits_attributes(form)
         form.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << {
+            id: sponsored_benefit.id,
             kind: sponsored_benefit.kind,
             product_package_kind: sponsored_benefit.product_package_kind,
             product_option_choice: sponsored_benefit.product_option_choice,
             reference_plan_id: sponsored_benefit.reference_plan_id,
-            sponsor_contribution: sponsored_contribution_attributes(sponsored_benefit)
+            sponsor_contribution_attributes: sponsor_contribution_attributes(sponsored_benefit)
           }
         end
       end
 
-      def sponsored_contribution_attributes(sponsored_benefit)
+      def sponsor_contribution_attributes(sponsored_benefit)
         contribution = sponsored_benefit.sponsor_contribution
         contribution_levels = contribution.contribution_levels.inject([]) do |contribution_levels, contribution_level|
           contribution_levels << {
+            id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
             is_offered: contribution_level.is_offered
           }
         end
 
-        { contribution_levels: contribution_levels}
+        { contribution_levels_attributes: contribution_levels}
       end
     end
   end

@@ -6,9 +6,9 @@ module BenefitSponsors
       # include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
-      PLAN_DESIGN_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
-      PLAN_DESIGN_DRAFT_STATES      = [:draft] + PLAN_DESIGN_EXCEPTION_STATES.freeze
-      PLAN_DESIGN_APPROVED_STATES   = [:approved].freeze
+      APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
+      APPLICATION_DRAFT_STATES      = [:draft] + APPLICATION_EXCEPTION_STATES.freeze
+      APPLICATION_APPROVED_STATES   = [:approved].freeze
       ENROLLING_STATES              = [:enrollment_open, :enrollment_closed].freeze
       ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible].freeze
       ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
@@ -16,7 +16,9 @@ module BenefitSponsors
       TERMINATED_STATES             = [:denied, :suspended, :terminated, :canceled, :expired].freeze
       EXPIRED_STATES                = [:expired].freeze
 
-      # APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
+      PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
+
+      APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
       # INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
 
 
@@ -38,13 +40,13 @@ module BenefitSponsors
       field :waived_summary,          type: Integer,  default: 0
 
       # Sponsor self-reported number of full-time employees
-      field :fte_count,               type: Integer, default: 0
+      field :fte_count,               type: Integer,  default: 0
 
       # Sponsor self-reported number of part-time employess
-      field :pte_count,               type: Integer, default: 0
+      field :pte_count,               type: Integer,  default: 0
 
       # Sponsor self-reported number of Medicare Second Payers
-      field :msp_count,               type: Integer, default: 0
+      field :msp_count,               type: Integer,  default: 0
 
       # Sponsor's Standard Industry Classification code for period covered by this
       # applciation
@@ -67,8 +69,9 @@ module BenefitSponsors
       belongs_to  :recorded_rating_area,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
-      belongs_to  :recorded_service_area,
-                  class_name: "::BenefitMarkets::Locations::ServiceArea"
+      has_and_belongs_to_many  :recorded_service_areas,
+                  class_name: "::BenefitMarkets::Locations::ServiceArea",
+                  :inverse_of => nil
 
       belongs_to  :benefit_sponsorship,
                   counter_cache: true,
@@ -80,7 +83,7 @@ module BenefitSponsors
       embeds_many :benefit_packages,
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
-      validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_area, :recorded_rating_area
+      validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area
 
       index({ "aasm_state" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
@@ -92,23 +95,24 @@ module BenefitSponsors
       def set_values
         recorded_sic_code     = benefit_sponsorship.sic_code unless recorded_sic_code.present?
         recorded_rating_area  = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-        recorded_service_area = benefit_sponsorship.service_area unless recorded_service_area.present?
+        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
       end
 
       # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
-      scope :plan_design_draft,               ->{ any_in(aasm_state: PLAN_DESIGN_DRAFT_STATES) }
-      scope :plan_design_approved,            ->{ any_in(aasm_state: PLAN_DESIGN_APPROVED_STATES) }
-      scope :plan_design_exception,           ->{ any_in(aasm_state: PLAN_DESIGN_EXCEPTION_STATES) }
+      scope :plan_design_draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+      scope :plan_design_approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
+      scope :plan_design_exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
       scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
       scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
       scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
       scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
+      scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
       scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
-                                                        :aasm_state.in => PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES)
+                                                        :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
                                                             }
 
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -128,24 +132,27 @@ module BenefitSponsors
       scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"open_enrollment_period.max" => compare_date)
                                                             }
+      # TODO
+      scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
+      scope :renewing,                        ->{ is_renewing } # Deprecate it in future
 
       # scope :by_effective_date_range,         ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
       # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
       # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
       # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
 
-      # scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
-      #   where(
-      #     "$and" => [
-      #       {:aasm_state.in => APPROVED_STATES },
-      #       {"$or" => [
-      #         { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
-      #         { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
-      #       ]
-      #     }
-      #   ]
-      #   )
-      # }
+      scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
+        where(
+          "$and" => [
+            {:aasm_state.in => APPROVED_STATES },
+            {"$or" => [
+              { :effective_period.min => {"$gte" => begin_on, "$lte" => end_on }},
+              { :effective_period.max => {"$gte" => begin_on, "$lte" => end_on }}
+            ]
+          }
+        ]
+        )
+      }
 
       # scope :published_plan_years_by_date, ->(date) {
       #   where(
@@ -219,7 +226,7 @@ module BenefitSponsors
       end
 
       def sponsor_profile
-        benefit_sponsorship.benefit_sponsorable
+        benefit_sponsorship.profile
       end
 
       def default_benefit_group
@@ -227,7 +234,15 @@ module BenefitSponsors
       end
 
       def is_renewing?
-        predecessor_application.present? && (PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+        predecessor_application.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+      end
+
+      def is_renewal_enrolling?
+        predecessor_application.present? && (ENROLLING_STATES).include?(aasm_state)
+      end
+
+      def open_enrollment_contains?(date)
+        open_enrollment_period.cover?(date)
       end
 
       # TODO Refactor -- use the new state: :open_enrollment_closed
@@ -256,7 +271,7 @@ module BenefitSponsors
             msp_count:                msp_count,
             benefit_sponsor_catalog:  new_benefit_sponsor_catalog,
             predecessor_application:  self,
-            recorded_service_area:    benefit_sponsorship.service_area,
+            recorded_service_areas:   benefit_sponsorship.service_areas,
             recorded_rating_area:     benefit_sponsorship.rating_area,
             effective_period:         new_benefit_sponsor_catalog.effective_period,
             open_enrollment_period:   new_benefit_sponsor_catalog.open_enrollment_period
@@ -270,10 +285,59 @@ module BenefitSponsors
         renewal_application
       end
 
+      def overlapping_published_benefit_applications
+        self.sponsor_profile.benefit_applications.published_benefit_applications_within_date_range(self.start_on, self.end_on)
+      end
+
+      def renew_benefit_package_assignments
+        benefit_packages.each do |benefit_package|
+          predecessor_benefit_package = benefit_package.predecessor
+          predecessor_effective_date  = predecessor_application.effective_period.min
+
+          predecessor_benefit_package.census_employees_assigned_on(predecessor_effective_date).each  do |employee|
+            new_benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
+            if new_benefit_package_assignment.blank? || (benefit_package_assignment.benefit_package != benefit_package)
+              census_employee.assign_to_benefit_package(benefit_package, effective_period.min)
+            end
+          end
+        end
+
+        benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |employee|
+          assign_to_default_benefit_package(census_employee)
+        end
+      end
+
+      def assign_to_default_benefit_package(census_employee, assignment_on = effective_period.min)
+        census_employee.assign_to_benefit_package(default_benefit_package, assignment_on)
+      end
+
+      def renew_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          member_collection = benefit_package.census_employees_assigned_on(benefit_package.effective_period.min)
+          benefit_package.renew_member_benefits(member_collection)
+        end
+      end
+
+      def refresh(new_benefit_sponsor_catalog)
+        if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
+
+          benefit_packages.each do |benefit_package|
+            benefit_package.refresh(new_benefit_sponsor_catalog)
+          end
+
+          self.benefit_sponsor_catalog = new_benefit_sponsor_catalog
+        end
+
+        self
+      end
+
+      def cancel_enrollments
+      end
+
       def is_event_date_valid?
         today = TimeKeeper.date_of_record
 
-        valid = case aasm_state
+        is_valid = case aasm_state
         when "approved", "draft"
           today >= open_enrollment_period.begin
         when "enrollment_open"
@@ -286,7 +350,7 @@ module BenefitSponsors
           false
         end
 
-        valid
+        is_valid
       end
 
       aasm do
@@ -310,12 +374,13 @@ module BenefitSponsors
         state :appealing            # request reversal of negative determination
         ## End optional states for exception processing
 
-        state :enrollment_open      #,       :after_enter => :send_employee_invites          # Approved application has entered open enrollment period
+        state :enrollment_open      # Approved application has entered open enrollment period
+        # :after_enter => :send_employee_invites
         # state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
 
         state :enrollment_closed
-
-        state :enrollment_eligible,   :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
+        state :enrollment_eligible  # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
+        # :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed]
         # Published plan open enrollment has ended and is eligible for coverage,
                                                                           #   but effective date is in future
         # state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
@@ -364,7 +429,9 @@ module BenefitSponsors
           ## TODO update these renewal transitions
           # transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
           # transitions from: :draft, to: :approved,        guard:  :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster]
+        end
 
+        event :review_application do
           transitions from: :draft, to: :pending
         end
 
@@ -392,7 +459,7 @@ module BenefitSponsors
 
         # Upon review, application ineligible status overturned and deemed eligible
         event :approve_application do
-          transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :approved
+          transitions from: APPLICATION_EXCEPTION_STATES, to: :approved
         end
 
         event :submit_for_review do
@@ -401,7 +468,7 @@ module BenefitSponsors
 
         # Upon review, submitted application ineligible status verified ineligible
         event :deny_application do
-          transitions from: PLAN_DESIGN_EXCEPTION_STATES, to: :denied
+          transitions from: APPLICATION_EXCEPTION_STATES, to: :denied
         end
 
         event :begin_open_enrollment do
@@ -410,7 +477,8 @@ module BenefitSponsors
         end
 
         event :end_open_enrollment do
-          transitions from:   :enrollment_open, to: :enrollment_closed
+          transitions from:   :enrollment_open,
+                      to:     :enrollment_closed
         end
 
         event :approve_enrollment_eligiblity do
@@ -423,8 +491,13 @@ module BenefitSponsors
                       to:     :enrollment_ineligible
         end
 
+        event :reverse_enrollment_eligiblity do
+          transitions from:   :enrollment_eligible,
+                      to:     :enrollment_closed
+        end
+
         event :revert_application do #, :after => :revert_employer_profile_application do
-          transitions from:   [:approved, :denied] + PLAN_DESIGN_EXCEPTION_STATES,
+          transitions from:   [:approved, :denied] + APPLICATION_EXCEPTION_STATES,
                       to:     :draft
         end
 
@@ -435,24 +508,22 @@ module BenefitSponsors
                                   :active,
                                 ],
                       to:     :draft,
-                      after:  [:cancel_enrollments]
+                      after:  :cancel_enrollments
         end
 
         event :activate_enrollment do
           transitions from:   [:enrollment_open, :enrollment_closed, :enrollment_eligible],
-                      to:     :active,
-                      guard:  :can_be_activated?
+                      to:     :active
         end
 
         event :expire do
           transitions from:   [:approved, :enrollment_open, :enrollment_eligible, :active],
-                      to:     :expired,
-                      guard:  :can_be_expired?
+                      to:     :expired
         end
 
         # Enrollment processed stopped due to missing binder payment
         event :cancel do
-          transitions from:   PLAN_DESIGN_DRAFT_STATES + ENROLLING_STATES,
+          transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
                       to:     :canceled
         end
 
@@ -472,6 +543,10 @@ module BenefitSponsors
         end
       end
 
+      def cancel_enrollments
+        # TODO
+      end
+
       def publish_state_transition
         return unless benefit_sponsorship.present?
         benefit_sponsorship.application_event_subscriber(aasm)
@@ -481,6 +556,24 @@ module BenefitSponsors
         if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
           approve_enrollment_eligiblity!
         end
+
+        if aasm.to_state == :binder_reversed
+          reverse_enrollment_eligiblity!
+        end
+      end
+
+      def is_published?
+        PUBLISHED_STATES.include?(aasm_state)
+      end
+
+      def benefit_groups # Deprecate in future
+        warn "[Deprecated] Instead use benefit_packages" unless Rails.env.test?
+        benefit_packages
+      end
+
+      def employees_are_matchable? # Deprecate in future
+        warn "[Deprecated] Instead use is_published?" unless Rails.env.test?
+        is_published?
       end
 
       private
