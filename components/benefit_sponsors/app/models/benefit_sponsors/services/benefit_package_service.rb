@@ -2,7 +2,7 @@ module BenefitSponsors
   module Services
     class BenefitPackageService
 
-      attr_reader :benefit_package_factory, :benefit_application
+      attr_reader :benefit_package_factory, :benefit_application, :employer_profile
 
       def initialize(factory_kind = BenefitSponsors::BenefitPackages::BenefitPackageFactory)
         @benefit_package_factory = factory_kind
@@ -16,6 +16,7 @@ module BenefitSponsors
 
       def load_form_metadata(form)
         application  = find_benefit_application(form)
+        @employer_profile = benefit_application.benefit_sponsorship.profile
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
       end
 
