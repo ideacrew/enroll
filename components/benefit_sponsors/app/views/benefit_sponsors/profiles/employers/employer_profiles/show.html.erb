@@ -1,5 +1,5 @@
 <% content_for :navigation do %>
-<%= render :partial => 'primary_nav', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
+<%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
 <% end %>
 
 <%- if @tab == 'home' %>
@@ -32,10 +32,10 @@
 <% if @current_plan_year.present? %>
 <aside class="col-xs-4 employer-right-column module">
   <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
-    <%= render partial: 'open_enrollment_ends_panel' %>
+    <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/open_enrollment_ends_panel' %>
   <% end %>
-  <%= render partial: 'enrollment_report_widget' %>
-  <%= render partial: 'employer_broker_widget' %>
+  <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/enrollment_report_widget' %>
+  <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/employer_broker_widget' %>
 </aside>
 <% else %>
 
