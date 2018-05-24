@@ -62,6 +62,7 @@ module SponsoredBenefits
       allow(subject).to receive(:active_user).and_return(active_user)
       allow(current_person).to receive(:broker_role).and_return(broker_role)
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
+      allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
     end
 
     describe "GET #index" do
