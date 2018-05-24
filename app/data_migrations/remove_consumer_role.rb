@@ -1,7 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require "csv"
 
-class RemoveResidentRole < MongoidMigrationTask
+class RemoveConsumerRole < MongoidMigrationTask
   # This script is meant to disassociate a consumer role for a person who is meant
   # to only have a resident role at this point in time since coverall phase 2 has
   # not been released yet. This script will mark all the current enrollments associated
