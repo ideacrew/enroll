@@ -95,17 +95,17 @@ module BenefitSponsors
       end
 
       def organization_attributes(form)
-        form.attributes.slice(:fein, :dba, :legal_name)
+        form.attributes.slice(:entity_kind, :fein, :dba, :legal_name)
       end
 
       def profile_attributes(form)
         if is_broker_profile?
-          form.attributes.slice(:entity_kind, :id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
+          form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours)
         elsif is_sponsor_profile?
           if is_cca_sponsor_profile?
-            form.attributes.slice(:entity_kind, :contact_method, :id, :sic_code)
+            form.attributes.slice(:contact_method, :id, :sic_code)
           else
-            form.attributes.slice(:entity_kind, :contact_method, :id)
+            form.attributes.slice(:contact_method, :id)
           end
         end
       end

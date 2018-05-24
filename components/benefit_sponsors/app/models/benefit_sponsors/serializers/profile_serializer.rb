@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Serializers
     class ProfileSerializer < ActiveModel::Serializer
-      attributes :id, :entity_kind, :contact_method, :sic_code, :entity_kind_options,
+      attributes :id, :contact_method, :sic_code,
                    :languages_spoken, :working_hours, :accept_new_clients, :profile_type, :market_kind_options,
                     :market_kind, :language_options, :home_page, :grouped_sic_code_options
       attribute :contact_method_options
@@ -13,7 +13,6 @@ module BenefitSponsors
       attribute :accept_new_clients, if: :is_broker_profile?
       attribute :market_kind_options, if: :is_broker_profile?
       attribute :market_kind, if: :is_broker_profile?
-      attribute :entity_kind_options, if: :is_employer_profile?
       attribute :language_options, if: :is_broker_profile?
       attribute :home_page, if: :is_broker_profile?
       attribute :id, if: :is_persisted?
@@ -39,10 +38,6 @@ module BenefitSponsors
 
       def is_broker_profile?
         object.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
-      end
-
-      def entity_kind_options
-        object.entity_kinds
       end
 
       def market_kind_options
@@ -71,7 +66,7 @@ module BenefitSponsors
       def attributes(*args)
         hash = super
         unless object.persisted?
-          hash[:entity_kind] = :s_corporation if is_broker_profile?
+
         end
         hash
       end
