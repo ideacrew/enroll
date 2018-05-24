@@ -79,5 +79,13 @@ FactoryGirl.define do
         benefit_sponsorship.benefit_applications.map(&:save) # TODO
       end
     end
+
+    trait :with_broker_agency_account do
+      after :build do |benefit_sponsorship, evaluator|
+        broker_agency_account = FactoryGirl.build :benefit_sponsors_accounts_broker_agency_account
+        benefit_sponsorship.broker_agency_accounts= [broker_agency_account]
+      end
+    end
+
   end
 end
