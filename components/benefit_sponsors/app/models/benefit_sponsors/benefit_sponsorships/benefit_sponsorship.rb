@@ -108,7 +108,7 @@ module BenefitSponsors
 
       before_create :generate_hbx_id
 
-      after_initialize :set_service_and_rating_areas
+      # after_initialize :set_service_and_rating_areas
 
       index({ aasm_state: 1 })
 
