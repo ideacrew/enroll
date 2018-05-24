@@ -14,7 +14,7 @@ module BenefitSponsors
 
       def load_form_metadata(form)
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        benefit_sponsorship = find_benefit_sponsorship(form)
+        find_benefit_sponsorship(form)
         form.start_on_options = schedular.start_on_options_with_schedule
       end
 
@@ -25,7 +25,7 @@ module BenefitSponsors
   
       def save(form)
         model_attributes = form_params_to_attributes(form)
-        benefit_sponsorship = find_benefit_sponsorship(form)
+        find_benefit_sponsorship(form)
         benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
         store(form, benefit_application)
       end
