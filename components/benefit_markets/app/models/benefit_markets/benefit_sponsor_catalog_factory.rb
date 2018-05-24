@@ -47,9 +47,14 @@ module BenefitMarkets
     end
 
     def construct_sponsor_product_package(market_product_package)
-      package_attrs = market_product_package.attributes.slice(:product_kind, :benefit_kind, :package_kind, :title, :description)
+      product_package = BenefitMarkets::Products::ProductPackage.new(
+        title: market_product_package.title,
+        description: market_product_package.description,
+        product_kind: market_product_package.product_kind,
+        benefit_kind: market_product_package.benefit_kind, 
+        package_kind: market_product_package.package_kind
+      )
 
-      product_package = BenefitMarkets::Products::ProductPackage.new(package_attrs)
       product_package.application_period = @benefit_sponsor_catalog.effective_period
       product_package.contribution_model = market_product_package.contribution_model.create_copy_for_embedding
       product_package.pricing_model = market_product_package.pricing_model.create_copy_for_embedding
