@@ -15,7 +15,7 @@ module SponsoredBenefits
 
     let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
     let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
-                                    legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization) }
+                                    legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization, office_locations: []) }
     let(:old_broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
     let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: employer.id,
                                                                         owner_profile_id: broker_agency_profile_id,
@@ -80,6 +80,7 @@ module SponsoredBenefits
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
       allow(subject).to receive(:active_user).and_return(active_user)
       allow(active_user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
     end
 
     describe "GET #new" do
