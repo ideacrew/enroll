@@ -258,6 +258,16 @@ module BenefitSponsors
         date = date + 1 if date.sunday?
         date
       end
+
+      def default_dates_for_coverage_starting_on(coverage_start_date)
+        effective_date            = coverage_start_date.to_date.beginning_of_month
+        effective_period          = effective_date..(effective_date + 1.year - 1.day)
+        open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+        {
+            effective_period: effective_period,
+            open_enrollment_period: open_enrollment_period,
+        }
+      end
     end
   end
 end

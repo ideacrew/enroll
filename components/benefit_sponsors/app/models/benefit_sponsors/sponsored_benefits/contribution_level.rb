@@ -21,10 +21,16 @@ module BenefitSponsors
       validates_presence_of :display_name, :allow_blank => false
       validates_presence_of :contribution_unit_id, :allow_blank => false
 
-
       def contribution_pct
         (contribution_factor * 100)
       end
+
+      NAMES = [
+          "employee_only",
+          "employee_and_spouse",
+          "employee_and_one_or_more_dependents",
+          "family"
+      ]
     end
   end
 end

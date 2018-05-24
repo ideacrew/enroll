@@ -8,20 +8,20 @@ module Importers
     HIRE_COVERAGE_POLICIES = {
 #     "date of hire" => NewHireCoveragePolicy.new("date_of_hire", 0),
 #     "date of hire equal to effective date" => NewHireCoveragePolicy.new("date_of_hire", 0),
-      "first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
-      "first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
-      "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),
-      "on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0),
-      "first of the month following or coinciding with date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
+"first of the month following 30 days" => NewHireCoveragePolicy.new("first_of_month", 30),
+"first of the month following 60 days" => NewHireCoveragePolicy.new("first_of_month", 60),
+"first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),
+"on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0),
+"first of the month following or coinciding with date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
     }
 
     CARRIER_MAPPING = {
-      "aetna" => "AHI",
-      "carefirst bluecross blueshield" => "GHMSI",
-      "kaiser permanente" => "KFMASI",
-      "united healthcare" => "UHIC",
-      "united health care" => "UHIC",
-      "unitedhealthcare" => "UHIC"
+        "aetna" => "AHI",
+        "carefirst bluecross blueshield" => "GHMSI",
+        "kaiser permanente" => "KFMASI",
+        "united healthcare" => "UHIC",
+        "united health care" => "UHIC",
+        "unitedhealthcare" => "UHIC"
     }
     validates_length_of :fein, is: 9
 
@@ -35,14 +35,14 @@ module Importers
     attr_reader :fein, :plan_selection, :carrier
 
     attr_accessor :action,
-      :enrolled_employee_count,
-      :new_coverage_policy,
-      :new_coverage_policy_value,
-      :default_plan_year_start,
-      :most_common_hios_id,
-      :single_plan_hios_id,
-      :reference_plan_hios_id,
-      :coverage_start
+                  :enrolled_employee_count,
+                  :new_coverage_policy,
+                  :new_coverage_policy_value,
+                  :default_plan_year_start,
+                  :most_common_hios_id,
+                  :single_plan_hios_id,
+                  :reference_plan_hios_id,
+                  :coverage_start
 
     attr_reader :warnings
 
@@ -93,7 +93,7 @@ module Importers
       return false if plan_years.empty?
       plan_years.any? do |py|
         PlanYear::PUBLISHED.include?(py.aasm_state) ||
-          PlanYear::RENEWING.include?(py.aasm_state)
+            PlanYear::RENEWING.include?(py.aasm_state)
       end
     end
 
@@ -101,7 +101,7 @@ module Importers
       found_employer = find_employer
       return true unless found_employer
       return true if action.to_s.downcase == 'update'
-      if plan_years_are_active?(found_employer.plan_years) 
+      if plan_years_are_active?(found_employer.plan_years)
         errors.add(:fein, "already has active plan years")
       end
     end
@@ -114,7 +114,7 @@ module Importers
     end
 
     def find_employer
-      org = Organization.where(:fein => fein).first
+      org = BenefitSponsors::Organizations::Organization.where(fein: fein).first
       return nil unless org
       org.employer_profile
     end
@@ -153,8 +153,8 @@ module Importers
       employer.census_employees.non_terminated.each do |ce|
         next unless ce.valid?
         begin
-        ce.add_benefit_group_assignment(bg)
-        ce.save!
+          ce.add_benefit_group_assignment(bg)
+          ce.save!
         rescue Exception => e
           puts "Issue adding benefit group to employee:"
           puts "\n#{employer.fein} - #{employer.legal_name} - #{ce.full_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
