@@ -41,5 +41,9 @@ module BenefitMarkets
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
       end
     end
+
+    def create_copy_for_embedding
+      self.class.new(self.attributes.except(:premium_tuples))
+    end
   end
 end

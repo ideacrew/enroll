@@ -57,7 +57,7 @@ module BenefitSponsors
       end
 
       def is_conversion?
-        self.profile_source.to_s == "conversion"
+        self.organization.active_benefit_sponsorship.source_kind == :self_serve
       end
 
       def entity_kinds
