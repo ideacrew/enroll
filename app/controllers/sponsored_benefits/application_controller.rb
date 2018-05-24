@@ -17,7 +17,8 @@ module SponsoredBenefits
           @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id])
         elsif params[:plan_design_proposal_id].present?
           org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id]).plan_design_organization
-          @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
+          @broker_agency_profile = BenefitSponsors::Organizations::Profile.find(org.owner_profile_id)
+          @broker_agency_profile ||= ::BrokerAgencyProfile.find(org.owner_profile_id) # Deprecate this
         elsif params[:id].present?
           unless current_uri.include? 'broker_agency_profile'
             org = if controller_name == "plan_design_proposals"
@@ -25,7 +26,8 @@ module SponsoredBenefits
             elsif controller_name == "plan_design_organizations"
               SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
             end
-            @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id)
+            @broker_agency_profile = BenefitSponsors::Organizations::Profile.find(org.owner_profile_id)
+            @broker_agency_profile ||= ::BrokerAgencyProfile.find(org.owner_profile_id) # Deprecate this
           end
         end
       end

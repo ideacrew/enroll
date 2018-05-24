@@ -5,7 +5,7 @@ module SponsoredBenefits
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :organization, class_name: "::Organization"
+      embedded_in :organization, class_name: "SponsoredBenefits::Organizations::Organization"
 
       field :profile_source, type: String
 

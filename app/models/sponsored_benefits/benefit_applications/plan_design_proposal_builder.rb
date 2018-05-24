@@ -73,7 +73,8 @@ module SponsoredBenefits
       #   One-time Quote Access
       #   No Access
       def has_access?
-        broker_agency_accounts =  @employer_profile.broker_agency_accounts.where(broker_agency_profile_id: plan_design_organization.broker_agency_profile.id)
+        broker_agency_accounts =  @employer_profile.broker_agency_accounts.where(broker_agency_profile_id: plan_design_organization.broker_agency_profile.id) # Deprecate this
+        broker_agency_accounts =  @employer_profile.broker_agency_accounts.where(benefit_sponsors_broker_agency_profile_id: plan_design_organization.broker_agency_profile.id) if broker_agency_accounts.blank?
         
         if broker_agency_accounts.present? && broker_agency_accounts.any?{|acc| acc.is_active?}
           return true
