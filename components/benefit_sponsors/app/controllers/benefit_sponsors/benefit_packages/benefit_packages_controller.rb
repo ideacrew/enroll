@@ -11,7 +11,7 @@ module BenefitSponsors
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
         if @benefit_package_form.save
           flash[:notice] = "Benefit Package successfully created."
-          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile.id, :tab=>'benefits')
+          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
         else
           flash[:error] = error_messages(@benefit_package_form)
           render :new
@@ -25,8 +25,9 @@ module BenefitSponsors
       def update
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
         if @benefit_package_form.update
+
           flash[:notice] = "Benefit Package successfully updated."
-          redirect_to benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
         else
           flash[:error] = error_messages(@benefit_package_form)
           render :edit
