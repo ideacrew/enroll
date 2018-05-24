@@ -86,6 +86,7 @@ module BenefitSponsors
 
       class << self
         def find(id)
+          return nil if id.blank?
           organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).first
           return unless organization
           organization.profiles.detect { |profile| profile.id.to_s == id.to_s }
