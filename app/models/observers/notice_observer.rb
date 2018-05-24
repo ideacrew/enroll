@@ -136,6 +136,7 @@ module Observers
     end
 
     def plan_year_date_change(model_event)
+      current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
         if model_event.event_key == :renewal_employer_publish_plan_year_reminder_after_soft_dead_line
           trigger_on_queried_records("renewal_employer_publish_plan_year_reminder_after_soft_dead_line")
