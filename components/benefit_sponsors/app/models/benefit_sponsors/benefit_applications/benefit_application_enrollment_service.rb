@@ -6,6 +6,32 @@ module BenefitSponsors
       @benefit_application = benefit_application
     end
 
+    def begin_initial_open_enrollment
+      @benefit_application.validate_sponsor_market_policy
+      return false unless @benefit_application.is_valid?
+
+      if @benefit_application.may_begin_open_enrollment?
+        @benefit_application.begin_open_enrollment!
+      else
+        @benefit_application.errors.add(:base => "State transition failed")
+        return false
+      end
+    end
+
+    def begin_renewal_open_enrollment
+      @benefit_application.validate_sponsor_market_policy
+      return false unless @benefit_application.is_valid?
+
+      if @benefit_application.may_begin_open_enrollment?
+        @benefit_application.begin_open_enrollment!
+
+        if @benefit_application.enrollment_open?
+          @benefit_application.renew_benefit_package_members
+        else
+        end
+      end
+    end
+
     # validate :open_enrollment_date_checks
     ## Trigger events can be dates or from UI
     def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)

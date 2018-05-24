@@ -75,6 +75,42 @@ module BenefitSponsors
         end
       end
 
+      def commission_statements
+        permitted = params.permit(:id)
+        @id = permitted[:id]
+        if current_user.has_broker_role?
+          find_broker_agency_profile(current_user.person.broker_role.broker_agency_profile_id)
+        elsif current_user.has_hbx_staff_role?
+          find_broker_agency_profile(BSON::ObjectId.from_string(@id))
+        else
+          redirect_to new_broker_agencies_profile_path
+          return
+        end
+        documents = @broker_agency_profile.organization.documents
+        if documents
+          @statements = get_commission_statements(documents)
+        end
+        collect_and_sort_commission_statements
+        respond_to do |format|
+          format.js
+        end
+      end
+
+      def show_commission_statement
+        options={}
+        options[:filename] = @commission_statement.title
+        options[:type] = 'application/pdf'
+        options[:disposition] = 'inline'
+        send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+      end
+
+      def download_commission_statement
+        options={}
+        options[:content_type] = @commission_statement.type
+        options[:filename] = @commission_statement.title
+        send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+      end
+
       def employers
       end
 
@@ -168,6 +204,23 @@ module BenefitSponsors
 
       def check_general_agency_profile_permissions_set_default
       end
+
+      def get_commission_statements(documents)
+        commission_statements = []
+        documents.each do |document|
+          # grab only documents that are commission statements by checking the bucket in which they are placed
+          if document.identifier.include?("commission-statements")
+            commission_statements << document
+          end
+        end
+        commission_statements
+      end
+
+      def collect_and_sort_commission_statements(sort_order='ASC')
+        @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
+        @statements.sort_by!(&:date).reverse!
+      end
+
     end
   end
 end

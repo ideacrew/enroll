@@ -4,6 +4,6 @@ require File.expand_path(File.join(File.dirname(__FILE__), "benefit_markets_seed
 require File.expand_path(File.join(File.dirname(__FILE__), "locations_seed"))
 require File.expand_path(File.join(File.dirname(__FILE__), "factors_seed"))
 require File.expand_path(File.join(File.dirname(__FILE__), "products_seed"))
-Mongoid::Migration.say_with_time("Loading MA Contribution and Pricing Models") do
-  require File.expand_path(File.join(File.dirname(__FILE__),'..', 'ma_employer_pricing_and_contribution_models'))
-end
+require File.expand_path(File.join(File.dirname(__FILE__), "pricing_and_contribution_models_seed"))
+require File.expand_path(File.join(File.dirname(__FILE__), "benefit_market_catalogs"))
+require File.expand_path(File.join(File.dirname(__FILE__), "employer_profiles_seed"))

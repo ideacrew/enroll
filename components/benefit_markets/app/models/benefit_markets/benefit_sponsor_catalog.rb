@@ -10,7 +10,7 @@ module BenefitMarkets
     field :open_enrollment_period,  type: Range
     field :probation_period_kinds,  type: Array, default: []
 
-    belongs_to  :service_area,
+    has_and_belongs_to_many  :service_areas,
                 class_name: "BenefitMarkets::Locations::ServiceArea"
 
     embeds_one  :sponsor_market_policy,
@@ -24,11 +24,18 @@ module BenefitMarkets
 
 
     validates_presence_of :effective_date, :probation_period_kinds, :effective_period, :open_enrollment_period,
-                          :service_area, :sponsor_market_policy, :member_market_policy, :product_packages
+                          :service_areas, :product_packages
 
+    # :sponsor_market_policy, :member_market_policy - commenting out the validations until we have
+    # the seed for both of these on benefit market catalog.
     def product_package_for(sponsored_benefit)
       product_packages.by_package_kind(sponsored_benefit.product_package_kind)
                       .by_product_kind(sponsored_benefit.product_kind)[0]
+    end
+
+    def service_areas=(service_areas)
+      self.service_area_ids = service_areas.pluck(:_id)
+      @service_areas = service_areas
     end
 
     # TODO: check for late rate updates
@@ -46,7 +53,7 @@ module BenefitMarkets
     # end
 
     def comparable_attrs
-      [:effective_date, :service_area, :sponsor_market_policy, :member_market_policy]
+      [:effective_date, :service_areas, :sponsor_market_policy, :member_market_policy]
     end
 
     # Define Comparable operator

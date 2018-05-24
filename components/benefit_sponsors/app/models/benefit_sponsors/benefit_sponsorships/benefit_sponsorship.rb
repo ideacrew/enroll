@@ -85,9 +85,8 @@ module BenefitSponsors
                   counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
-      belongs_to  :service_area,
-                  counter_cache: true,
-                  class_name: "::BenefitMarkets::Locations::ServiceArea"
+      has_and_belongs_to_many :service_areas,
+                  class_name: "::BenefitMarkets::Locations::ServiceArea", :inverse_of => nil
 
       embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
                   validate: true
@@ -132,7 +131,7 @@ module BenefitSponsors
 
       def benefit_sponsor_catalog_for(effective_date)
         benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_area: service_area, effective_date: effective_date)
+        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
       def is_attestation_eligible?

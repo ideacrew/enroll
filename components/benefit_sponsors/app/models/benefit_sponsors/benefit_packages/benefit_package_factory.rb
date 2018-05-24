@@ -35,9 +35,13 @@ module BenefitSponsors
 
       def build_sponsor_contribution(sponsored_benefit, attrs)
         sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
+        
         attrs[:contribution_levels_attributes].each do |contribution_level_hash|
           contribution_level = sponsor_contribution.contribution_levels.where(display_name: contribution_level_hash[:display_name]).first
-          contribution_level.assign_attributes(contribution_level_hash.except(:id, :display_name))
+          
+          if contribution_level
+            contribution_level.assign_attributes(contribution_level_hash.except(:id, :display_name))
+          end
         end
         sponsor_contribution
       end

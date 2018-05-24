@@ -1,6 +1,7 @@
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackagesController < ApplicationController
+      layout "two_column"
 
       def new
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))

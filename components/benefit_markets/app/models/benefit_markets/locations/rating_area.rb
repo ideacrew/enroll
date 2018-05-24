@@ -29,23 +29,20 @@ module BenefitMarkets
     end
 
     def self.rating_area_for(address, during: TimeKeeper.date_of_record)
-      county_zips = ::BenefitMarkets::Locations::CountyZip.where(
+      county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
         :zip => address.zip,
         :county_name => address.county,
-        :state_code => address.state
+        :state => address.state
       ).map(&:id)
-      area = []
-      area << self.where(
-        active_year: during.year,
+      area = self.where(
+        "active_year" => during.year,
         "$or" => [
-          {"county_zip_ids" => { "$in" => county_zips.map(&:id) }},
-          {"$elemMatch" => {
-            covered_states: address.state
-          }}
+          {"county_zip_ids" => { "$in" => county_zip_ids }},
+          {"covered_states" => address.state}
         ]
       )
       raise "Multiple Rating Areas Returned" if area.size > 1
-      return nil if area.empty?
+      return nil if area.nil?
       area.first
     end
   end

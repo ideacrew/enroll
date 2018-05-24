@@ -187,6 +187,11 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def work_email_or_best
+    email = emails.detect { |adr| adr.kind == "work" } || emails.first
+    (email && email.address) || (user && user.email)
+  end
+
   class << self
 
     def additional_exprs(clean_str)

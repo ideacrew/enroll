@@ -93,25 +93,46 @@ module BenefitSponsors
         new_benefit_package
       end
 
-      def renew_employee_benefits
-        assigned_census_employees_on(effective_period.min).each do |census_employee|
-          renew_employee_benefit(census_employee)
+      def renew_member_benefits(member_collection)
+        member_collection.each do |member|
+          renew_member_benefit(member)
         end
       end
 
-      def renew_employee_benefit(census_employee)
-        predecessor_benefit_package = benefit_package.predecessor
 
-        # Check if already renewed
-        enrollments = census_employee.enrollments.by_benefit_sponsorship(benefit_sponsorship)
-                        .by_enrollment_period(predecessor_benefit_package.effective_period)
-                        .enrolled_and_waived
+      def probation_period_display_name
+        probation_period_display_texts = {
+          first_of_month: "First of the month following or coinciding with date of hire",
+          first_of_month_after_30_days: "First of the month following 30 days",
+          first_of_month_after_60_days: "First of the month following 60 days"
+        }
 
-        sponsored_benefits.map(&:product_kind).each do |product_kind|
-          enrollment = enrollments.by_coverage_kind(product_kind).first
+        probation_period_display_texts[probation_period_kind]
+      end
+
+      def renew_member_benefit(census_employee)
+        predecessor_benefit_package = predecessor
+
+        employee_role = census_employee.employee_role
+        family = employee_role.primary_family
+        
+        if family.blank?
+          return [false, "family missing for #{census_employee.full_name}"]
+        end
+
+        family.validate_member_eligibility_policy 
+        if family.is_valid?
+
+          enrollments = family.enrollments.by_benefit_sponsorship(benefit_sponsorship)
+          .by_effective_period(predecessor_benefit_package.effective_period)
+          .enrolled_and_waived
           
-          if is_renewal_benefit_available?(enrollment)
-            enrollment.renew_benefit(self)
+          sponsored_benefits.map(&:product_kind).each do |product_kind|
+            enrollment = enrollments.by_coverage_kind(product_kind).first
+
+            if is_renewal_benefit_available?(enrollment)
+              enrollment.renew_benefit(self)
+            end
           end
         end
       end
@@ -126,7 +147,7 @@ module BenefitSponsors
         sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind}
       end
 
-      def assigned_census_employees_on(effective_date)
+      def census_employees_assigned_on(effective_date)
         CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_terminated
       end
 

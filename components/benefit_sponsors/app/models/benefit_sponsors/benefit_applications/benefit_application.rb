@@ -69,7 +69,7 @@ module BenefitSponsors
       belongs_to  :recorded_rating_area,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
-      belongs_to  :recorded_service_area,
+      has_and_belongs_to_many  :recorded_service_areas,
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       belongs_to  :benefit_sponsorship,
@@ -82,7 +82,7 @@ module BenefitSponsors
       embeds_many :benefit_packages,
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
-      validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_area, :recorded_rating_area
+      validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area
 
       index({ "aasm_state" => 1 })
       index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
@@ -94,7 +94,7 @@ module BenefitSponsors
       def set_values
         recorded_sic_code     = benefit_sponsorship.sic_code unless recorded_sic_code.present?
         recorded_rating_area  = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-        recorded_service_area = benefit_sponsorship.service_area unless recorded_service_area.present?
+        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
       end
 
       # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
@@ -106,6 +106,7 @@ module BenefitSponsors
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
       scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
       scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
+      scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
@@ -269,7 +270,7 @@ module BenefitSponsors
             msp_count:                msp_count,
             benefit_sponsor_catalog:  new_benefit_sponsor_catalog,
             predecessor_application:  self,
-            recorded_service_area:    benefit_sponsorship.service_area,
+            recorded_service_areas:    benefit_sponsorship.service_areas,
             recorded_rating_area:     benefit_sponsorship.rating_area,
             effective_period:         new_benefit_sponsor_catalog.effective_period,
             open_enrollment_period:   new_benefit_sponsor_catalog.open_enrollment_period
@@ -288,7 +289,7 @@ module BenefitSponsors
           predecessor_benefit_package = benefit_package.predecessor
           predecessor_effective_date  = predecessor_application.effective_period.min
 
-          predecessor_benefit_package.assigned_census_employees_on(predecessor_effective_date).each  do |employee|
+          predecessor_benefit_package.census_employees_assigned_on(predecessor_effective_date).each  do |employee|
             new_benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
             if new_benefit_package_assignment.blank? || (benefit_package_assignment.benefit_package != benefit_package)
               census_employee.assign_to_benefit_package(benefit_package, effective_period.min)
@@ -305,8 +306,11 @@ module BenefitSponsors
         census_employee.assign_to_benefit_package(default_benefit_package, assignment_on)
       end
 
-      def renew_employee_benefits
-        benefit_packages.each{ |benefit_package| benefit_package.renew_employee_benefits }
+      def renew_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          member_collection = benefit_package.census_employees_assigned_on(benefit_package.effective_period.min)
+          benefit_package.renew_member_benefits(member_collection)
+        end
       end
 
       def refresh(new_benefit_sponsor_catalog)

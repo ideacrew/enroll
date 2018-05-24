@@ -22,7 +22,7 @@ module BenefitSponsors
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
           organization.assign_attributes(attributes[:organization])
-          factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes]
+          factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
             organization.save!
           else

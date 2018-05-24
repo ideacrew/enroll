@@ -45,7 +45,7 @@ class EmployerAttestationDocument < Document
   end
  
   def employer_profile
-    org = Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(self.id)).first
+    org = ::BenefitSponsors::Organizations::Organization.where(:"profiles.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(self.id)).first
     org.employer_profile
   end
 
