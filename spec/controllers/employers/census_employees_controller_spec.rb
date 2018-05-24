@@ -361,6 +361,7 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET terminate" do
+
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user
