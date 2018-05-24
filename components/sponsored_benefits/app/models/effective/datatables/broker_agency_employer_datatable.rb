@@ -13,7 +13,7 @@
             if row.broker_relationship_inactive?
               row.legal_name
             else
-              (link_to row.legal_name, main_app.employers_employer_profile_path(id: row.sponsor_profile_id, :tab=>'home'))
+              (link_to row.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home'))
             end
             }, :sortable => false, :filter => false
           table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false

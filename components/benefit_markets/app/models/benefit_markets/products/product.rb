@@ -63,12 +63,10 @@ module BenefitMarkets
             {name: "products_premium_tables_search_index"}
           )
 
-    scope :by_product_package,    ->(product_package) { where(
+    scope :by_product_package,    ->(product_package) { by_application_period(product_package.application_period).where(
                 :"benefit_market_kind"          => product_package.benefit_kind,
                 :"kind"                         => /#{product_package.product_kind}/i,
-                :"product_package_kinds"        => /#{product_package.package_kind}/,
-                :"application_period.min"       => product_package.application_period.min,
-                :"application_period.max"       => product_package.application_period.max,
+                :"product_package_kinds"        => /#{product_package.package_kind}/
               )
             }
 

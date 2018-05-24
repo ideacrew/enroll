@@ -24,8 +24,8 @@ module BenefitSponsors
 
       def update
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
-        if @benefit_package_form.update
 
+        if @benefit_package_form.update
           flash[:notice] = "Benefit Package successfully updated."
           redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
         else
