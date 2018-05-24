@@ -38,10 +38,6 @@ module BenefitSponsors
         new_form.validate
         expect(new_form).to_not be_valid
       end
-
     end
   end
 end
-
-
-
