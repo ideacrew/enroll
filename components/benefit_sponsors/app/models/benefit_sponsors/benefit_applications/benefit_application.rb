@@ -70,7 +70,8 @@ module BenefitSponsors
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
       has_and_belongs_to_many  :recorded_service_areas,
-                  class_name: "::BenefitMarkets::Locations::ServiceArea"
+                  class_name: "::BenefitMarkets::Locations::ServiceArea",
+                  :inverse_of => nil
 
       belongs_to  :benefit_sponsorship,
                   counter_cache: true,
@@ -270,7 +271,7 @@ module BenefitSponsors
             msp_count:                msp_count,
             benefit_sponsor_catalog:  new_benefit_sponsor_catalog,
             predecessor_application:  self,
-            recorded_service_areas:    benefit_sponsorship.service_areas,
+            recorded_service_areas:   benefit_sponsorship.service_areas,
             recorded_rating_area:     benefit_sponsorship.rating_area,
             effective_period:         new_benefit_sponsor_catalog.effective_period,
             open_enrollment_period:   new_benefit_sponsor_catalog.open_enrollment_period

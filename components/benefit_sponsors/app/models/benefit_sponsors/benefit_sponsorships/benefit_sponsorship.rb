@@ -86,7 +86,8 @@ module BenefitSponsors
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
       has_and_belongs_to_many :service_areas,
-                  class_name: "::BenefitMarkets::Locations::ServiceArea", :inverse_of => nil
+                  class_name: "::BenefitMarkets::Locations::ServiceArea", 
+                  :inverse_of => nil
 
       embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
                   validate: true
