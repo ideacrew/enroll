@@ -6,7 +6,7 @@ FactoryGirl.define do
     organization    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
 
     rating_area     { create(:benefit_markets_locations_rating_area) }
-    service_area    { create(:benefit_markets_locations_service_area) }
+    service_areas    { [create(:benefit_markets_locations_service_area)] }
 
 
     trait :with_benefit_market do

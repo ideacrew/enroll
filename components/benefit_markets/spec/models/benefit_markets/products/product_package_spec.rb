@@ -105,7 +105,7 @@ module BenefitMarkets
 
         it "should match" do
           expect(base_product_package <=> compare_product_package).to eq 0
-          expect(base_product_package).to eq compare_product_package
+          expect(base_product_package.attributes.except(:id)).to eq compare_product_package.attributes.except(:id)
         end
       end
 

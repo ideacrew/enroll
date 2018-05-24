@@ -22,7 +22,7 @@ module BenefitMarkets
         effective_period: effective_period,
         open_enrollment_period: open_enrollment_period,
         probation_period_kinds: probation_period_kinds,
-        service_area: service_area,
+        service_areas: [service_area],
         sponsor_market_policy: sponsor_market_policy,
         member_market_policy: member_market_policy,
         product_packages: product_packages,
@@ -77,7 +77,7 @@ module BenefitMarkets
       end
 
       context "with no service_area" do
-        subject { described_class.new(params.except(:service_area)) }
+        subject { described_class.new(params.except(:service_areas)) }
 
         it "should not be valid" do
           subject.validate
@@ -134,7 +134,7 @@ module BenefitMarkets
 
         it "should match" do
           expect(base_catalog <=> compare_catalog).to eq 0
-          expect(base_catalog).to eq compare_catalog
+          expect(base_catalog.attributes.except(:id)).to eq compare_catalog.attributes.except(:id)
         end
       end
 

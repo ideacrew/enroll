@@ -22,6 +22,7 @@ class EmployeeRole
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
+  delegate :primary_family, to: :person, allow_nil: true
 
   validates_presence_of :ssn, :dob, :gender, :hired_on
   # validates_presence_of :employer_profile_id

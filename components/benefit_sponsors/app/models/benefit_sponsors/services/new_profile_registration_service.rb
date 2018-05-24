@@ -86,7 +86,7 @@ module BenefitSponsors
       end
 
       def address_form_to_params(form)
-        attrs = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :id)
+        attrs = form.attributes.slice(:address_1, :address_2, :city, :kind, :state, :zip, :county, :id)
         sanitize_params attrs
       end
 
@@ -176,8 +176,7 @@ module BenefitSponsors
       
       def is_benefit_sponsor_already_registered?(user, form)
         if user.person.present? && user.person.has_active_employer_staff_role?
-          # this is should be new employer profile id
-          form.profile_id = user.person.active_employer_staff_roles.first.employer_profile_id.to_s
+          form.profile_id = user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id.to_s
           return false
         end
         true
@@ -185,7 +184,6 @@ module BenefitSponsors
 
       def is_broker_agency_registered?(user, form)
         if user.present? && (user.has_broker_agency_staff_role? || user.has_broker_role?)
-          # this is should be new broker profile id
           form.profile_id = (user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id || user.person.broker_role.benefit_sponsors_broker_agency_profile_id.to_s)
           return false
         end

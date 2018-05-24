@@ -7,10 +7,17 @@ FactoryGirl.define do
 
     transient do
       office_locations_count 1
+      secondary_office_locations_count 1
     end
 
     after(:build) do |profile, evaluator|
-      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :primary)
+      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :with_massachusetts_address)
+    end
+
+    trait :with_secondary_offices do
+      after(:build) do |profile, evaluator|
+        profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.secondary_office_locations_count, :with_massachusetts_address)
+      end
     end
   end
 end

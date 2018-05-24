@@ -83,8 +83,8 @@ module BenefitSponsors
                   counter_cache: true,
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
-      belongs_to  :service_area,
-                  counter_cache: true,
+      has_and_belongs_to_many :service_areas,
+                  :inverse_of => nil,
                   class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
@@ -110,6 +110,13 @@ module BenefitSponsors
 
       index({ aasm_state: 1 })
 
+      def primary_office_service_areas
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
+        end
+      end
+
       # Inverse of Profile#benefit_sponsorship
       def profile
         return @profile if defined?(@profile)
@@ -134,17 +141,23 @@ module BenefitSponsors
         else
           nil
         end
+        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?
       end
+
+      def latest_benefit_application
+        benefit_applications.order_by(:"created_at".desc).first
+      end
+
       # If there is a gap, it will fall under a new benefit sponsorship
       # Renewal_benefit_application's predecessor_application is always current benefit application
       # Latest benefit_application will always be their current benefit_application if no renewal
       def current_benefit_application
-        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : benefit_applications.order_by(:"created_at".desc).first
+        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : latest_benefit_application
       end
 
       def renewal_benefit_application

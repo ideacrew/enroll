@@ -46,7 +46,7 @@ class Employers::EmployerAttestationsController < ApplicationController
       flash[:error] = "Please upload file"
     end
 
-    redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
+    redirect_to benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
   end
 
   def update
@@ -103,12 +103,13 @@ class Employers::EmployerAttestationsController < ApplicationController
 
   def find_employer
     if params[:employer_attestation_id].present?
-      org = Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(params[:employer_attestation_id])).first
+      org = ::BenefitSponsors::Organizations::Organization.where(:"profiles.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(params[:employer_attestation_id])).first
       @employer_profile = org.employer_profile
     elsif params[:id].present?
-      @employer_profile = EmployerProfile.find(params[:id])
+      @employer_profile = EmployerProfile.find(params[:id]) || ::BenefitSponsors::Organizations::Profile.find(params[:id])
     else
       @employer_profile = Organization.where(:legal_name => params["document"]["creator"]).first.try(:employer_profile)
+      @employer_profile ||= ::BenefitSponsors::Organizations::Organization.where(:legal_name => params["document"]["creator"]).first.employer_profile
     end
     render file: 'public/404.html', status: 404 if @employer_profile.blank?
   end

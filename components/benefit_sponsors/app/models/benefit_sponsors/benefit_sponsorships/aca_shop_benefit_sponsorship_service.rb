@@ -5,11 +5,38 @@ module BenefitSponsors
       @benefit_sponsorship = benefit_sponsorship
     end
 
-    # How's this related to benefit application factory?
-    def initiate_benefit_application(effective_date)
-
-      benefit_application
+    def begin_initial_open_enrollment(open_enrollment_begin_on)
+      benefit_application = @benefit_sponsorship.initial_open_enrollment_begin_on(open_enrollment_begin_on)
+      
+      if benefit_application.present?
+        application_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+                
+        if application_service.begin_initial_open_enrollment
+          log("benefit application enrollment begin successful")
+        else
+          log(benefit_application.errors.to_s)
+        end
+      end
     end
+
+    def begin_renewal_open_enrollment(open_enrollment_begin_on)
+      benefit_application = @benefit_sponsorship.renewal_open_enrollment_begin_on(open_enrollment_begin_on)
+      if benefit_application.present?
+        application_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+        application_service.begin_renewal_open_enrollment
+      end
+    end
+
+
+    # def begin_open_enrollment
+    #   # get application to begin open enrollment 
+    #   @benefit_sponsorship
+    # end
+
+    # # How's this related to benefit application factory?
+    # def initiate_benefit_application(effective_date)
+    #   benefit_application
+    # end
 
     # Trigger : Periodic automatic renewal
     #         : Manual renewals for conversion & error recovery

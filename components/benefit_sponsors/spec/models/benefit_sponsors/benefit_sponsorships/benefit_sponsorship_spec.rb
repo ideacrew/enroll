@@ -7,12 +7,14 @@ module BenefitSponsors
     let(:organization)    { build(:benefit_sponsors_organizations_general_organization, site: site)}
     let(:profile)         { build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization) }
     let(:benefit_market)  { site.benefit_markets.first }
+    let(:service_areas)   { ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address) }
 
     let(:params) do
       {
         benefit_market: benefit_market,
         organization: organization,
         profile: profile,
+        service_areas: service_areas
       }
     end
 
@@ -167,14 +169,14 @@ module BenefitSponsors
 
     describe "Transitioning a BenefitSponsorship through workflow states" do
       let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
-                                                          :with_product_packages,
-                                                          benefit_market: benefit_market) }
+                                                :with_product_packages,
+                                                benefit_market: benefit_market) }
 
       let(:benefit_sponsorship)     { described_class.new(**params) }
       let(:benefit_application)     { build(:benefit_sponsors_benefit_application,
-                                                        :with_benefit_sponsor_catalog,
-                                                        benefit_sponsorship: benefit_sponsorship,
-                                                        service_area: benefit_sponsorship.service_area) }
+                                                :with_benefit_sponsor_catalog,
+                                                benefit_sponsorship: benefit_sponsorship,
+                                                service_areas: benefit_sponsorship.service_areas) }
 
       context "Initial application happy path workflow" do
         before {
