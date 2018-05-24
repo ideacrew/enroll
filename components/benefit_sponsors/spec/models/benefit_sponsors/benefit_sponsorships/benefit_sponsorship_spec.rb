@@ -3,25 +3,27 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
 
-    let(:benefit_market)            { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "DC Health SHOP") }
-    let(:site)                      { BenefitSponsors::Site.new(site_key: :dc, benefit_markets: [benefit_market]) }
-    let(:organization)              { BenefitSponsors::Organizations::GeneralOrganization.new(site: site, fein: 123456789, legal_name: "DC")}
-    let(:profile)                   { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new(organization: organization) }
+    let(:site)            { create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
+    let(:organization)    { build(:benefit_sponsors_organizations_general_organization, site: site)}
+    let(:profile)         { build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization) }
+    let(:benefit_market)  { site.benefit_markets.first }
+    let(:service_areas)   { ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address) }
 
     let(:params) do
       {
         benefit_market: benefit_market,
         organization: organization,
         profile: profile,
+        service_areas: service_areas
       }
     end
 
     context "A new model instance" do
-       it { is_expected.to be_mongoid_document }
-       it { is_expected.to have_fields(:hbx_id, :profile_id)}
-       it { is_expected.to have_field(:source_kind).of_type(Symbol).with_default_value_of(:self_serve)}
-       it { is_expected.to embed_many(:broker_agency_accounts)}
-       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponorships)}
+      it { is_expected.to be_mongoid_document }
+      it { is_expected.to have_fields(:hbx_id, :profile_id)}
+      it { is_expected.to have_field(:source_kind).of_type(Symbol).with_default_value_of(:self_serve)}
+      it { is_expected.to embed_many(:broker_agency_accounts)}
+      it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponorships)}
 
       context "with no arguments" do
         subject { described_class.new }
@@ -82,7 +84,7 @@ module BenefitSponsors
         let(:valid_build_benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
         let(:valid_create_benefit_sponsorships) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
 
-        it "should be validate" do
+        it "should be valid" do
           expect(benefit_sponsorships.valid?).to be_falsy
           expect(valid_build_benefit_sponsorships.valid?).to be_truthy
           expect(valid_create_benefit_sponsorships.valid?).to be_truthy
@@ -164,5 +166,74 @@ module BenefitSponsors
 
       # end
     end
+
+    describe "Transitioning a BenefitSponsorship through workflow states" do
+      let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
+                                                :with_product_packages,
+                                                benefit_market: benefit_market) }
+
+      let(:benefit_sponsorship)     { described_class.new(**params) }
+      let(:benefit_application)     { build(:benefit_sponsors_benefit_application,
+                                                :with_benefit_sponsor_catalog,
+                                                benefit_sponsorship: benefit_sponsorship,
+                                                recorded_service_areas: benefit_sponsorship.service_areas) }
+
+      context "Initial application happy path workflow" do
+        before {
+                    organization.benefit_sponsorships << benefit_sponsorship
+                    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+                  }
+
+        it "should initialize in state: :applicant" do
+          expect(benefit_sponsorship.aasm_state).to eq :applicant
+        end
+
+        context "and a valid application is submitted" do
+          before { benefit_sponsorship.approve_initial_application }
+
+          it "should transition to state: :approved" do
+            expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
+          end
+
+          # context "and open enrollment period begins" do
+          #   before {
+          #       TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
+          #       benefit_application.begin_open_enrollment
+          #     }
+
+          #   it "should transition to state: :approved" do
+          #     expect(benefit_application.aasm_state).to eq :enrollment_open
+          #   end
+
+          #   context "and open enrollment period ends" do
+          #     before { benefit_application.end_open_enrollment }
+
+          #     it "should transition to state: :approved" do
+          #       expect(benefit_application.aasm_state).to eq :enrollment_closed
+          #     end
+
+          #     context "and binder payment is made" do
+          #       before { benefit_application.approve_enrollment_eligiblity }
+
+          #       it "should transition to state: :enrollment_eligible" do
+          #         expect(benefit_application.aasm_state).to eq :enrollment_eligible
+          #       end
+
+          #       context "and effective period begins" do
+          #         before { benefit_application.activate_enrollment }
+
+          #         it "should transition to state: :approved" do
+          #           expect(benefit_application.aasm_state).to eq :active
+          #         end
+          #       end
+          #     end
+          #   end
+          # end
+        end
+      end
+
+    end
+
+
   end
 end

@@ -149,12 +149,13 @@ module BenefitSponsors
           end
 
           if profile.primary_office_location.address.present?
-            rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
+            rating_area   = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
             service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address)
           else
-            rating_area = nil
+            rating_area   = nil
             service_areas = nil
           end
+
           new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market, rating_area: rating_area, service_areas: service_areas)
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"

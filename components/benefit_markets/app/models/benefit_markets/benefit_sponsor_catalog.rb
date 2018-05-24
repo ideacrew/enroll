@@ -35,7 +35,7 @@ module BenefitMarkets
     end
 
     def service_areas=(service_areas)
-      self.service_area_ids = service_areas.pluck(:_id)
+      self.service_area_ids = service_areas.map(&:_id)
       @service_areas = service_areas
     end
 
