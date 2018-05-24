@@ -21,7 +21,7 @@ module BenefitSponsors
       end
 
       def edit
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.require(:id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.permit(:id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
       end
 
