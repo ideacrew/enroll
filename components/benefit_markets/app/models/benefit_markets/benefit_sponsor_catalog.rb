@@ -11,7 +11,8 @@ module BenefitMarkets
     field :probation_period_kinds,  type: Array, default: []
 
     has_and_belongs_to_many  :service_areas,
-                class_name: "BenefitMarkets::Locations::ServiceArea"
+                class_name: "BenefitMarkets::Locations::ServiceArea",
+                :inverse_of => nil
 
     embeds_one  :sponsor_market_policy,
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"
