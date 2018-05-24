@@ -21,6 +21,9 @@
 
 *.keep
 
+public/packs/*
+node_modules/*
+
 # Ignore local data content
 db/data
 db/seedfiles/**/*.xml
