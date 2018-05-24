@@ -1,6 +1,6 @@
-# ProductPackage provides the composite package for Benefits that may be purchased.  Site 
-# exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses 
-# all Products via ProductPackage. 
+# ProductPackage provides the composite package for Benefits that may be purchased.  Site
+# exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses
+# all Products via ProductPackage.
 # ProductPackage functions:
 # => Provides filters for benefit display
 # => Instantiates a SponsoredBenefit class for inclusion in BenefitPackage
@@ -21,14 +21,16 @@ module BenefitMarkets
     embeds_many :products,
                 class_name: "BenefitMarkets::Products::Product"
 
-    embeds_one  :contribution_model, 
+    embeds_one  :contribution_model,
                 class_name: "BenefitMarkets::ContributionModels::ContributionModel"
 
-    embeds_one  :pricing_model, 
+    embeds_one  :pricing_model,
                 class_name: "BenefitMarkets::PricingModels::PricingModel"
 
-    validates_presence_of :product_kind, :benefit_kind, :package_kind, :application_period
+    validates_presence_of :product_kind, :benefit_kind, :package_kind, :application_period,
+                          :pricing_model, :contribution_model
     validates_presence_of :title, :allow_blank => false
+    validates_presence_of :products, :allow_blank => false
 
     scope :by_benefit_kind,     ->(kind){ where(benefit_kind: kind) }
     scope :by_package_kind,     ->(package_kind) { where(package_kind: package_kind) }

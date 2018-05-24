@@ -15,7 +15,7 @@ module BenefitSponsors
 
     let(:recorded_service_areas)     { benefit_sponsorship.service_areas }
     let(:recorded_rating_area)      { benefit_sponsorship.rating_area }
-    let(:benefit_sponsor_catalog)   { FactoryGirl.build(:benefit_markets_benefit_sponsor_catalog) }
+    let(:benefit_sponsor_catalog)   { FactoryGirl.build(:benefit_markets_benefit_sponsor_catalog, service_areas: recorded_service_areas) }
 
     let(:params) do
       {
