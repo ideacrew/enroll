@@ -11,7 +11,7 @@ module BenefitSponsors
       attribute :extension, String
       attribute :office_kind_options, Array
       
-      validates_presence_of :kind, :area_code, :number, :state, :zip
+      validates_presence_of :kind, :area_code, :number
 
 
       def persisted?
