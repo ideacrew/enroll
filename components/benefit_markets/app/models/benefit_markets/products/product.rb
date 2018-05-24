@@ -80,10 +80,17 @@ module BenefitMarkets
 
     scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
 
-    scope :by_application_period,       ->(application_period){ where(:application_period => application_period) }
     scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
                                                                   :"premium_tables.effective_period.max".gte => effective_date) }
 
+    scope :by_application_period,       ->(application_period){ 
+      where(
+        "$or" => [
+      {"application_period.min" => {"$lte" => application_period.max, "$gte" => application_period.min}},
+      {"application_period.max" => {"$lte" => application_period.max, "$gte" => application_period.min}},
+      {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
+        ])
+    }
 
     def product_kind
       kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
