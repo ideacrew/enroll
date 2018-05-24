@@ -110,6 +110,8 @@ module BenefitSponsors
 
       before_create :generate_hbx_id
 
+      after_initialize :set_service_and_rating_areas
+
       index({ aasm_state: 1 })
 
       # Inverse of Profile#benefit_sponsorship
@@ -274,6 +276,25 @@ module BenefitSponsors
       end
 
       private
+
+      def set_service_and_rating_areas
+        self.service_areas = primary_office_service_areas
+        self.rating_area   = primary_office_rating_area
+      end
+
+      def primary_office_service_areas
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
+        end
+      end
+
+      def primary_office_rating_area
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office.address)
+        end
+      end
 
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
