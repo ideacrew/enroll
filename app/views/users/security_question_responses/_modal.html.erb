@@ -1,4 +1,4 @@
-<% if current_user && current_user.needs_to_provide_security_questions? %>
+<% if current_user && current_user.needs_to_provide_security_questions? && aca_security_questions %>
 
   <%= render 'users/security_question_responses/edit_modal', { action: 'create', method: 'POST' } %>
 
