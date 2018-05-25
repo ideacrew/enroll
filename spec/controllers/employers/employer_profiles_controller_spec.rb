@@ -287,7 +287,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { FactoryGirl.create(:person, :with_employee_role) }
     let(:employee_role) { person.employee_roles.first }
     let(:benefit_group) { FactoryGirl.build(:benefit_group)}
-    let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { employee_role.employer_profile }
     let(:policy) { double("policy") }
 
@@ -304,7 +304,7 @@ RSpec.describe Employers::EmployerProfilesController do
         sign_in(user)
       end
 
-      it "should get empty list of active employee" do
+      it "should get empty list of active employee", :dbclean => :around_each  do
         xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show_profile")
@@ -324,7 +324,7 @@ RSpec.describe Employers::EmployerProfilesController do
         sign_in(user)
       end
 
-      it "should get list of active employee" do
+      it "should get list of active employee", :dbclean => :around_each  do
         xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show_profile")
