@@ -62,6 +62,7 @@ module BenefitSponsors
       end
 
       delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
+      delegate :enforce_employer_attestation, to: :benefit_market
 
       belongs_to  :organization,
                   inverse_of: :benefit_sponorships,
@@ -146,7 +147,7 @@ module BenefitSponsors
       end
 
       def is_attestation_eligible?
-        return true unless enforce_employer_attestation?
+        return true unless enforce_employer_attestation
         employer_attestation.present? && employer_attestation.is_eligible?
       end
 
