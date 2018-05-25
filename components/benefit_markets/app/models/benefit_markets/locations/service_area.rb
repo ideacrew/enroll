@@ -36,8 +36,8 @@ module BenefitMarkets
 
       def self.service_areas_for(address, during: TimeKeeper.date_of_record)
         county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
-          :zip => address.zip,
           :county_name => address.county,
+          :zip => address.zip,
           :state => address.state
         ).map(&:id)
 

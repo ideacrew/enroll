@@ -17,7 +17,7 @@ module BenefitSponsors
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
-      include Config::AcaModelConcern
+      # include Config::AcaModelConcern
       # include Concerns::Observable
       include AASM
 
@@ -57,7 +57,7 @@ module BenefitSponsors
       field :registered_on,       type: Date,   default: ->{ TimeKeeper.date_of_record }
 
       # This sponsorship's workflow status
-      field :aasm_state,    type: String, default: :applicant do
+      field :aasm_state,          type: Symbol, default: :applicant do
         error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
       end
 
@@ -71,11 +71,9 @@ module BenefitSponsors
       has_many    :benefit_applications,
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
-      has_many    :census_employees
-
-      # has_many    :census_employees,
-      #             counter_cache: true,
-      #             class_name: "BenefitSponsors::CensusMembers::CensusEmployee"
+      has_many    :census_employees,
+                  counter_cache: true,
+                  class_name: "::CensusEmployee"
 
       belongs_to  :benefit_market,
                   counter_cache: true,
@@ -86,7 +84,8 @@ module BenefitSponsors
                   class_name: "::BenefitMarkets::Locations::RatingArea"
 
       has_and_belongs_to_many :service_areas,
-                  class_name: "::BenefitMarkets::Locations::ServiceArea", :inverse_of => nil
+                  :inverse_of => nil,
+                  class_name: "::BenefitMarkets::Locations::ServiceArea"
 
       embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
                   validate: true
@@ -111,7 +110,16 @@ module BenefitSponsors
 
       before_create :generate_hbx_id
 
+      # after_initialize :set_service_and_rating_areas
+
       index({ aasm_state: 1 })
+
+      def primary_office_service_areas
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
+        end
+      end
 
       # Inverse of Profile#benefit_sponsorship
       def profile
@@ -131,6 +139,11 @@ module BenefitSponsors
 
       def benefit_sponsor_catalog_for(effective_date)
         benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+        if benefit_market_catalog.present?
+          benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
+        else
+          nil
+        end
         benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
@@ -138,11 +151,16 @@ module BenefitSponsors
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?
       end
+
+      def latest_benefit_application
+        benefit_applications.order_by(:"created_at".desc).first
+      end
+
       # If there is a gap, it will fall under a new benefit sponsorship
       # Renewal_benefit_application's predecessor_application is always current benefit application
       # Latest benefit_application will always be their current benefit_application if no renewal
       def current_benefit_application
-        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : benefit_applications.order_by(:"created_at".desc).first
+        renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : latest_benefit_application
       end
 
       def renewal_benefit_application
@@ -171,7 +189,7 @@ module BenefitSponsors
 
       # Workflow for self service
       aasm do
-        state :new, initial: true
+        state :applicant, initial: true
         state :initial_application_approved     # Sponsor's first application is submitted and approved
         state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
         state :initial_enrollment_ineligible
@@ -183,7 +201,7 @@ module BenefitSponsors
         state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
         event :approve_initial_application do
-          transitions from: :new, to: :initial_application_approved
+          transitions from: :applicant, to: :initial_application_approved
         end
 
         event :close_initial_enrollment do
@@ -212,8 +230,8 @@ module BenefitSponsors
           transitions from: :initial_enrollment_eligible, to: :active
         end
 
-        event :revert_to_new do
-          transitions from: [:new, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
+        event :revert_to_applicant do
+          transitions from: [:applicant, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
         end
 
         event :terminate do
@@ -241,7 +259,7 @@ module BenefitSponsors
         end
 
         event :cancel do
-          transitions from: [:initial_application_approved, :initial_enrollment_closed], to: :new
+          transitions from: [:initial_application_approved, :initial_enrollment_closed], to: :applicant
         end
       end
 
@@ -276,15 +294,34 @@ module BenefitSponsors
 
       private
 
+      def set_service_and_rating_areas
+        self.service_areas = primary_office_service_areas
+        self.rating_area   = primary_office_rating_area
+      end
+
+      def primary_office_service_areas
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
+        end
+      end
+
+      def primary_office_rating_area
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office.address)
+        end
+      end
+
       def generate_hbx_id
         write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
       end
 
       def employer_profile_to_benefit_sponsor_states_map
         {
-          :applicant            => :new,
+          :applicant            => :applicant,
           :registered           => :initial_applicant,
-          :conversion_expired   => :new,
+          :conversion_expired   => :applicant,
         }
       end
 

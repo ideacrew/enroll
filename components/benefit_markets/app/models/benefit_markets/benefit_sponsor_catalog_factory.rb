@@ -47,28 +47,19 @@ module BenefitMarkets
     end
 
     def construct_sponsor_product_package(market_product_package)
-      package_attrs = market_product_package.attributes.slice(:product_kind, :benefit_kind, :package_kind, :title, :description)
+      product_package = BenefitMarkets::Products::ProductPackage.new(
+        title: market_product_package.title,
+        description: market_product_package.description,
+        product_kind: market_product_package.product_kind,
+        benefit_kind: market_product_package.benefit_kind, 
+        package_kind: market_product_package.package_kind
+      )
 
-      product_package = BenefitMarkets::Products::ProductPackage.new(package_attrs)
       product_package.application_period = @benefit_sponsor_catalog.effective_period
-      product_package.contribution_model = construct_contribution_model(market_product_package.contribution_model)
-      product_package.pricing_model = construct_pricing_model(market_product_package.pricing_model)
-      product_package.products = market_product_package.products #construct_products(market_product_package.products)
+      product_package.contribution_model = market_product_package.contribution_model.create_copy_for_embedding
+      product_package.pricing_model = market_product_package.pricing_model.create_copy_for_embedding
+      product_package.products = market_product_package.products.collect { |prod| prod.create_copy_for_embedding }
       product_package
-    end
-
-    def construct_contribution_model(contribution_model)
-      contribution_units = contribution_model.contribution_units
-      contribution_model = BenefitMarkets::ContributionModels::ContributionModel.new(contribution_model.attributes.except(:contribution_units))
-      contribution_model.contribution_units = contribution_units.collect{ |contribution_unit| contribution_unit.class.new(contribution_unit.attributes) }
-      contribution_model
-    end
-
-    def construct_pricing_model(pricing_model)
-      pricing_units = pricing_model.pricing_units
-      pricing_model = BenefitMarkets::PricingModels::PricingModel.new(pricing_model.attributes.except(:pricing_units))
-      pricing_model.pricing_units = pricing_units.collect{ |pricing_unit| pricing_unit.class.new(pricing_unit.attributes) }
-      pricing_model
     end
 
     def benefit_sponsor_catalog

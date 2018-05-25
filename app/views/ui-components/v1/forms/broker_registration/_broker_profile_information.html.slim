@@ -1,5 +1,4 @@
 .row
-  = f.hidden_field(:entity_kind, :value => "s_corporation")
   .col-md-3.mb-2
     label for="inputPracticeArea" Practice Area *
     = f.select(:market_kind, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) {|options, (k, v)| options << [k, v]}, selected: f.object.try(:market_kind)), { prompt: "Select Practice Area"}, { :class => 'form-control', required:'true'} )

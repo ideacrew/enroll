@@ -21,7 +21,7 @@ module BenefitSponsors
       end
 
       def edit
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.require(:id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.permit(:id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
       end
 
@@ -29,7 +29,12 @@ module BenefitSponsors
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.require(:id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.update_attributes(application_params)
-          redirect_to benefit_sponsorship_benefit_application_benefit_packages_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model)
+
+          if @benefit_application_form.show_page_model.benefit_packages.empty?
+            redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model)
+          else
+            redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model, @benefit_application_form.show_page_model.benefit_packages.first)
+          end
         else
           flash[:error] = error_messages(@benefit_application_form)
           render :edit

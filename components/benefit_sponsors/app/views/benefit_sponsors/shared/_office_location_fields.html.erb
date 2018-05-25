@@ -4,14 +4,6 @@
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
       <%= f.hidden_field :id, value: f.object.id if f.object.id %>
       <%= f.fields_for :address, f.object.address, errors: {}, fieldset: false do |address| %>
-
-        <%
-          # address_kind = ''
-          # if params.has_key?(:organization)
-          #   office_address = params[:organization][:office_locations_attributes].first
-          #   address_kind = office_address[1][:address_attributes][:kind]
-          # end
-        %>
         <div class="row row-form-wrapper no-buffer">
           <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
             <button class="btn btn-new-address" onclick="return false;">ADDRESS</button>
@@ -54,6 +46,11 @@
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
               </div>
+              <% if aca_address_query_county %>
+                <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                  <%= address.select(:county, options_for_select(BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq, selected: address.object.county), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', required: true) %>
+                </div>
+              <% end %>
           </div>
           <%= address.hidden_field :id, value: address.object.id if address.object.id %>
         <% end %>

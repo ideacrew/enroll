@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :benefit_sponsors_organizations_broker_agency_profile, class: 'BenefitSponsors::Organizations::BrokerAgencyProfile' do
     organization { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
-    entity_kind :s_corporation
 
     market_kind :shop
     corporate_npn "0989898981"

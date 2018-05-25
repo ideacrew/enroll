@@ -83,6 +83,7 @@ module SponsoredBenefits
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
       allow(subject).to receive(:effective_datatable).and_return(datatable)
       allow(subject).to receive(:employee_datatable).and_return(datatable)
+      allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
     end
 
     describe "GET #index" do
