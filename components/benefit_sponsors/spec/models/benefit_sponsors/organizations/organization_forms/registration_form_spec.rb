@@ -45,7 +45,17 @@ module BenefitSponsors
 
       let(:params) do
         {"profile_type"=>"#{profile_type}",
-         "staff_roles_attributes"=>{"0"=>{"first_name"=>"first_name", "last_name"=>"last_name", "dob"=>"05/03/2000", "email"=>"email@gmail.com", "npn"=>"444411112"}},
+         "staff_roles_attributes"=>{
+          "0"=>{
+              "first_name"=>"first_name",
+              "last_name"=>"last_name",
+              "dob"=>"05/03/2000",
+              "email"=>"email@gmail.com",
+              "npn"=>"444411112",
+              "area_code" => "123",
+              "number" => "2341231"
+            }
+          },
          "organization"=>
              {"legal_name"=>"#{profile_type}",
               "dba"=>"",
@@ -110,12 +120,12 @@ module BenefitSponsors
       let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
       let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
       let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
-      let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role], broker_role:BrokerRole.new(benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,provider_kind: "broker", npn:'12345678')) }
+      let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
       let(:user) { FactoryGirl.create(:user, :person => person)}
 
       context "profile_type = benefit_sponsor" do
 
-        let!(:edit_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit profile_id: employer_profile.id.to_s }
+        let(:edit_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit profile_id: employer_profile.id.to_s }
 
         it "update_form should be valid" do
           edit_form.validate
@@ -131,7 +141,12 @@ module BenefitSponsors
 
       context "profile_type = broker_agency" do
 
-        let!(:edit_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit profile_id: broker_agency_profile.id.to_s }
+        let(:edit_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit profile_id: broker_agency_profile.id.to_s }
+
+        before do
+          person.broker_role = BrokerRole.new(benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,provider_kind: "broker", npn:'12345678')
+          person.save!
+        end
 
         it "update_form should be valid" do
           edit_form.validate
@@ -153,7 +168,7 @@ module BenefitSponsors
       let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
       let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
       let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
-      let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role], broker_role:BrokerRole.new(benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,provider_kind: "broker", npn:'12345678')) }
+      let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
       let(:user) { FactoryGirl.create(:user, :person => person)}
 
       context "profile_type = benefit_sponsor" do
@@ -220,8 +235,12 @@ module BenefitSponsors
            "current_user_id"=> BSON::ObjectId("#{user.id}")}
         end
 
-        let!(:update_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update params }
+        let(:update_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update params }
 
+        before do
+          person.broker_role = BrokerRole.new(benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,provider_kind: "broker", npn:'12345678')
+          person.save!
+        end
         it "update_form should be valid" do
           update_form.validate
           expect(update_form).to be_valid
