@@ -194,6 +194,7 @@ module BenefitSponsors
       aasm do
         state :applicant, initial: true
         state :initial_application_approved     # Sponsor's first application is submitted and approved
+        state :initial_enrollment_open          # Sponsor members are in open enrollment period
         state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
         state :initial_enrollment_ineligible
         state :initial_enrollment_eligible,   after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
@@ -207,8 +208,12 @@ module BenefitSponsors
           transitions from: :applicant, to: :initial_application_approved
         end
 
+        event :open_initial_enrollment do
+          transitions from: :initial_application_approved, to: :initial_enrollment_open
+        end
+
         event :close_initial_enrollment do
-          transitions from: :initial_application_approved, to: :initial_enrollment_closed
+          transitions from: :initial_enrollment_open, to: :initial_enrollment_closed
         end
 
         event :approve_initial_enrollment_eligibility do
@@ -268,12 +273,13 @@ module BenefitSponsors
 
       def publish_binder_paid
         benefit_applications.each do |benefit_application|
-          benefit_application.application_event_subscriber(aasm)
+          benefit_application.benefit_sponsorship_event_subscriber(aasm)
         end
       end
 
       # BenefitApplication        BenefitSponsorship
       # approved               -> initial_application_approved
+      # enrollment_open         -> initial_enrollment_open
       # enrollment_closed      -> initial_enrollment_closed
       # application_ineligible -> initial_enrollment_ineligible
       # application_eligible   -> initial_enrollment_eligible
@@ -282,6 +288,8 @@ module BenefitSponsors
         case aasm.to_state
         when :approved
           approve_initial_application! if may_approve_initial_application?
+        when :enrollment_open
+          open_initial_enrollment! if may_open_initial_enrollment?
         when :enrollment_closed
           close_initial_enrollment! if may_close_initial_enrollment?
         when :application_ineligible

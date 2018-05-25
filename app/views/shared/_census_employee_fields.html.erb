@@ -48,7 +48,6 @@
         <span>
           <strong>Benefit Package</strong>
         </span>
-            <% @census_employee.benefit_group_assignments << @census_employee.benefit_group_assignments.build if (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last).blank? %>
             <%= f.fields_for :benefit_group_assignments, (@census_employee.active_benefit_group_assignment || @census_employee.benefit_group_assignments.last), errors: {}, fieldset: false do |benefit_group_assignment| %>
             <% # TODO - current option %>
             <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_packages, current_option: nil, prompt: "SELECT BENEFIT PACKAGE" %>

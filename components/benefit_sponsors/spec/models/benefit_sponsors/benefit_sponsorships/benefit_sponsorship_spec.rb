@@ -188,47 +188,61 @@ module BenefitSponsors
           expect(benefit_sponsorship.aasm_state).to eq :applicant
         end
 
-        context "and a valid application is submitted" do
-          before { benefit_sponsorship.approve_initial_application }
+        context "and a valid benefit application is submitted" do
+          before { benefit_application.approve_application! }
 
-          it "should transition to state: :approved" do
+          it "benefit_sponsorship should transition to state: :initial_application_approved" do
             expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
           end
 
-          # context "and open enrollment period begins" do
-          #   before {
-          #       TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
-          #       benefit_application.begin_open_enrollment
-          #     }
+          context "and open enrollment period begins" do
+            before {
+                TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
+                benefit_application.begin_open_enrollment!
+              }
 
-          #   it "should transition to state: :approved" do
-          #     expect(benefit_application.aasm_state).to eq :enrollment_open
-          #   end
+            it "should transition to state: :initial_enrollment_open" do
+              expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+            end
 
-          #   context "and open enrollment period ends" do
-          #     before { benefit_application.end_open_enrollment }
+            context "and open enrollment period ends" do
+              before {
+                  TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.max)
+                  benefit_application.end_open_enrollment!
+                }
 
-          #     it "should transition to state: :approved" do
-          #       expect(benefit_application.aasm_state).to eq :enrollment_closed
-          #     end
+              it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
+                expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
+              end
 
-          #     context "and binder payment is made" do
-          #       before { benefit_application.approve_enrollment_eligiblity }
+              context "and binder payment is made" do
+                before { benefit_sponsorship.credit_binder! }
 
-          #       it "should transition to state: :enrollment_eligible" do
-          #         expect(benefit_application.aasm_state).to eq :enrollment_eligible
-          #       end
+                it "benefit_sponsorship should transition to state: :initial_enrollment_eligible" do
+                  expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_eligible
+                end
 
-          #       context "and effective period begins" do
-          #         before { benefit_application.activate_enrollment }
+                it "benefit_application should transition to state: :enrollment_eligible" do
+                  expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                end
 
-          #         it "should transition to state: :approved" do
-          #           expect(benefit_application.aasm_state).to eq :active
-          #         end
-          #       end
-          #     end
-          #   end
-          # end
+                context "and effective period begins" do
+                  before {
+                      TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
+                      benefit_application.activate_enrollment!
+                    }
+
+                  it "benefit_sponsorship should transition to state: :active" do
+                    expect(benefit_sponsorship.aasm_state).to eq :active
+                  end
+
+                  it "benefit_application should transition to state: :active" do
+                    expect(benefit_application.aasm_state).to eq :active
+                  end
+                end
+              end
+            end
+          end
         end
       end
 
