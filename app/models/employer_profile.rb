@@ -776,20 +776,6 @@ class EmployerProfile
 
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
-
-        #initial employers misses binder payment due date deadline on next day notice
-        binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
-        if new_date == binder_next_day
-          initial_employers_enrolled_plan_year_state.each do |org|
-            if !org.employer_profile.binder_paid?
-                begin
-                  ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
-                rescue Exception => e
-                  (Rails.logger.error {"Unable to deliver Notice to  when missing binder payment due to #{e}"}) unless Rails.env.test?
-                end
-            end
-          end
-        end
       end
 
       # Employer activities that take place monthly - on first of month
@@ -1246,14 +1232,6 @@ class EmployerProfile
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def self.notice_to_employer_for_missing_binder_payment(org)
-    begin
-      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
-    rescue Exception => e
-      (Rails.logger.error {"Unable to deliver Notice on next day to #{org.legal_name} when employer misses binder payment due date deadline due to #{e}"}) unless Rails.env.test?
-    end
   end
 
   def self.notice_to_employee_for_missing_binder_payment(org)

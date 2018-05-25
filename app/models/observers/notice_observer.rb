@@ -163,6 +163,15 @@ module Observers
           end
         end
 
+        if model_event.event_key == :initial_employer_no_binder_payment_received
+          EmployerProfile.initial_employers_enrolled_plan_year_state.each do |org|
+            if !org.employer_profile.binder_paid?
+              py = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
+              trigger_notice(recipient: org.employer_profile, event_object: py, notice_event: "initial_employer_no_binder_payment_received")
+            end
+          end
+        end
+
         if model_event.event_key == :initial_employer_first_reminder_to_publish_plan_year
           trigger_initial_employer_publish_remainder("initial_employer_first_reminder_to_publish_plan_year")
         end
@@ -184,10 +193,15 @@ module Observers
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      census_employee = new_model_event.klass_instance
+      if CensusEmployee::OTHER_EVENTS.include?(new_model_event.event_key)
+        trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
+      end
 
       if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        census_employee = new_model_event.klass_instance
-        trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
+        if new_model_event.event_key == :employee_notice_for_employee_terminated_from_roster
+          trigger_notice(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
+        end
       end
     end
 
