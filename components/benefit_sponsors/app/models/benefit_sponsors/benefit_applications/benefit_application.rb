@@ -337,7 +337,7 @@ module BenefitSponsors
       def is_event_date_valid?
         today = TimeKeeper.date_of_record
 
-        is_valid = case aasm_state
+        is_valid = case aasm_state.to_s
         when "approved", "draft"
           today >= open_enrollment_period.begin
         when "enrollment_open"
