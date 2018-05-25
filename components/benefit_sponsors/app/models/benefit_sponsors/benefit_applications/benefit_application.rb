@@ -77,8 +77,8 @@ module BenefitSponsors
                   counter_cache: true,
                   class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
-      embeds_one  :benefit_sponsor_catalog, as: :catalogable
-                  # class_name: "::BenefitMarkets::BenefitSponsorCatalog"
+      embeds_one  :benefit_sponsor_catalog,
+                  class_name: "::BenefitMarkets::BenefitSponsorCatalog"
 
       embeds_many :benefit_packages,
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
