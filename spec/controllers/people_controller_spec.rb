@@ -20,6 +20,20 @@ RSpec.describe PeopleController do
     expect(response).to have_http_status(:success)
   end
 
+  describe "POST create" do
+    context "with valid attributes" do 
+      it 'should add a new person' do 
+        expect { post :create, person: FactoryGirl.attributes_for(:person) }.to change(Person,:count).by(0)
+      end
+    end
+
+    context "with invalid attributes"  do
+      it 'should not add a new person' do  
+        expect { post :create, person: FactoryGirl.attributes_for(:person,:with_bad_mailing_address) }.to_not change(Person,:count)
+      end
+    end
+  end
+
   describe "POST update" do
     let(:vlp_documents_attributes) { {"1" => vlp_document.attributes.to_hash}}
     let(:consumer_role_attributes) { consumer_role.attributes.to_hash}
