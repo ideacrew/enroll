@@ -53,7 +53,7 @@ module BenefitSponsors
 
     let(:broker_profile_attributes) {
       {
-        :market_kind => :individual,
+        :market_kind => :shop,
         :office_locations_attributes => office_locations_attributes,
         :contact_method => :paper_and_electronic
       }
