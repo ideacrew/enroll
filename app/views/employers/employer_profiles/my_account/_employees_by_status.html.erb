@@ -5,7 +5,7 @@
 <% end %>
 
   <div class= "effectivedatatable">
-    <%= raw render_datatable(@datatable) %>
+    <%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-6'> <'col-sm-6'f> >" + "<'row'<'col-sm-12'tr>>"})  %>
   </div>
 
 <script type="text/javascript" charset="utf-8">
