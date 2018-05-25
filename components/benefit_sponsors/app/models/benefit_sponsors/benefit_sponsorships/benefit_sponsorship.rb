@@ -114,12 +114,12 @@ module BenefitSponsors
 
       index({ aasm_state: 1 })
 
-      def primary_office_service_areas
-        primary_office = profile.primary_office_location
-        if primary_office.address.present?
-          ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
-        end
-      end
+      # def primary_office_service_areas
+      #   primary_office = profile.primary_office_location
+      #   if primary_office.address.present?
+      #     ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
+      #   end
+      # end
 
       # Inverse of Profile#benefit_sponsorship
       def profile

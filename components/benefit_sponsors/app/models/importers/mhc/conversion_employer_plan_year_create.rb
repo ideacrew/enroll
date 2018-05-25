@@ -7,7 +7,7 @@ module Importers::Mhc
       benefit_sponsorship = employer.organization.benefit_sponsorships.first
 
       plan = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.new(benefit_sponsorship, fetch_application_params)
-      binding.pry
+      create_benefit_pacakge(plan.benefit_application)
       # benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(default_plan_year_start)
       # benefit_sponsor_catalog.probation_period_kinds = new_coverage_policy
       #
@@ -20,6 +20,15 @@ module Importers::Mhc
       # plan_year_attrs[:is_conversion] = true
       # PlanYear.new(plan_year_attrs)
     end
+
+    def create_benefit_pacakge(benefit_appliation)
+
+
+    end
+
+
+
+
 
 
     def fetch_benefit_product
@@ -111,27 +120,12 @@ module Importers::Mhc
     #   end
     # end
 
-    def fetch_rating_area
-      address  = find_employer.office_locations.first.address
-      BenefitMarkets::Locations::RatingArea.rating_area_for(address, default_plan_year_start.year)
-    end
-
-    def fetch_service_area
-      address  = find_employer.office_locations.first.address
-
-    end
-
-
     def fetch_application_params
       service = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       formed_params = service.default_dates_for_coverage_starting_on(default_plan_year_start)
       valued_params = {
           fte_count: enrolled_employee_count,
-          pte_count: nil,
-          msp_count: nil,
           recorded_sic_code: "8999",
-          recorded_service_area: fetch_service_area,
-          recorded_rating_area: fetch_rating_area,
           aasm_state: :active
       }
       formed_params.merge!(valued_params)
@@ -139,7 +133,6 @@ module Importers::Mhc
 
     def save
       return false unless valid?
-      binding.pry
       record = map_plan_year
       save_result = record.save
       propagate_errors(record)

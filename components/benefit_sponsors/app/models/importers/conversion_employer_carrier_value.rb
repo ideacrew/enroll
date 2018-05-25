@@ -26,7 +26,6 @@ module Importers::ConversionEmployerCarrierValue
   end
 
   def find_carrier
-    binding.pry
     carrier = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name("Fallon Health")
     # return nil unless carrier
   end
