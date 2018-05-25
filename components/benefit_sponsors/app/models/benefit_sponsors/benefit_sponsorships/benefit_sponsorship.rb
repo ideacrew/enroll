@@ -135,6 +135,10 @@ module BenefitSponsors
         @roster_size = census_employees.active.size
       end
 
+      def is_eligible?
+        ["ineligible", "terminated"].exclude?(aasm_state)
+      end
+
       def benefit_sponsor_catalog_for(effective_date)
         benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
         if benefit_market_catalog.present?
