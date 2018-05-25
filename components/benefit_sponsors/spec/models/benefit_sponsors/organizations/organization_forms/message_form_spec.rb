@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
 
-  RSpec.describe Organizations::OrganizationForms::InboxForm, type: :model, dbclean: :after_each do
+  RSpec.describe Organizations::OrganizationForms::MessageForm, type: :model, dbclean: :after_each do
 
     subject { BenefitSponsors::Organizations::OrganizationForms::MessageForm }
 
