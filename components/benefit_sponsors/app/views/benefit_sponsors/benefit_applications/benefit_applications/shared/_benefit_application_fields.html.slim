@@ -4,12 +4,12 @@ h1.heading-text Add Benefit Package
 .row#benefitApplicationform
   .col-md-12.p0
     - benefit_application_start_dates = f.object.start_on_options.keys
-    - formatted_start_on = f.object.start_on
+    - formatted_start_on = Date.strptime(f.object.start_on, "%m/%d/%Y")
     .form-group
       .col-md-6.col-sm-12
         label for="inputStartOn" Start on
         = f.hidden_field :benefit_sponsorship_id
-        = f.select :start_on, options_for_select(benefit_application_start_dates, selected: formatted_start_on),{:prompt => "SELECT START ON"}, class:'form-control benefit-application-start-date', onchange:'selectedDate(this)', id:'baStartDate'
+        = f.select :start_on, benefit_application_start_dates,{:prompt => "SELECT START ON", :selected => formatted_start_on}, class:'form-control benefit-application-start-date', onchange:'selectedDate(this)', id:'baStartDate'
       .col-md-6.col-sm-12
         label for="inputStartOn" End on
         = f.text_field :end_on, class: "form-control", required: true, placeholder: 'END ON', readonly: true
@@ -44,7 +44,7 @@ h1.heading-text Add Benefit Package
       
 javascript:
 
-  var disableSelectric = true;
+  var disableSelectric = false;
   
   function selectedDate(element) {
     showHideRecommendDates(element.value)
