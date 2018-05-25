@@ -5,7 +5,7 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_dc_employer_profile)}
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile)}
     let(:employer_profile) { organization.employer_profile }
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }

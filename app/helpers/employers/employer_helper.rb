@@ -133,12 +133,20 @@ module Employers::EmployerHelper
     end
   end
 
+  # deprecated
   def get_benefit_groups_for_census_employee
     # TODO
     plan_years = @employer_profile.plan_years.select{|py| (PlanYear::PUBLISHED + ['draft']).include?(py.aasm_state) && py.end_on > TimeKeeper.date_of_record}
     benefit_groups = plan_years.flat_map(&:benefit_groups)
     renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year.present?
     return benefit_groups, (renewing_benefit_groups || [])
+  end
+
+  def get_benefit_packages_for_census_employee
+    benefit_applications = @benefit_sponsorship.benefit_applications.select{|b_app| (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES + [:draft]).include?(b_app.aasm_state) && b_app.end_on > TimeKeeper.date_of_record}
+    benefit_packages = benefit_applications.flat_map(&:benefit_packages)
+    renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
+    return benefit_packages, (renewing_benefit_packages || [])
   end
 
   def cobra_effective_date(census_employee)
