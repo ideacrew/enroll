@@ -24,6 +24,18 @@ PATH
       virtus
 
 PATH
+  remote: ../sponsored_benefits
+  specs:
+    sponsored_benefits (0.0.1)
+      aasm (~> 4.8.0)
+      config
+      mongoid (~> 5.4.0)
+      rails (~> 4.2.7.1)
+      roo (~> 2.1.0)
+      slim (~> 3.0.8)
+      symmetric-encryption (~> 3.6.0)
+
+PATH
   remote: .
   specs:
     benefit_sponsors (0.0.1)
@@ -387,6 +399,7 @@ DEPENDENCIES
   pry-stack_explorer
   rspec-rails
   shoulda-matchers
+  sponsored_benefits!
 
 BUNDLED WITH
    1.16.1
