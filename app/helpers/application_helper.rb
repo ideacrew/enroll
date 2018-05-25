@@ -638,7 +638,10 @@ module ApplicationHelper
   end
 
   def participation_rule(employer)
-    @participation_count = employer.show_plan_year.additional_required_participants_count
+    # fix me once new model enrollment and benefit group assignments got fixed
+    # making it zero for time being
+    # @participation_count = employer.show_plan_year.enrolled_summary
+    @participation_count = 0
     if @participation_count == 0
       "1. 2/3 Rule Met? : Yes"
     else
@@ -647,7 +650,10 @@ module ApplicationHelper
   end
 
   def non_owner_participation_rule(employer)
-    @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
+    # fix me compare with total enrollments
+    # fix me once new model enrollment and benefit group assignments got fixed
+    # @non_owner_participation_rule = employer.show_plan_year.assigned_census_employees_without_owner.present?
+    @non_owner_paticipation_rule = true
     if @non_owner_participation_rule == true
       "2. Non-Owner exists on the roster for the employer"
     else
