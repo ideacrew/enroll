@@ -7,6 +7,7 @@ module BenefitMarkets
     # let(:benefit_market_kind)     { :aca_shop }
 
     let(:benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog) }
+    let(:benefit_kind)            { :aca_shop }
     let(:product_kind)            { :health }
     let(:package_kind)            { :single_issuer }
     let(:title)                   { "SafeCo Issuer Health" }
@@ -18,14 +19,15 @@ module BenefitMarkets
 
     let(:params) do
         {
+          benefit_kind:           benefit_kind,
           product_kind:           product_kind,
           package_kind:           package_kind,
           title:                  title,
           description:            description,
           products:               products,
-          application_period:     benefit_market_catalog.application_period
-          # contribution_model: contribution_model,
-          # pricing_model:      pricing_model,
+          application_period:     benefit_market_catalog.application_period,
+          contribution_model:     contribution_model,
+          pricing_model:          pricing_model,
         }
     end
 
@@ -105,7 +107,7 @@ module BenefitMarkets
 
         it "should match" do
           expect(base_product_package <=> compare_product_package).to eq 0
-          expect(base_product_package.attributes.except(:id)).to eq compare_product_package.attributes.except(:id)
+          expect(base_product_package.attributes.except('_id')).to eq compare_product_package.attributes.except('_id')
         end
       end
 
