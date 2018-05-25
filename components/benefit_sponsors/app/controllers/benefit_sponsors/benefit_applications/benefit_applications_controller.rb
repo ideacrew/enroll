@@ -44,10 +44,11 @@ module BenefitSponsors
       def submit_application
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :updateable?
+        
         if @benefit_application_form.submit_application
           flash[:notice] = "Benefit Application successfully published."
           flash[:error] = error_messages(@benefit_application_form)
-          redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
+          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
         else
           flash[:error] = "Benefit Application failed to submit. #{error_messages(@benefit_application_form)}"
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
