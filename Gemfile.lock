@@ -337,7 +337,7 @@ GEM
     maskedinput-rails (1.4.0.0)
     method_source (0.8.2)
     mime-types (2.99.3)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.3.0)
     minitest (5.10.3)
     monetize (1.1.0)
       money (~> 6.5.0)
@@ -385,12 +385,12 @@ GEM
     multi_xml (0.5.5)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (3.1.1)
-    newrelic_rpm (3.15.2.317)
-    nio4r (1.2.1)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
-    nokogiri-happymapper (0.5.9)
+    net-ssh (4.2.0)
+    newrelic_rpm (4.6.0.338)
+    nio4r (2.1.0)
+    nokogiri (1.8.2)
+      mini_portile2 (~> 2.3.0)
+    nokogiri-happymapper (0.6.0)
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
@@ -688,7 +688,7 @@ DEPENDENCIES
   mongoid-versioning
   mongoid_userstamp
   newrelic_rpm
-  nokogiri (= 1.6.7.2)
+  nokogiri (= 1.8.2)
   nokogiri-happymapper
   non-stupid-digest-assets (~> 1.0, >= 1.0.9)
   notifier!

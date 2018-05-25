@@ -38,7 +38,7 @@ gem 'mongoid-enum'
 gem 'mongoid-history'
 gem 'mongoid-versioning'
 gem 'mongoid_userstamp'
-gem 'nokogiri', '1.6.7.2'
+gem 'nokogiri', '1.8.2'
 gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem 'nokogiri-happymapper', :require => 'happymapper'
 gem "notifier",           path: "components/notifier"
