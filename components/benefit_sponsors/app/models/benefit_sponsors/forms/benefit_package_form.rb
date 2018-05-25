@@ -61,6 +61,7 @@ module BenefitSponsors
 
       def self.fetch(params)
         form = self.new(params)
+        form.service.load_form_metadata(form)
         form
       end
 

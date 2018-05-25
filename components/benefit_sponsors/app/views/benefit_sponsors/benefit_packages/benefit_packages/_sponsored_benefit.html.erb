@@ -17,15 +17,11 @@
         <%#= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "edit_employee_costs_link", class: "hidden" %>
       </div>
     </span>
-  </div>
     </div>
-      <% end %>
+    <% end %>
+    </div>
     <br class="clear"/>
     <br/>
-
-    <%= f.fields_for :sponsor_contribution, errors: {}, fieldset: false do |sc|  %>
-      <%= render "sponsor_contribution", f: sc %>
-    <% end %>
 
     <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
       <div class="reference_plan_info" style='clear: both;'>
@@ -33,6 +29,6 @@
         <div class="content"></div>
       </div>
     </div>
-  </div>
-  
-  <%= render "product_choices", f: f %>
+
+    <%= render "product_choices", f: f %>
+</div>
