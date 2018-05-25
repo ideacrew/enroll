@@ -48,18 +48,9 @@ if use_plan_dumps
   puts "::: complete :::"
 end
 
-puts "*"*80
-puts "Creating Indexes"
-system "rake db:mongoid:create_indexes"
-puts "::: complete :::"
 
 if missing_plan_dumps
   puts "Running full seed"
-
-  puts "*"*80
-  puts "Creating Indexes"
-  system "rake db:mongoid:create_indexes"
-  puts "::: complete :::"
 
   puts "*"*80
   puts "Loading carriers and plans"
@@ -219,5 +210,10 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'sic_codes_seed')
 if Settings.site.key.to_s == "cca"
   require File.join(File.dirname(__FILE__),'seedfiles', 'cca','cca_seed')
 end
+
+puts "*"*80
+puts "Creating Indexes"
+system "rake db:mongoid:create_indexes"
+puts "::: complete :::"
 
 puts "End of Seed Data"

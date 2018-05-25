@@ -1,3 +1,4 @@
+require File.expand_path(File.join(File.dirname(__FILE__), "translations_seed"))
 require File.expand_path(File.join(File.dirname(__FILE__), "qles_seed"))
 require File.expand_path(File.join(File.dirname(__FILE__), "site_seed"))
 require File.expand_path(File.join(File.dirname(__FILE__), "issuer_profiles_seed"))

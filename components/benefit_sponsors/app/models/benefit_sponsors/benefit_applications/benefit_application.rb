@@ -77,8 +77,8 @@ module BenefitSponsors
                   counter_cache: true,
                   class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
-      embeds_one  :benefit_sponsor_catalog,
-                  class_name: "::BenefitMarkets::BenefitSponsorCatalog"
+      embeds_one  :benefit_sponsor_catalog, as: :catalogable
+                  # class_name: "::BenefitMarkets::BenefitSponsorCatalog"
 
       embeds_many :benefit_packages,
                   class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
@@ -99,9 +99,9 @@ module BenefitSponsors
       end
 
       # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
-      scope :plan_design_draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
-      scope :plan_design_approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
-      scope :plan_design_exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
+      scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+      scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
+      scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
       scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
       scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
@@ -171,6 +171,17 @@ module BenefitSponsors
       #     ]
       #     )
       # }
+
+
+      # def benefit_sponsor_catalog_for(effective_date)
+      #   benefit_market_catalog = benefit_sponsorship.benefit_market.benefit_market_catalog_effective_on(effective_date)
+      #   if benefit_market_catalog.present?
+      #     self.benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
+      #   else
+      #     nil
+      #   end
+      #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
+      # end
 
       def effective_period=(new_effective_period)
         effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
@@ -337,7 +348,7 @@ module BenefitSponsors
       def is_event_date_valid?
         today = TimeKeeper.date_of_record
 
-        is_valid = case aasm_state
+        is_valid = case aasm_state.to_s
         when "approved", "draft"
           today >= open_enrollment_period.begin
         when "enrollment_open"
@@ -459,7 +470,7 @@ module BenefitSponsors
 
         # Upon review, application ineligible status overturned and deemed eligible
         event :approve_application do
-          transitions from: APPLICATION_EXCEPTION_STATES, to: :approved
+          transitions from: :draft, to: :approved
         end
 
         event :submit_for_review do
@@ -553,7 +564,7 @@ module BenefitSponsors
       end
 
       def benefit_sponsorship_event_subscriber(aasm)
-        if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
+        if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
           approve_enrollment_eligiblity!
         end
 

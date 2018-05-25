@@ -229,12 +229,12 @@ module BenefitSponsors
       end
 
       it "should find applications in Plan Draft status" do
-        expect(BenefitApplications::BenefitApplication.plan_design_draft.to_a.sort).to eq (march_sponsors + april_sponsors).sort
+        expect(BenefitApplications::BenefitApplication.draft.to_a.sort).to eq (march_sponsors + april_sponsors).sort
       end
 
       it "should find applications with chained scopes" do
         expect(BenefitApplications::BenefitApplication.
-                                        plan_design_draft.
+                                        draft.
                                         open_enrollment_begin_on(april_open_enrollment_begin_on)).to eq april_sponsors
       end
 

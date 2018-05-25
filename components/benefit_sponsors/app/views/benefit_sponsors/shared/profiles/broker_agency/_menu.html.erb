@@ -81,13 +81,15 @@
 
         <% if current_user.has_hbx_staff_role? %>
         <% else %>
-          <li role="presentation" class="multi-line">
-            <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
-              First Time Applications for Medicaid
-              <br/>
-              and Premium Tax Credits
-            <% end %>
-          </li>
+          <% if individual_market_is_enabled? %>
+            <li role="presentation" class="multi-line">
+              <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
+                First Time Applications for Medicaid
+                <br/>
+                and Premium Tax Credits
+              <% end %>
+            </li>
+          <% end %>
         <% end %>
       </ul>
     </div>
