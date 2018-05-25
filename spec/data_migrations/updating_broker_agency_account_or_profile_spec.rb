@@ -93,7 +93,7 @@ describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("action").and_return("update_family_broker_agency_account_with_writing_agent")
     end
 
-    it "Should update the person broker_role id with with new broker_agency" do
+    it "Should update the writing agent of broker agency account" do
       new_person.primary_family.broker_agency_accounts.first.update_attributes(writing_agent_id: '')
       expect(new_person.primary_family.broker_agency_accounts.first.writing_agent).to eq nil
       subject.migrate

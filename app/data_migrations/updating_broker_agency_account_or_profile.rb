@@ -127,7 +127,7 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
   end
 
   def update_family_broker_agency_account_with_writing_agent
-    return "Fein not found" if ENV['org_fein'].blank?
+    return "Fein not found" if ENV['fein'].blank?
     return "hbx_id not found" if ENV['hbx_id'].blank?
 
     broker_agency_profile = Organization.where(:fein => ENV['org_fein']).first.broker_agency_profile
