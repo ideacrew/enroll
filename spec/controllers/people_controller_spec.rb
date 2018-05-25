@@ -28,9 +28,8 @@ RSpec.describe PeopleController do
     let(:census_employee_id) {employee_roles[0].census_employee_id}
 
     let(:email_attributes) { {"0"=>{"kind"=>"home", "address"=>"test@example.com"}}}
-    let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
-        "1"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
-        "2"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"}} }
+    let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "_id"=> person.addresses[0].to_s},
+        "1"=>{"kind"=>"mailing", "address_1"=>"address1", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "_id"=> person.addresses[1].to_s} } }
 
     before :each do
       allow(Person).to receive(:find).and_return(person)
@@ -44,12 +43,6 @@ RSpec.describe PeopleController do
       person_attributes[:addresses_attributes] = addresses_attributes
       sign_in user
       post :update, id: person.id, person: person_attributes
-    end
-
-    context "duplicate addresses records" do
-      it "clean all existing addresses " do
-        expect(person.addresses).to eq []
-      end
     end
 
     context "when individual" do
