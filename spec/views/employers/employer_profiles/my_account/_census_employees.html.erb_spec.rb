@@ -25,7 +25,7 @@ RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.er
   end
 
   it "should have the link of add employee" do
-    expect(rendered).to have_selector("a", text: 'Add Employee')
+    expect(rendered).to have_selector("a", text: 'Add New Employee')
   end
 
   it "should have tab of cobra" do
