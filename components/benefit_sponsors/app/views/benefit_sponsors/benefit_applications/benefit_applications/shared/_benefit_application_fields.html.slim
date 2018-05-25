@@ -4,7 +4,7 @@ h1.heading-text Add Benefit Package
 .row#benefitApplicationform
   .col-md-12.p0
     - benefit_application_start_dates = f.object.start_on_options.keys
-    - formatted_start_on = Date.strptime(f.object.start_on, "%m/%d/%Y")
+    - formatted_start_on = f.object.start_on.present? ? Date.strptime(f.object.start_on, "%m/%d/%Y") : nil
     .form-group
       .col-md-6.col-sm-12
         label for="inputStartOn" Start on
