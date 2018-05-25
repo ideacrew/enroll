@@ -97,8 +97,8 @@ module BenefitSponsors
           expect(response).to have_http_status(:redirect)
         end
 
-        it "should redirect to benefit packages new" do
-          expect(response.location.include?("edit")).to be_truthy
+        it "should redirect to benefits tab" do
+          expect(response.location.include?("tab=benefits")).to be_truthy
         end
 
         it "should return flash notices" do
@@ -195,7 +195,7 @@ module BenefitSponsors
 
         it "should redirect to benefit applications" do
           sign_in_and_do_update
-          expect(response.location.include?("benefit_applications")).to be_truthy
+          expect(response.location.include?("tab=benefits")).to be_truthy
         end
       end
 
