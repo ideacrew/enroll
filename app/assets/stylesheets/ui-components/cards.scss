@@ -1,9 +1,11 @@
 .panel-heading {
+  /*
   color:$mhc-orange !important;
   font-weight: 600;
   font-size: 18px;
   text-transform: uppercase;
   font-family: "Roboto Slab", serif;
+  */
 }
 .plan-year-heading, .benefit-group-heading {
   color:$primary-table-heading;
@@ -26,3 +28,83 @@
   color:$primary-green;
 }
 
+.my-account-widget {
+  .panel {
+    border-radius: 0;
+    background-image: none;
+    border-bottom: none;
+    font-size: 14px;
+    margin: 0;
+  }
+  .panel-default {
+    border-color: #ddd;
+  }
+  .panel-heading {
+    background-color: $primary-white;
+    background-image: none;
+    border-bottom: none;
+    padding: 0;
+    font-size: 12px;
+    text-align: center;
+      
+    h4 {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 0;
+      max-width: 155px;
+      color:$mhc-orange;
+    }
+  }
+  .panel-body {
+    font-size: 14px;
+    text-align: center;
+    padding-top:0;
+  }
+  .ttc {
+    text-transform: capitalize;
+  }
+  .ttu {
+      text-transform: uppercase;
+  }
+  .dg {
+    color: #414141;
+  }
+  .lg {
+      color: $primary-dark-gray;
+  }
+}
+
+#shop-for-plans-widget {
+  .image-area {
+    float: left;
+    margin-right: 20px;
+  }
+}
+
+.qles-panel {
+  .panel-heading {
+      background-image: none;
+      padding-bottom: 0;
+      border-bottom: 0;
+      background-color: transparent;
+      color: #333;
+  }
+  img {
+      vertical-align: middle;
+  }
+  h4 {
+      margin: 0;
+      line-height: 1.4em;
+      color: #c56c24;
+      font-size: 18px;
+          font-weight: 600;
+  }
+  #qle-header {
+    .panel-heading small  {
+        padding-top: 5px !important;
+        line-height: 135% !important;
+        display: block !important;
+    }
+  }
+  
+}
