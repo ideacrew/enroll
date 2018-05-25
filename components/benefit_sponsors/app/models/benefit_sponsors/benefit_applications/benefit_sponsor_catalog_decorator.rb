@@ -13,7 +13,7 @@ module BenefitSponsors
           contributions[product_package.package_kind.to_s] = {
             id: nil,
             contribution_levels: contribution.contribution_levels.collect{|cl| 
-                     ContributionLevel.new(cl.id, cl.display_name, cl.contribution_factor, cl.is_offered)
+                     ContributionLevel.new(cl.id, cl.display_name, cl.contribution_factor, true)
                     }
           }
 
