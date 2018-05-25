@@ -11,8 +11,11 @@ describe CreatingPersonRecord, dbclean: :after_each do
     end
   end
 
-  describe "should create broker_agency_accounts for employer" do
-    it "should have broker_agency_account for employer" do
+  describe "should create Person record" do
+    before do
+      allow(ENV).to receive(:[]).with('file_name').and_return "spec/test_data/person_test_record.csv"
+    end
+    it "should create person record" do
       expect(Person.all.to_a.size).to eq 0 # before migration
       subject.migrate
       expect(Person.all.to_a.size).to eq 1 # after migration
