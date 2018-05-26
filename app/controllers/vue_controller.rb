@@ -7,6 +7,15 @@ class VueController < ApplicationController
     render 'hello'
   end
 
+  def my_employees
+    my_employees = []
+    #Plan.valid_shop_by_metal_level_and_year("gold",2018).limit(25).each do |p|
+    EmployerProfile.all.first.census_employees.each do |p|
+      my_employees << { :first_name => p.first_name, :last_name => p.last_name}
+    end
+    render json: my_employees.to_json
+  end
+
   def index
 
   end

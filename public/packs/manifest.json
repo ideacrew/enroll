@@ -3,10 +3,10 @@
   "application.css.map": "/packs/application-30cf488ad91e11611d9785400f5e4d14.css.map",
   "application.js": "/packs/application-ca561cc3bc1d4adba8c1.js",
   "application.js.map": "/packs/application-ca561cc3bc1d4adba8c1.js.map",
-  "hbx.css": "/packs/hbx-f4979ec0d918cf2f0ac715ba9edb33e7.css",
-  "hbx.css.map": "/packs/hbx-f4979ec0d918cf2f0ac715ba9edb33e7.css.map",
-  "hbx.js": "/packs/hbx-94d3403969d8ce44d62d.js",
-  "hbx.js.map": "/packs/hbx-94d3403969d8ce44d62d.js.map",
+  "hbx.css": "/packs/hbx-10ad0bb8c41e666fbb4ff091a4cd72c9.css",
+  "hbx.css.map": "/packs/hbx-10ad0bb8c41e666fbb4ff091a4cd72c9.css.map",
+  "hbx.js": "/packs/hbx-f8a4b10bfce6dc73133f.js",
+  "hbx.js.map": "/packs/hbx-f8a4b10bfce6dc73133f.js.map",
   "hello_vue.js": "/packs/hello_vue-eb669abe9d708f70e2bc.js",
   "hello_vue.js.map": "/packs/hello_vue-eb669abe9d708f70e2bc.js.map"
 }

@@ -1,11 +1,9 @@
 <template>
   <div>
-
     <v-container  class="ma-2">
       <h1 class="display-1">Employee Detail</h1>
       <v-btn @click="$router.go(-1)" fab dark color="red"><v-icon>keyboard_arrow_left</v-icon></v-btn>
     </v-container>
-
   </div>
 </template>
 

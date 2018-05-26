@@ -42,10 +42,6 @@
     </v-card>
   </v-flex>
 </v-layout>
-
-
-    <button v-on:click="addRow()">Add</button>
-    <button v-on:click="removeRow(0)">Remove</button>
   </div>
 </template>
 

@@ -452,6 +452,7 @@ Rails.application.routes.draw do
       post  'save'
       get   'plans'
       get   'employers'
+      get   'my_employees'
       post  'calc'
     end
   end

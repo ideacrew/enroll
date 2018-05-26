@@ -42,7 +42,7 @@ Vue.component('employer-employees-datatable', EmployerEmployeesDatatable);
 
 const routes = [
   { path: '/hbx', name: 'hbx', component: Hbx },
-  { path: '/employer-home', name: 'employer-home', component: EmployerHome,
+  { path: '/employer-home/:id', name: 'employer-home', component: EmployerHome,
     children: [
       {
         path: 'employer-my', component: EmployerSummary
