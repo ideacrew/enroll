@@ -154,14 +154,14 @@ module BenefitSponsors
         )
       }
 
-      # scope :published_plan_years_by_date, ->(date) {
-      #   where(
-      #     "$and" => [
-      #       {:aasm_state.in => APPROVED_STATES },
-      #       {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
-      #     ]
-      #     )
-      # }
+      scope :published_benefit_applications_by_date, ->(date) {
+        where(
+          "$and" => [
+            {:aasm_state.in => APPROVED_STATES },
+            {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+          ]
+          )
+      }
 
       # scope :published_and_expired_plan_years_by_date, ->(date) {
       #   where(
