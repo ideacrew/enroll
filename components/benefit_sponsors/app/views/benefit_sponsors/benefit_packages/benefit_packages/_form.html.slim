@@ -19,6 +19,7 @@ h1.heading-text Benefit Package - Set Up
       = f.select :probation_period_kind, options_for_select(@benefit_package_form.catalog.probation_period_kinds, selected: f.object.probation_period_kind), {}, :class => 'form-control'
     = f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|
       = render "sponsored_benefit", f: sb
+  button.btn.btn-primary type="submit" Submit Benefit Package
       
 javascript:
   var disableSelectric = true;
