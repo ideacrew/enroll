@@ -409,3 +409,18 @@ thead {
     list-style: none;
   }
 }
+
+.horizontal-status {
+  padding: 3.75% 0 1.25%;
+  
+  .arrow {
+      padding-top: 1.25%;
+  }
+  .arrow img {
+      width: 100%;
+      max-width: 100%;
+  }
+  img {
+      vertical-align: middle;
+  }
+}

@@ -2,7 +2,7 @@
 <div class="container top-pd module" id='signup'>
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div id="registration-form-container" class="col-md-6 col-sm-8 col-xs-12">
-      <h1 class="no-top-margin text-center">Create Account</h1>
+      <h1 class="no-top-margin text-center heading-text">Create Account</h1>
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'input-no-pd', id: aca_recaptcha_enabled ? 'invisible-recaptcha-form' : ''}) do |f| %>
           <%= devise_error_messages! %>
           <div class="row error-block" style='display: none;'>
