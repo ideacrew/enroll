@@ -1,53 +1,62 @@
 <template>
   <div>
-    <h1 id="introduction" class="display-1 primary--text">Employee Form</h1>
 
-    <br>
-<v-container>
-  <v-card>
-  <v-form ref="form">
-  <v-layout row wrap>
-    <v-flex sm2 class="ma-3">
-      <v-text-field
-        label="First Name"
-        required
-      ></v-text-field>
-    </v-flex>
-    <v-flex sm2 class="ma-3">
-      <v-text-field
-        label="Middle"
-      ></v-text-field>
-    </v-flex>
-    <v-flex sm2 class="ma-3">
-      <v-text-field
-        label="Last Name"
-        required
-      ></v-text-field>
+<v-container fluid>
+  <v-layout row>
+    <v-flex>
+      <h1 id="introduction" class="display-1 primary--text">Employee Form</h1>
     </v-flex>
   </v-layout>
-  <v-layout row wrap>
-    <v-flex sm2 class="ma-3">
-      <v-text-field
-        label="Date of Birth"
-        required
-      ></v-text-field>
+
+  <v-layout row>
+    <v-flex sm4>
+      <v-card class="ma-2">
+        Card 2
+      </v-card>
     </v-flex>
-    <v-flex sm2 class="ma-3">
-      <v-text-field
-        label="SSN"
-        required
-      ></v-text-field>
-    </v-flex>
-    <v-flex sm2 class="ma-3 align-content-start align-start">
-        <v-radio-group label="Gender" :mandatory="true" row >
-          <v-radio label="Male" value="radio-1" class="text-xs-right"></v-radio>
-          <v-radio label="Female" value="radio-2" class="text-xs-right"></v-radio>
-        </v-radio-group>
+
+    <v-flex sm8>
+    <v-card class="ma-2">
+
+    <v-layout>
+      <v-flex><h2>Details</h2></v-flex>
+    </v-layout>
+
+    <v-form ref="form">
+    <v-layout row wrap>
+      <v-flex class="ma-2">
+        <v-text-field label="First Name"  required></v-text-field>
+      </v-flex>
+      <v-flex class="ma-2">
+        <v-text-field
+          label="Middle"
+        ></v-text-field>
+      </v-flex>
+      <v-flex class="ma-2">
+        <v-text-field label="Last Name" required></v-text-field>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap>
+      <v-flex class="ma-2">
+        <v-text-field label="Date of Birth" required></v-text-field>
+      </v-flex>
+      <v-flex class="ma-2">
+        <v-text-field label="SSN" required></v-text-field>
+      </v-flex>
+      <v-flex class="ma-2">
+          <v-radio-group label="Gender" :mandatory="true" row>
+            <v-radio label="Male" value="radio-1"></v-radio>
+            <v-radio label="Female" value="radio-2"></v-radio>
+          </v-radio-group>
+      </v-flex>
+    </v-layout>
+  </v-form>
+
+    </v-card>
     </v-flex>
   </v-layout>
-</v-form>
-</v-card>
 </v-container>
+
 
   </div>
 </template>

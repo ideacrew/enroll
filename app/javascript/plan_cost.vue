@@ -33,7 +33,7 @@
              ></v-select>
           </v-card-text>
         </v-card>
-        <v-card  class="my-2">
+        <v-card class="my-2">
           <v-card-text>
             <span>Contribution %</span>
             <v-slider step="5" value="50" max="100" hint="${employee_contribution}" v-model="employee_contribution" label="Employee"></v-slider>
