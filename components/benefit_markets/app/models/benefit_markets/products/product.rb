@@ -126,6 +126,10 @@ module BenefitMarkets
       @issuer_profile = new_issuer_profile
     end
 
+    def active_year
+      application_period.min.year
+    end
+
     def premium_table_effective_on(effective_date)
       premium_tables.detect { |premium_table| premium_table.effective_period.cover?(effective_date) }
     end

@@ -30,7 +30,7 @@ module BenefitMarkets
         product,
         sic_code
       )
-        $pf_cache_for_sic_code[[product.issuer_profile_id, product.active_year]].cached_lookup(participation_percent)
+        $pf_cache_for_sic_code[[product.issuer_profile_id, product.active_year]].cached_lookup(sic_code)
       end
       
       # Return the group size factor value for a given product.
@@ -41,7 +41,7 @@ module BenefitMarkets
         product,
         group_size
       )
-        $pf_cache_for_group_size[[product.issuer_profile_id, product.active_year]].cached_lookup(participation_percent)
+        $pf_cache_for_group_size[[product.issuer_profile_id, product.active_year]].cached_lookup(group_size)
       end
       
       # Return the participation percent factor value for a given product.
@@ -61,9 +61,9 @@ module BenefitMarkets
       # @return [Float, BigDecimal] the factor
       def self.lookup_composite_tier_factor(
         product,
-        participation_percent 
+        tier_name
       )
-        $pf_cache_for_composite_tier_factor[[product.issuer_profile_id, product.active_year]].cached_lookup(participation_percent)
+        $pf_cache_for_composite_tier_factor[[product.issuer_profile_id, product.active_year]].cached_lookup(tier_name)
       end
     end
   end

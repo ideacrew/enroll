@@ -37,7 +37,7 @@ module BenefitSponsors
             @member_rels[member.member_id] = rel_name
             @member_dobs[member.member_id] = member.dob
             contribution_unit = @contribution_model.contribution_units.detect do |cu|
-              cu.match?({rel_name => 1})
+              cu.match?({rel_name.to_s => 1})
             end
             cu = @level_map[contribution_unit.id]
             if cu.is_offered
