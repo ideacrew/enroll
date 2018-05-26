@@ -1,12 +1,12 @@
 {
   "application.css": "/packs/application-30cf488ad91e11611d9785400f5e4d14.css",
   "application.css.map": "/packs/application-30cf488ad91e11611d9785400f5e4d14.css.map",
-  "application.js": "/packs/application-91ca91ae197974b56e9d.js",
-  "application.js.map": "/packs/application-91ca91ae197974b56e9d.js.map",
-  "hbx.css": "/packs/hbx-7ab2f9232d6b0cb6d38334407ca5dedb.css",
-  "hbx.css.map": "/packs/hbx-7ab2f9232d6b0cb6d38334407ca5dedb.css.map",
-  "hbx.js": "/packs/hbx-3872a4101535b40e9f45.js",
-  "hbx.js.map": "/packs/hbx-3872a4101535b40e9f45.js.map",
-  "hello_vue.js": "/packs/hello_vue-003cec26221b56f1500d.js",
-  "hello_vue.js.map": "/packs/hello_vue-003cec26221b56f1500d.js.map"
+  "application.js": "/packs/application-ca561cc3bc1d4adba8c1.js",
+  "application.js.map": "/packs/application-ca561cc3bc1d4adba8c1.js.map",
+  "hbx.css": "/packs/hbx-f4979ec0d918cf2f0ac715ba9edb33e7.css",
+  "hbx.css.map": "/packs/hbx-f4979ec0d918cf2f0ac715ba9edb33e7.css.map",
+  "hbx.js": "/packs/hbx-94d3403969d8ce44d62d.js",
+  "hbx.js.map": "/packs/hbx-94d3403969d8ce44d62d.js.map",
+  "hello_vue.js": "/packs/hello_vue-eb669abe9d708f70e2bc.js",
+  "hello_vue.js.map": "/packs/hello_vue-eb669abe9d708f70e2bc.js.map"
 }

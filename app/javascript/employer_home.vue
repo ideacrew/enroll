@@ -6,13 +6,15 @@
     <v-flex sm2 class="ma-2 pa-2">
       <v-card >
         <v-list two-line subheader class="blue lighten-5">
-          <v-list-tile v-on:click="link = 'employer-my'">
+          <v-list-tile  :to="{path:'/employer-home/employer-my'}">
             <v-list-tile-content >
               <v-list-tile-title>My DC Healthlink</v-list-tile-title>
               <v-list-tile-sub-title>Summary</v-list-tile-sub-title>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile  v-on:click="link = 'employer-employees'">
+          <!-- <v-list-tile  v-on:click="link = 'employer-employees'"> -->
+          <v-list-tile :to="{path:'/employer-home/employer-employees'}">
+
             <v-list-tile-content>
               <v-list-tile-title>Employees</v-list-tile-title>
               <v-list-tile-sub-title>Employee Roster...</v-list-tile-sub-title>
@@ -34,7 +36,8 @@
       </v-card>
     </v-flex>
     <v-flex sm10 class="ma-2 pa-2">
-      <component v-bind:is="cmp"></component>
+      <!-- <component v-bind:is="cmp"></component> -->
+      <router-view/>
     </v-flex>
   </v-layout>
 </v-container>

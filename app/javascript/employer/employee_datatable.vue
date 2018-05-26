@@ -7,7 +7,10 @@
     class="elevation-1"
   >
     <template slot="items" slot-scope="props">
-      <tr @click="props.expanded = !props.expanded"><td>{{ props.item.name }}</td></tr>
+      <tr @click="props.expanded = !props.expanded">
+        <td>{{ props.item.name }}</td>
+        <td><router-link :to="{ path: '/employer-home/employer-employee-detail'}">Details</router-link></td>
+      </tr>
     </template>
     <template slot="expand" slot-scope="props">
       <v-card flat class="blue lighten-5">
@@ -23,7 +26,8 @@ export default {
   data: function() {
     return {
       headers: [
-        { text: 'Name', value: 'name', align: 'left', width: 250 }
+        { text: 'Name', value: 'name', align: 'left', width: 250 },
+        { text: 'Details'}
       ]
     }
   },
