@@ -35,6 +35,16 @@ module BenefitSponsors
         })
       end
 
+      def hide_or_show_claim_quote_button(employer_profile)
+        return true if employer_profile.published_benefit_application.blank?
+        return true if employer_profile.benefit_applications_with_drafts_statuses
+        # return true if employer_profile.has_active_state? && employer_profile.published_benefit_application.try(:terminated_on).present? && employer_profile.published_benefit_application.terminated_on > TimeKeeper.date_of_record
+        # TODO: Fix has_active_state on BenefitSponsorship ?
+        return true if employer_profile.published_benefit_application.try(:terminated_on).present? && employer_profile.published_benefit_application.terminated_on > TimeKeeper.date_of_record
+        return false if !employer_profile.benefit_applications_with_drafts_statuses && employer_profile.published_benefit_application.present?
+        false
+      end
+
       def deactivate_benefit_sponsors_employer_staff(person_id, employer_profile_id)
         begin
           person = Person.find(person_id)
