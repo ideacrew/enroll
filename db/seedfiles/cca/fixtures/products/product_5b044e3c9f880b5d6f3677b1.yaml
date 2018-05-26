@@ -34,7 +34,7 @@ attributes: !ruby/hash:BSON::Document
   provider_directory_url: https://ma.checkbookhealth.org/mashop
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-05-25 21:46:00.332000000 Z
+  updated_at: 2018-05-22 17:07:17.816000000 Z
   created_at: 2018-05-22 17:07:08.274000000 Z
   premium_tables:
   - !ruby/hash:BSON::Document

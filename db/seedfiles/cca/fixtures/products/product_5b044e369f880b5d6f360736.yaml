@@ -34,7 +34,7 @@ attributes: !ruby/hash:BSON::Document
   provider_directory_url: https://ma.checkbookhealth.org/mashop
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-05-25 21:46:02.200000000 Z
+  updated_at: 2018-05-22 17:07:15.589000000 Z
   created_at: 2018-05-22 17:07:02.597000000 Z
   sbc_document: !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -48,11 +48,11 @@ attributes: !ruby/hash:BSON::Document
     source: enroll_system
     language: en
     tags: []
-    _type: Document
     subject: SBC
     identifier: urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-prod#7747c747-4f4c-4ea2-802e-686fd88235e8
     updated_at: 2017-08-15 06:46:28.920000000 Z
     created_at: 2017-08-15 06:46:28.920000000 Z
+    _type: Document
   premium_tables:
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
