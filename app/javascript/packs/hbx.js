@@ -26,6 +26,7 @@ import EmployerSummary from '../employer/my.vue'
 import EmployerEmployees from '../employer/employees.vue'
 import EmployerEmployeesDatatable from '../employer/employee_datatable.vue'
 import EmployerEmployeeDetail from '../employer/employee_detail.vue'
+import EmployerBenefits from '../employer/benefits.vue'
 
 
 Vue.component('hbx', Hbx);
@@ -38,6 +39,7 @@ Vue.component('employer-home', EmployerHome);
 Vue.component('employer-my', EmployerSummary);
 Vue.component('employer-employees', EmployerEmployees);
 Vue.component('employer-employees-datatable', EmployerEmployeesDatatable);
+Vue.component('employer-benefits', EmployerBenefits);
 
 
 const routes = [
@@ -51,16 +53,17 @@ const routes = [
         path: 'employer-employees', component: EmployerEmployees
       },
       {
-        path: 'employer-employee-detail', component: EmployerEmployeeDetail
+        path: 'employer-employee-detail/:census_employee_id', component: EmployerEmployeeDetail
+      },
+      {
+        path: 'employer-benefits', component: EmployerBenefits
       },
     ]
   },
   { path: '/plan-cost', name: 'planCost', component: PlanCost }
 ]
 
-// 3. Create the router instance and pass the `routes` option
-// You can pass in additional options here, but let's
-// keep it simple for now.
+
 const router = new VueRouter({
   routes // short for `routes: routes`
 })

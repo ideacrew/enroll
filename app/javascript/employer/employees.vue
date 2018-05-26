@@ -1,12 +1,9 @@
 <template>
-  <div>
+  <div class="ma-2">
 
-    <v-container  class="ma-2">
       <h1 class="display-1">Your Employee Roster</h1>
 
       <employer-employees-datatable :employees="employees"></employer-employees-datatable>
-
-    </v-container>
 
   </div>
 </template>

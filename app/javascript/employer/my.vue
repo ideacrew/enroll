@@ -1,12 +1,8 @@
 <template>
-  <div>
-
-<v-container class="ma-2">
+  <div class="ma-2">
 
   <h1 class="display-1">My Health Benefits Program</h1>
   <p class="body-1 ma-2">It's time to set up your Health Benefits Program. You can either get help from a Broker, or set up your Health Benefits Program yourself. Choose the path that's right for you.</p>
-
-</v-container>
 
   </div>
 </template>

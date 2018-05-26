@@ -10,14 +10,20 @@ class VueController < ApplicationController
   def my_employees
     my_employees = []
     #Plan.valid_shop_by_metal_level_and_year("gold",2018).limit(25).each do |p|
-    EmployerProfile.all.first.census_employees.each do |p|
-      my_employees << { :first_name => p.first_name, :last_name => p.last_name}
+    EmployerProfile.find(params[:employer_id]).census_employees.each do |p|
+      my_employees << { :id => p.id, :dob => p.dob.strftime("%m/%d/%Y"), :first_name => p.first_name, :last_name => p.last_name}
     end
     render json: my_employees.to_json
   end
 
   def index
 
+  end
+
+  def plan_year
+    plan_years = EmployerProfile.find(params[:employer_id]).plan_years.first.attributes
+
+    render json: plan_years.to_json
   end
 
   def calc

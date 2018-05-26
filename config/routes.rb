@@ -453,6 +453,7 @@ Rails.application.routes.draw do
       get   'plans'
       get   'employers'
       get   'my_employees'
+      get   'plan_year'
       post  'calc'
     end
   end
