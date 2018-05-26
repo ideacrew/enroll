@@ -18,7 +18,9 @@ module BenefitSponsors
       # field :is_congress, type: Boolean, default: false
 
       embeds_many :sponsored_benefits,
-                  class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
+                  class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit",
+                  cascade_callbacks: true, validate: true
+                           
       accepts_nested_attributes_for :sponsored_benefits
 
       delegate :benefit_sponsor_catalog, to: :benefit_application
