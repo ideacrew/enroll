@@ -23,7 +23,7 @@ module BenefitSponsors
       it { is_expected.to have_fields(:hbx_id, :profile_id)}
       it { is_expected.to have_field(:source_kind).of_type(Symbol).with_default_value_of(:self_serve)}
       it { is_expected.to embed_many(:broker_agency_accounts)}
-      it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponorships)}
+      it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponsorships)}
 
       context "with no arguments" do
         subject { described_class.new }
