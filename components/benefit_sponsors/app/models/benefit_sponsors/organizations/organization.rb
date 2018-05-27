@@ -91,7 +91,7 @@ module BenefitSponsors
       embeds_many :documents, as: :documentable
 
       # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
-      has_many    :benefit_sponsorships, counter_cache: true,
+      has_many    :benefit_sponsorships,
                   class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
 

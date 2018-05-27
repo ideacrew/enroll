@@ -65,7 +65,7 @@ module BenefitSponsors
       delegate :enforce_employer_attestation, to: :benefit_market
 
       belongs_to  :organization,
-                  inverse_of: :benefit_sponorships,
+                  inverse_of: :benefit_sponsorships,
                   counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
