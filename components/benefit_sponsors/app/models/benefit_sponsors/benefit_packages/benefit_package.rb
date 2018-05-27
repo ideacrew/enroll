@@ -3,7 +3,7 @@ module BenefitSponsors
     class BenefitPackage
       include Mongoid::Document
       include Mongoid::Timestamps
-    
+
 
       embedded_in :benefit_application, class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
@@ -20,7 +20,7 @@ module BenefitSponsors
       embeds_many :sponsored_benefits,
                   class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit",
                   cascade_callbacks: true, validate: true
-                           
+
       accepts_nested_attributes_for :sponsored_benefits
 
       delegate :benefit_sponsor_catalog, to: :benefit_application
@@ -30,22 +30,14 @@ module BenefitSponsors
 
       delegate :start_on, :end_on, to: :benefit_application
 
-      # # Length of time New Hire must wait before coverage effective date
-      # field :probation_period, type: Range
- 
-
-      # # The date range when this application is active
-      # field :effective_period,        type: Range
-
-      # # The date range when all members may enroll in benefit products
-      # field :open_enrollment_period,  type: Range
+      validates_presence_of :title, :probation_period_kind, :is_default, :is_active
 
 
       # calculate effective on date based on probation period kind
       # Logic to deal with hired_on and created_at
       # returns a roster
       def new_hire_effective_on(roster)
-        
+
       end
 
       def eligible_on(date_of_hire)
@@ -97,8 +89,8 @@ module BenefitSponsors
         })
 
         new_benefit_package.predecessor = self
-        
-        sponsored_benefits.each do |sponsored_benefit| 
+
+        sponsored_benefits.each do |sponsored_benefit|
           new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
 
@@ -126,16 +118,16 @@ module BenefitSponsors
 
         employee_role = census_employee.employee_role
         family = employee_role.primary_family
-        
+
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
-        
-        family.validate_member_eligibility_policy 
+
+        family.validate_member_eligibility_policy
         if family.is_valid?
 
           enrollments = family.enrollments.by_benefit_sponsorship(benefit_sponsorship)
           .by_effective_period(predecessor_benefit_package.effective_period)
           .enrolled_and_waived
-          
+
           sponsored_benefits.map(&:product_kind).each do |product_kind|
             hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
 
@@ -178,7 +170,7 @@ module BenefitSponsors
 
       def self.find(id)
         ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
-          
+
           if benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(:"benefit_packages._id" => id).first
             benefit_application.benefit_packages.find(id)
           else
@@ -190,11 +182,11 @@ module BenefitSponsors
       # Scenario 1: sponsored_benefit is missing (because product not available during renewal)
       def refresh
 
-      end 
+      end
 
       #  Scenario 2: sponsored_benefit is present
       def refresh!(new_benefit_sponsor_catalog)
-        # construct sponsored benefits again 
+        # construct sponsored benefits again
         # compare them with old ones
 
         sponsored_benefits.each do |sponsored_benefit|

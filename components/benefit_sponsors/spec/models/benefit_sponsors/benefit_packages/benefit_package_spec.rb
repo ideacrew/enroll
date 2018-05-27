@@ -8,6 +8,70 @@ module BenefitSponsors
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
+    let(:title)                 { "Generous BenefitPackage - 2018"}
+    let(:probation_period_kind) { :first_of_month_after_30_days }
+
+    let(:params) do
+      {
+        title: title,
+        probation_period_kind: probation_period_kind,
+      }
+    end
+
+
+    context "A new model instance" do
+      it { is_expected.to be_mongoid_document }
+      it { is_expected.to have_field(:title).of_type(String).with_default_value_of("")}
+      it { is_expected.to have_field(:description).of_type(String).with_default_value_of("")}
+      it { is_expected.to have_field(:probation_period_kind).of_type(Symbol)}
+      it { is_expected.to have_field(:is_default).of_type(Mongoid::Boolean).with_default_value_of(false)}
+      it { is_expected.to have_field(:is_active).of_type(Mongoid::Boolean).with_default_value_of(true)}
+      it { is_expected.to have_field(:predecessor_id).of_type(BSON::ObjectId)}
+      it { is_expected.to embed_many(:sponsored_benefits)}
+      it { is_expected.to be_embedded_in(:benefit_application)}
+
+
+      context "with no arguments" do
+        subject { described_class.new }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with no title" do
+        subject { described_class.new(params.except(:title)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with no probation_period_kind" do
+        subject { described_class.new(params.except(:probation_period_kind)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+        end
+      end
+
+      context "with all required arguments" do
+        subject { described_class.new(params) }
+
+
+        context "and all arguments are valid" do
+          it "should be valid" do
+            subject.validate
+            expect(subject).to be_valid
+          end
+        end
+      end
+    end
+
+
     describe ".renew" do
       context "when passed renewal benefit package to current benefit package for renewal" do
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
@@ -69,13 +133,13 @@ module BenefitSponsors
       end
     end
 
-    describe '.is_renewal_benefit_available?' do 
+    describe '.is_renewal_benefit_available?' do
     end
 
-    describe '.sponsored_benefit_for' do 
+    describe '.sponsored_benefit_for' do
     end
 
-    describe '.assigned_census_employees_on' do 
+    describe '.assigned_census_employees_on' do
     end
 
     describe '.renew_employee_benefits' do
