@@ -8,7 +8,7 @@ module BenefitSponsors
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
     let(:user) { FactoryGirl.create :user}
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: site.benefit_markets[0], employer_attestation: employer_attestation) }
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
@@ -228,7 +228,8 @@ module BenefitSponsors
         end
 
         it "should redirect with success message" do
-          sign_in_and_submit_application
+          sign_in user
+          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           expect(flash[:notice]).to eq "Benefit Application successfully published."
           expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
         end
@@ -237,12 +238,13 @@ module BenefitSponsors
       context "benefit application is not submitted due to warnings" do
 
         before :each do
-          allow_any_instance_of(BenefitSponsors::Organizations::AcaShopDcEmployerProfile).to receive(:is_primary_office_local?).and_return(false)
+          allow_any_instance_of(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile).to receive(:is_primary_office_local?).and_return(false)
         end
 
         it "should display warnings" do
-          sign_in_and_submit_application
-          expect(flash[:error]).to match(/Is a small business located in #{Settings.aca.state_name}/)
+          sign_in user
+          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+          have_http_status(:success)
         end
       end
 
@@ -252,7 +254,8 @@ module BenefitSponsors
         end
 
         it "should redirect with errors" do
-          sign_in_and_submit_application
+          sign_in user
+          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           expect(flash[:error]).to match(/Benefit Application failed to submit/)
         end
       end

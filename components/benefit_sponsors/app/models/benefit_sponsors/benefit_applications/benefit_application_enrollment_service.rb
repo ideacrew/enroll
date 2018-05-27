@@ -284,10 +284,10 @@ module BenefitSponsors
       warnings = {}
 
       if employer_attestation_is_enabled?
-        unless benefit_sponsorship.is_attestation_eligible?
-          if benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+        unless benefit_sponsorship.profile.is_attestation_eligible?
+          if @benefit_application.no_documents_uploaded?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
-          elsif benefit_sponsorship.employer_attestation.denied?
+          elsif benefit_sponsorship.profile.employer_attestation.denied?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
           else
             warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})
