@@ -58,7 +58,7 @@ attributes: !ruby/hash:BSON::Document
     minimum_contribution_factor: 0.0
     name: domestic_partner
     display_name: Domestic Partner
-    order: 1
+    order: 2
     default_contribution_factor: 0.25
     member_relationship_maps:
     - !ruby/hash:BSON::Document
@@ -76,7 +76,7 @@ attributes: !ruby/hash:BSON::Document
     minimum_contribution_factor: 0.0
     name: child_under_26
     display_name: Child Under 26
-    order: 2
+    order: 3
     default_contribution_factor: 0.25
     member_relationship_maps:
     - !ruby/hash:BSON::Document
