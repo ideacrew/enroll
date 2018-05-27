@@ -292,7 +292,7 @@ module BenefitSponsors
         def is_employer_profile_claimed?(organization)
           if organization.present?
             if organization.employer_profile.present?
-              if (Person.where({"employer_staff_roles.employer_profile_id" => organization.employer_profile._id}).any?)
+              if (Person.where({"employer_staff_roles.benefit_sponsor_employer_profile_id" => organization.employer_profile._id}).any?)
                 return true
               end
             end
