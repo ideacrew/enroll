@@ -53,11 +53,29 @@ attributes: !ruby/hash:BSON::Document
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
+        WwROSZ+IC11vNseT
+    _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+    minimum_contribution_factor: 0.0
+    name: domestic_partner
+    display_name: Domestic Partner
+    order: 1
+    default_contribution_factor: 0.25
+    member_relationship_maps:
+    - !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          WwROSZ+IC11vNseU
+      operator: :>=
+      relationship_name: :spouse
+      count: 1
+  - !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
         WwROSZ+IC11vNseV
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
     minimum_contribution_factor: 0.0
-    name: dependent
-    display_name: Dependent
+    name: child_under_26
+    display_name: Child Under 26
     order: 2
     default_contribution_factor: 0.25
     member_relationship_maps:
@@ -84,6 +102,7 @@ attributes: !ruby/hash:BSON::Document
     relationship_kinds:
     - spouse
     - life_partner
+    - domestic_partner
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
