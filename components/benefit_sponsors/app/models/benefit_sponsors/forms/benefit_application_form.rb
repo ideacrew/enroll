@@ -24,6 +24,8 @@ module BenefitSponsors
       validates :open_enrollment_start_on, presence: true
       validates :open_enrollment_end_on, presence: true
 
+      validates_presence_of :fte_count, :pte_count, :msp_count, :benefit_sponsorship_id
+
       # validates :validate_application_dates
       attr_reader :service, :show_page_model
 

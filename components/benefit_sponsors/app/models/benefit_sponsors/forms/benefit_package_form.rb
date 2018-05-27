@@ -17,6 +17,9 @@ module BenefitSponsors
       # attr_accessor :benefit_application, :product_packages
       # validates :title, presence: true
 
+      validates_presence_of :title, :probation_period_kind
+      validate :benefit_package_info
+
       attr_reader :service, :show_page_model
 
       def sponsored_benefits_attributes=(attributes)
@@ -88,6 +91,39 @@ module BenefitSponsors
 
       def new_record?
         true
+      end
+
+      def benefit_package_info
+        sponsored_benefits.each do |sponsored_benefit|
+          validate_sponsored_benefit(sponsored_benefit)
+          validate_sponsored_contribution(sponsored_benefit)
+          validate_contribution_levels(sponsored_benefit)
+        end
+      end
+
+      def validate_sponsored_benefit(sponsored_benefit)
+        validate_form(sponsored_benefit)
+      end
+
+      def validate_sponsored_contribution(sponsored_benefit)
+        sponsor_contribution = sponsored_benefit.sponsor_contribution
+        return if sponsor_contribution.blank?
+        validate_form(sponsor_contribution)
+      end
+
+      def validate_contribution_levels(sponsored_benefit)
+        sponsor_contribution = sponsored_benefit.sponsor_contribution
+        return if sponsor_contribution.blank?
+        contribution_levels = sponsor_contribution.contribution_levels
+        contribution_levels.each do |contribution_level|
+          validate_form(contribution_level)
+        end
+      end
+
+      def validate_form(form)
+        unless form.valid?
+          self.errors.add(:base, form.errors.full_messages)
+        end
       end
     end
   end
