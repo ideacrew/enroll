@@ -78,6 +78,16 @@ module BenefitSponsors
         @predecessor = old_benefit_package
       end
 
+      def probation_period_display_name
+        probation_period_display_texts = {
+          first_of_month: "First of the month following or coinciding with date of hire",
+          first_of_month_after_30_days: "First of the month following 30 days",
+          first_of_month_after_60_days: "First of the month following 60 days"
+        }
+
+        probation_period_display_texts[probation_period_kind]
+      end
+
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
           title: title,
@@ -95,21 +105,20 @@ module BenefitSponsors
         new_benefit_package
       end
 
-      def renew_member_benefits(member_collection)
-        member_collection.each do |member|
-          renew_member_benefit(member)
+      def renew_employee_assignments
+        assigned_census_employees = predecessor_benefit_package.census_employees_assigned_on(predecessor.effective_period.min)
+
+        assigned_census_employees.each do |census_employee|
+          new_benefit_package_assignment = census_employee.benefit_package_assignment_on(effective_period.min)
+
+          if new_benefit_package_assignment.blank?
+            census_employee.assign_to_benefit_package(self, effective_period.min)
+          end
         end
       end
 
-
-      def probation_period_display_name
-        probation_period_display_texts = {
-          first_of_month: "First of the month following or coinciding with date of hire",
-          first_of_month_after_30_days: "First of the month following 30 days",
-          first_of_month_after_60_days: "First of the month following 60 days"
-        }
-
-        probation_period_display_texts[probation_period_kind]
+      def renew_member_benefits
+        census_employees_assigned_on(effective_period.min).each { |member| renew_member_benefit(member) }
       end
 
       def renew_member_benefit(census_employee)
@@ -118,10 +127,8 @@ module BenefitSponsors
         employee_role = census_employee.employee_role
         family = employee_role.primary_family
         
-        if family.blank?
-          return [false, "family missing for #{census_employee.full_name}"]
-        end
-
+        return [false, "family missing for #{census_employee.full_name}"] if family.blank?
+        
         family.validate_member_eligibility_policy 
         if family.is_valid?
 
@@ -130,10 +137,10 @@ module BenefitSponsors
           .enrolled_and_waived
           
           sponsored_benefits.map(&:product_kind).each do |product_kind|
-            enrollment = enrollments.by_coverage_kind(product_kind).first
+            hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
 
-            if is_renewal_benefit_available?(enrollment)
-              enrollment.renew_benefit(self)
+            if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
+              hbx_enrollment.renew_benefit(self)
             end
           end
         end
@@ -143,6 +150,22 @@ module BenefitSponsors
         return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
         sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
         sponsored_benefit.product_package.products.include?(enrollment.product.renewal_product)
+      end
+
+      def effectuate_family_coverages(family)
+        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
+          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
+          hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
+        end
+      end
+
+      def expire_family_coverages(family)
+        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
+          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
+          hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
+        end
       end
 
       def sponsored_benefit_for(coverage_kind)

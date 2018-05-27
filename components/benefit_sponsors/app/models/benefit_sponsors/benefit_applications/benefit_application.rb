@@ -303,35 +303,45 @@ module BenefitSponsors
 
       def renew_benefit_package_assignments
         benefit_packages.each do |benefit_package|
-          predecessor_benefit_package = benefit_package.predecessor
-          predecessor_effective_date  = predecessor_application.effective_period.min
-
-          predecessor_benefit_package.census_employees_assigned_on(predecessor_effective_date).each  do |employee|
-            new_benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
-            if new_benefit_package_assignment.blank? || (benefit_package_assignment.benefit_package != benefit_package)
-              census_employee.assign_to_benefit_package(benefit_package, effective_period.min)
-            end
-          end
+          benefit_package.renew_employee_assignments          
         end
 
-        benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |employee|
-          assign_to_default_benefit_package(census_employee)
+        default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
+        benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self.benefit_application).each do |census_employee|
+          census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
         end
-      end
-
-      def assign_to_default_benefit_package(census_employee, assignment_on = effective_period.min)
-        census_employee.assign_to_benefit_package(default_benefit_package, assignment_on)
-      end
-
-      def no_documents_uploaded?
-        benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
       end
 
       def renew_benefit_package_members
         benefit_packages.each do |benefit_package|
-          member_collection = benefit_package.census_employees_assigned_on(benefit_package.effective_period.min)
-          benefit_package.renew_member_benefits(member_collection)
+          benefit_package.renew_member_benefits
         end
+      end
+
+      def effectuate_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          Family.enrolled_through_benefit_package(self).each do |family|
+            benefit_package.effectuate_family_coverages(family)
+          end
+        end
+      end
+           
+      def expire_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          Family.enrolled_through_benefit_package(self).each do |family|
+            benefit_package.expire_family_coverages(family)
+          end
+        end
+      end
+
+      # TODO: Refer to benefit_sponsorship instead of employer profile.
+      def no_documents_uploaded?
+        # benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+        benefit_sponsorship.profile.employer_attestation.blank? || benefit_sponsorship.profile.employer_attestation.unsubmitted?
+      end
+
+      def validate_sponsor_market_policy
+        true
       end
 
       def refresh(new_benefit_sponsor_catalog)
@@ -598,10 +608,10 @@ module BenefitSponsors
         warnings = {}
 
         if employer_attestation_is_enabled?
-          unless benefit_sponsorship.is_attestation_eligible?
-            if benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+          unless benefit_sponsorship.profile.is_attestation_eligible?
+            if no_documents_uploaded?
               warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
-            elsif benefit_sponsorship.employer_attestation.denied?
+            elsif benefit_sponsorship.profile.employer_attestation.denied?
               warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
             else
               warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})
