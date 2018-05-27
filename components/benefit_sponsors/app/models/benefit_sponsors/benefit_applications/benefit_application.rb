@@ -3,6 +3,7 @@ module BenefitSponsors
     class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
+      include Config::AcaModelConcern
       # include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
@@ -333,6 +334,10 @@ module BenefitSponsors
         end
       end
 
+      def no_documents_uploaded?
+        benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+      end
+
       def validate_sponsor_market_policy
         true
       end
@@ -579,6 +584,63 @@ module BenefitSponsors
         if aasm.to_state == :binder_reversed
           reverse_enrollment_eligiblity!
         end
+      end
+
+      def minimum_employer_contribution
+        unless benefit_packages.size == 0
+          benefit_packages.map do |benefit_package|
+            if benefit_package#.sole_source?
+              OpenStruct.new(:premium_pct => 100)
+            else
+              # benefit_package.relationship_benefits.select do |relationship_benefit|
+              #   relationship_benefit.relationship == "employee"
+              # end.min_by do |relationship_benefit|
+              #   relationship_benefit.premium_pct
+              # end
+            end
+          end.map(&:premium_pct).first
+        end
+      end
+
+      def application_eligibility_warnings
+        warnings = {}
+
+        if employer_attestation_is_enabled?
+          unless benefit_sponsorship.is_attestation_eligible?
+            if benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+              warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+            elsif benefit_sponsorship.employer_attestation.denied?
+              warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+            else
+              warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+            end
+          end
+        end
+
+        unless benefit_sponsorship.profile.is_primary_office_local?
+          warnings.merge!({primary_office_location: "Is a small business located in #{Settings.aca.state_name}"})
+        end
+
+        # TODO: These valiations occuring when employer publish their benefit application. Following state not relavant for an unpublished application.
+        # Application is in ineligible state from prior enrollment activity
+        if aasm_state == "enrollment_ineligible"
+          warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
+        end
+
+        # Maximum company size at time of initial registration on the HBX
+        if fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
+          warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time equivalent employees" })
+        end
+
+        # Exclude Jan 1 effective date from certain checks
+        unless effective_date.yday == 1
+          # Employer contribution toward employee premium must meet minimum
+          if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+            warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
+          end
+        end
+
+        warnings
       end
 
       def is_published?

@@ -15,15 +15,16 @@ module BenefitSponsors
         include Enumerable
 
         attr_reader :reference_product
-        attr_reader :coverage_start
+        attr_reader :coverage_start, :census_employees
 
-        def initialize(r_product, c_start)
+        def initialize(census_employees, r_product, c_start)
           @reference_product = r_product
           @coverage_start = c_start
+          @census_employees = census_employees
         end
 
         def each
-          criteria.each do |ce|
+          census_employees.each do |ce|
             yield rosterize_census_employee(ce)
           end
         end
@@ -52,7 +53,6 @@ module BenefitSponsors
           member_enrollments = [::BenefitSponsors::Enrollments::MemberEnrollment.new({
             member_id: census_employee.id
           })]
-          dependent_entries = []
           census_employee.census_dependents.each do |cm|
             if cm.dob <= coverage_start
               member_entries << EnrollmentMemberAdapter.new(
@@ -71,11 +71,11 @@ module BenefitSponsors
             {
               product: reference_product,
               rate_schedule_date: nil,
-              coverage_start: coverage_start,
+              coverage_start_on: coverage_start,
               member_enrollments: member_enrollments
             })
           ::BenefitSponsors::Members::MemberGroup.new(
-            member_enrollments,
+            member_entries,
             {group_enrollment: group_enrollment}
           )
         end
@@ -173,7 +173,7 @@ module BenefitSponsors
         enrolling_employees = employees_enrolling
         group_mapper = CensusEmployeeMemberGroupMapper.new(enrolling_employees, reference_product, coverage_start)
         group_mapper.each do |ce_roster|
-          roster_group = roster_eligibility_optimizer.calculate_optimal_group_for(contribution_model, e_roster_entry, sponsor_contribution)
+          roster_group = roster_eligibility_optimizer.calculate_optimal_group_for(contribution_model, ce_roster, sponsor_contribution)
           price_group = p_calculator.calculate_price_for(pricing_model, roster_group, sponsor_contribution)
           contribution_group = c_calculator.calculate_contribution_for(contribution_model, price_group, sponsor_contribution)
           price_total = price_total + contribution_group.group_enrollment.product_cost_total
@@ -184,7 +184,7 @@ module BenefitSponsors
 
       def eligible_employee_criteria
         ::CensusEmployee.where(
-          :benefit_sponsorship_id => benefit_sposorship.id,
+          :benefit_sponsorship_id => benefit_sponsorship.id,
           :hired_on => {"$lte" => coverage_start},
           "$or" => [
             { "terminated_on" => nil },
