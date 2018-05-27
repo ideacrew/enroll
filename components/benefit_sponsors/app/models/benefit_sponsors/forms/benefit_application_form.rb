@@ -11,9 +11,9 @@ module BenefitSponsors
       attribute :end_on, String
       attribute :open_enrollment_start_on, String
       attribute :open_enrollment_end_on, String
-      attribute :fte_count, Integer
-      attribute :pte_count, Integer
-      attribute :msp_count, Integer
+      attribute :fte_count, Integer, default: 0
+      attribute :pte_count, Integer, default: 0
+      attribute :msp_count, Integer, default: 0
 
       attribute :id, String
       attribute :benefit_sponsorship_id, String
