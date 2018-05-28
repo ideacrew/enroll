@@ -15,11 +15,11 @@ export default class extends Controller {
   addLocation() {
     //clone new location node, unhide remove button, modify name attribute
     var newLocation = document.importNode(this.officeLocationTarget, true)
-    newLocation.querySelector('.js-non-primary').classList.remove('d-none')
+    newLocation.querySelector('.js-non-primary').classList.remove('hidden')
     newLocation.querySelectorAll('.js-remove').forEach(function(element) {
       element.remove()
     })
-    newLocation.querySelectorAll('input').forEach(function(input) {
+    newLocation.querySelectorAll('input[name]').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${Date.now()}]`)
       input.setAttribute('name', name)
       input.value = ''
