@@ -71,7 +71,7 @@ module BenefitSponsors
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :revert_application?
         flash[:error] = error_messages(@benefit_application_form) unless @benefit_application_form.revert
-        redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
+        render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
       end
 
       private

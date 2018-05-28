@@ -30,7 +30,7 @@ module BenefitSponsors
 
       delegate :start_on, :end_on, to: :benefit_application
 
-      validates_presence_of :title, :probation_period_kind, :is_default, :is_active
+      validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
 
 
       # calculate effective on date based on probation period kind
