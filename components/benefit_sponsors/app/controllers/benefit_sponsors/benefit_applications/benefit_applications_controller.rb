@@ -75,7 +75,6 @@ module BenefitSponsors
         else
           flash[:error] = "Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}".html_safe
         end
-        # redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
       end
 

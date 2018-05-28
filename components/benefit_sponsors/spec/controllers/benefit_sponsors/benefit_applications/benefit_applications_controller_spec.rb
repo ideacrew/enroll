@@ -249,13 +249,11 @@ module BenefitSponsors
       end
 
       context "benefit application is not submitted" do
-        before :each do
-          ben_app.update_attributes!(aasm_state: "pending")
-        end
+        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :pending) }
 
         it "should redirect with errors" do
           sign_in user
-          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           expect(flash[:error]).to match(/Benefit Application failed to submit/)
         end
       end
@@ -294,46 +292,40 @@ module BenefitSponsors
 
     describe "POST revert", dbclean: :after_each do
       include_context 'shared_stuff'
+      let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
       before do
-        benefit_sponsorship.benefit_applications = [ben_app]
-        ben_app.benefit_packages.build
-        ben_app.save
         benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
       end
 
       def sign_in_and_revert
         sign_in user
-        post :revert, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :revert, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "when there is no eligible application to revert" do
         it "should redirect" do
           sign_in_and_revert
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:success)
         end
 
         it "should display error message" do
           sign_in_and_revert
-          expect(flash[:error]).to match(/Benefit Application is not eligible to revert/)
+          expect(flash[:error]).to match(/Plan Year could not be reverted to draft state/)
         end
       end
 
       context "when there is an eligible application to revert" do
-
-        before do
-          ben_app.update_attributes(:aasm_state => "approved")
-        end
+        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :approved) }
 
         it "should revert benefit application" do
           sign_in_and_revert
-          ben_app.reload
           expect(ben_app.aasm_state).to eq :draft
         end
 
-        it "should redirect to employer profiles benefits tab" do
+        it "should display flash messages" do
           sign_in_and_revert
-          expect(response.location.include?("tab=benefits")).to be_truthy
+          expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
         end
       end
     end

@@ -36,6 +36,8 @@ module BenefitSponsors
           errors = @benefit_application.errors
           [false, @benefit_application, errors]
         end
+      else
+        [false, @benefit_application]
       end
     end
 
