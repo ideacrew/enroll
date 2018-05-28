@@ -19,6 +19,26 @@ module BenefitSponsors
       end
     end
 
+    def revert_application
+      if @benefit_application.may_revert_application?
+        @benefit_application.revert_application
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      elsif @benefit_application.may_revert_enrollment?
+        @benefit_application.revert_enrollment
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      end
+    end
+
     def submit_application
       if @benefit_application.may_submit_application? && is_application_ineligible?
         [false, @benefit_application, application_eligibility_warnings]
