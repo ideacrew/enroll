@@ -26,7 +26,7 @@ fieldset.mt-2
         = f.text_field :dba, class: "form-control", placeholder: 'DBA'
       .col-md-4.mb-2
         label for="inputFEIN"  FEIN *
-        = f.text_field :fein, class: "form-control", required: true, placeholder: 'FEIN'
+        = f.text_field :fein, class: "form-control", placeholder: 'FEIN', minlength:'9', maxlength:'9', onkeypress:'return isNumberKey(event)', required:'true'
         .invalid-feedback
           |
             Please provide a fein.
