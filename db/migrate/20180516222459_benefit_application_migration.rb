@@ -42,17 +42,113 @@ class BenefitApplicationMigration < Mongoid::Migration
       old_organizations.batch_size(limit).no_timeout.each do |old_org|
         new_organization = new_org(old_org)
         next unless new_organization.present?
-        create_benefit_sponsorship(org) unless org.benefit_sponsorships.present? # create benefit sponsorship if not present
-        has_continuous_coverage_previously?(old_org)
-        old_org.employer_profile.plan_years.each do |py|
-          benefit_sponsorship = new_organization.benefit_sponsorships.detect{ |bs| (bs.effective_begin_on..bs.effective_end_on).cover?(py.start_on) }
-          benefit_application = initialize_benefit_application(sanitize_params(params))
-          benefit_sponsorship.benefit_applications << benefit_application
-          benefit_sponsorship.save!
-        end
+
+
+        old_org.employer_profile.plan_years.each do |plan_year|
+
+          benefit_sponsorship = find_or_create_benefit_sponsorship(new_organization, plan_year)
+          create_benefit_application(benefit_sponsorship, plan_year)
+
+
+        # create_benefit_sponsorship(org) unless org.benefit_sponsorships.present? # create benefit sponsorship if not present
+        # has_continuous_coverage_previously?(old_org)
+        # old_org.employer_profile.plan_years.each do |py|
+        #   benefit_sponsorship = new_organization.benefit_sponsorships.detect{ |bs| (bs.effective_begin_on..bs.effective_end_on).cover?(py.start_on) }
+        #   initialize_benefit_application(benefit_sponsorship, params)
+        #   benefit_application = initialize_benefit_application(sanitize_params(params))
+        #   benefit_sponsorship.benefit_applications << benefit_application
+        #   benefit_sponsorship.save!
+        # end
+
+
+
       end
     end
   end
+
+  def find_or_create_benefit_sponsorship(new_organization, plan_year)
+    benefit_sponsorship = new_organization.benefit_sponsorships.detect{ |bs| (bs.effective_begin_on..bs.effective_end_on).cover?(py.start_on) } 
+  end
+
+  def create_benefit_application(benefit_sponsorship, plan_year)
+
+    benefit_application = construct_benefit_application(benefit_sponsorship, plan_year)
+    
+    @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
+    benefit_application.benefit_sponsor_catalog = @benefit_sponsor_catalog
+
+    plan_year.benefit_groups.each do |benefit_group|
+      construct_benefit_package(benefit_application, benefit_group)
+      benefit_application.benefit_packages.build(benefit_package_params)
+    end
+
+    @benefit_sponsor_catalog =  nil
+    benefit_application.save
+  end
+
+  def effective_period_for(plan_year)
+    plan_year.start_on..plan_year.end_on
+  end
+
+  def open_enrollment_period_for(plan_year)
+    plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on
+  end
+
+  def  construct_benefit_application(benefit_sponsorship, plan_year)
+    py_attrs = plan_year.attributes.except(:benefit_groups, :workflow_state_transitions)
+    application_attrs = py_attrs.slice(:fte_count, :pte_count, :msp_count, :enrolled_summary, :waived_summary, :created_at, :updated_at, :terminated_on)
+
+    benefit_application = benefit_sponsorship.benefit_applications.new(application_attrs)
+    benefit_application.effective_period = effective_period_for(plan_year)
+    benefit_application.open_enrollment_period = open_enrollment_period_for(plan_year)
+
+    # "aasm_state"=>"active",
+    # "imported_plan_year"=>false,
+    # "is_conversion"=>false,
+    # "updated_by_id"=>BSON::ObjectId('5909e07d082e766d68000078'),
+  end
+
+  def construct_benefit_package(benefit_application, benefit_group)
+    benefit_package = benefit_application.benefit_packages.build
+
+    if health_offering_available
+      attrs[:product_kind] = :health
+      construct_sponsored_benefit(benefit_package, attrs)
+    end
+
+    if dental_offering_available
+      attrs[:product_kind] = :dental
+      construct_sponsored_benefit(benefit_package, attrs)
+    end
+  end
+
+  def construct_sponsored_benefit(benefit_package, attrs)
+    sponsored_benefit  = benefit_package.sponsored_benefits.build
+    construct_sponsor_contribution(sponsored_benefit, contribution_attrs)
+  end
+
+  def product_package_for(product_kind, package_kind)
+    @benefit_sponsor_catalog.product_packages
+  end
+
+  def construct_sponsor_contribution(sponsored_benefit, attrs)
+    new_product_package = @benefit_sponsor_catalog.product_package_for(sponsored_benefit)
+
+    new_sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(new_product_package)
+    new_sponsor_contribution.contribution_levels.each do |new_contribution_level|
+
+      current_contribution_level = contribution_levels.detect{|cl| cl.display_name == new_contribution_level.display_name}
+      if current_contribution_level.present?
+        new_contribution_level.is_offered = current_contribution_level.is_offered
+        new_contribution_level.contribution_factor = current_contribution_level.contribution_factor
+      end
+    end
+  end
+
+  def construct_pricing_determination
+
+  end
+
 
   def date_params(py)
     {
