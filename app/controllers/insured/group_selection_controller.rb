@@ -68,9 +68,6 @@ class Insured::GroupSelectionController < ApplicationController
       hbx_enrollment.plan = @hbx_enrollment.plan
     end
 
-    hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
-      family_member_ids.include? member.applicant_id
-    end
     hbx_enrollment.generate_hbx_signature
 
     @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
@@ -79,7 +76,6 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
-    hbx_enrollment.coverage_kind = @adapter.coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     if hbx_enrollment.save

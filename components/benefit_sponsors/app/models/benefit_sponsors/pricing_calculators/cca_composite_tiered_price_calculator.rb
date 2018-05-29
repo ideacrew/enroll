@@ -24,6 +24,7 @@ module BenefitSponsors
         end
 
         def add(member)
+          puts member.inspect
           if member.is_primary_member?
             @primary_member_id = member.member_id
           end
@@ -57,7 +58,7 @@ module BenefitSponsors
       end
 
       def pricing_determination_builder
-        CompositeTierPrecalculator
+        CcaCompositeTierPrecalculator
       end
 
       def calculate_price_for(pricing_model, benefit_roster_entry, sponsor_contribution)

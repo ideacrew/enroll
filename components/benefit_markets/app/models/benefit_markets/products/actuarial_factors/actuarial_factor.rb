@@ -31,7 +31,7 @@ module BenefitMarkets
         end
 
         def cached_lookup(key)
-          entry = @cached_lookup[key]
+          entry = @cached_values[key]
           entry.nil? ? default_factor_value : entry
         end
 			end

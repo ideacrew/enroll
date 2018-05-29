@@ -1562,8 +1562,14 @@ class HbxEnrollment
    !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
  end
 
+  def sponsored_benefit_package
+    @sponsored_benefit_package ||= ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id)
+  end
+
   def sponsored_benefit
-    @sponsored_benefit ||= ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit.find(self.sponsored_benefit_id)
+    @sponsored_benefit ||= sponsored_benefit_package.sponsored_benefits.detect do |sb|
+     sb.id == sponsored_benefit_id
+    end
   end
 
   def rating_area
@@ -1597,10 +1603,12 @@ class HbxEnrollment
         hem.is_subscriber?,
         person.is_disabled
       )
+      roster_members << roster_member
       group_enrollment_member = BenefitSponsors::Enrollments::MemberEnrollment.new({
         member_id: hem.id,
         coverage_eligibility_on: hem.eligibility_date
       })
+      group_enrollment_members << group_enrollment_member
     end
     group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
       previous_product: previous_product,
