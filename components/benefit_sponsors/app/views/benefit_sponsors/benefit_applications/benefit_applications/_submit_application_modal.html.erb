@@ -4,7 +4,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <% if employer_attestation_is_enabled? %>
-          <h4 class="modal-title"><%= benefit_application.no_documents_uploaded?? "Document Upload Required to Proceed" : "Application may be ineligible!" %></h4>
+          <h4 class="modal-title"><%= benefit_application.no_documents_uploaded? ? "Document Upload Required to Proceed" : "Application may be ineligible!" %></h4>
         <%else%>
           <h4 class="modal-title">Confirm Publish Plan Year</h4>
         <%end%>

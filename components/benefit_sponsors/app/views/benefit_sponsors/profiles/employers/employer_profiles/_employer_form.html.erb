@@ -1,5 +1,5 @@
 <%= flash_messages  %>
-
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
 <div class="employer-edit-tab">
   <h1>Business Info</h1>
   <% if @agency.errors.any? %>
@@ -108,10 +108,48 @@
           <% end %>
           </div>
           <h2> Office Locations </h2>
-          <%= f_profile.fields_for :office_locations, errors: {}, fieldset: false do |office_location, block| %>
-            <%= render partial: 'benefit_sponsors/shared/office_location_fields', locals: {f: office_location} %>
-              <% @row = true %>
-          <% end %>
+          <div data-controller="site">
+            <div data-target="site.officeLocations">
+                <%= f_profile.fields_for :office_locations, f_profile.object.office_locations do |office_fields| %>
+                <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
+
+                <% if office_fields.object.is_primary? %>
+                    <div data-target="site.officeLocation" class="js-office-location">
+                      <div class="row row-form-wrapper no-buffer hidden js-non-primary">
+                <% else %>
+                    <div class="js-office-location">
+                      <div class="row row-form-wrapper no-buffer js-non-primary">
+                <% end %>
+
+                <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group no-pd">
+                  <a class="btn btn-sm btn-outline-primary" data-action="click->site#removeLocation">Remove</a>
+                </div>
+                </div>
+
+                <% if office_fields.object.is_primary? %>
+                    <div class="js-remove row">
+                      <label>Primary Address</label>
+                    </div>
+                    <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
+                        <%= address_fields.hidden_field :kind, value: 'primary' %>
+                        <%= render partial: './ui-components/v1/forms/office_locations/address', locals: {f: address_fields}  %>
+                    <% end %>
+                <% end %>
+
+                <div class="js-remove row">
+                  <label>Main Phone </label>
+                </div>
+                <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
+                    <%= phone_fields.hidden_field :kind, value: 'main' %>
+                    <%= render partial: './ui-components/v1/forms/office_locations/phone', locals: { f: phone_fields } %>
+                <% end %>
+                </div>
+                <% end %>
+            </div>
+            <a class="btn btn-sm btn-outline-primary" data-action="click->site#addLocation">Add Office Location</a>
+            </div>
+          </div>
+          </div>
           <br/>
           <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f_profile %><br>
         <% end %>

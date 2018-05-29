@@ -12,6 +12,7 @@ module BenefitSponsors
 
 
     accepts_nested_attributes_for :contribution_levels
+    validates_presence_of :contribution_levels
     # validate :validate_contribution_levels
 
     # def validate_contribution_levels

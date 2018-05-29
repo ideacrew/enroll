@@ -31,24 +31,24 @@
           <li role="presentation" class="col-xs-4">
             <%= f.radio_button :product_package_kind, "single_issuer", class: 'product_package_kind' %>
             <%= f.label :product_package_kind_single_issuer, class: "elected_plan" do %>
-            <i class="fa fa-circle-o"></i>
-            <i class="fa fa-dot-circle-o"></i>
+            <i class="far fa-circle"></i>
+            <i class="far fa-dot-circle"></i>
             By carrier
             <% end %>
           </li>
           <li role="presentation" class="col-xs-4">
             <%= f.radio_button :product_package_kind, "metal_level", class: 'product_package_kind' %>
             <%= f.label :product_package_kind_metal_level, class: "elected_plan" do %>
-            <i class="fa fa-circle-o"></i>
-            <i class="fa fa-dot-circle-o"></i>
+            <i class="far fa-circle"></i>
+            <i class="far fa-dot-circle"></i>
             By metal level
           </li>
           <% end %>
           <li role="presentation" class="col-xs-4">
             <%= f.radio_button :product_package_kind, "single_product", class: 'product_package_kind'%>
             <%= f.label :product_package_kind_single_product, class: "elected_plan" do %>
-            <i class="fa fa-circle-o"></i>
-            <i class="fa fa-dot-circle-o"></i>
+            <i class="far fa-circle"></i>
+            <i class="far fa-dot-circle"></i>
             Single plan
             <% end %>
           </li>
@@ -69,8 +69,8 @@
               <div class="col-xs-3">
                 <%= f.radio_button :product_option_choice, "#{ck}", class: 'product_option_choice' %>
                 <%= f.label "product_option_choice_#{ck}" do %>
-                <i class="fa fa-circle-o"></i>
-                <i class="fa fa-dot-circle-o"></i>
+                <i class="far fa-circle"></i>
+                <i class="far fa-dot-circle"></i>
                 <% end %>
               </div>
               <%# end %>
@@ -97,8 +97,8 @@
               <div class="col-xs-3">
                 <%= f.radio_button :product_option_choice, kind, class: 'product_option_choice' %>
                 <%= f.label "product_option_choice_#{kind}" do %>
-                <i class="fa fa-circle-o"></i>
-                <i class="fa fa-dot-circle-o"></i>
+                <i class="far fa-circle"></i>
+                <i class="far fa-dot-circle"></i>
                 <% end %>
               </div>
               <%# end %>
@@ -133,8 +133,8 @@
               <div class="col-xs-3">
                 <%= f.radio_button :product_option_choice, "#{ck}", class: 'product_option_choice' %>
                 <%= f.label "product_option_choice_#{ck}" do %>
-                <i class="fa fa-circle-o"></i>
-                <i class="fa fa-dot-circle-o"></i>
+                <i class="far fa-circle"></i>
+                <i class="far fa-dot-circle"></i>
                 <% end %>
               </div>
               <%# end %>
@@ -191,8 +191,74 @@
       var sponsor_contribution = sponsor_contributions[product_option_kind];
 
       initSponsorContributions(sponsor_contribution, location_id);
+
+      $(document).on('click', ".reference-plan input[type='radio']", function(event){
+        var reference_plan_id = $(this).val()
+        initReferencePlanDetails(filtered_products, reference_plan_id);
+      })
+
     });
   })
+
+  function initReferencePlanDetails(plan_options, reference_plan_id) {
+    var reference_plan
+    $.each(plan_options, function(index, product){
+      if(product["id"] == reference_plan_id){
+        reference_plan = product
+        return false;
+      }
+    })
+
+    $(".reference_plan_info").hide();
+    var referencePlanHtml = '<div class="row row-form-wrapper no-buffer reference_plan_info">\
+      <div class="col-xs-5">\
+        <h1>Your Reference Plan</h1>\
+      </div>\
+      <div>\
+        <section class="col-xs-7">\
+          <header class="row">\
+            <h5"><strong>'+ reference_plan["title"] +' </strong></h5>\
+          </header>\
+        </section>\
+        <h2></h2>\
+        <table>\
+          <tr>\
+            <th><header>Type</header></th>\
+            <th><header>Carrier</header></th>\
+            <th><header>Metal Level</header></th>\
+            <th><header>Network</header></th>\
+          </tr>\
+          <tr>\
+            <td><p>'+ reference_plan["title"] +'</p></td>\
+            <td><p>'+ reference_plan["carrier_name"] +'</p></td>\
+            <td><p>'+ reference_plan["metal_level_kind"] +'</p></td>\
+            <td></td>\
+          </tr>\
+        </table>\
+        <div class="col-xs-12">\
+          <div class="col-xs-4 row">\
+            <span>Your Estimated Monthly Cost</span>\
+            <h2 class="employer-monthly-cost"></h2>\
+          </div>\
+          <div class="col-xs-8">\
+            <table>\
+              <tr>\
+                <th></th>\
+                <th>Min</th>\
+                <th>Max</th>\
+              </tr>\
+              <tr>\
+                <td>Estimated monthly cost including all roster employees</td>\
+                <td class="employee-monthly-cost-min"></td>\
+                <td class="employee-monthly-cost-max" style="padding-left: 0;"></td>\
+              </tr>\
+            </table>\
+          </div>\
+        </div>\
+      </div>'
+
+    $(".reference-steps").append(referencePlanHtml)
+  }
 
   function initPlanOptions(plan_options, location_id) {
     
@@ -205,8 +271,8 @@
           <div class="col-xs-2">\
             <input type="radio" value="' + product["id"] + '" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]">\
             <label for="' + location_id + '_reference_plan_id">\
-              <i class="fa fa-circle-o"></i>\
-              <i class="fa fa-dot-circle-o"></i>\
+              <i class="far fa-circle-o"></i>\
+              <i class="far fa-dot-circle-o"></i>\
             </label>\
           </div>\
           <div class="col-xs-10">\
@@ -255,8 +321,8 @@
         <label>\
         <input checked="checked" id="' + attr_prefix + '[is_offered]" class="contribution_handler" name="' + attr_prefix +'[is_offered]" type="checkbox" value="' + contribution_level["is_offered"] +'" />\
           <label for="is_offered">\
-            <i class="fa fa-check-square-o fa-2x"></i>\
-            <i class="fa fa-square-o fa-2x"></i>\
+            <i class="far fa-check-square-o fa-2x"></i>\
+            <i class="far fa-square-o fa-2x"></i>\
           </label>\
           <span>\
             <input id="' + attr_prefix + '[display_name]" name="' + attr_prefix + '[display_name]" type="hidden" value="' + contribution_level["display_name"] + '" />\
@@ -278,6 +344,7 @@
       </div>\
     </div>\
   </fieldset>\
+  </br>\
 </div></div>';
 
       $('.sponsor_contributions').append(contributionHtml);

@@ -1,3 +1,13 @@
+window.onload = function() {
+  // Nothing for right now
+}
+
+function lettersOnly(input) {
+  var regex = /[^a-z]/gi;
+  input.value = input.value.replace(regex,"");
+}
+
+
 function toCurrency(element) {
   element.value = element.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
 }

@@ -30,26 +30,17 @@ module BenefitSponsors
         store(form, benefit_application)
       end
 
-      # TODO: needs to be reviewed due to benefit_application state machine changes
       def revert(form)
         benefit_application = find_model_by_id(form.id)
+        enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+        saved_result, benefit_application, errors = enrollment_service.revert_application
 
-        # if benefit_application.may_revert_renewal?
-        #   if benefit_application.revert_renewal!
-        #     return [true, benefit_application]
-        #   else
-        #     get_application_errors_for_revert(benefit_application, form)
-        #   end
-
-        if benefit_application.may_revert_application?
-          if benefit_application.revert_application!
-            return [true, benefit_application]
-          else
-            get_application_errors_for_revert(benefit_application, form)
+        if errors.present?
+          errors.each do |k, v|
+            form.errors.add(k, v)
           end
         end
-        form.errors.add(:base, "Benefit Application is not eligible to revert")
-        [false, benefit_application]
+        [saved_result, benefit_application]
       end
 
       def force_submit_application(form)
@@ -161,16 +152,6 @@ module BenefitSponsors
       # close together - normally this will be more complex
       def map_model_error_attribute(model_attribute_name)
         model_attribute_name
-      end
-
-      private
-
-      def get_application_errors_for_revert(benefit_application, form)
-        errors = benefit_application.errors.full_messages.merge(benefit_application.application_errors)
-        errors.each do |k, v|
-          form.errors.add(k, v)
-        end
-        return [false, benefit_application]
       end
       
     end

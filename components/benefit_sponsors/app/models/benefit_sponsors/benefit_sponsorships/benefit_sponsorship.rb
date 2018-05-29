@@ -65,7 +65,7 @@ module BenefitSponsors
       delegate :enforce_employer_attestation, to: :benefit_market
 
       belongs_to  :organization,
-                  inverse_of: :benefit_sponorships,
+                  inverse_of: :benefit_sponsorships,
                   counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
@@ -147,7 +147,6 @@ module BenefitSponsors
         else
           nil
         end
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
       def is_attestation_eligible?

@@ -34,7 +34,7 @@ module BenefitMarkets
       field :trans_er_immed, as: :transmit_employers_immediately, type: Boolean, default: false
       field :trans_scheduled_er, as: :transmit_scheduled_employers, type: Boolean, default: true
       field :er_transmission_dom, as: :employer_transmission_day_of_month, type: Integer, default: 16
-      field :enforce_er_attest, as: :enforce_employer_attestation, type: Boolean, default: false
+      field :enforce_er_attest, as: :enforce_employer_attestation, type: Boolean, default: true
       field :stan_indus_class, as: :standard_industrial_classification, type: Boolean, default: false
       field :carrier_filters_enabled, type: Boolean, default: false
 

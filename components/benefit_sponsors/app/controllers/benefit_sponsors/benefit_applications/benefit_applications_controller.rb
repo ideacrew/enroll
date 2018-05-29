@@ -70,8 +70,12 @@ module BenefitSponsors
       def revert
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :revert_application?
-        flash[:error] = error_messages(@benefit_application_form) unless @benefit_application_form.revert
-        redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
+        if @benefit_application_form.revert
+          flash[:notice] = "Plan Year successfully reverted to draft state."
+        else
+          flash[:error] = "Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}".html_safe
+        end
+        render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
       end
 
       private

@@ -1,7 +1,7 @@
 <div class="employee-add-tab census-employee-add content-bottom">
   <div class="module">
     <% page_title = @census_employee.persisted? ? "Update "+@census_employee.full_name.titleize : 'Add New Employee' %>
-    <h1><%= page_title %></h1>
+    <h1 class="heading-text"><%= page_title %></h1>
     <%= render 'errors_if_any' %>
 
     <% unless @census_employee.persisted? %>

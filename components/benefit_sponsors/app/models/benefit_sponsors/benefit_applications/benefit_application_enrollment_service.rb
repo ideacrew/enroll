@@ -19,6 +19,28 @@ module BenefitSponsors
       end
     end
 
+    def revert_application
+      if @benefit_application.may_revert_application?
+        @benefit_application.revert_application
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      elsif @benefit_application.may_revert_enrollment?
+        @benefit_application.revert_enrollment
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      else
+        [false, @benefit_application]
+      end
+    end
+
     def submit_application
       if @benefit_application.may_submit_application? && is_application_ineligible?
         [false, @benefit_application, application_eligibility_warnings]
@@ -278,10 +300,10 @@ module BenefitSponsors
       warnings = {}
 
       if employer_attestation_is_enabled?
-        unless benefit_sponsorship.is_attestation_eligible?
-          if benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+        unless benefit_sponsorship.profile.is_attestation_eligible?
+          if @benefit_application.no_documents_uploaded?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
-          elsif benefit_sponsorship.employer_attestation.denied?
+          elsif benefit_sponsorship.profile.employer_attestation.denied?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
           else
             warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})

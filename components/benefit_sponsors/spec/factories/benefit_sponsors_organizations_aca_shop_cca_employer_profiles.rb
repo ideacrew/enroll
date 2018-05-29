@@ -2,6 +2,7 @@ FactoryGirl.define do
   factory :benefit_sponsors_organizations_aca_shop_cca_employer_profile, class: 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile' do
 
     organization  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
+    employer_attestation { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     sic_code      "001"
 
     transient do

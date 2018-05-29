@@ -27,6 +27,7 @@ module BenefitSponsors
       delegate :contribution_calculator, to: :product_package, allow_nil: true
 
       validate :product_package_exists
+      validates_presence_of :sponsor_contribution
 
       def product_package_exists
         if product_package.blank?

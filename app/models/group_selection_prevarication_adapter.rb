@@ -19,7 +19,7 @@ class GroupSelectionPrevaricationAdapter
 		change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 		coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
 		enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-		shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+		shop_for_plans = params[:shop_for_plans].present? ? params[:shop_for_plans] : ''
 		optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
 		record = self.new(
 			person: person,
@@ -261,5 +261,100 @@ class GroupSelectionPrevaricationAdapter
       benefit_group_assignment: nil,
       qle: is_qle?,
       opt_effective_on: optional_effective_on)
+  end
+
+  def can_shop_shop?(person)
+    person.present? && person.has_employer_benefits?
+  end
+
+  def can_shop_individual?(person)
+    false
+  end
+
+  def can_shop_resident?(person)
+    false
+  end
+
+  def can_shop_both_markets?(person)
+    false
+  end
+
+  def is_eligible_for_dental?(employee_role, is_change_plan, enrollment)
+    false
+  end
+
+  def is_dental_offered?(employee_role)
+    false
+  end
+
+	def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
+    return([true, false])
+		benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
+
+    # Here we need to use the complex method to determine if this member is eligible to enroll
+    eligibility_checker = shop_benefit_eligibilty_checker_for(benefit_group, :health)
+    [eligibility_checker.can_cover?(family_member, coverage_start), false]
+	end
+
+	def class_for_ineligible_row(family_member, is_ivl_coverage, coverage_start)
+		class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
+			is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
+
+			if !is_health_coverage && !is_health_coverage.nil?
+				class_names << "ineligible_health_row_#{employee_role.id}"
+			end
+
+			if !is_dental_coverage && !is_dental_coverage.nil?
+				class_names << "ineligible_dental_row_#{employee_role.id}"
+			end
+			class_names
+		end
+
+		class_names << "ineligible_ivl_row" if (!is_ivl_coverage.nil? && !is_ivl_coverage)
+		class_names << "is_primary" if family_member.is_primary_applicant?
+
+		class_names.to_sentence.gsub("and", '').gsub(",", "")
+	end
+
+	def get_benefit_group(benefit_group, employee_role, qle)
+		if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
+			benefit_group
+		else
+			select_benefit_group_from_qle_and_employee_role(qle, employee_role)
+		end
+	end
+
+	def select_benefit_group_from_qle_and_employee_role(qle, employee_role)
+	  employee_role.benefit_group(qle: qle) 
+	end
+
+	protected
+
+	def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
+		health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
+
+		if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
+			dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
+		end
+
+		return health_offered_relationship_benefits, dental_offered_relationship_benefits
+	end
+
+	def health_relationship_benefits(benefit_group)
+		return unless benefit_group.present?
+
+		benefit_group.sole_source? ? composite_benefits(benefit_group) : traditional_benefits(benefit_group)
+	end
+
+	def composite_benefits(benefit_group)
+		benefit_group.composite_tier_contributions.select(&:offered).map(&:composite_rating_tier)
+	end
+
+	def traditional_benefits(benefit_group)
+		benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
+	end
+
+  def shop_benefit_eligibilty_checker_for(benefit_package, coverage_kind)
+    @shop_eligibility_checkers[coverage_kind] ||= GroupSelectionEligibilityChecker.new(benefit_package, coverage_kind)
   end
 end

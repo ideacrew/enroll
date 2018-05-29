@@ -18,6 +18,8 @@ module BenefitSponsors
 
       attr_accessor :sponsor_contribution
 
+      validates_presence_of :product_package_kind, :product_option_choice, :reference_plan_id, :sponsor_contribution
+
       def sponsor_contribution_attributes=(attributes)
         @sponsor_contribution = SponsorContributionForm.new(attributes)
       end
