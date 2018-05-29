@@ -21,7 +21,7 @@ module BenefitSponsors
       DatabaseCleaner.clean
     end
 
-    shared_context "params", :shared_context => :metadata do
+    shared_context "valid params", :shared_context => :metadata do
       let(:benefit_package_params) {
         {
           :benefit_application_id => benefit_application.id.to_s,
@@ -59,6 +59,71 @@ module BenefitSponsors
       }
     end
 
+    shared_context "invalid params", :shared_context => :metadata do
+      let(:benefit_package_params) {
+        {
+          :benefit_application_id => nil,
+          :title => nil,
+          :description => "New Model Benefit Package",
+          :probation_period_kind => "first_of_month",
+          :sponsored_benefits_attributes => sponsored_benefits_params
+        }
+      }
+
+      let(:sponsored_benefits_params) {
+        {
+          "0" => {
+            :sponsor_contribution_attributes => sponsor_contribution_attributes,
+            :product_package_kind => product_package_kind,
+            :kind => "health",
+            :product_option_choice => issuer_profile.legal_name,
+            :reference_plan_id => product.id.to_s
+          }
+        }
+      }
+
+      let(:sponsor_contribution_attributes) {
+        {
+        :contribution_levels_attributes => invalid_contribution_levels_attributes
+        }
+      }
+
+      let(:invalid_contribution_levels_attributes) {
+        {
+          "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => nil},
+          "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
+          "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+        }
+      }
+    end
+
+    describe "validate form" do
+      context "valid params" do
+        include_context "valid params"
+
+        let(:form) {BenefitSponsors::Forms::BenefitPackageForm.new(benefit_package_params)}
+
+        it "should return true" do
+          expect(form.valid?).to be_truthy
+        end
+      end
+
+      context "invalid params" do
+        include_context "invalid params"
+
+        let(:form) {BenefitSponsors::Forms::BenefitPackageForm.new(benefit_package_params)}
+
+        it "should return false" do
+          expect(form.valid?).to be_falsey
+        end
+
+        it "should return errors " do
+          form.valid?
+          expect(form.errors.full_messages.flatten.sort).to eq ["Contribution factor can't be blank", "Title can't be blank"]
+        end
+      end
+    end
+
     describe "#for_new" do
 
       let(:benefit_application_id)  { benefit_application.id.to_s }
@@ -78,7 +143,7 @@ module BenefitSponsors
     end
 
     describe "#for_create" do
-      include_context 'params'
+      include_context 'valid params'
 
       subject { BenefitSponsors::Forms::BenefitPackageForm.for_create benefit_package_params }
 
@@ -97,7 +162,7 @@ module BenefitSponsors
 
     describe '#for_edit' do
 
-      include_context 'params'
+      include_context 'valid params'
 
       let(:benefit_application_id)  { benefit_application.id.to_s }
       let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
@@ -117,7 +182,7 @@ module BenefitSponsors
 
     describe '#for_update' do
 
-      include_context 'params'
+      include_context 'valid params'
 
       let(:contribution_levels)    { benefit_package.sponsored_benefits[0].sponsor_contribution.contribution_levels }
       let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
