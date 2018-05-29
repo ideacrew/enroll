@@ -147,7 +147,6 @@ module BenefitSponsors
         else
           nil
         end
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
       def is_attestation_eligible?
