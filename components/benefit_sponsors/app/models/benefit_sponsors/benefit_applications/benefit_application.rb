@@ -4,7 +4,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include Config::AcaModelConcern
-      # include BenefitSponsors::Concerns::RecordTransition
+      include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
       APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
@@ -657,6 +657,11 @@ module BenefitSponsors
       def employees_are_matchable? # Deprecate in future
         warn "[Deprecated] Instead use is_published?" unless Rails.env.test?
         is_published?
+      end
+
+
+      def matching_state_for(plan_year)
+        plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
       end
 
       private
