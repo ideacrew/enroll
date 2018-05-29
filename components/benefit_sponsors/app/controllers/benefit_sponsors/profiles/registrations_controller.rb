@@ -52,7 +52,6 @@ module BenefitSponsors
       def update
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(registration_params)
         authorize @agency
-        sanitize_office_locations_params
         updated, result_url = @agency.update
         result_url = self.send(result_url)
         if updated
@@ -82,15 +81,6 @@ module BenefitSponsors
 
       def is_broker_profile?
         profile_type == "broker_agency"
-      end
-
-      def sanitize_office_locations_params
-        # TODO - implement in accepts_nested_attributes_for
-        params[:agency][:organization][:profile_attributes][:office_locations_attributes].each do |key, location|
-          if location && location[:address_attributes]
-            location[:is_primary] = (location[:address_attributes][:kind] == 'primary')
-          end
-        end
       end
 
       def registration_params
