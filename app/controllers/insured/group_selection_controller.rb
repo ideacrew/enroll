@@ -57,7 +57,7 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
-    hbx_enrollment = build_hbx_enrollment
+    hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
 
@@ -97,12 +97,14 @@ class Insured::GroupSelectionController < ApplicationController
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
+=begin
   rescue Exception => error
     flash[:error] = error.message
     logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
     return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
+=end
   end
 
   def terminate_selection
@@ -127,7 +129,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
-  def build_hbx_enrollment
+  def build_hbx_enrollment(family_member_ids)
     case @market_kind
     when 'shop'
       @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |e_role|
@@ -142,7 +144,7 @@ class Insured::GroupSelectionController < ApplicationController
       if @adapter.previous_hbx_enrollment.present?
         @adapter.build_shop_change_enrollment(@employee_role, @change_plan)
       else
-        @adapter.build_new_shop_enrollment(@employee_role)
+        @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
       end
     when 'individual'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
