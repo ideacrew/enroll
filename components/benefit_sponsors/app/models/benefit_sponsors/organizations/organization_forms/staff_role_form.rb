@@ -23,12 +23,12 @@ module BenefitSponsors
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
 
-      validates :area_code, :if => Proc.new { |m| m.profile_id.blank? },
+      validates :area_code, :if => Proc.new { |m| m.area_code.present? },
                 numericality: true,
                 length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
                 allow_blank: false
 
-      validates :number,:if => Proc.new { |m| m.profile_id.blank? },
+      validates :number,:if => Proc.new { |m| m.number.present? },
                 numericality: true,
                 length: { minimum: 7, maximum: 7, message: "%{value} is not a valid phone number" },
                 allow_blank: false
