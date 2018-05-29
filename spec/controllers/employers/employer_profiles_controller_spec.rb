@@ -271,7 +271,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET show_profile" do
+  describe "GET show_profile", :dbclean => :around_each do
     let(:user) do
       double("user",
              :person => person,
@@ -291,7 +291,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:employer_profile) { employee_role.employer_profile }
     let(:policy) { double("policy") }
 
-    context 'When employee_roles not in EMPLOYMENT_ACTIVE_STATES then' do
+    context 'When employee_roles not in EMPLOYMENT_ACTIVE_STATES then', :dbclean => :around_each do
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:is_broker_for_employer?).and_return(false)
@@ -300,11 +300,11 @@ RSpec.describe Employers::EmployerProfilesController do
         census_employee.update(aasm_state: 'employment_terminated')
         employee_role.census_employee_id = census_employee.id
         employee_role.save
-        employer_profile.plan_years = [plan_year]
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
         sign_in(user)
       end
 
-      it "should get empty list of active employee", :dbclean => :around_each  do
+      it "should get empty list of active employee", :dbclean => :around_each do
         xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show_profile")
@@ -312,7 +312,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context 'When employee_roles in EMPLOYMENT_ACTIVE_STATES then' do
+    context 'When employee_roles in EMPLOYMENT_ACTIVE_STATES then', :dbclean => :around_each do
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:is_broker_for_employer?).and_return(false)
@@ -324,7 +324,7 @@ RSpec.describe Employers::EmployerProfilesController do
         sign_in(user)
       end
 
-      it "should get list of active employee", :dbclean => :around_each  do
+      it "should get list of active employee", :dbclean => :around_each do
         xhr :get, :show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'families'}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show_profile")
