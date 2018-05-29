@@ -27,6 +27,9 @@
                 METAL LEVEL
               </v-flex>
             </v-layout>
+            <v-layout>
+              <v-flex><v-btn @click="createPlanYear()">Create Plan Year</v-btn></v-flex>
+            </v-layout>
           </v-container>
 
           <pre>
@@ -58,6 +61,9 @@ export default {
         console.log("Error loading employees");
       });
     },
+    createPlanYear() {
+      this.$router.push({path:`/employer-home/${this.$route.params.id}/plan-year`})
+    }
   }
 }
 </script>
