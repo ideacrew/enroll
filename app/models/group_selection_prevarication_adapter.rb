@@ -284,7 +284,6 @@ class GroupSelectionPrevaricationAdapter
   end
 
 	def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
-    return([true, false])
 		benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
@@ -414,7 +413,11 @@ class GroupSelectionPrevaricationAdapter
 		benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
 	end
 
+  def shop_eligibility_checkers
+    @shop_eligibility_checkers ||= Hash.new
+  end
+
 	def shop_benefit_eligibilty_checker_for(benefit_package, coverage_kind)
-		@shop_eligibility_checkers[coverage_kind] ||= GroupSelectionEligibilityChecker.new(benefit_package, coverage_kind)
+		shop_eligibility_checkers[coverage_kind] ||= GroupSelectionEligibilityChecker.new(benefit_package, coverage_kind)
 	end
 end

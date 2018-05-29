@@ -28,6 +28,11 @@ module BenefitSponsors
         false
       end
 
+      def number=(val)
+        number = val.gsub("-", "")
+        super number
+      end
+
     end
   end
 end
