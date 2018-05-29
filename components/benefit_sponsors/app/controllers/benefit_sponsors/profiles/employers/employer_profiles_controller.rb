@@ -4,6 +4,7 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :premium_statements]
+        before_action :load_hbx_enrollments, only: [:premium_statements], if: :is_format_csv?
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
@@ -108,6 +109,11 @@ module BenefitSponsors
           end
         end
 
+        def load_hbx_enrollments
+          query = ::Queries::EmployerPremiumStatement.new(@employer_profile, set_billing_date)
+          @hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments
+        end
+
         def default_url
           "employers/employer_profiles/employee_csv_upload_errors"
         end
@@ -145,6 +151,18 @@ module BenefitSponsors
               'application/vnd.ms-excel'
             else
               'text/csv'
+          end
+        end
+
+        def is_format_csv?
+          request.format.csv?
+        end
+
+        def set_billing_date
+          if params[:billing_date].present?
+            Date.strptime(params[:billing_date], "%m/%d/%Y")
+          else
+            TimeKeeper.date_of_record # TODO
           end
         end
       end
