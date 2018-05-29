@@ -187,9 +187,21 @@ module Observers
       end
     end
 
+    def special_enrollment_period_update(new_model_event)
+      special_enrollment_period = new_model_event.klass_instance
+
+      if special_enrollment_period.is_shop?
+        primary_applicant = special_enrollment_period.family.primary_applicant
+        if employee_role = primary_applicant.person.active_employee_roles[0]
+          trigger_notice(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
+        end
+      end
+    end
+
     def employer_profile_date_change; end
     def hbx_enrollment_date_change; end
     def census_employee_date_change; end
+    def special_enrollment_period_date_change; end
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
