@@ -21,8 +21,8 @@
 
 *.keep
 
-public/packs/*
-node_modules/*
+public/packs/
+node_modules/
 
 # Ignore local data content
 db/data
