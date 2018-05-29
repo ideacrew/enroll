@@ -8,7 +8,6 @@ module BenefitSponsors
 
         #New person registered with existing organization and approval request submitted to employer
         def show_pending
-          authorize [:benefit_sponsors, :employer_profile]
           respond_to do |format|
             format.html
             format.js
