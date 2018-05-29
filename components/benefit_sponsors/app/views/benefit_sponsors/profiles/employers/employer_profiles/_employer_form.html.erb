@@ -111,6 +111,7 @@
           <div data-controller="site">
             <div data-target="site.officeLocations">
                 <%= f_profile.fields_for :office_locations, f_profile.object.office_locations do |office_fields| %>
+                  <%= office_fields.hidden_field :id, value: office_fields.object.try(:id) %>
                 <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
 
                 <% if office_fields.object.is_primary? %>
