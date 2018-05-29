@@ -1,18 +1,13 @@
-import Vue from 'vue/dist/vue.esm'
-import VueResource from 'vue-resource'
-//import BootstrapVue from 'bootstrap-vue';
+import Vue from 'vue/dist/vue.esm';
+import VueResource from 'vue-resource';
+
 import Vuetify from 'vuetify';
+import VueRouter from 'vue-router';
 
-
-Vue.use(VueRouter)
-Vue.use(VueResource);
+Vue.use(VueRouter);
 Vue.use(Vuetify);
+Vue.use(VueResource);
 
-import VueRouter from 'vue-router'
-
-// import 'bootstrap/dist/css/bootstrap.css'
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
-// Helpers
 
 import 'vuetify/dist/vuetify.min.css' // Ensure you are using css-loader
 
@@ -27,6 +22,7 @@ import EmployerEmployees from '../employer/employees.vue'
 import EmployerEmployeesDatatable from '../employer/employee_datatable.vue'
 import EmployerEmployeeDetail from '../employer/employee_detail.vue'
 import EmployerBenefits from '../employer/benefits.vue'
+import EmployerPlanYear from '../employer/plan_year.vue'
 
 
 Vue.component('hbx', Hbx);
@@ -40,6 +36,7 @@ Vue.component('employer-my', EmployerSummary);
 Vue.component('employer-employees', EmployerEmployees);
 Vue.component('employer-employees-datatable', EmployerEmployeesDatatable);
 Vue.component('employer-benefits', EmployerBenefits);
+Vue.component('plan-year', EmployerPlanYear);
 
 
 const routes = [
@@ -58,13 +55,16 @@ const routes = [
       {
         path: 'employer-benefits', component: EmployerBenefits
       },
+      {
+        path: 'plan-year', component: EmployerPlanYear
+      },
     ]
   },
   { path: '/plan-cost', name: 'planCost', component: PlanCost }
 ]
 
 
-const router = new VueRouter({
+var router = new VueRouter({
   routes // short for `routes: routes`
 })
 
