@@ -32,6 +32,7 @@ module Importers
                   :mailing_location_state,
                   :contact_email,
                   :contact_phone,
+                  :contact_phone_extension,
                   :enrolled_employee_count,
                   :new_hire_count,
                   :broker_name,
@@ -104,7 +105,7 @@ module Importers
 
     def validate_new_fein
       return true if fein.blank?
-      found_org = Organization.where(:fein => fein).first
+      found_org = BenefitSponsors::Organizations::Organization.where(fein: fein).first
       if found_org
         if found_org.employer_profile
           errors.add(:fein, "is already taken")
@@ -209,7 +210,7 @@ module Importers
           :first_name => contact_first_name,
           :last_name => contact_last_name,
           :employer_staff_roles => [
-              EmployerStaffRole.new(employer_profile_id: emp.id, is_owner: false)
+              EmployerStaffRole.new(employer_profile_id: emp.id, benefit_sponsor_employer_profile_id:emp.id, is_owner: false)
           ],
           :phones => [
               Phone.new({

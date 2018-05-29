@@ -1,10 +1,6 @@
 module BenefitSponsors
   module Importers::Mhc
-    class ConversionEmployerCreate < ConversionEmployer
-
-      def initialize(opts = {})
-        super(opts)
-      end
+    class ConversionEmployerCreate < ::Importers::Mhc::ConversionEmployerCreate
 
       def save
         if valid?
@@ -25,8 +21,8 @@ module BenefitSponsors
             if save_result
               map_poc(employer_profile)
 
-              if corporate_npn.present?
-                broker_agency_profile = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(:corporate_npn => corporate_npn).first
+              if broker_npn.present?
+                broker_agency_profile = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(:corporate_npn => broker_npn).first
                 new_organization.profiles << broker_agency_profile if broker_agency_profile
               end
             end
@@ -46,6 +42,43 @@ module BenefitSponsors
         BenefitSponsors::Site.by_site_key(:cca).first if BenefitSponsors::Site.by_site_key(:cca).present?
       end
 
+      def build_mailing_address
+        BenefitSponsors::Locations::Address.new(
+            :kind => "mailing",
+            :address_1 => mailing_location_address_1,
+            :address_2 => mailing_location_address_2,
+            :city => mailing_location_city,
+            :state => mailing_location_state,
+            :zip => mailing_location_zip
+        )
+      end
+
+      def build_phone
+        BenefitSponsors::Locations::Phone.new({
+                                                  :kind => "work",
+                                                  :full_phone_number => contact_phone
+                                              })
+      end
+
+      def map_office_locations
+        locations = []
+        primary_address = build_primary_address
+        mailing_address = build_mailing_address
+        locations << BenefitSponsors::Locations::OfficeLocation.new({
+                                                                        :is_primary => true,
+                                                                        :address => primary_address,
+                                                                        :phone => build_phone,
+                                                                    })
+        unless primary_location_address_1 == mailing_location_address_1
+          locations << BenefitSponsors::Locations::OfficeLocation.new({
+                                                                          :is_primary => false,
+                                                                          :address => mailing_address,
+                                                                      })
+
+        end
+        locations
+      end
+
       def employer_profile_prams
         {
             :sic_code => sic_code,
@@ -59,7 +92,7 @@ module BenefitSponsors
             :legal_name => legal_name,
             :dba => dba,
             :fein => fein,
-            :entity_kind => fetch_entity_kind,
+            :entity_kind => :s_corporation,
             :site => map_site
         }
       end
