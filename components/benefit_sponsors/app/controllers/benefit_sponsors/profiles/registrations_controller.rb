@@ -8,7 +8,7 @@ module BenefitSponsors
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-      layout 'single_column', :only => :edit
+      layout 'two_column', :only => :edit
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type)
@@ -64,13 +64,6 @@ module BenefitSponsors
           flash[:error] = "Employer information not saved. #{org_error_msg}."
         end
         redirect_to result_url
-      end
-
-      def show_pending
-        respond_to do |format|
-          format.html
-          format.js
-        end
       end
 
       private
