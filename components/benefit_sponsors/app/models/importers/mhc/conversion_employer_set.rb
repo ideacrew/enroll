@@ -118,9 +118,7 @@ module BenefitSponsors
         else
           puts "Please provide the excel header on action column either add or update"
         end
-
       end
-
     end
   end
 end
