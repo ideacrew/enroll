@@ -585,7 +585,7 @@ end
 And /^employer clicks on linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "employee_role_linked")
   expect(page).to have_content "Eddie Vedder"
-  click_link 'Eddie Vedder11'
+  click_link employees.first.full_name
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
@@ -630,7 +630,7 @@ end
 And /^employer clicks on linked employee without address$/ do
   employees.first.address.delete
   expect(page).to have_content "Eddie Vedder"
-  click_link 'Eddie Vedder11'
+  click_link employees.first.full_name
 end
 
 Then /^employer should see the address on the roster$/ do
@@ -653,13 +653,13 @@ end
 
 And /^employer clicks on non-linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "eligible")
-  click_link 'Eddie Vedder11'
+  click_link employees.first.full_name
 end
 
 And /^employer clicks on non-linked employee without address$/ do
   employees.first.address.delete
   employees.first.update_attributes(aasm_state: "eligible")
-  click_link 'Eddie Vedder11'
+  click_link employees.first.full_name
 end
 
 Then /^employer should see employee roaster$/ do
