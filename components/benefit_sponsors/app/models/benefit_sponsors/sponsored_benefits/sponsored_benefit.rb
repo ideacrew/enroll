@@ -25,6 +25,8 @@ module BenefitSponsors
       delegate :pricing_model, to: :product_package, allow_nil: true
       delegate :pricing_calculator, to: :product_package, allow_nil: true
       delegate :contribution_calculator, to: :product_package, allow_nil: true
+      delegate :recorded_rating_area, to: :benefit_package
+      delegate :rate_schedule_date, to: :benefit_package
 
       validate :product_package_exists
       validates_presence_of :sponsor_contribution
@@ -42,6 +44,10 @@ module BenefitSponsors
       # Don't remove this. Added it to get around mass assignment
       def kind=(kind)
         # do nothing
+      end
+
+      def products
+        @products = product_package.products
       end
 
       def product_package

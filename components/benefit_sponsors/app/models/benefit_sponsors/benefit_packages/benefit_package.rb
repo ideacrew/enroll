@@ -28,16 +28,17 @@ module BenefitSponsors
       delegate :effective_period,        to: :benefit_application
       delegate :predecessor_application, to: :benefit_application
 
-      delegate :start_on, :end_on, to: :benefit_application
+      delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
+      delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
+      delegate :recorded_rating_area, to: :benefit_application
+      delegate :benefit_sponsorship, to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
-
 
       # calculate effective on date based on probation period kind
       # Logic to deal with hired_on and created_at
       # returns a roster
       def new_hire_effective_on(roster)
-
       end
 
       def eligible_on(date_of_hire)
@@ -47,7 +48,36 @@ module BenefitSponsors
 
       def effective_on_for(date_of_hire)
         # TODO
-        Date.today
+        shopping_date = ::TimeKeeper.date_of_record
+        if open_enrollment_period.include?(shopping_date)
+          start_on
+        else
+          ::TimeKeeper.date_of_record
+        end
+      end
+
+      def package_for_open_enrollment(shopping_date)
+        if open_enrollment_period.include?(shopping_date)
+          return self
+        elsif (shopping_date < open_enrollment_start_on)
+          return nil unless predecessor.present?
+          predecessor.package_for_open_enrollment(shopping_date)
+        else
+          return nil unless successor.present?
+          successor.package_for_open_enrollment(shopping_date)
+        end
+      end
+
+      def package_for_date(coverage_start_date)
+        if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
+          return self
+        elsif (coverage_start_date < start_on)
+          return nil unless predecessor.present?
+          predecessor.package_for_date(coverage_start_date)
+        else
+          return nil unless successor.present?
+          successor.package_for_date(coverage_start_date)
+        end
       end
 
       # TODO: there can be only one sponsored benefit of each kind
@@ -161,7 +191,8 @@ module BenefitSponsors
       end
 
       def sponsored_benefit_for(coverage_kind)
-        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind}
+        # I know it's a symbol - but we should behave like indifferent access here
+        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind.to_s == coverage_kind.to_s }
       end
 
       def census_employees_assigned_on(effective_date)
