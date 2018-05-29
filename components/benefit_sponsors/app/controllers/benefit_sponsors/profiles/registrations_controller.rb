@@ -66,6 +66,13 @@ module BenefitSponsors
         redirect_to result_url
       end
 
+      def show_pending
+        respond_to do |format|
+          format.html
+          format.js
+        end
+      end
+
       private
 
       def profile_type

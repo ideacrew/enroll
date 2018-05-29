@@ -318,7 +318,7 @@ module BenefitSponsors
           if is_broker_profile?
             :broker_new_registration_url
           elsif is_employer_profile?
-            return "sponsor_show_pending_registration_url@#{profile_id}" if is_pending
+            return "sponsor_show_pending_registration_url" if is_pending
             return "sponsor_home_registration_url@#{profile_id}" if is_saved
             :sponsor_new_registration_url
           end
