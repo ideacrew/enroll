@@ -167,13 +167,13 @@ module Importers
       number
     end
 
-    def propagate_errors(plan_year)
-      plan_year.errors.each do |attr, err|
-        errors.add("plan_year_" + attr.to_s, err)
-      end
-      plan_year.benefit_groups.first.errors.each do |attr, err|
-        errors.add("plan_year_benefit_group_" + attr.to_s, err)
-      end
-    end
+    # def propagate_errors(plan_year)
+    #   plan_year.errors.each do |attr, err|
+    #     errors.add("plan_year_" + attr.to_s, err)
+    #   end
+    #   plan_year.benefit_groups.first.errors.each do |attr, err|
+    #     errors.add("plan_year_benefit_group_" + attr.to_s, err)
+    #   end
+    # end
   end
 end
