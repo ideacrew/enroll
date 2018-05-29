@@ -7,6 +7,6 @@ require File.join(Rails.root, "app", "data_migrations", "remove_consumer_role")
 
 namespace :migrations do
   desc "remove incorrectly assigned consumer role to person via hbx_id"
-  RemoveResidentRole.define_task :remove_consumer_role => :environment
+  RemoveConsumerRole.define_task :remove_consumer_role => :environment
 end
 
