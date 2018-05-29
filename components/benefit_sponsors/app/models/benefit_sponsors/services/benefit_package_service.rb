@@ -29,7 +29,7 @@ module BenefitSponsors
       def disable_benefit_package(form)
         benefit_application = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
-        if benefit_package.disable_benefit_package
+        if benefit_application.disable_benefit_package(benefit_package)
           return [true, benefit_package]
         else
           map_errors_for(benefit_package, onto: form)

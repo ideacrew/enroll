@@ -188,6 +188,32 @@ module BenefitSponsors
           hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
           hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
         end
+        deactivate
+      end
+
+      def terminate_family_coverages(family)
+        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
+          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
+          if hbx_enrollment && hbx_enrollment.may_terminate_coverage?
+            hbx_enrollment.terminate_coverage!
+            hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+          end
+        end
+        deactivate
+      end
+
+      def cancel_family_coverages(family)
+        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+        sponsored_benefits.map(&:product_kind).each do |product_kind|
+          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
+          hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
+        end
+        deactivate
+      end
+
+      def deactivate
+        self.update_attribute(is_active: false)
       end
 
       def sponsored_benefit_for(coverage_kind)
@@ -228,32 +254,6 @@ module BenefitSponsors
             sponsored_benefit.refresh
           end
         end
-      end
-
-      def disable_benefit_package
-        self.benefit_application.benefit_sponsorship.census_employees.each do |census_employee|
-          benefit_package_assignments = census_employee.benefit_package_assignments.where(benefit_package_id: self.id)
-
-          if benefit_package_assignments.present?
-            benefit_package_assignments.each do |benefit_package_assignment|
-              benefit_package_assignment.hbx_enrollments.each do |enrollment|
-                enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-              end
-              benefit_package_assignment.update(is_active: false) unless self.benefit_application.is_renewing?
-            end
-
-            other_benefit_package = self.benefit_application.benefit_packages.detect{ |benefit_package| benefit_package.id != self.id }
-
-            # TODO: Add methods on census employee
-            if self.benefit_application.is_renewing?
-              # census_employee.add_renew_benefit_group_assignment(other_benefit_package)
-            else
-              # census_employee.find_or_create_benefit_group_assignment([other_benefit_package])
-            end
-          end
-        end
-
-        self.is_active = false
       end
 
       def build_relationship_benefits

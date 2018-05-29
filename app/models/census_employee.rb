@@ -181,6 +181,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def deactive_benefit_group_assignments(benefit_package_ids)
+    assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_package_ids)
+    assignments.each do |assignment|
+      if assignment.may_delink_coverage?
+        assignment.delink_coverage!
+        assignment.update_attribute(:is_active, false)
+      end
+    end
+  end
+
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
