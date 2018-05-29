@@ -45,12 +45,12 @@ attributes: !ruby/hash:BSON::Document
         address_1: 823 Cosmic Way, NW
         address_2: ''
         address_3: ''
-        county: County
+        county: Hampden
         country_name: ''
         kind: work
         city: Boston
         state: MA
-        zip: '02101'
+        zip: '01001'
         updated_at: 2018-05-22 18:43:44.591000000 Z
         created_at: 2018-05-22 18:43:44.591000000 Z
       phone: !ruby/hash:BSON::Document

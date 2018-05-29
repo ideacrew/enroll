@@ -27,6 +27,8 @@ module BenefitSponsors
 
       validates_presence_of :market_kind, if: :is_broker_profile?
 
+      validate :validate_profile_office_locations
+
       def persisted?
         false
       end
@@ -42,6 +44,18 @@ module BenefitSponsors
       def is_employer_profile?
         profile_type == "benefit_sponsor"
       end
+
+      def validate_profile_office_locations
+        location_kinds = self.office_locations.flat_map(&:address).compact.flat_map(&:kind)
+        if location_kinds.count('primary').zero?
+          self.errors.add(:base, "must select one primary address")
+        elsif location_kinds.count('primary') > 1
+          self.errors.add(:base, "can't have multiple primary addresses")
+        elsif location_kinds.count('mailing') > 1
+          self.errors.add(:base, "can't have more than one mailing address")
+        end
+      end
+
     end
   end
 end

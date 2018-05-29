@@ -8,7 +8,7 @@ module BenefitSponsors
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
     let(:user) { FactoryGirl.create :user}
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: site.benefit_markets[0], employer_attestation: employer_attestation) }
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
@@ -228,7 +228,8 @@ module BenefitSponsors
         end
 
         it "should redirect with success message" do
-          sign_in_and_submit_application
+          sign_in user
+          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           expect(flash[:notice]).to eq "Benefit Application successfully published."
           expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
         end
@@ -237,22 +238,22 @@ module BenefitSponsors
       context "benefit application is not submitted due to warnings" do
 
         before :each do
-          allow_any_instance_of(BenefitSponsors::Organizations::AcaShopDcEmployerProfile).to receive(:is_primary_office_local?).and_return(false)
+          allow_any_instance_of(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile).to receive(:is_primary_office_local?).and_return(false)
         end
 
         it "should display warnings" do
-          sign_in_and_submit_application
-          expect(flash[:error]).to match(/Is a small business located in #{Settings.aca.state_name}/)
+          sign_in user
+          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+          have_http_status(:success)
         end
       end
 
       context "benefit application is not submitted" do
-        before :each do
-          ben_app.update_attributes!(aasm_state: "pending")
-        end
+        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :pending) }
 
         it "should redirect with errors" do
-          sign_in_and_submit_application
+          sign_in user
+          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           expect(flash[:error]).to match(/Benefit Application failed to submit/)
         end
       end
@@ -291,46 +292,40 @@ module BenefitSponsors
 
     describe "POST revert", dbclean: :after_each do
       include_context 'shared_stuff'
+      let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
 
       before do
-        benefit_sponsorship.benefit_applications = [ben_app]
-        ben_app.benefit_packages.build
-        ben_app.save
         benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
       end
 
       def sign_in_and_revert
         sign_in user
-        post :revert, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :revert, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "when there is no eligible application to revert" do
         it "should redirect" do
           sign_in_and_revert
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:success)
         end
 
         it "should display error message" do
           sign_in_and_revert
-          expect(flash[:error]).to match(/Benefit Application is not eligible to revert/)
+          expect(flash[:error]).to match(/Plan Year could not be reverted to draft state/)
         end
       end
 
       context "when there is an eligible application to revert" do
-
-        before do
-          ben_app.update_attributes(:aasm_state => "approved")
-        end
+        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :approved) }
 
         it "should revert benefit application" do
           sign_in_and_revert
-          ben_app.reload
           expect(ben_app.aasm_state).to eq :draft
         end
 
-        it "should redirect to employer profiles benefits tab" do
+        it "should display flash messages" do
           sign_in_and_revert
-          expect(response.location.include?("tab=benefits")).to be_truthy
+          expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
         end
       end
     end

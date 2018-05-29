@@ -83,12 +83,30 @@ attributes: !ruby/hash:BSON::Document
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
+            WwROSZ+IC11vNseT
+        _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+        minimum_contribution_factor: 0.0
+        name: domestic_partner
+        display_name: Domestic Partner
+        order: 2
+        default_contribution_factor: 0.25
+        member_relationship_maps:
+        - !ruby/hash:BSON::Document
+          _id: !ruby/object:BSON::ObjectId
+            raw_data: !binary |-
+              WwROSZ+IC11vNseU
+          operator: :>=
+          relationship_name: :spouse
+          count: 1
+      - !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
             WwROSZ+IC11vNseV
         _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
         minimum_contribution_factor: 0.0
-        name: dependent
-        display_name: Dependent
-        order: 2
+        name: child_under_26
+        display_name: Child Under 26
+        order: 3
         default_contribution_factor: 0.25
         member_relationship_maps:
         - !ruby/hash:BSON::Document
@@ -114,6 +132,7 @@ attributes: !ruby/hash:BSON::Document
         relationship_kinds:
         - spouse
         - life_partner
+        - domestic_partner
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
@@ -152,6 +171,7 @@ attributes: !ruby/hash:BSON::Document
         relationship_kinds:
         - spouse
         - life_partner
+        - domestic_partner
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
@@ -5262,12 +5282,30 @@ attributes: !ruby/hash:BSON::Document
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
+            WwROSZ+IC11vNseT
+        _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
+        minimum_contribution_factor: 0.0
+        name: domestic_partner
+        display_name: Domestic Partner
+        order: 2
+        default_contribution_factor: 0.25
+        member_relationship_maps:
+        - !ruby/hash:BSON::Document
+          _id: !ruby/object:BSON::ObjectId
+            raw_data: !binary |-
+              WwROSZ+IC11vNseU
+          operator: :>=
+          relationship_name: :spouse
+          count: 1
+      - !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
             WwROSZ+IC11vNseV
         _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
         minimum_contribution_factor: 0.0
-        name: dependent
-        display_name: Dependent
-        order: 2
+        name: child_under_26
+        display_name: Child Under 26
+        order: 3
         default_contribution_factor: 0.25
         member_relationship_maps:
         - !ruby/hash:BSON::Document
@@ -5293,6 +5331,7 @@ attributes: !ruby/hash:BSON::Document
         relationship_kinds:
         - spouse
         - life_partner
+        - domestic_partner
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
@@ -5331,6 +5370,7 @@ attributes: !ruby/hash:BSON::Document
         relationship_kinds:
         - spouse
         - life_partner
+        - domestic_partner
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
@@ -11947,6 +11987,7 @@ attributes: !ruby/hash:BSON::Document
         relationship_kinds:
         - spouse
         - life_partner
+        - domestic_partner
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
@@ -12000,6 +12041,7 @@ attributes: !ruby/hash:BSON::Document
         relationship_kinds:
         - spouse
         - life_partner
+        - domestic_partner
       - !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-

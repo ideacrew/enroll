@@ -3,7 +3,7 @@ module BenefitSponsors
     # Chose the correct strategy for roster optimization and execute it.
     class RosterEligibilityOptimizer
       def initialize(contribution_model)
-        if contribution_model.many_simultaneous_contribution_units?
+        @optimizer = if contribution_model.many_simultaneous_contribution_units?
           RelationshipRosterEligibilityOptimizer.new
         else
           TieredRosterEligibilityOptimizer.new

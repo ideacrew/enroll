@@ -51,6 +51,7 @@ module BenefitSponsors
       # When present, date when all benefit applications are terminated and sponsorship ceases
       field :effective_end_on,    type: Date
       field :termination_kind,    type: Symbol
+      field :termination_reason,  type: Symbol
 
       # Immutable value indicating origination of this BenefitSponsorship
       field :source_kind,         type: Symbol, default: :self_serve
@@ -62,9 +63,10 @@ module BenefitSponsors
       end
 
       delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
+      delegate :enforce_employer_attestation, to: :benefit_market
 
       belongs_to  :organization,
-                  inverse_of: :benefit_sponorships,
+                  inverse_of: :benefit_sponsorships,
                   counter_cache: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
 
@@ -108,6 +110,12 @@ module BenefitSponsors
         inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
         allow_blank: false
 
+
+
+      scope :effective_begin_on,    ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                    :"effective_begin_on".lte => compare_date )
+                                                 }
+
       before_create :generate_hbx_id
 
       # after_initialize :set_service_and_rating_areas
@@ -137,6 +145,10 @@ module BenefitSponsors
         @roster_size = census_employees.active.size
       end
 
+      def is_eligible?
+        ["ineligible", "terminated"].exclude?(aasm_state)
+      end
+
       def benefit_sponsor_catalog_for(effective_date)
         benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
         if benefit_market_catalog.present?
@@ -144,11 +156,10 @@ module BenefitSponsors
         else
           nil
         end
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
       def is_attestation_eligible?
-        return true unless enforce_employer_attestation?
+        return true unless enforce_employer_attestation
         employer_attestation.present? && employer_attestation.is_eligible?
       end
 
@@ -171,6 +182,14 @@ module BenefitSponsors
         benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
       end
 
+      # TODO: pass in termination reason and kind
+      def terminate_enrollment(benefit_end_date)
+        if self.may_terminate?
+          self.terminate!
+          self.update_attributes(effective_end_on: benefit_end_on, termination_kind: :voluntary, termination_reason: :nonpayment)
+        end
+      end
+
       # TODO Refactor (moved from PlanYear)
       # def overlapping_published_plan_years
       #   benefit_sponsorship.benefit_applications.published_benefit_applications_within_date_range(start_on, end_on)
@@ -191,6 +210,7 @@ module BenefitSponsors
       aasm do
         state :applicant, initial: true
         state :initial_application_approved     # Sponsor's first application is submitted and approved
+        state :initial_enrollment_open          # Sponsor members are in open enrollment period
         state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
         state :initial_enrollment_ineligible
         state :initial_enrollment_eligible,   after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
@@ -204,8 +224,12 @@ module BenefitSponsors
           transitions from: :applicant, to: :initial_application_approved
         end
 
+        event :open_initial_enrollment do
+          transitions from: :initial_application_approved, to: :initial_enrollment_open
+        end
+
         event :close_initial_enrollment do
-          transitions from: :initial_application_approved, to: :initial_enrollment_closed
+          transitions from: :initial_enrollment_open, to: :initial_enrollment_closed
         end
 
         event :approve_initial_enrollment_eligibility do
@@ -265,12 +289,13 @@ module BenefitSponsors
 
       def publish_binder_paid
         benefit_applications.each do |benefit_application|
-          benefit_application.application_event_subscriber(aasm)
+          benefit_application.benefit_sponsorship_event_subscriber(aasm)
         end
       end
 
       # BenefitApplication        BenefitSponsorship
       # approved               -> initial_application_approved
+      # enrollment_open         -> initial_enrollment_open
       # enrollment_closed      -> initial_enrollment_closed
       # application_ineligible -> initial_enrollment_ineligible
       # application_eligible   -> initial_enrollment_eligible
@@ -279,6 +304,8 @@ module BenefitSponsors
         case aasm.to_state
         when :approved
           approve_initial_application! if may_approve_initial_application?
+        when :enrollment_open
+          open_initial_enrollment! if may_open_initial_enrollment?
         when :enrollment_closed
           close_initial_enrollment! if may_close_initial_enrollment?
         when :application_ineligible

@@ -27,7 +27,7 @@ module Effective
         table_column :plan_year_state, :proc => Proc.new { |row|
           if @employer_profile.present?
             @latest_plan_year = @employer_profile.latest_benefit_application
-            @latest_plan_year.aasm_state.titleize if @latest_plan_year.present?
+            @latest_plan_year.aasm_state.to_s.titleize if @latest_plan_year.present?
           end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
           @latest_plan_year.try(:start_on)

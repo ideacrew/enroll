@@ -27,6 +27,7 @@ module BenefitSponsors
       delegate :contribution_calculator, to: :product_package, allow_nil: true
 
       validate :product_package_exists
+      validates_presence_of :sponsor_contribution
 
       def product_package_exists
         if product_package.blank?
@@ -45,7 +46,7 @@ module BenefitSponsors
 
       def product_package
         return @product_package if defined? @product_package
-        @product_package = benefit_sponsor_catalog.product_packages.by_package_kind(product_package_kind).by_product_kind(product_kind)[0]
+        @product_package = benefit_sponsor_catalog.product_package_for(self)
       end
 
       def latest_pricing_determination

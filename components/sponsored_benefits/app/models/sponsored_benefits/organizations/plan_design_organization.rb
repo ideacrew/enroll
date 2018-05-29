@@ -76,7 +76,8 @@ module SponsoredBenefits
       end
 
       def active_employer_benefit_sponsorship
-        employer_profile.active_benefit_sponsorship
+        bs = employer_profile.active_benefit_sponsorship
+        bs if (bs && bs.is_eligible?)
       end
 
       # TODO Move this method to BenefitMarket Model

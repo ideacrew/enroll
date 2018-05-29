@@ -56,7 +56,7 @@ class BenefitGroupAssignment
   end
 
   def is_case_old?
-    self.benefit_group_id.present?
+    self.benefit_package_id.blank?
   end
 
   def plan_year

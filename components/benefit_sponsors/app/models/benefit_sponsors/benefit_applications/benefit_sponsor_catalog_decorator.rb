@@ -3,6 +3,39 @@ module BenefitSponsors
     class BenefitSponsorCatalogDecorator < SimpleDelegator
 
       Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :sole_source, :coverage_kind)
+      ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered)
+
+      def sponsor_contributions(benefit_package_id = nil)
+        return @contributions if defined? @contributions
+
+        if benefit_package_id.present?
+          benefit_package = self.benefit_application.benefit_packages.detect{|bp| bp.id.to_s == benefit_package_id}
+        end
+
+
+        @contributions = product_packages.inject({}) do |contributions, product_package|
+          
+          if benefit_package.present?
+            if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
+              sponsor_contribution = sponsored_benefit.sponsor_contribution
+            end
+          end
+
+          if sponsor_contribution.blank?
+            contribution_service = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
+            sponsor_contribution = contribution_service.build_sponsor_contribution(product_package)
+          end
+
+          contributions[product_package.package_kind.to_s] = {
+            id: nil,
+            contribution_levels: sponsor_contribution.contribution_levels.collect{|cl| 
+                     ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true)
+                    }
+          }
+
+          contributions
+        end
+      end
 
       def plan_option_kinds
         plan_options.keys

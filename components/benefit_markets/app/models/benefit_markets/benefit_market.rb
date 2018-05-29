@@ -31,6 +31,8 @@ module BenefitMarkets
 
     index({ kind:  1 })
 
+    delegate :enforce_employer_attestation, to: :configuration, allow_nil: true
+
     # BenefitMarketCatalogs may not overlap application_periods
     def add_benefit_market_catalog(new_benefit_market_catalog)
       application_period_is_covered = benefit_market_catalogs.detect do | catalog | 

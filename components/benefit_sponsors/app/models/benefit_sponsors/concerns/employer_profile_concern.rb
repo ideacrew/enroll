@@ -70,6 +70,14 @@ module BenefitSponsors
         active_benefit_sponsorship.current_benefit_application
       end
 
+      def draft_benefit_applications
+        benefit_applications.select{ |benefit_application| benefit_application.aasm_state.to_s == "draft" }
+      end
+
+      def benefit_applications_with_drafts_statuses
+        benefit_applications.draft.size > 0
+      end
+
       def renewal_benefit_application
         active_benefit_sponsorship.renewal_benefit_application
       end

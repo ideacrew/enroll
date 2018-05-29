@@ -40,7 +40,9 @@ module BenefitSponsors
       end
 
       def self.for_create(attrs)
-        new(attrs)
+        service = resolve_service(profile_type: attrs[:profile_type])
+        form_params = service.load_form_metadata(new(attrs))
+        new(form_params)
       end
 
       def self.for_edit(profile_id)

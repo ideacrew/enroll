@@ -104,7 +104,7 @@ module BenefitSponsors
     end
 
     def association_limits
-        BenefitSponsors::BENEFIT_MARKET_KINDS.each do |market_kind|
+        BenefitMarkets::BENEFIT_MARKET_KINDS.each do |market_kind|
         market_count = benefit_markets.select { |market| market.kind == market_kind }
         if market_count.size > 1
           errors.add(:benefit_markets, "cannot be more than one #{market_kind}")

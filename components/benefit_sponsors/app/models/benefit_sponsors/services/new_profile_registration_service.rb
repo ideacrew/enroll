@@ -38,6 +38,13 @@ module BenefitSponsors
         }
       end
 
+      def load_form_metadata(form)
+        load_organization_form(form)
+        load_profile_form(form)
+        load_office_location_form(form)
+        form
+      end
+
       def form_attributes_to_params(form)
         {
           :"current_user_id" => form.current_user_id,
@@ -53,6 +60,24 @@ module BenefitSponsors
           result[index_val] = form.attributes
           result
         end
+      end
+
+      def load_organization_form(form)
+        form.organization.entity_kind_options = BenefitSponsors::Organizations::Organization::ENTITY_KINDS
+        form
+      end
+
+      def load_profile_form(form)
+        form.organization.profile.grouped_sic_code_options = Caches::SicCodesCache.load
+        form.organization.profile.contact_method_options = ::BenefitMarkets::CONTACT_METHODS_HASH
+        form
+      end
+
+      def load_office_location_form(form)
+        form.organization.profile.office_locations.each do |office|
+          office.address.office_kind_options = BenefitSponsors::Locations::Address::OFFICE_KINDS
+        end
+        form
       end
 
       def organization_form_to_params(form)

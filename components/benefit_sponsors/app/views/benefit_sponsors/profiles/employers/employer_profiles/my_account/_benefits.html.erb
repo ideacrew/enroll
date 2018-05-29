@@ -2,20 +2,28 @@
 <div class="benefits-tab">
   <div class="row">
     <div class="col-xs-8">
-      <h1>Benefits - Coverage You Offer</h1>
+      <h1 class="heading-text">Benefits - Coverage You Offer</h1>
     </div>
     <div class="col-xs-4">
-      <%# if @employer_profile.is_new_employer? && @employer_profile.published_plan_year.blank? %>
-        <%#= link_to "Claim Quote", "", data: { toggle: "modal", target: "#claimQUoteModal" }, class: 'btn btn-default btn-block' %>
-      <%# end %>
+      <% if site_broker_claim_quoting_enabled? %>
+        <% if hide_or_show_claim_quote_button(@employer_profile) %>
+          <% claim_warnings, claim_modal_name = claim_quote_warnings(@employer_profile) %>
+
+          <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#{claim_modal_name}" }, class: 'btn btn-default btn-block' %>
+
+          <% if claim_warnings.present? %>
+            <%= render "employers/plan_years/claim_quote_warnings", warnings: claim_warnings %>
+          <% end %>
+        <% end %>
+      <% end %>
       <%#= pundit_span EmployerProfile,:updateable? %>
-        <%# if @plan_years.present? && @employer_profile.published_plan_year.blank? && !@employer_profile.draft_plan_year.present? %>
-        <%#= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
-        <%# end %>
+        <% if @benefit_applications.present? && @benefit_applications.published.blank? && !@employer_profile.draft_benefit_applications.present? %>
+        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
+        <% end %>
       </span>
     </div>
-    <%# unless @employer_profile.plan_years.blank? || @employer_profile.published_plan_year.present? %>
-    <%# if @employer_profile.renewing_plan_year.blank? || @employer_profile.active_plan_year.blank? %>
+    <% unless @benefit_applications.blank? || @benefit_applications.published.present? %>
+    <% if @employer_profile.renewal_benefit_application.blank? || @employer_profile.active_benefit_application.blank? %>
     <div class="col-xs-12">
       <h4>Carefully review the plan information and pricing below. If you haven't added employees to your plan yet, select 'Employees' in the blue menu bar to the left and edit each of your employees to add them to your benefit package. If you want to
         create more than one benefit package and offer different benefits to different employees, select 'Edit Plan Year' and then select 'Add Benefit Group' at bottom of the page. When you're satisfied with your benefit package(s), select 'Publish Plan Year'.</h4>
@@ -27,8 +35,8 @@
       </h4>
       <br/>
     </div>
-    <%# end %>
-    <%# end %>
+    <% end %>
+    <% end %>
   </div>
   <% if @benefit_applications.present? %>
 
@@ -38,11 +46,11 @@
           <h3 class="no-buffer">
             <div class="row">
               <span data-toggle="tooltip" title="<%= benefit_application.aasm_state.to_s.humanize.titleize %>">
-                <% if benefit_application.draft? || benefit_application.renewing_draft? %>
+                <% if benefit_application.draft? %>
                 <i class="fa fa-file"></i>
-                <% elsif benefit_application.enrolling? || benefit_application.renewing_enrolling? %>
+                <% elsif benefit_application.enrollment_open? %>
                 <i class="fa fa-star enrolling"></i>
-                <% elsif benefit_application.published? || benefit_application.renewing_published? %>
+                <% elsif benefit_application.approved? %>
                 <i class="fa fa-users"></i>
                 <% end %>
               </span>
@@ -61,9 +69,9 @@
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz"%>
             <% end %>
             <%#= pundit_span(EmployerProfile, :revert_application?) %>
-            <% if current_user.has_hbx_staff_role? && ( benefit_application.may_revert_application? || benefit_application.may_revert_renewal? ) %>
-              <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
-              <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
+            <% if current_user.has_hbx_staff_role? && ( benefit_application.may_revert_enrollment? || benefit_application.may_revert_application? ) %>
+              <span class="btn btn-default pull-right" data-target="#revertBenefitApplication_<%= benefit_application.id %>" data-toggle="modal">Revert Application</span>
+              <%#= link_to "Revert Application", benefit_sponsorship_benefit_application_revert_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right"%>
             <% end %>
             <span></span>
           </div>
@@ -86,7 +94,7 @@
               <div class="col-xs-11">
                 <section class="col-xs-10">
                   <header class="row">
-                    <h3 class="title no-buffer">
+                    <h3 class="title heading-text">
                       <%= package.title %>
                     </h3>
                     <% if package.description.present? %>
@@ -154,8 +162,8 @@
 
         <div class="col-xs-12"></div>
 
-        <%#= render "employers/plan_years/publish_modal", plan_year: benefit_application %>
-        <%#= render "employers/plan_years/revert_modal", plan_year: benefit_application %>
+        <%= render "benefit_sponsors/benefit_applications/benefit_applications/submit_application_modal", benefit_application: benefit_application %>
+        <%= render "benefit_sponsors/benefit_applications/benefit_applications/revert_application_modal", benefit_application: benefit_application %>
 
     <% end %>
   <% else %>

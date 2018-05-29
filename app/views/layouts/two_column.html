@@ -12,6 +12,7 @@
     <%= csrf_meta_tags %>
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
       <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -22,7 +23,7 @@
   </head>
   <body class="font">
 
-    <%= render 'layouts/header' %>
+    <%= render partial: './ui-components/v1/navs/header' %>
 
 
     <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
@@ -41,7 +42,7 @@
       </div>
     </div>
 
-    <%= render 'layouts/footer' %>
+    <%= render partial: './ui-components/v1/layouts/footer' %>
 
   </body>
  </html>

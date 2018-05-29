@@ -15,6 +15,8 @@ module BenefitSponsors
       attribute :contribution_cap, Float
       attribute :flat_contribution_amount, Float
 
+      validates_presence_of :contribution_factor
+
       def self.for_new
         contribution_levels.collect do |level_attrs|
           form = self.new(level_attrs)

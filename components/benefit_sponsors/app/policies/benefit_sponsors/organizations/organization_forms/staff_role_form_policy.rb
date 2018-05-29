@@ -7,7 +7,7 @@ module BenefitSponsors
 
         def initialize(user, record)
           super
-          @service = Services::StaffRoleService.new(
+          @service = BenefitSponsors::Services::StaffRoleService.new(
               profile_id: record.profile_id
           )
         end

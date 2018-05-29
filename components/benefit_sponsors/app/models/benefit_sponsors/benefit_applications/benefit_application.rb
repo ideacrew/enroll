@@ -3,7 +3,8 @@ module BenefitSponsors
     class BenefitApplication
       include Mongoid::Document
       include Mongoid::Timestamps
-      # include BenefitSponsors::Concerns::RecordTransition
+      include Config::AcaModelConcern
+      include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
       APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
@@ -99,9 +100,9 @@ module BenefitSponsors
       end
 
       # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
-      scope :plan_design_draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
-      scope :plan_design_approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
-      scope :plan_design_exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
+      scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+      scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
+      scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
       scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
       scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
@@ -154,14 +155,14 @@ module BenefitSponsors
         )
       }
 
-      # scope :published_plan_years_by_date, ->(date) {
-      #   where(
-      #     "$and" => [
-      #       {:aasm_state.in => APPROVED_STATES },
-      #       {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
-      #     ]
-      #     )
-      # }
+      scope :published_benefit_applications_by_date, ->(date) {
+        where(
+          "$and" => [
+            {:aasm_state.in => APPROVED_STATES },
+            {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
+          ]
+          )
+      }
 
       # scope :published_and_expired_plan_years_by_date, ->(date) {
       #   where(
@@ -171,6 +172,17 @@ module BenefitSponsors
       #     ]
       #     )
       # }
+
+
+      # def benefit_sponsor_catalog_for(effective_date)
+      #   benefit_market_catalog = benefit_sponsorship.benefit_market.benefit_market_catalog_effective_on(effective_date)
+      #   if benefit_market_catalog.present?
+      #     self.benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
+      #   else
+      #     nil
+      #   end
+      #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
+      # end
 
       def effective_period=(new_effective_period)
         effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
@@ -291,31 +303,45 @@ module BenefitSponsors
 
       def renew_benefit_package_assignments
         benefit_packages.each do |benefit_package|
-          predecessor_benefit_package = benefit_package.predecessor
-          predecessor_effective_date  = predecessor_application.effective_period.min
-
-          predecessor_benefit_package.census_employees_assigned_on(predecessor_effective_date).each  do |employee|
-            new_benefit_package_assignment = employee.benefit_package_assignment_on(effective_period.min)
-            if new_benefit_package_assignment.blank? || (benefit_package_assignment.benefit_package != benefit_package)
-              census_employee.assign_to_benefit_package(benefit_package, effective_period.min)
-            end
-          end
+          benefit_package.renew_employee_assignments          
         end
 
-        benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |employee|
-          assign_to_default_benefit_package(census_employee)
+        default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
+        benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self.benefit_application).each do |census_employee|
+          census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
         end
-      end
-
-      def assign_to_default_benefit_package(census_employee, assignment_on = effective_period.min)
-        census_employee.assign_to_benefit_package(default_benefit_package, assignment_on)
       end
 
       def renew_benefit_package_members
         benefit_packages.each do |benefit_package|
-          member_collection = benefit_package.census_employees_assigned_on(benefit_package.effective_period.min)
-          benefit_package.renew_member_benefits(member_collection)
+          benefit_package.renew_member_benefits
         end
+      end
+
+      def effectuate_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          Family.enrolled_through_benefit_package(self).each do |family|
+            benefit_package.effectuate_family_coverages(family)
+          end
+        end
+      end
+           
+      def expire_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          Family.enrolled_through_benefit_package(self).each do |family|
+            benefit_package.expire_family_coverages(family)
+          end
+        end
+      end
+
+      # TODO: Refer to benefit_sponsorship instead of employer profile.
+      def no_documents_uploaded?
+        # benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+        benefit_sponsorship.profile.employer_attestation.blank? || benefit_sponsorship.profile.employer_attestation.unsubmitted?
+      end
+
+      def validate_sponsor_market_policy
+        true
       end
 
       def refresh(new_benefit_sponsor_catalog)
@@ -337,7 +363,7 @@ module BenefitSponsors
       def is_event_date_valid?
         today = TimeKeeper.date_of_record
 
-        is_valid = case aasm_state
+        is_valid = case aasm_state.to_s
         when "approved", "draft"
           today >= open_enrollment_period.begin
         when "enrollment_open"
@@ -459,7 +485,7 @@ module BenefitSponsors
 
         # Upon review, application ineligible status overturned and deemed eligible
         event :approve_application do
-          transitions from: APPLICATION_EXCEPTION_STATES, to: :approved
+          transitions from: :draft, to: :approved
         end
 
         event :submit_for_review do
@@ -553,13 +579,70 @@ module BenefitSponsors
       end
 
       def benefit_sponsorship_event_subscriber(aasm)
-        if (aasm.to_state == :initial_application_eligible) && may_approve_enrollment_eligiblity?
+        if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
           approve_enrollment_eligiblity!
         end
 
         if aasm.to_state == :binder_reversed
           reverse_enrollment_eligiblity!
         end
+      end
+
+      def minimum_employer_contribution
+        unless benefit_packages.size == 0
+          benefit_packages.map do |benefit_package|
+            if benefit_package#.sole_source?
+              OpenStruct.new(:premium_pct => 100)
+            else
+              # benefit_package.relationship_benefits.select do |relationship_benefit|
+              #   relationship_benefit.relationship == "employee"
+              # end.min_by do |relationship_benefit|
+              #   relationship_benefit.premium_pct
+              # end
+            end
+          end.map(&:premium_pct).first
+        end
+      end
+
+      def application_eligibility_warnings
+        warnings = {}
+
+        if employer_attestation_is_enabled?
+          unless benefit_sponsorship.profile.is_attestation_eligible?
+            if no_documents_uploaded?
+              warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+            elsif benefit_sponsorship.profile.employer_attestation.denied?
+              warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+            else
+              warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+            end
+          end
+        end
+
+        unless benefit_sponsorship.profile.is_primary_office_local?
+          warnings.merge!({primary_office_location: "Is a small business located in #{Settings.aca.state_name}"})
+        end
+
+        # TODO: These valiations occuring when employer publish their benefit application. Following state not relavant for an unpublished application.
+        # Application is in ineligible state from prior enrollment activity
+        if aasm_state == "enrollment_ineligible"
+          warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
+        end
+
+        # Maximum company size at time of initial registration on the HBX
+        if fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
+          warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time equivalent employees" })
+        end
+
+        # Exclude Jan 1 effective date from certain checks
+        unless effective_date.yday == 1
+          # Employer contribution toward employee premium must meet minimum
+          if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+            warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
+          end
+        end
+
+        warnings
       end
 
       def is_published?
@@ -574,6 +657,11 @@ module BenefitSponsors
       def employees_are_matchable? # Deprecate in future
         warn "[Deprecated] Instead use is_published?" unless Rails.env.test?
         is_published?
+      end
+
+
+      def matching_state_for(plan_year)
+        plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
       end
 
       private

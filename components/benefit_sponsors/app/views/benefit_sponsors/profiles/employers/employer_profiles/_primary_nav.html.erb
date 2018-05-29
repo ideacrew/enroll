@@ -1,5 +1,5 @@
 <nav>
-  <ul>
+  <ul id="uic-employers-right-menu">
     <li <%= menu_tab_class(active_tab, "home") %>>
       <%= link_to "My #{Settings.site.short_name}", profiles_employers_employer_profile_path(profile.id, :tab=>'home'), "aria-expanded" => "true" %>
     </li>
