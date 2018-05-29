@@ -97,8 +97,6 @@ class BrokerRole
     self.person
   end
 
-
-
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.is_a? BrokerAgencyProfile
@@ -394,9 +392,10 @@ class BrokerRole
   def current_state
     aasm_state.gsub(/\_/,' ').camelcase
   end
-  
+
   def remove_broker_assignments
-    @orgs = Organization.by_broker_role(id)
+    @orgs = self.benefit_sponsors_broker_agency_profile_id.present? ?
+     (BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_role(id).map(&:organization)) : (Organization.by_broker_role(id))
     @employers = @orgs.map(&:employer_profile)
     # Remove broker from employers
     @employers.each do |e|
