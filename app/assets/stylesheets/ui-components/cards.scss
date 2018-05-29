@@ -171,6 +171,9 @@
       line-height: 1.6em;
     }
   }
+  input[type=radio] {
+    display:none;
+  }
 }
 
 .reference-plans {
@@ -198,13 +201,3 @@
   }
 }
 
-#offering_slider_header {
-  .col-xs-6 {
-    border-bottom: solid 1px #d5d5d5;
-    padding: 15px 0 25px;
-    text-align: center;
-    color: #838780;
-    text-transform: uppercase;
-    font-size: 14px;
-  }
-}
