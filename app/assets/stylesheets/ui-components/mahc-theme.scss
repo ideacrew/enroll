@@ -1,6 +1,10 @@
 @import "./_variables";
 @import url('https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700');
 
+* {
+    font-family: 'Roboto Slab', sans-serif;
+}
+
 a {
   color: $mhc-href;
   text-decoration: none;
@@ -24,7 +28,6 @@ html {
 body {
   background-color: $primary-light-gray;
   padding-bottom: 70px;
-  font-family: "Roboto Slab";
   font-size: 14px;
   line-height: 1.42857143;
   color: #333;
