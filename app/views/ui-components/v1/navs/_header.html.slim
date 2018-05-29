@@ -12,7 +12,7 @@
       .collapse.navbar-collapse#bs-example-navbar-collapse-1
         ul.nav.navbar-nav
           li 
-            h4 = get_benefit_sponsors_header_text(controller_name)
+            h4 = get_header_text(controller_name)
         ul.nav.navbar-nav.navbar-right
           li
             a.call-customer-service href="tel:#{Settings.contact_center.phone_number}"

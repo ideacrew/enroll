@@ -47,7 +47,7 @@ module BenefitSponsors
       def update(form)
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)
-        benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
+        benefit_package  = benefit_package_factory.call(benefit_application, model_attributes)
         store(form, benefit_package)
       end
 
@@ -99,6 +99,7 @@ module BenefitSponsors
           probation_period_kind: benefit_package.probation_period_kind,
           sponsored_benefits: sponsored_benefits_attributes_to_form_params(benefit_package)
         }
+
         form.attributes
       end
 
@@ -156,7 +157,7 @@ module BenefitSponsors
           contribution_levels << {
             id: contribution_level.id,
             display_name: contribution_level.display_name,
-            contribution_factor: contribution_level.contribution_factor,
+            contribution_factor: (contribution_level.contribution_factor * 0.01),
             is_offered: contribution_level.is_offered
           }
         end

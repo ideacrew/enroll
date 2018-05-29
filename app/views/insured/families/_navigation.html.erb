@@ -1,5 +1,5 @@
 <nav>
-  <ul>
+  <ul id="uic-families-right-menu">
     <li <%= menu_tab_class(@tab, 'home') %>>
       <%= link_to l10n("my_site_short_name", site_short_name: site_short_name), family_account_path(tab: 'home') %>
     </li>
@@ -35,7 +35,7 @@
     <div class="panel-heading">
       <h4><%= l10n("my_account") %></h4>
     </div>
-    <div class="panel-body" style="padding: 0;">
+    <div class="panel-body">
       <span class="dg ttc">
         <%= @person.first_name.try(:humanize) %> <%= @person.last_name.try(:humanize) %>
       </span>

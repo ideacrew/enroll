@@ -31,7 +31,7 @@
       | Please select a state.
   .col-md-3.col-sm-12.col-xs-12
     label for="inputZip" Zip
-    = f.text_field :zip, required:'true', id:'inputZip', class:'form-control mb-1', maxlength:'5', onkeypress:'return isNumberKey(event)'
+    = f.text_field :zip, required:'true', id:'inputZip', class:'form-control mb-1', minlength:'5', maxlength:'5', onkeypress:'return isNumberKey(event)'
     .invalid-feedback
       | Please provide a valid zipcode.
 

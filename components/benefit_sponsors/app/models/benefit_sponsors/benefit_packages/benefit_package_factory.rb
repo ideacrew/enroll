@@ -29,7 +29,7 @@ module BenefitSponsors
         sponsored_benefit = new_sponsored_benefit_for(args[0][:kind])
         sponsored_benefit.benefit_package = @benefit_package
         sponsored_benefit.assign_attributes(args[0].except(:id, :kind, :sponsor_contribution_attributes))
-        sponsored_benefit.sponsor_contribution = build_sponsor_contribution(sponsored_benefit ,args[0][:sponsor_contribution_attributes])
+        sponsored_benefit.sponsor_contribution = build_sponsor_contribution(sponsored_benefit, args[0][:sponsor_contribution_attributes])
         sponsored_benefit.to_a
       end
 
@@ -39,8 +39,11 @@ module BenefitSponsors
         attrs[:contribution_levels_attributes].each do |contribution_level_hash|
           contribution_level = sponsor_contribution.contribution_levels.where(display_name: contribution_level_hash[:display_name]).first
           
+          contribution_level_attrs = contribution_level_hash.except(:id, :display_name)
+          contribution_level_attrs[:is_offered] ||= false
+
           if contribution_level
-            contribution_level.assign_attributes(contribution_level_hash.except(:id, :display_name))
+            contribution_level.assign_attributes(contribution_level_attrs)
           end
         end
         sponsor_contribution
@@ -63,16 +66,9 @@ module BenefitSponsors
 
       def update_sponsored_benefits(args)
         sponsored_benefit = @benefit_package.sponsored_benefits.find(args[:id])
-        sponsored_benefit.benefit_package = @benefit_package
         sponsored_benefit.assign_attributes(args.except(:id, :kind, :sponsor_contribution_attributes))
-        sponsored_benefit.sponsor_contribution = update_sponsor_contribution(sponsored_benefit, args[:sponsor_contribution_attributes])
+        sponsored_benefit.sponsor_contribution = build_sponsor_contribution(sponsored_benefit, args[:sponsor_contribution_attributes])
         sponsored_benefit
-      end
-
-      def update_sponsor_contribution(sponsored_benefit, args)
-        sponsor_contribution = sponsored_benefit.sponsor_contribution
-        sponsor_contribution.assign_attributes(args)
-        sponsor_contribution
       end
 
       def benefit_package

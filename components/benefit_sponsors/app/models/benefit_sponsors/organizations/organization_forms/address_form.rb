@@ -17,6 +17,12 @@ module BenefitSponsors
 
       validates_presence_of :address_1, :city, :state, :zip
 
+      validates :zip,
+                format: {
+                    :with => /\A\d{5}(-\d{4})?\z/,
+                    :message => "should be in the form: 12345 or 12345-1234"
+                }
+
 
       def persisted?
         false

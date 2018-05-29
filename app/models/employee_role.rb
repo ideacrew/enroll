@@ -76,7 +76,7 @@ class EmployeeRole
   # end
 
   def is_case_old?
-    self.employer_profile_id.present?
+    self.benefit_sponsors_employer_profile_id.blank?
   end
 
   def employer_profile=(new_employer_profile)

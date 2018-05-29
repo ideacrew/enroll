@@ -73,7 +73,7 @@ module BenefitSponsors
       end
 
       def benefit_sponsorships
-        organization.benefit_sponsorships.collect { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
+        organization.benefit_sponsorships.select { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
       end
 
       def contact_methods

@@ -4,7 +4,7 @@ fieldset
   .row
     .col-md-4.mb-2
         label for="inputFirstname"  First name *
-        = f.text_field :first_name, placeholder:'First Name', required:'true', id:'inputFirstname', class:'form-control'
+        = f.text_field :first_name, placeholder:'First Name', required:'true', id:'inputFirstname', class:'form-control', onkeyup:'lettersOnly(this)'
         .invalid-feedback
           |
             Please provide a first name.

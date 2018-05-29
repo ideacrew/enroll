@@ -29,7 +29,12 @@ module BenefitSponsors
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_update(params.require(:id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.update_attributes(application_params)
-          redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model, @benefit_application_form.show_page_model.benefit_packages.first)
+
+          if @benefit_application_form.show_page_model.benefit_packages.empty?
+            redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model)
+          else
+            redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.show_page_model.benefit_sponsorship, @benefit_application_form.show_page_model, @benefit_application_form.show_page_model.benefit_packages.first)
+          end
         else
           flash[:error] = error_messages(@benefit_application_form)
           render :edit
@@ -42,7 +47,11 @@ module BenefitSponsors
         if @benefit_application_form.submit_application
           flash[:notice] = "Benefit Application successfully published."
           flash[:error] = error_messages(@benefit_application_form)
-          redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
+          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
+        elsif @benefit_application_form.errors.messages.keys.include?(:attestation_ineligible)
+          respond_to do |format|
+            format.js
+          end
         else
           flash[:error] = "Benefit Application failed to submit. #{error_messages(@benefit_application_form)}"
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
@@ -61,8 +70,12 @@ module BenefitSponsors
       def revert
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :revert_application?
-        flash[:error] = error_messages(@benefit_application_form) unless @benefit_application_form.revert
-        redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
+        if @benefit_application_form.revert
+          flash[:notice] = "Plan Year successfully reverted to draft state."
+        else
+          flash[:error] = "Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}".html_safe
+        end
+        render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
       end
 
       private

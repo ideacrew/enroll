@@ -8,7 +8,7 @@ module SponsoredBenefits
     let(:current_person) { double(:current_person) }
     let(:broker_role) { double(:broker_role, broker_agency_profile_id: '5ac4cb58be0a6c3ef400009b') }
     let(:datatable) { double(:datatable) }
-    let(:sponsor) { double(:sponsor, id: '555', sic_code: '1111') }
+    let(:sponsor) { double(:sponsor, id: '5ac4cb58be0a6c3ef400009a', sic_code: '1111') }
     let(:active_user) { double(:has_hbx_staff_role? => false) }
 
     let!(:plan_design_organization) {
@@ -83,6 +83,7 @@ module SponsoredBenefits
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
       allow(subject).to receive(:effective_datatable).and_return(datatable)
       allow(subject).to receive(:employee_datatable).and_return(datatable)
+      allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
     end
 
     describe "GET #index" do

@@ -6,6 +6,72 @@ module BenefitSponsors
       @benefit_application = benefit_application
     end
 
+    def renew
+      effective_period_end = @benefit_application.effective_period.end
+      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end.next_day)
+      
+      if benefit_sponsor_catalog
+        new_benefit_application = @benefit_application.renew(benefit_sponsor_catalog)
+
+        if new_benefit_application.save
+          new_benefit_application.renew_benefit_package_assignments
+        end
+      end
+    end
+
+    def revert_application
+      if @benefit_application.may_revert_application?
+        @benefit_application.revert_application
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      elsif @benefit_application.may_revert_enrollment?
+        @benefit_application.revert_enrollment
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      else
+        [false, @benefit_application]
+      end
+    end
+
+    def submit_application
+      if @benefit_application.may_submit_application? && is_application_ineligible?
+        [false, @benefit_application, application_eligibility_warnings]
+      else
+        @benefit_application.submit_application! if @benefit_application.may_submit_application?
+        if @benefit_application.approved? || @benefit_application.enrollment_open?
+
+          if @benefit_application.enrollment_open?
+            @benefit_application.renew_benefit_package_members
+          end
+
+          unless assigned_census_employees_without_owner.present?
+            warnings = { base: "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?" }
+          end
+
+          [true, @benefit_application, warnings || {}]
+        else
+          errors = application_errors.merge(open_enrollment_date_errors)
+          [false, @benefit_application, errors]
+        end
+      end
+    end
+
+    def force_submit_application
+      if is_application_invalid? || is_application_ineligible?
+        @benefit_application.submit_for_review! if @benefit_application.may_submit_for_review?
+      else
+        @benefit_application.submit_application! if @benefit_application.may_submit_application?
+      end
+    end
+
     def begin_initial_open_enrollment
       @benefit_application.validate_sponsor_market_policy
       return false unless @benefit_application.is_valid?
@@ -24,10 +90,32 @@ module BenefitSponsors
 
       if @benefit_application.may_begin_open_enrollment?
         @benefit_application.begin_open_enrollment!
-
         if @benefit_application.enrollment_open?
           @benefit_application.renew_benefit_package_members
-        else
+        end
+      end
+    end
+
+    def close_open_enrollment
+      if @benefit_application.may_advance_date?
+        @benefit_application.advance_date!
+      end
+    end
+
+    def effectuate
+      if @benefit_application.may_activate_enrollment?
+        @benefit_application.activate_enrollment!
+        if @benefit_application.active?
+          @benefit_application.effectuate_benefit_package_members
+        end
+      end
+    end
+
+    def expire
+      if @benefit_application.may_expire?
+        @benefit_application.expire!
+        if @benefit_application.expired?
+          @benefit_application.expire_benefit_package_members
         end
       end
     end
@@ -52,46 +140,6 @@ module BenefitSponsors
       application_eligibility_warnings.present?
     end
 
-    def force_submit_application
-      if is_application_invalid? || is_application_ineligible?
-        @benefit_application.submit_for_review! if @benefit_application.may_submit_for_review?
-      else
-        @benefit_application.submit_application! if @benefit_application.may_submit_application?
-      end
-    end
-   
-    def submit_application
-      if @benefit_application.may_submit_application? && is_application_ineligible?
-        [false, @benefit_application, application_eligibility_warnings]
-      else
-        @benefit_application.submit_application! if @benefit_application.may_submit_application?
-        if @benefit_application.approved? || @benefit_application.enrollment_open?
-          unless assigned_census_employees_without_owner.present?
-            warnings = { base: "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?" }
-          end
-          [true, @benefit_application, warnings || {}]
-        else
-          errors = application_errors.merge(open_enrollment_date_errors)
-          [false, @benefit_application, errors]
-        end
-      end
-    end
-
-    def begin_open_enrollment
-      if @benefit_application.may_advance_date?
-        @benefit_application.advance_date!
-
-        if @benefit_application.predecessor_application.present?
-          @benefit_application.renew_employee_coverages
-        end
-      end
-    end
-
-    def close_open_enrollment
-      if @benefit_application.may_advance_date?
-        @benefit_application.advance_date!
-      end
-    end
 
     def cancel_open_enrollment(benefit_application)
 
@@ -107,19 +155,6 @@ module BenefitSponsors
 
     end
     
-    def renew
-      effective_period_end = @benefit_application.effective_period.end
-      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end.next_day)
-      
-      if benefit_sponsor_catalog
-        new_benefit_application = @benefit_application.renew(benefit_sponsor_catalog)
-
-        if new_benefit_application.save
-          new_benefit_application.renew_benefit_package_assignments
-        end
-      end
-    end
-
     # benefit_market_catalog - ?
     # benefit_sponsor_catalog
     def terminate
@@ -129,30 +164,11 @@ module BenefitSponsors
     end
 
     def benefit_sponsorship
-      @benefit_application.benefit_sponsorship
+      return @benefit_sponsorship if defined? @benefit_sponsorship
+      @benefit_sponsorship = @benefit_application.benefit_sponsorship
     end
 
-    def active_census_employees
-      benefit_sponsorship.census_employees.non_terminated
-    end
 
-    def effectuate
-      if @benefit_application.may_activate_enrollment?
-        @benefit_application.activate_enrollment!
-        active_census_employees.each do |census_employee|
-          census_employee.effectuate_coverage
-        end
-      end
-    end
-
-    def expire
-      if @benefit_application.may_expire?
-        @benefit_application.expire!
-        active_census_employees.each do |census_employee|
-          census_employee.expire_coverage
-        end
-      end
-    end
 
     def member_participation_percent
       return "-" if eligible_to_enroll_count == 0
@@ -284,10 +300,10 @@ module BenefitSponsors
       warnings = {}
 
       if employer_attestation_is_enabled?
-        unless benefit_sponsorship.is_attestation_eligible?
-          if benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+        unless benefit_sponsorship.profile.is_attestation_eligible?
+          if @benefit_application.no_documents_uploaded?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
-          elsif benefit_sponsorship.employer_attestation.denied?
+          elsif benefit_sponsorship.profile.employer_attestation.denied?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
           else
             warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})

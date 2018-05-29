@@ -292,7 +292,7 @@ module BenefitSponsors
         def is_employer_profile_claimed?(organization)
           if organization.present?
             if organization.employer_profile.present?
-              if (Person.where({"employer_staff_roles.employer_profile_id" => organization.employer_profile._id}).any?)
+              if (Person.where({"employer_staff_roles.benefit_sponsor_employer_profile_id" => organization.employer_profile._id}).any?)
                 return true
               end
             end
@@ -318,7 +318,7 @@ module BenefitSponsors
           if is_broker_profile?
             :broker_new_registration_url
           elsif is_employer_profile?
-            return "sponsor_show_pending_registration_url@#{profile_id}" if is_pending
+            return "sponsor_show_pending_registration_url" if is_pending
             return "sponsor_home_registration_url@#{profile_id}" if is_saved
             :sponsor_new_registration_url
           end

@@ -65,8 +65,8 @@ module BenefitMarkets
 
     scope :by_product_package,    ->(product_package) { by_application_period(product_package.application_period).where(
                 :"benefit_market_kind"          => product_package.benefit_kind,
-                :"kind"                         => /#{product_package.product_kind}/i,
-                :"product_package_kinds"        => /#{product_package.package_kind}/
+                :"kind"                         => product_package.product_kind,
+                :"product_package_kinds"        => product_package.package_kind
               )
             }
 
@@ -124,6 +124,10 @@ module BenefitMarkets
     def issuer_profile=(new_issuer_profile)
       write_attribute(:issuer_profile_id, new_issuer_profile.id)
       @issuer_profile = new_issuer_profile
+    end
+
+    def active_year
+      application_period.min.year
     end
 
     def premium_table_effective_on(effective_date)

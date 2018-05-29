@@ -247,7 +247,7 @@ class CensusEmployee < CensusMember
 
   def employer_profile
     return @employer_profile if defined? @employer_profile
-    return @employer_profile = EmployerProfile.find(self.employer_profile_id) if self.employer_profile_id.present?
+    return @employer_profile = EmployerProfile.find(self.employer_profile_id) if (self.employer_profile_id.present? && self.benefit_sponsors_employer_profile_id.blank?)
     return nil if self.benefit_sponsorship.blank? # Need this for is_case_old?
     @employer_profile = self.benefit_sponsorship.organization.employer_profile
   end

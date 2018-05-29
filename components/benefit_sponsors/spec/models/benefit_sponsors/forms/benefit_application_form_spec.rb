@@ -13,11 +13,44 @@ module BenefitSponsors
       }
     end
 
-    describe "validate Factory" do
-      let(:build_benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
+    describe "validate Form" do
 
-      it "should be valid" do
-        expect(build_benefit_application_form.valid?).to be_truthy
+      let(:valid_params) {
+        {
+          :benefit_sponsorship_id => "id",
+          :start_on => TimeKeeper.date_of_record + 3.months,
+          :end_on => TimeKeeper.date_of_record + 1.year + 3.months  - 1.day,
+          :open_enrollment_start_on => TimeKeeper.date_of_record + 2.months,
+          :open_enrollment_end_on => TimeKeeper.date_of_record + 2.months + 20.day
+        }
+      }
+
+      let(:invalid_params) {
+        {
+          :benefit_sponsorship_id => nil,
+          :start_on => TimeKeeper.date_of_record + 3.months,
+          :end_on =>  TimeKeeper.date_of_record + 1.year + 3.months  - 1.day,
+          :open_enrollment_start_on => TimeKeeper.date_of_record + 2.months,
+          :open_enrollment_end_on => TimeKeeper.date_of_record + 2.months + 20.day
+        }
+      }
+
+      context "with invalid params" do
+
+        let(:build_benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(invalid_params)}
+        
+        it "should return false" do
+          expect(build_benefit_application_form.valid?).to be_falsey
+        end
+      end
+
+      context "with valid params" do
+
+        let(:build_benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(valid_params)}
+
+        it "should return true" do
+          expect(build_benefit_application_form.valid?).to be_truthy
+        end
       end
     end
 

@@ -75,6 +75,11 @@ module SponsoredBenefits
         self.try(:employer_profile).try(:active_general_agency_account)
       end
 
+      def active_employer_benefit_sponsorship
+        bs = employer_profile.active_benefit_sponsorship
+        bs if (bs && bs.is_eligible?)
+      end
+
       # TODO Move this method to BenefitMarket Model
       def service_areas_available_on(date)
         if use_simple_employer_calculation_model?

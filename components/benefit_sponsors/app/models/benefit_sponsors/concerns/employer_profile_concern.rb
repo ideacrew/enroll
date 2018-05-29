@@ -71,6 +71,14 @@ module BenefitSponsors
         active_benefit_sponsorship.current_benefit_application
       end
 
+      def draft_benefit_applications
+        benefit_applications.select{ |benefit_application| benefit_application.aasm_state.to_s == "draft" }
+      end
+
+      def benefit_applications_with_drafts_statuses
+        benefit_applications.draft.size > 0
+      end
+
       def renewal_benefit_application
         active_benefit_sponsorship.renewal_benefit_application
       end
@@ -106,7 +114,7 @@ module BenefitSponsors
       end
 
       def hire_broker_agency(new_broker_agency, start_on = today)
-        SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self, office_locations: office_locations) if parent
+        ::SponsoredBenefits::Organizations::BrokerAgencyProfile.assign_employer(broker_agency: new_broker_agency, employer: self, office_locations: office_locations) if parent
         start_on = start_on.to_date.beginning_of_day
         if active_broker_agency_account.present?
           terminate_on = (start_on - 1.day).end_of_day
@@ -120,7 +128,7 @@ module BenefitSponsors
 
       def fire_broker_agency(terminate_on = today)
         return unless active_broker_agency_account
-        SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: broker_agency_profile, employer: self) if parent
+        ::SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: broker_agency_profile, employer: self) if parent
         active_broker_agency_account.update_attributes!(end_on: terminate_on, is_active: false)
         # TODO fix these during notices implementation
         # employer_broker_fired

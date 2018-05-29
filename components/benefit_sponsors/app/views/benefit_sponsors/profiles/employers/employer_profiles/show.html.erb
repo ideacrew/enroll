@@ -1,5 +1,5 @@
 <% content_for :navigation do %>
-<%= render :partial => 'benefit_sponsors/profiles/employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
+<%= render :partial => 'ui-components/v1/navs/employers_navigation', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
 <% end %>
 
 <%- if @tab == 'home' %>

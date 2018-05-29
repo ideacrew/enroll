@@ -8,6 +8,8 @@ module BenefitSponsors
       attribute :contribution_levels, Array[ContributionLevelForm]
       attr_accessor :contribution_levels
 
+      validates_presence_of :contribution_levels
+
       def contribution_levels_attributes=(attributes)
         @contribution_levels ||= []
         attributes.each do |i, contribution_level_attributes|
