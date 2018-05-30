@@ -260,9 +260,9 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
-      { :phones_attributes => [:kind, :full_phone_number] },
-      { :emails_attributes => [:kind, :address] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :_destroy] },
+      { :emails_attributes => [:kind, :address, :_destroy] },
       { :consumer_role_attributes => [:contact_method, :language_preference]},
       :first_name,
       :last_name,
