@@ -51,11 +51,7 @@ module BenefitSponsors
 
       # Benefit Sponsor will always have an active benefit sponsorship
       def census_employees
-        parent.active_benefit_sponsorship.census_employees
-      end
-
-      def benefit_applications
-        parent.active_benefit_sponsorship.benefit_applications
+        active_benefit_sponsorship.census_employees
       end
 
       def active_benefit_application
@@ -87,7 +83,13 @@ module BenefitSponsors
       end
 
       def active_benefit_sponsorship
-        organization.active_benefit_sponsorship rescue nil
+        return @benefit_sponsorship if defined? @benefit_sponsorship
+        @benefit_sponsorship = organization.active_benefit_sponsorship rescue nil
+      end
+
+      def benefit_applications
+        return @benefit_applications if defined? @benefit_applications
+        @benefit_applications = active_benefit_sponsorship.benefit_applications
       end
 
       def active_broker_agency_account
@@ -159,6 +161,24 @@ module BenefitSponsors
         renewing_published_benefit_application || current_benefit_application
       end
 
+      def billing_benefit_application(billing_date=nil)
+        billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
+        valid_applications = benefit_applications.non_draft.non_imported
+        application = valid_applications.effective_period_cover(billing_report_date).first
+        if billing_date.blank? && application.blank?
+
+          application = valid_applications.future_effective_date(billing_report_date).open_enrollment_period_cover.first
+          return application, application.start_on if application.present?
+
+          application = valid_applications.effective_period_cover.first
+          return application, TimeKeeper.date_of_record if application.present?
+
+          application = valid_applications.future_effective_date(billing_report_date).first
+          return application, application.start_on if application.present?
+        end
+        return application, billing_report_date
+      end
+
       # Deprecate below methods in future
 
       def renewing_plan_year
@@ -197,11 +217,12 @@ module BenefitSponsors
       end
 
       def billing_plan_year(billing_date=nil)
-        [] # TODO
+        warn "[Deprecated] Instead use billing_benefit_application" unless Rails.env.test?
+        billing_benefit_application(billing_date)
       end
 
       def earliest_plan_year_start_on_date
-        # Deprecate This
+        current_benefit_application.start_on
       end
 
       class << self
