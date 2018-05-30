@@ -212,7 +212,7 @@ module BenefitSponsors
     end
 
     def filter_active_enrollments_by_date(date)
-      enrollment_proxies = BenefitApplicationEnrollmentsQuery.new(self).call(Family, date)
+      enrollment_proxies = BenefitApplications::BenefitApplicationEnrollmentsQuery.new(@benefit_application).call(Family, date)
       return [] if (enrollment_proxies.count > 100)
       enrollment_proxies.map do |ep|
         OpenStruct.new(ep)

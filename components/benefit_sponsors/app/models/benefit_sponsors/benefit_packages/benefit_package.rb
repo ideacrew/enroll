@@ -32,6 +32,7 @@ module BenefitSponsors
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
       delegate :recorded_rating_area, to: :benefit_application
       delegate :benefit_sponsorship, to: :benefit_application
+      delegate :recorded_service_area_ids, to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
 
