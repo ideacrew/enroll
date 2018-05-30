@@ -32,6 +32,10 @@ class RemoveConsumerRole < MongoidMigrationTask
           if enrollment.kind == "individual"
             results << ["Updating kind to coverall for hbx enrollment #{enrollment.id}"] unless Rails.env.test?
             enrollment.kind = "coverall"
+
+            #need to associate enrollment with the resident role of the person
+            enrollment.resident_role = person.resident_role if person.resident_role.present?
+
             # check for all members on enrollment to remove all consumer roles
             if enrollment.hbx_enrollment_members.size > 1
               enrollment.hbx_enrollment_members.each do |member|
@@ -41,8 +45,7 @@ class RemoveConsumerRole < MongoidMigrationTask
                 end
               end
             end
-            # enrollment already points to the correct resident role so need to remove
-            # reference to disassociated consumer role
+            #need to remove reference to disassociated consumer role
             enrollment.consumer_role_id = nil
             enrollment.save!
           end
