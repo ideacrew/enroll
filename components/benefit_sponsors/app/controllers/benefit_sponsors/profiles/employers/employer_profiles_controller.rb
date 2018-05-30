@@ -53,7 +53,8 @@ module BenefitSponsors
 
         def premium_statements
           authorize @employer_profile
-          @datatable = Effective::Datatables::PremiumBillingReportDataTable.new({ id: params.require(:employer_profile_id), billing_date: params[:billing_date]})
+          @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
+          @datatable = Effective::Datatables::BenefitSponsorsPremiumStatementsDataTable.new({ id: params.require(:employer_profile_id), billing_date: @billing_date})
 
           respond_to do |format|
             format.html
@@ -110,8 +111,9 @@ module BenefitSponsors
         end
 
         def load_hbx_enrollments
-          query = ::Queries::EmployerPremiumStatement.new(@employer_profile, set_billing_date)
-          @hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments
+          billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
+          query = Queries::PremiumStatementsQuery.new(@employer_profile, billing_date)
+          @hbx_enrollments =  query.enrollments
         end
 
         def default_url
@@ -121,7 +123,7 @@ module BenefitSponsors
         def csv_for(hbx_enrollments)
           (output = "").tap do
             CSV.generate(output) do |csv|
-              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
+              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Covered Ct", "Employer Contribution",
               "Employee Premium", "Total Premium"]
               hbx_enrollments.each do |enrollment|
                 census_employee = enrollment.census_employee
@@ -132,9 +134,9 @@ module BenefitSponsors
                           census_employee.dob,
                           census_employee.hired_on,
                           census_employee.published_benefit_group.title,
-                          enrollment.plan.coverage_kind,
-                          enrollment.plan.name,
-                          enrollment.plan.carrier_profile.legal_name,
+                          # enrollment.plan.coverage_kind,
+                          # enrollment.plan.name,
+                          # enrollment.plan.carrier_profile.legal_name, # toDo "Type", "Name", "Issuer"
                           enrollment.humanized_members_summary,
                           view_context.number_to_currency(enrollment.total_employer_contribution),
                           view_context.number_to_currency(enrollment.total_employee_cost),
@@ -156,14 +158,6 @@ module BenefitSponsors
 
         def is_format_csv?
           request.format.csv?
-        end
-
-        def set_billing_date
-          if params[:billing_date].present?
-            Date.strptime(params[:billing_date], "%m/%d/%Y")
-          else
-            TimeKeeper.date_of_record # TODO
-          end
         end
       end
     end
