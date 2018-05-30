@@ -19,8 +19,8 @@ DT = (function() {
   var clear_button_todojf = function() {          // Need to put this in the base framework
     setTimeout(
       function() {
-        $($('.dataTables_filter label')[0]).append("<div class='btn btn-sm btn-default' style='display:inline'><span class='glyphicon glyphicon-remove'></span> </div>")
-        $('.dataTables_filter .glyphicon-remove').on('click', function(){
+        $($('.dataTables_filter label')[0]).append("<div class='btn btn-sm btn-default' style='display:inline'><i class='fas fa-times'></i></div>")
+        $('.dataTables_filter .fa-times').on('click', function(){
           window.dt_search_string = ''
           $('input[type=search]').val(window.dt_search_string).trigger('keyup');
         })

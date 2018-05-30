@@ -68,16 +68,25 @@ javascript:
     }
   }
   
+  var monthName = ["Jan", "Feb", "Mar", "April", "May", "June",
+    "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+  ];
+  
   function assignBenefitApplicationDates(targetDate) {
     var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
     var latest_submitted_on = date[targetDate]["employer_initial_application_latest_submit_on"];
     var binder_payment_deadline = date[targetDate]["binder_payment_due_date"];
+    var submitByMonth = new Date(latest_submitted_on).getMonth()+1;
+    var deadlineMonth = new Date(binder_payment_deadline).getMonth()+1;
     document.querySelector('input#benefit_application_end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
     document.querySelector("input#benefit_application_open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
     document.querySelector("input#benefit_application_open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
     setDueDates('benefit_application_latest_submitted_on_day', new Date(latest_submitted_on).getDate());
-    setDueDates('benefit_application_latest_submitted_on_month', new Date(latest_submitted_on).getMonth()+1);
+    setDueDates('benefit_application_latest_submitted_on_month', monthName[submitByMonth]);
     setDueDates('binder_payment_deadline_day', new Date(binder_payment_deadline).getDate());
-    setDueDates('binder_payment_deadline_month', new Date(binder_payment_deadline).getMonth()+1);
+    setDueDates('binder_payment_deadline_month', monthName[deadlineMonth]);
+    
+    console.log();
   }
+  
   

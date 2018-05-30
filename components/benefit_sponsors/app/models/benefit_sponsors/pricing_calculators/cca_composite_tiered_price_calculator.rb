@@ -24,7 +24,6 @@ module BenefitSponsors
         end
 
         def add(member)
-          puts member.inspect
           if member.is_primary_member?
             @primary_member_id = member.member_id
           end
