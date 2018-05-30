@@ -84,4 +84,7 @@ module BenefitSponsors
   def self.range_is_increasing?(range)
     range.begin < range.end
   end
+
+  class BenefitSponsorShipIneligibleError; end
+
 end
