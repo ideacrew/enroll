@@ -2,11 +2,11 @@
   <div class="ma-2">
       <h1 class="display-1">Plan year</h1>
 
-      <v-card class="mt-3 pa-3">
+      <v-card class="mt-3 pa-2 subheading">
       <v-container grid-list-lg>
-        <!--<v-layout>
+        <v-layout>
           <v-flex>
-          <div class="headline">When would you like your coverage to start?</div>
+          <div class="title grey--text text--darker-1">When would you like your coverage to start?</div>
           </v-flex>
         </v-layout>
         <v-layout>
@@ -24,19 +24,18 @@
             <v-text-field label="Coverage End" v-model="selected_coverage_date.end_on_display"></v-text-field>
           </v-flex>
         </v-layout>
-        <v-layout>
+        <v-layout row>
           <v-flex>
-          <div class="headline">Select your open enrollment dates</div>
+          <div class="title">Select your open enrollment dates</div>
           </v-flex>
-        </v-layout>-->
-        <v-layout>
+        </v-layout>
+        <v-layout row>
           <v-flex>
             <v-menu
                 ref="oe_start_menu"
                 :close-on-content-click="false"
                 v-model="oe_start_menu"
                 :nudge-right="40"
-                :return-value.sync="oe_start_on"
                 lazy
                 transition="scale-transition"
                 offset-y
@@ -53,22 +52,32 @@
                 :close-on-content-click="false"
                 v-model="oe_end_menu"
                 :nudge-right="40"
-                :return-value.sync="oe_end_on"
                 lazy
                 transition="scale-transition"
                 offset-y
                 full-width
                 min-width="290px"
               >
-                <v-text-field slot="activator" v-model="oe_end_on" label="Open Enrollment End On" prepend-icon="event" readonly></v-text-field>
+                <v-text-field slot="activator" v-model="oe_end_on" label="Open Enrollment End Date" prepend-icon="event" readonly></v-text-field>
                 <v-date-picker v-model="oe_end_on" no-title scrollable @input="oe_end_menu = false"></v-date-picker>
               </v-menu>
           </v-flex>
         </v-layout>
-        <v-layout>
-          <v-flex><v-text-field v-model="fte_count" label="FULL TIME EMPLOYEES"></v-text-field></v-flex>
-          <v-flex><v-text-field v-model="part_time_count" label="PART TIME EMPLOYEES"></v-text-field></v-flex>
-          <v-flex><v-text-field v-model="med_count" label="SECONDARY MEDICARE"></v-text-field></v-flex>
+        <v-layout row>
+          <v-flex>
+          <div class="title">Add the total number of employees in your workforce</div>
+          </v-flex>
+        </v-layout>
+        <v-layout row>
+          <v-flex>
+            <v-text-field label="FULL TIME EMPLOYEES" v-model="fte_count"></v-text-field>
+          </v-flex>
+          <v-flex>
+            <v-text-field label="PART TIME EMPLOYEES" v-model="part_time_count"></v-text-field>
+          </v-flex>
+          <v-flex>
+            <v-text-field label="SECONDARY MEDICARE" v-model="med_count"></v-text-field>
+          </v-flex>
         </v-layout>
       </v-container>
       </v-card>

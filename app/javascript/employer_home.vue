@@ -1,11 +1,12 @@
 <template>
   <div>
 
-<v-container>
-  <v-layout>
+<v-container fluid grid-list-lg>
+  <v-layout row>
+    <v-flex>
     <v-select
        :items="employers"
-       label="Simulate Employer . . . "
+       label=". . . "
        v-model="selectedEmployer"
        item-text="legal_name"
        item-value="id"
@@ -14,12 +15,13 @@
        auto
        @change="changeEmployer()"
      ></v-select>
+   </v-flex>
   </v-layout>
 
   <v-layout row>
     <v-flex sm2 class="ma-2 pa-2">
       <v-card >
-        <v-list two-line subheader class="blue lighten-5">
+        <v-list two-line subheader>
           <v-list-tile :to="{path:`/employer-home/${$route.params.id}/employer-my`}">
             <v-list-tile-content >
               <v-list-tile-title>My DC Healthlink</v-list-tile-title>
@@ -46,11 +48,21 @@
               <v-list-tile-sub-title>Your brokers</v-list-tile-sub-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-list-tile>
+            <v-list-tile-content>
+              <v-badge color="red">
+              <span slot="badge">2</span>
+              <v-list-tile-title>
+                  Documents
+              </v-list-tile-title>
+              </v-badge>
+              <v-list-tile-sub-title>Documents ...</v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
       </v-list>
       </v-card>
     </v-flex>
     <v-flex sm10 class="ma-2 pa-2">
-      <!-- <component v-bind:is="cmp"></component> -->
       <router-view/>
     </v-flex>
   </v-layout>
