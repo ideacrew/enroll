@@ -1,0 +1,74 @@
+- content_for :horizontal_status do
+  = render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 2}
+= render "ui-components/v1/modals/detail_modal"
+#message_form
+.container#plan_shoppings_show_form
+  .select_plan_wrapper
+    .row
+      .col-lg-8.col-md-8.col-sm-8.col-xs-12
+        .ct-1
+          h1.darkblue= l10n("choose_plan")
+          h4.switch-header= l10n(".choose_plan_filter_results_header")
+          - if display_plan_cost_warning(@benefit_group)
+            b= l10n("insured.plan_shoppings.final_cost_change")
+          .row.no-buffer
+            p.pull-right
+              a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}"
+                = l10n("compare_plans").to_s.upcase
+            #plan-summary
+            #all-plans.all-filters-row
+              = render 'ui-components/v1/filters/plan_filters'
+              .col-lg-9.col-md-9.co-sm-9.col-xs-12 style="padding-right: 0"
+                .sort-area style="margin:10px 0"
+                  span
+                    strong = l10n("sort_by")
+                  .btn-group#sort_by role="group"
+                    a.btn.btn-default href='javascript:void(0)' data-sort-by='plan-name' = l10n("plan_name")
+                    a.btn.btn-default href='javascript:void(0)' data-sort-by='plan-metal-premium' = l10n("premium_amount")
+                    a.btn.btn-default href='javascript:void(0)' data-sort-by='plan-metal-deductible' = l10n("deductible")
+                    a.btn.btn-default href='javascript:void(0)' data-sort-by='plan-carrier' = l10n("carrier")
+                #plans
+                  = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
+      .no-buffer
+        p.pull-right
+          a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}" = l10n("compare_plans").to_s.upcase
+      .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-1.col-sm-offset-1.right-section
+        - if @change_plan.blank? && @market_kind == "individual"
+          - if @enrollment_kind.blank? && is_under_open_enrollment?
+            = render partial: 'shared/individual_progress', locals: {step: '4'}
+          - else
+            = render partial: 'shared/sep_progress', locals: {step: '5'}
+        - elsif @change_plan.blank? && @market_kind == "coverall"
+          = render partial: 'shared/resident_progress', locals: {step: '4'}
+        - elsif @change_plan.blank?
+          = render partial: 'shared/signup_progress', locals: {step: '5'}
+        - elsif @change_plan == "change_by_qle"
+          = render partial: 'shared/qle_progress', locals: {step: '2',show_button:'true'}
+        - elsif @change_plan == "change_plan"
+          - if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep'
+            = render partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'}
+          - else
+            = render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true}
+
+.modal.fade#plans-compare-alert
+  .modal-dialog.modal-lg
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times;
+        h4.modal-title = l10n("plan_compare_alert")
+      .modal-body
+        p style='color:red;' = l10n(".can_not_select_more_than_n_plans_to_compare", number: 3)
+      .modal-footer
+        button.btn.btn-default type="button" data-dismiss="modal"
+
+= render :partial => "ui-components/v1/modals/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.try(:employee_role).present?
+
+= render :partial => "ui-components/v1/modals/help_with_plan", :locals => {:enrollment => @hbx_enrollment }
+
+javascript:
+  var coverageKind = "#{@hbx_enrollment.coverage_kind}";
+
+  if (coverageKind == "dental") {
+    $(".plan-metal-level-selection-filter").attr("disabled", true);
+  }
