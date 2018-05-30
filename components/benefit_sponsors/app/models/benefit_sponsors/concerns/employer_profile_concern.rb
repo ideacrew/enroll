@@ -217,8 +217,9 @@ module BenefitSponsors
       end
 
       def billing_plan_year(billing_date=nil)
+        return @billing_benefit_application if defined? @billing_benefit_application
         warn "[Deprecated] Instead use billing_benefit_application" unless Rails.env.test?
-        billing_benefit_application(billing_date)
+        @billing_benefit_application = billing_benefit_application(billing_date)
       end
 
       def earliest_plan_year_start_on_date
