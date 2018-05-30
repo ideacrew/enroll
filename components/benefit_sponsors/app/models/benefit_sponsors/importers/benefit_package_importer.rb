@@ -53,13 +53,18 @@ module BenefitSponsors
         if sponsored_benefit.sponsor_contribution.blank?
           raise StandardError, "Sponsor Contribution construction failed!!"
         end
-
-        ponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
-          contribution_match = attrs[:contributions].detect{|contribution| contribution['relationship'] == new_contribution_level.name}
+        
+        sponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
+          contribution_match = attrs[:contributions].detect{|contribution| contribution['relationship'] == new_contribution_level.display_name}
 
           if contribution_match.present?
             new_contribution_level.is_offered = contribution_match['offered']
             new_contribution_level.contribution_factor = (contribution_match['premium_pct'].to_f / 100)
+            new_contribution_level.display_name = contribution_match['display_name']
+            new_contribution_level.contribution_unit_id = contribution_match['contribution_unit_id']
+            new_contribution_level.order = contribution_match['order']
+            new_contribution_level.min_contribution_factor = contribution_match['min_contribution_factor']
+            # new_contribution_level.contribution_cap = contribution_match['contribution_cap']
           end
         end
       end

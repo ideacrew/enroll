@@ -25,8 +25,18 @@ module Importers::Mhc
         effective_on_offset: new_coverage_policy_value.offset,
         is_default: true,
         plan_option_kind: plan_selection,
-        reference_plan_hios_id: single_plan_hios_id
+        reference_plan_hios_id: single_plan_hios_id,
+        relationship_benefits: form_contributions
       }
+    end
+
+    def form_contributions
+      sanitized_params = Hash.new
+      contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
+      contribution_level_names.each do |sponsor_contribution_name|
+        sanitized_params.merge!(formed_params(sponsor_contribution_name))
+      end
+      binding.pry
     end
 
     def fetch_benefit_product
@@ -38,16 +48,24 @@ module Importers::Mhc
       (preference.present?) ? true : false
     end
 
+    def fetch_order(sponsor_level_name)
+      order = {
+          "employee_only" => 1,
+          "employee_and_spouse" => 2,
+          "employee_and_one_or_more_dependents" => 3,
+          "family" => 4
+
+      }
+      order[sponsor_level_name]
+    end
+
     def formed_params(sponsor_level_name)
       {
-          display_name: sponsor_level_name,
+          relationship: sponsor_level_name,
+          offered: tier_offered?(sponsor_level_name),
+          premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
           contribution_unit_id: fetch_benefit_product.id,
-          is_offered: tier_offered?(sponsor_level_name),
-          order: 1,
-          contribution_factor: eval("#{sponsor_level_name}_rt_contribution"),
-          min_contribution_factor: eval("#{sponsor_level_name}_rt_contribution"),
-          contribution_cap: eval("#{sponsor_level_name}_rt_premium"),
-          flat_contribution_amount: eval("#{sponsor_level_name}_rt_premium")
+          order: fetch_order(sponsor_level_name)
       }
     end
 
