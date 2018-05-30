@@ -6,15 +6,16 @@
   %>
   <div id="hbx" data="<%= props %>">
     <v-app>
-      <v-toolbar color="blue darken-2" dark fixed app>
+      <v-toolbar fixed app>
+        <img src="/logo/logo.png">
         <v-spacer></v-spacer>
         <v-toolbar-items>
 
           <!-- <v-btn flat :to="{name:'employer-my'}">Employer Home</v-btn> -->
-          <v-btn flat to="/employer-home/1234">Employer Home</v-btn>
+          <v-btn color="blue" flat to="/employer-home/1234">Employer Home</v-btn>
           <!--<v-btn flat v-on:click="link = 'employer-home'">Employer Home</v-btn>-->
-          <v-btn flat :to="{path: '/hbx'}">Plan Browser</v-btn>
-          <v-btn flat :to="{path: 'plan-cost'}">Plan Cost Estimator</v-btn>
+          <v-btn color="blue" flat :to="{path: '/hbx'}">Plan Browser</v-btn>
+          <v-btn color="blue" flat :to="{path: 'plan-cost'}">Plan Cost Estimator</v-btn>
         </v-toolbar-items>
       </v-toolbar>
       <v-content>
