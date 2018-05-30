@@ -4,15 +4,15 @@ module Importers::Mhc
     def map_plan_year
       employer = find_employer
       found_carrier = find_carrier
-      benefit_sponsorship = employer.organization.benefit_sponsorships.first
 
+      benefit_sponsorship = employer.organization.benefit_sponsorships.first
       plan = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.new(benefit_sponsorship, fetch_application_params)
+
       benefit_package = create_benefit_pacakge(plan.benefit_application)
       benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(default_plan_year_start)
       plan.benefit_application.benefit_sponsor_catalog = benefit_sponsor_catalog
       # benefit_sponsor_catalog.probation_period_kinds = new_coverage_policy
       #
-      # benefit_package = formed_params_and_build_package
       plan.benefit_application.benefit_packages << benefit_package
 
       benefit_package.add_sponsored_benefit(fetch_sponsor_benefit)
@@ -20,41 +20,35 @@ module Importers::Mhc
     end
 
     def create_benefit_pacakge(benefit_appliation)
-      formed_params_and_build_package
-    end
-
-
-    def fetch_benefit_product
-      BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
-    end
-
-    def formed_params_and_build_package
       formed_params = {
           title: "simple package",
           description: "only health",
           probation_period_kind: :firstofthemonthfollowing30days,
           is_default: true
       }
+
       BenefitSponsors::BenefitPackages::BenefitPackage.new(formed_params)
     end
 
+    def fetch_benefit_product
+      BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
+    end
+
     def fetch_sponsor_benefit
-      sponsor_benefit = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new(sponsor_benefit_params)
+      sponsor_benefit = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new({
+        product_package_kind: :single_product,
+        product_option_choice: fetch_benefit_product.issuer_profile.abbrev,
+        reference_product: fetch_benefit_product,
+      })
+
       contribution_levels = build_employee_sponsor_contribution(sponsor_benefit)
       sponsor_conribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.new
       sponsor_conribution.contribution_levels << contribution_levels
       sponsor_benefit.sponsor_contribution = sponsor_conribution
       sponsor_benefit
+
       # pricing_determinations = build_pricing_determinations(sponsor_benefit)
       # sponsor_benefit.pricing_determinations.push(pricing_determinations)
-    end
-
-    def sponsor_benefit_params
-      {
-          product_package_kind: :single_product,
-          product_option_choice: fetch_benefit_product.issuer_profile.abbrev,
-          reference_product: fetch_benefit_product,
-      }
     end
 
     def create_a_reference_product(sponsor_benefit)
