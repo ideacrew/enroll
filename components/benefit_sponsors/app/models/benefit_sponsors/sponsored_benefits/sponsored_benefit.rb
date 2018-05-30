@@ -26,6 +26,7 @@ module BenefitSponsors
       delegate :pricing_calculator, to: :product_package, allow_nil: true
       delegate :contribution_calculator, to: :product_package, allow_nil: true
       delegate :recorded_rating_area, to: :benefit_package
+      delegate :recorded_service_area_ids, to: :benefit_package
       delegate :rate_schedule_date, to: :benefit_package
 
       validate :product_package_exists
@@ -47,7 +48,12 @@ module BenefitSponsors
       end
 
       def products
-        @products = product_package.products
+        @products ||= lookup_package_products
+      end
+
+      def lookup_package_products
+        return [reference_product] if product_package_kind == :single_product
+        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_areas_ids)
       end
 
       def product_package
