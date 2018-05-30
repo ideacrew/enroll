@@ -71,8 +71,8 @@ class CensusEmployee < CensusMember
   validates :expected_selection,
     inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   after_update :update_hbx_enrollment_effective_on_by_hired_on
-  after_save :assign_default_benefit_package
-  after_save :assign_benefit_packages
+  # after_save :assign_default_benefit_package
+  # after_save :assign_benefit_packages
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
