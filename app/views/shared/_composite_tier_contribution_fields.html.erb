@@ -6,8 +6,8 @@
           <label>
             <%= f.check_box :offered, {class: "contribution_handler #{f.object.composite_rating_tier}", disabled: (f.object.composite_rating_tier == 'employee_only' ? true : false)}, "true", "false" %>
             <%= f.label :offered do %>
-              <i class="fa fa-check-square-o fa-2x"></i>
-              <i class="fa fa-square-o fa-2x"></i>
+              <i class="far fa-check-square fa-2x"></i>
+              <i class="far fa-square fa-2x"></i>
             <% end %>
 
             <span>

@@ -181,6 +181,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def deactive_benefit_group_assignments(benefit_package_ids)
+    assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_package_ids)
+    assignments.each do |assignment|
+      if assignment.may_delink_coverage?
+        assignment.delink_coverage!
+        assignment.update_attribute(:is_active, false)
+      end
+    end
+  end
+
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
@@ -1094,6 +1104,22 @@ class CensusEmployee < CensusMember
         :"benefit_group_assignment_id".in => benefit_group_assignments.map(&:id)
       })
     end
+  end
+
+  def benefit_package_for_open_enrollment(shopping_date)
+    active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
+  end
+
+  def benefit_package_for_date(coverage_date)
+    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
+  end
+
+  def benefit_package_for_date(coverage_date)
+    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
+  end
+
+  def earliest_benefit_package_after(coverage_date)
+    active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
 
   private

@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Serializers
     class AddressSerializer < ActiveModel::Serializer
-      attributes :address_1, :address_2, :city, :state, :zip, :office_kind_options, :state_options, :id, :county
+      attributes :address_1, :address_2, :city, :state, :zip, :kind, :office_kind_options, :state_options, :id, :county
       attribute :id, if: :is_persisted?
 
 

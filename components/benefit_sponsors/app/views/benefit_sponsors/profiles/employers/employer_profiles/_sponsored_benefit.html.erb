@@ -82,7 +82,7 @@
             </tr>
             <% sponsored_benefit.sponsor_contribution.contribution_levels.each_with_index do |cl, i| %>
             <tr>
-              <td><%= cl.is_offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= cl.display_name %></td>
+              <td><%= cl.is_offered ? raw("<i class='far fa-check-square fa-lg'></i>") : raw("<i class='far fa-square fa-lg'></i>") %><%= cl.display_name %></td>
               <td id="pct">
                 <strong><%= number_to_percentage cl.contribution_pct.ceil, precision: 0 %></strong>
               </td>

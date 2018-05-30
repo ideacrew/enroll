@@ -100,6 +100,22 @@ module BenefitSponsors
         office && office.phone.to_s
       end
 
+      def linked_employees
+        employer_profiles = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(self)
+        if employer_profiles
+          emp_ids = employer_profiles.map(&:id)
+          Person.where(:'employee_roles.benefit_sponsors_employer_profile_id'.in => emp_ids)
+        end
+      end
+
+      def families
+        linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+        employee_families = linked_active_employees.map(&:primary_family).to_a
+        consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
+        families = (consumer_families + employee_families).uniq
+        families.sort_by{|f| f.primary_applicant.person.last_name}
+      end
+
       aasm do #no_direct_assignment: true do
         state :is_applicant, initial: true
         state :is_approved

@@ -2,12 +2,7 @@ BenefitSponsors::Engine.routes.draw do
   resources :sites
 
   namespace :profiles do
-    resources :registrations do
-      collection do
-        get :show_pending
-      end
-    end
-
+    resources :registrations
 
     namespace :broker_agencies do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do

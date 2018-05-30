@@ -122,12 +122,15 @@ module BenefitSponsors
 
       index({ aasm_state: 1 })
 
-      # def primary_office_service_areas
-      #   primary_office = profile.primary_office_location
-      #   if primary_office.address.present?
-      #     ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
-      #   end
-      # end
+      scope :by_broker_role,              ->( broker_role_id ){ where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
+      scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
+
+      def primary_office_service_areas
+        primary_office = profile.primary_office_location
+        if primary_office.address.present?
+          ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office.address)
+        end
+      end
 
       # Inverse of Profile#benefit_sponsorship
       def profile
