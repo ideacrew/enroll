@@ -75,7 +75,7 @@ module Notifier
 
     def dependents_name
       names = []
-      payload["dep_hbx_ids"].each do |dep_id|
+      payload[:notice_params][:dep_hbx_ids].each do |dep_id|
         names << Person.where(hbx_id: dep_id).first.full_name
       end
       merge_model.dependents_name = names.join(", ")
