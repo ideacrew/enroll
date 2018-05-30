@@ -2,6 +2,7 @@ module Observers
   class NoticeObserver < Observer
 
     def plan_year_update(new_model_event)
+      current_date = TimeKeeper.date_of_record
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
       if PlanYear::REGISTERED_EVENTS.include?(new_model_event.event_key)
@@ -52,9 +53,17 @@ module Observers
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 
+        if new_model_event.event_key == :group_advance_termination_confirmation
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+
+          plan_year.employer_profile.census_employees.active.each do |ce|
+            trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
+          end
+        end
+        
         if new_model_event.event_key == :ineligible_initial_application_submitted
           if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
-              trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
+            trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
           end
         end
 
@@ -72,13 +81,13 @@ module Observers
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
           trigger_notice(recipient: plan_year.employer_profile,  event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed" )
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
-              enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
-              if enrollment.present?
-                trigger_notice(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
-              end
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+            enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
+            if enrollment.present?
+              trigger_notice(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
             end
+          end
         end
 
         if new_model_event.event_key == :application_denied
