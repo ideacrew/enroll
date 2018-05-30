@@ -35,7 +35,9 @@ module BenefitSponsors
 
       def set_attestation_to_true(benefit_sponsorship)
         attestation = benefit_sponsorship.build_employer_attestation
-        attestation.submit!
+        attestation.submit
+        attestation.approve
+        attestation.save
       end
 
       def map_site

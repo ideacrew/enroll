@@ -34,7 +34,7 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
 
   let!(:fein) { record_attrs[:fein] }
 
-  subject { Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => registered_on})) }
+  subject { BenefitSponsors::Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => registered_on})) }
 
   context "provided with employer date" do
     before :each do
@@ -52,7 +52,7 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
       expect(employer_profile.dba).to eq record_attrs[:dba]
       sponsorship =employer_profile.organization.benefit_sponsorships.first
       # expect(employer_profile.benefit_sponsorships.first.issuer_assigned_id). to eq record_attrs[:assigned_employer_id]
-      expect(sponsorship.source_kind).to eq :conversion
+      expect(sponsorship.source_kind).to eq :mid_plan_year_conversion
       expect(sponsorship.employer_attestation.approved?).to be_truthy
     end
 
