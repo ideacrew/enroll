@@ -5,7 +5,7 @@ module BenefitSponsors
       # Pass following atttributes along with benefit application to this service. 
       # It would attach benefit_package along with sponsored_benefits.
       # {
-      #   :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind,
+      #   :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
       #   :is_default, :plan_option_kind, :reference_plan_hios_id, :relationship_benefits,
       #   :dental_reference_plan_hios_id, :dental_relationship_benefits
       # }
@@ -23,7 +23,7 @@ module BenefitSponsors
         benefit_package = @benefit_application.benefit_packages.build(sanitize_attributes_for_benefit_package(attributes))
         construct_sponsored_benefit(benefit_package, sanitize_attributes_for_sponsored_benefit(attributes, :health))
 
-        if benefit_group.is_offering_dental?
+        if is_offering_dental?(attributes)
           construct_sponsored_benefit(benefit_package, sanitize_attributes_for_sponsored_benefit(attributes, :dental))
         end
       end
@@ -36,8 +36,8 @@ module BenefitSponsors
           sponsored_benefit.benefit_package = benefit_package
         
           if sponsored_benefit.product_package.present?
-            sponsored_benefit.reference_product = product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
-            sponsored_benefit.product_package_choice = product_package_choice_for(sponsored_benefit)
+            sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
+            sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
             contribution_attrs = { contributions: sponsored_benefit_attrs[:relationship_benefits] }
             construct_sponsor_contribution(sponsored_benefit, contribution_attrs)
           else
@@ -48,7 +48,7 @@ module BenefitSponsors
 
       def construct_sponsor_contribution(sponsored_benefit, attrs)
         sponsored_benefit.sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
-        return if attrs[:contributions].empty?
+        return if attrs[:contributions].blank?
 
         if sponsored_benefit.sponsor_contribution.blank?
           raise StandardError, "Sponsor Contribution construction failed!!"
@@ -70,7 +70,7 @@ module BenefitSponsors
 
       def sanitize_attributes_for_benefit_package(attributes)
         benefit_package_attrs = attributes.slice(:title, :description, :created_at, :updated_at, :is_active, :is_default)
-        benefit_package_attrs[:probation_period_kind] = probation_period_kind_for(attributes[:effective_on_kind])
+        benefit_package_attrs[:probation_period_kind] = probation_period_kind_for(attributes[:effective_on_kind], attributes[:effective_on_offset])
         benefit_package_attrs
       end
 
@@ -106,7 +106,23 @@ module BenefitSponsors
         end
       end
 
-      def probation_period_kind_for(effective_on_kind)
+      def probation_period_kind_for(effective_on_kind, effective_on_offset)
+        if effective_on_kind == 'first_of_month'
+          case effective_on_offset
+          when 0
+            :first_of_month
+          when 30
+            :first_of_month_after_30_days
+          when 60
+            :first_of_month_after_60_days
+          end
+        elsif effective_on_kind == 'date_of_hire'
+          :date_of_hire
+        end
+      end
+
+      def is_offering_dental?(attributes)
+        attributes[:dental_reference_plan_hios_id].present?
       end
     end
   end

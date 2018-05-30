@@ -11,51 +11,26 @@ module Importers::Mhc
       benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(benefit_sponsorship, fetch_application_params)
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(default_plan_year_start)
 
+      BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
+
       benefit_application
     end
 
-    def create_benefit_pacakge(benefit_appliation)
-      formed_params = {
-          title: "simple package",
-          description: "only health",
-          probation_period_kind: :firstofthemonthfollowing30days,
-          is_default: true
+    def benefit_package_attributes
+      {
+        title: 'Standard',
+        description: 'Standard package',
+        is_active: true,
+        effective_on_kind: new_coverage_policy_value.kind,
+        effective_on_offset: new_coverage_policy_value.offset,
+        is_default: true,
+        plan_option_kind: plan_selection,
+        reference_plan_hios_id: single_plan_hios_id
       }
-
-      BenefitSponsors::BenefitPackages::BenefitPackage.new(formed_params)
     end
 
     def fetch_benefit_product
       BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
-    end
-
-    def fetch_sponsor_benefit
-      sponsor_benefit = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new({
-        product_package_kind: :single_product,
-        product_option_choice: fetch_benefit_product.issuer_profile.abbrev,
-        reference_product: fetch_benefit_product,
-      })
-
-      contribution_levels = build_employee_sponsor_contribution(sponsor_benefit)
-      sponsor_conribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.new
-      sponsor_conribution.contribution_levels << contribution_levels
-      sponsor_benefit.sponsor_contribution = sponsor_conribution
-      sponsor_benefit
-
-      # pricing_determinations = build_pricing_determinations(sponsor_benefit)
-      # sponsor_benefit.pricing_determinations.push(pricing_determinations)
-    end
-
-    def create_a_reference_product(sponsor_benefit)
-    end
-
-    def build_employee_sponsor_contribution(sponsor_benefit)
-      contribution_level = []
-      contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
-      contribution_level_names.each do |sponser_level_name|
-        contribution_level << BenefitSponsors::SponsoredBenefits::ContributionLevel.new(formed_params(sponser_level_name))
-      end
-      contribution_level
     end
 
     def tier_offered?(preference)
