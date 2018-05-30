@@ -328,6 +328,7 @@ module BenefitSponsors
            
       def expire_benefit_package_members
         benefit_packages.each do |benefit_package|
+          benefit_package.deactivate
           Family.enrolled_through_benefit_package(benefit_package).each do |family|
             benefit_package.expire_family_coverages(family)
           end
@@ -336,6 +337,7 @@ module BenefitSponsors
 
       def terminate_benefit_package_members
         benefit_packages.each do |benefit_package|
+          benefit_package.deactivate
           Family.enrolled_through_benefit_package(benefit_package).each do |family|
             benefit_package.terminate_family_coverages(family)
           end
@@ -349,6 +351,7 @@ module BenefitSponsors
       end
 
       def disable_benefit_package(benefit_package)
+        benefit_package.deactivate
         Family.enrolled_through_benefit_package(benefit_package).each do |family|
           benefit_package.cancel_family_coverages(family)
         end
