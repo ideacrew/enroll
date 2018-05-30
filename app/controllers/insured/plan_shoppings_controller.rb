@@ -180,6 +180,13 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
+    products = @hbx_enrollment.sponsored_benefit.products
+    @member_groups = sponsored_cost_calculator.groups_for_products(products)
+    @enrolled_hbx_enrollment_plan_ids = []
+    render "show_slug"
+=begin
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
@@ -203,6 +210,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @metal_levels = %w[platinum gold silver bronze catastrophic]
     @plan_types = %w[HMO PPO POS]
     @networks = %w[nationwide DC-Metro]
+=end
   end
 
   def set_elected_aptc

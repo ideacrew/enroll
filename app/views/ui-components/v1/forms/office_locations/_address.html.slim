@@ -9,7 +9,7 @@
   .col-md-3.col-sm-6.col-xs-12
     label for="inputKind" Kind
     - kinds = f.object.office_kind_options; kinds = kinds.rotate if params[:child_index]
-    = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, f.object.kind ),{}, class: "form-control", required: true, id:'kindSelect',placeholder: 'KIND'
+    = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: f.object.try(:kind)),{}, class: "form-control", required: true, id:'kindSelect',placeholder: 'KIND'
     .invalid-feedback
       | Please select a Address kind.
 
@@ -26,7 +26,7 @@
       | Please provide a valid city.
   .col-md-3.col-sm-12.col-xs-12
     label for="inputState" State
-    = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
+    = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
     .invalid-feedback
       | Please select a state.
   .col-md-3.col-sm-12.col-xs-12
@@ -38,7 +38,7 @@
   - if aca_address_query_county
     .col-md-3.col-sm-12.col-xs-12
       label for="inputCounty" County
-      = f.select(:county, options_for_select(BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', required: true)
+      = f.select(:county, options_for_select(BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq, selected: f.object.try(:county)), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', required: true)
       .invalid-feedback
         | Please provide a valid county.
   

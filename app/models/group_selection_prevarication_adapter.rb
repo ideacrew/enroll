@@ -251,16 +251,12 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def build_new_shop_enrollment(
-    controller_employee_role
+    controller_employee_role,
+    family_member_ids
   )
-    coverage_household.household.new_hbx_enrollment_from(
-      employee_role: controller_employee_role,
-      resident_role: person.resident_role,
-      coverage_household: coverage_household,
-      benefit_group: nil,
-      benefit_group_assignment: nil,
-      qle: is_qle?,
-      opt_effective_on: optional_effective_on)
+    build_new_shop_enrollment_for_family_members(
+      controller_employee_role,
+      family_member_ids)
   end
 
   def can_shop_shop?(person)
@@ -288,7 +284,6 @@ class GroupSelectionPrevaricationAdapter
   end
 
 	def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
-    return([true, false])
 		benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
@@ -330,8 +325,72 @@ class GroupSelectionPrevaricationAdapter
 
 	protected
 
+  def build_new_shop_enrollment_for_family_members(
+    controller_employee_role,
+    family_member_ids
+  )
+    enrollment = HbxEnrollment.new
+    enrollment.coverage_household_id = coverage_household.id
+    enrollment.household = coverage_household.household
+    enrollment.kind = "employer_sponsored"
+    enrollment.employee_role = controller_employee_role
+
+    benefit_package = nil
+
+		if is_qle? && enrollment.family.is_under_special_enrollment_period?
+      if optional_effective_on.present?
+        benefit_package = benefit_package_for_date(controller_employee_role, optional_effective_on)
+				enrollment.effective_on = optional_effective_on
+      else
+        possible_benefit_package = benefit_package_for_date(controller_employee_role, enrollment.family.current_sep.effective_on)
+        if possible_benefit_package
+          # They are in a sep and there is an applicable benefit package
+          benefit_package = possible_benefit_package
+				  enrollment.effective_on = enrollment.family.current_sep.effective_on
+        else
+          # They are in a sep, but there is NO benefit package available then
+          benefit_package = benefit_package_closest_to_but_after_date(controller_employee_role, enrollment.family.current_sep.effective_on)
+          enrollment.effective_on = benefit_package.start_on
+        end
+      end
+		  enrollment.enrollment_kind = "special_enrollment"
+      # TODO: Assign sep
+		else
+			effective_date = earliest_eligible_date_for_shop(controller_employee_role)
+			enrollment.effective_on = effective_date
+			enrollment.enrollment_kind = "open_enrollment"
+      benefit_package = benefit_package_for_date(controller_employee_role, effective_date)
+		end
+
+    enrollment.rebuild_members_by_coverage_household(coverage_household: coverage_household)
+
+    enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
+      family_member_ids.include? member.applicant_id
+    end
+
+    enrollment.sponsored_benefit_package_id = benefit_package.id
+    sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind)
+    enrollment.sponsored_benefit_id = sponsored_benefit.id
+    enrollment.rating_area_id = benefit_package.recorded_rating_area.id
+    enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id 
+
+		enrollment
+	end
+
+  def earliest_eligible_date_for_shop(employee_role)
+    employee_role.benefit_package_for_open_enrollment(::TimeKeeper.date_of_record).start_on
+  end
+
+  def benefit_package_for_date(employee_role, start_date)
+    employee_role.benefit_package_for_date(start_date)
+  end
+
+  def benefit_package_closest_to_but_after_date(employee_role, suggested_start_date)
+  end
+
 	def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
 		health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
+    dental_offered_relationship_benefits = nil
 
 		if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
 			dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
@@ -354,7 +413,11 @@ class GroupSelectionPrevaricationAdapter
 		benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
 	end
 
-  def shop_benefit_eligibilty_checker_for(benefit_package, coverage_kind)
-    @shop_eligibility_checkers[coverage_kind] ||= GroupSelectionEligibilityChecker.new(benefit_package, coverage_kind)
+  def shop_eligibility_checkers
+    @shop_eligibility_checkers ||= Hash.new
   end
+
+	def shop_benefit_eligibilty_checker_for(benefit_package, coverage_kind)
+		shop_eligibility_checkers[coverage_kind] ||= GroupSelectionEligibilityChecker.new(benefit_package, coverage_kind)
+	end
 end

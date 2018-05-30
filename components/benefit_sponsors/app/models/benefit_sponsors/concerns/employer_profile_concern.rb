@@ -5,6 +5,7 @@ module BenefitSponsors
     module EmployerProfileConcern
       extend ActiveSupport::Concern
       include StateMachines::EmployerProfileStateMachine
+      include Config::AcaModelConcern
 
       attr_accessor :broker_role_id
 
@@ -136,6 +137,10 @@ module BenefitSponsors
         # broker_fired_confirmation_to_broker
       end
 
+      def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
+        return true unless general_agency_enabled?
+      end
+
       def broker_fired_confirmation_to_broker
         trigger_notices('broker_fired_confirmation_to_broker')
       end
@@ -203,6 +208,14 @@ module BenefitSponsors
 
       def earliest_plan_year_start_on_date
         # Deprecate This
+      end
+
+      class << self
+        def find_by_broker_agency_profile(broker_agency_profile)
+          raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile") unless broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+          orgs = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_agency_profile(broker_agency_profile.id).map(&:organization)
+          orgs.collect(&:employer_profile)
+        end
       end
 
       alias_method :broker_agency_profile=, :hire_broker_agency

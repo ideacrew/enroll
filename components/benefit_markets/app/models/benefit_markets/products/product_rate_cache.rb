@@ -39,8 +39,8 @@ module BenefitMarkets
 
       def self.age_bounding(plan_id, coverage_age)
         plan_age = $product_rate_age_bounding_cache[plan_id]
-        return plan_age[:minimum] if given_age < plan_age[:minimum]
-        return plan_age[:maximum] if given_age > plan_age[:maximum]
+        return plan_age[:minimum] if coverage_age < plan_age[:minimum]
+        return plan_age[:maximum] if coverage_age > plan_age[:maximum]
         given_age
       end
 
@@ -59,7 +59,7 @@ module BenefitMarkets
         rating_area
       )
         calc_age = age_bounding(product.id, coverage_age)
-        age_record = $product_rate_calculation_cache[product.id][rating_area][coverage_age].detect do |pt|
+        age_record = $product_rate_calculation_cache[product.id][rating_area][calc_age].detect do |pt|
           (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date)
         end
         age_record[:cost]

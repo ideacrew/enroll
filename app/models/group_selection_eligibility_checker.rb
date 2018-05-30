@@ -3,6 +3,7 @@
 # to be aware of how composite rating can include/exclude members.
 # It does NOT function correctly in the individual market.
 class GroupSelectionEligibilityChecker
+  MemberAgeSlug = Struct.new(:dob, :member_id)
 
   def initialize(benefit_package, coverage_kind)
     @sponsored_benefit = benefit_package.sponsored_benefits.detect do |sb|
@@ -16,17 +17,17 @@ class GroupSelectionEligibilityChecker
     rel, disability, dob = map_family_member_data(family_member)
     return true if (rel.to_s == "self")
     return false if dob > coverage_date
-    coverage_age = calc_coverage_age_for(member, nil, coverage_date, {}, nil)
-    mapped_relationship = @contribution_model.map_relationship_for(relationship, coverage_age, disability)
+    coverage_age = @age_calculator.calc_coverage_age_for(MemberAgeSlug.new(dob, family_member.id), nil, coverage_date, {}, nil)
+    # If the relationship doesn't even map, they aren't allowed
+    mapped_relationship = @contribution_model.map_relationship_for(rel, coverage_age, disability)
     return false unless mapped_relationship
-    # FIXME:
-    # Correct checking for relationship coverage in model once I can add family members again
+    # TODO: Check for mapped relationships that fall under groups that aren't offered
     true
   end
 
   def map_family_member_data(family_member)
     rel = family_member.is_primary_applicant? ? "self" : family_member.relationship
-    disability = family_member.is_disabled?
+    disability = family_member.person.is_disabled
     dob = family_member.person.dob
     [rel, disability, dob]
   end
