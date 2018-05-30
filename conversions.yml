@@ -5,3 +5,5 @@ conversions:
   employee_policies_date: 2017-01-01
   employee_policy_year: 2017
   number_of_dependents: 8
+  mid_year_conversion: true
+  plan_year_end_date: 2018-08-31
