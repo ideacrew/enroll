@@ -36,7 +36,8 @@ namespace :recurring do
       end
     end
   end
-endnamespace :recurring do
+end
+namespace :recurring do
   #used congressional and non-congressional event names based on  dc to work in both DC and MA
   # As per business request - Do not use this rake task in MA. This rake task needs to be run only in DC. In MA, its Manual.
   desc "An automation rake task that sends out dependent age off termination notifications to congressional and non congressional employees"
@@ -83,11 +84,12 @@ endnamespace :recurring do
         if relations.present?
           aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
           next if aged_off_dependents.empty?
-          dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
-          event_name = ben_grp ? "employee_notice_dependent_age_off_termination_congressional" : "employee_notice_dependent_age_off_termination_non_congressional"
-          observer = Observers::Observer.new
-          observer.trigger_notice(recipient: employee_role, event_object: employee_role.census_employee, notice_event: event_name,  notice_params: {dep_hbx_ids: dep_hbx_ids})
-          puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?
+            dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
+            event_name = ben_grp ? "employee_notice_dependent_age_off_termination_congressional" : "employee_notice_dependent_age_off_termination_non_congressional"
+            observer = Observers::Observer.new
+            observer.trigger_notice(recipient: employee_role, event_object: employee_role.census_employee, notice_event: event_name,  notice_params: {dep_hbx_ids: dep_hbx_ids})
+            puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?
+
         end
       end
     end
