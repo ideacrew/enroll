@@ -1,0 +1,54 @@
+- selected_kind_carrier = f.object.product_option_choice == 'single_issuer'
+- selected_kind_metal_level = f.object.product_option_choice == 'metal_level'
+- selected_kind_plan = f.object.product_option_choice == 'single_product'
+
+- if @benefit_package_form.new_record?
+  .col-md-12
+    h1.heading-text Select Your Plan Offering
+    h4 Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
+    br
+- else
+  .edit-offering.health
+    h4.currently-offered
+    .offered-plan
+
+.reference-steps
+  - unless @benefit_package_form.new_record?
+    br
+    h1.heading-text Edit Your Plan Offering
+    h4.currently-offering
+    br
+    br
+  .benefit-package-health
+    #metal-level-select.card
+    .card-body
+      ul.nav.nav-tabs
+        li role="presentation"
+          label
+            a href="#carrier" aria-controls="carrier" role="tab" data-toggle="tab"
+            | One Carrier
+            input[type="radio" name="tab-radio"]
+            span.checkmark
+        li role="presentation"
+          label
+            a href="#level" aria-controls="level" role="tab" data-toggle="tab"
+            | One Level
+            input[type="radio" name="tab-radio"]
+            span.checkmark
+        li role="presentation"
+          label
+            a href="#plan" aria-controls="plan" role="tab" data-toggle="tab"
+            | One Plan
+            input[type="radio" name="tab-radio"]
+            span.checkmark
+      .tab-content
+        .tab-pane#carrier role="tabpanel"
+          | piepigjpdibjdpibfdfinvpdfvndfpivnfdpvidfnvpfdivdfvdf
+        .tab-pane#level role="tabpanel"
+          | level infor
+        .tab-pane#plan role="tabpanel"
+          | plan info
+
+javascript:
+
+  

@@ -65,7 +65,7 @@
                     <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right" %>
 
                 <% end %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
+                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
             <% end %>
             <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
@@ -376,7 +376,7 @@
                   </tr>
                   <% bg.relationship_benefits.each_with_index do |rb, i| %>
                   <tr>
-                    <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td>
+                    <td><%= bg.dental_relationship_benefits[i].offered ? raw("<i class='far fa-square fa-lg'></i>") : raw("<i class='far fa-square fa-lg'></i>") %><%= bg.dental_relationship_benefits[i].relationship.try(:humanize) %></td>
                     <% if bg.is_offering_dental? %>
                     <td>
                       <strong><%= number_to_percentage bg.dental_relationship_benefits[i].premium_pct.ceil, precision: 0 %></strong>
