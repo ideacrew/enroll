@@ -153,9 +153,11 @@ class TaxHousehold
       end
     end
     if options[:hbx_enrollment].present?
-      coverage_applicant_ids = household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state" => "coverage_selected").map(&:hbx_enrollment_members).flatten.uniq.map(&:applicant_id).map(&:to_s)
+      coverage_households = household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state" => "coverage_selected") 
+      coverage_applicant_ids = coverage_households.map(&:hbx_enrollment_members).flatten.uniq.map(&:applicant_id).map(&:to_s)
+      tax_household = household.latest_active_tax_household
       current_applicant_ids = options[:hbx_enrollment].hbx_enrollment_members.pluck(:applicant_id).map(&:to_s)
-      if coverage_applicant_ids.present?
+      if tax_household.present? && coverage_households.last.present? && coverage_households.last.updated_at > tax_household.created_at && coverage_applicant_ids.present?
         coverage_applicant_ids.each do | applicant_id |
           aptc_available_amount_hash[applicant_id.to_s] = 0 
         end
