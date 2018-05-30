@@ -184,6 +184,8 @@ class Insured::PlanShoppingsController < ApplicationController
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products
     @member_groups = sponsored_cost_calculator.groups_for_products(products)
+    @enrolled_hbx_enrollment_plan_ids = []
+    render "show_slug"
 =begin
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
