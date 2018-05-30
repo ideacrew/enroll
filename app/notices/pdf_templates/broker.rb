@@ -19,7 +19,6 @@ module PdfTemplates
     attribute :assignment_date, Date
     attribute :full_name, String
     attribute :terminated_on, Date
-    attribute :agency, String
   end
 
   def shop?

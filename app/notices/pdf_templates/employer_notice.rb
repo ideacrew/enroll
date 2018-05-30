@@ -11,6 +11,7 @@ module PdfTemplates
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
+    attribute :enrollment, PdfTemplates::Enrollment
     attribute :employer_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :broker, PdfTemplates::Broker
@@ -31,7 +32,6 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
-    attribute :aasm_state, String
     attribute :employee_email, String
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
     attribute :enrollment, PdfTemplates::Enrollment
