@@ -226,7 +226,7 @@ module BenefitSponsors
       def self.find(id)
         ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
 
-          if benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(:"benefit_packages._id" => id).first
+          if benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
             benefit_application.benefit_packages.find(id)
           else
             nil

@@ -67,7 +67,6 @@ module Importers::Mhc
       propagate_errors(record)
 
       if save_result
-        
         benefit_sponsorship = record.benefit_sponsorship
         benefit_sponsorship.update(effective_begin_on: record.start_on, aasm_state: :active)
         benefit_sponsorship.workflow_state_transitions.create({
@@ -75,7 +74,7 @@ module Importers::Mhc
            to_state: 'active'
           })
 
-        map_employees_to_benefit_groups(employer, record)
+        map_employees_to_benefit_groups(benefit_sponsorship, record)
       end
       return save_result
     end

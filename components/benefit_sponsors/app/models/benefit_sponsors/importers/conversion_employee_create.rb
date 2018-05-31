@@ -37,11 +37,11 @@ module BenefitSponsors
             dob: dob,
             gender: gender
         }
-        if hire_date.blank?
+        # if hire_date.blank?
           attr_hash[:hired_on] = default_hire_date
-        else
-          attr_hash[:hired_on] = hire_date
-        end
+        # else
+        #   attr_hash[:hired_on] = hire_date
+        # end
         unless middle_name.blank?
           attr_hash[:middle_name] = middle_name
         end
