@@ -29,6 +29,12 @@ module Importers
       end
     end
 
+    def find_employer
+      org = Organization.where(:fein => fein).first
+      return nil unless org
+      org.employer_profile
+    end
+
     def save
       return false unless valid?
       found_employee = find_employee
@@ -39,7 +45,6 @@ module Importers
       end
 
       proxy = found_employee.nil? ? ::Importers::ConversionEmployeeCreate.new(@original_attributes) : ::Importers::ConversionEmployeeUpdate.new(@original_attributes)
-
       result = proxy.save
       propagate_warnings(proxy)
       propagate_errors(proxy)

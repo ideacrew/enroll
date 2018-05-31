@@ -112,7 +112,7 @@ module Importers
     end
 
     def find_employer
-      org = BenefitSponsors::Organizations::Organization.where(fein: fein).first
+      org = Organization.where(:fein => fein).first
       return nil unless org
       org.employer_profile
     end
@@ -122,7 +122,6 @@ module Importers
       census_employee = map_subscriber
       census_employee.employer_profile = find_employer
       census_employee.census_dependents = map_dependents
-      census_employee.benefit_sponsors_employer_profile_id = find_employer.id
       save_result = census_employee.save
       unless save_result
         propagate_errors(census_employee)

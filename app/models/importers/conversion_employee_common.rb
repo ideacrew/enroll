@@ -82,7 +82,7 @@ module Importers
     end
 
     def start_date
-      [@hire_date, @default_hire_date].detect { |val| !val.blank? }
+      [@hire_date, @default_hire_date].detect {|val| !val.blank?}
     end
 
     (1..8).to_a.each do |num|
@@ -109,12 +109,6 @@ module Importers
             @dep_#{num}_dob = val.blank? ? nil : (Date.strptime(val, ("%m/%d/%Y")) rescue nil)
           end
       RUBYCODE
-    end
-
-    def find_employer
-      org = BenefitSponsors::Organizations::Organization.where(fein: fein).first
-      return nil unless org
-      org.employer_profile
     end
 
     def find_employee
