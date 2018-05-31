@@ -22,6 +22,9 @@
             - if (aca_broker_routing_information && @agency.profile_type == "broker_agency")
               = render partial: "benefit_sponsors/shared/profiles/broker_agency/bank_information", locals: {f: f}
             = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f}
+            - if (aca_broker_routing_information && @agency.profile_type == "broker_agency")
+              h5.heading-text
+                = l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)
 
         = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right'
 - else
