@@ -5,7 +5,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
 
   let(:model_event) { "low_enrollment_notice_for_employer" }
   let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
-  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, aasm_state: 'renewing_enrolling') }
+  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer,  start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, aasm_state: 'renewing_enrolling') }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: 18)}
 
