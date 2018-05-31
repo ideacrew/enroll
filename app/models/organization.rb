@@ -112,7 +112,6 @@ class Organization
 
   before_save :generate_hbx_id
   after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
-  after_save :validate_and_send_denial_notice
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -186,12 +185,6 @@ class Organization
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join
       break random_fein unless Organization.where(:fein => random_fein).count > 0
-    end
-  end
-
-  def validate_and_send_denial_notice
-    if employer_profile.present? && primary_office_location.present? && primary_office_location.address.present?
-      employer_profile.validate_and_send_denial_notice
     end
   end
 

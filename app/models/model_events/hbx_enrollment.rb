@@ -3,6 +3,7 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :application_coverage_selected,
+      :notify_employee_of_plan_selection_in_open_enrollment,
       :employee_waiver_confirmation,
       :employee_coverage_termination
     ]
@@ -15,6 +16,10 @@ module ModelEvents
           is_application_coverage_selected = true
         end
 
+        if is_transition_matching?(to: :renewing_coverage_selected, from: :auto_renewing, event: :select_coverage)
+          is_notify_employee_of_plan_selection_in_open_enrollment = true
+        end
+      
         if is_transition_matching?(to: :inactive, from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], event: :waive_coverage)
           is_employee_waiver_confirmation = true
         end

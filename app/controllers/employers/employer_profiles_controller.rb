@@ -458,7 +458,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def paginate_families
     #FIXME add paginate
-    @employees = @employer_profile.employee_roles.to_a
+    @employees = @employer_profile.employee_roles.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
   end
 
   def check_employer_staff_role

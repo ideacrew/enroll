@@ -30,12 +30,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "#display_carrier_logo" do
     let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
-    let(:plan){ FactoryGirl.build(:plan, carrier_profile: carrier_profile) }
+    let(:plan){ Maybe.new(FactoryGirl.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
 
-    before do
-      allow(plan).to receive(:carrier_profile).and_return(carrier_profile)
-      allow(carrier_profile).to receive_message_chain(:legal_name, :extract_value).and_return('kaiser')
-    end
     it "should return the named logo" do
       expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
     end
@@ -225,7 +221,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 4
+      expect(helper.calculate_participation_minimum.ceil).to eq 4
     end
   end
 

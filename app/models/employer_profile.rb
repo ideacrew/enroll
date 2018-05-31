@@ -148,6 +148,7 @@ class EmployerProfile
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_broker_agency(terminate_on)
+      fire_general_agency!(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
@@ -253,6 +254,7 @@ class EmployerProfile
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
+    self.trigger_notices("general_agency_terminated")
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
@@ -576,16 +578,6 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
-    def organizations_for_low_enrollment_notice(new_date)
-      Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
-          :"open_enrollment_end_on" => new_date+2.days
-          }
-      })
-
-    end
-
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
           { :$elemMatch => {
@@ -735,7 +727,6 @@ class EmployerProfile
         #     end
         #   end
         # end
-
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
         employer_enroll_factory.date = new_date
 
@@ -784,20 +775,6 @@ class EmployerProfile
           effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
 
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
-        end
-
-        #initial employers misses binder payment due date deadline on next day notice
-        binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
-        if new_date == binder_next_day
-          initial_employers_enrolled_plan_year_state.each do |org|
-            if !org.employer_profile.binder_paid?
-                begin
-                  ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
-                rescue Exception => e
-                  (Rails.logger.error {"Unable to deliver Notice to  when missing binder payment due to #{e}"}) unless Rails.env.test?
-                end
-            end
-          end
         end
       end
 
@@ -1204,12 +1181,6 @@ class EmployerProfile
     employer_attestation.present? && employer_attestation.is_eligible?
   end
 
-  def validate_and_send_denial_notice
-    if !is_primary_office_local? || !(is_zip_outside?)
-      self.trigger_notices('initial_employer_denial')
-    end
-  end
-
   def terminate(termination_date)
     plan_year = published_plan_year
     if plan_year.present?
@@ -1263,14 +1234,6 @@ class EmployerProfile
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def self.notice_to_employer_for_missing_binder_payment(org)
-    begin
-      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
-    rescue Exception => e
-      (Rails.logger.error {"Unable to deliver Notice on next day to #{org.legal_name} when employer misses binder payment due date deadline due to #{e}"}) unless Rails.env.test?
-    end
   end
 
   def self.notice_to_employee_for_missing_binder_payment(org)
