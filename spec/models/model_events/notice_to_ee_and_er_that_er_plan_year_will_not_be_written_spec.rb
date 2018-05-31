@@ -147,11 +147,11 @@ describe 'ModelEvents::InitialEmployerNoBinderPaymentReceived', :dbclean => :aft
     end
 
     it "should return next available start date" do
-      expect(merge_model.plan_year.next_available_start_date).to eq next_available_start_date
+      expect(merge_model.plan_year.next_available_start_date).to eq next_available_start_date.to_s
     end
 
     it "should return next application deadline" do
-      expect(merge_model.plan_year.next_application_deadline).to eq Date.new(next_available_start_date.year, next_available_start_date.prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month)
+      expect(merge_model.plan_year.next_application_deadline).to eq Date.new(next_available_start_date.year, next_available_start_date.prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month).to_s
     end
 
     it "should return employer name" do

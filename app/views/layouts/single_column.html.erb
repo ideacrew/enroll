@@ -36,8 +36,10 @@
     <%= render 'layouts/header' %>
     <%= yield :horizontal_menu %>
     <%= render_flash %>
+    <%= render 'users/security_question_responses/modal' %>
 
     <div class="content <%= controller_name %> content-bottom">
+
         <%= yield %>
     </div>
 

@@ -822,7 +822,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
     let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
-    let(:census_employee1) { FactoryGirl.build(:census_employee) }
+    let(:census_employee1) { FactoryGirl.build(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+    let!(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let!(:plan_year)         { FactoryGirl.create(:plan_year, aasm_state: "published", benefit_groups: [benefit_group]) }
+    let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
@@ -844,6 +847,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
 
+    it "should send email notification for non conversion employee" do
+      allow(census_employee1).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      census_employee1.active_benefit_group_assignment.benefit_group.plan_year.update_attributes(aasm_state: 'published')
+      person.employee_roles.create!(ssn: census_employee1.ssn,
+                                    employer_profile_id: census_employee1.employer_profile.id,
+                                    hired_on: census_employee1.hired_on)
+      expect(census_employee1.send_invite!).to eq true
+    end
     # it "should return true when match person has no active employee roles for current census employee" do
     #   person.employee_roles.create!(ssn: census_employee.ssn,
     #                                 employer_profile_id: census_employee.employer_profile.id,
@@ -1727,6 +1738,23 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "when active employeees has renewal benifit group" do
+    let(:census_employee) { CensusEmployee.new(**valid_params) }
+    let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    
+    before do
+      benefit_group_assignment.update_attribute(:updated_at, benefit_group_assignment.updated_at + 1.day)
+      benefit_group_assignment.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+    end
+
+    it "returns true when employees waive the coverage" do
+      expect(census_employee.waived?).to be_falsey
+    end
+    it "returns false for employees who are enrolling" do
+      benefit_group_assignment.aasm_state = "coverage_waived"
+      expect(census_employee.waived?).to be_truthy
+    end
+  end
 
   context '.renewal_benefit_group_assignment' do
     let(:census_employee) { CensusEmployee.new(**valid_params) }

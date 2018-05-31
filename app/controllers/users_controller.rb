@@ -57,6 +57,10 @@ class UsersController < ApplicationController
     @user.update_attributes(email_update_params)
   end
 
+  def login_history
+    @user_login_history = SessionIdHistory.for_user(user_id: user.id).order('created_at DESC').page(params[:page]).per(15)
+  end
+  
   private
   helper_method :user
 
@@ -70,10 +74,6 @@ class UsersController < ApplicationController
              elsif params[:user].present? && !@user.update_attributes(email_update_params)
                 @user.errors.full_messages.join.gsub('(optional) ', '')
               end
-  end
-
-  def login_history
-    @user_login_history = SessionIdHistory.for_user(user_id: user.id).order('created_at DESC').page(params[:page]).per(15)
   end
 
   def user

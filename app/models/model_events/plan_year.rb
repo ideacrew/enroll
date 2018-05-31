@@ -9,9 +9,11 @@ module ModelEvents
       :renewal_enrollment_confirmation,
       :ineligible_initial_application_submitted,
       :ineligible_renewal_application_submitted,
+      :initial_employer_open_enrollment_completed,
       # :open_enrollment_began, #not being used
       :application_denied,
       :renewal_application_denied,
+      :group_advance_termination_confirmation,
       :zero_employees_on_roster
     ]
 
@@ -21,6 +23,7 @@ module ModelEvents
         :renewal_plan_year_first_reminder_before_soft_dead_line,
         :initial_employer_no_binder_payment_received,
         :renewal_plan_year_publish_dead_line,
+        :low_enrollment_notice_for_employer,
         :initial_employer_first_reminder_to_publish_plan_year,
         :initial_employer_second_reminder_to_publish_plan_year,
         :initial_employer_final_reminder_to_publish_plan_year
@@ -32,6 +35,10 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
           is_renewal_application_created = true
+        end
+
+        if is_transition_matching?(to: :enrolled, from: :enrolling, event: :advance_date)
+          is_initial_employer_open_enrollment_completed = true
         end
 
         if is_transition_matching?(to: :publish_pending, from: :draft, event: [:publish, :force_publish])
@@ -69,6 +76,14 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
+        end
+
+        if is_transition_matching?(to: :termination_pending, from: :active, event: :schedule_termination)
+          is_group_advance_termination_confirmation = true
+        end
+        
+        if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
+          is_group_advance_termination_confirmation = true
         end
 
         if is_transition_matching?(to: :published, from: :draft, event: :force_publish)
@@ -116,6 +131,10 @@ module ModelEvents
         # renewal_application with un-published plan year, send notice 2 days prior to the publish due date i.e 13th of the month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
           is_renewal_plan_year_publish_dead_line = true
+        end
+
+        if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
+          is_low_enrollment_notice_for_employer = true
         end
 
         # remainder notices for initial application with unpublished plan year
