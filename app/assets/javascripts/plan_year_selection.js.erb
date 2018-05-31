@@ -354,6 +354,11 @@ ready = function() {
         $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
         $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
         $(this).val(hidden);
+        if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+          EmployerProfile.validateEditPlanYear();
+        } else {
+          EmployerProfile.validatePlanYear();
+        }
       }
     });
 
@@ -725,13 +730,15 @@ function loadCarrierNames() {
   var employer_profile_id = $('#employerProfileId').data('value');
   var benefit_group_id = $('#benefitGroupId').data('value');
   var location_id = $(this).closest('fieldset').attr('id');
+  var panel_id = $(this).closest('fieldset').attr('data-benefit-group');
   $.ajax({
     type: "GET",
     data:{
       start_on: start_on,
       selected_carrier_level: selected_carrier_level,
       benefit_group: benefit_group_id,
-      location_id: location_id
+      location_id: location_id,
+      panel_id: panel_id
     },
     url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
   });

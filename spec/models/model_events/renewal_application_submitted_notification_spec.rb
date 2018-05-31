@@ -9,7 +9,9 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
   let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
   let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft', benefit_groups: [benefit_group]) }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
-
+  let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer.id)}
+  let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
+  
   describe "ModelEvent" do
     context "when renewal application created" do
   
@@ -33,6 +35,13 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
       let(:model_event) { ModelEvents::ModelEvent.new(:renewal_application_submitted, model_instance, {}) }
 
       it "should trigger notice event" do
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employer.zero_employees_on_roster_notice"
+          expect(payload[:employer_id]).to eq employer.hbx_id.to_s
+          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+         end
+
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.renewal_application_published"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s

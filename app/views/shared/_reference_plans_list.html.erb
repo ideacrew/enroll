@@ -88,13 +88,13 @@
     </div>
     <div class="col-xs-12 metals-tab tab-container" style="display: none;">
       <br><br>
-      <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explaned %></p>
+      <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explained %></p>
       <br/>
-      <% reference_plans = Plan::REFERENCE_PLAN_METAL_LEVELS %>
+      <% metal_levels = Plan::REFERENCE_PLAN_METAL_LEVELS %>
       <% if check_plan_options_title %>
-          <% reference_plans = reference_plans_for_metal_level %>
+          <% metal_levels = enabled_metal_levels_for_single_carrier %>
       <% end %>
-      <% reference_plans.each do |kind| %>
+      <% metal_levels.each do |kind| %>
       <div class="col-xs-3 metals">
         <div class="col-xs-12 row">
           <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
@@ -161,7 +161,7 @@ $(function(){
 $('a[data-remote=true]').click( function() {
    var current_href = $(this).attr('href');
    var location_id = $(this).closest('.benefit-group-fields').attr('id');
-   var object_id = <%= f.object.id %>;
+   var object_id = "<%= f.object.id %>";
    $(this).attr('href', current_href + "&location_id=" + location_id + "&object_id=" + object_id);
 });
 

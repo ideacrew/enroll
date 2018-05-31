@@ -62,7 +62,7 @@
                 <strong> Hours: </strong> Monday, Tuesday, Wednesday, Friday from 8:00 a.m. to 6:00 p.m.; Thursday from 8:00 a.m. to 8:00 p.m.  <br>
                 <strong> Email: </strong> memberservices@nhp.org <br/>
               </div>
-            <% when "Tufts Health Plan Direct" %>
+            <% when "Tufts Health Direct" %>
               <div>
                 <strong> Call: </strong>
                 <a href="tel:+18882571985"> 1-888-257-1985 </a> <br>
@@ -125,9 +125,9 @@
               </div>
             <% end %>
           </div>
-        <% else %> 
+        <% else %>
           <div class="carrier-numbers">
-            <% case plan.carrier_profile.legal_name %> 
+            <% case plan.carrier_profile.legal_name %>
             <% when "CareFirst" %>
                 <div>
                   Call:

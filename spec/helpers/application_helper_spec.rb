@@ -30,12 +30,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "#display_carrier_logo" do
     let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
-    let(:plan){ FactoryGirl.build(:plan, carrier_profile: carrier_profile) }
+    let(:plan){ Maybe.new(FactoryGirl.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
 
-    before do
-      allow(plan).to receive(:carrier_profile).and_return(carrier_profile)
-      allow(carrier_profile).to receive_message_chain(:legal_name, :extract_value).and_return('kaiser')
-    end
     it "should return the named logo" do
       expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
     end
@@ -225,7 +221,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum.ceil).to eq 4
     end
   end
 
@@ -426,48 +422,7 @@ end
     end
   end
 
-  describe ".notify_employer_when_employee_terminate_coverage" do
-    let(:published_benefit_group_assignment) { double(hbx_enrollments: hbx_enrollments)}
-    let(:census_employee) { double(published_benefit_group_assignment: published_benefit_group_assignment) }
-    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0, census_employee: census_employee, coverage_kind: 'health') }
-    let(:hbx_enrollments) { [double(coverage_kind: 'health', aasm_state: 'coverage_termination_pending')] }
-
-    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
-      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.notify_employer_when_employee_terminate_coverage(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employer_when_employee_terminate_coverage']
-    end
-  end
-
-  describe ".notify_employee_confirming_coverage_termination" do
-    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
-    let(:census_employee) {FactoryGirl.create(:census_employee)}
-    it "should trigger notify_employee_confirming_coverage_termination job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:coverage_kind).and_return("health")
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
-      allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
-      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.notify_employee_confirming_coverage_termination(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_coverage_termination']
-    end
-  end
-
   describe "#previous_year" do
-
     it "should return past year" do
       expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
     end
@@ -479,37 +434,7 @@ end
     it "should not return next year" do
       expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
     end
-end
-
-  # describe ".notify_employer_when_employee_terminate_coverage" do
-  #   let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-  #   let(:person) {FactoryGirl.create(:person)}
-  #   let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
-  #   let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month,aasm_state: "active",benefit_groups:[benefit_group]) }
-  #   let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
-  #   let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
-  #   let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-  #   let(:employee_role) { FactoryGirl.create(:employee_role)}
-  #   let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
-  #   let(:enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id)}
-
-  #   it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
-  #     allow(enrollment).to receive(:is_shop?).and_return(true)
-  #     allow(enrollment).to receive(:enrollment_kind).and_return('health')
-  #     allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
-  #     allow(enrollment).to receive(:census_employee).and_return(census_employee)
-  #     ActiveJob::Base.queue_adapter = :test
-  #     ActiveJob::Base.queue_adapter.enqueued_jobs = []
-  #     helper.notify_employer_when_employee_terminate_coverage(enrollment)
-  #     queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-  #       job_info[:job] == ShopNoticesNotifierJob
-  #     end
-  #     expect(queued_job[:args]).not_to be_empty
-  #     expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
-  #     expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
-  #     expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
-  #   end
-  # end
+  end
 
   describe "convert_to_bool" do
     let(:val1) {true }

@@ -1,14 +1,12 @@
 # This rake task used to terminate employer active plan year && active enrollments.
 # RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
 # RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date', 'generate_termination_notice']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017',true/false]
 
 namespace :migrations do
   desc "Terminating active plan year and enrollments"
-  task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
+  task :terminate_employer_account, [:fein, :end_on, :termination_date] => :environment do |task, args|
     fein = args[:fein]
-    generate_termination_notice = (args[:generate_termination_notice] == 'true') ? true : false
+    # generate_termination_notice = (args[:generate_termination_notice].to_s == "true") ? true : false   #can be reenabled if business decides to send notice based on ER 
     organizations = Organization.where(fein: fein)
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
@@ -48,8 +46,9 @@ namespace :migrations do
         end
 
         if plan_year.may_terminate?
+          plan_year.update(terminated_on: termination_date)
           plan_year.terminate!
-          plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+          plan_year.update(end_on: end_on)
           # send_termination_notice_to_employer(organization) if generate_termination_notice
           bg_ids = plan_year.benefit_groups.map(&:id)
           census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
@@ -58,10 +57,9 @@ namespace :migrations do
               assignment.update(end_on: plan_year.end_on) if assignment.end_on.present? && assignment.end_on > plan_year.end_on
             end
           end
-          if generate_termination_notice
-            send_notice_to_employer(organization)
-            send_notice_to_employees(organization)
-          end
+          # if generate_termination_notice
+            # send_notice_to_employees(organization, plan_year) 
+          # end
         end
       end
 
@@ -124,35 +122,6 @@ namespace :migrations do
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
-    end
-  end
-
-  def send_notice_to_employer(org)
-    puts "group_advance_termination_confirmation:Notification generated for employer"
-    begin
-      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver Notices to #{org.employer_profile.legal_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
-    end
-  end
-
-  def send_notice_to_employees(org)
-    puts "Notification generated for employee"
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
-      rescue Exception => e
-        (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
-      end
-    end
-  end
-
-  def send_termination_notice_to_employer(org)
-    begin
-      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
-      puts "Termination notice sent to #{org.legal_name}" unless Rails.env.test?
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver termination notice to #{org.legal_name} due to #{e}" }) unless Rails.env.test?
     end
   end
 end

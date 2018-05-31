@@ -15,6 +15,10 @@ module Config::SiteHelper
   def site_website_name
     Settings.site.website_name
   end
+  
+  def site_website_link
+    link_to site_website_name, site_website_name
+  end
 
   def site_website_link
     link_to site_website_name, site_website_name
@@ -96,12 +100,20 @@ module Config::SiteHelper
     Settings.site.main_web_address
   end
 
+  def site_main_web_address_url
+    Settings.site.main_web_address_url
+  end
+
   def site_main_web_link
     link_to site_website_name, site_main_web_address_url
   end
 
   def site_make_their_premium_payments_online
     Settings.site.make_their_premium_payments_online
+  end
+
+  def link_to_make_their_premium_payments_online
+    link_to "make your premium payments online", site_make_their_premium_payments_online
   end
 
   def health_care_website
@@ -114,10 +126,6 @@ module Config::SiteHelper
 
   def ivl_login_url
     Settings.site.ivl_login_url
-  end
-
-  def site_main_web_address_url
-     Settings.site.main_web_address_url
   end
 
   def site_uses_default_devise_path?

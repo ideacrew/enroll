@@ -71,7 +71,7 @@ class ConsumerRole
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
 
-  field :native_validation, type: String, default: nil
+  field :native_validation, type: String, default: -> {"na"}
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
   # DC residency
@@ -567,9 +567,6 @@ class ConsumerRole
   end
 
   def update_by_person(*args)
-    person.addresses = []
-    person.phones = []
-    person.emails = []
     person.consumer_role.update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
     args[0].delete("is_applying_coverage")
     person.update_attributes(args[0])

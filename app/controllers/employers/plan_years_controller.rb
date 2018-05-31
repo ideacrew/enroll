@@ -431,6 +431,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_dental_carriers_and_plans
+
     @location_id = params[:location_id]
     @plan_year_id = params[:plan_year_id]
     @object_id = params[:object_id]
@@ -445,6 +446,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = build_plan_year
     @benefit_group = params[:benefit_group]
     @location_id = params[:location_id]
+    @panel_id = params[:panel_id]
     @start_on = params[:start_on]
     @carrier_search_level = params[:selected_carrier_level]
     @object_id = @location_id.split('-').last

@@ -25,8 +25,9 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
 
     let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.last_month.end_of_month, aasm_state: "expired",benefit_groups:[benefit_group]) }
     let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_publish_pending") }
+    let(:plan_year2){ FactoryGirl.build(:plan_year, aasm_state: "renewing_canceled") }
 
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,plan_year]) }
+    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,plan_year, plan_year2]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
 
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on:active_plan_year.start_on, benefit_group: benefit_group)}
@@ -44,6 +45,8 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       active_household.hbx_enrollments =[enrollment]
       active_household.save!
       allow(ENV).to receive(:[]).with("state").and_return('')
+      
+      allow(ENV).to receive(:[]).with("py_aasm_state").and_return('renewing_publish_pending')
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
     end
@@ -53,6 +56,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_enrolling"
+      expect(plan_year2.aasm_state).to eq "renewing_canceled"
     end
 
     it "should not should update aasm_state of plan year when ENV['plan_year_start_on'] is empty" do
@@ -64,6 +68,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
 
     ["renewing_publish_pending", "renewing_application_ineligible"].each do |plan_year_state|
       it "should update aasm_state of plan year" do
+        allow(ENV).to receive(:[]).with("py_aasm_state").and_return(plan_year_state)
         allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(false)
         plan_year.update_attributes(aasm_state: plan_year_state)
         subject.migrate
@@ -106,7 +111,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       plan_year.reload
       expect(census_employee.active_benefit_group_assignment).to eq renewal_benefit_group_assignment  # should update benefit_group_assignment
       expect(plan_year.aasm_state).to eq "active"
-      expect(employer_profile.plan_years.map(&:aasm_state)).to eq ["expired", "active"]
+      expect(employer_profile.plan_years.map(&:aasm_state)).to eq ["expired", "active", "renewing_canceled"]
       expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ["coverage_expired", "coverage_enrolled"]
     end
   end

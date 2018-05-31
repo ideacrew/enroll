@@ -145,26 +145,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     let(:user) { double("User") }
     let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
-    let(:factory_employee_role) { FactoryGirl.build(:employee_role) }
-    let(:person1) { FactoryGirl.build(:person) }
-    let(:factory_plan) { FactoryGirl.build(:plan) }
-    let(:factory_benefit_group) { FactoryGirl.build(:benefit_group) }
-    let(:factory_employee_role){FactoryGirl.create(:employee_role)}
-    let(:qle) { double("Qualifyinglifeeventkind", end_on: Date.today + 1.month, title: "New Job", qle_on: Date.today)}
-    let(:hbx_enrollment) { HbxEnrollment.new(plan: factory_plan, employee_role: factory_employee_role, effective_on: 1.month.ago.to_date, benefit_group: factory_benefit_group, kind: "employer_sponsored") }
-    let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:plan) { double("Plan") }
-    let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:options) { { :sep_qle_end_on => qle.end_on.to_s, :sep_qle_title => qle.title, :sep_qle_on => qle.qle_on.to_s }}
 
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
-      allow(HbxEnrollment).to receive(:find).with("123").and_return(hbx_enrollment)
-      allow(BenefitGroup).to receive(:find).with(factory_benefit_group.id).and_return(factory_benefit_group)
       allow(enrollment).to receive(:is_shop?).and_return(false)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
@@ -192,43 +180,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       sign_in(user)
       get :receipt, id: "id"
       expect(assigns(:employer_profile)).to eq employer_profile
-    end
-
-    it "should trigger notice" do
-      controller.instance_variable_set(:@market_kind, "shop")
-      controller.instance_variable_set(:@person, person1)
-      allow(person).to receive(:employee_roles).and_return([factory_employee_role])
-      allow(factory_employee_role).to receive(:census_employee).and_return(census_employee)
-      allow(controller).to receive(:sep_qle_request_accept_notice_ee).and_return(true)
-      sign_in(user)
-      get :receipt, id: "123", change_plan: "change_by_qle"
-      expect(controller).to have_received(:sep_qle_request_accept_notice_ee).with(census_employee.id.to_s, hbx_enrollment)
-      expect(assigns(:employer_profile)).to eq hbx_enrollment.employer_profile
-      expect(assigns(:employee_role)).to eq factory_employee_role
-    end
-
-    it "should not trigger notice when it is not QLE" do
-      sign_in(user)
-      get :receipt, id: "123", change_plan: "change_plan"
-      expect(controller).not_to receive(:sep_qle_request_accept_notice_ee).with(census_employee.id.to_s, hbx_enrollment)
-    end
-
-    it "should not trigger notice when market_kind is individual" do
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      sign_in(user)
-      get :receipt, id: "123", change_plan: "change_by_qle"
-      expect(controller).not_to receive(:sep_qle_request_accept_notice_ee).with(census_employee.id.to_s, hbx_enrollment)
-    end
-
-    it "should trigger notice by performing job queue" do
-      controller.instance_variable_set(:@market_kind, "shop")
-      controller.instance_variable_set(:@person, person1)
-      allow(person).to receive(:employee_roles).and_return([factory_employee_role])
-      allow(factory_employee_role).to receive(:census_employee).and_return(census_employee)
-      allow(hbx_enrollment).to receive(:special_enrollment_period).and_return(qle)
-      ShopNoticesNotifierJob.should_receive(:perform_later).with(census_employee.id.to_s, "notify_employee_of_special_enrollment_period", :sep => options).and_return(true)
-       sign_in(user)
-      get :receipt, id: "123", change_plan: "change_by_qle"
     end
   end
 
@@ -346,14 +297,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   context "GET print_waiver" do
     let(:enrollment){ double(:HbxEnrollment) }
 
-    it "should return hbx_enrollment to print waiver" do
+   it "should return hbx_enrollment to print waiver" do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       sign_in(user)
-      allow(hbx_enrollment).to receive(:census_employee).and_return(double)
-      allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
-      allow(subject).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
-      # allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end
@@ -569,7 +516,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+          #allow(hbx_enrollment).to receive_message_chain(:employee_rol,:census_employe).and_return 'individual'
           get :show, id: "hbx_id"
         end
 
@@ -587,6 +536,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -604,6 +554,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
           get :show, id: "hbx_id"
@@ -624,8 +575,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(hbx_enrollment).to receive(:kind).and_return 'shop'
+          allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
           get :show, id: "hbx_id"
         end
 

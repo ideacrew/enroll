@@ -1,6 +1,4 @@
 # Run the following - bundle exec rake migrations:generate_notices input_file_name=upload_notice_to_employers
-
-
 require 'csv'
 
 namespace :migrations do

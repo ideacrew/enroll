@@ -9,6 +9,7 @@ RSpec.describe Insured::FamilyMembersController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -65,6 +66,8 @@ RSpec.describe Insured::FamilyMembersController do
 
     # Some times Effective dates vary even for the next day. So creating a new SEP & re-calculating effective on dates
     context "with sep_id in params" do
+
+       subject { Observers::Observer.new } 
 
       let(:sep) { FactoryGirl.create :special_enrollment_period, family: test_family }
       let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }

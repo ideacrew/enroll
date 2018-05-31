@@ -2,8 +2,13 @@
   module Effective
     module Datatables
       class BrokerAgencyEmployerDatatable < ::Effective::MongoidDatatable
+        include Config::AcaModelConcern
 
         datatable do
+          if individual_market_is_enabled?
+            bulk_actions_column do
+            end
+          end 
           table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
             if row.broker_relationship_inactive?
               row.legal_name
@@ -34,20 +39,34 @@
                  broker_name(row)
                end
             }, :sortable => false, :filter => false
+          
+          if attributes["general_agency_is_enabled"]
+              table_column :general_agency, :label => "General Agency", :proc => Proc.new { |row| 
+              if row.general_agency_profile
+                 general_agency_profiles = row.general_agency_profile
+                 broker_agency_profile = row.broker_agency_profile
+                 ga_legal_name = general_agency_profiles.legal_name
+                 clear_assign_path =  raw('<br>') + link_to( "#{l10n('clear_assignment')}", main_app.clear_assign_for_employer_broker_agencies_profile_path(id: broker_agency_profile.id, employer_id: row.employer_profile.id), method: :post, remote: true, data: {  confirm: l10n("broker_agencies.profiles.remove_general_agency_assignment") })
+                 general_agency = ga_legal_name + clear_assign_path if ga_legal_name
+              end
+            }, :sortable => false, :filter => false
 
+           end
 
-          table_column :actions, :width => '50px', :proc => Proc.new { |row|
-            dropdown = [
-             # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
-             ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
-             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
-             ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
-                                remove_employer_link_type(row),
-                                "Are you sure you want to remove this employer?"]
-            ]
-            render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
-          }, :filter => false, :sortable => false
+          unless attributes["general_agency_is_enabled"]
+            table_column :actions, :width => '50px', :proc => Proc.new { |row|
+              dropdown = [
+               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+               ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
+               ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
+               ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
+               ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
+                                  remove_employer_link_type(row),
+                                  "Are you sure you want to remove this employer?"]
+              ]
+              render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
+            }, :filter => false, :sortable => false
+          end
         end
 
         def remove_employer_link_type(employer)
