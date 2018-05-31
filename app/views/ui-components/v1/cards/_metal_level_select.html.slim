@@ -37,13 +37,13 @@
         .tab-content
           .tab-pane.fade#carrier role="tabpanel"
             h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
-            - @benefit_package_form.catalog.carrier_names.each do |ck|
+            - @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id|
               .col-xs-3.carriers
                 .col-xs-12
                   .col-xs-3
-                    = f.radio_button :product_option_choice, "#{ck}", class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                    = f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice', onclick:"getPlanInfo(this)"
                   .col-xs-9
-                    h5.heading-text = ck
+                    h5.heading-text = issuer_name
               
           .tab-pane.fade#level role="tabpanel"
             h4 Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.
@@ -57,13 +57,13 @@
                     
           .tab-pane.fade#plan role="tabpanel"
             h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?
-            - @benefit_package_form.catalog.single_product_options.each do |ck|
+            - @benefit_package_form.catalog.single_product_options.each do |issuer_name, issuer_id|
               .col-xs-3.plans
                 .col-xs-12
                   .col-xs-3
-                    = f.radio_button :product_option_choice, ck, class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                    = f.radio_button :product_option_choice, issuer_id, class: 'product_option_choice', onclick:"getPlanInfo(this)"
                   .col-xs-9
-                    h5.heading-text = ck
+                    h5.heading-text = issuer_name
         
         #referencePlans.hidden
           h2.heading-text.pt-1 Select Your Reference Plan
