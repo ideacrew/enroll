@@ -39,6 +39,7 @@ module Importers::Mhc
     end
 
     def fetch_benefit_product
+      # needs more filter here for rating area and service area serach and rescue logs
       BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
     end
 
