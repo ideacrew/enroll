@@ -2,9 +2,7 @@ BenefitSponsors::Engine.routes.draw do
   resources :sites
 
   namespace :profiles do
-    resources :registrations do
-      post :counties_for_zip_code, on: :collection
-    end
+    resources :registrations
 
     namespace :broker_agencies do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do

@@ -19,6 +19,8 @@
           = render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f}
           = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
             = render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f}
+            - if (aca_broker_routing_information && @agency.profile_type == "broker_agency")
+              = render partial: "benefit_sponsors/shared/profiles/broker_agency/bank_information", locals: {f: f}
             = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f}
 
         = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right'
