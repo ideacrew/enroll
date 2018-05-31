@@ -69,7 +69,7 @@ module BenefitSponsors
       end
 
       def update!
-        return false unless valid?
+        return false, :agency_edit_registration_url unless valid?
         service({profile_id: profile_id}).store!(self)
       end
 

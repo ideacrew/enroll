@@ -1,0 +1,54 @@
+<fieldset>
+  <h4>ACH Routing Information</h4>
+  <div id="routing_info" class="row no-buffer focus_effect personal-info-row">
+    <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+      <div class="form-group form-group-lg">
+        <div class="row no-buffer row-form-wrapper">
+          <%= f.text_field :ach_account_number, value: f.object.ach_account_number, class: "floatlabel form-control", required: true, placeholder: 'Account #' %>
+        </div>
+        <div class="row no-buffer row-form-wrapper">
+          <%= f.text_field :ach_routing_number, value: f.object.ach_routing_number, class: "floatlabel form-control", required: true, placeholder: '9 digit ACH Routing #', maxlength: 9 %>
+        </div>
+        <div class="row no-buffer row-form-wrapper">
+          <%= f.text_field :ach_routing_number_confirmation, value: f.object.ach_routing_number, class: "floatlabel form-control", required: true, placeholder: 'Confirm Routing #', maxlength: 9 %>
+        </div>
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+<!-- <script>
+  var loadAchRecord = function(routing_number) {
+    $.ajax({
+      url: "<%= main_app.check_ach_routing_number_path %>",
+      data: { f: { 'routing_number': routing_number } }
+    });
+  }
+  $(document).ready(function(){
+    $('body').on('keyup', 'input.interaction-field-control-organization-ach-record-routing-number', function(){
+      var valueOfConfirm = $('input.interaction-field-control-organization-ach-record-routing-number-confirmation').val();
+      var originalVal = $(this).val();
+      if (originalVal.length === 9) {
+        loadAchRecord(originalVal);
+      }
+      if (originalVal !== valueOfConfirm) {
+        $('button.interaction-click-control-create-broker-agency').attr('disabled',true)
+        $('button.interaction-click-control-create-broker-agency.valid').attr('data-original-title', 'ACH Routing # mismatch').tooltip('show');
+      } else {
+        $('button.interaction-click-control-create-broker-agency.valid').attr('disabled',false)
+        $('button.interaction-click-control-create-broker-agency.valid').tooltip('hide');
+      }
+    });
+
+    $('body').on('keyup', 'input.interaction-field-control-organization-ach-record-routing-number-confirmation', function(){
+      var valueOfRoutingNum = $('input.interaction-field-control-organization-ach-record-routing-number').val();
+      if (valueOfRoutingNum !== $(this).val()) {
+        $('button.interaction-click-control-create-broker-agency').attr('disabled',true)
+        $('button.interaction-click-control-create-broker-agency.valid').attr('data-original-title', 'ACH Routing # mismatch').tooltip('show');
+      } else {
+        $('button.interaction-click-control-create-broker-agency.valid').tooltip('hide');
+        $('button.interaction-click-control-create-broker-agency.valid').attr('disabled',false)
+      }
+    });
+  });
+</script> -->

@@ -45,7 +45,7 @@ describe "CcaBrokerAgencyProfilesMigration" do
       expect(@migrated_organizations.count).to eq @old_organizations.count
     end
 
-    it "should not migrate organizations with broker agency profile" do
+    it "should not migrate organizations with employer profiles" do
       expect(BenefitSponsors::Organizations::Organization.employer_profiles.count).to eq 0
     end
 
@@ -92,12 +92,13 @@ describe "CcaBrokerAgencyProfilesMigration" do
       expect(person_with_old_profile_id).to eq person_with_migrated_profile_id
     end
 
-    it "should match all migrated attributes for employer profile" do
+    it "should match all migrated attributes for broker agency profile" do
       migrated_profile = @migrated_organizations.first.broker_agency_profile
       old_profile = @old_organizations.first.broker_agency_profile
-      expect(migrated_profile).to have_attributes(entity_kind: old_profile.entity_kind.to_sym, created_at: old_profile.created_at,
+      expect(migrated_profile).to have_attributes(created_at: old_profile.created_at,
                                                   updated_at: old_profile.updated_at,
-                                                  aasm_state: old_profile.aasm_state)
+                                                  aasm_state: old_profile.aasm_state, ach_routing_number: old_profile.ach_routing_number,
+                                                  ach_account_number: old_profile.ach_account_number)
     end
 
     it "should match all migrated attributes for organization" do

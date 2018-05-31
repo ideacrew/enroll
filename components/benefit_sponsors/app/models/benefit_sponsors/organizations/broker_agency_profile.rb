@@ -24,6 +24,9 @@ module BenefitSponsors
       field :working_hours, type: Boolean, default: false
       field :accept_new_clients, type: Boolean
 
+      field :ach_routing_number, type: String
+      field :ach_account_number, type: String
+
       field :aasm_state, type: String
 
       field :home_page, type: String

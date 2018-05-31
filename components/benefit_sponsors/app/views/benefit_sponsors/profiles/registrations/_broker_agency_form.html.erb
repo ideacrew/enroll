@@ -25,7 +25,12 @@
                   <div class="row no-buffer row-form-wrapper">
                     <%= render "benefit_sponsors/shared/broker_agency_profile_fields", f: f, read_only_dropdown: 'read_only_dropdown' %>
                   </div><br>
-
+                  <div class="action-group">
+                    <% if (aca_broker_routing_information && @agency.profile_type == "broker_agency") %>
+                       <%= render "benefit_sponsors/shared/profiles/broker_agency/bank_information", f: f %>
+                       <p class="bank-name-container"></p>
+                    <% end %>
+                  </div><br>
                   <div class="action-group">
                     <%= render "benefit_sponsors/shared/office_locations", f: f %>
                     <div class="row no-buffer">
