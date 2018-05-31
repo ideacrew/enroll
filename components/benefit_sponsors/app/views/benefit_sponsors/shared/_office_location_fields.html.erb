@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div class="row row-form-wrapper no-buffer">
+          <div class="row row-form-wrapper no-buffer" controller="zip-check">
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
               </div>
@@ -44,7 +44,7 @@
                 <%= address.select(:state, options_for_select(address.object.state_options.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
+                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: 'change=>zip-check.zipChange' } %>
               </div>
               <% if (aca_address_query_county && @agency.profile_type != "broker_agency") %>
                 <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
