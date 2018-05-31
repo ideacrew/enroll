@@ -11,6 +11,7 @@ module BenefitSponsors
       attribute :probation_period_kind, Symbol
       attribute :benefit_application_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
+      attribute :parent, BenefitSponsors::Forms::BenefitApplicationForm
 
       attr_accessor :catalog, :sponsored_benefits
 
