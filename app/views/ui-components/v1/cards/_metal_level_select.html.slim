@@ -70,10 +70,17 @@
 
           h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
           #yourPlans
+          
+          #yourSponsorContributions
+          
+          #yourReferencePlanDetails
 
 javascript:
   var productOptionKind = String;
   var selectedRadio = String;
+  var sponsorContribution = String;
+  var filteredProducts = String;
+  var referencePlanID = String;
   var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
   
@@ -101,12 +108,15 @@ javascript:
   
   function getPlanInfo(element) {
     var selectedRadio = element.value;
-    var filteredProducts = planOptions[productOptionKind][selectedRadio];
+    filteredProducts = planOptions[productOptionKind][selectedRadio];
     populateReferencePlans(filteredProducts)
   }
   
   function populateReferencePlans(plans) {
-    console.log(sponsorContributions)
+    sponsorContribution = sponsorContributions[productOptionKind]['contribution_levels'];
+    
+    document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions")}'
+    
     // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
     // Removes reference plans if metal level changes
@@ -121,24 +131,65 @@ javascript:
     // Build reference plans to be displayed in UI
     for(plan of plans) {
     
-    var div = document.createElement('div')
-    div.setAttribute('id', 'yourAvailablePlans')
-    div.innerHTML = '<div class="col-xs-4 reference-plans">\
-        <div class="col-xs-12 p0 mb-1">\
-          <div class="col-xs-3 p0">\
-            <input type="radio" name="reference-plans">\
+      var div = document.createElement('div')
+      div.setAttribute('id', 'yourAvailablePlans')
+      div.innerHTML = '<div class="col-xs-4 reference-plans">\
+          <div class="col-xs-12 p0 mb-1">\
+            <div class="col-xs-3 p0">\
+              <input type="radio" name="reference-plans" id="'+plan.id+' "onclick="displayReferencePlanDetails(this)">\
+            </div>\
+            <div class="col-xs-9 p0 rp-info mb-1">\
+              <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
+              <span class="plan-label">Type:</span><br>\
+              <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
+              <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
+            </div>\
           </div>\
-          <div class="col-xs-9 p0 rp-info mb-1">\
-            <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
-            <span class="plan-label">Type:</span><br>\
-            <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
-            <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
+        </div>'
+
+        document.getElementById('yourPlans').append(div);
+    }
+    
+    setTimeout(function() {
+      buildSponsorContributions(sponsorContribution)
+    },400);
+  }
+  
+  function buildSponsorContributions(contributions) {
+    var element = document.getElementById('benefitFields');
+    
+    for (contribution of contributions) {
+
+      var div = document.createElement('div')
+      div.setAttribute('id', 'yourAvailableContributions')
+      div.innerHTML = '<div class="row">\
+        <div class="col-xs-6 pr-3">\
+          <div class="row ml-4">\
+            <i class="far fa-check-square fa-2x fl" style="width:60px"></i><p class="ml-2 fl">' +contribution.display_name+'</p>\
+          </div>\
+        </div>\
+        <div class="col-xs-6">\
+          <div class="col-xs-3">\
+            <input type="number" id="'+contribution.id+'" name="'+contribution.display_name+'">\
+          </div>\
+          <div class="col-xs-9">\
+            <input type="range" min="0" max="100" value="0" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)">\
           </div>\
         </div>\
       </div>'
-
-      document.getElementById('yourPlans').append(div);
+      element.append(div)
     }
+  }
+  
+  function displayReferencePlanDetails(element) {
+    //console.log(filteredProducts)
+    referencePlanID = element.id;
+
+    document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
+  }
+  
+  function setInputValue(element) {
+    document.getElementById(element.id).value = element.value;
   }
   
   
