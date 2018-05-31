@@ -17,6 +17,7 @@ module BenefitSponsors
       def load_form_metadata(form)
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
+        form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
       end
 

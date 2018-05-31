@@ -17,13 +17,18 @@ list_bill_contribution_model = BenefitMarkets::ContributionModels::ContributionM
 list_bill_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "MA List Bill Shop Pricing Model").first
 
 
+def products_for(kind)
+  BenefitMarkets::Products::HealthProducts::HealthProduct.where(:product_package_kinds => /#{kind}/).to_a
+end
+
 puts "Creating Product Packages..."
 benefit_market_catalog.product_packages.create!({ 
   benefit_kind: :aca_shop, product_kind: :health, title: 'Single Issuer', 
   package_kind: :single_issuer, 
   application_period: benefit_market_catalog.application_period,
   contribution_model: list_bill_contribution_model,
-  pricing_model: list_bill_pricing_model
+  pricing_model: list_bill_pricing_model,
+  products: products_for('single_issuer')
   })
 
 benefit_market_catalog.product_packages.create!({ 
@@ -31,7 +36,8 @@ benefit_market_catalog.product_packages.create!({
   package_kind: :metal_level, 
   application_period: benefit_market_catalog.application_period,
   contribution_model: list_bill_contribution_model,
-  pricing_model: list_bill_pricing_model
+  pricing_model: list_bill_pricing_model,
+  products: products_for('metal_level')
 })
 
 benefit_market_catalog.product_packages.create!({
@@ -39,14 +45,6 @@ benefit_market_catalog.product_packages.create!({
   package_kind: :single_product, 
   application_period: benefit_market_catalog.application_period,
   contribution_model: composite_contribution_model,
-  pricing_model: composite_pricing_model
+  pricing_model: composite_pricing_model,
+  products: products_for('single_product')
 })
-
-
-puts "Associating Products with Product Packages..."
-%w(single_product metal_level single_issuer).each do |kind|
-  if product_package = benefit_market_catalog.product_packages.detect{|package| package.package_kind == kind.to_sym}
-    product_package.products = BenefitMarkets::Products::HealthProducts::HealthProduct.where(:product_package_kinds => /#{kind}/).to_a
-    product_package.save
-  end
-end

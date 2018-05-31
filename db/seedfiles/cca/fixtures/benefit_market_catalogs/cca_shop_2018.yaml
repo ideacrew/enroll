@@ -15,7 +15,7 @@ attributes: !ruby/hash:BSON::Document
   benefit_market_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WwROH5+IC11vNZLU
-  updated_at: 2018-05-24 20:34:14.061000000 Z
+  updated_at: 2018-05-31 20:21:24.061000000 Z
   created_at: 2018-05-22 21:23:02.120000000 Z
   product_packages:
   - !ruby/hash:BSON::Document
@@ -11927,7 +11927,7 @@ attributes: !ruby/hash:BSON::Document
             WwROSZ+IC11vNsd+
         _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
         minimum_contribution_factor: 0.5
-        name: employee
+        name: employee_only
         display_name: Employee Only
         order: 0
         default_contribution_factor: 0.75
