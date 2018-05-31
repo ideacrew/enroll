@@ -386,7 +386,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       context "with no referenced scope" do
-        it "should return all loaded plans" do
+        it "should return all loaded plans", :dbclean => :around_each do
           expect(Plan.all.count).to eq total_plan_count
         end
       end
