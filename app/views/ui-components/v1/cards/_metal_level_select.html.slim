@@ -82,6 +82,7 @@ javascript:
   }
   
   function setCircle(element) {
+    // Adds toggle circle icon to metal level tabs
     var items = document.querySelectorAll('#metal-level-select ul li');
     document.getElementById('referencePlans').classList.add('hidden')
     
@@ -92,6 +93,7 @@ javascript:
     
       if (item.innerText == element.innerText) {
         element.querySelector('.fa-circle').classList.toggle('fa-dot-circle')
+        // Gets product option info
         productOptionKind = element.querySelector('a').dataset.name;
       }
     }
@@ -104,7 +106,10 @@ javascript:
   }
   
   function populateReferencePlans(plans) {
+    console.log(sponsorContributions)
+    // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
+    // Removes reference plans if metal level changes
     var populatedReferencePlans = document.querySelectorAll("#yourAvailablePlans");
     
     if (populatedReferencePlans) {
@@ -113,7 +118,7 @@ javascript:
       }
     }
 
-        
+    // Build reference plans to be displayed in UI
     for(plan of plans) {
     
     var div = document.createElement('div')
