@@ -120,9 +120,18 @@ module Notifier
     end
 
     def plan_year_enrollment_errors
+      enrollment_errors = []
       plan_year = (renewal_plan_year || current_plan_year)
       if plan_year.present?
-        merge_model.plan_year.enrollment_errors = plan_year.enrollment_errors.values.join(' AND/OR ')
+        plan_year.enrollment_errors.each do |k, _|
+          case k.to_s
+          when "enrollment_ratio"
+            enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+          when "non_business_owner_enrollment_count"
+            enrollment_errors << "One non-owner employee enrolled in health coverage"
+          end
+        end
+        merge_model.plan_year.enrollment_errors = enrollment_errors.join(' AND/OR ')
       end
     end
 

@@ -92,7 +92,9 @@ describe 'ModelEvents::InitialEmployerApplicationDenied' do
         expect(merge_model.broker_present?).to be_falsey
       end
       it "should return enrollment errors" do
-        expect(merge_model.plan_year.enrollment_errors).to include(employer.plan_years.first.enrollment_errors.values.join(' AND/OR '))
+        enrollment_errors = [] 
+        enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+        expect(merge_model.plan_year.enrollment_errors).to include(enrollment_errors.join(' AND/OR '))
       end
     end
   end
