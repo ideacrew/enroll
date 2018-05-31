@@ -40,6 +40,10 @@ module BenefitMarkets
         new_pricing_model.member_relationships = self.member_relationships.collect{ |mr| mr.class.new(mr.attributes) }
         new_pricing_model
       end
+
+      def find_by_pricing_unit(pricing_unit_id)
+        pricing_units.find(pricing_unit_id)
+      end
     end
   end
 end

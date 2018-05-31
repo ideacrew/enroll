@@ -25,46 +25,25 @@ module Importers::Mhc
         is_default: true,
         plan_option_kind: plan_selection,
         reference_plan_hios_id: single_plan_hios_id,
-        relationship_benefits: form_contributions
+        composite_tier_contributions: form_contributions
       }
     end
 
     def form_contributions
       contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
-      contribution_level_names.inject([]) do |contributions, sponsor_contribution_name|
-        contributions << formed_params(sponsor_contribution_name)
+      contribution_level_names.inject([]) do |contributions, sponsor_level_name|
+        contributions << {
+          relationship: sponsor_level_name,
+          offered: tier_offered?(sponsor_level_name),
+          premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
+          estimated_tier_premium: eval("#{sponsor_level_name}_rt_premium")
+        }
       end
-    end
-
-    def fetch_benefit_product
-      # needs more filter here for rating area and service area serach and rescue logs
-      BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
     end
 
     def tier_offered?(preference)
       return true if preference == "employee_only"
       (preference.present?) ? true : false
-    end
-
-    def fetch_order(sponsor_level_name)
-      order = {
-          "employee_only" => 1,
-          "employee_and_spouse" => 2,
-          "employee_and_one_or_more_dependents" => 3,
-          "family" => 4
-
-      }
-      order[sponsor_level_name]
-    end
-
-    def formed_params(sponsor_level_name)
-      {
-          relationship: sponsor_level_name,
-          offered: tier_offered?(sponsor_level_name),
-          premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
-          contribution_unit_id: fetch_benefit_product.id,
-          order: fetch_order(sponsor_level_name)
-      }
     end
 
     def fetch_application_params

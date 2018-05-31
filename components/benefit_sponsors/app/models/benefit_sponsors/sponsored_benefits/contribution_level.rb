@@ -18,12 +18,19 @@ module BenefitSponsors
       field :contribution_cap, type: Float
       field :flat_contribution_amount, type: Float
 
+      delegate :contribution_model, to: :sponsor_contribution
+
       validates_presence_of :display_name, :allow_blank => false
       validates_presence_of :contribution_unit_id, :allow_blank => false
       validates_presence_of :contribution_factor, :allow_blank => false
 
       def contribution_pct
         (contribution_factor * 100)
+      end
+
+      def contribution_unit
+        return @contribution_unit if defined? @contribution_unit
+        @contribution_unit = contribution_model.find_contribution_unit(contribution_unit_id)
       end
 
       NAMES = [
