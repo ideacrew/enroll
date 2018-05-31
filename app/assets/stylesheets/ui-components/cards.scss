@@ -176,6 +176,7 @@
 }
 
 .reference-steps {
+  /*
   ul.nav.nav-tabs li label {
     font-weight: bold;
     font-size: 18px;
@@ -204,6 +205,56 @@
   }
   input[type=radio] {
     display:none;
+  }*/
+}
+
+#metal-level-select {
+  .fa-circle {
+    color:$mhc-light-gray;
+  }
+  .fa-dot-circle {
+    color:$primary-green;
+  }
+  .nav-tabs {
+    border-bottom:none;
+  }
+  .nav-tabs > li > a {
+    background-color:$mhc-blue;
+    border-bottom: solid 3px $primary-botton-border-bottom;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px;
+    color:$primary-white;
+    text-transform: uppercase;
+  }
+  .nav-tabs > li > a:hover {
+    background-color:$mhc-dark-blue;
+  }
+  .tab-pane#carrier {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  .tab-pane#level {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:220px;
+  }
+  .tab-pane#plan {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  h5 {
+    font-weight: bold;
+  }
+  #refencePlans {
+   background-color:$primary-white;
+   padding:0px 20px 20px 20px;
+  }
+  p.reference-plan-title {
+    font-size:12px;
   }
 }
 
