@@ -10,9 +10,8 @@ module Importers::Mhc
       benefit_sponsorship = employer_profile.organization.benefit_sponsorships.first
       benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(benefit_sponsorship, fetch_application_params)
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(default_plan_year_start)
-
+      
       BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
-
       benefit_application
     end
 
@@ -31,10 +30,9 @@ module Importers::Mhc
     end
 
     def form_contributions
-      sanitized_params = Hash.new
       contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
-      contribution_level_names.each do |sponsor_contribution_name|
-        sanitized_params.merge!(formed_params(sponsor_contribution_name))
+      contribution_level_names.inject([]) do |contributions, sponsor_contribution_name|
+        contributions << formed_params(sponsor_contribution_name)
       end
     end
 
