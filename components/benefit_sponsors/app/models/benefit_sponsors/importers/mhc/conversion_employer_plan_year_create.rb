@@ -2,7 +2,6 @@ module BenefitSponsors
 module Importers::Mhc
   class ConversionEmployerPlanYearCreate < ConversionEmployerPlanYear
 
-
     def map_plan_year
       employer_profile = find_employer
       issuer_profile   = find_carrier
@@ -13,37 +12,6 @@ module Importers::Mhc
       
       BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
       benefit_application
-    end
-
-    def benefit_package_attributes
-      {
-        title: 'Standard',
-        description: 'Standard package',
-        is_active: true,
-        effective_on_kind: new_coverage_policy_value.kind,
-        effective_on_offset: new_coverage_policy_value.offset,
-        is_default: true,
-        plan_option_kind: plan_selection,
-        reference_plan_hios_id: single_plan_hios_id,
-        composite_tier_contributions: form_contributions
-      }
-    end
-
-    def form_contributions
-      contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
-      contribution_level_names.inject([]) do |contributions, sponsor_level_name|
-        contributions << {
-          relationship: sponsor_level_name,
-          offered: tier_offered?(sponsor_level_name),
-          premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
-          estimated_tier_premium: eval("#{sponsor_level_name}_rt_premium")
-        }
-      end
-    end
-
-    def tier_offered?(preference)
-      return true if preference == "employee_only"
-      (preference.present?) ? true : false
     end
 
     def fetch_application_params
@@ -61,6 +29,37 @@ module Importers::Mhc
       })
     end
 
+    def benefit_package_attributes
+      {
+        title: 'Standard',
+        description: 'Standard package',
+        is_active: true,
+        effective_on_kind: new_coverage_policy_value.kind,
+        effective_on_offset: new_coverage_policy_value.offset,
+        is_default: true,
+        plan_option_kind: plan_selection,
+        reference_plan_hios_id: single_plan_hios_id,
+        composite_tier_contributions: tier_contribution_values
+      }
+    end
+
+    def tier_contribution_values
+      contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
+      contribution_level_names.inject([]) do |contributions, sponsor_level_name|
+        contributions << {
+          relationship: sponsor_level_name,
+          offered: tier_offered?(sponsor_level_name),
+          premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
+          estimated_tier_premium: eval("#{sponsor_level_name}_rt_premium")
+        }
+      end
+    end
+
+    def tier_offered?(preference)
+      return true if preference == "employee_only"
+      (preference.present?) ? true : false
+    end
+
     def save
       # return false unless valid?
       record = map_plan_year
@@ -68,12 +67,14 @@ module Importers::Mhc
       propagate_errors(record)
 
       if save_result
-        employer = find_employer
-        begin
-          employer.update_attributes!(:aasm_state => "enrolled")
-        rescue Exception => e
-          raise "\n#{employer.fein} - #{employer.legal_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
-        end
+        
+        benefit_sponsorship = record.benefit_sponsorship
+        benefit_sponsorship.update(effective_begin_on: record.start_on, aasm_state: :active)
+        benefit_sponsorship.workflow_state_transitions.create({
+           from_state: 'applicant',
+           to_state: 'active'
+          })
+
         map_employees_to_benefit_groups(employer, record)
       end
       return save_result
