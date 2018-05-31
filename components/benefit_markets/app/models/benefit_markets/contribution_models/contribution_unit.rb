@@ -23,6 +23,12 @@ module BenefitMarkets
         cv.order = order
       end
 
+      def at_least_one_matches?(rel_hash)
+        member_relationship_maps.any? do |mrm|
+          mrm.match?(rel_hash)
+        end
+      end
+
       def match?(rel_hash)
         member_relationship_maps.all? do |mrm|
           mrm.match?(rel_hash)

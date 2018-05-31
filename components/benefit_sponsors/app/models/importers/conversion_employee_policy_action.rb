@@ -41,6 +41,21 @@ module BenefitSponsors
         end
       end
 
+      def find_benefit_group_assignment
+        return @found_benefit_group_assignment unless @found_benefit_group_assignment.nil?
+        census_employee = find_employee
+        return nil unless census_employee
+
+        found_employer = find_employer
+        benefit_application = find_employer.active_benefit_application
+        # try to fetch benefit_applciation which were active
+
+        if benefit_application
+          candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_group_id".in  => benefit_application.benefit_packages.map(&:id))
+          @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+        end
+      end
+
       def validate_plan
         return true if hios_id.blank?
         found_plan = find_plan
@@ -53,11 +68,14 @@ module BenefitSponsors
         return @found_employee unless @found_employee.nil?
         return nil if subscriber_ssn.blank?
         found_employer = find_employer
+        benefit_sponsorship = find_sponsorship
         return nil if found_employer.nil?
         candidate_employees = CensusEmployee.where({
                                                        employer_profile_id: found_employer.id,
+                                                       benefit_sponsorship_id: benefit_sponsorship.id,
+
                                                        # hired_on: {"$lte" => start_date},
-                                                       encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                       # encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                                                    })
         non_terminated_employees = candidate_employees.reject do |ce|
           (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
@@ -66,20 +84,24 @@ module BenefitSponsors
         @found_employee = non_terminated_employees.sort_by(&:hired_on).last
       end
 
+      def find_sponsorship
+        return @sponsorship unless @sponsorship.nil?
+        org = BenefitSponsors::Organizations::Organization.where(:fein => fein).first
+        return nil if org.nil?
+        org.active_benefit_sponsorship
+      end
+
       def find_plan
         return @plan unless @plan.nil?
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
         corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-        @plan = Plan.where({
-                               active_year: plan_year.to_i,
-                               hios_id: corrected_hios_id
-                           }).first
+        @plan = BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
       end
 
       def find_employer
         return @found_employer unless @found_employer.nil?
-        org = Organization.where(:fein => fein).first
+        org = BenefitSponsors::Organizations::Organization.where(:fein => fein).first
         return nil unless org
         @found_employer = org.employer_profile
       end

@@ -17,6 +17,7 @@ module BenefitSponsors
 
       def map_employees_to_benefit_groups(employer, benefit_application)
         benefit_package = benefit_application.benefit_packages.first
+        # adding to all employees here there is a case employees already added exist in system and terminated
         employer.census_employees.each do |ce|
           next unless ce.valid?
           begin

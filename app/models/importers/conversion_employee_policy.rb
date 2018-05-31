@@ -185,9 +185,11 @@ module Importers
           end
           return false
         end
+
         cancel_other_enrollments_for_bga(bga)
-        hh = family.active_household
-        ch = hh.immediate_family_coverage_household
+        house_hold = family.active_household
+        coverage_household = hh.immediate_family_coverage_household
+
         en = hh.new_hbx_enrollment_from({
           coverage_household: ch,
           employee_role: role,

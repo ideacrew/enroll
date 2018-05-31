@@ -101,7 +101,7 @@ module BenefitSponsors
         price = 0.00
         contribution = 0.00
         if employees_enrolling.count < 1
-          [sponsor_contribution, price, contribution]
+          return [sponsor_contribution, price, contribution]
         end
         if p_determination_builder
           precalculate_costs(

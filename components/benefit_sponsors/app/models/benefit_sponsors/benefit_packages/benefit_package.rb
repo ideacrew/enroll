@@ -32,6 +32,7 @@ module BenefitSponsors
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
       delegate :recorded_rating_area, to: :benefit_application
       delegate :benefit_sponsorship, to: :benefit_application
+      delegate :recorded_service_area_ids, to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
 
@@ -188,7 +189,6 @@ module BenefitSponsors
           hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
           hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
         end
-        deactivate
       end
 
       def terminate_family_coverages(family)
@@ -200,7 +200,6 @@ module BenefitSponsors
             hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
           end
         end
-        deactivate
       end
 
       def cancel_family_coverages(family)
@@ -209,11 +208,10 @@ module BenefitSponsors
           hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
           hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
         end
-        deactivate
       end
 
       def deactivate
-        self.update_attribute(is_active: false)
+        self.update_attributes(is_active: false)
       end
 
       def sponsored_benefit_for(coverage_kind)

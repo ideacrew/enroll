@@ -349,8 +349,10 @@ class GroupSelectionPrevaricationAdapter
 				  enrollment.effective_on = enrollment.family.current_sep.effective_on
         else
           # They are in a sep, but there is NO benefit package available then
-          benefit_package = benefit_package_closest_to_but_after_date(controller_employee_role, enrollment.family.current_sep.effective_on)
-          enrollment.effective_on = benefit_package.start_on
+          # Maybe they weren't hired yet
+			    effective_date = earliest_eligible_date_for_shop(controller_employee_role)
+          enrollment.effective_on = effective_date
+          benefit_package = benefit_package_for_date(controller_employee_role, effective_date)
         end
       end
 		  enrollment.enrollment_kind = "special_enrollment"
@@ -378,14 +380,11 @@ class GroupSelectionPrevaricationAdapter
 	end
 
   def earliest_eligible_date_for_shop(employee_role)
-    employee_role.benefit_package_for_open_enrollment(::TimeKeeper.date_of_record).start_on
+    employee_role.census_employee.coverage_effective_on
   end
 
   def benefit_package_for_date(employee_role, start_date)
     employee_role.benefit_package_for_date(start_date)
-  end
-
-  def benefit_package_closest_to_but_after_date(employee_role, suggested_start_date)
   end
 
 	def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
