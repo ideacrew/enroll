@@ -268,6 +268,7 @@ private
 
 
   def is_eligible?
+    return true unless is_active?
     return true unless is_shop?
 
     person = family.primary_applicant.person
