@@ -23,7 +23,6 @@ module Notifier
           iterator: collection.singularize,
           type: 'loop'
         }
-
         if merge_model = self.class.attribute_set.detect{|e| e.name == collection.to_sym}
           get_editor_attributes(merge_model.type.member_type).each do |attribute|
             placeholders << {

@@ -55,7 +55,6 @@ module Concerns::Observable
           @@observer_peers[self.to_s] << add_observer(observer_instance, update_method_name.to_sym, {})
         end
       end
-
       add_observer_peer.call(Observers::NoticeObserver.new)
     end
 

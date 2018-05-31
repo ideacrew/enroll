@@ -206,3 +206,11 @@ a > img {
 	max-height: 1080px;
 	margin:0 auto;
 }
+
+.total_table {
+	width:100%;
+}
+
+.thick_broder td,th {
+	border: 1px solid black;
+}

@@ -9,7 +9,7 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole)) ? resource.person : resource
     end
 
     def construct_notice_object
@@ -19,6 +19,7 @@ module Notifier
       builder.event_name = event_name if resource.is_a?(EmployeeRole)
       builder.payload = payload
       builder.append_contact_details
+      binding.pry
       template.data_elements.each do |element|
         elements = element.split('.')
         date_element = elements.detect{|ele| Notifier::MergeDataModels::EmployerProfile::DATE_ELEMENTS.any?{|date| ele.match(/#{date}/i).present?}}
@@ -200,7 +201,7 @@ module Notifier
 
     def create_secure_inbox_message(notice)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole))
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
       receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"

@@ -99,7 +99,7 @@ module ModelEvents
     module ClassMethods
       def date_change_event(new_date)
         # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
-        if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1
+        if true
           is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
         end
 

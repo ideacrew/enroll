@@ -39,10 +39,6 @@ module Observers
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
         end
 
-        if new_model_event.event_key == :initial_employer_open_enrollment_completed
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_open_enrollment_completed")
-        end
-
         if new_model_event.event_key == :renewal_application_created
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
         end
@@ -50,12 +46,6 @@ module Observers
         if new_model_event.event_key == :renewal_application_autosubmitted
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
           trigger_zero_employees_on_roster_notice(plan_year)
-        end
-
-        if new_model_event.event_key == :ineligible_initial_application_submitted
-          if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
-              trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
-          end
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
@@ -99,8 +89,27 @@ module Observers
 
     def employer_profile_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      employer_profile = new_model_event.klass_instance
       if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        employer_profile = new_model_event.klass_instance
+        if new_model_event.event_key == :initial_employee_plan_selection_confirmation
+          if employer_profile.is_new_employer?
+            census_employees = employer_profile.census_employees.non_terminated
+            census_employees.each do |ce|
+              if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
+                trigger_notice(recipient: ce.employee_role, event_object: ce.active_benefit_group_assignment.hbx_enrollment, notice_event: "initial_employee_plan_selection_confirmation")
+              end
+            end
+          end
+        end
+      end
+
+      if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
+        if new_model_event.event_key == :generate_initial_employer_invoice
+          if employer_profile.is_new_employer?
+            trigger_notice(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "generate_initial_employer_invoice")
+          end
+        end
+
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
           trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
         elsif new_model_event.event_key == :welcome_notice_to_employer
@@ -134,6 +143,23 @@ module Observers
         end
       end
     end
+
+    def document_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+
+      if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        document = new_model_event.klass_instance
+        if new_model_event.event_key == :initial_employer_invoice_available
+          employer_profile = document.documentable.employer_profile
+          deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
+        end
+      end
+    end
+
+    def family_update; end
+    def vlp_document_update; end
+    def paper_application_update; end
+    def employer_attestation_document_update; end
 
     def plan_year_date_change(model_event)
       current_date = TimeKeeper.date_of_record
@@ -187,9 +213,20 @@ module Observers
       end
     end
 
+    def family_date_change(model_event)
+      current_date = TimeKeeper.date_of_record
+      if Family::DATA_CHANGE_EVENTS.include?(model_event.event_key)
+        send_enrollment_notice_for_ivl("enrollment_notice")
+      end
+    end
+
+
     def employer_profile_date_change; end
     def hbx_enrollment_date_change; end
     def census_employee_date_change; end
+    def document_date_change; end
+
+
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
@@ -219,13 +256,14 @@ module Observers
       end
     end
 
-    def organizations_for_low_enrollment_notice(current_date)
-      Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
-          :"open_enrollment_end_on" => current_date+2.days
-          }
-      })
+    def send_enrollment_notice_for_ivl(event_name)
+      current_date = TimeKeeper.date_of_record
+      families_for_enr_notice(current_date).each do |family|
+        person = family.primary_applicant.person
+        if person.consumer_role.present?
+          trigger_notice(recipient: person.consumer_role, event_object: person, notice_event:event_name)
+        end
+      end
     end
 
     def trigger_initial_employer_publish_remainder(event_name)

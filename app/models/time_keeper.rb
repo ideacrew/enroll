@@ -100,6 +100,7 @@ class TimeKeeper
 
   def push_date_change_event
     PlanYear.date_change_event(self.date_of_record)
+    Family.date_change_event(TimeKeeper.date_of_record)
   end
 
   def self.with_cache

@@ -41,5 +41,19 @@ module Observers
                               }
                               })
     end
+
+    def families_for_enr_notice(new_date)
+      start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
+      end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
+      families = Family.where({
+                       "households.hbx_enrollments" => {
+                           "$elemMatch" => {
+                               "kind" => "individual",
+                               "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
+                               "created_at" => { "$gte" => start_time, "$lte" => end_time},
+                           } }
+                   })
+      families
+    end
   end
 end

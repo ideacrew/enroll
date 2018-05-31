@@ -18,6 +18,9 @@ class Family
   include Sortable
   include Mongoid::Autoinc
   include DocumentsVerificationStatus
+  include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::Family
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -151,7 +154,7 @@ class Family
   scope :by_general_agency_profile_id,      ->(general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
 
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
-                                                  :"households.tax_households.eligibility_determinations.determined_at".desc) }
+      :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
   scope :all_aptc_hbx_enrollments,      ->{ unscoped.where(:"households.hbx_enrollments.applied_aptc_amount.cents".gt => 0)}
   scope :all_unassisted,                ->{ exists(:"households.tax_households.eligibility_determinations" => false) }
@@ -159,7 +162,7 @@ class Family
   scope :all_eligible_for_assistance,   ->{ exists(:"households.tax_households.eligibility_determinations" => true) }
 
   scope :all_assistance_receiving,      ->{ unscoped.where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
-                                                  :"households.tax_households.eligibility_determinations.determined_at".desc) }
+      :"households.tax_households.eligibility_determinations.determined_at".desc) }
 
   scope :all_active_assistance_receiving_for_current_year, ->{ unscoped.where( :"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0).order(
                                                                         :"households.tax_households.eligibility_determinations.determined_at".desc).and(
@@ -393,9 +396,9 @@ class Family
     active_employee_roles = primary_applicant.person.active_employee_roles if primary_applicant.present?
     active_employee_roles.each do |employee_role|
       if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
-        (employer_profile = employee_role.try(:employer_profile))
+          (employer_profile = employee_role.try(:employer_profile))
         employer_profile.try(:published_plan_year).try(:enrolling?) &&
-        benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
+            benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
 
         eligible_open_enrollments << EnrollmentEligibilityReason.new(employer_profile)
       end
@@ -600,7 +603,7 @@ class Family
         is_primary_applicant: is_primary_applicant,
         is_coverage_applicant: is_coverage_applicant,
         is_consent_applicant: is_consent_applicant
-      )
+    )
 
     active_household.add_household_coverage_member(family_member)
     family_member
@@ -673,8 +676,8 @@ class Family
         mp = mem.person
         mem_dob = mem.dob.blank? ? nil : mem.dob.strftime("%m/%d/%Y")
         (personish.last_name.downcase.strip == mp.last_name.downcase.strip) &&
-          (personish.first_name.downcase.strip == mp.first_name.downcase.strip) &&
-          (search_dob == mem_dob)
+            (personish.first_name.downcase.strip == mp.first_name.downcase.strip) &&
+            (search_dob == mem_dob)
       end
     end
   end
@@ -764,7 +767,7 @@ class Family
           :effective_on => current_benefit_period.start_on,
           :kind => 'individual',
           :aasm_state => 'auto_renewing'
-        }
+      }
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
 
       families.each do |family|
@@ -785,13 +788,13 @@ class Family
       start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
       end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
       families = Family.where({
-        "households.hbx_enrollments" => {
-          "$elemMatch" => {
-            "kind" => "individual",
-            "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
-            "created_at" => { "$gte" => start_time, "$lte" => end_time},
-        } }
-      })
+                                  "households.hbx_enrollments" => {
+                                      "$elemMatch" => {
+                                          "kind" => "individual",
+                                          "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
+                                          "created_at" => { "$gte" => start_time, "$lte" => end_time},
+                                      } }
+                              })
       families.each do |family|
         begin
           person = family.primary_applicant.person
@@ -918,26 +921,26 @@ class Family
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def enrollments_for_display
     Family.collection.aggregate([
-      {"$match" => {'_id' => self._id}},
-      {"$unwind" => '$households'},
-      {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {"households.hbx_enrollments.aasm_state" => {"$nin" => ['void', "coverage_canceled"]} }},
-      {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
-      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-      {"$group" => {'_id' => {
-                  'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
-                  'month' => { "$month" => '$households.hbx_enrollments.effective_on'},
-                  'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
-                  'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
-                  'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
-                  'benefit_group_id' => '$households.hbx_enrollments.benefit_group_id',
-                  'state' => '$households.hbx_enrollments.aasm_state',
-                  'market' => '$households.hbx_enrollments.kind',
-                  'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
-                  "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
-      ],
-      :allow_disk_use => true)
+                                    {"$match" => {'_id' => self._id}},
+                                    {"$unwind" => '$households'},
+                                    {"$unwind" => '$households.hbx_enrollments'},
+                                    {"$match" => {"households.hbx_enrollments.aasm_state" => {"$nin" => ['void', "coverage_canceled"]} }},
+                                    {"$match" => {"households.hbx_enrollments.external_enrollment" => {"$ne" => true}}},
+                                    {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
+                                    {"$group" => {'_id' => {
+                                        'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
+                                        'month' => { "$month" => '$households.hbx_enrollments.effective_on'},
+                                        'day' => { "$dayOfMonth" => '$households.hbx_enrollments.effective_on'},
+                                        'subscriber_id' => '$households.hbx_enrollments.enrollment_signature',
+                                        'provider_id'   => '$households.hbx_enrollments.carrier_profile_id',
+                                        'benefit_group_id' => '$households.hbx_enrollments.benefit_group_id',
+                                        'state' => '$households.hbx_enrollments.aasm_state',
+                                        'market' => '$households.hbx_enrollments.kind',
+                                        'coverage_kind' => '$households.hbx_enrollments.coverage_kind'},
+                                                  "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+                                    {"$project" => {'hbx_enrollment._id' => 1, '_id' => 1}}
+                                ],
+                                :allow_disk_use => true)
   end
 
 
@@ -946,18 +949,18 @@ class Family
   # @return [ Array<HbxEnrollment> ] The {HbxEnrollment HbxEnrollments} filtered by display criteria
   def waivers_for_display
     Family.collection.aggregate([
-      {"$match" => {'_id' => self._id}},
-      {"$unwind" => '$households'},
-      {"$unwind" => '$households.hbx_enrollments'},
-      {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
-      {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
-      {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
-                    'state' => '$households.hbx_enrollments.aasm_state',
-                    'kind' => '$households.hbx_enrollments.kind',
-                    'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
-      {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
-      ],
-      :allow_disk_use => true)
+                                    {"$match" => {'_id' => self._id}},
+                                    {"$unwind" => '$households'},
+                                    {"$unwind" => '$households.hbx_enrollments'},
+                                    {"$match" => {'households.hbx_enrollments.aasm_state' => 'inactive'}},
+                                    {"$sort" => {"households.hbx_enrollments.submitted_at" => -1 }},
+                                    {"$group" => {'_id' => {'year' => { "$year" => '$households.hbx_enrollments.effective_on'},
+                                                            'state' => '$households.hbx_enrollments.aasm_state',
+                                                            'kind' => '$households.hbx_enrollments.kind',
+                                                            'coverage_kind' => '$households.hbx_enrollments.coverage_kind'}, "hbx_enrollment" => { "$first" => '$households.hbx_enrollments'}}},
+                                    {"$project" => {'hbx_enrollment._id' => 1, '_id' => 0}}
+                                ],
+                                :allow_disk_use => true)
   end
 
   def generate_family_search
@@ -1031,7 +1034,7 @@ class Family
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
       self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date}).or(:"min_verification_due_date" => nil)
     else
-     self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
+      self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
     end
   end
 
@@ -1040,10 +1043,10 @@ class Family
     document_status_outstanding = []
     self.active_family_members.each do |member|
       member.person.verification_types.each do |type|
-      if member.person.consumer_role && is_document_not_verified(type, member.person)
-        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
-        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
-      end
+        if member.person.consumer_role && is_document_not_verified(type, member.person)
+          documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
+          document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
+        end
       end
     end
     case
@@ -1073,7 +1076,7 @@ class Family
     e_case_id.split('#').last.scan(/\D/).empty?
   end
 
-private
+  private
   def build_household
     if households.size == 0
       irs_group = initialize_irs_group
@@ -1097,13 +1100,13 @@ private
   def only_one_active_primary_family
     return unless primary_family_member.present? && primary_family_member.person.present?
     families_with_same_primary = Family.where(
-      "family_members" => {
-        "$elemMatch" => {
-          "is_primary_applicant" => true,
-          "person_id" => BSON::ObjectId.from_string(primary_family_member.person_id.to_s)
-        }
-      },
-      "is_active" => true
+        "family_members" => {
+            "$elemMatch" => {
+                "is_primary_applicant" => true,
+                "person_id" => BSON::ObjectId.from_string(primary_family_member.person_id.to_s)
+            }
+        },
+        "is_active" => true
     )
     if (families_with_same_primary.any? { |fam| fam.id.to_s != self.id.to_s })
       self.errors.add(:base, "has another active family with the same primary applicant")
@@ -1142,7 +1145,7 @@ private
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
       errors.add(:family_members, "Duplicate family_members for person: #{k}\n" +
-                          "family_members: #{v.inspect}")
+          "family_members: #{v.inspect}")
     end
   end
 

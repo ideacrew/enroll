@@ -36,6 +36,16 @@ CKEDITOR.editorConfig = function( config )
         key: 'select_conditional_statement',
         title: 'Select Condition/Loop',
         placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
+      },
+      {
+          key: 'select_system_settings',
+          title: 'Select Application Settings',
+          placeholders: <%= Notifier::MergeDataModels::ConsumerRole.new.settings_placeholders.to_json %>
+      },
+      {
+          key: 'select_conditional_statement',
+          title: 'Select Condition/Loop',
+          placeholders: <%= Notifier::MergeDataModels::ConsumerRole.new.place_holders.to_json %>
       }
      
       ];

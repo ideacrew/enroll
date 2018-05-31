@@ -15,6 +15,18 @@ module Notifier
       enrollment
     end
 
+    def enrollment_latest_active_enrollment
+      merge_model.enrollment.latest_active_enrollment = consumer_role.person.primary_family.enrollments.sort_by(&:effective_on).last.effective_on.strftime("%B %d, %Y")
+    end
+
+    def enrollment_coverage_year
+      merge_model.enrollment.coverage_year = self.ivl_coverage_year
+    end
+
+    def enrollment_family_deductible
+      merge_model.enrollment.family_deductible = consumer_role.person.primary_family.enrollments.sort_by(&:effective_on).last.plan.family_deductible.split("|").last.squish
+    end
+
     def enrollment_coverage_start_on
       return if enrollment.blank?
       merge_model.enrollment.coverage_start_on = format_date(enrollment.effective_on)
@@ -23,6 +35,13 @@ module Notifier
     def enrollment_coverage_end_on
       return if enrollment.blank?
       merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
+    end
+
+    # def enrollment_enrollees
+    #   merge_model.enrollment.enrollees = enrollment.enrollees
+    # end
+    def enrollment_enrollees
+      merge_model.enrollments.flat_map(&:enrollees)
     end
 
     def enrollment_plan_name
@@ -58,6 +77,20 @@ module Notifier
     def enrollment_employee_last_name
       return if enrollment.blank?
       merge_model.enrollment.employee_last_name = enrollment.census_employee.last_name
+    end
+
+
+
+    def ivl_coverage_year
+      hbx_enrollments = []
+      en = consumer_role.person.primary_family.enrollments.select{ |en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
+      health_enrollments = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:effective_on)
+      dental_enrollments = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:effective_on)
+      hbx_enrollments << health_enrollments
+      hbx_enrollments << dental_enrollments
+      hbx_enrollments.flatten!
+      hbx_enrollments.compact!
+      hbx_enrollments.compact.first.effective_on.year
     end
 
   end
