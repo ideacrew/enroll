@@ -192,6 +192,7 @@ class HbxEnrollment
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
   scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
+  scope :by_benefit_package,       -> (benefit_package) { where(:benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
 
   embeds_many :workflow_state_transitions, as: :transitional
@@ -1227,9 +1228,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1523,16 +1524,6 @@ class HbxEnrollment
     benefit_group.rating_area
   end
 
-  def ee_select_plan_during_oe
-    begin
-      if is_shop? && self.census_employee.present? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "select_plan_year_during_oe", {:enrollment_hbx_id => self.hbx_id.to_s})
-      end
-    rescue Exception => e
-      Rails.logger.error { "Unable to send MAE068 notice to #{self.census_employee.full_name} due to #{e.backtrace}" }
-    end
-  end
-
   # def ee_plan_selection_confirmation_sep_new_hire
   #   if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
   #     if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
@@ -1562,8 +1553,14 @@ class HbxEnrollment
    !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
  end
 
+  def sponsored_benefit_package
+    @sponsored_benefit_package ||= ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id)
+  end
+
   def sponsored_benefit
-    @sponsored_benefit ||= ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit.find(self.sponsored_benefit_id)
+    @sponsored_benefit ||= sponsored_benefit_package.sponsored_benefits.detect do |sb|
+     sb.id == sponsored_benefit_id
+    end
   end
 
   def rating_area
@@ -1597,10 +1594,12 @@ class HbxEnrollment
         hem.is_subscriber?,
         person.is_disabled
       )
+      roster_members << roster_member
       group_enrollment_member = BenefitSponsors::Enrollments::MemberEnrollment.new({
         member_id: hem.id,
         coverage_eligibility_on: hem.eligibility_date
       })
+      group_enrollment_members << group_enrollment_member
     end
     group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
       previous_product: previous_product,

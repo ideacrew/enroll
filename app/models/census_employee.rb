@@ -73,6 +73,7 @@ class CensusEmployee < CensusMember
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
   after_save :assign_benefit_packages
+  after_save :notify_on_save
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
@@ -137,10 +138,10 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
   scope :by_employer_profile_id,          ->(employer_profile_id) { scoped_profile(employer_profile_id) }
 
-  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) { 
-    where(:"benefit_group_assignments" => { :$elemMatch => { 
-      :start_on.lte => effective_on, :end_on.gte => effective_on, 
-      :benefit_package_id => benefit_package.id, :is_active => true 
+  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
+    where(:"benefit_group_assignments" => { :$elemMatch => {
+      :start_on.lte => effective_on, :end_on.gte => effective_on,
+      :benefit_package_id => benefit_package.id, :is_active => true
     }})
   }
 
@@ -181,6 +182,16 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def deactive_benefit_group_assignments(benefit_package_ids)
+    assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_package_ids)
+    assignments.each do |assignment|
+      if assignment.may_delink_coverage?
+        assignment.delink_coverage!
+        assignment.update_attribute(:is_active, false)
+      end
+    end
+  end
+
   def assign_to_benefit_package(benefit_package, assignment_on)
     return if benefit_package.blank?
 
@@ -192,7 +203,7 @@ class CensusEmployee < CensusMember
   end
 
   def benefit_package_assignment_for(benefit_package)
-    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect{ |assignment| 
+    benefit_group_assignments.effective_on(benefit_package.effective_period.min).detect{ |assignment|
       assignment.benefit_package_id == benefit_package.id
     }
   end
@@ -265,7 +276,7 @@ class CensusEmployee < CensusMember
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
     # Guard against linking employee roles with different employer/identifying information
-    slug = is_case_old? && self.employer_profile_id == new_employee_role.employer_profile_id 
+    slug = is_case_old? && self.employer_profile_id == new_employee_role.employer_profile_id
     if (self.benefit_sponsors_employer_profile_id == new_employee_role.benefit_sponsors_employer_profile_id) || slug
       self.employee_role_id = new_employee_role._id
       @employee_role = new_employee_role
@@ -1094,6 +1105,22 @@ class CensusEmployee < CensusMember
         :"benefit_group_assignment_id".in => benefit_group_assignments.map(&:id)
       })
     end
+  end
+
+  def benefit_package_for_open_enrollment(shopping_date)
+    active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
+  end
+
+  def benefit_package_for_date(coverage_date)
+    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
+  end
+
+  def benefit_package_for_date(coverage_date)
+    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
+  end
+
+  def earliest_benefit_package_after(coverage_date)
+    active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
 
   private

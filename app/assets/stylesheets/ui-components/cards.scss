@@ -138,13 +138,45 @@
   }
   #calendar-stack {
     position: relative;
-        display: inline-block;
-        width: (13em / 14);
-        height: 1em;
+    display: inline-block;
+    width: (13em / 14);
+    height: 1em;
+    
+    .fa-calendar,
+    #benefit_application_latest_submitted_on_day, #benefit_application_latest_submitted_on_month, #binder_payment_deadline_day, #binder_payment_deadline_month {
+      position: absolute;
+    }
+    
+    #benefit_application_latest_submitted_on_day, #binder_payment_deadline_day {
+      top:42px;
+      left: (4em / 8);
+      width: (11em / 8);
+      height: (6em / 8);
+      font-family: sans-serif;
+      font-size: (8em / 22);
+      font-weight: 700;
+      line-height: (8em / 14);
+      text-align: center;
+      color:$mhc-orange;
+    }
+    
+    #benefit_application_latest_submitted_on_month, #binder_payment_deadline_month {
+      top:70px;
+      left: (18em / 8);
+      width: (11em / 8);
+      height: (6em / 8);
+      font-family: sans-serif;
+      font-size: (8em / 60);
+      font-weight: 700;
+      line-height: (8em / 14);
+      text-align: center;
+      color:$primary-black;
+    }
   }
 }
 
 .reference-steps {
+  /*
   ul.nav.nav-tabs li label {
     font-weight: bold;
     font-size: 18px;
@@ -173,10 +205,72 @@
   }
   input[type=radio] {
     display:none;
+  }*/
+}
+
+#metal-level-select {
+  .fa-circle {
+    color:$mhc-light-gray;
   }
+  .fa-dot-circle {
+    color:$primary-green;
+  }
+  .nav-tabs {
+    border-bottom:none;
+  }
+  .nav-tabs > li > a {
+    background-color:$mhc-blue;
+    border-bottom: solid 3px $primary-botton-border-bottom;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px;
+    color:$primary-white;
+    text-transform: uppercase;
+  }
+  .nav-tabs > li > a:hover {
+    background-color:$mhc-dark-blue;
+  }
+  .tab-pane#carrier {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  .tab-pane#level {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:220px;
+  }
+  .tab-pane#plan {
+    background-color:$primary-white;
+    padding:20px;
+    min-height:370px;
+  }
+  h5 {
+    font-weight: bold;
+  }
+  #refencePlans {
+   background-color:$primary-white;
+   padding:0px 20px 20px 20px;
+  }
+  p.reference-plan-title {
+    font-size:12px;
+  }
+  .rp-info {
+    min-height:140px;
+  }
+  #yourPlans {
+    padding-top:10px;
+    width:100%;
+    height:310px;
+    background-color:$primary-white;
+    overflow-y: scroll;
+  }
+
 }
 
 .reference-plans {
+  min-height:170px;
   .panel-heading {
     border-bottom: 1px solid transparent;
     border-top-left-radius: 3px;
@@ -195,9 +289,9 @@
     }
   }
   .plan-label {
-        color: #b7b7b7;
-        font-size: 10px;
-            text-transform: uppercase;
+    color: #b7b7b7;
+    font-size: 10px;
+    text-transform: uppercase;
   }
 }
 

@@ -57,7 +57,7 @@ module BenefitSponsors
       end
 
       def pricing_determination_builder
-        CompositeTierPrecalculator
+        CcaCompositeTierPrecalculator
       end
 
       def calculate_price_for(pricing_model, benefit_roster_entry, sponsor_contribution)

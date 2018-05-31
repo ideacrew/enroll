@@ -17,10 +17,11 @@ module BenefitSponsors
         attr_reader :reference_product
         attr_reader :coverage_start, :census_employees
 
-        def initialize(census_employees, r_product, c_start)
+        def initialize(census_employees, r_product, c_start, s_benefit)
           @reference_product = r_product
           @coverage_start = c_start
           @census_employees = census_employees
+          @sponsored_benefit = s_benefit
         end
 
         def each
@@ -70,9 +71,10 @@ module BenefitSponsors
           group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
             {
               product: reference_product,
-              rate_schedule_date: nil,
+              rate_schedule_date: @sponsored_benefit.rate_schedule_date,
               coverage_start_on: coverage_start,
-              member_enrollments: member_enrollments
+              member_enrollments: member_enrollments,
+              rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code
             })
           ::BenefitSponsors::Members::MemberGroup.new(
             member_entries,
@@ -121,7 +123,8 @@ module BenefitSponsors
           sponsor_contribution,
           p_calculator,
           c_calculator,
-          roster_eligibility_optimizer
+          roster_eligibility_optimizer,
+          sponsored_benefit
         )
         [sponsor_contribution, price, contribution]
       end
@@ -152,11 +155,11 @@ module BenefitSponsors
         participation = calculate_participation_percent
         sic_code = sponsor_contribution.sic_code
         enrolling_employees = employees_enrolling
-        group_mapper = CensusEmployeeMemberGroupMapper.new(enrolling_employees, reference_product, coverage_start)
+        group_mapper = CensusEmployeeMemberGroupMapper.new(enrolling_employees, reference_product, coverage_start, sponsored_benefit)
         mapped_eligible_roster = group_mapper.lazy.map do |e_roster_entry|
           roster_eligibility_optimizer.calculate_optimal_group_for(contribution_model, e_roster_entry, sponsor_contribution)
         end
-        p_determination_builder.create_pricing_determination(sponsored_benefit, reference_product, pricing_model, mapped_eligible_roster, group_size, participation, sic_code)
+        p_determination_builder.create_pricing_determinations(sponsored_benefit, reference_product, pricing_model, mapped_eligible_roster, group_size, participation, sic_code)
       end
 
       def calculate_normal_costs(
@@ -166,12 +169,13 @@ module BenefitSponsors
         sponsor_contribution,
         p_calculator,
         c_calculator,
-        roster_eligibility_optimizer
+        roster_eligibility_optimizer,
+        sponsored_benefit
       )
         price_total = 0.00
         contribution_total = 0.00
         enrolling_employees = employees_enrolling
-        group_mapper = CensusEmployeeMemberGroupMapper.new(enrolling_employees, reference_product, coverage_start)
+        group_mapper = CensusEmployeeMemberGroupMapper.new(enrolling_employees, reference_product, coverage_start, sponsored_benefit)
         group_mapper.each do |ce_roster|
           roster_group = roster_eligibility_optimizer.calculate_optimal_group_for(contribution_model, ce_roster, sponsor_contribution)
           price_group = p_calculator.calculate_price_for(pricing_model, roster_group, sponsor_contribution)

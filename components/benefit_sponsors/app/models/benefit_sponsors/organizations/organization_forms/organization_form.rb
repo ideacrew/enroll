@@ -35,7 +35,7 @@ module BenefitSponsors
 
       # Strip non-numeric characters
       def fein=(new_fein)
-        fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
+        fein = new_fein.to_s.gsub(/\D/, '') rescue nil
         super fein
       end
 

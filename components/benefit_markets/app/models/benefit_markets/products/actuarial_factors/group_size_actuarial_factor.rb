@@ -18,8 +18,8 @@ module BenefitMarkets
 				end
 
         def cached_lookup(lookup_key)
-					max_adjusted_key = (val > max_integer_factor_key) ? max_integer_factor_key : val
-					lookup_key = (val < 1) ? 1 : max_adjusted_key
+					max_adjusted_key = (lookup_key > max_integer_factor_key) ? max_integer_factor_key : lookup_key
+					lookup_key = (lookup_key < 1) ? 1 : max_adjusted_key
           super(lookup_key)
         end
 			end

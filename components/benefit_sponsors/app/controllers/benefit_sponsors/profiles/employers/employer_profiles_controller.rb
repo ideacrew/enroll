@@ -4,6 +4,7 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :premium_statements]
+        before_action :load_hbx_enrollments, only: [:premium_statements], if: :is_format_csv?
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
@@ -52,7 +53,8 @@ module BenefitSponsors
 
         def premium_statements
           authorize @employer_profile
-          @datatable = Effective::Datatables::PremiumBillingReportDataTable.new({ id: params.require(:employer_profile_id), billing_date: params[:billing_date]})
+          @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
+          @datatable = Effective::Datatables::BenefitSponsorsPremiumStatementsDataTable.new({ id: params.require(:employer_profile_id), billing_date: @billing_date})
 
           respond_to do |format|
             format.html
@@ -108,6 +110,12 @@ module BenefitSponsors
           end
         end
 
+        def load_hbx_enrollments
+          billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
+          query = Queries::PremiumStatementsQuery.new(@employer_profile, billing_date)
+          @hbx_enrollments =  query.enrollments
+        end
+
         def default_url
           "employers/employer_profiles/employee_csv_upload_errors"
         end
@@ -115,7 +123,7 @@ module BenefitSponsors
         def csv_for(hbx_enrollments)
           (output = "").tap do
             CSV.generate(output) do |csv|
-              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
+              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Covered Ct", "Employer Contribution",
               "Employee Premium", "Total Premium"]
               hbx_enrollments.each do |enrollment|
                 census_employee = enrollment.census_employee
@@ -126,9 +134,9 @@ module BenefitSponsors
                           census_employee.dob,
                           census_employee.hired_on,
                           census_employee.published_benefit_group.title,
-                          enrollment.plan.coverage_kind,
-                          enrollment.plan.name,
-                          enrollment.plan.carrier_profile.legal_name,
+                          # enrollment.plan.coverage_kind,
+                          # enrollment.plan.name,
+                          # enrollment.plan.carrier_profile.legal_name, # toDo "Type", "Name", "Issuer"
                           enrollment.humanized_members_summary,
                           view_context.number_to_currency(enrollment.total_employer_contribution),
                           view_context.number_to_currency(enrollment.total_employee_cost),
@@ -146,6 +154,10 @@ module BenefitSponsors
             else
               'text/csv'
           end
+        end
+
+        def is_format_csv?
+          request.format.csv?
         end
       end
     end
