@@ -3,8 +3,8 @@
 <% end %>
 <div class="premium-reports-tab">
   <div class="row no-buffer">
-    <% plan_year, @billing_date = @employer_profile.billing_plan_year %>
-    <% if plan_year.present? && billing_date.present? %>
+    <% @plan_year, @billing_date = @employer_profile.billing_plan_year(@billing_date) %>
+    <% if @plan_year.present? && @billing_date.present? %>
 
       <div class="col-xs-8 col-xs-offset-4">
         <div class="row">

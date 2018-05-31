@@ -16,6 +16,7 @@ module BenefitSponsors
       COVERAGE_EFFECTIVE_STATES     = [:active].freeze
       TERMINATED_STATES             = [:denied, :suspended, :terminated, :canceled, :expired].freeze
       EXPIRED_STATES                = [:expired].freeze
+      IMPORTED_STATES               = [:imported].freeze
 
       PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
 
@@ -108,7 +109,10 @@ module BenefitSponsors
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
       scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
       scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
+      scope :imported,                        ->{ any_in(aasm_state: IMPORTED_STATES) }
       scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
+      scope :non_draft,                       ->{ not_in(aasm_state: APPLICATION_DRAFT_STATES) }
+      scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
@@ -122,6 +126,9 @@ module BenefitSponsors
       scope :effective_period_cover,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"effective_period.min".lte => compare_date,
                                                               :"effective_period.max".gte => compare_date)
+                                                            }
+      scope :future_effective_date,         ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                              :"effective_period.min".gte => compare_date )
                                                             }
       scope :open_enrollment_period_cover,    ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"opem_enrollment_period.min".lte => compare_date,
@@ -328,6 +335,7 @@ module BenefitSponsors
            
       def expire_benefit_package_members
         benefit_packages.each do |benefit_package|
+          benefit_package.deactivate
           Family.enrolled_through_benefit_package(benefit_package).each do |family|
             benefit_package.expire_family_coverages(family)
           end
@@ -336,6 +344,7 @@ module BenefitSponsors
 
       def terminate_benefit_package_members
         benefit_packages.each do |benefit_package|
+          benefit_package.deactivate
           Family.enrolled_through_benefit_package(benefit_package).each do |family|
             benefit_package.terminate_family_coverages(family)
           end
@@ -349,6 +358,7 @@ module BenefitSponsors
       end
 
       def disable_benefit_package(benefit_package)
+        benefit_package.deactivate
         Family.enrolled_through_benefit_package(benefit_package).each do |family|
           benefit_package.cancel_family_coverages(family)
         end

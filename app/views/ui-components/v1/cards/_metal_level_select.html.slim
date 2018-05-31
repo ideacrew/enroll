@@ -3,10 +3,9 @@
 - selected_kind_plan = f.object.product_option_choice == 'single_product'
 
 - if @benefit_package_form.new_record?
-  .col-md-12
-    h1.heading-text Select Your Plan Offering
-    h4 Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
-    br
+  h1.heading-text Select Your Plan Offering
+  h4 Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
+  br
 - else
   .edit-offering.health
     h4.currently-offered
@@ -21,34 +20,131 @@
     br
   .benefit-package-health
     #metal-level-select.card
-    .card-body
-      ul.nav.nav-tabs
-        li role="presentation"
-          label
-            a href="#carrier" aria-controls="carrier" role="tab" data-toggle="tab"
-            | One Carrier
-            input[type="radio" name="tab-radio"]
-            span.checkmark
-        li role="presentation"
-          label
-            a href="#level" aria-controls="level" role="tab" data-toggle="tab"
-            | One Level
-            input[type="radio" name="tab-radio"]
-            span.checkmark
-        li role="presentation"
-          label
-            a href="#plan" aria-controls="plan" role="tab" data-toggle="tab"
-            | One Plan
-            input[type="radio" name="tab-radio"]
-            span.checkmark
-      .tab-content
-        .tab-pane#carrier role="tabpanel"
-          | piepigjpdibjdpibfdfinvpdfvndfpivnfdpvidfnvpfdivdfvdf
-        .tab-pane#level role="tabpanel"
-          | level infor
-        .tab-pane#plan role="tabpanel"
-          | plan info
+      .card-body
+        ul.nav.nav-tabs role="tablist"
+          li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
+            a href="#carrier" aria-controls="carrier" role="tab" data-toggle="tab" data-name="single_issuer"
+              i.far.fa-circle.mr-2
+              | One Carrier
+          li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
+            a href="#level" aria-controls="level" role="tab" data-toggle="tab" data-name="metal_level"
+              i.far.fa-circle.mr-2
+              | One Level
+          li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
+            a href="#plan" aria-controls="plan" role="tab" data-toggle="tab" data-name="single_product"
+              i.far.fa-circle.mr-2
+              | One Plan
+        .tab-content
+          .tab-pane.fade#carrier role="tabpanel"
+            h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
+            - @benefit_package_form.catalog.carrier_names.each do |ck|
+              .col-xs-3.carriers
+                .col-xs-12
+                  .col-xs-3
+                    = f.radio_button :product_option_choice, "#{ck}", class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                  .col-xs-9
+                    h5.heading-text = ck
+              
+          .tab-pane.fade#level role="tabpanel"
+            h4 Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.
+            - @benefit_package_form.catalog.metal_levels.each do |kind|
+              .col-xs-3.metals
+                .col-xs-12
+                  .col-xs-3
+                    = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                  .col-xs-9
+                    h5.heading-text = kind
+                    
+          .tab-pane.fade#plan role="tabpanel"
+            h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?
+            - @benefit_package_form.catalog.single_product_options.each do |ck|
+              .col-xs-3.plans
+                .col-xs-12
+                  .col-xs-3
+                    = f.radio_button :product_option_choice, ck, class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                  .col-xs-9
+                    h5.heading-text = ck
+        
+        #referencePlans.hidden
+          h2.heading-text.pt-1 Select Your Reference Plan
+
+          h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+          #yourPlans
 
 javascript:
+  var productOptionKind = String;
+  var selectedRadio = String;
+  var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
+  var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
+  
+  function radioSelected(element) {
+    setCircle(element)
+  }
+  
+  function setCircle(element) {
+    // Adds toggle circle icon to metal level tabs
+    var items = document.querySelectorAll('#metal-level-select ul li');
+    document.getElementById('referencePlans').classList.add('hidden')
+    
+    for(item of items) {
+      if (item.querySelector('.fa-dot-circle')) {
+        item.querySelector('.fa-dot-circle').classList.toggle('fa-circle')
+      }
+    
+      if (item.innerText == element.innerText) {
+        element.querySelector('.fa-circle').classList.toggle('fa-dot-circle')
+        // Gets product option info
+        productOptionKind = element.querySelector('a').dataset.name;
+      }
+    }
+  }
+  
+  function getPlanInfo(element) {
+    var selectedRadio = element.value;
+    var filteredProducts = planOptions[productOptionKind][selectedRadio];
+    populateReferencePlans(filteredProducts)
+  }
+  
+  function populateReferencePlans(plans) {
+    console.log(sponsorContributions)
+    // Makes reference plans visible
+    document.getElementById('referencePlans').classList.remove('hidden');
+    // Removes reference plans if metal level changes
+    var populatedReferencePlans = document.querySelectorAll("#yourAvailablePlans");
+    
+    if (populatedReferencePlans) {
+      for(rplans of populatedReferencePlans) {
+        rplans.remove()
+      }
+    }
+
+    // Build reference plans to be displayed in UI
+    for(plan of plans) {
+    
+    var div = document.createElement('div')
+    div.setAttribute('id', 'yourAvailablePlans')
+    div.innerHTML = '<div class="col-xs-4 reference-plans">\
+        <div class="col-xs-12 p0 mb-1">\
+          <div class="col-xs-3 p0">\
+            <input type="radio" name="reference-plans">\
+          </div>\
+          <div class="col-xs-9 p0 rp-info mb-1">\
+            <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
+            <span class="plan-label">Type:</span><br>\
+            <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
+            <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
+          </div>\
+        </div>\
+      </div>'
+
+      document.getElementById('yourPlans').append(div);
+    }
+  }
+  
+  
+
+
+  
+  
 
   

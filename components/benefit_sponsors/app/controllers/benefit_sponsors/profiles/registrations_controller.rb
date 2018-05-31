@@ -65,6 +65,12 @@ module BenefitSponsors
         redirect_to result_url
       end
 
+			def counties_for_zip_code
+        @counties = BenefitMarkets::Locations::CountyZip.where(zip: params[:zip_code]).pluck(:county_name).uniq
+
+        render json: @counties
+			end
+
       private
 
       def profile_type

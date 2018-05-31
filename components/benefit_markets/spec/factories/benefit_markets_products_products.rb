@@ -25,7 +25,7 @@ FactoryGirl.define do
     end
 
     description          "Highest rated and highest value"
-    service_area         FactoryGirl.build(:benefit_markets_locations_service_area)
+    service_area         { FactoryGirl.build(:benefit_markets_locations_service_area) }
 
     after(:build) do |product, evaluator|
       product.premium_tables << build_list(:benefit_markets_products_premium_table, 1)
