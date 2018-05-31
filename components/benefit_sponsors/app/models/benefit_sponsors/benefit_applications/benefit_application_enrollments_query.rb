@@ -12,7 +12,7 @@ module BenefitSponsors
         klass_name.collection.aggregate([
           {"$match" => { "households.hbx_enrollments" => {
             "$elemMatch" => {
-            "benefit_group_id" => {
+            "sponsored_benefit_package_id" => {
               "$in" => benefit_package_ids
             },
             "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
@@ -21,7 +21,7 @@ module BenefitSponsors
           {"$unwind" => "$households"},
           {"$unwind" => "$households.hbx_enrollments"},
           {"$match" => {
-            "households.hbx_enrollments.benefit_group_id" => {
+            "households.hbx_enrollments.sponsored_benefit_package_id" => {
               "$in" => benefit_package_ids
             },
             "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},

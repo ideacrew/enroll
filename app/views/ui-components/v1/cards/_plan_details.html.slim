@@ -1,7 +1,7 @@
 - # plan_carrier = Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile }
 - member_enrollment = plan.group_enrollment
 - plan = plan.group_enrollment.product
-- plan_carrier = plan.issuer_profile
+- plan_carrier = ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, plan.issuer_profile_id) { plan.issuer_profile }
 
 .module.plan-row.panel.panel-default
   .panel-body
@@ -60,16 +60,7 @@
       .col-xs-4
         = "SBC LINK WILL GO HERE"
       .col-md-5.col-sm-5.col-xs-5.text-right style="padding-left: 0"
-        - if @person.primary_family.active_household.latest_active_tax_household.present? && params[:market_kind]=='individual'
-          - eligibility_kind = @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
-          - if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != "csr_100" && plan.metal_level != "silver"
-            = link_to "Select Plan", "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"}
-            = link_to("Select Plan", "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}})
-            = render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan }
-          - else
-            = link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}})
-        - else
-          = link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}})
-          = link_to "See Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default ml-1", :remote => true}
+        = link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}})
+        = link_to "See Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default ml-1", :remote => true}
             
           

@@ -226,7 +226,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   context "PUT update", dbclean: :after_each do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryGirl.build(:person) }
+    let(:person){ FactoryGirl.create(:person) }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -235,6 +235,25 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
       sign_in user
+    end
+
+
+    context "to verify new addreses not created on updating the existing address" do
+      before :each do
+        put :update, person: person_params, id: "test"
+      end
+
+      it "should not empty the person's addresses on update" do
+        expect(person.addresses).not_to eq []
+      end
+
+      it "should not create new address instances on update" do
+        expect(person.addresses.map(&:id).map(&:to_s)).to eq person.addresses.map(&:id).map(&:to_s)
+      end
+
+      it "should have same number of addresses on update" do
+        expect(person.addresses.count).to eq 2
+      end
     end
 
     it "should update existing person" do

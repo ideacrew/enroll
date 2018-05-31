@@ -132,9 +132,9 @@ class Person
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
-  accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
-  accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
-  accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| Email.new(addy).blank? }
+  accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| addy[:address].blank? }, allow_destroy: true
 
   validates_presence_of :first_name, :last_name
   validate :date_functional_validations

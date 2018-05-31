@@ -20,9 +20,16 @@ class GroupSelectionEligibilityChecker
     coverage_age = @age_calculator.calc_coverage_age_for(MemberAgeSlug.new(dob, family_member.id), nil, coverage_date, {}, nil)
     # If the relationship doesn't even map, they aren't allowed
     mapped_relationship = @contribution_model.map_relationship_for(rel, coverage_age, disability)
-    return false unless mapped_relationship
-    # TODO: Check for mapped relationships that fall under groups that aren't offered
-    true
+    matching_contribution_units = @contribution_model.contribution_units.select do |cu|
+      cu.at_least_one_matches?({mapped_relationship.to_s => 1})
+    end
+    return false if matching_contribution_units.empty?
+    cu_ids = matching_contribution_units.map(&:id)
+    matching_contribution_levels = @sponsored_benefit.sponsor_contribution.contribution_levels.select do |cl|
+      cu_ids.include?(cl.contribution_unit_id) 
+    end
+    return false if matching_contribution_levels.empty?
+    matching_contribution_levels.any?(&:is_offered?)
   end
 
   def map_family_member_data(family_member)

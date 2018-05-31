@@ -88,7 +88,7 @@ module BenefitMarkets
 
     def issuer_profile_products_for(issuer_profile)
       return @issuer_profile_products if defined?(@issuer_profile_products)
-      @issuer_profile_products = active_products.by_issuer_profile(issuer_profile)
+      @issuer_profile_products = products.by_issuer_profile(issuer_profile)
     end
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
@@ -122,7 +122,7 @@ module BenefitMarkets
       if package_kind == :metal_level
         products.by_metal_level(product_option_choice)
       else
-        issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name(product_option_choice)
+        issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find(product_option_choice)
         return [] unless issuer_profile
         issuer_profile_products_for(issuer_profile)
       end

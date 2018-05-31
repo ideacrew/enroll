@@ -62,13 +62,6 @@ class Insured::PlanShoppingsController < ApplicationController
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
     # @enrollment.mid_year_plan_change_notice #mirror notice
 
-    # send accepted SEP QLE event notice to enrolled employee
-    if @market_kind == "shop" && @enrollment.employee_role_id.present? && @change_plan == "change_by_qle"
-       emp_role_id = @enrollment.employee_role_id.to_s
-       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id }
-       sep_qle_request_accept_notice_ee(@employee_role.census_employee.id.to_s, @enrollment)
-    end
-
     send_receipt_emails if @person.emails.first
   end
 
@@ -148,17 +141,6 @@ class Insured::PlanShoppingsController < ApplicationController
      end
     end
 
-  def sep_qle_request_accept_notice_ee(employee_id, enrollment)
-    sep = enrollment.special_enrollment_period
-    options = { :sep_qle_end_on => sep.end_on.to_s, :sep_qle_title => sep.title, :sep_qle_on => sep.qle_on.to_s }
-    begin
-      ShopNoticesNotifierJob.perform_later(employee_id, "notify_employee_of_special_enrollment_period", :sep => options)
-    rescue Exception => e
-      logger.debug("Exception raised in %s" % e.backtrace)
-      raise "Unable to trigger sep_qle_request_accept_notice_ee"
-    end
-  end
-
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
@@ -174,6 +156,11 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
+    ip_lookup_table = {}
+    issuer_profile_cache = ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |ipo|
+      ip_lookup_table[ipo.issuer_profile.id] = ipo.issuer_profile
+    end
+    ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
@@ -186,6 +173,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @member_groups = sponsored_cost_calculator.groups_for_products(products)
     @enrolled_hbx_enrollment_plan_ids = []
     render "show_slug"
+    ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
 =begin
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)

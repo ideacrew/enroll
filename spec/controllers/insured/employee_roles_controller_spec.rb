@@ -39,10 +39,17 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         expect(response).to redirect_to(insured_family_members_path(:employee_role_id => employee_role_id))
       end
 
-      context "clean duplicate addresses" do
-        it "returns empty array for people's addresses" do
+      context "to verify new addreses not created on updating the existing address" do
+        before :each do
           put :update, :person => person_parameters, :id => person_id
-          expect(person.addresses).to eq []
+        end
+
+        it "should not empty the person's addresses on update" do
+          expect(person.addresses).not_to eq []
+        end
+
+        it "should not create new address instances on update" do
+          expect(person.addresses.map(&:id).map(&:to_s)).to eq person.addresses.map(&:id).map(&:to_s)
         end
       end
     end
