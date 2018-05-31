@@ -13,6 +13,7 @@ module ModelEvents
       # :open_enrollment_began, #not being used
       :application_denied,
       :renewal_application_denied,
+      :group_advance_termination_confirmation,
       :zero_employees_on_roster
     ]
 
@@ -75,6 +76,14 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
           is_renewal_application_denied = true
+        end
+
+        if is_transition_matching?(to: :termination_pending, from: :active, event: :schedule_termination)
+          is_group_advance_termination_confirmation = true
+        end
+        
+        if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
+          is_group_advance_termination_confirmation = true
         end
 
         if is_transition_matching?(to: :published, from: :draft, event: :force_publish)

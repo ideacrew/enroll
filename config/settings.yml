@@ -165,6 +165,7 @@ aca:
     new_employee_paper_application: true
     census_employees_template_file: 'DCHL Employee Census'
     coverage_start_period: "90 days"
+    small_market_active_employee_limit: 200
 
     earliest_enroll_prior_to_effective_on:
       days: -30
