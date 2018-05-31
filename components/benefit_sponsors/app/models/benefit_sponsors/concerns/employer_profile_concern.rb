@@ -222,6 +222,11 @@ module BenefitSponsors
         @billing_benefit_application = billing_benefit_application(billing_date)
       end
 
+      def latest_plan_year
+        warn "[Deprecated] Instead use latest_benefit_application" unless Rails.env.test?
+        latest_benefit_application
+      end
+
       def earliest_plan_year_start_on_date
         current_benefit_application.start_on
       end
