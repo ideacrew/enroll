@@ -15,6 +15,10 @@ module Config::SiteHelper
   def site_website_name
     Settings.site.website_name
   end
+  
+  def site_website_link
+    link_to site_website_name, site_website_name
+  end
 
   def site_website_link
     link_to site_website_name, site_website_name
@@ -106,6 +110,10 @@ module Config::SiteHelper
 
   def site_make_their_premium_payments_online
     Settings.site.make_their_premium_payments_online
+  end
+
+  def link_to_make_their_premium_payments_online
+    link_to "make your premium payments online", site_make_their_premium_payments_online
   end
 
   def health_care_website

@@ -20,7 +20,6 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
                                           aasm_state: "shopping"
   ) }
 
-
   describe "ModelEvent" do
     context "when employee plan coverage selected" do
       it "should trigger model event" do
