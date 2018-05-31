@@ -40,10 +40,10 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
         "employee_profile.broker.phone",
         "employee_profile.broker.email",
         "employee_profile.broker_present?",
-        "employee_profile.qle.title",
-        "employee_profile.qle.start_on",
-        "employee_profile.qle.end_on",
-        "employee_profile.qle.event_on",
+        "employee_profile.special_enrollment_period.title",
+        "employee_profile.special_enrollment_period.start_on",
+        "employee_profile.special_enrollment_period.end_on",
+        "employee_profile.special_enrollment_period.event_on",
       ]
     }
 
@@ -89,19 +89,19 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
 
     context "with QLE data_elements" do
       it "should return qle_title" do
-        expect(merge_model.qle.title).to eq qle.title
+        expect(merge_model.special_enrollment_period.title).to eq qle.title
       end
 
       it "should return qle_start_on" do
-        expect(merge_model.qle.start_on).to eq qle.start_on
+        expect(merge_model.special_enrollment_period.start_on).to eq qle.start_on.to_s
       end
 
       it "should return qle_end_on" do
-        expect(merge_model.qle.end_on).to eq qle.end_on
+        expect(merge_model.special_enrollment_period.end_on).to eq qle.end_on.to_s
       end
 
       it "should return qle_event_on" do
-        expect(merge_model.qle.event_on).to eq  Date.strptime(payload['qle_event_on'], '%m/%d/%Y')
+        expect(merge_model.special_enrollment_period.event_on).to eq Date.strptime(payload['qle_event_on'], '%m/%d/%Y')
       end
     end
   end
