@@ -53,7 +53,7 @@ module BenefitSponsors
         if sponsored_benefit.sponsor_contribution.blank?
           raise StandardError, "Sponsor Contribution construction failed!!"
         end
-        
+
         sponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
           contribution_match = attrs[:contributions].detect{|contribution| contribution['relationship'] == new_contribution_level.display_name}
 

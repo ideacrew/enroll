@@ -10,7 +10,6 @@ module Importers
     attr_converter :subscriber_gender, :as => :gender
 
     attr_reader :warnings, :fein, :subscriber_dob, :subscriber_zip, :benefit_begin_date
-    
     attr_accessor :action,
       :default_policy_start,
       :hios_id,
@@ -82,7 +81,7 @@ module Importers
           @subscriber_zip = val[0..4]
         else
           @subscriber_zip = val.strip.rjust(5, "0")
-        end 
+        end
       end
     end
 

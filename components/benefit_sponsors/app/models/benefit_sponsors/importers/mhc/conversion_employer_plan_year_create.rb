@@ -36,7 +36,6 @@ module Importers::Mhc
       contribution_level_names.each do |sponsor_contribution_name|
         sanitized_params.merge!(formed_params(sponsor_contribution_name))
       end
-      binding.pry
     end
 
     def fetch_benefit_product
@@ -97,7 +96,7 @@ module Importers::Mhc
         rescue Exception => e
           raise "\n#{employer.fein} - #{employer.legal_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
         end
-        # map_employees_to_benefit_groups(employer, record)
+        map_employees_to_benefit_groups(employer, record)
       end
       return save_result
     end
