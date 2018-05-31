@@ -59,12 +59,12 @@ module BenefitSponsors
               member_entries << EnrollmentMemberAdapter.new(
                 cm.id,
                 cm.dob,
-                map_ce_relationship(ce.relationship),
+                map_ce_relationship(cm.employee_relationship),
                 false,
-                map_ce_disabled(ce.relationship)
+                map_ce_disabled(cm.employee_relationship)
               )
               member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
-                member_id: census_employee.id
+                member_id: cm.id
               })
             end
           end
