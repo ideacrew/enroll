@@ -6,4 +6,5 @@ conversions:
   employee_policy_year: 2017
   number_of_dependents: 8
   mid_year_conversion: true
+  mpyc_plan_year_begin_date: 2017-09-01
   plan_year_end_date: 2018-08-31
