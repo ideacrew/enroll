@@ -206,7 +206,7 @@ class FinancialAssistance::Application
     end
 
     event :determine, :after => :record_transition do
-      transitions from: :submitted, to: :determined, :after => [:verification_update_for_applicants]
+      transitions from: :submitted, to: :determined, :after => [:trigger_eligibilility_notice, :verification_update_for_applicants]
     end
 
   end
