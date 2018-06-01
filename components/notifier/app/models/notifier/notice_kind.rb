@@ -38,9 +38,13 @@ module Notifier
     attr_accessor :resource, :payload
 
     def set_data_elements
+      @logger = Logger.new("#{Rails.root}/log/notice_kind.log")
+       @logger.info "enter data elements"
       if template.present?
+        @logger.info "enter data element #{template}"
         tokens = template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
         conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
+           @logger.info "enter conditional tokens"
         template.data_elements = tokens + conditional_tokens
       end
     end
@@ -52,7 +56,7 @@ module Notifier
       if finder_mapping.nil?
         raise ArgumentError.new("BOGUS EVENT...could n't find resoure mapping for event #{event_name}.")
       end
-
+      @logger.info "enter execute notice"
       @payload = payload
       @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
       if @resource.blank?
