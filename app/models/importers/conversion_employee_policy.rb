@@ -80,37 +80,37 @@ module Importers
 
     PersonSlug = Struct.new(:name_pfx, :first_name, :middle_name, :last_name, :name_sfx, :ssn, :dob, :gender)
 
-    def examine_and_maybe_merge_poc(employer, employee)
-      staff_roles = employer.staff_roles
-      staff_roles_to_merge = staff_roles.select do |sr|
-        (employee.first_name.downcase.strip == sr.first_name.downcase.strip) &&
-          (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
-      end
-      if staff_roles_to_merge.empty?
-        return true
-      end
-      if staff_roles_to_merge.count > 1
-        errors.add(:base, "this employee has the same personal data as multiple points of contact")
-        return false
-      end
-      merge_staff = staff_roles_to_merge.first
-      existing_people = Person.match_by_id_info(ssn: employee.ssn, dob: employee.dob, last_name: employee.last_name, first_name: employee.first_name)
-      if existing_people.count > 1
-        errors.add(:base, "matching conflict for this personal data")
-        return false
-      end
-      if existing_people.empty?
-        begin
-          merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
-        rescue Exception  => e 
-          errors.add(:base, e.to_s)
-        end
-        return true
-      end
-      existing_person = existing_people.first
-      merge_poc_and_employee_person(merge_staff, existing_person, employer)
-      true
-    end
+    # def examine_and_maybe_merge_poc(employer, employee)
+    #   staff_roles = employer.staff_roles
+    #   staff_roles_to_merge = staff_roles.select do |sr|
+    #     (employee.first_name.downcase.strip == sr.first_name.downcase.strip) &&
+    #       (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
+    #   end
+    #   if staff_roles_to_merge.empty?
+    #     return true
+    #   end
+    #   if staff_roles_to_merge.count > 1
+    #     errors.add(:base, "this employee has the same personal data as multiple points of contact")
+    #     return false
+    #   end
+    #   merge_staff = staff_roles_to_merge.first
+    #   existing_people = Person.match_by_id_info(ssn: employee.ssn, dob: employee.dob, last_name: employee.last_name, first_name: employee.first_name)
+    #   if existing_people.count > 1
+    #     errors.add(:base, "matching conflict for this personal data")
+    #     return false
+    #   end
+    #   if existing_people.empty?
+    #     begin
+    #       merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
+    #     rescue Exception  => e
+    #       errors.add(:base, e.to_s)
+    #     end
+    #     return true
+    #   end
+    #   existing_person = existing_people.first
+    #   merge_poc_and_employee_person(merge_staff, existing_person, employer)
+    #   true
+    # end
 
     def merge_poc_and_employee_person(poc_person, employee_person, employer)
       return true if poc_person.id == employee_person.id
@@ -138,9 +138,9 @@ module Importers
       return false unless valid?
       employer = find_employer
       employee = find_employee
-      unless examine_and_maybe_merge_poc(employer, employee)
-        return false
-      end
+      # unless examine_and_maybe_merge_poc(employer, employee)
+      #   return false
+      # end
       plan = find_plan
       bga = find_benefit_group_assignment
 
@@ -190,10 +190,10 @@ module Importers
 
         cancel_other_enrollments_for_bga(bga)
         house_hold = family.active_household
-        coverage_household = hh.immediate_family_coverage_household
+        coverage_household = house_hold.immediate_family_coverage_household
 
-        en = hh.new_hbx_enrollment_from({
-          coverage_household: ch,
+        en = house_hold.new_hbx_enrollment_from({
+          coverage_household: coverage_household,
           employee_role: role,
           benefit_group: bga.benefit_group,
           benefit_group_assignment: bga,
@@ -209,11 +209,13 @@ module Importers
         end
         en.save!
         en.update_attributes!({
-          carrier_profile_id: plan.carrier_profile_id,
-          plan_id: plan.id,
-          aasm_state: "coverage_selected",
-          coverage_kind: 'health'
-          })
+                                  benefit_sponsorship_id: benefit_sponsorship.id,
+                                  sponsored_benefit_package_id: benefit_package.id,
+                                  sponsored_benefit_id: sponsored_benefit.id,
+                                  rating_area_id: rating_area.id,
+                                  aasm_state: "coverage_selected",
+                                  coverage_kind: 'health'
+                              })
         true
       rescue Exception => e
         errors.add(:base, e.to_s)

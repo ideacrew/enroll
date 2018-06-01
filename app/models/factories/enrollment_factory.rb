@@ -341,7 +341,7 @@ module Factories
       role = case roles.count
       when 0
         # Assign employee-specifc attributes
-        person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
+        person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on, benefit_sponsors_employer_profile_id: employer_profile.id )
         # when 1
         #   roles.first
         # else

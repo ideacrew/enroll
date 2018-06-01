@@ -41,7 +41,7 @@ module BenefitSponsors
         clean_hios = hios_id.strip
         corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
         sponsor_benefit = find_sponsor_benefit
-        sponsored_benefit.product_package.products.where(hios_id: corrected_hios_id ).first
+        sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id ).first
       end
 
       def find_sponsor_benefit
@@ -64,14 +64,13 @@ module BenefitSponsors
         employer = find_employer
         employee = find_employee
         employee_role = employee.employee_role
-        benefit_application = employee.active_benefit_application
+        benefit_application = employer.active_benefit_application
         benefit_package = benefit_application.benefit_packages.first
 
         if find_benefit_group_assignment.blank?
           if benefit_application
             has_active_state = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES.include?(benefit_application.aasm_state)
             employee.benefit_group_assignments << BenefitGroupAssignment.new({
-                                                                                 benefit_group_id: benefit_application.id,
                                                                                  benefit_package_id: benefit_package.id,
                                                                                  start_on: benefit_application.start_on,
                                                                                  is_active: has_active_state})
@@ -105,7 +104,6 @@ module BenefitSponsors
         return [] if benefit_application.blank?
 
         family.active_household.hbx_enrollments.where({
-                                                          :benefit_group_id.in => benefit_application.id,
                                                           :benefit_sponsorship_id => sponsor_ship.id,
                                                           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
                                                       })
