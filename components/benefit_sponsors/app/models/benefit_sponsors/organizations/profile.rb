@@ -84,6 +84,10 @@ module BenefitSponsors
         # TODO
       end
 
+      def staff_roles #managing profile staff
+        Person.staff_for_employer(self)
+      end
+
       class << self
         def find(id)
           return nil if id.blank?
