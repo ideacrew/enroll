@@ -88,6 +88,9 @@ module BenefitMarkets
     }
 
     scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
+    scope :by_state,                    ->(state) {where(
+      :"issuer_profile_id".in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
+    )}
 
     scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
                                                                   :"premium_tables.effective_period.max".gte => effective_date) }
