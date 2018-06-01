@@ -142,12 +142,14 @@ module Importers
       return false unless valid?
       employer = find_employer      
       employee = find_employee
+      benefit_sponsorship = employer.active_benefit_sponsorship
 
       unless examine_and_maybe_merge_poc(employer, employee)
         return false
       end
 
       plan = find_plan
+      rating_area_id = employer.active_benefit_application.recorded_rating_area_id
       bga = find_benefit_group_assignment
 
       # add when benefit_group_assignments not added to employees
@@ -218,10 +220,10 @@ module Importers
         en.save!
 
         en_attributes = {
-          carrier_profile_id: plan.carrier_profile_id,
-          plan_id: plan.id,
-          aasm_state: "coverage_selected",
-          coverage_kind: 'health'
+            issuer_profile_id: plan.issuer_profile_id,
+            product_id: plan.id,
+            aasm_state: "coverage_selected",
+            coverage_kind: 'health'
         }
 
         unless employer.is_a?(EmployerProfile)
@@ -229,7 +231,7 @@ module Importers
             benefit_sponsorship_id: benefit_sponsorship.id,
             sponsored_benefit_package_id: benefit_package.id,
             sponsored_benefit_id: sponsored_benefit.id,
-            rating_area_id: rating_area.id
+            rating_area_id: rating_area_id
           })
         end
 

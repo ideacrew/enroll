@@ -79,8 +79,8 @@ class HbxEnrollment
   field :terminated_on, type: Date
   field :terminate_reason, type: String
 
-  field :plan_id, type: BSON::ObjectId
-  field :carrier_profile_id, type: BSON::ObjectId
+  field :product_id, type: BSON::ObjectId
+  field :issuer_profile_id, type: BSON::ObjectId
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
