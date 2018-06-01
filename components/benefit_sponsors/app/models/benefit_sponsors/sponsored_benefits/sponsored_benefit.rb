@@ -53,7 +53,7 @@ module BenefitSponsors
 
       def lookup_package_products
         return [reference_product] if product_package_kind == :single_product
-        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_areas_ids)
+        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids)
       end
 
       def product_package
