@@ -27,7 +27,7 @@ module Importers::Mhc
 
       formed_params.merge({ 
         fte_count: enrolled_employee_count, 
-        aasm_state: (mid_year_conversion ? :imported : :active)
+        aasm_state: (mid_year_conversion ? :active : :imported)
       })
     end
 
