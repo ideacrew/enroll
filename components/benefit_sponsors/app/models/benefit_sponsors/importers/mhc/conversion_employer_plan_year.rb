@@ -2,7 +2,7 @@ module BenefitSponsors
   module Importers::Mhc
     class ConversionEmployerPlanYear < ::Importers::Mhc::ConversionEmployerPlanYear
 
-      attr_accessor :plan_year_end, :mid_year_conversion
+      attr_accessor :plan_year_end, :mid_year_conversion, :orginal_plan_year_begin_date
 
 
       def find_carrier
