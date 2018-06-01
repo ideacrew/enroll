@@ -2,7 +2,7 @@ import { Controller } from "stimulus"
 
 export default class extends Controller {
 
-  testFunction() {
+  test() {
     alert("Test Alert")
   }
 }
