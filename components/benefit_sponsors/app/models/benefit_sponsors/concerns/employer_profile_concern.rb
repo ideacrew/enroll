@@ -105,6 +105,10 @@ module BenefitSponsors
         active_broker_agency_account.broker_agency_profile rescue nil
       end
 
+      def staff_roles
+        Person.staff_for_employer(self)
+      end
+
       def today=(new_date)
         raise ArgumentError.new("expected Date") unless new_date.is_a?(Date)
         @today = new_date
