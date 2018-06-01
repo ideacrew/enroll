@@ -29,7 +29,7 @@ describe 'ModelEvents::InitialEmployerApplicationDenied' do
       let(:model_event) { ModelEvents::ModelEvent.new(:application_denied, model_instance, {}) }
 
       it "should trigger model event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_denied"
           expect(payload[:employer_id]).to eq employer.send(:hbx_id).to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

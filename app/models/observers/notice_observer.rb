@@ -101,7 +101,7 @@ module Observers
             end
           end
 
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
 
         end
 
