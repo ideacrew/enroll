@@ -46,6 +46,8 @@ module Notifier
     end
 
     def execute_notice(event_name, payload)
+      @logger = Logger.new("#{Rails.root}/log/notice_kind.log")
+       @logger.info "enter  execute notice"
       finder_mapping = Notifier::ApplicationEventMapper.lookup_resource_mapping(event_name)
       if finder_mapping.nil?
         raise ArgumentError.new("BOGUS EVENT...could n't find resoure mapping for event #{event_name}.")
@@ -56,7 +58,7 @@ module Notifier
       if @resource.blank?
         raise ArgumentError.new("Bad Payload...could n't find resoure with #{payload[finder_mapping.identifier_key.to_s]}.")
       end
-
+      @logger.info "generating notice ......."
       generate_pdf_notice
       upload_and_send_secure_message
       send_generic_notice_alert

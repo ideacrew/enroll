@@ -38,6 +38,8 @@ namespace :recurring do
   end
 end
 namespace :recurring do
+  @logger = Logger.new("#{Rails.root}/log/employee_dependent_age_off_termination.log")
+  @logger.info "enter rake task"
   #used congressional and non-congressional event names based on  dc to work in both DC and MA
   # As per business request - Do not use this rake task in MA. This rake task needs to be run only in DC. In MA, its Manual.
   desc "An automation rake task that sends out dependent age off termination notifications to congressional and non congressional employees"
@@ -61,6 +63,7 @@ namespace :recurring do
     return unless args[:hbx_id].present?
     begin
       primary_person = Person.where(:hbx_id => args[:hbx_id].to_s).first
+      @logger.info "enter person"
       trigger_dep_age_off_notice(primary_person)
     rescue Exception => e
       Rails.logger.error {"Unable to deliver employee_dependent_age_off_termination notice to: #{primary_person.hbx_id} due to #{e.backtrace}"}
@@ -68,28 +71,35 @@ namespace :recurring do
   end
 
   def trigger_dep_age_off_notice(person)
+     @logger.info "enter trigger dependent age off notice"
     new_date = TimeKeeper.date_of_record
     employee_roles = person.active_employee_roles
     employee_roles.each do |employee_role|
       next if (employee_role.benefit_group.nil?)
+      @logger.info "enter trigger dependent age off notice"
       ben_grp = employee_role.benefit_group.is_congress
       hbx_enrollments = employee_role.census_employee.active_benefit_group_assignment.hbx_enrollments
       enrollments = hbx_enrollments.select{|e| (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).include?(e.aasm_state)}
       if enrollments.present?
+        @logger.info "enrollments present"
         covered_members = enrollments.inject([]) do |covered_members, enrollment|
           covered_members += enrollment.hbx_enrollment_members.map(&:family_member).map(&:person)
         end.uniq
         covered_members_ids = covered_members.flat_map(&:_id)
         relations = person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "child")}
         if relations.present?
+          @logger.info "relations present"
           aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
           next if aged_off_dependents.empty?
+          @logger.info "age of dependent present"
             dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
             event_name = ben_grp ? "employee_notice_dependent_age_off_termination_congressional" : "employee_notice_dependent_age_off_termination_non_congressional"
+            @logger.info "#{event_name}"
             observer = Observers::Observer.new
+             @logger.info "instance created"
             observer.trigger_notice(recipient: employee_role, event_object: employee_role.census_employee, notice_event: event_name,  notice_params: {dep_hbx_ids: dep_hbx_ids})
+            @logger.info "triggered notice "
             puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?
-
         end
       end
     end
