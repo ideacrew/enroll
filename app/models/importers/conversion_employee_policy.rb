@@ -136,7 +136,7 @@ module Importers
 
     def save
       return false unless valid?
-      employer = find_employer
+      employer = find_employer      
       employee = find_employee
       # unless examine_and_maybe_merge_poc(employer, employee)
       #   return false
@@ -192,6 +192,9 @@ module Importers
         house_hold = family.active_household
         coverage_household = house_hold.immediate_family_coverage_household
 
+        benefit_package   = bga.benefit_package
+        sponsored_benefit = benefit_package.sponsored_benefit_for('health')
+
         en = house_hold.new_hbx_enrollment_from({
           coverage_household: coverage_household,
           employee_role: role,
@@ -208,14 +211,24 @@ module Importers
           mem.coverage_start_on = start_date
         end
         en.save!
-        en.update_attributes!({
-                                  benefit_sponsorship_id: benefit_sponsorship.id,
-                                  sponsored_benefit_package_id: benefit_package.id,
-                                  sponsored_benefit_id: sponsored_benefit.id,
-                                  rating_area_id: rating_area.id,
-                                  aasm_state: "coverage_selected",
-                                  coverage_kind: 'health'
-                              })
+
+        en_attributes = {
+          carrier_profile_id: plan.carrier_profile_id,
+          plan_id: plan.id,
+          aasm_state: "coverage_selected",
+          coverage_kind: 'health'
+        }
+
+        unless employer.is_a?(EmployerProfile)
+          en_attributes.merge!({
+            benefit_sponsorship_id: benefit_sponsorship.id,
+            sponsored_benefit_package_id: benefit_package.id,
+            sponsored_benefit_id: sponsored_benefit.id,
+            rating_area_id: rating_area.id
+          })
+        end
+
+        en.update_attributes!(en_attributes)
         true
       rescue Exception => e
         errors.add(:base, e.to_s)
