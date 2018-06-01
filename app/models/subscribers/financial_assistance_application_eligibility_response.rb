@@ -76,13 +76,15 @@ module Subscribers
       family.e_case_id = verified_family.integrated_case_id
       begin
         active_household.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household, application_in_context)
+        family.save!
       rescue
         application_in_context.set_determination_response_error!
         application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failure to update tax household")
         throw(:processing_issue, "ERROR: Failure to update tax household")
       end
-      family.save!
-      application_in_context.determine!
+      unless application_in_context.determine!
+        throw(:processing_issue, "ERROR: Failure to transition application to determined state")
+      end
     end
 
     def search_person(verified_family_member)

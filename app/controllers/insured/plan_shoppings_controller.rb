@@ -155,7 +155,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @family_member_ids = params[:family_member_ids]
     year = HbxEnrollment.find(hbx_enrollment_id).effective_on.year
     @family_member_ids = @family_member_ids.collect { |k,v| v}
-    shopping_tax_households = get_tax_households_from_family_members(@person, @family_member_ids, year) if @person.primary_family.active_approved_application.present?
+    shopping_tax_households = get_tax_households_from_family_members(@person, @family_member_ids, year) if !@person.primary_family.application_in_progress.present?
   
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
