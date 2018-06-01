@@ -29,7 +29,7 @@ module Observers
         end
 
         if new_model_event.event_key == :initial_application_submitted
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 
@@ -47,7 +47,7 @@ module Observers
         end
 
         if new_model_event.event_key == :initial_employer_open_enrollment_completed
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_open_enrollment_completed")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_open_enrollment_completed")
         end
 
         if new_model_event.event_key == :renewal_application_created
@@ -60,16 +60,16 @@ module Observers
         end
 
         if new_model_event.event_key == :group_advance_termination_confirmation
-          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
 
           plan_year.employer_profile.census_employees.active.each do |ce|
-            trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
+            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
           end
         end
         
         if new_model_event.event_key == :ineligible_initial_application_submitted
           if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
-            trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
           end
         end
 
@@ -100,7 +100,7 @@ module Observers
           if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               if ce.employee_role.present?
-                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
               end
             end
           end
@@ -116,13 +116,13 @@ module Observers
 
       if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
         employer_profile = new_model_event.klass_instance
-        deliver(recipient: employer_profile, event_object: employer_profile, notice_event: new_model_event.event_key.to_s)
+        # deliver(recipient: employer_profile, event_object: employer_profile, notice_event: new_model_event.event_key.to_s)
         if new_model_event.event_key == :initial_employee_plan_selection_confirmation
           if employer_profile.is_new_employer?
             census_employees = employer_profile.census_employees.non_terminated
             census_employees.each do |ce|
               if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
-                trigger_notice(recipient: ce.employee_role, event_object: ce.active_benefit_group_assignment.hbx_enrollment, notice_event: "initial_employee_plan_selection_confirmation")
+                deliver(recipient: ce.employee_role, event_object: ce.active_benefit_group_assignment.hbx_enrollment, notice_event: "initial_employee_plan_selection_confirmation")
               end
             end
           end
@@ -132,9 +132,9 @@ module Observers
       if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
         employer_profile = new_model_event.klass_instance
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
-          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
         elsif new_model_event.event_key == :welcome_notice_to_employer
-          trigger_notice(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
+          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
         end
       end
     end
@@ -144,13 +144,6 @@ module Observers
 
       if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
         hbx_enrollment = new_model_event.klass_instance
-        if new_model_event.event_key == :application_coverage_selected
-          if hbx_enrollment.is_shop?
-            if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
-              deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
-            end
-          end
-        end
 
         if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
           
@@ -158,29 +151,29 @@ module Observers
 
           if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
             if is_valid_employer_py_oe
-              trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
+              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
             end
           end
 
           if new_model_event.event_key == :application_coverage_selected
             if is_valid_employer_py_oe
-              trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #initial EE notice
+              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #initial EE notice
             end
             
             if !is_valid_employer_py_oe && (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
-              trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
+              deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             end
           end
         end
 
         if new_model_event.event_key == :employee_waiver_confirmation
-          trigger_notice(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+          deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
         end
 
         if new_model_event.event_key == :employee_coverage_termination
           if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.benefit_group.plan_year.active?
-            trigger_notice(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
-            trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
+            deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
+            deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
           end
         end
       end
@@ -208,7 +201,7 @@ module Observers
              #exclude congressional employees
               next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
               if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-                trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer")
+                deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: "low_enrollment_notice_for_employer")
               end
             end
           end
@@ -218,7 +211,7 @@ module Observers
           EmployerProfile.initial_employers_enrolled_plan_year_state.each do |org|
             if !org.employer_profile.binder_paid?
               py = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
-              trigger_notice(recipient: org.employer_profile, event_object: py, notice_event: "initial_employer_no_binder_payment_received")
+              deliver(recipient: org.employer_profile, event_object: py, notice_event: "initial_employer_no_binder_payment_received")
             end
           end
         end
@@ -243,7 +236,7 @@ module Observers
       if special_enrollment_period.is_shop?
         primary_applicant = special_enrollment_period.family.primary_applicant
         if employee_role = primary_applicant.person.active_employee_roles[0]
-          trigger_notice(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
+          deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
         end
       end
     end
@@ -255,14 +248,16 @@ module Observers
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      census_employee = new_model_event.klass_instance
 
-      if CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        census_employee = new_model_event.klass_instance
+      if CensusEmployee::OTHER_EVENTS.include?(new_model_event.event_key)
         deliver(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
       end
-
-      if new_model_event.event_key == :employee_notice_for_employee_terminated_from_roster
-        trigger_notice(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
+      
+      if CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
+       if new_model_event.event_key == :employee_notice_for_employee_terminated_from_roster
+        deliver(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
+       end
       end
     end
 

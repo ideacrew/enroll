@@ -26,7 +26,7 @@ describe 'ModelEvents::InitialEmployerFirstRemainderToPublishPlanYear', dbclean:
       let(:model_event) { ModelEvents::ModelEvent.new(:initial_employer_first_reminder_to_publish_plan_year, PlanYear, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_employer_first_reminder_to_publish_plan_year"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
