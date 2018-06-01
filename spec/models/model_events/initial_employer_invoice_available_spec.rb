@@ -17,7 +17,7 @@ describe 'ModelEvents::InitialEmployerInvoiceAvailable', dbclean: :after_each do
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
 
   before do
-    organization.documents << model_instance
+    organization.employer_profile.documents << model_instance
   end
 
   describe "ModelEvent" do
