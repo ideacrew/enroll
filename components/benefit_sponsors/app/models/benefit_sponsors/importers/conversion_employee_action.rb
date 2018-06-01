@@ -59,7 +59,7 @@ module BenefitSponsors
         benefit_sponsorship = found_employer.active_benefit_sponsorship
         return nil if found_employer.nil?
         candidate_employees = CensusEmployee.where({
-                                                       employer_profile_id: found_employer.id,
+                                                       benefit_sponsors_employer_profile_id: found_employer.id,
                                                        benefit_sponsorship_id: benefit_sponsorship.id,
                                                        # hired_on: {"$lte" => start_date},
                                                        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)

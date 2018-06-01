@@ -9,7 +9,6 @@ module BenefitSponsors
 
         found_employer = find_employer
         benefit_application = find_employer.active_benefit_application
-        # try to fetch benefit_applciation which were active
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
@@ -36,13 +35,20 @@ module BenefitSponsors
         @found_employee = non_terminated_employees.sort_by(&:hired_on).last
       end
 
-      # TODO: Fix below method to fetch product from sponsored_benefit#product_package#products
       def find_plan
         return @plan unless @plan.nil?
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
         corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-        @plan = BenefitMarkets::Products::Product.where(hios_id: corrected_hios_id).first
+        sponsor_benefit = find_sponsor_benefit
+        sponsored_benefit.product_package.products.where(hios_id: corrected_hios_id ).first
+      end
+
+      def find_sponsor_benefit
+        employer = find_employer
+        benefit_application = employer.active_benefit_application
+        benefit_package = benefit_application.benefit_packages.first
+        sponsor_benefit = benefit_package.sponsored_benefits.first
       end
 
       def find_employer
@@ -58,13 +64,17 @@ module BenefitSponsors
         employer = find_employer
         employee = find_employee
         employee_role = employee.employee_role
+        benefit_application = employee.active_benefit_application
+        benefit_package = benefit_application.benefit_packages.first
 
         if find_benefit_group_assignment.blank?
-          if plan_year = employer.plan_years.published_and_expired_plan_years_by_date(employer.registered_on).first
+          if benefit_application
+            has_active_state = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES.include?(benefit_application.aasm_state)
             employee.benefit_group_assignments << BenefitGroupAssignment.new({
-                                                                                 benefit_group: plan_year.benefit_groups.first,
-                                                                                 start_on: plan_year.start_on,
-                                                                                 is_active: PlanYear::PUBLISHED.include?(plan_year.aasm_state)})
+                                                                                 benefit_group_id: benefit_application.id,
+                                                                                 benefit_package_id: benefit_package.id,
+                                                                                 start_on: benefit_application.start_on,
+                                                                                 is_active: has_active_state})
             employee.save
           end
         end
@@ -81,7 +91,6 @@ module BenefitSponsors
         result
       end
 
-      # TODO: update references for plan years with benefit applications
       def find_enrollments(employee_role)
         person = employee_role.person
 
@@ -89,12 +98,15 @@ module BenefitSponsors
         return [] if family.blank?
 
         employer = find_employer
-        plan_years = employer.plan_years.select {|py| py.coverage_period_contains?(start_date)}
-        active_plan_year = plan_years.detect {|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
-        return [] if active_plan_year.blank?
+        sponsor_ship = employer.active_benefit_sponsorship
+        benefit_application = employer.active_benefit_application
+        # plan_years = employer.plan_years.select {|py| py.coverage_period_contains?(start_date)}
+        # active_plan_year = plan_years.detect {|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+        return [] if benefit_application.blank?
 
         family.active_household.hbx_enrollments.where({
-                                                          :benefit_group_id.in => active_plan_year.benefit_group_ids,
+                                                          :benefit_group_id.in => benefit_application.id,
+                                                          :benefit_sponsorship_id => sponsor_ship.id,
                                                           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
                                                       })
       end
