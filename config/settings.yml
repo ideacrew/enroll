@@ -40,7 +40,6 @@ site:
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
-  website_name: "www.DCHealthLink.com"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
@@ -126,6 +125,8 @@ aca:
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
+  carrier_hios_logo_variant:
+    '': ""
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
   plan_option_years:
@@ -155,6 +156,7 @@ aca:
     employee_participation_ratio_minimum: <%= 3 / 4.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 23
+    small_market_active_employee_limit: 200
     new_employee_paper_application: true
     census_employees_template_file: 'Health Connector - Employee Census Template'
     coverage_start_period: "2 months"
@@ -174,7 +176,7 @@ aca:
       advertised_deadline_of_month: 10
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 24
+        day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait

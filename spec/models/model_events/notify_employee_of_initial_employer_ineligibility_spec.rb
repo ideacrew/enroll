@@ -82,7 +82,7 @@ describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean =
 
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
 
-      it "should retrun merge mdoel" do
+      it "should retrun merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end
 
