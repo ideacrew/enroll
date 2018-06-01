@@ -33,7 +33,7 @@ module BenefitSponsors
       # Doing Business As (alternate name)
       field :dba, type: String
 
-      # Business structure or entity type 
+      # Business structure or entity type
       field :entity_kind, type: Symbol
 
       # Federal Employer ID Number
@@ -44,7 +44,7 @@ module BenefitSponsors
 
 
       # Association that enables organizational hierarchies.
-      # Organizations may be stored in a tree, with a parent "agency" associated with one or 
+      # Organizations may be stored in a tree, with a parent "agency" associated with one or
       # more "divisions".  Defining one side of the association will automatically populate
       # the other.  For example:
       # org_a.divisions << org_b  # org_b.agency => org_a
@@ -56,14 +56,14 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Organizations::Organization"
 
 
-      # PlanDesignOrganization (an Organization subclass) association enables an organization 
+      # PlanDesignOrganization (an Organization subclass) association enables an organization
       # or its agent to model options and costs for different benefit scenarios.  This is managed through
       # two association types: HABTM to track access/permissions and OTM to track instances of plan_designs.
-      # Example 1: a Broker agent may prepare one or more designs/quotes for an Employer.  
-      # Under this scenario, the Broker's access is defined through plan_design_authors and reciprocal 
-      # plan_design_subjects associations, and the broker owns a plan_design_organization instance for the 
+      # Example 1: a Broker agent may prepare one or more designs/quotes for an Employer.
+      # Under this scenario, the Broker's access is defined through plan_design_authors and reciprocal
+      # plan_design_subjects associations, and the broker owns a plan_design_organization instance for the
       # Employer (plan_design_subject) that may be used for modeling purposes.
-      # Example 2: an Employer may prepare one or more plan designs for future coverage.  
+      # Example 2: an Employer may prepare one or more plan designs for future coverage.
       # Under this scenario, the Employer is both the plan_design_author and the plan_design_subject
       has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, autosave: true,
                               class_name: "BenefitSponsors::Organizations::Organization"
@@ -85,7 +85,7 @@ module BenefitSponsors
       belongs_to  :site_owner, inverse_of: :owner_organization,
                   class_name: "BenefitSponsors::Site"
 
-      embeds_many :profiles, 
+      embeds_many :profiles,
                   class_name: "BenefitSponsors::Organizations::Profile"
 
       embeds_many :documents, as: :documentable
@@ -119,6 +119,50 @@ module BenefitSponsors
       scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
       scope :by_employer_profile,             ->( profile_id ){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
+
+      scope :employer_profiles_applicants,   ->{
+        where(
+          :"profiles" => {
+            :$elemMatch => {
+              :"aasm_state" => "applicant",
+              :"_type" => /.*EmployerProfile$/
+            }
+          })
+      }
+
+      scope :'employer_profiles_renewing_application_pending', -> {}
+      scope :'employer_profiles_renewing_open_enrollment',     -> {}
+
+      scope :'employer_profiles_initial_application_pending',  -> {}
+      scope :'employer_profiles_initial_open_enrollment',      -> {}
+      scope :'employer_profiles_binder_pending',               -> {}
+      scope :'employer_profiles_binder_paid',                  -> {}
+
+
+      scope :'employer_profiles_enrolled', -> {}
+      scope :'employer_profiles_suspended', -> {}
+
+      scope :employer_profiles_enrolling,     -> {}
+      scope :employer_profiles_enrolled,      -> {}
+
+      scope :'employer_profiles_enrolling',   -> {}
+      scope :'employer_profiles_initial_eligible', -> {}
+      scope :'employer_profiles_renewing',    -> {}
+      scope :'employer_profiles_enrolling',   -> {}
+
+      scope :employer_attestations,           -> {}
+      scope :employer_attestations_submitted, -> {}
+      scope :employer_attestations_pending,   -> {}
+      scope :employer_attestations_approved,  -> {}
+      scope :employer_attestations_denied,    -> {}
+
+      scope :'employer_profiles_applicants',  -> {}
+      scope :'employer_profiles_enrolling',   -> {}
+      scope :'employer_profiles_enrolled',    -> {}
+
+
+
+
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
