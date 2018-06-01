@@ -116,7 +116,6 @@ module Observers
 
       if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
         employer_profile = new_model_event.klass_instance
-        # deliver(recipient: employer_profile, event_object: employer_profile, notice_event: new_model_event.event_key.to_s)
         if new_model_event.event_key == :initial_employee_plan_selection_confirmation
           if employer_profile.is_new_employer?
             census_employees = employer_profile.census_employees.non_terminated
@@ -131,11 +130,7 @@ module Observers
 
       if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
         employer_profile = new_model_event.klass_instance
-        if new_model_event.event_key == :broker_hired_confirmation_to_employer
-          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
-        elsif new_model_event.event_key == :welcome_notice_to_employer
-          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
-        end
+        deliver(recipient: employer_profile, event_object: employer_profile, notice_event: new_model_event.event_key.to_s)
       end
     end
 
