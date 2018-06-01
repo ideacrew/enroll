@@ -81,8 +81,12 @@ module Subscribers
         application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failure to update tax household")
         throw(:processing_issue, "ERROR: Failure to update tax household")
       end
-      family.save!
-      application_in_context.determine!
+      begin
+        family.save!
+        application_in_context.determine!
+      rescue
+        throw(:processing_issue, "ERROR: Failure to save family or to transition application to determined state")
+      end
     end
 
     def search_person(verified_family_member)
