@@ -6,7 +6,7 @@ class TaxHouseholdMember
 
   include BelongsToFamilyMember
 
-  PDC_TYPES = [['In-eligible', 'is_ia_eligible'], ['Medicaid', 'is_medicaid_chip_eligible'] ]
+  PDC_TYPES = [['Assisted', 'is_ia_eligible'], ['Medicaid', 'is_medicaid_chip_eligible'] ]
 
   embedded_in :tax_household
 
