@@ -144,20 +144,22 @@ module Importers
       plan = find_plan
       bga = find_benefit_group_assignment
 
-      if bga.blank?
-        plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
+      # add when benefit_group_assignments not added to employees
 
-        if plan_years.any?{|py| py.conversion_expired? }
-          errors.add(:base, "ER migration expired!")
-          return false
-        end
-
-        if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
-          employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
-          employee.reload
-          bga = employee.benefit_group_assignments.first
-        end
-      end
+      # if bga.blank?
+      #   plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
+      #
+      #   if plan_years.any?{|py| py.conversion_expired? }
+      #     errors.add(:base, "ER migration expired!")
+      #     return false
+      #   end
+      #
+      #   if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+      #     employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
+      #     employee.reload
+      #     bga = employee.benefit_group_assignments.first
+      #   end
+      # end
 
       person_data = PersonSlug.new(nil, employee.first_name, employee.middle_name,
                                    employee.last_name, employee.name_sfx,
