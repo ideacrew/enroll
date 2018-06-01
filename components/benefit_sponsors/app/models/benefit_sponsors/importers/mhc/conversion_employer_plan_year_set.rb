@@ -9,6 +9,7 @@ module BenefitSponsors
         @default_plan_year_start = config["conversions"]["plan_year_date"]
         @plan_year_end = config["conversions"]["plan_year_end_date"]
         @mid_year_conversion = config["conversions"]["mid_year_conversion"]
+        @orginal_plan_year_begin_date = config["conversions"]["orginal_plan_year_begin_date"]
       end
 
       def create_model(record_attrs)
@@ -17,7 +18,8 @@ module BenefitSponsors
         plan_year_attrs = record_attrs.merge({
           default_plan_year_start: @default_plan_year_start,
           plan_year_end: @plan_year_end,
-          mid_year_conversion: @mid_year_conversion 
+          mid_year_conversion: @mid_year_conversion,
+          orginal_plan_year_begin_date: @orginal_plan_year_begin_date
           })
 
         case the_action
