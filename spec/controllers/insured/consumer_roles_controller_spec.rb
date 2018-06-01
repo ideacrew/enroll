@@ -226,7 +226,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   context "PUT update" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryGirl.build(:person) }
+    let(:person){ FactoryGirl.create(:person) }
+    let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
+    "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -234,7 +236,29 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
+      person_params[:addresses_attributes] = addresses_attributes
       sign_in user
+    end
+
+    context "to verify new addreses not created on updating the existing address" do
+      
+      before :each do
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        put :update, person: person_params, id: "test"
+      end
+
+      it "should not empty the person's addresses on update" do
+        expect(person.addresses).not_to eq []
+      end
+
+      it "should update addresses" do
+        expect(person.addresses.first.address_1).to eq addresses_attributes["0"]["address_1"]
+        expect(person.addresses.last.address_2).to eq addresses_attributes["1"]["address_2"]
+      end
+
+      it "should have same number of addresses on update" do
+        expect(person.addresses.count).to eq 2
+      end
     end
 
     it "should update existing person" do

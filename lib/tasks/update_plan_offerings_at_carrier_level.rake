@@ -5,5 +5,4 @@ require File.join(Rails.root, "app", "data_migrations", "update_all_plan_options
 namespace :migrations do
   desc "It will update Plan attributes at carrier level filter"
   UpdateAllPlanOptions.define_task :plan_offerings => :environment
-  puts "successfully updated the plan attributes" unless Rails.env.test?
 end

@@ -67,6 +67,7 @@ class CensusEmployee < CensusMember
     inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
+  after_save :notify_on_save
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
@@ -457,7 +458,7 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-      send_invite! if _id_changed?
+      send_invite! if _id_changed? && !self.employer_profile.is_conversion?
 
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role?
@@ -972,7 +973,8 @@ def self.to_csv
   end
 
   def waived?
-    active_benefit_group_assignment.aasm_state == 'coverage_waived'
+    bga = renewal_benefit_group_assignment || active_benefit_group_assignment
+    return bga.present? ? bga.aasm_state == 'coverage_waived' : false
   end
 
   # TODO: Implement for 16219

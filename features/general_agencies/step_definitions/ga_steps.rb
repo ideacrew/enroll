@@ -254,10 +254,10 @@ end
 
 And /^selects the general agency from dropdown for the employer$/ do
   expect(page).to have_content('EmployerA')
-  find("input[id^='broker_dt_employer_ids_']").click
+  find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Rooxo')]").click
-  find("#assign_general_agency").click
+  find("#assign_general_agency").trigger('click')
 end
 
 Then /^the employer is assigned to general agency$/ do
@@ -354,7 +354,7 @@ end
 Then /^the ga should see the broker$/ do
   expect(page).to have_content('Acarehouse')
   expect(page).to have_selector('.disabled', text: 'Change Broker')
-  expect(page).to have_selector('.disabled', text: 'ROWSE BROKERS')
+  expect(page).to have_selector('.disabled', text: 'Browse Brokers')
 end
 
 When /^the ga click the back link$/ do
@@ -377,10 +377,10 @@ end
 
 And /^selects the GA2 from dropdown for the employer$/ do
   expect(page).to have_content('EmployerA')
-  find("input[id^='broker_dt_employer_ids_']").click
+  find(:xpath, "//*[@id='datatable_filter_bulk_actions']").click
   find(:xpath, "//p[@class='label'][contains(., 'Select General Agency')]").click
   find(:xpath, "//li[contains(., 'Zooxy')]").click
-  find("#assign_general_agency").click
+  find("#assign_general_agency").trigger('click')
 end
 
 Then /^the employer has assigned to GA2$/ do
@@ -432,4 +432,29 @@ end
 
 Then(/^he should not be able to see the Assign link under his profile$/) do
 expect(page).not_to have_selector('#assign-tab')
+end
+
+When(/^the ga clicks on EDIT GENERAL AGENCY button\/link$/) do
+  click_link "Edit General Agency"
+end
+
+Then(/^the ga should see ga profile form to update informaton$/) do
+  expect(page).to have_content('General Agency / TPA Modification')
+end
+
+When(/^the ga enters personal information or general agency information or office location$/) do
+  fill_in "organization[npn]", with: "3457684567"
+  fill_in "organization[legal_name]", with: "Sample General LLc"
+end
+
+And(/^the ga clicks update general agency$/) do
+  click_button "Update General Agency"
+end
+
+Then(/^the ga should see successful message\.$/) do
+  expect(page).to have_content('Successfully Update General Agency Profile')
+end
+
+Then(/^the ga should see updated informaton on page$/) do
+  expect(page).to have_content("Sample General LLc")
 end

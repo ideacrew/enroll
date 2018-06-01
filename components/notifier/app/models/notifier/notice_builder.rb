@@ -9,13 +9,14 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))? resource.person : resource
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
     end
 
     def construct_notice_object
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
+      builder.event_name = event_name if resource.is_a?(EmployeeRole)
       builder.payload = payload
       builder.append_contact_details
       template.data_elements.each do |element|
@@ -27,7 +28,6 @@ module Notifier
           elements = elements[0..date_ele_index]
           elements[date_ele_index] = date_element.scan(/[a-zA-Z_]+/).first
         end
-
         element_retriver = elements.reject{|ele| ele == recipient_klass_name.to_s}.join('_')
         builder.instance_eval(element_retriver)
       end

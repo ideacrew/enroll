@@ -105,9 +105,9 @@ class PlanCostDecorator < SimpleDelegator
     end
     value = if the_plan.health?
       if use_simple_employer_calculation_model?
-        benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f
-      else
         1.0
+      else
+        benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f
       end
     else
       1.0

@@ -256,7 +256,7 @@ class Address
   # @param another_address [ Object ] The address to be compared.
   #
   # @return [ true, false ] true if addresses are the same, false if addresses are different
-  def matches?(another_address)
+  def matches_addresses?(another_address)
     return(false) if another_address.nil?
     attrs_to_match = [:kind, :address_1, :address_2, :address_3, :city, :state, :zip]
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
