@@ -80,37 +80,41 @@ module Importers
 
     PersonSlug = Struct.new(:name_pfx, :first_name, :middle_name, :last_name, :name_sfx, :ssn, :dob, :gender)
 
-    # def examine_and_maybe_merge_poc(employer, employee)
-    #   staff_roles = employer.staff_roles
-    #   staff_roles_to_merge = staff_roles.select do |sr|
-    #     (employee.first_name.downcase.strip == sr.first_name.downcase.strip) &&
-    #       (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
-    #   end
-    #   if staff_roles_to_merge.empty?
-    #     return true
-    #   end
-    #   if staff_roles_to_merge.count > 1
-    #     errors.add(:base, "this employee has the same personal data as multiple points of contact")
-    #     return false
-    #   end
-    #   merge_staff = staff_roles_to_merge.first
-    #   existing_people = Person.match_by_id_info(ssn: employee.ssn, dob: employee.dob, last_name: employee.last_name, first_name: employee.first_name)
-    #   if existing_people.count > 1
-    #     errors.add(:base, "matching conflict for this personal data")
-    #     return false
-    #   end
-    #   if existing_people.empty?
-    #     begin
-    #       merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
-    #     rescue Exception  => e
-    #       errors.add(:base, e.to_s)
-    #     end
-    #     return true
-    #   end
-    #   existing_person = existing_people.first
-    #   merge_poc_and_employee_person(merge_staff, existing_person, employer)
-    #   true
-    # end
+    def examine_and_maybe_merge_poc(employer, employee)
+      staff_roles = employer.staff_roles
+      staff_roles_to_merge = staff_roles.select do |sr|
+        (employee.first_name.downcase.strip == sr.first_name.downcase.strip) &&
+          (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
+      end
+
+      if staff_roles_to_merge.empty?
+        return true
+      end
+
+      if staff_roles_to_merge.count > 1
+        errors.add(:base, "this employee has the same personal data as multiple points of contact")
+        return false
+      end
+
+      merge_staff = staff_roles_to_merge.first
+      existing_people = Person.match_by_id_info(ssn: employee.ssn, dob: employee.dob, last_name: employee.last_name, first_name: employee.first_name)
+
+      if existing_people.count > 1
+        errors.add(:base, "matching conflict for this personal data")
+        return false
+      end
+      if existing_people.empty?
+        begin
+          merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
+        rescue Exception  => e
+          errors.add(:base, e.to_s)
+        end
+        return true
+      end
+      existing_person = existing_people.first
+      merge_poc_and_employee_person(merge_staff, existing_person, employer)
+      true
+    end
 
     def merge_poc_and_employee_person(poc_person, employee_person, employer)
       return true if poc_person.id == employee_person.id
@@ -138,28 +142,29 @@ module Importers
       return false unless valid?
       employer = find_employer      
       employee = find_employee
-      # unless examine_and_maybe_merge_poc(employer, employee)
-      #   return false
-      # end
+
+      unless examine_and_maybe_merge_poc(employer, employee)
+        return false
+      end
+
       plan = find_plan
       bga = find_benefit_group_assignment
 
       # add when benefit_group_assignments not added to employees
+      if bga.blank?
+        plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
-      # if bga.blank?
-      #   plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
-      #
-      #   if plan_years.any?{|py| py.conversion_expired? }
-      #     errors.add(:base, "ER migration expired!")
-      #     return false
-      #   end
-      #
-      #   if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
-      #     employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
-      #     employee.reload
-      #     bga = employee.benefit_group_assignments.first
-      #   end
-      # end
+        if plan_years.any?{|py| py.conversion_expired? }
+          errors.add(:base, "ER migration expired!")
+          return false
+        end
+
+        if active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
+          employee.add_benefit_group_assignment(active_plan_year.benefit_groups.first, active_plan_year.start_on)
+          employee.reload
+          bga = employee.benefit_group_assignments.first
+        end
+      end
 
       person_data = PersonSlug.new(nil, employee.first_name, employee.middle_name,
                                    employee.last_name, employee.name_sfx,
