@@ -10,7 +10,7 @@ module Notifier
       log("NOTICE EVENT: #{event_name} #{payload}", {:severity => 'info'})
 
       NoticeKind.where(event_name: event_name.split(".")[4]).each do |notice_kind|
-        begin          
+        begin
           notice_kind.execute_notice(event_name, payload)
         rescue Exception => e
           # ADD LOGGING AND HANDLING

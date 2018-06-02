@@ -1,5 +1,0 @@
-= content_for :navigation do
-    = render "benefit_sponsors/profiles/employers/employer_profiles/primary_nav", {:active_tab=>params[:tab], organization: @benefit_application_form.service.benefit_sponsorship.profile.organization, profile: @benefit_application_form.service.benefit_sponsorship.profile}
-
-= form_for @benefit_application_form, as: :benefit_application, url: benefit_sponsorship_benefit_application_path, method: :put do |f|
-  = render 'form', f: f

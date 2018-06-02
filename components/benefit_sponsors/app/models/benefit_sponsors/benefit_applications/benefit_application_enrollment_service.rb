@@ -19,6 +19,28 @@ module BenefitSponsors
       end
     end
 
+    def revert_application
+      if @benefit_application.may_revert_application?
+        @benefit_application.revert_application
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      elsif @benefit_application.may_revert_enrollment?
+        @benefit_application.revert_enrollment
+        if @benefit_application.save
+          [true, @benefit_application, {}]
+        else
+          errors = @benefit_application.errors
+          [false, @benefit_application, errors]
+        end
+      else
+        [false, @benefit_application]
+      end
+    end
+
     def submit_application
       if @benefit_application.may_submit_application? && is_application_ineligible?
         [false, @benefit_application, application_eligibility_warnings]
@@ -89,11 +111,31 @@ module BenefitSponsors
       end
     end
 
+    def cancel
+      if @benefit_application.may_cancel?
+        @benefit_application.cancel!
+        if @benefit_application.canceled?
+          @benefit_application.cancel_benefit_package_members
+        end
+      end
+    end
+
     def expire
       if @benefit_application.may_expire?
         @benefit_application.expire!
         if @benefit_application.expired?
           @benefit_application.expire_benefit_package_members
+        end
+      end
+    end
+
+    def terminate(end_on, termination_date)
+      if @benefit_application.may_terminate_enrollment?
+        @benefit_application.terminate_enrollment!
+        if @benefit_application.terminated?
+          updated_dates = @benefit_application.effective_period.min.to_date..end_on
+          @benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date)
+          @benefit_application.terminate_benefit_package_members
         end
       end
     end
@@ -131,11 +173,6 @@ module BenefitSponsors
     # Exempt exception handling situation
     def retroactive_open_enrollment(benefit_application)
 
-    end
-    
-    # benefit_market_catalog - ?
-    # benefit_sponsor_catalog
-    def terminate
     end
 
     def reinstate
@@ -176,7 +213,7 @@ module BenefitSponsors
     end
 
     def filter_active_enrollments_by_date(date)
-      enrollment_proxies = BenefitApplicationEnrollmentsQuery.new(self).call(Family, date)
+      enrollment_proxies = BenefitApplications::BenefitApplicationEnrollmentsQuery.new(@benefit_application).call(Family, date)
       return [] if (enrollment_proxies.count > 100)
       enrollment_proxies.map do |ep|
         OpenStruct.new(ep)

@@ -17,6 +17,7 @@ module BenefitSponsors
       def load_form_metadata(form)
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
+        form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
       end
 
@@ -29,7 +30,7 @@ module BenefitSponsors
       def disable_benefit_package(form)
         benefit_application = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
-        if benefit_package.disable_benefit_package
+        if benefit_application.disable_benefit_package(benefit_package)
           return [true, benefit_package]
         else
           map_errors_for(benefit_package, onto: form)

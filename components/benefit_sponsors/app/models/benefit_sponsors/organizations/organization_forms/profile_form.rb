@@ -22,10 +22,17 @@ module BenefitSponsors
       attribute :sic_code, String
       attribute :inbox, OrganizationForms::InboxForm
       attribute :parent, OrganizationForms::OrganizationForm
+      attribute :ach_account_number, String
+      attribute :ach_routing_number, String
+      attribute :ach_routing_number_confirmation, String
 
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
       validates_presence_of :market_kind, if: :is_broker_profile?
+      validates_presence_of :ach_routing_number, if: :is_broker_profile?
+
+      validate :validate_profile_office_locations
+      validate :validate_routing_information, if: :is_broker_profile?
 
       def persisted?
         false
@@ -42,6 +49,24 @@ module BenefitSponsors
       def is_employer_profile?
         profile_type == "benefit_sponsor"
       end
+
+      def validate_routing_information
+        if !(ach_routing_number.present? && ach_routing_number == ach_routing_number_confirmation)
+          self.errors.add(:base, "can't have two different routing numbers, please make sure you have same routing numbers on both fields")
+        end
+      end
+
+      def validate_profile_office_locations
+        location_kinds = self.office_locations.flat_map(&:address).compact.flat_map(&:kind)
+        if location_kinds.count('primary').zero?
+          self.errors.add(:base, "must select one primary address")
+        elsif location_kinds.count('primary') > 1
+          self.errors.add(:base, "can't have multiple primary addresses")
+        elsif location_kinds.count('mailing') > 1
+          self.errors.add(:base, "can't have more than one mailing address")
+        end
+      end
+
     end
   end
 end

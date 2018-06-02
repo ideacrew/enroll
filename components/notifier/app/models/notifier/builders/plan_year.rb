@@ -1,5 +1,6 @@
 module Notifier
   module Builders::PlanYear
+    include ActionView::Helpers::NumberHelper
 
     def plan_year_current_py_start_date
       if current_plan_year.present?
@@ -19,6 +20,14 @@ module Notifier
       end
     end
 
+    def plan_year_next_available_start_date
+      merge_model.plan_year.next_available_start_date = PlanYear.calculate_start_on_options.first.last.to_date
+    end
+
+    def plan_year_next_application_deadline
+      merge_model.plan_year.next_application_deadline = Date.new(plan_year_next_available_start_date.year, plan_year_next_available_start_date.prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month)
+    end
+
     def plan_year_renewal_py_end_date
       if renewal_plan_year.present?
         merge_model.plan_year.renewal_py_end_date = format_date(renewal_plan_year.end_on)
@@ -28,6 +37,13 @@ module Notifier
     def plan_year_current_py_oe_start_date
       if current_plan_year.present?
         merge_model.plan_year.current_py_oe_start_date = format_date(current_plan_year.open_enrollment_start_on)
+      end
+    end
+
+    def plan_year_monthly_employer_contribution_amount
+      if current_plan_year.present?
+        payment = current_plan_year.benefit_groups.map(&:monthly_employer_contribution_amount)
+        merge_model.plan_year.monthly_employer_contribution_amount = number_to_currency(payment.inject(0){ |sum,a| sum+a })
       end
     end
 

@@ -45,9 +45,9 @@ fieldset
                   = render partial: 'benefit_sponsors/locations/address', locals: { f: address_fields }
                 .js-remove.row
                   label Main Phone
-                    = office_fields.fields_for :phone, office_fields.object.phone do |phone_fields|
-                      = phone_fields.hidden_field :kind, value: 'main'
-                      = render partial: 'benefit_sponsors/locations/phone', locals: { f: phone_fields }
+                = office_fields.fields_for :phone, office_fields.object.phone do |phone_fields|
+                  = phone_fields.hidden_field :kind, value: 'main'
+                  = render partial: 'benefit_sponsors/locations/phone', locals: { f: phone_fields }
           a.btn.btn-default.btn-outline-primary data-action="click->site#addLocation" Add another location
                       
       

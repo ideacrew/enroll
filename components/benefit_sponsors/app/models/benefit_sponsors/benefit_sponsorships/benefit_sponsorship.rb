@@ -51,6 +51,7 @@ module BenefitSponsors
       # When present, date when all benefit applications are terminated and sponsorship ceases
       field :effective_end_on,    type: Date
       field :termination_kind,    type: Symbol
+      field :termination_reason,  type: Symbol
 
       # Immutable value indicating origination of this BenefitSponsorship
       field :source_kind,         type: Symbol, default: :self_serve
@@ -107,11 +108,20 @@ module BenefitSponsors
         inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
         allow_blank: false
 
+
+
+      scope :effective_begin_on,    ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                    :"effective_begin_on".lte => compare_date )
+                                                 }
+
       before_create :generate_hbx_id
 
       # after_initialize :set_service_and_rating_areas
 
       index({ aasm_state: 1 })
+
+      scope :by_broker_role,              ->( broker_role_id ){ where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
+      scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
 
       def primary_office_service_areas
         primary_office = profile.primary_office_location
@@ -147,7 +157,6 @@ module BenefitSponsors
         else
           nil
         end
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
       end
 
       def is_attestation_eligible?
@@ -172,6 +181,14 @@ module BenefitSponsors
 
       def renewing_published_benefit_application # TODO -recheck
         benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
+      end
+
+      # TODO: pass in termination reason and kind
+      def terminate_enrollment(benefit_end_date)
+        if self.may_terminate?
+          self.terminate!
+          self.update_attributes(effective_end_on: benefit_end_on, termination_kind: :voluntary, termination_reason: :nonpayment)
+        end
       end
 
       # TODO Refactor (moved from PlanYear)

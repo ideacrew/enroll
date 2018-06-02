@@ -4,7 +4,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include Config::AcaModelConcern
-      # include BenefitSponsors::Concerns::RecordTransition
+      include BenefitSponsors::Concerns::RecordTransition
       include AASM
 
       APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
@@ -16,6 +16,7 @@ module BenefitSponsors
       COVERAGE_EFFECTIVE_STATES     = [:active].freeze
       TERMINATED_STATES             = [:denied, :suspended, :terminated, :canceled, :expired].freeze
       EXPIRED_STATES                = [:expired].freeze
+      IMPORTED_STATES               = [:imported].freeze
 
       PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
 
@@ -108,7 +109,10 @@ module BenefitSponsors
       scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
       scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
       scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
+      scope :imported,                        ->{ any_in(aasm_state: IMPORTED_STATES) }
       scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
+      scope :non_draft,                       ->{ not_in(aasm_state: APPLICATION_DRAFT_STATES) }
+      scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 
       scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
@@ -120,12 +124,15 @@ module BenefitSponsors
                                                               :"effective_period.min" => compare_date )
                                                             }
       scope :effective_period_cover,          ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                              :"effective_period.min".gte => compare_date,
-                                                              :"effective_period.max".lte => compare_date)
+                                                              :"effective_period.min".lte => compare_date,
+                                                              :"effective_period.max".gte => compare_date)
+                                                            }
+      scope :future_effective_date,         ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                              :"effective_period.min".gte => compare_date )
                                                             }
       scope :open_enrollment_period_cover,    ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                              :"opem_enrollment_period.min".gte => compare_date,
-                                                              :"opem_enrollment_period.max".lte => compare_date)
+                                                              :"opem_enrollment_period.min".lte => compare_date,
+                                                              :"opem_enrollment_period.max".gte => compare_date)
                                                             }
       scope :open_enrollment_begin_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"open_enrollment_period.min" => compare_date)
@@ -320,7 +327,7 @@ module BenefitSponsors
 
       def effectuate_benefit_package_members
         benefit_packages.each do |benefit_package|
-          Family.enrolled_through_benefit_package(self).each do |family|
+          Family.enrolled_through_benefit_package(benefit_package).each do |family|
             benefit_package.effectuate_family_coverages(family)
           end
         end
@@ -328,9 +335,32 @@ module BenefitSponsors
            
       def expire_benefit_package_members
         benefit_packages.each do |benefit_package|
-          Family.enrolled_through_benefit_package(self).each do |family|
+          benefit_package.deactivate
+          Family.enrolled_through_benefit_package(benefit_package).each do |family|
             benefit_package.expire_family_coverages(family)
           end
+        end
+      end
+
+      def terminate_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          benefit_package.deactivate
+          Family.enrolled_through_benefit_package(benefit_package).each do |family|
+            benefit_package.terminate_family_coverages(family)
+          end
+        end
+      end
+
+      def cancel_benefit_package_members
+        benefit_packages.each do |benefit_package|
+          disable_benefit_package(benefit_package)
+        end
+      end
+
+      def disable_benefit_package(benefit_package)
+        benefit_package.deactivate
+        Family.enrolled_through_benefit_package(benefit_package).each do |family|
+          benefit_package.cancel_family_coverages(family)
         end
       end
 
@@ -657,6 +687,11 @@ module BenefitSponsors
       def employees_are_matchable? # Deprecate in future
         warn "[Deprecated] Instead use is_published?" unless Rails.env.test?
         is_published?
+      end
+
+
+      def matching_state_for(plan_year)
+        plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
       end
 
       private

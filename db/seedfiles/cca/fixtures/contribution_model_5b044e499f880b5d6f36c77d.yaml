@@ -10,7 +10,7 @@ attributes: !ruby/hash:BSON::Document
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::TieredPercentContributionCalculator"
   title: MA Composite Contribution Model
   many_simultaneous_contribution_units: false
-  updated_at: 2018-05-22 17:07:21.400000000 Z
+  updated_at: 2018-05-31 20:18:37.786000000 Z
   created_at: 2018-05-22 17:07:21.400000000 Z
   contribution_units:
   - !ruby/hash:BSON::Document
@@ -19,7 +19,7 @@ attributes: !ruby/hash:BSON::Document
         WwROSZ+IC11vNsd+
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
     minimum_contribution_factor: 0.5
-    name: employee
+    name: employee_only
     display_name: Employee Only
     order: 0
     default_contribution_factor: 0.75

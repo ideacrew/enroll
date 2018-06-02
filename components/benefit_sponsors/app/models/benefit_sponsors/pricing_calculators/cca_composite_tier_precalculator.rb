@@ -67,8 +67,8 @@ module BenefitSponsors
             price: v
           )
         end 
-        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(price_determination_tiers: price_determination_tiers)
-        sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determination + [price_determination]
+        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(pricing_determination_tiers: price_determination_tiers)
+        sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations + [price_determination]
       end
 
       def calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)

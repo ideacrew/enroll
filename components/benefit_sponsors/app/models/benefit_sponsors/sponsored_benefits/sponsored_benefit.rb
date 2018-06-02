@@ -25,6 +25,9 @@ module BenefitSponsors
       delegate :pricing_model, to: :product_package, allow_nil: true
       delegate :pricing_calculator, to: :product_package, allow_nil: true
       delegate :contribution_calculator, to: :product_package, allow_nil: true
+      delegate :recorded_rating_area, to: :benefit_package
+      delegate :recorded_service_area_ids, to: :benefit_package
+      delegate :rate_schedule_date, to: :benefit_package
 
       validate :product_package_exists
       validates_presence_of :sponsor_contribution
@@ -44,9 +47,18 @@ module BenefitSponsors
         # do nothing
       end
 
+      def products(coverage_date)
+        lookup_package_products(coverage_date)
+      end
+
+      def lookup_package_products(coverage_date)
+        return [reference_product] if product_package_kind == :single_product
+        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids).by_coverage_date(coverage_date)
+      end
+
       def product_package
         return @product_package if defined? @product_package
-        @product_package = benefit_sponsor_catalog.product_packages.by_package_kind(product_package_kind).by_product_kind(product_kind)[0]
+        @product_package = benefit_sponsor_catalog.product_package_for(self)
       end
 
       def latest_pricing_determination

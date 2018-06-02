@@ -106,7 +106,7 @@
               th Employer Dental Contribution
           - bg.relationship_benefits.each_with_index do |rb, i|
             tr
-              td = raw(bg.dental_relationship_benefits[i].offered ? "<i class='fa fa-check-square-o fa-lg'></i>" : "<i class='fa fa-square-o fa-lg'></i>"  " #{bg.dental_relationship_benefits[i].relationship.try(:humanize)}")
+              td = raw(bg.dental_relationship_benefits[i].offered ? "<i class='far fa-check-square fa-lg'></i>" : "<i class='far fa-square fa-lg'></i>"  " #{bg.dental_relationship_benefits[i].relationship.try(:humanize)}")
               td
                 strong = number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0
         .panel.benefitgroup.col-xs-12.referenceplan.home.est

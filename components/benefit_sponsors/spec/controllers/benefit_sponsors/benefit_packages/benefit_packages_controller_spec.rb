@@ -52,9 +52,9 @@ module BenefitSponsors
 
     let(:contribution_levels_attributes) {
       {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
-        "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95"},
+        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85"},
+        "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"}
       }
     }
 
@@ -160,9 +160,9 @@ module BenefitSponsors
 
       let(:contribution_levels_attributes) {
         {
-          "0" => {:id => contribution_levels[0].id.to_s, :is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
-          "1" => {:id => contribution_levels[1].id.to_s, :is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
-          "2" => {:id => contribution_levels[2].id.to_s, :is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+          "0" => {:id => contribution_levels[0].id.to_s, :is_offered => "true", :display_name => "Employee", :contribution_factor => "95"},
+          "1" => {:id => contribution_levels[1].id.to_s, :is_offered => "true", :display_name => "Spouse", :contribution_factor => "85"},
+          "2" => {:id => contribution_levels[2].id.to_s, :is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"}
         }
       }
 

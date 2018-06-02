@@ -148,7 +148,7 @@ class Family
   scope :all_tax_households,                ->{ exists(:"households.tax_households" => true) }
 
   scope :by_writing_agent_id,               ->(broker_id){ where(broker_agency_accounts: {:$elemMatch=> {writing_agent_id: broker_id, is_active: true}})}
-  scope :by_broker_agency_profile_id,       ->(broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {is_active: true, "$or": [{broker_agency_profile_id: broker_agency_profile_id},{benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id}]}})}
+  scope :by_broker_agency_profile_id,       ->(broker_agency_profile_id) { where(broker_agency_accounts: {:$elemMatch=> {is_active: true, "$or": [{benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id}, {broker_agency_profile_id: broker_agency_profile_id}]}})}
   scope :by_general_agency_profile_id,      ->(general_agency_profile_id) { where(general_agency_accounts: {:$elemMatch=> {general_agency_profile_id: general_agency_profile_id, aasm_state: "active"}})}
 
   scope :all_assistance_applying,           ->{ unscoped.exists(:"households.tax_households.eligibility_determinations" => true).order(
@@ -203,7 +203,7 @@ class Family
   scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
   scope :enrolled_through_benefit_package,      ->(benefit_package) { unscoped.where(
                                                     :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
-                                                    :"households.hbx_enrollments.benefit_package_id" => benefit_package._id
+                                                    :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
                                                   ) }
 
   def active_broker_agency_account
