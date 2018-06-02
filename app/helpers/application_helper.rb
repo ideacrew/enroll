@@ -244,6 +244,7 @@ module ApplicationHelper
 
     if f.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
+      new_object.build_composite_tier_contributions
       new_object.build_dental_relationship_benefits
     end
 
