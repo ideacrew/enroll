@@ -10,11 +10,12 @@ module Importers::ConversionEmployerCarrierValue
   end
 
   def carrier=(val)
+    return @carrier if defined? @carrier
     if val.blank?
       @carrier = nil
       return val
     end
-    @carrier = self.class::CARRIER_MAPPING[val.strip.downcase]
+    @carrier = val
   end
 
   def validate_carrier
@@ -25,9 +26,8 @@ module Importers::ConversionEmployerCarrierValue
   end
 
   def find_carrier
-    org = Organization.where("carrier_profile.abbrev" => carrier).first
-    return nil unless org
-    org.carrier_profile
+    carrier = BenefitSponsors::Organizations::IssuerProfile.find_by_issuer_name("Fallon Health")
+    # return nil unless carrier
   end
 
 end

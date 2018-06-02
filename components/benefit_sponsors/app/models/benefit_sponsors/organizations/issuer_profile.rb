@@ -38,8 +38,14 @@ module BenefitSponsors
       end
 
       class << self
+
         def find_by_issuer_name(issuer_name)
           issuer_org = BenefitSponsors::Organizations::Organization.where(:legal_name => issuer_name, :"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first
+          issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
+        end
+
+        def find_by_abbrev(abbrev)
+          issuer_org = BenefitSponsors::Organizations::Organization.where(:"profiles.abbrev" => abbrev, :"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first
           issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
         end
       end

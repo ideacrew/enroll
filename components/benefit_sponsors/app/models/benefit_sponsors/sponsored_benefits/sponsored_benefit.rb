@@ -28,6 +28,8 @@ module BenefitSponsors
       delegate :recorded_rating_area, to: :benefit_package
       delegate :recorded_service_area_ids, to: :benefit_package
       delegate :rate_schedule_date, to: :benefit_package
+      delegate :benefit_sponsor_catalog, to: :benefit_package
+      delegate :benefit_sponsorship, to: :benefit_package
 
       validate :product_package_exists
       validates_presence_of :sponsor_contribution
@@ -83,11 +85,6 @@ module BenefitSponsors
       end
 
       def renew_pricing_determinations(new_product_package)
-      end
-
-      def benefit_sponsor_catalog
-        return if benefit_package.blank?
-        benefit_package.benefit_sponsor_catalog
       end
 
       def reference_plan_id=(product_id)

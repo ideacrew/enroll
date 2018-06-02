@@ -147,19 +147,24 @@ class BenefitApplicationMigration < Mongoid::Migration
     application_attrs = py_attrs.slice(:fte_count, :pte_count, :msp_count, :enrolled_summary, :waived_summary, :created_at, :updated_at, :terminated_on)
 
     benefit_application = benefit_sponsorship.benefit_applications.new(application_attrs)
-    benefit_application.effective_period = effective_period_for(plan_year)
-    benefit_application.open_enrollment_period = open_enrollment_period_for(plan_year)
+    benefit_application.effective_period = (plan_year.start_on..plan_year.end_on)
+    benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
 
     # "aasm_state"=>"active",
     # "imported_plan_year"=>false,
-    # "is_conversion"=>false,
     # "updated_by_id"=>BSON::ObjectId('5909e07d082e766d68000078'),
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
     benefit_application.benefit_sponsor_catalog = @benefit_sponsor_catalog
 
     plan_year.benefit_groups.each do |benefit_group|
-      construct_benefit_package(benefit_application, benefit_group)
+      params = santize_benefit_group_attrs(benefit_group)
+      BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, params)
+    end
+
+    if plan_year.is_conversion
+      aasm_state = :imported
+    else
     end
 
     benefit_application.aasm_state = benefit_application.matching_state_for(plan_year)
@@ -168,91 +173,21 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application
   end
 
-  def effective_period_for(plan_year)
-    plan_year.start_on..plan_year.end_on
-  end
+  def santize_benefit_group_attrs(benefit_group)
+    attributes = benefit_group.attributes.slice(
+      :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind,
+      :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
+      )
 
-  def open_enrollment_period_for(plan_year)
-    plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on
-  end
-
-  def probation_period_kind_for(benefit_group)
-  end
-
-  def construct_benefit_package(benefit_application, benefit_group)
-    benefit_group_attrs = benefit_group.attributes.slice(:title, :description, :created_at, :updated_at, :is_active)
-    benefit_group_attrs[:is_default] = benefit_group.default
-    benefit_group_attrs[:probation_period_kind] = probation_period_kind_for(benefit_group)
-
-    benefit_package = benefit_application.benefit_packages.build(benefit_group_attrs)
-
-    sponsored_benefit_attrs = benefit_group.attributes.slice(:plan_option_kind, :reference_plan_id, :relationship_benefits)
-    sponsored_benefit_attrs[:product_kind] = :health
-    sponsored_benefit_attrs[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
-    benefit_package.sponsored_benefits << construct_sponsored_benefit(benefit_package, sponsored_benefit_attrs)
-
-    if benefit_group.is_offering_dental?
-      sponsored_benefit_attrs = benefit_group.attributes.slice(:dental_reference_plan_id, :dental_relationship_benefits)
-      sponsored_benefit_attrs[:product_kind] = :dental
-      sponsored_benefit_attrs[:reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id
-      benefit_package.sponsored_benefits << construct_sponsored_benefit(sponsored_benefit_attrs)
-    end
-  end
-
-  def construct_sponsored_benefit(benefit_package, sponsored_benefit_attrs)
-    if sponsored_benefit_attrs[:product_kind] == :health
-      sponsored_benefit = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
-      sponsored_benefit.product_package_kind = map_product_package_kind(sponsored_benefit_attrs[:plan_option_kind])
-      contribution_attrs = {contributions: sponsored_benefit_attrs[:relationship_benefits]}
-    elsif sponsored_benefit_attrs[:product_kind] == :dental
-      sponsored_benefit = BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
-      contribution_attrs = {contributions: sponsored_benefit_attrs[:dental_relationship_benefits]}
-    end
-
-    product_package = @benefit_sponsor_catalog.product_package_for(sponsored_benefit)
-    sponsored_benefit.reference_product = product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
-    sponsored_benefit.product_package_choice = product_package_choice_for(sponsored_benefit)
-    construct_sponsor_contribution(sponsored_benefit, product_package, contribution_attrs)
-  end
-
-  def construct_sponsor_contribution(sponsored_benefit, product_package, attrs)
-    new_sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(product_package)
-    new_sponsor_contribution.contribution_levels.each do |new_contribution_level|
-      contribution_match = attrs[:contributions].detect{|contribution| contribution['relationship'] == new_contribution_level.name}
-
-      if contribution_match.present?
-        new_contribution_level.is_offered = contribution_match['offered']
-        new_contribution_level.contribution_factor = (contribution_match['premium_pct'].to_f / 100)
-      end
-    end
-  end
-
-  def construct_pricing_determination
+    attributes[:is_default] = benefit_group.default
+    attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
+    attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+    attributes
   end
 
   def construct_workflow_state_transitions(benefit_application, plan_year)
     plan_year.workflow_state_transitions.asc(:transition_at).each do |wst|
       benefit_application.workflow_state_transitions.build(wst.attributes.except(:_id))
-    end
-  end
-
-  def map_product_package_kind(plan_option_kind)
-    package_kind_mapping = {
-      sole_source: :single_product,
-      single_plan: :single_product,
-      single_carrier: :single_issuer,
-      metal_level: :metal_level
-    }
-
-    package_kind_mapping[plan_option_kind.to_sym]
-  end
-
-  def product_package_choice_for(sponsored_benefit)
-    case sponsored_benefit.product_package_kind
-    when :single_product, :single_issuer
-      sponsored_benefit.reference_product.issuer_profile.legal_name
-    when :metal_level
-      sponsored_benefit.reference_product.metal_level_kind
     end
   end
 

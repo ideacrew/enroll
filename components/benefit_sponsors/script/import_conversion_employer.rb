@@ -14,7 +14,7 @@ module BenefitSponsors
         unless Settings.site.key == :mhc
           importer = BenefitSponsors::Importers::Mhc::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])
         else
-          importer = Importers::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])
+          importer = ::Importers::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])
         end
 
         importer.import!

@@ -35,7 +35,6 @@ module BenefitSponsors
         # validates :profile_source,
         #   inclusion: { in: PROFILE_SOURCE_KINDS },
         #   allow_blank: false
-
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
@@ -104,6 +103,10 @@ module BenefitSponsors
 
       def broker_agency_profile
         active_broker_agency_account.broker_agency_profile rescue nil
+      end
+
+      def staff_roles
+        Person.staff_for_employer(self)
       end
 
       def today=(new_date)

@@ -74,17 +74,6 @@ class BenefitGroupAssignment
     employer_profile.is_conversion? && plan_year.is_conversion
   end
 
-  def benefit_package=(new_benefit_package)
-    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
-    self.benefit_package_id = new_benefit_package._id
-    @benefit_package = new_benefit_package
-  end
-
-  def benefit_package
-    return @benefit_package if defined? @benefit_package
-    @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(self.benefit_package_id)
-  end
-
   def benefit_group=(new_benefit_group)
     warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
     # raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
@@ -107,17 +96,14 @@ class BenefitGroupAssignment
   end
 
   def benefit_package=(new_benefit_package)
-    raise ArgumentError.new("expected BenefitGroup") unless new_benefit_package.class.to_s.match(/BenefitPackage/)
+    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
     self.benefit_package_id = new_benefit_package._id
     @benefit_package = new_benefit_package
   end
 
   def benefit_package
     return @benefit_package if defined? @benefit_package
-    return nil if benefit_package_id.blank?
-    @benefit_package = BenefitSponsors::BenefitApplications::BenefitApplication.where(
-      :"benefit_packages._id" => benefit_package_id
-    ).first.benefit_packages.find(benefit_package_id)
+    @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
   end
 
   def hbx_enrollment=(new_hbx_enrollment)
