@@ -34,8 +34,9 @@ module BenefitSponsors
       end
 
       def create_model(record_attrs)
+        # sheet values random values will be given we have to set properly
         sheet_given_start_date = set_original_start_date(record_attrs[:coverage_start])
-        sheet_given_end_date = set_plan_year_end_date(record_attrs[:coverage_start]) y
+        sheet_given_end_date = set_plan_year_end_date(record_attrs[:coverage_start])
         the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
 
         plan_year_attrs = record_attrs.merge({
