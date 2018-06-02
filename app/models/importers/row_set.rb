@@ -28,7 +28,7 @@ module Importers
       row_mapping.each_with_index do |k, idx|
         value = row[idx]
         unless (k == :ignore) || value.blank?
-          record_attrs[k] = value.to_s.strip.gsub(/\.0\Z/,"")
+          record_attrs[k] = value.to_s.strip.gsub(/\.0\Z/, "")
         end
       end
 
@@ -44,7 +44,7 @@ module Importers
           import_details = ["imported", ""]
         end
       else
-        import_details  = []
+        import_details = []
         import_details << ["import failed", JSON.dump(record.errors.to_hash)]
         import_details << ["warnings", JSON.dump(record.warnings.to_hash)] if record.warnings.any?
       end
