@@ -9,7 +9,7 @@
   -#%abbreviation= " " filed doesn't exists
   %fein= employer.fein.strip
   %office_locations
-    = render :partial => "events/v2/organizations/office_location", :collection => employer.organization.office_locations
+    = render :partial => "events/v2/organizations/office_location", :collection => employer.office_locations
   - if !employer.organization.home_page.blank?
     %website= employer.organization.home_page
   - if employer.staff_roles.any?

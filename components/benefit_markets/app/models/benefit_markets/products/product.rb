@@ -76,8 +76,21 @@ module BenefitMarkets
     scope :by_kind,                     ->(kind){ where(kind: kind) }
     scope :by_service_area,             ->(service_area){ where(service_area: service_area) }
     scope :by_service_areas, ->(service_area_ids) { where("service_area_id" => {"$in" => service_area_ids }) }
+    scope :by_coverage_date, ->(coverage_date) {
+      where(
+        "premium_tables" => {
+          "$elemMatch" => {
+            "effective_period.min" => { "$lte" => coverage_date },
+            "effective_period.max" => { "$gte" => coverage_date }
+          }
+        }
+      )
+    }
 
     scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
+    scope :by_state,                    ->(state) {where(
+      :"issuer_profile_id".in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
+    )}
 
     scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
                                                                   :"premium_tables.effective_period.max".gte => effective_date) }
