@@ -134,19 +134,19 @@ module BenefitSponsors
 
       it "should be a success" do
         sign_in user
-        get :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+        xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
         expect(response).to have_http_status(:success)
       end
 
       it "should render edit template" do
         sign_in user
-        get :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+        xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
         expect(response).to render_template("edit")
       end
 
       it "should initialize form" do
         sign_in user
-        get :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+        xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
         expect(form_class).to respond_to(:for_edit)
       end
     end
@@ -195,7 +195,7 @@ module BenefitSponsors
 
       def sign_in_and_do_update
         sign_in user
-        post :update, :id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application => benefit_application_params
+        xhr :put, :update, :id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application => benefit_application_params
       end
     end
 

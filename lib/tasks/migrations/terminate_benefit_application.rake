@@ -18,7 +18,7 @@ namespace :migrations do
     puts "Processing #{organizations.first.legal_name}" unless Rails.env.test?
     termination_date = Date.strptime(args[:termination_date], "%m/%d/%Y")
     end_on = Date.strptime(args[:end_on], "%m/%d/%Y")
-    organization = organization.first
+    organization = organizations.first
 
     # Expire previous year benefit applications
     organization.active_benefit_sponsorship.benefit_applications.published.where(:"effective_period.max".lte => TimeKeeper.date_of_record).each do |benefit_application|
