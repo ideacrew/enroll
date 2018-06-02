@@ -1,8 +1,6 @@
 require 'ostruct'
 
 class HbxEnrollment
-  @logger = Logger.new("#{Rails.root}/log/hbx_enrollment.log")
-  @logger.info "enter hbx enrollment"
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -1530,10 +1528,8 @@ class HbxEnrollment
   # end
 
   def any_dependent_members_age_above_26?
-      @logger.info "check for dependents age_"
     hbx_enrollment_members.where(is_subscriber: false).map(&:family_member).map(&:person).each do |person|
       return true if person.age_on(TimeKeeper.date_of_record) >= 26
-        @logger.info "person found"
     end
     return false
   end

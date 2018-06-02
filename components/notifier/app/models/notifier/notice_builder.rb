@@ -13,8 +13,6 @@ module Notifier
     end
 
     def construct_notice_object
-      @logger = Logger.new("#{Rails.root}/log/notice_builder.log")
-       @logger.info "enter construct notice object"
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
@@ -30,12 +28,9 @@ module Notifier
           elements = elements[0..date_ele_index]
           elements[date_ele_index] = date_element.scan(/[a-zA-Z_]+/).first
         end
-        @logger.info "#{element}"
         element_retriver = elements.reject{|ele| ele == recipient_klass_name.to_s}.join('_')
-        @logger.info "#{element_retriver}"
         builder.instance_eval(element_retriver)
       end
-      @logger.info "builder merge model"
       builder.merge_model
     end
 

@@ -38,31 +38,23 @@ module Notifier
     attr_accessor :resource, :payload
 
     def set_data_elements
-      @logger = Logger.new("#{Rails.root}/log/notice_kind.log")
-       @logger.info "enter data elements"
       if template.present?
-        @logger.info "enter data element #{template}"
         tokens = template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
         conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
-           @logger.info "enter conditional tokens"
         template.data_elements = tokens + conditional_tokens
       end
     end
 
     def execute_notice(event_name, payload)
-      @logger = Logger.new("#{Rails.root}/log/notice_kind.log")
-       @logger.info "enter  execute notice"
       finder_mapping = Notifier::ApplicationEventMapper.lookup_resource_mapping(event_name)
       if finder_mapping.nil?
         raise ArgumentError.new("BOGUS EVENT...could n't find resoure mapping for event #{event_name}.")
       end
-      @logger.info "enter execute notice"
       @payload = payload
       @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
       if @resource.blank?
         raise ArgumentError.new("Bad Payload...could n't find resoure with #{payload[finder_mapping.identifier_key.to_s]}.")
       end
-      @logger.info "generating notice ......."
       generate_pdf_notice
       upload_and_send_secure_message
       send_generic_notice_alert

@@ -7,14 +7,11 @@ module Notifier
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
-       @logger = Logger.new("#{Rails.root}/log/notification_subscriber.log")
-       @logger.info "enter  subscriber"
       log("NOTICE EVENT: #{event_name} #{payload}", {:severity => 'info'})
 
       NoticeKind.where(event_name: event_name.split(".")[4]).each do |notice_kind|
         begin
           notice_kind.execute_notice(event_name, payload)
-           @logger.info "enter notice kind"
         rescue Exception => e
           # ADD LOGGING AND HANDLING
           puts "#{e.inspect} #{e.backtrace}"

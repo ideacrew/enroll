@@ -103,8 +103,6 @@ class Notice
   end
 
   def generate_pdf_notice
-    @logger = Logger.new("#{Rails.root}/log/notice.log")
-      @logger.info "enter generate notice"
     begin
       File.open(notice_path, 'wb') do |file|
         file << self.pdf

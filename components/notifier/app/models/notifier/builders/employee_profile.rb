@@ -1,7 +1,6 @@
 module Notifier
   class Builders::EmployeeProfile
-     @logger = Logger.new("#{Rails.root}/log/employee_profile.log")
-      @logger.info "enter employee profile"
+
     include ActionView::Helpers::NumberHelper
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
@@ -159,10 +158,8 @@ module Notifier
     end
 
     def dependents_name
-       @logger.info "enter dependents name"
       names = []
-      payload[:notice_params][:dep_hbx_ids].each do |dep_id|
-         @logger.info "enter loop"
+      payload["notice_params"]["dep_hbx_ids"].each do |dep_id|
         names << Person.where(hbx_id: dep_id).first.full_name
       end
       merge_model.dependents_name = names.join(", ")
