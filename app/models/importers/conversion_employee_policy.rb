@@ -219,9 +219,13 @@ module Importers
         end
         en.save!
 
+        if plan.is_a?(BenefitMarkets::Products::Product)
+          en.product = plan
+        else
+          en.plan = plan
+        end
+
         en_attributes = {
-            issuer_profile_id: plan.issuer_profile_id,
-            product_id: plan.id,
             aasm_state: "coverage_selected",
             coverage_kind: 'health'
         }
