@@ -3,7 +3,7 @@ module BenefitSponsors
     class ProfileSerializer < ActiveModel::Serializer
       attributes :id, :contact_method, :sic_code,
                    :languages_spoken, :working_hours, :accept_new_clients, :profile_type, :market_kind_options,
-                    :market_kind, :language_options, :home_page, :grouped_sic_code_options
+                    :market_kind, :language_options, :home_page, :grouped_sic_code_options, :ach_routing_number, :ach_account_number
       attribute :contact_method_options
       # attribute :rating_area_id, if: :is_cca_employer_profile?
       attribute :sic_code, if: :is_cca_employer_profile?
@@ -16,6 +16,8 @@ module BenefitSponsors
       attribute :language_options, if: :is_broker_profile?
       attribute :home_page, if: :is_broker_profile?
       attribute :id, if: :is_persisted?
+      attribute :ach_account_number, if: :is_broker_profile?
+      attribute :ach_routing_number, if: :is_broker_profile?
 
       has_many :office_locations, serializer: ::BenefitSponsors::Serializers::OfficeLocationSerializer
       has_one :inbox, serializer: ::BenefitSponsors::Serializers::InboxSerializer

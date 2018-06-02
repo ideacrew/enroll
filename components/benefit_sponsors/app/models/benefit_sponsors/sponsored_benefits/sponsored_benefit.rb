@@ -47,13 +47,13 @@ module BenefitSponsors
         # do nothing
       end
 
-      def products
-        @products ||= lookup_package_products
+      def products(coverage_date)
+        lookup_package_products(coverage_date)
       end
 
-      def lookup_package_products
+      def lookup_package_products(coverage_date)
         return [reference_product] if product_package_kind == :single_product
-        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_areas_ids)
+        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids).by_coverage_date(coverage_date)
       end
 
       def product_package

@@ -2,7 +2,7 @@
 # ex: RAILS_ENV=production bundle exec rake migrations:cancel_employer_renewal['521111111 522221111 5211333111']
 namespace :migrations do
   desc "Cancel renewal for employer"
-  task :cancel_employer_renewal, [:fein] => [:environment] do |task, args|
+  task :cancel_benefit_application, [:fein] => [:environment] do |task, args|
 
     feins = args[:fein].split(' ').uniq
 
@@ -29,10 +29,10 @@ namespace :migrations do
     feins = args[:fein].split(' ').uniq
     feins.each do |fein|
       organization = BenefitSponsors::Organizations::Organization.where(fein: fein).first
-      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
+      next puts "unable to find employer profile with fein: #{fein}" if organization.blank?
       benefit_application = organization.active_benefit_sponsorship.benefit_applications.published.first
       if benefit_application.present?
-        puts "found  plan year for #{employer_profile.legal_name}---#{plan_year.start_on}" unless Rails.env.test?
+        puts "found  plan year for #{organization.legal_name}---#{plan_year.start_on}" unless Rails.env.test?
         enrollment_service = initialize_service(benefit_application)
         enrollment_service.cancel
         organization.active_benefit_sponsorship.terminate! if organization.active_benefit_sponsorship.may_terminate?

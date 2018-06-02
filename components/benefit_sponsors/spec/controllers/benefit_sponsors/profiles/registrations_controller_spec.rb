@@ -52,7 +52,9 @@ module BenefitSponsors
     }
 
     let(:broker_profile_attributes) {
-      {
+      { :ach_account_number => "1234567890",
+        :ach_routing_number => "011000015",
+        :ach_routing_number_confirmation => "011000015",
         :market_kind => :shop,
         :office_locations_attributes => office_locations_attributes,
         :contact_method => :paper_and_electronic
@@ -380,8 +382,7 @@ module BenefitSponsors
           end
 
           it "should redirect to new" do
-            expect(response.location.include?("/edit")).to eq true if profile_type == "benefit_sponsor"
-            expect(response.location.include?("/broker_agency_profiles/")).to eq true if profile_type == "broker_agency"
+            expect(response.location.include?("/edit")).to eq true
           end
         end
 

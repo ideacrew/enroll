@@ -3,5 +3,8 @@
 <% end %>
 
 <%= form_for @benefit_package_form, as: :benefit_package, url: benefit_sponsorship_benefit_application_benefit_package_path, method: :put do |f| %>
+  <div id="benefitApplicationTile">
+    <%= render 'benefit_application_tile', f: f.object %>
+  </div>
   <%= render 'form', f:f %>
 <% end %>
