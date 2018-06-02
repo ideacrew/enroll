@@ -103,6 +103,9 @@ class HbxEnrollment
   field :sponsored_benefit_id, type: BSON::ObjectId
   field :rating_area_id, type: BSON::ObjectId
 
+  field :product_id, type: BSON::ObjectId
+  field :issuer_profile_id, type: BSON::ObjectId
+
   field :original_application_type, type: String
 
   field :submitted_at, type: DateTime
@@ -192,7 +195,7 @@ class HbxEnrollment
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
   scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
-  scope :by_benefit_package,       -> (benefit_package) { where(:benefit_package_id => benefit_package.id) }
+  scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
 
   embeds_many :workflow_state_transitions, as: :transitional
@@ -725,6 +728,18 @@ class HbxEnrollment
   def plan
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
+  end
+
+  def product=(new_product)
+    raise ArgumentError.new("expected product") unless new_product.is_a?(BenefitMarkets::Products::Product)
+    self.product_id = new_product._id
+    self.issuer_profile_id = new_product.issuer_profile_id
+    @product = new_product
+  end
+
+  def product
+    return @product if defined? @product
+    @product = BenefitMarkets::Products::Product.find(self.product_id) unless product_id.blank?
   end
 
   def set_coverage_termination_date(coverage_terminated_on=TimeKeeper.date_of_record)

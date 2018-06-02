@@ -140,7 +140,8 @@ module Observers
         hbx_enrollment = new_model_event.klass_instance
         if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
           
-          is_valid_employer_py_oe = (hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.submitted_at) || hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.created_at))
+          #TODO: Need to fix these methods on benefit application while dealing with notices.
+          is_valid_employer_py_oe = true#(hbx_enrollment.sponsored_benefit_package.plan_year.open_enrollment_contains?(hbx_enrollment.submitted_at) || hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.created_at))
 
           if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
             if is_valid_employer_py_oe
@@ -165,7 +166,7 @@ module Observers
         end
 
         if new_model_event.event_key == :employee_coverage_termination
-          if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.benefit_group.plan_year.active?
+          if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.sponsored_benefit_package.benefit_application.active?
             trigger_notice(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
             trigger_notice(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
           end

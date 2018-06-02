@@ -133,7 +133,8 @@ module BenefitSponsors
       if @benefit_application.may_terminate_enrollment?
         @benefit_application.terminate_enrollment!
         if @benefit_application.terminated?
-          @benefit_application.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+          updated_dates = @benefit_application.effective_period.min.to_date..end_on
+          @benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date)
           @benefit_application.terminate_benefit_package_members
         end
       end
