@@ -111,7 +111,6 @@ module BenefitSponsors
       end
 
       def save
-        binding.pry
         return false unless valid?
         census_employee = map_subscriber
         employer = find_employer
@@ -121,7 +120,6 @@ module BenefitSponsors
         census_employee.benefit_sponsorship_id = sponsorship.id
         sponsorship.census_employees << census_employee
         save_result = census_employee.save
-        binding.pry
         unless save_result
           propagate_errors(census_employee)
         end
