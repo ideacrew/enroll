@@ -140,6 +140,7 @@ module Observers
         hbx_enrollment = new_model_event.klass_instance
         if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
           
+          #TODO: Need to fix these methods on benefit application while dealing with notices.
           is_valid_employer_py_oe = true#(hbx_enrollment.sponsored_benefit_package.plan_year.open_enrollment_contains?(hbx_enrollment.submitted_at) || hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.created_at))
 
           if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
