@@ -2,7 +2,7 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitSponsorCatalogDecorator < SimpleDelegator
 
-      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :sole_source, :coverage_kind)
+      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind)
       ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered)
 
       def sponsor_contributions(benefit_package_id = nil)
@@ -41,8 +41,12 @@ module BenefitSponsors
         plan_options.keys
       end
 
-      def carrier_names
-        plan_options[:single_issuer].keys
+      def single_issuer_options
+        carrier_name_and_id_hash = {}
+        plan_options[:single_issuer].each do |k, v|
+          carrier_name_and_id_hash[k] = v.first["issuer_id"].to_s
+        end
+        carrier_name_and_id_hash
       end
 
       def metal_levels
@@ -50,7 +54,11 @@ module BenefitSponsors
       end
 
       def single_product_options
-        plan_options[:single_product].keys
+        single_product_options_hash = {}
+        plan_options[:single_product].each do |k, v|
+          single_product_options_hash[k] = v.first["issuer_id"].to_s
+        end
+        single_product_options_hash
       end
 
       def probation_period_kinds
@@ -67,7 +75,7 @@ module BenefitSponsors
 
         product_packages.each do |product_package|
           package_products = product_package.products.collect do |product|
-            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental")
+            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental")
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :single_issuer

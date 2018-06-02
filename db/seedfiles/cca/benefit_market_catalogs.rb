@@ -11,7 +11,7 @@ Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
     yaml_str = File.read(f_name)
     data = YAML.load(yaml_str)
     data.new_record = true
-    data.save! rescue binding.pry
+    data.save!
   end
 end
 

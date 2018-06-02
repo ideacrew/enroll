@@ -35,7 +35,7 @@
     .invalid-feedback
       | Please provide a valid zipcode.
 
-  - if aca_address_query_county
+  - if (aca_address_query_county && @agency.profile_type != "broker_agency")
     .col-md-3.col-sm-12.col-xs-12
       label for="inputCounty" County
       = f.select(:county, options_for_select(BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq, selected: f.object.try(:county)), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', required: true, data: { target: 'zip-check.countySelect' })

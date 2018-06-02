@@ -11,7 +11,8 @@ namespace :reports do
 
       # census_employees = CensusEmployee.find_all_terminated(date_range: date_range)
       #employer_profiles = EmployerProfile.all
-      orgs = Organization.exists(employer_profile: true).order_by([:legal_name])
+      # orgs = Organization.exists(employer_profile: true).order_by([:legal_name])
+      organizations = BenefitSponsors::Organizations::Organization.employer_profiles.order_by([:legal_name])
 
       field_names  = %w(
           fein
@@ -48,75 +49,53 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        orgs.all.each do |org|
+        organizations.all.each do |org|
           er = org.employer_profile
-          plan_year = er.active_plan_year || er.latest_plan_year
-          next unless plan_year
+          benefit_application = er.active_benefit_application || er.latest_benefit_application
+          next unless benefit_application
 
           fein                  = er.fein
           legal_name            = er.legal_name
           dba                   = er.dba
           employer_aasm_state   = er.aasm_state
 
-          staff_role = er.staff_roles.first
-          if staff_role
+          staff_person = Person.staff_for_employer(er).first
+          if staff_person
+            staff_role = staff_person.employer_staff_roles.where(benefit_sponsor_employer_profile_id: er.id).first
             staff_name    = staff_role.full_name
             staff_phone   = staff_role.work_phone || staff_role.mobile_phone
             staff_email   = staff_role.work_email_or_best
           end
 
-          if er.broker_agency_profile
-            broker_role = er.broker_agency_profile.primary_broker_role
-            if broker_role
-              broker_name   = broker_role.person.full_name
-              broker_phone  = broker_role.phone
-              broker_email  = broker_role.email.address if broker_role.email
-            end
+          broker_account = er.active_benefit_sponsorship.broker_agency_accounts.first
+
+          if broker_account.present?
+            role = broker_account.broker_agency_profile.primary_broker_role
+            broker_name   = role.person.full_name
+            broker_phone  = role.phone
+            broker_email  = role.email.address if role.email
           end
 
-          plan_year_start_on    = plan_year.start_on
-          plan_year_aasm_state  = plan_year.aasm_state
+          plan_year_start_on    = benefit_application.start_on
+          plan_year_aasm_state  = benefit_application.aasm_state
 
-          plan_year.benefit_groups.each do |bg|
+          benefit_application.benefit_groups.each do |bg|
             benefit_package_title = bg.title
-            plan_option_kind      = bg.plan_option_kind
 
-            reference_plan    = bg.reference_plan
-            ref_plan_name     = reference_plan.name
-            ref_plan_year     = reference_plan.active_year
-            ref_plan_hios_id  = reference_plan.hios_id
+            plan_option_kind      = bg.sponsored_benefits.map(&:product_package_kind).join(',')
 
-            if bg.relationship_benefits.detect { |rb| rb.relationship == "employee"}.try(:premium_pct)
-              employee_contribution_pct = bg.relationship_benefits.detect { |rb| rb.relationship == "employee"}.premium_pct
-            else
-              employee_contribution_pct = 0
-            end
+            reference_products    = bg.sponsored_benefits.map(&:reference_product)
+            ref_plan_name     = reference_products.map(&:title).join(',')
+            ref_plan_year     = reference_products.map(&:active_year).join(',')
+            ref_plan_hios_id  = reference_products.map(&:hios_id).join(',')
 
-            if bg.relationship_benefits.detect { |rb| rb.relationship == "spouse"}.try(:premium_pct)
-              spouse_contribution_pct = bg.relationship_benefits.detect { |rb| rb.relationship == "spouse"}.premium_pct
-            else
-              spouse_contribution_pct = 0
-            end
+            contribution_levels = bg.sponsored_benefits.map(&:sponsor_contribution).map(&:contribution_levels)
+            health_contribution_levels = contribution_levels[0] # No dental for cca
 
-            if bg.relationship_benefits.detect { |rb| rb.relationship == "domestic_partner"}.try(:premium_pct)
-              domestic_partner_contribution_pct = bg.relationship_benefits.detect { |rb| rb.relationship == "domestic_partner"}.premium_pct
-            else
-              domestic_partner_contribution_pct = 0
-            end
-
-            if bg.relationship_benefits.detect { |rb| rb.relationship == "child_under_26"}.try(:premium_pct)
-              child_under_26_contribution_pct = bg.relationship_benefits.detect { |rb| rb.relationship == "child_under_26"}.premium_pct
-            else
-              child_under_26_contribution_pct = 0
-            end
-
-            # spouse_contribution_pct           = bg.relationship_benefits.detect { |rb| rb.relationship == "spouse"}.premium_pct
-            # domestic_partner_contribution_pct = bg.relationship_benefits.detect { |rb| rb.relationship == "domestic_partner"}.premium_pct
-            # child_under_26_contribution_pct   = bg.relationship_benefits.detect { |rb| rb.relationship == "child_under_26"}.premium_pct
-
-
-            # if er.binder_paid? ||er.enrolled? || er.suspended?
-            # end
+            employee_contribution_pct = health_contribution_levels.where(display_name: "Employee").first.contribution_pct
+            spouse_contribution_pct = health_contribution_levels.where(display_name: "Spouse").first.contribution_pct
+            domestic_partner_contribution_pct = health_contribution_levels.where(display_name: "Domestic Partner").first.contribution_pct
+            child_under_26_contribution_pct = health_contribution_levels.where(display_name: "Child Under 26").first.contribution_pct
 
             csv << field_names.map do |field_name|
               if field_name == "fein"
@@ -129,12 +108,16 @@ namespace :reports do
           end
         end
       end
-      pubber = Publishers::Legacy::EmployerReportPublisher.new
-      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} employers output to file: #{file_name}"
-      pubber = Publishers::LegacyShopReportPublisher.new
-      pubber.publish URI.join("file://", file_name)
+
+      if Rails.env.production?
+        pubber = Publishers::Legacy::EmployerReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
+
+        pubber = Publishers::LegacyShopReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
+      end
     end
   end
 end

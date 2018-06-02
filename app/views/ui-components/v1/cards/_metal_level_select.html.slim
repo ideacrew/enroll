@@ -22,6 +22,7 @@
     #metal-level-select.card
       .card-body
         ul.nav.nav-tabs role="tablist"
+          input#ppKind type="hidden" name="benefit_package[sponsored_benefits_attributes][0][product_package_kind]"
           li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
             a href="#carrier" aria-controls="carrier" role="tab" data-toggle="tab" data-name="single_issuer"
               i.far.fa-circle.mr-2
@@ -37,13 +38,14 @@
         .tab-content
           .tab-pane.fade#carrier role="tabpanel"
             h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
-            - @benefit_package_form.catalog.carrier_names.each do |ck|
+            - @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id|
               .col-xs-3.carriers
                 .col-xs-12
                   .col-xs-3
-                    = f.radio_button :product_option_choice, "#{ck}", class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                    = f.hidden_field :kind, value: "health"
+                    = f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: issuer_name}
                   .col-xs-9
-                    h5.heading-text = ck
+                    h5.heading-text = issuer_name
               
           .tab-pane.fade#level role="tabpanel"
             h4 Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.
@@ -51,29 +53,36 @@
               .col-xs-3.metals
                 .col-xs-12
                   .col-xs-3
-                    = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                    = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: kind}
                   .col-xs-9
                     h5.heading-text = kind
                     
           .tab-pane.fade#plan role="tabpanel"
             h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?
-            - @benefit_package_form.catalog.single_product_options.each do |ck|
+            - @benefit_package_form.catalog.single_product_options.each do |carrier_name, carrier_id|
               .col-xs-3.plans
                 .col-xs-12
                   .col-xs-3
-                    = f.radio_button :product_option_choice, ck, class: 'product_option_choice', onclick:"getPlanInfo(this)"
+                    = f.radio_button :product_option_choice, carrier_id, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: carrier_name}
                   .col-xs-9
-                    h5.heading-text = ck
+                    h5.heading-text = carrier_name
         
         #referencePlans.hidden
           h2.heading-text.pt-1 Select Your Reference Plan
 
           h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
           #yourPlans
+          
+          #yourSponsorContributions
+          
+          #yourReferencePlanDetails
 
 javascript:
   var productOptionKind = String;
   var selectedRadio = String;
+  var sponsorContribution = String;
+  var filteredProducts = String;
+  var referencePlanID = String;
   var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
   
@@ -95,18 +104,24 @@ javascript:
         element.querySelector('.fa-circle').classList.toggle('fa-dot-circle')
         // Gets product option info
         productOptionKind = element.querySelector('a').dataset.name;
+        // Sets kind to hidden input field for form submission
+        document.getElementById('ppKind').setAttribute('value', productOptionKind)
       }
     }
   }
   
   function getPlanInfo(element) {
     var selectedRadio = element.value;
-    var filteredProducts = planOptions[productOptionKind][selectedRadio];
+    var selectedName = element.dataset.name;
+    filteredProducts = planOptions[productOptionKind][selectedName];
     populateReferencePlans(filteredProducts)
   }
   
   function populateReferencePlans(plans) {
-    console.log(sponsorContributions)
+    sponsorContribution = sponsorContributions[productOptionKind]['contribution_levels'];
+    
+    document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions")}'
+    
     // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
     // Removes reference plans if metal level changes
@@ -119,26 +134,75 @@ javascript:
     }
 
     // Build reference plans to be displayed in UI
-    for(plan of plans) {
-    
-    var div = document.createElement('div')
-    div.setAttribute('id', 'yourAvailablePlans')
-    div.innerHTML = '<div class="col-xs-4 reference-plans">\
-        <div class="col-xs-12 p0 mb-1">\
-          <div class="col-xs-3 p0">\
-            <input type="radio" name="reference-plans">\
+    for (plan of filteredProducts) {
+
+      var div = document.createElement('div')
+      div.setAttribute('id', 'yourAvailablePlans')
+      div.innerHTML = '<div class="col-xs-4 reference-plans">\
+          <div class="col-xs-12 p0 mb-1">\
+            <div class="col-xs-3 p0">\
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="'+plan.id+'" onclick="displayReferencePlanDetails(this, plan)" value="'+plan.id+'">\
+            </div>\
+            <div class="col-xs-9 p0 rp-info mb-1">\
+              <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
+              <span class="plan-label">Type:</span><br>\
+              <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
+              <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
+            </div>\
           </div>\
-          <div class="col-xs-9 p0 rp-info mb-1">\
-            <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
-            <span class="plan-label">Type:</span><br>\
-            <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
-            <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
+        </div>'
+
+        document.getElementById('yourPlans').append(div);
+    }
+    
+    setTimeout(function() {
+      buildSponsorContributions(sponsorContribution)
+    },400);
+  }
+  
+  function buildSponsorContributions(contributions) {
+    var element = document.getElementById('benefitFields');
+    index = 0;
+    
+    for (contribution of contributions) {
+      index += 1;
+      var attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
+      var div = document.createElement('div')
+      div.setAttribute('id', 'yourAvailableContributions')
+      div.innerHTML = '<div class="row">\
+        <input id="' + attrPrefix + '[id]" name="' + attrPrefix + '[id]" type="hidden" value="' + contribution['id'] + '" />\
+        <div class="col-xs-6 pr-3">\
+          <div class="row ml-4">\
+            <i class="far fa-check-square fa-2x fl" style="width:60px"></i><p class="ml-2 fl">' +contribution.display_name+'</p>\
+          </div>\
+        </div>\
+        <div class="col-xs-6">\
+          <div class="col-xs-3">\
+            <input checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" type="hidden" value="' + contribution["is_offered"] +'" />\
+            <input id="' + attrPrefix + '[display_name]" name="' + attrPrefix + '[display_name]" type="hidden" value="' + contribution["display_name"] + '" />\
+            <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '">\
+          </div>\
+          <div class="col-xs-9">\
+            <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'">\
           </div>\
         </div>\
       </div>'
-
-      document.getElementById('yourPlans').append(div);
+      element.append(div)
     }
+  }
+  
+  function displayReferencePlanDetails(element, plan) {
+    referencePlanID = element.id;
+
+    document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
+    
+    document.getElementById('referencePlanTitle').append(plan.title);
+    document.getElementById('rpCarrier').append(plan.carrier_name);
+    document.getElementById('rpMetalLevel').append(plan.metal_level_kind);
+  }
+  
+  function setInputValue(element) {
+    document.getElementById(element.dataset.id).value = element.value;
   }
   
   

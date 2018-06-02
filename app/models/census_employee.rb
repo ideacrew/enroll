@@ -1107,6 +1107,37 @@ class CensusEmployee < CensusMember
     end
   end
 
+  # Enrollments with current active and renewal benefit applications
+  def active_benefit_group_enrollments
+    return nil if employee_role.blank?
+    family = Family.where({
+      "households.hbx_enrollments" => {:"$elemMatch" => {
+        :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
+        :"employee_role_id" => self.employee_role_id }
+      }
+    }).first
+
+    family.active_household.hbx_enrollments.where(
+      :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
+      :"employee_role_id" => self.employee_role_id
+    )
+  end
+
+  def renewal_benefit_group_enrollments
+    return nil if employee_role.blank?
+    family = Family.where({
+      "households.hbx_enrollments" => {:"$elemMatch" => {
+        :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
+        :"employee_role_id" => self.employee_role_id }
+      }
+    }).first
+
+    family.active_household.hbx_enrollments.where(
+      :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
+      :"employee_role_id" => self.employee_role_id
+    )
+  end
+
   def benefit_package_for_open_enrollment(shopping_date)
     active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
   end

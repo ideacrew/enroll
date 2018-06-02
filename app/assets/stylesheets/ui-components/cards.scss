@@ -266,7 +266,55 @@
     background-color:$primary-white;
     overflow-y: scroll;
   }
+}
 
+#sponsorContributions {
+  background-color:$primary-white;
+  height:300px;
+  p {
+    width:190px;
+    font-size: 14px;
+    color:$mhc-heading-gray;
+  }
+  .offered-heading {
+    border-bottom: solid 1px #d5d5d5;
+    padding: 15px 0 25px;
+    font-size: 14px;
+    color:$mhc-heading-gray;
+  }
+  .ac-row {
+    padding: 15px 0;
+  }
+  .fa-check-square {
+    color:$primary-green;
+  }
+  hr {
+    border-top:1px solid $mhc-light-gray;
+    height:2px;
+  }
+  input {
+    border: 1px solid #b7b7b7;
+    border-radius: 0;
+    box-shadow: none;
+    display: inline-block;
+    font-weight: bold;
+    line-height: normal;
+    width:40px;
+    height:40px;
+    margin-top:10px;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .slider {
+    width: 100%; /* Full-width */
+    background: #d3d3d3; /* Grey background */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
 }
 
 .reference-plans {
