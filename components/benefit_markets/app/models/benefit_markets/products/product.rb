@@ -76,17 +76,18 @@ module BenefitMarkets
     scope :by_kind,                     ->(kind){ where(kind: kind) }
     scope :by_service_area,             ->(service_area){ where(service_area: service_area) }
     scope :by_service_areas, ->(service_area_ids) { where("service_area_id" => {"$in" => service_area_ids }) }
+=begin
     scope :by_coverage_date, ->(coverage_date) {
       where(
-        "premium_tables" => {
+        "premium_tables.effective_period" => {
           "$elemMatch" => {
-            "effective_period.min" => { "$lte" => coverage_date },
-            "effective_period.max" => { "$gte" => coverage_date }
+              "min" => { "$lte" => coverage_date },
+              "max" => { "$gte" => coverage_date }
           }
         }
       )
     }
-
+=end
     scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
     scope :by_state,                    ->(state) {where(
       :"issuer_profile_id".in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
@@ -103,6 +104,19 @@ module BenefitMarkets
       {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
         ])
     }
+
+    # Highly nested scopes don't behave in a way I entirely understand with
+    # respect to the $elemMatch operator.  Since we are only invoking this
+    # method when we already have the document, I'm going to abuse lazy
+    # enumeration to create something that behaves like a scope but will
+    # only be evaluated once.
+    def self.by_coverage_date(collection, coverage_date)
+      collection.select do |product|
+        product.premium_tables.any? do |pt| 
+          (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
+        end
+      end
+    end
 
     def product_kind
       kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
