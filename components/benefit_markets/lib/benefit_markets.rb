@@ -1,4 +1,6 @@
 require "benefit_markets/engine"
+require 'benefit_markets/rules_engine'
+
 require "virtus"
 require "mongoid"
 require "aasm"
