@@ -62,8 +62,20 @@ module Importers::Mhc
       (preference.present?) ? true : false
     end
 
+    def plan_year_exists?
+      employer_profile = find_employer
+      sponsorship = employer_profile.organization.benefit_sponsorships[0]
+      if sponsorship.benefit_applications.present?
+        errors.add(:application_exists, "Benefit Application already created!!")
+        return true
+      end
+      false
+    end
+
     def save
       return false unless valid?
+      return false if plan_year_exists?
+
       record = map_plan_year
       save_result = record.save
       propagate_errors(record)
