@@ -32,7 +32,7 @@ module Importers::Mhc
 
     def build_primary_address
       Address.new(
-          :kind => "work",
+          :kind => "primary",
           :address_1 => primary_location_address_1,
           :address_2 => primary_location_address_2,
           :city =>  primary_location_city,
