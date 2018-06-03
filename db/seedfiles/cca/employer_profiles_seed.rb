@@ -13,7 +13,6 @@ Mongoid::Migration.say_with_time("Load MA employer Profiles") do
     organization.new_record = true
     organization.site = site
     benefit_sponsorship = organization.employer_profile.add_benefit_sponsorship
-    benefit_sponsorship.source_kind = organization.employer_profile.profile_source.to_sym
     benefit_sponsorship.save!
     organization.save!
   end

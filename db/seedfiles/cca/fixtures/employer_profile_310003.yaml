@@ -25,7 +25,6 @@ attributes: !ruby/hash:BSON::Document
     contact_method: :electronic_only
     _type: BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
     aasm_state: applicant
-    profile_source: self_serve
     created_at: 2018-05-22 18:43:44.584000000 Z
     registered_on: 2018-05-22 00:00:00.000000000 Z
     sic_code: '4923'
