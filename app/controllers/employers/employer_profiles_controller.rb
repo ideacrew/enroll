@@ -409,7 +409,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def check_and_download_invoice
-    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+    @invoice = @employer_profile.organization.invoices.find(params[:invoice_id])
   end
 
   def sort_plan_years(plans)
