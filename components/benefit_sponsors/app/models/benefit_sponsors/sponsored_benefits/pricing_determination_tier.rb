@@ -8,6 +8,13 @@ module BenefitSponsors
 
       field :pricing_unit_id, type: BSON::ObjectId
       field :price, type: Float
+
+      delegate :pricing_model, to: :pricing_determination
+
+      def pricing_unit
+        return @pricing_unit if defined? @pricing_unit
+        @pricing_unit = pricing_model.find_by_pricing_unit(pricing_unit_id)
+      end
     end
   end
 end

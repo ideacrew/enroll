@@ -13,8 +13,6 @@ module BenefitSponsors
         ACTIVE_STATES   ||= ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
         INACTIVE_STATES ||= ["suspended", "ineligible"]
 
-        PROFILE_SOURCE_KINDS  ||= ["self_serve", "conversion"]
-
         INVOICE_VIEW_INITIAL  ||= %w(published enrolling enrolled active suspended)
         INVOICE_VIEW_RENEWING ||= %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
@@ -23,13 +21,8 @@ module BenefitSponsors
         # Workflow attributes
         field :aasm_state, type: String, default: "applicant"
 
-        field :profile_source, type: String, default: "self_serve"
-        field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
         field :xml_transmitted_timestamp, type: DateTime
 
-        validates :profile_source,
-          inclusion: { in: PROFILE_SOURCE_KINDS },
-          allow_blank: false
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
@@ -98,6 +91,10 @@ module BenefitSponsors
 
       def broker_agency_profile
         active_broker_agency_account.broker_agency_profile rescue nil
+      end
+
+      def staff_roles
+        Person.staff_for_employer(self)
       end
 
       def today=(new_date)
@@ -180,6 +177,14 @@ module BenefitSponsors
       end
 
       # Deprecate below methods in future
+
+      def profile_source
+        active_benefit_sponsorship.source_kind
+      end
+
+      def registered_on
+        active_benefit_sponsorship.registered_on
+      end
 
       def renewing_plan_year
         warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?

@@ -10,14 +10,15 @@ module BenefitSponsors
     embeds_many :contribution_levels,
                 class_name: "BenefitSponsors::SponsoredBenefits::ContributionLevel"
 
-
+    delegate :contribution_model, to: :sponsored_benefit
+    
     accepts_nested_attributes_for :contribution_levels
     validates_presence_of :contribution_levels
-    validate :validate_contribution_levels
+    # validate :validate_contribution_levels
 
-    def validate_contribution_levels
-      true
-    end
+    # def validate_contribution_levels
+    #   true
+    # end
 
     def sic_code
       # Needs to return the most recent SIC CODE value recorded for this sponsorship

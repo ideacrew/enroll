@@ -60,6 +60,10 @@ module BenefitMarkets
         new_contribution_model.member_relationships = self.member_relationships.collect{ |mr| mr.class.new(mr.attributes) }
         new_contribution_model
       end
+
+      def find_contribution_unit(contribution_unit_id)
+        contribution_units.find(contribution_unit_id)
+      end
     end
   end
 end

@@ -1,5 +1,5 @@
 class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
-	EnrollmentProductAdapter = Struct.new(:id)
+	EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
   
   MemberNameAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix)
 
@@ -47,7 +47,8 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 							"effective_on" => "$households.hbx_enrollments.effective_on",
 							"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
 							"_id" => "$households.hbx_enrollments._id",
-							"product_id" => "$households.hbx_enrollments.plan_id",
+              "product_id" => "$households.hbx_enrollments.product_id",
+							"issuer_profile_id" => "$households.hbx_enrollments.issuer_profile_id",
               "employee_role_id" => "$households.hbx_enrollments.employee_role_id"
 						},
 						"family_members" => 1,
@@ -161,7 +162,11 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
       end
       group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
         {
-          product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
+          product: EnrollmentProductAdapter.new(
+            enrollment_record["hbx_enrollment"]["product_id"],
+            enrollment_record["hbx_enrollment"]["issuer_profile_id"],
+            enrollment_record["hbx_enrollment"]["effective_on"].year
+          ),
           previous_product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
           rate_schedule_date: @sponsored_benefit.rate_schedule_date,
           coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],

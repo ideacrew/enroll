@@ -126,11 +126,13 @@ module BenefitSponsors
       end
 
       def open_enrollment_period_by_effective_date(start_on)
-        open_enrollment_start_on = [(start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months), TimeKeeper.date_of_record].max
+        open_enrollment_start_on = (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
+        if start_on.future?
+          open_enrollment_start_on = [open_enrollment_start_on, TimeKeeper.date_of_record].max
+        end
         open_enrollment_end_on   = ("#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
         open_enrollment_start_on..open_enrollment_end_on
       end
-
 
       def renewal_open_enrollment_dates(start_on)
         open_enrollment_start_on = start_on - 2.months
@@ -257,6 +259,16 @@ module BenefitSponsors
         date = date + 2 if date.saturday?
         date = date + 1 if date.sunday?
         date
+      end
+
+      def default_dates_for_coverage_starting_on(coverage_start_date)
+        effective_date            = coverage_start_date.to_date.beginning_of_month
+        effective_period          = effective_date..(effective_date + 1.year - 1.day)
+        open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+        {
+            effective_period: effective_period,
+            open_enrollment_period: open_enrollment_period,
+        }
       end
     end
   end

@@ -15,7 +15,7 @@ attributes: !ruby/hash:BSON::Document
   benefit_market_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WwROH5+IC11vNZLU
-  updated_at: 2018-05-31 20:45:48.231000000 Z
+  updated_at: 2018-06-03 16:18:33.602000000 Z
   created_at: 2018-05-22 21:23:02.120000000 Z
   product_packages:
   - !ruby/hash:BSON::Document
@@ -67,7 +67,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:33.754000000 Z
+      updated_at: 2018-06-03 16:14:41.375000000 Z
       created_at: 2018-05-22 17:07:08.055000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -177,7 +177,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:33.988000000 Z
+      updated_at: 2018-06-03 16:14:41.515000000 Z
       created_at: 2018-05-22 17:07:06.316000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -354,7 +354,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:34.134000000 Z
+      updated_at: 2018-06-03 16:14:41.604000000 Z
       created_at: 2018-05-22 17:07:11.325000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -464,7 +464,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:35.223000000 Z
+      updated_at: 2018-06-03 16:14:42.328000000 Z
       created_at: 2018-05-22 17:07:03.943000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -801,7 +801,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:35.675000000 Z
+      updated_at: 2018-06-03 16:14:42.700000000 Z
       created_at: 2018-05-22 17:07:00.426000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1138,7 +1138,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:36.675000000 Z
+      updated_at: 2018-06-03 16:14:43.469000000 Z
       created_at: 2018-05-22 17:07:06.473000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1315,7 +1315,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:37.129000000 Z
+      updated_at: 2018-06-03 16:14:43.823000000 Z
       created_at: 2018-05-22 17:07:10.175000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1652,7 +1652,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:37.693000000 Z
+      updated_at: 2018-06-03 16:14:44.220000000 Z
       created_at: 2018-05-22 17:07:12.331000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1762,7 +1762,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:39.610000000 Z
+      updated_at: 2018-06-03 16:14:45.488000000 Z
       created_at: 2018-05-22 17:07:11.904000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -1872,7 +1872,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:40.068000000 Z
+      updated_at: 2018-06-03 16:14:45.796000000 Z
       created_at: 2018-05-22 17:07:01.202000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2209,7 +2209,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:40.272000000 Z
+      updated_at: 2018-06-03 16:14:45.912000000 Z
       created_at: 2018-05-22 17:07:12.843000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2319,7 +2319,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:41.009000000 Z
+      updated_at: 2018-06-03 16:14:46.451000000 Z
       created_at: 2018-05-22 17:07:11.735000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2429,7 +2429,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:41.521000000 Z
+      updated_at: 2018-06-03 16:14:46.850000000 Z
       created_at: 2018-05-22 17:07:11.241000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2539,7 +2539,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:41.914000000 Z
+      updated_at: 2018-06-03 16:14:47.168000000 Z
       created_at: 2018-05-22 17:06:59.806000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -2876,7 +2876,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:42.172000000 Z
+      updated_at: 2018-06-03 16:14:47.373000000 Z
       created_at: 2018-05-22 17:07:06.026000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3053,7 +3053,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:42.591000000 Z
+      updated_at: 2018-06-03 16:14:47.690000000 Z
       created_at: 2018-05-22 17:07:10.781000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3390,7 +3390,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:43.151000000 Z
+      updated_at: 2018-06-03 16:14:48.123000000 Z
       created_at: 2018-05-22 17:07:12.165000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3500,7 +3500,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:43.590000000 Z
+      updated_at: 2018-06-03 16:14:48.472000000 Z
       created_at: 2018-05-22 17:07:09.357000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3837,7 +3837,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:43.777000000 Z
+      updated_at: 2018-06-03 16:14:48.595000000 Z
       created_at: 2018-05-22 17:07:11.648000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -3947,7 +3947,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:44.692000000 Z
+      updated_at: 2018-06-03 16:14:49.258000000 Z
       created_at: 2018-05-22 17:07:01.668000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4284,7 +4284,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:44.894000000 Z
+      updated_at: 2018-06-03 16:14:49.394000000 Z
       created_at: 2018-05-22 17:07:12.248000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4394,7 +4394,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:45.022000000 Z
+      updated_at: 2018-06-03 16:14:49.530000000 Z
       created_at: 2018-05-22 17:07:12.952000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4504,7 +4504,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:46.358000000 Z
+      updated_at: 2018-06-03 16:14:50.583000000 Z
       created_at: 2018-05-22 17:07:03.563000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4841,7 +4841,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:48.555000000 Z
+      updated_at: 2018-06-03 16:14:52.029000000 Z
       created_at: 2018-05-22 17:07:13.056000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -4951,7 +4951,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:48.689000000 Z
+      updated_at: 2018-06-03 16:14:52.118000000 Z
       created_at: 2018-05-22 17:07:08.274000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5061,7 +5061,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:49.343000000 Z
+      updated_at: 2018-06-03 16:14:52.578000000 Z
       created_at: 2018-05-22 17:07:06.137000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5238,7 +5238,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:50.787000000 Z
+      updated_at: 2018-06-03 16:14:53.527000000 Z
       created_at: 2018-05-22 17:07:11.067000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5348,7 +5348,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:51.055000000 Z
+      updated_at: 2018-06-03 16:14:53.663000000 Z
       created_at: 2018-05-22 17:07:06.785000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5525,7 +5525,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:51.564000000 Z
+      updated_at: 2018-06-03 16:14:54.023000000 Z
       created_at: 2018-05-22 17:07:02.597000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5862,7 +5862,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:51.784000000 Z
+      updated_at: 2018-06-03 16:14:54.142000000 Z
       created_at: 2018-05-22 17:07:08.130000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -5972,7 +5972,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:51.920000000 Z
+      updated_at: 2018-06-03 16:14:54.229000000 Z
       created_at: 2018-05-22 17:07:08.353000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6082,7 +6082,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:52.437000000 Z
+      updated_at: 2018-06-03 16:14:54.580000000 Z
       created_at: 2018-05-22 17:07:08.805000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6419,7 +6419,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:53.278000000 Z
+      updated_at: 2018-06-03 16:14:55.064000000 Z
       created_at: 2018-05-22 17:07:06.628000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6596,7 +6596,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:55.290000000 Z
+      updated_at: 2018-06-03 16:14:56.368000000 Z
       created_at: 2018-05-22 17:07:13.259000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -6706,7 +6706,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:56.298000000 Z
+      updated_at: 2018-06-03 16:14:56.998000000 Z
       created_at: 2018-05-22 17:07:04.437000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7043,7 +7043,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:56.483000000 Z
+      updated_at: 2018-06-03 16:14:57.118000000 Z
       created_at: 2018-05-22 17:07:08.199000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7153,7 +7153,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:57.072000000 Z
+      updated_at: 2018-06-03 16:14:57.524000000 Z
       created_at: 2018-05-22 17:07:07.972000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7263,7 +7263,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:58.437000000 Z
+      updated_at: 2018-06-03 16:14:58.477000000 Z
       created_at: 2018-05-22 17:07:09.845000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7600,7 +7600,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:15:58.604000000 Z
+      updated_at: 2018-06-03 16:14:58.592000000 Z
       created_at: 2018-05-22 17:07:11.152000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7710,7 +7710,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:16:00.418000000 Z
+      updated_at: 2018-06-03 16:14:59.917000000 Z
       created_at: 2018-05-22 17:07:11.573000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -7820,7 +7820,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:16:01.031000000 Z
+      updated_at: 2018-06-03 16:15:00.235000000 Z
       created_at: 2018-05-22 17:07:01.947000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8157,7 +8157,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:16:03.238000000 Z
+      updated_at: 2018-06-03 16:15:01.919000000 Z
       created_at: 2018-05-22 17:07:02.103000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8294,7 +8294,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:16:03.712000000 Z
+      updated_at: 2018-06-03 16:15:02.281000000 Z
       created_at: 2018-05-22 17:07:03.319000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
@@ -8631,7 +8631,7 @@ attributes: !ruby/hash:BSON::Document
       provider_directory_url: https://ma.checkbookhealth.org/mashop
       is_reference_plan_eligible: true
       kind: :health
-      updated_at: 2018-06-01 20:16:03.894000000 Z
+      updated_at: 2018-06-03 16:15:02.407000000 Z
       created_at: 2018-05-22 17:07:12.491000000 Z
       renewal_product_id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-

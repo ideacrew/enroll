@@ -17,6 +17,8 @@ module BenefitSponsors
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
+      include BenefitSponsors::Concerns::RecordTransition
+
       # include Config::AcaModelConcern
       # include Concerns::Observable
       include AASM
@@ -94,6 +96,8 @@ module BenefitSponsors
 
       embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
                   validate: true
+
+      embeds_one :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
 
       has_many    :documents,
                   inverse_of: :benefit_sponsorship_docs,

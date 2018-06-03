@@ -79,8 +79,8 @@ class HbxEnrollment
   field :terminated_on, type: Date
   field :terminate_reason, type: String
 
-  field :plan_id, type: BSON::ObjectId
-  field :carrier_profile_id, type: BSON::ObjectId
+  field :product_id, type: BSON::ObjectId
+  field :issuer_profile_id, type: BSON::ObjectId
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
@@ -102,6 +102,9 @@ class HbxEnrollment
   field :sponsored_benefit_package_id, type: BSON::ObjectId
   field :sponsored_benefit_id, type: BSON::ObjectId
   field :rating_area_id, type: BSON::ObjectId
+
+  field :product_id, type: BSON::ObjectId
+  field :issuer_profile_id, type: BSON::ObjectId
 
   field :original_application_type, type: String
 
@@ -725,6 +728,18 @@ class HbxEnrollment
   def plan
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
+  end
+
+  def product=(new_product)
+    raise ArgumentError.new("expected product") unless new_product.is_a?(BenefitMarkets::Products::Product)
+    self.product_id = new_product._id
+    self.issuer_profile_id = new_product.issuer_profile_id
+    @product = new_product
+  end
+
+  def product
+    return @product if defined? @product
+    @product = BenefitMarkets::Products::Product.find(self.product_id) unless product_id.blank?
   end
 
   def set_coverage_termination_date(coverage_terminated_on=TimeKeeper.date_of_record)

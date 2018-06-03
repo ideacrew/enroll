@@ -86,15 +86,19 @@ module Importers
         (employee.first_name.downcase.strip == sr.first_name.downcase.strip) &&
           (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
       end
+
       if staff_roles_to_merge.empty?
         return true
       end
+
       if staff_roles_to_merge.count > 1
         errors.add(:base, "this employee has the same personal data as multiple points of contact")
         return false
       end
+
       merge_staff = staff_roles_to_merge.first
       existing_people = Person.match_by_id_info(ssn: employee.ssn, dob: employee.dob, last_name: employee.last_name, first_name: employee.first_name)
+
       if existing_people.count > 1
         errors.add(:base, "matching conflict for this personal data")
         return false
@@ -102,7 +106,7 @@ module Importers
       if existing_people.empty?
         begin
           merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
-        rescue Exception  => e 
+        rescue Exception  => e
           errors.add(:base, e.to_s)
         end
         return true
@@ -136,14 +140,19 @@ module Importers
 
     def save
       return false unless valid?
-      employer = find_employer
+      employer = find_employer      
       employee = find_employee
+      benefit_sponsorship = employer.active_benefit_sponsorship
+
       unless examine_and_maybe_merge_poc(employer, employee)
         return false
       end
+
       plan = find_plan
+      rating_area_id = employer.active_benefit_application.recorded_rating_area_id
       bga = find_benefit_group_assignment
 
+      # add when benefit_group_assignments not added to employees
       if bga.blank?
         plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
@@ -185,11 +194,16 @@ module Importers
           end
           return false
         end
+
         cancel_other_enrollments_for_bga(bga)
-        hh = family.active_household
-        ch = hh.immediate_family_coverage_household
-        en = hh.new_hbx_enrollment_from({
-          coverage_household: ch,
+        house_hold = family.active_household
+        coverage_household = house_hold.immediate_family_coverage_household
+
+        benefit_package   = bga.benefit_package
+        sponsored_benefit = benefit_package.sponsored_benefit_for('health')
+
+        en = house_hold.new_hbx_enrollment_from({
+          coverage_household: coverage_household,
           employee_role: role,
           benefit_group: bga.benefit_group,
           benefit_group_assignment: bga,
@@ -204,12 +218,28 @@ module Importers
           mem.coverage_start_on = start_date
         end
         en.save!
-        en.update_attributes!({
-          carrier_profile_id: plan.carrier_profile_id,
-          plan_id: plan.id,
-          aasm_state: "coverage_selected",
-          coverage_kind: 'health'
+
+        if plan.is_a?(BenefitMarkets::Products::Product)
+          en.product = plan
+        else
+          en.plan = plan
+        end
+
+        en_attributes = {
+            aasm_state: "coverage_selected",
+            coverage_kind: 'health'
+        }
+
+        unless employer.is_a?(EmployerProfile)
+          en_attributes.merge!({
+            benefit_sponsorship_id: benefit_sponsorship.id,
+            sponsored_benefit_package_id: benefit_package.id,
+            sponsored_benefit_id: sponsored_benefit.id,
+            rating_area_id: rating_area_id
           })
+        end
+
+        en.update_attributes!(en_attributes)
         true
       rescue Exception => e
         errors.add(:base, e.to_s)

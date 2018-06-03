@@ -28,6 +28,8 @@ module BenefitSponsors
       delegate :recorded_rating_area, to: :benefit_package
       delegate :recorded_service_area_ids, to: :benefit_package
       delegate :rate_schedule_date, to: :benefit_package
+      delegate :benefit_sponsor_catalog, to: :benefit_package
+      delegate :benefit_sponsorship, to: :benefit_package
 
       validate :product_package_exists
       validates_presence_of :sponsor_contribution
@@ -53,7 +55,7 @@ module BenefitSponsors
 
       def lookup_package_products(coverage_date)
         return [reference_product] if product_package_kind == :single_product
-        product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids).by_coverage_date(coverage_date)
+        BenefitMarkets::Products::Product.by_coverage_date(product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids), coverage_date)
       end
 
       def product_package
@@ -83,11 +85,6 @@ module BenefitSponsors
       end
 
       def renew_pricing_determinations(new_product_package)
-      end
-
-      def benefit_sponsor_catalog
-        return if benefit_package.blank?
-        benefit_package.benefit_sponsor_catalog
       end
 
       def reference_plan_id=(product_id)
