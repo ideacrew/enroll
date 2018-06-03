@@ -24,7 +24,7 @@ module BenefitMarkets
               rule_instance = find_rule_by_name(rule)
 
               if rule_instance.present?
-                list << rule
+                list << rule_instance
               else
                 raise Error, "rule definition not found: #{missing_rules}"
               end
