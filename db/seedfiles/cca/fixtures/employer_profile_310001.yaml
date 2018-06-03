@@ -26,7 +26,6 @@ attributes: !ruby/hash:BSON::Document
     _type: BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
     aasm_state: applicant
     created_at: 2018-05-22 18:43:44.584000000 Z
-    registered_on: 2018-05-22 00:00:00.000000000 Z
     sic_code: '4923'
     updated_at: 2018-05-22 18:43:44.584000000 Z
     xml_transmitted_timestamp:

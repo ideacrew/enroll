@@ -34,10 +34,6 @@ module BenefitSponsors
         self.organization
       end
 
-      def profile_source
-        active_benefit_sponsorship.source_kind
-      end
-
       def is_conversion?
         self.organization.active_benefit_sponsorship.source_kind == :self_serve
       end
@@ -181,6 +177,14 @@ module BenefitSponsors
       end
 
       # Deprecate below methods in future
+
+      def profile_source
+        active_benefit_sponsorship.source_kind
+      end
+
+      def registered_on
+        active_benefit_sponsorship.registered_on
+      end
 
       def renewing_plan_year
         warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
