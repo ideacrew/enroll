@@ -458,7 +458,7 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-      send_invite! if _id_changed?
+      send_invite! if _id_changed? && !self.employer_profile.is_conversion?
 
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role?

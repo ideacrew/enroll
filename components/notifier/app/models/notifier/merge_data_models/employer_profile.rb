@@ -18,6 +18,7 @@ module Notifier
     attribute :broker, MergeDataModels::Broker
     # attribute :to, String
     # attribute :plan, MergeDataModels::Plan
+    attribute :enrollment, MergeDataModels::Enrollment
     attribute :plan_year, MergeDataModels::PlanYear
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Enrollment

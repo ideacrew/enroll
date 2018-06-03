@@ -98,7 +98,6 @@ class Insured::EmployeeRolesController < ApplicationController
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
-    @person.addresses = [] #fix unexpected duplicates issue
     if @person.update_attributes(object_params)
       set_notice_preference(@person, @employee_role)
       if save_and_exit
@@ -170,9 +169,9 @@ class Insured::EmployeeRolesController < ApplicationController
   def person_parameters_list
     [
       :employee_role_id,
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
-      { :phones_attributes => [:kind, :full_phone_number, :id] },
-      { :emails_attributes => [:kind, :address, :id] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
+      { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :employee_roles_attributes => [:id, :contact_method, :language_preference]},
       :first_name,
       :last_name,
@@ -221,14 +220,6 @@ class Insured::EmployeeRolesController < ApplicationController
     else
       current_user.last_portal_visited = search_insured_employee_index_path
       current_user.save!
-    end
-  end
-
-  def employee_eligible_notice(census_employee)
-    begin
-      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_matches_employer_rooster")
-    rescue Exception => e
-      puts "Unable to send Employee Open Enrollment begin notice to #{census_employee.full_name}" unless Rails.env.test?
     end
   end
 end
