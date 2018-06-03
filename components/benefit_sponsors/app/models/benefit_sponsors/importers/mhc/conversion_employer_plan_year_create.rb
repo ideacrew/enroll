@@ -62,9 +62,7 @@ module Importers::Mhc
       (preference.present?) ? true : false
     end
 
-    def plan_year_exists?
-      employer_profile = find_employer
-      sponsorship = employer_profile.organization.benefit_sponsorships[0]
+    def plan_year_exists?(sponsorship)
       if sponsorship.benefit_applications.present?
         errors.add(:application_exists, "Benefit Application already created!!")
         return true
@@ -72,9 +70,29 @@ module Importers::Mhc
       false
     end
 
+    def rating_area_missing?(sponsorship)
+      if sponsorship.rating_area.blank?
+        errors.add(:rating_area, "Benefit Sponsorship rating area blank")
+        return true
+      end
+      false
+    end
+
+    def service_areas_missing?(sponsorship)
+      if sponsorship.service_areas.blank?
+        errors.add(:service_areas, "Benefit Sponsorship service areas blank")
+        return true
+      end
+      false
+    end
+
     def save
       return false unless valid?
-      return false if plan_year_exists?
+      employer_profile = find_employer
+      sponsorship = employer_profile.organization.benefit_sponsorships[0]
+      return false if rating_area_missing?(sponsorship)
+      return false if service_areas_missing?(sponsorship)
+      return false if plan_year_exists?(sponsorship)
 
       record = map_plan_year
       save_result = record.save

@@ -41,14 +41,16 @@ module BenefitSponsors
         clean_hios = hios_id.strip
         corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
         sponsor_benefit = find_sponsor_benefit
-        sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id ).first
+        return nil if sponsor_benefit.blank?
+        sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id).first
       end
 
       def find_sponsor_benefit
         employer = find_employer
-        benefit_application = employer.active_benefit_application
-        benefit_package = benefit_application.benefit_packages.first
-        sponsor_benefit = benefit_package.sponsored_benefits.first
+        if benefit_application = employer.active_benefit_application
+          benefit_package = benefit_application.benefit_packages.first
+          benefit_package.sponsored_benefits.first
+        end
       end
 
       def find_employer
