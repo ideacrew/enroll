@@ -5,7 +5,6 @@ module BenefitSponsors
       include ActiveModel::Validations
 
       attribute :id, String
-      attribute :profile_source, String
       attribute :market_kind, Symbol
       attribute :is_benefit_sponsorship_eligible, String
       attribute :corporate_npn, String
