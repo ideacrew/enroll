@@ -73,7 +73,7 @@ let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.next_month.prev_ye
     let(:payload)   { {
         "event_object_kind" => "CensusEmployee",
         "event_object_id" => census_employee.id,
-        "dep_hbx_ids" => dep_hbx_ids
+        "notice_params" => {"dep_hbx_ids" => dep_hbx_ids}
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
