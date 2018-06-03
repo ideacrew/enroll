@@ -6,44 +6,37 @@ module BenefitSponsors
         @spreadsheet = Roo::Spreadsheet.open(file_name)
         @out_stream = o_stream
         @out_csv = CSV.new(o_stream)
+
         @default_plan_year_start = config["conversions"]["plan_year_date"]
         @plan_year_end = config["conversions"]["plan_year_end_date"]
         @mid_year_conversion = config["conversions"]["mid_year_conversion"]
         @orginal_plan_year_begin_date = config["conversions"]["orginal_plan_year_begin_date"]
       end
 
-      def set_original_start_date(coverage_start_date)
-        current_year = TimeKeeper.date_of_record.year
-        if coverage_start_date
-          # to_date parse do not use here
-          date = Date.strptime(coverage_start_date, '%m/%d/%Y')
-          # since random values given in sheet taking previous year
-          start_date = date.change(year: current_year - 1)
-          @orginal_plan_year_begin_date = start_date
+      def recalc_plan_year_dates_from_sheet(coverage_start_date)
+        coverage_start = Date.strptime(coverage_start_date, '%m/%d/%Y')
+        if coverage_start.month <= @default_plan_year_start.month
+          corrected_coverage_start = coverage_start.change(year: @default_plan_year_start.year)
         else
-          @orginal_plan_year_begin_date
+          corrected_coverage_start = coverage_start.change(year: (@default_plan_year_start.year - 1))
         end
-      end
 
-      def set_plan_year_end_date(coverage_start_date)
-        if coverage_start_date
-          @plan_year_end = @orginal_plan_year_begin_date + 1.year - 1.day
-        else
-          @plan_year_end
-        end
+        @orginal_plan_year_begin_date = corrected_coverage_start
+        @plan_year_end = corrected_coverage_start.next_year.prev_day
       end
 
       def create_model(record_attrs)
-        # sheet values random values will be given we have to set properly
-        sheet_given_start_date = set_original_start_date(record_attrs[:coverage_start])
-        sheet_given_end_date = set_plan_year_end_date(record_attrs[:coverage_start])
+        if @mid_year_conversion
+          recalc_plan_year_dates_from_sheet(record_attrs[:coverage_start])
+        end
+
         the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
 
         plan_year_attrs = record_attrs.merge({
           default_plan_year_start: @default_plan_year_start,
-          plan_year_end: sheet_given_end_date,
+          plan_year_end: @plan_year_end,
           mid_year_conversion: @mid_year_conversion,
-          orginal_plan_year_begin_date: sheet_given_start_date
+          orginal_plan_year_begin_date: @orginal_plan_year_begin_date
           })
 
         case the_action

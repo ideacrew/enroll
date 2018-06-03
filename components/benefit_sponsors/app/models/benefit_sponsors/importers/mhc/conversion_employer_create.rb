@@ -16,6 +16,7 @@ module BenefitSponsors
             benefit_sponsorship = employer_profile.add_benefit_sponsorship
             benefit_sponsorship.update_attributes!(registered_on: registered_on, source_kind: :mid_plan_year_conversion)
             set_attestation_to_true(benefit_sponsorship)
+          
             save_result = new_organization.save!
 
             if save_result
@@ -45,14 +46,16 @@ module BenefitSponsors
       end
 
       def build_mailing_address
-        BenefitSponsors::Locations::Address.new(
+        if mailing_location_address_1.present?
+          BenefitSponsors::Locations::Address.new(
             :kind => "mailing",
             :address_1 => mailing_location_address_1,
             :address_2 => mailing_location_address_2,
             :city => mailing_location_city,
             :state => mailing_location_state,
             :zip => mailing_location_zip
-        )
+            )
+        end
       end
 
       def build_phone
@@ -71,12 +74,14 @@ module BenefitSponsors
                                                                         :address => primary_address,
                                                                         :phone => build_phone,
                                                                     })
-        unless primary_location_address_1 == mailing_location_address_1
-          locations << BenefitSponsors::Locations::OfficeLocation.new({
-                                                                          :is_primary => false,
-                                                                          :address => mailing_address,
-                                                                      })
 
+        if mailing_address.present?
+          unless primary_location_address_1 == mailing_location_address_1
+            locations << BenefitSponsors::Locations::OfficeLocation.new({
+              :is_primary => false,
+              :address => mailing_address,
+              })
+          end
         end
         locations
       end

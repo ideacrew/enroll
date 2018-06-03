@@ -118,7 +118,6 @@ module BenefitSponsors
         sponsorship = employer.active_benefit_sponsorship
         census_employee.census_dependents = map_dependents
         census_employee.benefit_sponsorship_id = sponsorship.id
-        sponsorship.census_employees << census_employee
         save_result = census_employee.save
         unless save_result
           propagate_errors(census_employee)
