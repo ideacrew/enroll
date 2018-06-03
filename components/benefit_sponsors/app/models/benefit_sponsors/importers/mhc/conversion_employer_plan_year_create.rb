@@ -63,7 +63,7 @@ module Importers::Mhc
     end
 
     def save
-      # return false unless valid?
+      return false unless valid?
       record = map_plan_year
       save_result = record.save
       propagate_errors(record)

@@ -5,6 +5,20 @@ module BenefitSponsors
       attr_accessor :plan_year_end, :mid_year_conversion, :orginal_plan_year_begin_date
 
 
+      def validate_reference_plan
+        found_carrier = find_carrier
+        if found_carrier.blank?
+          errors.add(:carrer, "carrier not found")
+          return
+        end
+
+        reference_product = BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
+
+        if reference_product.blank?
+          errors.add(:reference_product, "Unable to find product with HIOS Id #{single_plan_hios_id}.")
+        end
+      end
+
       def find_carrier
         BenefitSponsors::Organizations::IssuerProfile.find_by_abbrev(carrier)
       end

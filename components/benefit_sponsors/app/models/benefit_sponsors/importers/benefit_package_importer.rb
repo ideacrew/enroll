@@ -36,9 +36,11 @@ module BenefitSponsors
           sponsored_benefit.benefit_package = benefit_package
         
           if sponsored_benefit.product_package.present?
+            
             sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
+            raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
             sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
-      
+
             if sole_source?
               sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
             else
