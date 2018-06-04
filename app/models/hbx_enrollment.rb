@@ -79,8 +79,6 @@ class HbxEnrollment
   field :terminated_on, type: Date
   field :terminate_reason, type: String
 
-  field :product_id, type: BSON::ObjectId
-  field :issuer_profile_id, type: BSON::ObjectId
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
@@ -102,7 +100,6 @@ class HbxEnrollment
   field :sponsored_benefit_package_id, type: BSON::ObjectId
   field :sponsored_benefit_id, type: BSON::ObjectId
   field :rating_area_id, type: BSON::ObjectId
-
   field :product_id, type: BSON::ObjectId
   field :issuer_profile_id, type: BSON::ObjectId
 
@@ -1598,7 +1595,7 @@ class HbxEnrollment
     previous_enrollment = self.parent_enrollment
     previous_product = nil
     if previous_enrollment
-      previous_product = previous_enrollment.plan
+      previous_product = previous_enrollment.product
     end
     hbx_enrollment_members.each do |hem|
       person = hem.person
