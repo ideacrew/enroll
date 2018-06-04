@@ -1612,7 +1612,7 @@ class HbxEnrollment
       roster_members << roster_member
       group_enrollment_member = BenefitSponsors::Enrollments::MemberEnrollment.new({
         member_id: hem.id,
-        coverage_eligibility_on: hem.eligibility_date
+        coverage_eligibility_on: hem.coverage_start_on
       })
       group_enrollment_members << group_enrollment_member
     end

@@ -229,25 +229,8 @@ class GroupSelectionPrevaricationAdapter
     controller_employee_role,
     controller_change_plan
   )
-    benefit_group = nil
-    benefit_group_assignment = nil
-    if controller_employee_role == previous_hbx_enrollment.employee_role
-      benefit_group = previous_hbx_enrollment.benefit_group
-      benefit_group_assignment = previous_hbx_enrollment.benefit_group_assignment
-    else
-      benefit_group = controller_employee_role.benefit_group(qle: is_qle?)
-      benefit_group_assignment = benefit_group_assignment_by_plan_year(controller_employee_role, benefit_group, controller_change_plan)
-    end
-    change_enrollment = coverage_household.household.new_hbx_enrollment_from(
-      employee_role: controller_employee_role,
-      resident_role: person.resident_role,
-      coverage_household: coverage_household,
-      benefit_group: benefit_group,
-      benefit_group_assignment: benefit_group_assignment,
-      qle: is_qle?,
-      opt_effective_on: optional_effective_on)
-    change_enrollment.predecessor_enrollment_id = previous_hbx_enrollment.id
-    change_enrollment
+    e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
+    e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on)
   end
 
   def build_new_shop_enrollment(

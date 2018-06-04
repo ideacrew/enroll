@@ -3,7 +3,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
   
   MemberNameAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix)
 
-	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :name) do
+	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :name, :benefit_package) do
 		def is_disabled?
 			is_disabled
 		end
@@ -16,9 +16,10 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 	class HbxEnrollmentRosterMapper
 		include Enumerable
 
-		def initialize(he_id_list, s_benefit)
+		def initialize(he_id_list, s_benefit, benefit_package)
 			@hbx_enrollment_id_list = he_id_list
 			@sponsored_benefit = s_benefit
+      @benefit_package = benefit_package
 		end
 
 		def each
@@ -137,7 +138,8 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           sub_person["middle_name"],
           sub_person["last_name"],
           sub_person["name_sfx"]
-        )
+        ),
+        @benefit_package
       )
       member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
         member_id: sub_member["_id"],
@@ -152,7 +154,8 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           false,
           family_disables[dep_member["applicant_id"]],
           nil,
-          family_names[dep_member["applicant_id"]]
+          family_names[dep_member["applicant_id"]],
+          nil
         )
         member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
           member_id: dep_member["_id"],
@@ -183,9 +186,10 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 
   include Enumerable
 
-  def initialize(s_benefit, hbx_enrollment_ids)
+  def initialize(s_benefit, hbx_enrollment_ids, benefit_package)
     @sponsored_benefit = s_benefit
     @hbx_enrollment_id_list = hbx_enrollment_ids
+    @benefit_package = benefit_package
   end
 
   def each
@@ -198,7 +202,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     if hbx_enrollment_id_list.count < 1
       return
     end
-    group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
+    group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit, @benefit_package)
     group_mapper.each do |ce_roster|
       price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution)
       contribution_group = c_calculator.calculate_contribution_for(contribution_model, price_group, sponsor_contribution)

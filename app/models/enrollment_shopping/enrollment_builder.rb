@@ -58,27 +58,70 @@ module EnrollmentShopping
 			enrollment
 		end
 
+    def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: optional_effective_on)
+			enrollment = @household.hbx_enrollments.build
+			enrollment.coverage_household_id = @coverage_household.id
+			enrollment.kind = "employer_sponsored"
+			enrollment.employee_role = @employee_role
+      enrollment.predecessor_enrollment_id = previous_enrollment.id
+      enrollment.sponsored_benefit_package_id = previous_enrollment.sponsored_benefit_package_id
+      benefit_package = previous_enrollment.sponsored_benefit_package
+      sponsored_benefit = previous_enrollment.sponsored_benefit
+			enrollment.sponsored_benefit_id = previous_enrollment.sponsored_benefit_id
+			enrollment.rating_area_id = benefit_package.recorded_rating_area.id
+			enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
+
+			if is_qle && enrollment.family.is_under_special_enrollment_period?
+				if optional_effective_on.present?
+					enrollment.effective_on = optional_effective_on
+				else
+				  enrollment.effective_on = enrollment.family.current_sep.effective_on
+				end
+				enrollment.enrollment_kind = "special_enrollment"
+        # TODO: Assign sep
+			else
+				effective_date = earliest_eligible_date_for_shop(@employee_role)
+				enrollment.effective_on = effective_date
+				enrollment.enrollment_kind = "open_enrollment"
+			end
+
+			enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
+
+      old_applicant_ids = previous_enrollment.hbx_enrollment_members.map(&:applicant_id)
+      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |hem|
+        old_applicant_ids.include?(hem.applicant_id)
+      end
+
+      copy_member_coverage_dates(previous_enrollment, enrollment)
+      enrollment
+    end
+
     def check_for_affected_enrollment(enrollment, sponsored_benefit)
       aef = AffectedEnrollmentFinder.new
       affected_enrollments = aef.for_sponsored_benefit_and_date(sponsored_benefit, enrollment.effective_on)
       if affected_enrollments.any?
         affected_enrollment = affected_enrollments.first
-        affected_enrollment.hbx_enrollment_members.each do |old_hen|
-          enrollment.hbx_enrollment_members.each do |new_hen|
-            if old_hen.applicant_id == new_hen.applicant_id
-              new_hen.coverage_start_on = old_hen.coverage_start_on
-            end
+        enrollment.predecessor_enrollment_id = affected_enrollment.id
+        copy_member_coverage_dates(affected_enrollment, enrollment)
+      end
+    end
+
+    def copy_member_coverage_dates(old_hen, new_hem)
+      old_hem.hbx_enrollment_members.each do |old_member|
+        new_hem.hbx_enrollment_members.each do |new_member|
+          if old_member.applicant_id == new_member.applicant_id
+            new_member.coverage_start_on = old_member.coverage_start_on
           end
         end
       end
     end
 
-		def benefit_package_for_date(employee_role, start_date)
-			employee_role.benefit_package_for_date(start_date)
-		end
+    def benefit_package_for_date(employee_role, start_date)
+      employee_role.benefit_package_for_date(start_date)
+    end
 
-		def earliest_eligible_date_for_shop(employee_role)
-			employee_role.census_employee.coverage_effective_on
-		end
-	end
+    def earliest_eligible_date_for_shop(employee_role)
+      employee_role.census_employee.coverage_effective_on
+    end
+  end
 end
