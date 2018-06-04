@@ -3,7 +3,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
   
   MemberNameAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix)
 
-	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :name) do
+	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :name, :sponsored_benefit) do
 		def is_disabled?
 			is_disabled
 		end
@@ -137,11 +137,12 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           sub_person["middle_name"],
           sub_person["last_name"],
           sub_person["name_sfx"]
-        )
+        ),
+        @sponsored_benefit
       )
       member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
         member_id: sub_member["_id"],
-        coverage_eligibility_on: sub_member["effective_on"]
+        coverage_eligibility_on: sub_member["coverage_start_on"]
       })
       dep_members.each do |dep_member|
         person_id = family_people_ids[dep_member["applicant_id"]]
@@ -152,21 +153,23 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           false,
           family_disables[dep_member["applicant_id"]],
           nil,
-          family_names[dep_member["applicant_id"]]
+          family_names[dep_member["applicant_id"]],
+          nil
         )
         member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
           member_id: dep_member["_id"],
-          coverage_eligibility_on: dep_member["effective_on"]
+          coverage_eligibility_on: dep_member["coverage_start_on"]
         })
       end
-      group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
-        {
-          product: EnrollmentProductAdapter.new(
+      product = EnrollmentProductAdapter.new(
             enrollment_record["hbx_enrollment"]["product_id"],
             enrollment_record["hbx_enrollment"]["issuer_profile_id"],
             enrollment_record["hbx_enrollment"]["effective_on"].year
-          ),
-          previous_product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
+          )
+      group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
+        {
+          product: product,
+          previous_product: product,
           rate_schedule_date: @sponsored_benefit.rate_schedule_date,
           coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
           member_enrollments: member_enrollments, 

@@ -151,6 +151,7 @@ module BenefitSponsors
               "Employee Premium", "Total Premium"]
               groups.each do |element|
                 census_employee = element.first.employee_role.census_employee
+                sponsored_benefit = element.first.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
                 csv << [  
@@ -158,7 +159,7 @@ module BenefitSponsors
                           census_employee.ssn,
                           census_employee.dob,
                           census_employee.hired_on,
-                          census_employee.published_benefit_group.title,
+                          sponsored_benefit.benefit_package.title,
                           product[:kind],
                           product[:title],
                           product[:issuer_name],
