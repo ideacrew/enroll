@@ -1,6 +1,6 @@
 module BenefitSponsors
   module BenefitApplications
-    class BenefitSponsorTimeKeeperJobs
+    class BenefitSponsorScheduledJobs
 
       attr_reader :new_date
 
