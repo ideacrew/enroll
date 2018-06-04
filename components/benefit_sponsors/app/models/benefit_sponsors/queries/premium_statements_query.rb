@@ -12,19 +12,14 @@ module BenefitSponsors
         @collection = []
 
         s_benefits = application.benefit_packages.map(&:sponsored_benefits).flatten
-
-        s_benefits.each do |s_benefit|
-          HbxEnrollmentSponsorEnrollmentCoverageReportCalculator.new(s_benefit, enrollment_ids).each do |result|
-            @collection << [result]
-          end
-        end
-        @collection
+        criteria = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit)] }.reject { |pair| pair.last.nil? }
+        BenefitSponsors::LegacyCoverageReportAdapter.new(criteria)
       end
 
-      def enrollment_ids
-        return @enrollment_ids if defined? @enrollment_ids
-        query = BenefitApplications::BenefitApplicationEnrollmentService.new(application)
-        @enrollment_ids = query.filter_active_enrollments_by_date(billing_date).map(&:hbx_enrollment_id)
+      def query(s_benefit)
+        query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(application, s_benefit).call(::Family, billing_report_date)
+        return nil if query.count > 100
+        query
       end
 
       def billing_date
