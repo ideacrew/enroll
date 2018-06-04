@@ -192,7 +192,8 @@ RSpec.describe FinancialAssistance::Application, type: :model do
 
     it "on event determine and family totally eligibile" do
       expect(application.is_family_totally_ineligibile).to eq false
-      expect(application).to receive(:trigger_eligibilility_notice)
+      #trigger_eligibilility_notice method is not in use
+      # expect(application).to receive(:trigger_eligibilility_notice)
       application.determine!
     end
   end
@@ -210,7 +211,8 @@ RSpec.describe FinancialAssistance::Application, type: :model do
 
     it "event determine and family totally ineligibile" do
       expect(application.is_family_totally_ineligibile).to eq true
-      expect(application).to receive(:trigger_eligibilility_notice)
+      #trigger_eligibilility_notice method is not in use
+      # expect(application).to receive(:trigger_eligibilility_notice)
       application.determine!
     end
   end
@@ -224,5 +226,21 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       new_application.save
       expect(new_application.hbx_id).not_to eq nil
     end
+  end
+
+  describe "copy_application" do
+
+    it "should copy application is applications are not in draft" do
+      family.applications.first.copy_application
+      expect(family.applications.count).to eq 6
+    end
+
+    it "should not copy application is application is in draft" do
+      family.applications.last.update_attributes(aasm_state: "draft")
+      family.applications.first.copy_application
+      expect(family.applications.count).to eq 5
+    end
+
+
   end
 end
