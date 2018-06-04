@@ -36,12 +36,12 @@ module BenefitSponsors
           }},
           {"$group" => {
             "_id" => {
-              "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
+              "bga_id" => "$households.hbx_enrollments.employee_role_id",
               "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
             },
             "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments._id"},
             "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
-            "plan_id" => {"$last" => "$households.hbx_enrollments.plan_id"},
+            "product_id" => {"$last" => "$households.hbx_enrollments.product_id"},
             "benefit_group_id" => {"$last" => "$households.hbx_enrollments.benefit_group_id"},
             "benefit_group_assignment_id" => {"$last" => "$households.hbx_enrollments.benefit_group_assignment_id"},
             "family_members" => {"$last" => "$family_members"}
