@@ -89,5 +89,10 @@ module BenefitSponsors
       end
     end
 
+    def format_name(first_name: nil, last_name: nil, middle_name: nil, name_sfx: nil)
+      given_name = [first_name, middle_name].reject(&:nil? || empty?).join(' ')
+      sir_name  = content_tag(:strong, mixed_case(last_name))
+      raw([mixed_case(given_name), sir_name, name_sfx].reject(&:nil? || empty?).join(' '))
+    end
   end
 end
