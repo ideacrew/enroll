@@ -6,62 +6,73 @@ module BenefitSponsors
 
       def process(new_date)
         @new_date = new_date
+
         process_applications_for { open_enrollment_begin }
         process_applications_for { open_enrollment_end }
-        process_applications_for { coverage_begin }
-        process_applications_for { coverage_end }
+        process_applications_for { benefit_begin }
+        process_applications_for { benefit_end }
+        process_applications_for { benefit_termination }
+        process_applications_for { benefit_renewal }
       end
-
-      def may_begin_initial_open_enrollment
-        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_initial_open_enrollment_on(new_date)
-        begin_initial_open_enrollment(benefit_sponsorships)
-      end
-
-      def may_begin_renewal_open_enrollment
-        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_renewal_open_enrollment_on(new_date)
-        begin_renewal_open_enrollment(benefit_sponsorships)
-      end
-
-      def begin_initial_open_enrollment(benefit_sponsorships)
-        benefit_sponsorships.each do |benefit_sponsorship|
-          sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship)
-          sponsorship_service.begin_initial_open_enrollment(new_date)
-        end
-      end
-
-      def begin_renewal_open_enrollment(benefit_sponsorships)
-        benefit_sponsorships.each do |benefit_sponsorship|
-          begin
-            sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship)
-            sponsorship_service.begin_renewal_open_enrollment(new_date)
-          rescue Exception => e 
-          end
-        end
-      end
-
 
       def open_enrollment_begin
-        service = AcaShopOpenEnrollmentService.new
-        benefit_applications = BenefitApplication.by_open_enrollment_begin_on(new_date).plan_design_approved
-        benefit_applications.each do |benefit_application|
-          process_application {
-            service.begin_open_enrollment(benefit_application)
-          }
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_open_enrollment?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service.benefit_sponsorship = benefit_sponsorship
+          sponsorship_service.begin_open_enrollment
         end
       end
 
       def open_enrollment_end
-        service = AcaShopOpenEnrollmentService.new
-        benefit_applications = BenefitApplication.by_open_enrollment_end_on(new_date).plan_design_approved
-        benefit_applications.each do |benefit_application|
-          process_application {
-            service.close_open_enrollment(benefit_application)
-          }
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_open_enrollment?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service.benefit_sponsorship = benefit_sponsorship
+          sponsorship_service.end_open_enrollment
         end
       end
 
-      def coverage_begin; end
-      def coverage_end; end
+      def benefit_begin
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_benefit_coverage?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service.benefit_sponsorship = benefit_sponsorship
+          sponsorship_service.begin_sponsor_benefit
+        end
+      end
+
+      def benefit_end
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_benefit_coverage?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service.benefit_sponsorship = benefit_sponsorship
+          sponsorship_service.end_sponsor_benefit
+        end
+      end
+
+      def benefit_termination
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_benefit_coverage?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service.benefit_sponsorship = benefit_sponsorship
+          sponsorship_service.terminate_sponsor_benefit
+        end
+      end
+
+      def benefit_renewal
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_renew_application?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          sponsorship_service.benefit_sponsorship = benefit_sponsorship
+          sponsorship_service.renew_sponsor_benefit
+        end
+      end
+
+      def sponsorship_service
+        return @sponsorship_service if defined? @sponsorship_service
+        @sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(new_date: new_date)
+      end
 
       private
 

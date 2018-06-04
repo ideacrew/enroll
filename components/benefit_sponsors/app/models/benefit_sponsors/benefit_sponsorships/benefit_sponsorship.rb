@@ -131,6 +131,11 @@ module BenefitSponsors
         unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
       }
 
+      scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_end_on(compare_date).coverage_effective
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
+
       scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
         matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_end_on(compare_date).coverage_effective
         unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
