@@ -117,9 +117,21 @@ class TaxHousehold
       aptc_available_amount = aptc_available_amount_by_member(applicant_ids: applicant_ids, hbx_enrollment: hbx_enrollment)
       sum + (aptc_available_amount[member.applicant_id.to_s] || 0)
     end
-    total_aptc_available = total_aptc_available - deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
+
+    if enrollments_with_coverage_selected.last.present?  && enrollments_with_coverage_selected.last.applied_aptc_amount > 0 && enrollments_with_coverage_selected.last.updated_at > household.latest_active_tax_household.created_at 
+     deduct_aptc =  0
+   else
+    deduct_aptc =  deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
+    end
+
+    total_aptc_available = total_aptc_available - deduct_aptc
     total_aptc_available > 0 ? total_aptc_available : 0
   end
+
+  def enrollments_with_coverage_selected
+    household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state" => "coverage_selected") 
+  end
+
 
   def deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
@@ -130,6 +142,7 @@ class TaxHousehold
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+
     hbx_enrollment.household.latest_active_tax_household.tax_household_members.in(applicant_id: unenrolled).each do |member|
       deduct_aptc_available_amount += slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date) || 0
     end
