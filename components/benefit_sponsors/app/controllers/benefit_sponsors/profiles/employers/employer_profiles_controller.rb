@@ -4,7 +4,7 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :premium_statements]
-        before_action :load_hbx_enrollments, only: [:premium_statements], if: :is_format_csv?
+        before_action :load_group_enrollments, only: [:premium_statements], if: :is_format_csv?
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
@@ -60,7 +60,7 @@ module BenefitSponsors
             format.html
             format.js
             format.csv do
-              send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
+              send_data(csv_for(@group_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
             end
           end
         end
@@ -110,23 +110,48 @@ module BenefitSponsors
           end
         end
 
-        def load_hbx_enrollments
+        def load_group_enrollments
           billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
           query = Queries::PremiumStatementsQuery.new(@employer_profile, billing_date)
-          @hbx_enrollments =  query.enrollments
+          @group_enrollments =  query.execute.first
+          @product_info = load_products
+        end
+
+        def load_products
+          current_year = TimeKeeper.date_of_record.year
+          previous_year = current_year - 1
+          next_year = current_year + 1
+
+          plans = BenefitMarkets::Products::Product.aca_shop_market.by_state(Settings.aca.state_abbreviation)
+
+          current_possible_plans = plans.where(:"application_period.min".in =>[
+            Date.new(previous_year, 1, 1),
+            Date.new(current_year, 1, 1),
+            Date.new(next_year, 1, 1)
+          ])
+
+          @product_info = current_possible_plans.inject({}) do |result, product|
+            result[product.id] = {
+              :title => product.title,
+              :kind => product.kind,
+              :issuer_name => product.issuer_profile.legal_name
+            }
+            result
+          end
         end
 
         def default_url
           "employers/employer_profiles/employee_csv_upload_errors"
         end
 
-        def csv_for(hbx_enrollments)
+        def csv_for(groups)
           (output = "").tap do
             CSV.generate(output) do |csv|
-              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Covered Ct", "Employer Contribution",
+              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
               "Employee Premium", "Total Premium"]
-              hbx_enrollments.each do |enrollment|
-                census_employee = enrollment.census_employee
+              groups.each do |element|
+                census_employee = element.first.employee_role.census_employee
+                product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
                 csv << [  
                           census_employee.full_name,
@@ -134,13 +159,13 @@ module BenefitSponsors
                           census_employee.dob,
                           census_employee.hired_on,
                           census_employee.published_benefit_group.title,
-                          # enrollment.plan.coverage_kind,
-                          # enrollment.plan.name,
-                          # enrollment.plan.carrier_profile.legal_name, # toDo "Type", "Name", "Issuer"
-                          enrollment.humanized_members_summary,
-                          view_context.number_to_currency(enrollment.total_employer_contribution),
-                          view_context.number_to_currency(enrollment.total_employee_cost),
-                          view_context.number_to_currency(enrollment.total_premium)
+                          product[:kind],
+                          product[:title],
+                          product[:issuer_name],
+                          (element.members.size - 1),
+                          view_context.number_to_currency(element.group_enrollment.sponsor_contribution_total.to_s),
+                          view_context.number_to_currency((element.group_enrollment.product_cost_total.to_f - element.group_enrollment.sponsor_contribution_total.to_f).to_s),
+                          view_context.number_to_currency(element.group_enrollment.product_cost_total.to_s)
                         ]
               end
             end

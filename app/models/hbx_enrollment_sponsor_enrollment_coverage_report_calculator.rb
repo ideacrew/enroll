@@ -24,7 +24,6 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 		def each
 			@hbx_enrollment_id_list.each_slice(200) do |heidl|
         search_criteria(heidl).each do |agg_result|
-          puts agg_result["hbx_enrollment"]["product_id"].inspect
           yield rosterize_hbx_enrollment(agg_result)
         end
 			end

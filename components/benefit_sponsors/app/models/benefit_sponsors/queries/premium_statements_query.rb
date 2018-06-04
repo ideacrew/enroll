@@ -28,7 +28,7 @@ module BenefitSponsors
       end
 
       def billing_date
-        return @billing_date if @billing_date
+        return @billing_date if @billing_date.present?
         @billing_date = billing_report_date
       end
 
