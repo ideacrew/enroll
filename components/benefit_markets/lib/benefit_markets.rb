@@ -1,5 +1,5 @@
 require "benefit_markets/engine"
-require 'benefit_markets/rules_engine'
+require 'benefit_markets/business_rules_engine'
 
 require "virtus"
 require "mongoid"

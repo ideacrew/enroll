@@ -16,7 +16,7 @@
 # violating a design rule and should seek advice on proper approch to perform the necessary activity.
 module BenefitSponsors
   class BenefitApplications::AcaShopApplicationEnrollmentPolicy
-    include BenefitMarkets::RulesEngine
+    include BenefitMarkets::BusinessRulesEngine
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
@@ -25,14 +25,23 @@ module BenefitSponsors
     end
 
 
-
     rule  :open_enrollment_period_minimum_rule,
-          # params:     { number_of_days: (@benefit_application.open_enrollment_period.max - @benefit_application.open_enrollment_period.min) },
-          validate: ->(number_of_days){ number_of_days < @benefit_market.configuration.open_enrollment_days_min },
-          fail:     ->(number_of_days){"open enrollment period length #{number_of_days} day(s) is less than #{@benefit_market.configuration.open_enrollment_days_min} day(s) minimum" }
+            # params:     { number_of_days: (@benefit_application.open_enrollment_period.max - @benefit_application.open_enrollment_period.min) },
+            validate: ->(number_of_days){ number_of_days < @benefit_market.configuration.open_enrollment_days_min },
+            fail:     ->(number_of_days){"open enrollment period length #{number_of_days} day(s) is less than #{@benefit_market.configuration.open_enrollment_days_min} day(s) minimum" }
 
-    rule_policy :passes_open_enrollment_period_policy, rules: [:open_enrollment_period_minimum_rule]
+    rule  :period_begin_before_end_rule,
+            # params:   { date_range: @benefit_application.open_enrollment_period },
+            validate: ->(date_range){ date_range.min < date_range.max },
+            fail:     ->{"begin date must be earlier than end date" }
 
+
+    business_policy :passes_open_enrollment_period_policy,
+            rules: [:period_begin_before_end_rule, :open_enrollment_period_minimum_rule]
+
+
+    business_policy :loosely_passes_open_enrollment_period_policy,
+            rules: [:period_begin_before_end_rule]
 
 
 
