@@ -142,7 +142,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
       )
       member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
         member_id: sub_member["_id"],
-        coverage_eligibility_on: sub_member["effective_on"]
+        coverage_eligibility_on: sub_member["coverage_start_on"]
       })
       dep_members.each do |dep_member|
         person_id = family_people_ids[dep_member["applicant_id"]]
@@ -158,7 +158,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
         )
         member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
           member_id: dep_member["_id"],
-          coverage_eligibility_on: dep_member["effective_on"]
+          coverage_eligibility_on: dep_member["coverage_start_on"]
         })
       end
       product = EnrollmentProductAdapter.new(
