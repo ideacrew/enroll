@@ -224,7 +224,7 @@ module VerificationHelper
   end
 
   def has_active_resident_members?(family_members)
-    family_members.present? && !family_members.map(&:person).all?(&:is_consumer_role_active?)
+    family_members.present? && family_members.map(&:person).any?(&:is_resident_role_active?)
   end
 
   def has_active_consumer_dependent?(person,dependent)
