@@ -1,48 +1,53 @@
 module Effective
   module Datatables
-    class BenefitSponsorsPremiumStatementsDataTable < Effective::MongoidDatatable
-      attr_accessor :enrollment_ids
+    class BenefitSponsorsPremiumStatementsDataTable < Effective::ArraycolumnDatatable
+      attr_accessor :product_info, :issuer_info
       datatable do
-        table_column :full_name, label: "Employee Profile",
+        array_column :full_name, label: "Employee Profile",
           :proc => Proc.new { |row|
-            # update this datatable to include dental too
-            @enrollment = row.active_household.hbx_enrollments.where(:"_id".in => enrollment_ids).first
-            content_tag(:span, class: 'name') do
-            name_to_listing(@enrollment.employee_role.person)
+            @row = row[0]
+            primary_member = @row.primary_member
+            name_adapter = primary_member.name
+            content_tag(:span) do
+            format_name(
+              first_name: name_adapter.first_name,
+              last_name: name_adapter.last_name,
+              middle_name: name_adapter.middle_name,
+              name_sfx: name_adapter.suffix
+            )
           end +
-          content_tag(:span, content_tag(:p, "DOB: #{format_date @enrollment.employee_role.person.dob}")) +
-          content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn @enrollment.employee_role.person.ssn}")) +
-          content_tag(:span, "HIRED:  #{format_date @enrollment.employee_role.census_employee.hired_on}")
+          content_tag(:span, content_tag(:p, "DOB: #{format_date primary_member.dob}")) +
+          content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn primary_member.employee_role.ssn}")) +
+          content_tag(:span, "HIRED:  #{format_date primary_member.employee_role.census_employee.hired_on}")
           }, :filter => false, :sortable => false
         
-        table_column :title, :label => 'Benefit Package',
+        array_column :title, :label => 'Benefit Package',
           :proc => Proc.new { |row|
             content_tag(:span, class: 'benefit-group') do
-              @enrollment.benefit_group.title.try(:titleize)
+              # @enrollment.sponsored_benefit_package.title.titleize
             end
           }, :filter => false, :sortable => false
 
-        table_column :coverage_kind,:label => 'Insurance Coverage',
+        array_column :coverage_kind,:label => 'Insurance Coverage',
         :proc => Proc.new { |row|
           content_tag(:span) do
             content_tag(:span, class: 'name') do
-              mixed_case(@enrollment.coverage_kind)
+              mixed_case("health") # toDo
             end +
             content_tag(:span) do
-              " | # Dep(s) Covered: ".to_s + @enrollment.humanized_dependent_summary.to_s
+              " | # Dep(s) Covered: ".to_s + (@row.members.size - 1).to_s
             end +
-            # content_tag(:p, (hbx.plan.carrier_profile.legal_name.to_s + " -- " + hbx.plan.name.to_s))
-            content_tag(:p, ("toDo"))
+            content_tag(:p, (issuer_info[@row.group_enrollment.product[:issuer_profile_id]] + " -- " + product_info[@row.group_enrollment.product[:id]]))
           end
         }, :filter => false, :sortable => false
 
-        table_column :cost,:label => 'COST',
+        array_column :cost,:label => 'COST',
         :proc => Proc.new { |row|
-          content_tag(:span, "Employer Contribution: ".to_s + (number_to_currency @enrollment.total_employer_contribution.to_s)) +
+          content_tag(:span, "Employer Contribution: ".to_s + (number_to_currency @row.group_enrollment.sponsor_contribution_total.to_s)) +
           content_tag(:div) do 
-            "Employee Contribution:".to_s + (number_to_currency number_to_currency @enrollment.total_employee_cost) 
+            "Employee Contribution:".to_s + (number_to_currency (@row.group_enrollment.product_cost_total.to_f - @row.group_enrollment.sponsor_contribution_total.to_f).to_s) 
           end  +
-          content_tag(:p,  content_tag(:strong, "Total:") +  content_tag(:strong, @enrollment.total_premium))
+          content_tag(:p,  content_tag(:strong, "Total:") +  content_tag(:strong, @row.group_enrollment.product_cost_total.to_s))
         }, :filter => false, :sortable => false
       end
 
@@ -50,13 +55,43 @@ module Effective
       def collection
         return @collection if defined? @collection
         @employer_profile = BenefitSponsors::Organizations::Profile.find(attributes[:id])
+        return [[]] if @employer_profile.blank? 
         query = BenefitSponsors::Queries::PremiumStatementsQuery.new(@employer_profile, attributes[:billing_date])
-        @enrollment_ids, @families = query.execute
-        @families
+        @products_hash ||= load_products
+        @collection = query.execute
       end
 
       def global_search?
-        false
+        true
+      end
+
+      def arrayize(columns)
+        return [] if columns.flatten.blank?
+        super(columns)
+      end
+
+      def load_products
+        current_year = TimeKeeper.date_of_record.year
+        previous_year = current_year - 1
+        next_year = current_year + 1
+
+        plans = BenefitMarkets::Products::Product.aca_shop_market.by_state(Settings.aca.state_abbreviation)
+
+        current_possible_plans = plans.where(:"application_period.min".in =>[
+          Date.new(previous_year, 1, 1),
+          Date.new(current_year, 1, 1),
+          Date.new(next_year, 1, 1)
+        ])
+
+        @product_info = current_possible_plans.inject({}) do |result, product|
+          result[product.id] = product.title
+          result
+        end
+
+        @issuer_info = current_possible_plans.map(&:issuer_profile).uniq.inject({}) do |result, issuer|
+          result[issuer.id] = issuer.legal_name
+          result
+        end
       end
     end
   end
