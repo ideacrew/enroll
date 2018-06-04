@@ -12,6 +12,17 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
   let(:sep) { FactoryGirl.create(:special_enrollment_period, family: person.primary_family, qualifying_life_event_kind_id: qle.id) }
   let(:qle_reporting_deadline) {TimeKeeper.date_of_record}
   let(:qle_event_on) { qle_reporting_deadline.next_day}
+  let(:notice_params) {
+    {
+      qle_title: qle.title,
+      qle_reporting_deadline: qle_reporting_deadline.to_s,
+      qle_event_on: qle_event_on.to_s
+    }
+  }
+
+  before do
+    allow(person).to receive_message_chain("primary_family.current_sep").and_return(nil)
+  end
 
   describe "NoticeTrigger" do
     context "when employee matches er roster" do
@@ -19,10 +30,10 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.sep_request_denial_notice"
-          expect(payload[:event_object_kind]).to eq 'QualifyingLifeEventKind'
-          expect(payload[:event_object_id]).to eq qle.id.to_s
+          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(payload[:event_object_id]).to eq plan_year.id.to_s
         end
-        subject.trigger_notice(recipient: employee_role, event_object: qle, notice_event: "sep_request_denial_notice")
+        subject.trigger_notice(recipient: employee_role, event_object: plan_year, notice_event: "sep_request_denial_notice", notice_params: notice_params)
       end
     end
   end
@@ -41,8 +52,7 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
         "employee_profile.broker.email",
         "employee_profile.broker_present?",
         "employee_profile.special_enrollment_period.title",
-        "employee_profile.special_enrollment_period.start_on",
-        "employee_profile.special_enrollment_period.end_on",
+        "employee_profile.special_enrollment_period.reporting_deadline",
         "employee_profile.special_enrollment_period.event_on",
       ]
     }
@@ -50,10 +60,10 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload)   { {
-        "event_object_kind" => "QualifyingLifeEventKind",
-        "event_object_id" => qle.id,
-        "qle_event_on" => qle_event_on.to_s,
-        "qle_reporting_deadline" => qle_reporting_deadline.to_s
+        "employee_role_id" => employee_role.id.to_s,
+        "event_object_kind" => "PlanYear",
+        "event_object_id" => plan_year.id.to_s,
+        "notice_params" => notice_params
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
@@ -92,16 +102,12 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
         expect(merge_model.special_enrollment_period.title).to eq qle.title
       end
 
-      it "should return qle_start_on" do
-        expect(merge_model.special_enrollment_period.start_on).to eq qle.start_on.to_s
-      end
-
-      it "should return qle_end_on" do
-        expect(merge_model.special_enrollment_period.end_on).to eq qle.end_on.to_s
+      it "should return qle_reporting_deadline" do
+        expect(merge_model.special_enrollment_period.reporting_deadline).to eq qle_reporting_deadline
       end
 
       it "should return qle_event_on" do
-        expect(merge_model.special_enrollment_period.event_on).to eq Date.strptime(payload['qle_event_on'], '%m/%d/%Y')
+        expect(merge_model.special_enrollment_period.event_on).to eq qle_event_on
       end
     end
   end

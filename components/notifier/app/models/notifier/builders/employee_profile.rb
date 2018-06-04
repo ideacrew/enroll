@@ -170,21 +170,21 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      if special_enrollment_period.is_a? QualifyingLifeEventKind
-        merge_model.special_enrollment_period.event_on = special_enrollment_period.event_on.blank? ? Date.strptime(payload['qle_event_on'], '%m/%d/%Y') : special_enrollment_period.event_on
-      end
+      merge_model.special_enrollment_period.event_on = (special_enrollment_period.present? && special_enrollment_period.event_on.present?) ? special_enrollment_period.event_on : Date.strptime(payload['notice_params'][:qle_event_on], '%m/%d/%Y')
     end
 
     def special_enrollment_period_title
-      merge_model.special_enrollment_period.title = special_enrollment_period.blank? ? payload['qle_title'] : special_enrollment_period.title
+      merge_model.special_enrollment_period.title = special_enrollment_period.blank? ? payload['notice_params'][:qle_title] : special_enrollment_period.title
     end
 
     def special_enrollment_period_qle_reported_on
-      merge_model.special_enrollment_period.qle_reported_on = special_enrollment_period.qle_on.present? ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
+      merge_model.special_enrollment_period.qle_reported_on = (special_enrollment_period.present? && special_enrollment_period.qle_on.present?) ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
     end
 
     def special_enrollment_period_start_on
-      merge_model.special_enrollment_period.start_on = format_date(special_enrollment_period.start_on)
+      if special_enrollment_period.present? && special_enrollment_period.start_on.present?
+        merge_model.special_enrollment_period.start_on = format_date(special_enrollment_period.start_on)
+      end
     end
 
     def special_enrollment_period_end_on
@@ -196,7 +196,7 @@ module Notifier
     end
 
     def special_enrollment_period_reporting_deadline
-      merge_model.special_enrollment_period.reporting_deadline = Date.strptime(payload['qle_reporting_deadline'], '%m/%d/%Y') if payload['qle_reporting_deadline'].present?
+      merge_model.special_enrollment_period.reporting_deadline = Date.strptime(payload['notice_params'][:qle_reporting_deadline], '%m/%d/%Y') if payload['notice_params'][:qle_reporting_deadline].present?
     end
 
     def format_date(date)
