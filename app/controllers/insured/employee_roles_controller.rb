@@ -88,8 +88,9 @@ class Insured::EmployeeRolesController < ApplicationController
       @family = @person.primary_family
       build_nested_models
     end
-    observer = Observers::Observer.new
-    observer.trigger_notice(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster")
+    
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster")
   end
 
   def update
@@ -98,7 +99,6 @@ class Insured::EmployeeRolesController < ApplicationController
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
-    @person.addresses = [] #fix unexpected duplicates issue
     if @person.update_attributes(object_params)
       set_notice_preference(@person, @employee_role)
       if save_and_exit
@@ -170,9 +170,9 @@ class Insured::EmployeeRolesController < ApplicationController
   def person_parameters_list
     [
       :employee_role_id,
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
-      { :phones_attributes => [:kind, :full_phone_number, :id] },
-      { :emails_attributes => [:kind, :address, :id] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
+      { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :employee_roles_attributes => [:id, :contact_method, :language_preference]},
       :first_name,
       :last_name,
@@ -223,5 +223,4 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
-
 end

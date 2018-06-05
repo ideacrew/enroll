@@ -148,7 +148,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
           end
         end
 
-        context 'When renewal enrollments purchased with QLE and in quiet period' do
+        context 'When renewal enrollments purchased with QLE and submitted before the drop date' do
           let(:qle_coverages_in_quiet_period) {
             renewing_employees[0..4].inject([]) do |enrollments, ce|
               family = ce.employee_role.person.primary_family
@@ -164,7 +164,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
             qle_coverages_in_quiet_period
           end
 
-          it 'should not return QLE enrollments that are in quiet period' do
+          it 'should return QLE enrollments' do
             result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
             expect((result & qle_coverages_in_quiet_period.map(&:hbx_id)).sort).to eq []
           end

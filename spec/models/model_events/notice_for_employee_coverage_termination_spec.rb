@@ -16,17 +16,17 @@ describe 'ModelEvents::EmployeeCoverageTermination', dbclean: :after_each  do
 
   describe "NoticeTrigger" do
     context "when employee terminates coverage" do
-      subject { Observers::Observer.new }
+      subject { Observers::NoticeObserver.new }
       let(:model_event) { ModelEvents::ModelEvent.new(:employee_coverage_termination, model_instance, {}) }
 
       it "should trigger notice event" do
         [notice_event1, notice_event2].each do |notice_event|
-          expect(subject).to receive(:notify) do |event_name, payload|
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employer.#{notice_event}"
             expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
             expect(payload[:event_object_id]).to eq model_instance.id.to_s
           end
-          subject.trigger_notice(recipient: model_instance.employer_profile, event_object: model_instance, notice_event: notice_event)
+          subject.deliver(recipient: model_instance.employer_profile, event_object: model_instance, notice_event: notice_event)
         end
       end
     end
