@@ -365,6 +365,7 @@ GEM
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
+    test-prof (0.5.0)
     thor (0.20.0)
     thread_safe (0.3.6)
     tilt (2.0.8)
@@ -400,6 +401,7 @@ DEPENDENCIES
   rspec-rails
   shoulda-matchers
   sponsored_benefits!
+  test-prof
 
 BUNDLED WITH
    1.16.1

@@ -23,6 +23,10 @@ class SecurityQuestionResponse
     BCrypt::Password.create(question_answer + original_question)
   end
 
+  def security_question=(val)
+    security_question_id = val.id
+  end
+
   private
 
   def security_question
