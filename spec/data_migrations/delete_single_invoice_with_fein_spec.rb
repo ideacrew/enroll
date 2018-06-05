@@ -19,13 +19,13 @@ describe DeleteSingleInvoiceWithFein, dbclean: :after_each do
     before do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       organization.documents << employer_invoice_1
-      allow(ENV).to receive(:[]).with("date").and_return(organization.invoices.first.date.to_s)
+      allow(ENV).to receive(:[]).with("date").and_return(organization.documents.first.date.to_s)
     end
     it "Should delete the invoice" do
-      expect(organization.invoices.size).to eq 1
+      expect(organization.documents.size).to eq 1
       subject.migrate
       organization.reload
-      expect(organization.invoices.size).to eq 0
+      expect(organization.documents.size).to eq 0
     end
   end
 end
