@@ -64,22 +64,14 @@ FactoryGirl.define do
       end
 
       after(:create) do |plan, evaluator|
-        start_on_date = PlanYear.calculate_start_on_dates[0]
-        if start_on_date.present? && plan.active_year.to_i == start_on_date.year.to_i
-          start_on = PlanYear.calculate_start_on_dates[0].beginning_of_quarter
-          end_on = start_on.end_of_quarter
-        else
-          start_on = Date.new(plan.active_year,1,1)
-          end_on = start_on + 1.year - 1.day
-        end
+        start_on = Date.new(plan.active_year,1,1)
+        end_on = start_on + 1.year - 1.day
 
         unless Settings.aca.rating_areas.empty?
           plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
           plan.save!
           rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
-          create_list(:premium_table, 1, plan: plan, start_on: start_on - 3.months, end_on: end_on - 3.months, rating_area: rating_area)
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
-          create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on + 3.months, end_on: end_on + 3.months, rating_area: rating_area)
         else
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
         end

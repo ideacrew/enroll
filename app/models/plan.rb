@@ -482,12 +482,12 @@ class Plan
       date = start_on_date || PlanYear.calculate_start_on_dates[0]
       return false if date.blank?
 
-      date = date.beginning_of_quarter
       carrier_count = Plan.where(active_year: date.year).pluck(:carrier_profile_id).uniq.size
       result = Plan.collection.aggregate([
         {"$match" => {"active_year" => date.year}},
         {"$unwind" => '$premium_tables'},
-        {"$match" => {"premium_tables.start_on" => date}},
+        {"$match" => {"premium_tables.start_on" => { "$lte" => date}}},
+        {"$match" => {"premium_tables.end_on" => { "$gte" => date}}},
         {"$group" => {
           "_id" => {"carrier_profile" => "$carrier_profile_id"}, "count" => {"$sum" => 1}
           }
