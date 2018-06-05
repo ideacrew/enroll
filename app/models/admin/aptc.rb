@@ -29,11 +29,11 @@ class Admin::Aptc < ApplicationController
       months = []
       date = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date
       offset_month = TimeKeeper.datetime_of_record.day <= 15 ? 1 : 2
-      if offset_month == 1
-        months = [date.strftime('%b')]
-      elsif offset_month == 2
-        months = [date.last_month.strftime('%b'), date.last_month.last_month.strftime('%b')]
+      month_value = date.month - 1
+      (1..month_value).to_a.each do |month|
+      months << Date.new(date.year, month, 1).strftime('%b')
       end
+      max_aptc_vals_array = (max_aptc_vals.values - ["0.00"]).uniq
       previous_max_aptc = 0
       if max_aptc.present?  
         max_aptc_vals.each do |key, value|
@@ -47,10 +47,10 @@ class Admin::Aptc < ApplicationController
         current_available_aptc_value = current_available_aptc_hash.values.first.to_f * 12
         available_aptc_value = (current_available_aptc_value - previous_available_aptc_value) / current_available_aptc_hash.count
         max_aptc_vals.each do |key, value|
-          if months.include?(key) || previous_max_aptc == max_aptc
-            previous_max_aptc = value.to_f
+          if months.include?(key) || max_aptc_vals_array.count == 1
             max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
           else 
+            previous_max_aptc = max_aptc_vals_array.first.to_f
             remaining_available_aptc = previous_max_aptc.to_f - total_aptc_applied_vals_for_household[key].to_f
             remaining_available_aptc = remaining_available_aptc > 0 ? remaining_available_aptc : 0
             max_aptc_vals[key] = '%.2f' % (available_aptc_value + remaining_available_aptc) if value.to_f == max_aptc
@@ -434,12 +434,11 @@ class Admin::Aptc < ApplicationController
       if hbxs.present? && find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
         aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = Settings.aptc_errors.effective_date_overflow
       end
-
       if applied_aptcs_array.present?
         applied_aptcs_array.each do |hbx|
           max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx[1]["hbx_id"].gsub("aptc_applied_",""), max_aptc)
           applied_aptc = hbx[1]["aptc_applied"].to_f
-          aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.enrollment_max_smaller_than_applied + "[NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > max_for_hbx
+          
           hbx_enrollment = hbxs.select{|h| h.id.to_s == hbx[1]["hbx_id"].gsub("aptc_applied_","") }.first
           plan_premium = hbx_enrollment.total_premium
           aptc_errors["PREMIUM_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.plan_premium_smaller_than_applied + "[PLAN_PREMIUM (#{'%.2f' % plan_premium.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > plan_premium
@@ -450,8 +449,6 @@ class Admin::Aptc < ApplicationController
 
       if max_aptc == "NaN"
         aptc_errors["MAX_APTC_NON_NUMERIC"] = Settings.aptc_errors.max_aptc_non_numeric
-      elsif applied_aptcs_array.present? && sum_of_all_applied.to_f > max_aptc.to_f
-        aptc_errors["MAX_APTC_TOO_SMALL"] = Settings.aptc_errors.max_aptc_too_small
       elsif max_aptc.to_f > 9999.99
         aptc_errors["MAX_APTC_TOO_BIG"]  = Settings.aptc_errors.max_aptc_too_big
       end
