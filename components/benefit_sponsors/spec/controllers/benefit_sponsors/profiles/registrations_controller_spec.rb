@@ -218,7 +218,7 @@ module BenefitSponsors
           before do
             sign_in user
             address_attributes.merge!({
-              kind: nil  
+              kind: nil
             })
             post :create, :agency => self.send("#{profile_type}_params")
           end
