@@ -47,9 +47,6 @@ module Effective
 
     def paginate(collection)
       result_scope = collection.skip((page - 1) * per_page).limit(per_page)
-      unless result_scope.kind_of?(Mongoid::Criteria)
-        raise "Expected a type of Mongoid::Criteria, got #{result_scope.class.name} instead."
-      end
       result_scope
     end
   end

@@ -1,13 +1,12 @@
 module Effective
   module Datatables
-    class BenefitSponsorsPremiumStatementsDataTable < Effective::ArraycolumnDatatable
+    class BenefitSponsorsPremiumStatementsDataTable < Effective::MongoidDatatable
       attr_accessor :product_info, :issuer_info
       datatable do
-        array_column :full_name, label: "Employee Profile",
+        table_column :full_name, label: "Employee Profile",
           :proc => Proc.new { |row|
-            @row = row[0]
-            @sponsored_benefit = @row.primary_member.sponsored_benefit
-            primary_member = @row.primary_member
+            @sponsored_benefit = row.primary_member.sponsored_benefit
+            primary_member = row.primary_member
             name_adapter = primary_member.name
             content_tag(:span) do
             format_name(
@@ -22,33 +21,33 @@ module Effective
           content_tag(:span, "HIRED:  #{format_date primary_member.employee_role.hired_on}")
           }, :filter => false, :sortable => false
         
-        array_column :title, :label => 'Benefit Package',
+        table_column :title, :label => 'Benefit Package',
           :proc => Proc.new { |row|
             content_tag(:span, class: 'benefit-group') do
               @sponsored_benefit.benefit_package.title.to_s.humanize
             end
           }, :filter => false, :sortable => false
 
-        array_column :coverage_kind,:label => 'Insurance Coverage',
+        table_column :coverage_kind,:label => 'Insurance Coverage',
         :proc => Proc.new { |row|
           content_tag(:span) do
             content_tag(:span, class: 'name') do
               mixed_case(@sponsored_benefit.product_kind.to_s.humanize)
             end +
             content_tag(:span) do
-              " | # Dep(s) Covered: ".to_s + (@row.members.size - 1).to_s
+              " | # Dep(s) Covered: ".to_s + (row.members.size - 1).to_s
             end +
-            content_tag(:p, (issuer_info[@row.group_enrollment.product[:issuer_profile_id]] + " -- " + product_info[@row.group_enrollment.product[:id]]))
+            content_tag(:p, (issuer_info[row.group_enrollment.product[:issuer_profile_id]] + " -- " + product_info[row.group_enrollment.product[:id]]))
           end
         }, :filter => false, :sortable => false
 
-        array_column :cost,:label => 'COST',
+        table_column :cost,:label => 'COST',
         :proc => Proc.new { |row|
-          content_tag(:span, "Employer Contribution: ".to_s + (number_to_currency @row.group_enrollment.sponsor_contribution_total.to_s)) +
+          content_tag(:span, "Employer Contribution: ".to_s + (number_to_currency row.group_enrollment.sponsor_contribution_total.to_s)) +
           content_tag(:div) do 
-            "Employee Contribution:".to_s + (number_to_currency (@row.group_enrollment.product_cost_total.to_f - @row.group_enrollment.sponsor_contribution_total.to_f).to_s) 
+            "Employee Contribution:".to_s + (number_to_currency (row.group_enrollment.product_cost_total.to_f - row.group_enrollment.sponsor_contribution_total.to_f).to_s) 
           end  +
-          content_tag(:p,  content_tag(:strong, "Total:") +  content_tag(:strong, @row.group_enrollment.product_cost_total.to_s))
+          content_tag(:p,  content_tag(:strong, "Total:") +  content_tag(:strong, row.group_enrollment.product_cost_total.to_s))
         }, :filter => false, :sortable => false
       end
 
@@ -64,11 +63,6 @@ module Effective
 
       def global_search?
         true
-      end
-
-      def arrayize(columns)
-        return [] if columns.flatten.blank?
-        super(columns)
       end
 
       def load_products
