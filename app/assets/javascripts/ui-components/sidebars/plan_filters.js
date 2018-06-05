@@ -1,6 +1,6 @@
 //Clear filter selections on page refresh
 window.addEventListener('load', function() {
-  //clearAll();
+  clearAll();
 })
 
 // Stores values to be processed on function filterResults
@@ -109,7 +109,7 @@ function clearAll() {
 
 // Gets the filtered Results
 function filterResults() {
-  console.log(filterParams)
+  filterResultsSelections(filterParams)
 }
 
 // Removes an item from array
