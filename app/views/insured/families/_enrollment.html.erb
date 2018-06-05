@@ -1,11 +1,11 @@
 <% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment } %>
 <% else %>
-<% plan = hbx_enrollment.plan %>
+<% plan = hbx_enrollment.product %>
 <div class="module hbx-enrollment-panel panel panel-default">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="no-buffer">
-      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind %> Coverage
+      <%= hbx_enrollment.coverage_year %> <%= plan.benefit_market_kind %> Coverage
       <span class="separator">
         <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>
@@ -20,7 +20,7 @@
           <%= display_carrier_logo(Maybe.new(plan), {width: 110}) %>
         </div>
         <h3>
-          <%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year}), remote: true %>
+          <%= link_to plan.title, summary_products_plans_path({:standard_component_id => plan.hios_base_id, hbx_enrollment_id: hbx_enrollment.id, active_year: plan.active_year}), remote: true %>
         </h3>
       </div>
       <div class="col-xs-12 vertically-aligned-row">
@@ -71,7 +71,7 @@
         <div class="enrollment-type info vertical-align-top">
           <strong><%= l10n("plan_type") %>:
           </strong>
-          <%= render_plan_type_details(plan) %>
+          <%#= render_plan_type_details(plan) %>
         </div>
       </div>
       <% if read_only == true %>
@@ -175,13 +175,13 @@
       <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan } %>
     </div>
     <div>
-      <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
+      <a class="vertically-aligned-row" data-target="#<%= plan.benefit_market_kind %>-<%= plan.id %>" data-toggle="modal">
         <i class="fa fa-phone fa-2x pull-right"></i>
         <span><%= l10n(".plan_contact_info") %></span>
       </a>
-        <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
+        <%#= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.issuer_profile.blank? %>
     </div>
-    <% if !read_only == true %>
+    <% if read_only == true %>
       <div class="col-lg-3">
         <div class="row <%if disable_make_changes_button?(hbx_enrollment)%>cna<%end%>">
           <% if @family.is_eligible_to_enroll? && !hbx_enrollment.coverage_terminated? %>

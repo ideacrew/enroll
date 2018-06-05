@@ -25,10 +25,10 @@ class Insured::FamiliesController < FamiliesController
     valid_display_enrollments = Array.new
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
 
-    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.plan.blank?}
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
     update_changing_hbxs(@hbx_enrollments)
 
-    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
+    # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
     @employee_role = @person.active_employee_roles.first
     @tab = params['tab']

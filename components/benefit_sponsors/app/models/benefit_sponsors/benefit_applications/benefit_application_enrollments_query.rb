@@ -14,14 +14,14 @@ module BenefitSponsors
           {"$match" => { "households.hbx_enrollments" => {
             "$elemMatch" => {
             "sponsored_benefit_id" => @sponsored_benefit.id,
-            "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
+            "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
             "effective_on" =>  {"$lte" => date.end_of_month, "$gte" => benefit_application.effective_period.min}
           }}}},
           {"$unwind" => "$households"},
           {"$unwind" => "$households.hbx_enrollments"},
           {"$match" => {
             "households.hbx_enrollments.sponsored_benefit_id" => @sponsored_benefit.id,
-            "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
+            "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
             "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => benefit_application.effective_period.min},
             "$or" => [
              {"households.hbx_enrollments.terminated_on" => {"$eq" => nil} },
@@ -36,9 +36,9 @@ module BenefitSponsors
               "bga_id" => "$households.hbx_enrollments.sponsored_benefit_id",
               "employee_role_id" => "$households.hbx_enrollments.employee_role_id"
             },
-            "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments._id"}
-          }},
-          {"$match" => {"aasm_state" => {"$nin" => HbxEnrollment::WAIVED_STATUSES}}}
+            "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments._id"},
+            "hbx_enrollments" => {"$last" => "$households.hbx_enrollments"}
+          }}
         ])
       end
     end

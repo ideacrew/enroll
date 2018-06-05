@@ -76,6 +76,16 @@ module BenefitSponsors
          "current_user_id"=> profile_type == "benefit_sponsor" ? FactoryGirl.create(:user).id: nil}
       end
 
+      before :each do
+        params["organization"]["profile_attributes"].merge!(
+            {
+              "ach_account_number" => "1234567890",
+              "ach_routing_number" => "011000015",
+              "ach_routing_number_confirmation" => "011000015"
+            }
+        ) if profile_type == 'broker_agency'
+      end
+
       let!(:create_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create params }
 
       it "create_form should be valid" do
@@ -124,6 +134,10 @@ module BenefitSponsors
       let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
       let(:user) { FactoryGirl.create(:user, :person => person)}
 
+      before :each do
+        broker_agency_profile.update_attributes!(ach_account_number: "1234567890", ach_routing_number: "011000015")
+      end
+
       context "profile_type = benefit_sponsor" do
 
         let(:edit_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit profile_id: employer_profile.id.to_s }
@@ -147,11 +161,6 @@ module BenefitSponsors
         before do
           person.broker_role = BrokerRole.new(benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id,provider_kind: "broker", npn:'12345678')
           person.save!
-        end
-
-        it "update_form should be valid" do
-          edit_form.validate
-          expect(edit_form).to be_valid
         end
 
         it 'loads the broker agency in to the Registartion Form' do
@@ -223,6 +232,9 @@ module BenefitSponsors
                     {"id"=>broker_agency_profile.id.to_s,
                      "entity_kind"=>"s_corporation",
                      "sic_code"=>"0111",
+                     "ach_account_number"=>"1234567890",
+                     "ach_routing_number"=>"011000015",
+                     "ach_routing_number_confirmation"=>"011000015",
                      "market_kind"=>"shop",
                      "languages_spoken"=>["", "en"],
                      "working_hours"=>"1",
