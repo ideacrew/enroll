@@ -50,7 +50,7 @@ module BenefitSponsors
       end
 
       def validate_routing_information
-        if !(ach_routing_number.present? && ach_routing_number == ach_routing_number_confirmation)
+        if ach_routing_number.present? && !(ach_routing_number == ach_routing_number_confirmation)
           self.errors.add(:base, "can't have two different routing numbers, please make sure you have same routing numbers on both fields")
         end
       end
