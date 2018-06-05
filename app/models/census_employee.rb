@@ -9,6 +9,7 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
+  include Insured::FamiliesHelper
 
   require 'roo'
 
