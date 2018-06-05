@@ -494,6 +494,7 @@ class Plan
         },
       ],
       :allow_disk_use => true).map{|a| a["count"]}
+
       carrier_count == result.size
     end
 
