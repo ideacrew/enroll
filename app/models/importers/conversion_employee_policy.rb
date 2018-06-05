@@ -201,6 +201,11 @@ module Importers
 
         benefit_package   = bga.benefit_package
         sponsored_benefit = benefit_package.sponsored_benefit_for('health')
+        set_external_enrollments = true
+
+        if @mid_year_conversion
+          set_external_enrollments = false
+        end
 
         en = house_hold.new_hbx_enrollment_from({
           coverage_household: coverage_household,
@@ -209,7 +214,7 @@ module Importers
           benefit_group_assignment: bga,
           coverage_start: start_date,
           enrollment_kind: "open_enrollment",
-          external_enrollment: true
+          external_enrollment: set_external_enrollments
           })
 
         en.external_enrollment = true

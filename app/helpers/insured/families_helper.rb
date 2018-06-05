@@ -127,6 +127,7 @@ module Insured::FamiliesHelper
   end
 
   def disable_make_changes_button?(hbx_enrollment)
+    return false
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
     return false if !hbx_enrollment.is_shop?

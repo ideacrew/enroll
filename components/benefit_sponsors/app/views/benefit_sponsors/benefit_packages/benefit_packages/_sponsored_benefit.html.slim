@@ -1,6 +1,6 @@
 .row.health
-  h1.heading-text 
-    = @benefit_package_form.new_record? ? 'Health – Set Up Benefit Package' : 'Health - Edit Benefit Package'
+  h1.heading-text
+    = @benefit_package_form.id.present? ? 'Health - Edit Benefit Package' : 'Health – Set Up Benefit Package'
   h4 
     | Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
   
@@ -16,5 +16,3 @@
       h4
       .content
   = render "./ui-components/v1/cards/metal_level_select", f: f
-  
-  
