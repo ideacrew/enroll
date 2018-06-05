@@ -1,6 +1,6 @@
 module BenefitSponsors
   module Queries
-    class PremiumStatementsQuery
+    class CoverageReportsQuery
 
       def initialize(employer_profile, billing_date)
         @employer_profile = employer_profile

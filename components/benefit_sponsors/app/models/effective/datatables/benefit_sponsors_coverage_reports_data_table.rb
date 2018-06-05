@@ -1,6 +1,6 @@
 module Effective
   module Datatables
-    class BenefitSponsorsPremiumStatementsDataTable < Effective::MongoidDatatable
+    class BenefitSponsorsCoverageReportsDataTable < Effective::MongoidDatatable
       attr_accessor :product_info, :issuer_info
       datatable do
         table_column :full_name, label: "Employee Profile",
@@ -56,7 +56,7 @@ module Effective
         return @collection if defined? @collection
         @employer_profile = BenefitSponsors::Organizations::Profile.find(attributes[:id])
         return BenefitSponsors::LegacyCoverageReportAdapter.new([]) if @employer_profile.nil?
-        query = BenefitSponsors::Queries::PremiumStatementsQuery.new(@employer_profile, attributes[:billing_date])
+        query = BenefitSponsors::Queries::CoverageReportsQuery.new(@employer_profile, attributes[:billing_date])
         @products_hash ||= load_products
         @collection = query.execute
       end
