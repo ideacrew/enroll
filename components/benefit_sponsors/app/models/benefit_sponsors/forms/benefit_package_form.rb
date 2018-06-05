@@ -12,6 +12,7 @@ module BenefitSponsors
       attribute :benefit_application_id, String
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
       attribute :parent, BenefitSponsors::Forms::BenefitApplicationForm
+      attribute :probation_period_display_name, String
 
       attr_accessor :catalog, :sponsored_benefits
 
@@ -49,9 +50,9 @@ module BenefitSponsors
         form
       end
 
-      def self.for_edit(params)
+      def self.for_edit(params, load_benefit_application_form)
         form = self.new(params)
-        form.service.load_form_params_from_resource(form)
+        form.service.load_form_params_from_resource(form, load_benefit_application_form)
         form.service.load_form_metadata(form)
         form
       end
