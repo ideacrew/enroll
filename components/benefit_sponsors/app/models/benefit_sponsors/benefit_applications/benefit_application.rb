@@ -268,11 +268,6 @@ module BenefitSponsors
         open_enrollment_period.cover?(date)
       end
 
-      # TODO Refactor -- use the new state: :open_enrollment_closed
-      # def open_enrollment_completed?
-      #   ::TimeKeeper.date_of_record > open_enrollment_period.end unless open_enrollment_period.blank?
-      # end
-
       # Build a new [BenefitApplication] instance along with all associated child model instances, for the
       # benefit period immediately following this application's, applying the renewal settings
       # specified in the passed [BenefitSponsorCatalog]
@@ -308,13 +303,9 @@ module BenefitSponsors
         renewal_application
       end
 
-      def overlapping_published_benefit_applications
-        self.sponsor_profile.benefit_applications.published_benefit_applications_within_date_range(self.start_on, self.end_on)
-      end
-
       def renew_benefit_package_assignments
         benefit_packages.each do |benefit_package|
-          benefit_package.renew_employee_assignments          
+          benefit_package.renew_employee_assignments
         end
 
         default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
@@ -336,7 +327,7 @@ module BenefitSponsors
           end
         end
       end
-           
+
       def expire_benefit_package_members
         benefit_packages.each do |benefit_package|
           benefit_package.deactivate
@@ -355,6 +346,7 @@ module BenefitSponsors
         end
       end
 
+
       def cancel_benefit_package_members
         benefit_packages.each do |benefit_package|
           disable_benefit_package(benefit_package)
@@ -368,15 +360,6 @@ module BenefitSponsors
         end
       end
 
-      # TODO: Refer to benefit_sponsorship instead of employer profile.
-      def no_documents_uploaded?
-        # benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
-        benefit_sponsorship.profile.employer_attestation.blank? || benefit_sponsorship.profile.employer_attestation.unsubmitted?
-      end
-
-      def validate_sponsor_market_policy
-        true
-      end
 
       def refresh(new_benefit_sponsor_catalog)
         if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
@@ -391,27 +374,6 @@ module BenefitSponsors
         self
       end
 
-      def cancel_enrollments
-      end
-
-      def is_event_date_valid?
-        today = TimeKeeper.date_of_record
-
-        is_valid = case aasm_state.to_s
-        when "approved", "draft"
-          today >= open_enrollment_period.begin
-        when "enrollment_open"
-          today > open_enrollment_period.end
-        when "enrollment_closed"
-          today >= effective_period.begin
-        when "active"
-          today > effective_period.end
-        else
-          false
-        end
-
-        is_valid
-      end
 
       aasm do
         state :draft, initial: true
@@ -462,22 +424,22 @@ module BenefitSponsors
         end
 
         # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
-        event :advance_date do
-          transitions from: :enrollment_eligible,                   to: :active,                 guard:   :is_event_date_valid?
-          transitions from: :approved,                              to: :enrollment_open,        guard:   :is_event_date_valid?
-          transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_eligible,    guards:  [:is_open_enrollment_closed?, :is_enrollment_valid?]
-          transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed? #, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
-          transitions from: :enrollment_open,                       to: :enrollment_closed,      guard:   :is_event_date_valid?
+        # event :advance_date do
+        #   transitions from: :enrollment_eligible,                   to: :active,                 guard:   :is_event_date_valid?
+        #   transitions from: :approved,                              to: :enrollment_open,        guard:   :is_event_date_valid?
+        #   transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_eligible,    guards:  [:is_open_enrollment_closed?, :is_enrollment_valid?]
+        #   transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed? #, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+        #   transitions from: :enrollment_open,                       to: :enrollment_closed,      guard:   :is_event_date_valid?
 
-          transitions from: :active,                                to: :terminated,             guard:   :is_event_date_valid?
-          transitions from: [:pending],                             to: :expired,                guard:   :is_plan_year_end?
-          transitions from: :enrollment_ineligible,                 to: :canceled,               guard:   :is_plan_year_end?
+        #   transitions from: :active,                                to: :terminated,             guard:   :is_event_date_valid?
+        #   transitions from: [:pending],                             to: :expired,                guard:   :is_plan_year_end?
+        #   transitions from: :enrollment_ineligible,                 to: :canceled,               guard:   :is_plan_year_end?
 
-          ## TODO update this renewal transition
-          # transitions from: :enrollment_open,                           to: :enrollment_ineligible,  guard:  :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+        #   ## TODO update this renewal transition
+        #   # transitions from: :enrollment_open,                           to: :enrollment_ineligible,  guard:  :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
-          transitions from: :enrollment_open,                       to: :enrollment_open  # avoids error when application is in enrollment_open state
-        end
+        #   transitions from: :enrollment_open,                       to: :enrollment_open  # avoids error when application is in enrollment_open state
+        # end
 
         ## Application eligibility determination process
 
@@ -603,9 +565,6 @@ module BenefitSponsors
         end
       end
 
-      def cancel_enrollments
-        # TODO
-      end
 
       def publish_state_transition
         return unless benefit_sponsorship.present?
@@ -620,63 +579,6 @@ module BenefitSponsors
         if aasm.to_state == :binder_reversed
           reverse_enrollment_eligiblity!
         end
-      end
-
-      def minimum_employer_contribution
-        unless benefit_packages.size == 0
-          benefit_packages.map do |benefit_package|
-            if benefit_package#.sole_source?
-              OpenStruct.new(:premium_pct => 100)
-            else
-              # benefit_package.relationship_benefits.select do |relationship_benefit|
-              #   relationship_benefit.relationship == "employee"
-              # end.min_by do |relationship_benefit|
-              #   relationship_benefit.premium_pct
-              # end
-            end
-          end.map(&:premium_pct).first
-        end
-      end
-
-      def application_eligibility_warnings
-        warnings = {}
-
-        if employer_attestation_is_enabled?
-          unless benefit_sponsorship.profile.is_attestation_eligible?
-            if no_documents_uploaded?
-              warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{benefit_sponsorship.profile_id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
-            elsif benefit_sponsorship.profile.employer_attestation.denied?
-              warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
-            else
-              warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{benefit_sponsorship.employer_attestation.aasm_state.humanize}. Please contact customer service."})
-            end
-          end
-        end
-
-        unless benefit_sponsorship.profile.is_primary_office_local?
-          warnings.merge!({primary_office_location: "Is a small business located in #{Settings.aca.state_name}"})
-        end
-
-        # TODO: These valiations occuring when employer publish their benefit application. Following state not relavant for an unpublished application.
-        # Application is in ineligible state from prior enrollment activity
-        if aasm_state == "enrollment_ineligible"
-          warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
-        end
-
-        # Maximum company size at time of initial registration on the HBX
-        if fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
-          warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time equivalent employees" })
-        end
-
-        # Exclude Jan 1 effective date from certain checks
-        unless effective_date.yday == 1
-          # Employer contribution toward employee premium must meet minimum
-          if benefit_packages.size > 0 && (minimum_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
-            warnings.merge!({ minimum_employer_contribution:  "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)" })
-          end
-        end
-
-        warnings
       end
 
       def is_published?
@@ -699,6 +601,11 @@ module BenefitSponsors
       end
 
       private
+
+      def log_message(errors)
+        msg = yield.first
+        (errors[msg[0]] ||= []) << msg[1]
+      end
 
       # AASM states used in PlanYear as mapped to new BenefitApplication model
       def plan_year_to_benefit_application_states_map
@@ -739,10 +646,6 @@ module BenefitSponsors
       end
 
 
-      def log_message(errors)
-        msg = yield.first
-        (errors[msg[0]] ||= []) << msg[1]
-      end
     end
   end
 end
