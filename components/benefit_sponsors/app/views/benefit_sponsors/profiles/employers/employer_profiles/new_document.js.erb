@@ -1,0 +1,3 @@
+$('body').before('<div id="modal-wrapper"></div>')
+$('#modal-wrapper').html("<%= escape_javascript(render "/benefit_sponsors/profiles/employers/employer_profiles/new_document.erb") %>");
+$('#modal-wrapper').fadeIn();

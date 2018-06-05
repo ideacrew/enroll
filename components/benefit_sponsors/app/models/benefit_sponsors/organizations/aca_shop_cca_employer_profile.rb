@@ -10,9 +10,8 @@ module BenefitSponsors
       # TODO use SIC code validation
       validates_presence_of :sic_code
 
-      embeds_one  :employer_attestation
-
       # TODO: Temporary fix until we move employer_attestation to benefit_sponsorship
+      #TODO change this to work with new model employer attestation
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?

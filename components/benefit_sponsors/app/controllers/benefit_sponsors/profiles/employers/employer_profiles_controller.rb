@@ -3,7 +3,7 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :coverage_reports]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :coverage_reports, :new_document, :upload_document]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         layout "two_column", except: [:new]
 
@@ -92,6 +92,50 @@ module BenefitSponsors
           @sent_box = false
         end
 
+        def download_invoice
+          # options={}
+          # options[:content_type] = @invoice.type
+          # options[:filename] = @invoice.title
+          # send_data Aws::S3Storage.find(@invoice.identifier) , options
+        end
+
+        def new_document # Should be in ER attestations controller
+          @document = @employer_profile.documents.new
+          respond_to do |format|
+            format.js
+          end
+        end
+
+        def upload_document # Should be in ER attestations controller
+          @employer_profile.upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
+          redirect_to employers_employer_profile_path(:id => @employer_profile) + '?tab=documents'
+        end
+
+        def download_documents # Should be in ER attestations controller
+          @employer_profile = EmployerProfile.find(params[:id])
+          #begin
+          doc = @employer_profile.documents.find(params[:ids][0])
+          send_file doc.identifier, file_name: doc.title,content_type:doc.format
+
+          #render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+          #rescue => e
+          #  render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+          #end
+
+          #render json: { status: 200, message: 'Successfully Downloaded.' }
+
+        end
+
+        def delete_documents
+          # @employer_profile = EmployerProfile.find(params[:id])
+          # begin
+          #   @employer_profile.documents.any_in(:_id =>params[:ids]).destroy_all
+          #   render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+          # rescue => e
+          #   render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+          # end
+        end
+
         private
 
         def find_employer
@@ -103,10 +147,10 @@ module BenefitSponsors
         end
 
         def load_documents
-          if @employer_profile.employer_attestation.present?
-            @documents = @employer_profile.employer_attestation.employer_attestation_documents
+          if @employer_profile.active_benefit_sponsorship.employer_attestation.present?
+            @documents = @employer_profile.active_benefit_sponsorship.employer_attestation.employer_attestation_documents
           else
-            @employer_profile.build_employer_attestation
+            @employer_profile.active_benefit_sponsorship.build_employer_attestation
           end
         end
 

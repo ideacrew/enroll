@@ -154,6 +154,9 @@ module BenefitSponsors
 
       scope :by_broker_role,              ->( broker_role_id ){ where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
       scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
+      scope :by_employer_attestation_document_id,   ->( employer_attestation_document_id ){ where(:"employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(employer_attestation_document_id))}
+      scope :by_employer_attestation_id,            ->( employer_attestation_id ){ where(:"employer_attestation._id" => BSON::ObjectId.from_string(employer_attestation_id)) }
+
 
       def primary_office_service_areas
         primary_office = profile.primary_office_location
@@ -191,6 +194,7 @@ module BenefitSponsors
         end
       end
 
+      #TODO change this to work with new model employer attestation
       def is_attestation_eligible?
         return true unless enforce_employer_attestation
         employer_attestation.present? && employer_attestation.is_eligible?

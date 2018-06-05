@@ -36,6 +36,16 @@ BenefitSponsors::Engine.routes.draw do
         collection do
           get :show_pending
         end
+
+        member do
+          get "download_invoice"
+          get 'new_document'
+          post 'download_documents'
+          post 'delete_documents'
+          post 'upload_document'
+          post 'generate_checkbook_urls'
+        end
+
         member do
           get :inbox
         end
@@ -52,6 +62,13 @@ BenefitSponsors::Engine.routes.draw do
         member do
           get :approve
         end
+      end
+
+      resources :employer_attestations do
+        get 'authorized_download'
+        get 'verify_attestation'
+        delete 'delete_attestation_documents'
+        #get 'revert_attestation'
       end
     end
   end

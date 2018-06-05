@@ -10,7 +10,7 @@
 
   <div class="col-xs-12">
   <div class="pull-right upload-document-location">
-    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, main_app.new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
+    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_profiles_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.active_benefit_sponsorship.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
   </div>
   </div>
   </div>

@@ -47,12 +47,16 @@ module BenefitSponsors
       end
 
       def employer_profile
-        org = Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(self.id)).first
-        org.employer_profile
+        benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_employer_attestation_document_id(self.id).first
+        benefit_sponsorship.profile
+      end
+
+      def benefit_sponsorship
+        benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_employer_attestation_document_id(self.id).first
       end
 
       def employer_attestation
-        employer_profile.employer_attestation
+        benefit_sponsorship.employer_attestation
       end
 
       def submit_review(params)

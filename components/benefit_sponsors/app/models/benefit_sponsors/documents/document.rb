@@ -62,6 +62,8 @@ module BenefitSponsors
 
       field :tags, type: Array, default: []
 
+      field :size, type: String
+
       validates_presence_of :identifier, :title, :creator, :publisher, :type, :format, :source, :language
 
       validates :rights,

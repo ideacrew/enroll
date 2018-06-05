@@ -26,7 +26,7 @@ module Effective
            key, bucket = get_key_and_bucket(row.identifier)
           dropdown = [
            ['Download',  main_app.document_download_path(bucket, key)+ "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}",'static'],
-           ['Delete', main_app.employers_employer_attestation_delete_attestation_documents_path(row.id), (@employer_profile.employer_attestation.editable? && row.submitted?) ? 'delete ajax with confirm' : 'disabled',  'Do you want to Delete this document?']
+           ['Delete', profiles_employers_employer_attestation_delete_attestation_documents_path(row.id), (@employer_profile.active_benefit_sponsorship.employer_attestation.editable? && row.submitted?) ? 'delete ajax with confirm' : 'disabled',  'Do you want to Delete this document?']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -36,9 +36,9 @@ module Effective
       def collection
         @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(attributes[:employer_profile_id])).first
         @employer_profile = @organization.employer_profile
-        documents = EmployerAttestationDocument.none
-        if @employer_profile.employer_attestation.present?
-          documents = @employer_profile.employer_attestation.employer_attestation_documents
+        documents = BenefitSponsors::Documents::EmployerAttestationDocument.none
+        if @employer_profile.active_benefit_sponsorship.employer_attestation.present?
+          documents = @employer_profile.active_benefit_sponsorship.employer_attestation.employer_attestation_documents
         end
         documents
       end

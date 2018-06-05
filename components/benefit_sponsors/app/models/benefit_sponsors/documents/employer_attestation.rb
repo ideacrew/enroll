@@ -9,7 +9,7 @@ module BenefitSponsors
 
       embedded_in :benefit_sponsorship, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
-      embeds_many :employer_attestation_documents, class_name: "BenefitSponsors::Documents::EmployerAttestationDocument", store_as: :documentable
+      embeds_many :employer_attestation_documents, class_name: "BenefitSponsors::Documents::EmployerAttestationDocument", as: :documentable
 
       aasm do
         state :unsubmitted, initial: true
@@ -64,6 +64,9 @@ module BenefitSponsors
         # )
       end
 
+      def terminate_employer
+
+      end
     end
   end
 end
