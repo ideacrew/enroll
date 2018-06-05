@@ -298,6 +298,10 @@ module VerificationHelper
     family_members.present? && (family_members.map(&:person).any?(&:is_consumer_role_active?) || family_members.map(&:person).any?(&:is_resident_role_active?))
   end
 
+  def has_active_resident_members?(family_members)
+    family_members.present? && family_members.map(&:person).any?(&:is_resident_role_active?)
+  end
+
   def has_active_consumer_dependent?(person,dependent)
     !person.has_active_employee_role? && (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_consumer_role_active?)
   end
