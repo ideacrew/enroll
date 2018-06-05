@@ -45,7 +45,6 @@ module BenefitSponsors
         end
       end
 
-
       def legal_name
         broker_agency_profile.present? ? broker_agency_profile.legal_name : ""
       end

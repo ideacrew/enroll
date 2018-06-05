@@ -829,7 +829,7 @@ class HbxEnrollment
 
   def coverage_year
     year = if self.is_shop?
-             benefit_group.plan_year.start_on.year
+             sponsored_benefit_package.benefit_application.start_on.year
            else
              plan.try(:active_year) || effective_on.year
            end
@@ -1396,10 +1396,13 @@ class HbxEnrollment
   end
 
   def decorated_hbx_enrollment
+    # need to update this to match new model
+    return
     return @cost_decorator if @cost_decorator
-    if plan.present? && benefit_group.present?
-      if benefit_group.is_congress #is_a? BenefitGroupCongress
-        @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
+    if product.present? && sponsored_benefit_package.present?
+      if sponsored_benefit_package.is_congress #is_a? BenefitGroupCongress
+        #need to map to new model
+        @cost_decorator = PlanCostDecoratorCongress.new(product, self, benefit_group)
       elsif self.composite_rated? && (!plan.dental?)
         @cost_decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
       else

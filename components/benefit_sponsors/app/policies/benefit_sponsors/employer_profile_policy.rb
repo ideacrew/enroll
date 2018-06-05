@@ -13,7 +13,7 @@ module BenefitSponsors
       true
     end
 
-    def premium_statements?
+    def coverage_reports?
       return false unless user.present?
       return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
       # TODO
@@ -36,7 +36,7 @@ module BenefitSponsors
     end
 
     def list_enrollments?
-      premium_statements?
+      coverage_reports?
     end
 
     def can_list_enrollments?

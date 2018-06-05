@@ -3,8 +3,8 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :premium_statements]
-        before_action :load_group_enrollments, only: [:premium_statements], if: :is_format_csv?
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :coverage_reports]
+        before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
@@ -51,10 +51,10 @@ module BenefitSponsors
           end
         end
 
-        def premium_statements
+        def coverage_reports
           authorize @employer_profile
           @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
-          @datatable = Effective::Datatables::BenefitSponsorsPremiumStatementsDataTable.new({ id: params.require(:employer_profile_id), billing_date: @billing_date})
+          @datatable = Effective::Datatables::BenefitSponsorsCoverageReportsDataTable.new({ id: params.require(:employer_profile_id), billing_date: @billing_date})
 
           respond_to do |format|
             format.html
@@ -112,8 +112,8 @@ module BenefitSponsors
 
         def load_group_enrollments
           billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
-          query = Queries::PremiumStatementsQuery.new(@employer_profile, billing_date)
-          @group_enrollments =  query.execute.first
+          query = Queries::CoverageReportsQuery.new(@employer_profile, billing_date)
+          @group_enrollments =  query.execute
           @product_info = load_products
         end
 
@@ -150,8 +150,9 @@ module BenefitSponsors
               csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
               "Employee Premium", "Total Premium"]
               groups.each do |element|
-                census_employee = element.first.employee_role.census_employee
-                sponsored_benefit = element.first.sponsored_benefit
+                primary = element.primary_member
+                census_employee = primary.employee_role.census_employee
+                sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
                 csv << [  

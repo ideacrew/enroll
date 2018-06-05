@@ -58,6 +58,19 @@ module BenefitSponsors
         end
       end
 
+      def build_primary_address
+        BenefitSponsors::Locations::Address.new(
+            :kind => "primary",
+            :address_1 => primary_location_address_1,
+            :address_2 => primary_location_address_2,
+            :city =>  primary_location_city,
+            :state => primary_location_state,
+            :county => primary_location_county,
+            :location_state_code => primary_location_county_fips,
+            :zip => primary_location_zip
+        )
+      end
+
       def build_phone
         BenefitSponsors::Locations::Phone.new({
                                                   :kind => "work",

@@ -172,6 +172,9 @@ class Insured::PlanShoppingsController < ApplicationController
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
     @member_groups = sponsored_cost_calculator.groups_for_products(products)
     @enrolled_hbx_enrollment_plan_ids = []
+    @metal_levels = %w[platinum gold silver bronze catastrophic]
+    @plan_types = %w[HMO PPO POS]
+    @networks = %w[nationwide]
     render "show_slug"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
 =begin
@@ -191,12 +194,12 @@ class Insured::PlanShoppingsController < ApplicationController
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
       @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     end
-    @carriers = @carrier_names_map.values
+    
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
-    @metal_levels = %w[platinum gold silver bronze catastrophic]
-    @plan_types = %w[HMO PPO POS]
+    
+    
     @networks = %w[nationwide DC-Metro]
 =end
   end
