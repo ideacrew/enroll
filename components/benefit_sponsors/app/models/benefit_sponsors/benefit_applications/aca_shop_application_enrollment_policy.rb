@@ -17,6 +17,7 @@
 module BenefitSponsors
   class BenefitApplications::AcaShopApplicationEnrollmentPolicy
     include BenefitMarkets::BusinessRulesEngine
+    include Config::AcaModelConcern
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
