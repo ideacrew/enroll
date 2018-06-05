@@ -1,8 +1,47 @@
 module BenefitSponsors
   class BenefitSponsorships::AcaShopBenefitSponsorshipService
 
-    def initialize(benefit_sponsorship)
+    attr_accessor :benefit_sponsorship, :new_date
+
+    def initialize(benefit_sponsorship: nil, new_date: TimeKeeper.date_of_record)
       @benefit_sponsorship = benefit_sponsorship
+      @new_date = new_date
+    end
+
+    def begin_open_enrollment
+      benefit_application = @benefit_sponsorship.benefit_applications.open_enrollment_begin_on(new_date).first
+      application_service.benefit_application = benefit_application
+
+      if benefit_application.is_renewing?
+        application_service.begin_renewal_open_enrollment
+      else
+        application_service.begin_initial_open_enrollment
+      end
+    end
+
+    def end_open_enrollment
+
+    end
+
+    def begin_sponsor_benefit
+
+    end
+
+    def end_sponsor_benefit
+
+    end
+
+    def terminate_sponsor_benefit
+
+    end
+
+    def renew_sponsor_benefit
+
+    end
+
+    def application_service
+      return @application_service if defined? @application_service
+      @application_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new
     end
 
     def begin_initial_open_enrollment(open_enrollment_begin_on)
@@ -27,11 +66,6 @@ module BenefitSponsors
       end
     end
 
-
-    # def begin_open_enrollment
-    #   # get application to begin open enrollment 
-    #   @benefit_sponsorship
-    # end
 
     # # How's this related to benefit application factory?
     # def initiate_benefit_application(effective_date)

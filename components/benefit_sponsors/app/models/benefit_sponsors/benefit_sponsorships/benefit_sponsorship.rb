@@ -76,7 +76,6 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
 
       has_many    :census_employees,
-                  counter_cache: true,
                   class_name: "::CensusEmployee"
 
       belongs_to  :benefit_market,
@@ -113,10 +112,39 @@ module BenefitSponsors
         allow_blank: false
 
 
-
       scope :effective_begin_on,    ->(compare_date = TimeKeeper.date_of_record) { where(
                                                     :"effective_begin_on".lte => compare_date )
                                                  }
+
+      scope :may_begin_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.open_enrollment_begin_on(compare_date).approved
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
+
+      scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.open_enrollment_end_on(compare_date).enrolling
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
+
+      scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_begin_on(compare_date).enrollment_eligible
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
+
+      scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_end_on(compare_date).coverage_effective
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
+
+      scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_end_on(compare_date).coverage_effective
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
+
+      scope :may_terminate_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+        matched = BenefitSponsors::BenefitApplications::BenefitApplication.benefit_terminate_on(compare_date)
+        unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      }
 
       before_create :generate_hbx_id
 

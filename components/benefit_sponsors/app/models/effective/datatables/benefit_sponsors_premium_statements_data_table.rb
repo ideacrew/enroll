@@ -6,6 +6,7 @@ module Effective
         array_column :full_name, label: "Employee Profile",
           :proc => Proc.new { |row|
             @row = row[0]
+            @sponsored_benefit = @row.primary_member.sponsored_benefit
             primary_member = @row.primary_member
             name_adapter = primary_member.name
             content_tag(:span) do
@@ -18,13 +19,13 @@ module Effective
           end +
           content_tag(:span, content_tag(:p, "DOB: #{format_date primary_member.dob}")) +
           content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn primary_member.employee_role.ssn}")) +
-          content_tag(:span, "HIRED:  #{format_date primary_member.employee_role.census_employee.hired_on}")
+          content_tag(:span, "HIRED:  #{format_date primary_member.employee_role.hired_on}")
           }, :filter => false, :sortable => false
         
         array_column :title, :label => 'Benefit Package',
           :proc => Proc.new { |row|
             content_tag(:span, class: 'benefit-group') do
-              # @enrollment.sponsored_benefit_package.title.titleize
+              @sponsored_benefit.benefit_package.title.to_s.humanize
             end
           }, :filter => false, :sortable => false
 
@@ -32,7 +33,7 @@ module Effective
         :proc => Proc.new { |row|
           content_tag(:span) do
             content_tag(:span, class: 'name') do
-              mixed_case("health") # toDo
+              mixed_case(@sponsored_benefit.product_kind.to_s.humanize)
             end +
             content_tag(:span) do
               " | # Dep(s) Covered: ".to_s + (@row.members.size - 1).to_s
@@ -55,7 +56,7 @@ module Effective
       def collection
         return @collection if defined? @collection
         @employer_profile = BenefitSponsors::Organizations::Profile.find(attributes[:id])
-        return [[]] if @employer_profile.blank? 
+        return BenefitSponsors::LegacyCoverageReportAdapter.new([]) if @employer_profile.nil?
         query = BenefitSponsors::Queries::PremiumStatementsQuery.new(@employer_profile, attributes[:billing_date])
         @products_hash ||= load_products
         @collection = query.execute

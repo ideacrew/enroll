@@ -3,7 +3,7 @@ __selected_fields:
 attributes: !ruby/hash:BSON::Document
   _id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
-      WwROHZ+IC11vNZE1
+      WxWP5J+ICzHOaeVt
   _type: BenefitSponsors::Organizations::ExemptOrganization
   created_at: 2017-08-15 06:40:45.330000000 Z
   dba: DCHL
@@ -11,15 +11,15 @@ attributes: !ruby/hash:BSON::Document
   hbx_id: '210005'
   home_page: 
   legal_name: Health Connector
-  updated_at: 2018-05-22 17:06:39.328000000 Z
+  updated_at: 2018-06-04 19:15:50.725000000 Z
   site_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
-      WwROHZ+IC11vNZE2
+      WxWP5J+ICzHOaeVu
   profiles:
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
-        WwROHZ+IC11vNZE3
+        WxWP5J+ICzHOaeVv
     contact_method: :paper_and_electronic
     _type: BenefitSponsors::Organizations::HbxProfile
     cms_id: MA0
@@ -31,12 +31,12 @@ attributes: !ruby/hash:BSON::Document
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
-          WwROHZ+IC11vNZE4
+          WxWP5J+ICzHOaeVw
       is_primary: true
       address: !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
-            WwROHZ+IC11vNZE5
+            WxWP5J+ICzHOaeVx
         address_1: 1225 I St, NW
         address_2: ''
         address_3: ''
@@ -51,7 +51,7 @@ attributes: !ruby/hash:BSON::Document
       phone: !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
-            WwROHZ+IC11vNZE6
+            WxWP5J+ICzHOaeVy
         kind: main
         country_code: ''
         area_code: '855'
@@ -63,7 +63,7 @@ attributes: !ruby/hash:BSON::Document
     inbox: !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
-          WwROHZ+IC11vNZE7
+          WxWP5J+ICzHOaeVz
   site_owner_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
-      WwROHZ+IC11vNZE2
+      WxWP5J+ICzHOaeVu
