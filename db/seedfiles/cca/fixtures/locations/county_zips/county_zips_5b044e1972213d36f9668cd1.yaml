@@ -1,9 +1,0 @@
---- !ruby/object:BenefitMarkets::Locations::CountyZip
-attributes: !ruby/hash:BSON::Document
-  _id: !ruby/object:BSON::ObjectId
-    raw_data: !binary |-
-      WwROGXIhPTb5ZozR
-  zip: 01038
-  county_name: Hampshire
-  state: MA
-__selected_fields: 

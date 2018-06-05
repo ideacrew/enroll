@@ -93,6 +93,10 @@ module BenefitSponsors
         active_broker_agency_account.broker_agency_profile rescue nil
       end
 
+      def active_broker_agency_legal_name
+        active_broker_agency_account.ba_name if active_broker_agency_account
+      end
+
       def staff_roles
         Person.staff_for_employer(self)
       end

@@ -229,25 +229,8 @@ class GroupSelectionPrevaricationAdapter
     controller_employee_role,
     controller_change_plan
   )
-    benefit_group = nil
-    benefit_group_assignment = nil
-    if controller_employee_role == previous_hbx_enrollment.employee_role
-      benefit_group = previous_hbx_enrollment.benefit_group
-      benefit_group_assignment = previous_hbx_enrollment.benefit_group_assignment
-    else
-      benefit_group = controller_employee_role.benefit_group(qle: is_qle?)
-      benefit_group_assignment = benefit_group_assignment_by_plan_year(controller_employee_role, benefit_group, controller_change_plan)
-    end
-    change_enrollment = coverage_household.household.new_hbx_enrollment_from(
-      employee_role: controller_employee_role,
-      resident_role: person.resident_role,
-      coverage_household: coverage_household,
-      benefit_group: benefit_group,
-      benefit_group_assignment: benefit_group_assignment,
-      qle: is_qle?,
-      opt_effective_on: optional_effective_on)
-    change_enrollment.predecessor_enrollment_id = previous_hbx_enrollment.id
-    change_enrollment
+    e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
+    e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on)
   end
 
   def build_new_shop_enrollment(
@@ -329,63 +312,9 @@ class GroupSelectionPrevaricationAdapter
     controller_employee_role,
     family_member_ids
   )
-    enrollment = HbxEnrollment.new
-    enrollment.coverage_household_id = coverage_household.id
-    enrollment.household = coverage_household.household
-    enrollment.kind = "employer_sponsored"
-    enrollment.employee_role = controller_employee_role
-
-    benefit_package = nil
-
-		if is_qle? && enrollment.family.is_under_special_enrollment_period?
-      if optional_effective_on.present?
-        benefit_package = benefit_package_for_date(controller_employee_role, optional_effective_on)
-				enrollment.effective_on = optional_effective_on
-      else
-        possible_benefit_package = benefit_package_for_date(controller_employee_role, enrollment.family.current_sep.effective_on)
-        if possible_benefit_package
-          # They are in a sep and there is an applicable benefit package
-          benefit_package = possible_benefit_package
-				  enrollment.effective_on = enrollment.family.current_sep.effective_on
-        else
-          # They are in a sep, but there is NO benefit package available then
-          # Maybe they weren't hired yet
-			    effective_date = earliest_eligible_date_for_shop(controller_employee_role)
-          enrollment.effective_on = effective_date
-          benefit_package = benefit_package_for_date(controller_employee_role, effective_date)
-        end
-      end
-		  enrollment.enrollment_kind = "special_enrollment"
-      # TODO: Assign sep
-		else
-			effective_date = earliest_eligible_date_for_shop(controller_employee_role)
-			enrollment.effective_on = effective_date
-			enrollment.enrollment_kind = "open_enrollment"
-      benefit_package = benefit_package_for_date(controller_employee_role, effective_date)
-		end
-
-    enrollment.rebuild_members_by_coverage_household(coverage_household: coverage_household)
-
-    enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
-      family_member_ids.include? member.applicant_id
-    end
-
-    enrollment.sponsored_benefit_package_id = benefit_package.id
-    sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind)
-    enrollment.sponsored_benefit_id = sponsored_benefit.id
-    enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-    enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id 
-
-		enrollment
+    e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
+    e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: optional_effective_on)
 	end
-
-  def earliest_eligible_date_for_shop(employee_role)
-    employee_role.census_employee.coverage_effective_on
-  end
-
-  def benefit_package_for_date(employee_role, start_date)
-    employee_role.benefit_package_for_date(start_date)
-  end
 
 	def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
 		health_offered_relationship_benefits = health_relationship_benefits(benefit_group)

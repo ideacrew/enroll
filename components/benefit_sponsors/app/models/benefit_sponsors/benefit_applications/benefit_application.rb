@@ -123,22 +123,30 @@ module BenefitSponsors
       scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"effective_period.min" => compare_date )
                                                             }
+      
+      scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                              :"effective_period.max" => compare_date )
+                                                            }
+
       scope :effective_period_cover,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"effective_period.min".lte => compare_date,
                                                               :"effective_period.max".gte => compare_date)
                                                             }
-      scope :future_effective_date,         ->(compare_date = TimeKeeper.date_of_record) { where(
+      scope :future_effective_date,           ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"effective_period.min".gte => compare_date )
                                                             }
       scope :open_enrollment_period_cover,    ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"opem_enrollment_period.min".lte => compare_date,
                                                               :"opem_enrollment_period.max".gte => compare_date)
                                                             }
-      scope :open_enrollment_begin_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
+      scope :open_enrollment_begin_on,        ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"open_enrollment_period.min" => compare_date)
                                                             }
       scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                               :"open_enrollment_period.max" => compare_date)
+                                                            }
+      scope :benefit_terminate_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                              :"terminated_on" => compare_date)
                                                             }
       # TODO
       scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }

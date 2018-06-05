@@ -22,7 +22,6 @@ class HbxEnrollmentListSponsorCostCalculator
 		def each
 			@hbx_enrollment_id_list.each_slice(200) do |heidl|
         search_criteria(heidl).each do |agg_result|
-          puts agg_result["hbx_enrollment"]["product_id"].inspect
           yield rosterize_hbx_enrollment(agg_result)
         end
 			end
@@ -45,7 +44,7 @@ class HbxEnrollmentListSponsorCostCalculator
 							"effective_on" => "$households.hbx_enrollments.effective_on",
 							"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
 							"_id" => "$households.hbx_enrollments._id",
-							"product_id" => "$households.hbx_enrollments.plan_id"
+							"product_id" => "$households.hbx_enrollments.product_id"
 						},
 						"family_members" => 1,
 						"people_ids" => {
@@ -108,7 +107,7 @@ class HbxEnrollmentListSponsorCostCalculator
       )
       member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
                 member_id: sub_member["_id"],
-                coverage_eligibility_on: sub_member["effective_on"]
+                coverage_eligibility_on: sub_member["coverage_start_on"]
       })
 			dep_members.each do |dep_member|
 				person_id = family_people_ids[dep_member["applicant_id"]]
@@ -121,7 +120,7 @@ class HbxEnrollmentListSponsorCostCalculator
 				)
         member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
                 member_id: dep_member["_id"],
-                coverage_eligibility_on: dep_member["effective_on"]
+                coverage_eligibility_on: dep_member["coverage_start_on"]
         })
 			end
 			group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(

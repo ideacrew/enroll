@@ -1,9 +1,0 @@
---- !ruby/object:BenefitMarkets::Locations::CountyZip
-attributes: !ruby/hash:BSON::Document
-  _id: !ruby/object:BSON::ObjectId
-    raw_data: !binary |-
-      WwROGXIhPTb5Zogo
-  zip: 02495
-  county_name: Middlesex
-  state: MA
-__selected_fields: 
