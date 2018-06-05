@@ -24,7 +24,7 @@ module BenefitSponsors
                  end
     end
 
-    def order_by({})
+    def order_by(v={})
       self
     end
 
