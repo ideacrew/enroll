@@ -28,7 +28,7 @@ class PlanSelection
   end
 
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
-    hbx_enrollment.update_current(plan_id: plan.id)
+    hbx_enrollment.update_current(product_id: plan.id)
     # hbx_enrollment.inactive_related_hbxs
     # hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
 
@@ -57,7 +57,7 @@ class PlanSelection
   end
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)
-    plan = Plan.find(plan_id)
+    plan = BenefitMarkets::Products::Product.find(plan_id)
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
     self.new(hbx_enrollment, plan)
   end
@@ -122,11 +122,7 @@ class PlanSelection
   end
 
   def previous_active_coverages
-    if hbx_enrollment.is_shop?
-      coverage_year_start = hbx_enrollment.benefit_group.start_on
-    else
-      coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
-    end
+    coverage_year_start = hbx_enrollment.effective_on.year
 
     family.active_household.hbx_enrollments.where({
       :_id.ne => hbx_enrollment.id,

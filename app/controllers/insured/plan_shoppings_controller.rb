@@ -44,7 +44,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def receipt
     @enrollment = HbxEnrollment.find(params.require(:id))
-    plan = @enrollment.plan
+    @plan = @enrollment.product
 
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
@@ -54,7 +54,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @market_kind = "individual"
     end
 
-    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -65,10 +65,18 @@ class Insured::PlanShoppingsController < ApplicationController
     send_receipt_emails if @person.emails.first
   end
 
+  def fix_member_dates(enrollment, plan)
+    return if enrollment.parent_enrollment.present? && plan.id == enrollment.parent_enrollment.product_id
+
+    @enrollment.hbx_enrollment_members.each do |member|
+      member.coverage_start_on = enrollment.effective_on
+    end
+  end
+
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
-    @plan = Plan.find(params.require(:plan_id))
+    @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
 
@@ -78,8 +86,10 @@ class Insured::PlanShoppingsController < ApplicationController
       get_aptc_info_from_session(@enrollment)
     end
 
-    @enrollment.reset_dates_on_previously_covered_members(@plan)
-    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    # TODO Fix this stub
+    #@plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+
     @family = @person.primary_family
 
     #FIXME need to implement can_complete_shopping? for individual
@@ -87,7 +97,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
+    #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
@@ -182,6 +192,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     render "show_slug"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
+
 =begin
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)

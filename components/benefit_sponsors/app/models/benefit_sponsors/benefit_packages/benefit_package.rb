@@ -57,6 +57,10 @@ module BenefitSponsors
         end
       end
 
+      def open_enrollment_contains?(date)
+        open_enrollment_period.include?(date)
+      end
+
       def package_for_open_enrollment(shopping_date)
         if open_enrollment_period.include?(shopping_date)
           return self

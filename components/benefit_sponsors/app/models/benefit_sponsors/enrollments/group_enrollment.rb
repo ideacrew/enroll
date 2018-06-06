@@ -45,5 +45,10 @@ module BenefitSponsors
       })
     end
 
+    def employee_cost_total
+      product_cost_total - sponsor_contribution_total
+    end
+
+    alias total_employee_cost employee_cost_total
   end
 end
