@@ -86,6 +86,8 @@ function processValues(element) {
 function clearAll() {
   // Clears all checkboxes within #filter-sidebar only
   var inputs = document.querySelectorAll("#filter-sidebar input");
+  // Clears slections from view
+  clearSelections()
   
   for(var i = 0; i < inputs.length; i++) {
       inputs[i].checked = false;
