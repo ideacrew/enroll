@@ -179,6 +179,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @metal_levels = %w[platinum gold silver bronze catastrophic]
     @plan_types = %w[HMO PPO POS]
     @networks = %w[nationwide]
+    @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     render "show_slug"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
 =begin
