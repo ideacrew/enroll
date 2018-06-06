@@ -5,7 +5,7 @@ class MigrateInvoicesToEmployerProfile < MongoidMigrationTask
     
     Organization.all_employer_profiles.each do |org|
       begin
-        invoices = org.documents.select{ |invoice| invoice.subject == "invoice" }
+        invoices = org.documents.select{ |invoice| ["invoice", "initial_invoice"].include? invoice.subject }
         next if invoices.empty?
         puts "Found #{invoices.count} invoices for employer #{org.fein}"
         invoices.each do |invoice|
@@ -13,7 +13,7 @@ class MigrateInvoicesToEmployerProfile < MongoidMigrationTask
         end
         org.save!
         org.reload
-        org.documents.select{ |invoice| (invoice.subject == "invoice") && (org.employer_profile.documents.include?(invoice)) }.each{|doc| doc.delete}
+        org.documents.select{ |invoice| (["invoice", "initial_invoice"].include? invoice.subject) && (org.employer_profile.documents.include?(invoice)) }.each{|doc| doc.delete}
         puts "Successfully migrated invoices from Organization to employer_profile for FEIN: #{org.fein}"
       rescue Exception => e
         log("#{e.message}; for employer with FEIN: #{org.fein}")

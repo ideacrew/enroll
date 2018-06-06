@@ -193,7 +193,7 @@ class Organization
   end
 
   def invoices
-    employer_profile.documents.select{ |document| document.subject == 'invoice' }
+    employer_profile.documents.select{ |document| ["invoice", "initial_invoice"].include? document.subject }
   end
 
   def current_month_invoice
