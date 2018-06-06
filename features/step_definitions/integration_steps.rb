@@ -877,7 +877,7 @@ end
 
 When(/^.+ clicks? on the add employee button$/) do
   evaluate_script(<<-JSCODE)
-  $('.interaction-click-control-add-employee')[0].click()
+  $('.interaction-click-control-add-new-employee')[0].click()
   JSCODE
   wait_for_ajax
 end

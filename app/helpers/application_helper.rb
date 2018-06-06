@@ -170,6 +170,11 @@ module ApplicationHelper
     test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
   end
 
+  # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
+  def prepend_glyph_to_text(test)
+    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
+  end
+
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
   def number_to_ssn(number)
     return unless number
@@ -244,6 +249,7 @@ module ApplicationHelper
 
     if f.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
+      new_object.build_composite_tier_contributions
       new_object.build_dental_relationship_benefits
     end
 

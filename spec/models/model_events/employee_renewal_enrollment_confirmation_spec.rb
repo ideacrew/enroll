@@ -62,7 +62,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         allow_any_instance_of(PlanYear).to receive(:eligible_to_enroll_count).and_return(1)
         allow_any_instance_of(PlanYear).to receive(:non_business_owner_enrolled).and_return(["rspec1", "rspec2"])
         allow_any_instance_of(PlanYear).to receive(:enrollment_ratio).and_return(2)
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.renewal_employer_open_enrollment_completed"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
@@ -70,7 +70,7 @@ describe 'ModelEvents::RenewalApplicationSubmittedNotification' do
         end
 
         employer.census_employees.non_terminated.each do |ce|
-          expect(subject).to receive(:notify) do |event_name, payload|
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employee.renewal_employee_enrollment_confirmation"
             expect(payload[:employee_role_id]).to eq ce.employee_role_id.to_s
             expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
