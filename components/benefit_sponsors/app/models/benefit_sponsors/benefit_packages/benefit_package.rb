@@ -33,6 +33,7 @@ module BenefitSponsors
       delegate :recorded_rating_area, to: :benefit_application
       delegate :benefit_sponsorship, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
+      delegate :benefit_market, to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
 
@@ -90,6 +91,18 @@ module BenefitSponsors
         sponsored_benefits << new_sponsored_benefit
       end
 
+      def health_sponsored_benefit
+        sponsored_benefits.where(_type: /.*HealthSponsoredBenefit/).first
+      end
+
+      def dental_sponsored_benefit
+        sponsored_benefits.where(_type: /.*DentalSponsoredBenefit/).first
+      end
+
+      def rating_area
+        recorded_rating_area.blank? ? benefit_group.benefit_sponsorship.rating_area : recorded_rating_area
+      end
+      
       def drop_sponsored_benefit(sponsored_benefit)
         sponsored_benefits.delete(sponsored_benefit)
       end
