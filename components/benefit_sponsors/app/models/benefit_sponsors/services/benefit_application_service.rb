@@ -34,6 +34,7 @@ module BenefitSponsors
         model_attributes = form_params_to_attributes(form)
         find_benefit_sponsorship(form)
         benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
+
         store(form, benefit_application)
       end
 
@@ -80,7 +81,7 @@ module BenefitSponsors
       # TODO: Test this query for benefit applications cca/dc
       # TODO: Change it back to find once find method on BenefitApplication is fixed.
       def find_model_by_id(id)
-        BenefitSponsors::BenefitApplications::BenefitApplication.where(id: id).first
+        BenefitSponsors::BenefitApplications::BenefitApplication.find(id)
       end
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
@@ -135,8 +136,9 @@ module BenefitSponsors
           return [false, nil]
         end
 
-        save_successful = benefit_application.save
-        unless save_successful 
+        if save_successful = benefit_application.save
+          benefit_application.benefit_sponsor_catalog.save
+        else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
         end
