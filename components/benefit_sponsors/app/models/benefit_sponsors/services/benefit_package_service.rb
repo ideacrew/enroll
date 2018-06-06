@@ -2,7 +2,7 @@ module BenefitSponsors
   module Services
     class BenefitPackageService
 
-      attr_reader :benefit_package_factory, :benefit_application, :employer_profile
+      attr_reader :benefit_package_factory, :benefit_application, :employer_profile, :benefit_package
 
       def initialize(factory_kind = BenefitSponsors::BenefitPackages::BenefitPackageFactory)
         @benefit_package_factory = factory_kind
@@ -17,13 +17,15 @@ module BenefitSponsors
       def load_form_metadata(form)
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
-        form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
       end
 
-      def load_form_params_from_resource(form)
+      def load_form_params_from_resource(form, load_benefit_application_form)
         application  = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
+        if load_benefit_application_form
+          form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
+        end
         attributes_to_form_params(benefit_package, form)
       end
 
@@ -55,7 +57,8 @@ module BenefitSponsors
       # TODO: Test this query for benefit applications cca/dc
       # TODO: Change it back to find once find method on BenefitApplication is fixed.
       def find_model_by_id(id)
-        @benefit_application.benefit_packages.find(id)
+        return @benefit_package if defined? @benefit_package
+        @benefit_package = @benefit_application.benefit_packages.find(id)
       end
 
       # TODO: Change it back to find once find method on BenefitSponsorship is fixed.
@@ -98,6 +101,7 @@ module BenefitSponsors
           title: benefit_package.title,
           description: benefit_package.description,
           probation_period_kind: benefit_package.probation_period_kind,
+          probation_period_display_name: benefit_package.probation_period_display_name,
           sponsored_benefits: sponsored_benefits_attributes_to_form_params(benefit_package)
         }
 

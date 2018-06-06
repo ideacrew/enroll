@@ -58,7 +58,7 @@ module EnrollmentShopping
 			enrollment
 		end
 
-    def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: optional_effective_on)
+    def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: nil)
 			enrollment = @household.hbx_enrollments.build
 			enrollment.coverage_household_id = @coverage_household.id
 			enrollment.kind = "employer_sponsored"

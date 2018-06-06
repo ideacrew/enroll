@@ -2,6 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::StaffRoleService, type: :model, :dbclean => :after_each do
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
     let!(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}

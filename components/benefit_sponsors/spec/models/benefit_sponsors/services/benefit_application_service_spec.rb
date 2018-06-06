@@ -34,6 +34,9 @@ module BenefitSponsors
         }
       end
 
+      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application) }
       let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
       let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }

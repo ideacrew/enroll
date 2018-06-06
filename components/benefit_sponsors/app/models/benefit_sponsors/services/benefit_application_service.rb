@@ -20,7 +20,14 @@ module BenefitSponsors
 
       def load_form_params_from_resource(form)
         benefit_application = find_model_by_id(form.id)
+        load_benefit_packages_form(form, benefit_application)
         attributes_to_form_params(benefit_application, form)
+      end
+
+      def load_benefit_packages_form(form, benefit_application)
+        benefit_application.benefit_packages.each do |benefit_package|
+          form.benefit_packages << BenefitSponsors::Forms::BenefitPackageForm.for_edit({id: benefit_package.id.to_s, benefit_application_id: benefit_application.id.to_s}, false)
+        end
       end
   
       def save(form)

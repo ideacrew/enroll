@@ -62,6 +62,7 @@ module BenefitSponsors
       it 'should succesfully assigns broker agency to the employer_profile' do
         expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).not_to eq []
         subject.terminate_agencies(broker_management_form_terminate)
+        employer_profile.active_benefit_sponsorship.reload
         expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).to eq []
       end
     end

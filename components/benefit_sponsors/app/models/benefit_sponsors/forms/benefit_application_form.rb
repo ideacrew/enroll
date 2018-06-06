@@ -14,6 +14,7 @@ module BenefitSponsors
       attribute :fte_count, Integer, default: 0
       attribute :pte_count, Integer, default: 0
       attribute :msp_count, Integer, default: 0
+      attribute :benefit_packages, Array[BenefitSponsors::Forms::BenefitPackageForm]
 
       attribute :id, String
       attribute :benefit_sponsorship_id, String

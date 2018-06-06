@@ -20,7 +20,7 @@
         </div>
       </div>
 
-      <%= form_tag profiles_employers_employer_profile_premium_statements_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
+      <%= form_tag profiles_employers_employer_profile_coverage_reports_path(@employer_profile), :remote => true, :method => :get, :id => 'billing_date_form' do %>
         <%= hidden_field_tag 'billing_date', @billing_date.strftime("%m/%d/%Y") %>
       <% end %>
 
@@ -33,7 +33,7 @@
         <% @billing_date ||= TimeKeeper.date_of_record # TODO %>
         <h3 style="margin: 5px 0;">Enrollment Report <%= @billing_date.beginning_of_month %> - <%= @billing_date.end_of_month %></h3>
         <div class="text-danger">This is not an invoice.</div>
-        <%= button_to 'Download', profiles_employers_employer_profile_premium_statements_path(@employer_profile, format: :csv), method: :get, params: { billing_date: @billing_date.strftime("%m/%d/%Y")}, class: 'btn btn-default buttons-csv buttons-html5 interaction-click-control-csv' %>
+        <%= button_to 'Download', profiles_employers_employer_profile_coverage_reports_path(@employer_profile, format: :csv), method: :get, params: { billing_date: @billing_date.strftime("%m/%d/%Y")}, class: 'btn btn-default buttons-csv buttons-html5 interaction-click-control-csv' %>
           </div>
         </div>
       </div>

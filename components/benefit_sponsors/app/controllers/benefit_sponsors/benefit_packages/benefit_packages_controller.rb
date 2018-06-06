@@ -19,7 +19,7 @@ module BenefitSponsors
       end
 
       def edit
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.permit(:id, :benefit_application_id))
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.permit(:id, :benefit_application_id), true)
       end
 
       def update
@@ -27,7 +27,11 @@ module BenefitSponsors
 
         if @benefit_package_form.update
           flash[:notice] = "Benefit Package successfully updated."
-          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
+          if params[:add_new_benefit_package] == "true"
+            redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application)
+          else
+            redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
+          end
         else
           flash[:error] = error_messages(@benefit_package_form)
           render :edit

@@ -1,6 +1,6 @@
 //Clear filter selections on page refresh
 window.addEventListener('load', function() {
-  //clearAll();
+  clearAll();
 })
 
 // Stores values to be processed on function filterResults
@@ -86,6 +86,8 @@ function processValues(element) {
 function clearAll() {
   // Clears all checkboxes within #filter-sidebar only
   var inputs = document.querySelectorAll("#filter-sidebar input");
+  // Clears slections from view
+  clearSelections()
   
   for(var i = 0; i < inputs.length; i++) {
       inputs[i].checked = false;
@@ -109,7 +111,7 @@ function clearAll() {
 
 // Gets the filtered Results
 function filterResults() {
-  console.log(filterParams)
+  filterResultsSelections(filterParams)
 }
 
 // Removes an item from array
