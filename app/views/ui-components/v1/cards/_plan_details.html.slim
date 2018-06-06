@@ -49,8 +49,12 @@
                 - plan_level = plan.metal_level_kind.to_s.humanize
                 span class="#{plan_level.downcase}-icon"
                   = plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize
-              td = false ? "Nationwide" : "DC-Metro"
-              td = "DEDUCTABLE WILL GO HERE"
+              td Nationwide
+              td 
+                - if @hbx_enrollment.hbx_enrollment_members.size > 1
+                  = plan.family_deductible
+                - else
+                  = plan.deductoble
     .row
       .col-xs-3
         .checkbox.no-buffer

@@ -18,7 +18,11 @@ module BenefitSponsors
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
     let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
-    let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship) }
+    let!(:benefit_application) { 
+      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship) 
+      application.benefit_sponsor_catalog.save!
+      application
+    }
     let!(:benefit_application_id) { benefit_application.id.to_s }
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile }
     let!(:product_package_kind) { :single_issuer }

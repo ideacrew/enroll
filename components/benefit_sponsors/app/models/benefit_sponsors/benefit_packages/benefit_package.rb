@@ -35,7 +35,7 @@ module BenefitSponsors
       delegate :recorded_service_area_ids, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
 
-      validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
+      validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
       # calculate effective on date based on probation period kind
       # Logic to deal with hired_on and created_at

@@ -16,8 +16,8 @@
         - pricing_deter.pricing_determination_tiers.each do |deter_tier|
           %composite_rating_tier
             %tier_name= "urn:openhbx:terms:v1:composite_rating_tier#" + deter_tier.pricing_unit.name
-            %premium= ctc.price
-            %contribution_percent= ctc.employer_contribution_percent #todo
+            %premium= deter_tier.price
+            %contribution_percent= deter_tier.sponsor_contribution_factor
   - else
     %relationship_benefits
       = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits

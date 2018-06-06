@@ -3,7 +3,7 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
+    belongs_to :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
     field :effective_date,          type: Date
     field :effective_period,        type: Range
