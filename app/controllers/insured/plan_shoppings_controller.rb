@@ -156,7 +156,8 @@ class Insured::PlanShoppingsController < ApplicationController
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      max_available_aptc = @tax_household.eligibility_determinations.last.max_available_aptc.to_f
+      @max_aptc = max_available_aptc > 0 ? max_available_aptc : @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     else

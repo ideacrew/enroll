@@ -50,10 +50,17 @@ class Admin::Aptc < ApplicationController
           if months.include?(key) || max_aptc_vals_array.count == 1
             max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
           else 
+            
             previous_max_aptc = max_aptc_vals_array.first.to_f
-            remaining_available_aptc = previous_max_aptc.to_f - total_aptc_applied_vals_for_household[key].to_f
+            if total_aptc_applied_vals_for_household[key].to_f > value.to_f
+              remaining_available_aptc = available_aptc_value.to_f - total_aptc_applied_vals_for_household[key].to_f
+            else
+              remaining_available_aptc = available_aptc_value.to_f
+              # remaining_available_aptc = previous_max_aptc - total_aptc_applied_vals_for_household[key].to_f
+              # remaining_available_aptc = available_aptc_value.to_f + remaining_available_aptc
+            end
             remaining_available_aptc = remaining_available_aptc > 0 ? remaining_available_aptc : 0
-            max_aptc_vals[key] = '%.2f' % (available_aptc_value + remaining_available_aptc) if value.to_f == max_aptc
+            max_aptc_vals[key] = '%.2f' % (remaining_available_aptc) if value.to_f == max_aptc
           end
         end
       else
@@ -301,7 +308,7 @@ class Admin::Aptc < ApplicationController
     end
 
     # Redetermine Eligibility on Max APTC / CSR Update.
-    def redetermine_eligibility_with_updated_values(family, params, hbxs, year)
+    def redetermine_eligibility_with_updated_values(family, params, hbxs, year, max_available_aptc = 0)
       eligibility_redetermination_result = false
       latest_eligibility_determination = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination
       max_aptc = latest_eligibility_determination.max_aptc
@@ -325,7 +332,8 @@ class Admin::Aptc < ApplicationController
                                                         "max_aptc"                      => params[:max_aptc].to_f,
                                                         "benchmark_plan_id"             => latest_eligibility_determination.benchmark_plan_id,
                                                         "e_pdc_id"                      => latest_eligibility_determination.e_pdc_id,
-                                                        "source"                        => "Admin"
+                                                        "source"                        => "Admin",
+                                                        "max_available_aptc"            => max_available_aptc
                                                        }).save!
         eligibility_redetermination_result = true
       end

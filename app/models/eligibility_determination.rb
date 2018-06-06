@@ -27,6 +27,7 @@ class EligibilityDetermination
   # Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)
   field :max_aptc, type: Money, default: 0.00
   field :premium_credit_strategy_kind, type: String
+  field :max_available_aptc, type: Money, default: 0.00
 
   # Cost-sharing reduction assistance subsidies reduce out-of-pocket expenses by raising
   #   the plan actuarial value (the average out-of-pocket costs an insurer pays on a plan)
