@@ -15,6 +15,11 @@ module BenefitSponsors
         return @pricing_unit if defined? @pricing_unit
         @pricing_unit = pricing_model.find_by_pricing_unit(pricing_unit_id)
       end
+
+      # FIXME: This exists only because it is needed by the legacy xml
+      def contribution_percent
+        pricing_determination.sponsored_benefit.sponsor_contribution
+      end
     end
   end
 end
