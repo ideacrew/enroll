@@ -42,52 +42,6 @@
            <% end %>
           </div>
         </div>
-        <div class="col-xs-10">
-          <div class="row">
-            <!--  non javascript click when clicked on new employee -->
-            <!-- javascript click when clicked on new employee -->
-            <%#= pundit_span(EmployerProfile, :updateable?) %>
-              <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add New Employee".html_safe, main_app.new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
-              <%#= link_to "<i class='fa fa-file-text-o' aria-hidden='true'></i> Upload Employee Roster".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-default" %>
-            </span>
-            <%#= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe, employers_employer_profile_export_census_employees_path(@employer_profile, format: :csv), class: "btn btn-default" %>
-
-          </div>
-        </div>
-
-        <div class="col-xs-2" id="employees-filter">
-
-          <div class="filter" onclick="$(this).closest('.col-xs-2').find('.filter-options').toggle();">
-            <span id='filter-span'>Active </span><i class="fa fa-chevron-down"></i>
-          </div>
-          <div class="filter-options">
-            <h4>Filter By <i class="fa fa-chevron-up"></i></h4>
-            <div class="form-inline button-group-wrapper">
-              <div aria-label="" class="btn-group" role="group">
-                <div class="btn-group" data-toggle="buttons" name="employee_family_tabs">
-                  <label class="btn btn-default active">
-                    <input autocomplete="off" checked id="terminated_no" name="options" type="radio" value="active">
-                    Active
-                  </label>
-                  <label class="btn btn-default">
-                    <input autocomplete="off" id="terminated_yes" name="options" type="radio" value="terminated">
-                    Terminated
-                  </label>
-                  <label class="btn btn-default">
-                    <input autocomplete="off" id="family_all" name="options" type="radio" value="all">
-                    All
-                  </label>
-                  <label class="btn btn-default">
-                    <input autocomplete="off" id="cobra" name="options" type="radio" value="cobra">
-                    COBRA Continuation
-                  </label>
-                </div>
-              </div>
-              <span name="employee_families_url" style="display:none"><%= main_app.employers_employer_profile_path(@employer_profile) %></span>
-            </div>
-          </div>
-
-          </div>
       <% end %>
     </div>
     <% if @employer_profile.census_employees.count > 0 %>
