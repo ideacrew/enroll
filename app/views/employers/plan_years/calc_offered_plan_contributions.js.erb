@@ -70,6 +70,7 @@ $("#<%= @location_id %> <%= @coverage_type %> <%= @coverage_type %>-view-summary
 $(".change-dental-reference-plan").show();
 
 if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+
   if ( '<%= @coverage_type %>' == '.dental' ) {
     $("#<%= @location_id %> .dental .change-dental-reference-plan").on('click', function() {
       $("#<%= @location_id %> .dental .nav-tabs input[type=radio]").removeAttr('checked');
@@ -103,17 +104,19 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
      $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
 
      var start_on = $("#plan_year_start_on").val().substr(0,4);
-     var selected_carrier_level = $('.health .nav li input:checked').val();
+     var selected_carrier_level = $(this).closest('.benefit-group-fields').find('.health .nav li input:checked').val();
      var employer_profile_id = $('#employerProfileId').data('value');
      var benefit_group_id = $('#benefitGroupId').data('value');
      var location_id = $('.health .nav li:visible').closest('fieldset').attr('id');
+     var panel_id = $(this).closest('fieldset').attr('data-benefit-group');
      $.ajax({
        type: "GET",
        data:{
          start_on: start_on,
          selected_carrier_level: selected_carrier_level,
          benefit_group: benefit_group_id,
-         location_id: location_id
+         location_id: location_id,
+         panel_id: panel_id
        },
        url: "/employers/employer_profiles/" + employer_profile_id + "/plan_years/generate_health_carriers_and_plans"
      });
