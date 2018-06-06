@@ -156,11 +156,6 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
-    ip_lookup_table = {}
-    issuer_profile_cache = ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |ipo|
-      ip_lookup_table[ipo.issuer_profile.id] = ipo.issuer_profile
-    end
-    ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
@@ -170,11 +165,21 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
+    ip_lookup_table = {}
+    @issuer_profiles = []
+    ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |ipo|
+      if @issuer_profile_ids.include?(ipo.issuer_profile.id)
+        @issuer_profiles << ipo.issuer_profile
+        ip_lookup_table[ipo.issuer_profile.id] = ipo.issuer_profile
+      end
+    end
+    ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     @member_groups = sponsored_cost_calculator.groups_for_products(products)
     @enrolled_hbx_enrollment_plan_ids = []
     @metal_levels = %w[platinum gold silver bronze catastrophic]
     @plan_types = %w[HMO PPO POS]
     @networks = %w[nationwide]
+    @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     render "show_slug"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
 =begin

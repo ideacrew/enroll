@@ -18,7 +18,15 @@ module Importers::Mhc
 
     def fetch_application_params
       service = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      formed_params = service.default_dates_for_coverage_starting_on(default_plan_year_start)
+
+      plan_year_begin = default_plan_year_start
+      if mid_year_conversion
+        if orginal_plan_year_begin_date > default_plan_year_start
+          plan_year_begin = orginal_plan_year_begin_date
+        end
+      end
+
+      formed_params = service.default_dates_for_coverage_starting_on(plan_year_begin)
       
       if mid_year_conversion
         effective_period = formed_params[:effective_period]

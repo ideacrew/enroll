@@ -18,7 +18,11 @@ module BenefitSponsors
         if coverage_start.month <= @default_plan_year_start.month
           corrected_coverage_start = coverage_start.change(year: @default_plan_year_start.year)
         else
-          corrected_coverage_start = coverage_start.change(year: (@default_plan_year_start.year - 1))
+          if coverage_start > @default_plan_year_start
+            corrected_coverage_start = coverage_start
+          else
+            corrected_coverage_start = coverage_start.change(year: (@default_plan_year_start.year - 1))
+          end
         end
 
         @orginal_plan_year_begin_date = corrected_coverage_start
