@@ -8,6 +8,7 @@ module BenefitMarkets
       field :hios_id,                     type: String
       field :hios_base_id,                type: String
       field :csr_variant_id,              type: String
+      field :hsa_eligibility,             type: Boolean,  default: false
 
     end
   end
