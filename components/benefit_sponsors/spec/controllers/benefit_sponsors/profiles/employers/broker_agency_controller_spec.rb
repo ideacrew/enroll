@@ -4,6 +4,7 @@ module BenefitSponsors
   RSpec.describe Profiles::Employers::BrokerAgencyController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile)}
     let(:employer_profile) { organization.employer_profile }
