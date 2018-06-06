@@ -434,6 +434,10 @@ class HbxEnrollment
     terminated_on >= TimeKeeper.date_of_record
   end
 
+  def active_during?(date)
+    false
+  end
+
   def is_active?
     self.is_active
   end
