@@ -28,17 +28,14 @@ module BenefitSponsors
         (contribution_factor * 100)
       end
 
+      def offered?
+        is_offered
+      end
+
       def contribution_unit
         return @contribution_unit if defined? @contribution_unit
         @contribution_unit = contribution_model.find_contribution_unit(contribution_unit_id)
       end
-
-      NAMES = [
-          "employee_only",
-          "employee_and_spouse",
-          "employee_and_one_or_more_dependents",
-          "family"
-      ]
     end
   end
 end

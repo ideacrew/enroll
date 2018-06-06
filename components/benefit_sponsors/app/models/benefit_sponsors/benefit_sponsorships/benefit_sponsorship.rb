@@ -352,6 +352,10 @@ module BenefitSponsors
         broker_agency_accounts.detect { |baa| baa.is_active }
       end
 
+      def is_conversion?
+        source_kind == :conversion
+      end
+
       private
 
       def set_service_and_rating_areas

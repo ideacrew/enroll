@@ -49,6 +49,10 @@ module BenefitSponsors
         # do nothing
       end
 
+      def single_plan_type?
+        product_package_kind == :single_product
+      end
+
       def products(coverage_date)
         lookup_package_products(coverage_date)
       end
