@@ -10,7 +10,7 @@ module BenefitSponsors
       result_file = File.open(File.join(Rails.root, "conversion_employee_policy_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
 
       if Settings.site.key == :cca
-        importer = BenefitSponsors::Importers::Mhc::ConversionEmployeePolicySet.new(in_file, result_file, config["conversions"]["employee_policies_date"], config["conversions"]["employee_policy_year"])
+        importer = BenefitSponsors::Importers::Mhc::ConversionEmployeePolicySet.new(in_file, result_file, config)
       else
         importer = Importers::ConversionEmployeePolicySet.new(in_file, result_file, config["conversions"]["employee_policies_date"], config["conversions"]["employee_policy_year"])
       end

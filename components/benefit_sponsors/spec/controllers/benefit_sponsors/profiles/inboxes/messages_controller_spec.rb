@@ -4,6 +4,7 @@ module BenefitSponsors
   RSpec.describe Inboxes::MessagesController, type: :controller, dbclean: :after_all do
 
     routes {BenefitSponsors::Engine.routes}
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)}
 

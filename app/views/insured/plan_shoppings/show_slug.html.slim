@@ -79,7 +79,7 @@ javascript:
   var carriers = document.getElementById('filteredPlans').dataset.carriers;
   var filterType = String;
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
-    
+     
   // Grabs available products as JSON for filtering onload
   (function() {
     document.getElementById('filteredPlans').classList.add('hidden');
@@ -161,45 +161,47 @@ javascript:
     }
     showFilteredResults()
   }
-  
+  // Filters based on Metal Level
   function filterResultsSelections(selections) {
-    filteredResultsArray = [];
+    var resultsArray = [];
     
     metalLevels = selections.selectedMetalLevels;
     if (metalLevels) {
        metalLevels.forEach(function(metalLevel) {
          availableEnrollments.forEach(function(enrollment) {
            if (enrollment.product.metal_level_kind.toLowerCase() == metalLevel.toLowerCase()) {
-             return;
+             resultsArray.push(enrollment);
            }
          })
        })
     }
-    
+    // Filters based on Plan Type
     planTypes = selections.selectedPlanTypes;
     if (planTypes) {
       planTypes.forEach(function(plan) {
         availableEnrollments.forEach(function(enrollment) {
           if (enrollment.product.health_plan_kind.toLowerCase() == plan.toLowerCase()) {
-            return;
+            resultsArray.push(enrollment);
           }
         })
       })
     }
-    /* Missing From array
-    networks = selections.selectedPlanNetworks;
-    if (networks) {
-      networks.forEach(function(network) {
-        availableEnrollments.forEach(function(enrollment) {
-          if (enrollment.product.health_plan_kind.toLowerCase() == network.toLowerCase()) {
-            return;
-          }
-        })
-      })
-    }
-    */
-    console.log(selections)
+    // Filters based on Premium Amount
+    premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
+    premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
     
+    availableEnrollments.filter(function(enrollment) {
+      premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
+      if (premiumTotal >= premiumFrom && premiumTotal <= premiumTo) {
+        resultsArray.push(enrollment);
+      }
+    })
+    // Removes duplicates from results array
+    filteredArray = removeDuplicates(resultsArray)
+    // Shows results in the view
+    clearSelections();
+    applyFilter();
+    showFilteredResults()
   }
   
   function showFilteredResults() {
@@ -232,4 +234,11 @@ javascript:
       element.append(div)
       //console.log(result)
     });
+  }
+  
+  function removeDuplicates(data) {
+    return data.filter((item, index,arr)=>{
+      const c = arr.map(item=> item.product_cost_total);
+      return  index === c.indexOf(item.product_cost_total)
+    })
   }

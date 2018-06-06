@@ -17,7 +17,7 @@ FactoryGirl.define do
     pricing_model { create(:benefit_markets_pricing_models_pricing_model) }
 
     transient do
-      number_of_products 5
+      number_of_products 2
     end
 
     after(:build) do |product_package, evaluator|

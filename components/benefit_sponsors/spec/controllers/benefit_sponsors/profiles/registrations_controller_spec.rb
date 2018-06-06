@@ -4,6 +4,7 @@ module BenefitSponsors
   RSpec.describe Profiles::RegistrationsController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
@@ -218,7 +219,7 @@ module BenefitSponsors
           before do
             sign_in user
             address_attributes.merge!({
-              kind: nil  
+              kind: nil
             })
             post :create, :agency => self.send("#{profile_type}_params")
           end

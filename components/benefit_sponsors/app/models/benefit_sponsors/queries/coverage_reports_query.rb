@@ -8,12 +8,12 @@ module BenefitSponsors
       end
 
       def execute
-        return [[]] if application.nil?
+        return coverage_report_adapter([]) if application.nil?
         @collection = []
 
         s_benefits = application.benefit_packages.map(&:sponsored_benefits).flatten
         criteria = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit)] }.reject { |pair| pair.last.nil? }
-        BenefitSponsors::LegacyCoverageReportAdapter.new(criteria)
+        coverage_report_adapter(criteria)
       end
 
       def query(s_benefit)
@@ -41,6 +41,10 @@ module BenefitSponsors
         return @billing_adapter if defined? @billing_adapter
         billing_info = @employer_profile.billing_plan_year(@billing_date)
         @billing_adapter = {:application => billing_info[0], :billing_date => billing_info[1]}
+      end
+
+      def coverage_report_adapter(criteria)
+        BenefitSponsors::LegacyCoverageReportAdapter.new(criteria)
       end
     end
   end

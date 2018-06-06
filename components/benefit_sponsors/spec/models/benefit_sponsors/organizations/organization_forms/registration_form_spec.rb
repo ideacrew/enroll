@@ -3,8 +3,7 @@ require 'rails_helper'
 module BenefitSponsors
 
   RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :after_each do
-
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :cca) }
     subject { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
 
     describe '#for_new' do
@@ -42,6 +41,7 @@ module BenefitSponsors
     end
 
     shared_examples_for "should validate create_form and save profile" do |profile_type|
+      let!(:security_question)  { FactoryGirl.create_default :security_question }
 
       let(:params) do
         {"profile_type"=>"#{profile_type}",
@@ -74,6 +74,16 @@ module BenefitSponsors
                   "contact_method"=>"paper_and_electronic"}},
          "profile_id"=>nil,
          "current_user_id"=> profile_type == "benefit_sponsor" ? FactoryGirl.create(:user).id: nil}
+      end
+
+      before :each do
+        params["organization"]["profile_attributes"].merge!(
+            {
+              "ach_account_number" => "1234567890",
+              "ach_routing_number" => "011000015",
+              "ach_routing_number_confirmation" => "011000015"
+            }
+        ) if profile_type == 'broker_agency'
       end
 
       let!(:create_form) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create params }
@@ -114,6 +124,7 @@ module BenefitSponsors
     end
 
     describe '##for_edit' do
+      let!(:security_question)  { FactoryGirl.create_default :security_question }
 
       let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
       let!(:employer_profile) {general_org.employer_profile}
@@ -122,6 +133,10 @@ module BenefitSponsors
       let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
       let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
       let(:user) { FactoryGirl.create(:user, :person => person)}
+
+      before :each do
+        broker_agency_profile.update_attributes!(ach_account_number: "1234567890", ach_routing_number: "011000015")
+      end
 
       context "profile_type = benefit_sponsor" do
 
@@ -148,11 +163,6 @@ module BenefitSponsors
           person.save!
         end
 
-        it "update_form should be valid" do
-          edit_form.validate
-          expect(edit_form).to be_valid
-        end
-
         it 'loads the broker agency in to the Registartion Form' do
           expect(edit_form.profile_type).to eql("broker_agency")
           expect(edit_form.organization.legal_name).to eql(broker_agency.legal_name)
@@ -162,7 +172,7 @@ module BenefitSponsors
     end
 
     describe '##for_update' do
-
+      let!(:security_question)  { FactoryGirl.create_default :security_question }
       let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
       let!(:employer_profile) {general_org.employer_profile}
       let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
@@ -222,6 +232,9 @@ module BenefitSponsors
                     {"id"=>broker_agency_profile.id.to_s,
                      "entity_kind"=>"s_corporation",
                      "sic_code"=>"0111",
+                     "ach_account_number"=>"1234567890",
+                     "ach_routing_number"=>"011000015",
+                     "ach_routing_number_confirmation"=>"011000015",
                      "market_kind"=>"shop",
                      "languages_spoken"=>["", "en"],
                      "working_hours"=>"1",

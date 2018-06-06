@@ -14,7 +14,7 @@ module BenefitSponsors
       end
 
       def state_options
-        State::NAME_IDS
+        ::State::NAME_IDS
       end
 
       # provide defaults(if any needed) that were not set on Model

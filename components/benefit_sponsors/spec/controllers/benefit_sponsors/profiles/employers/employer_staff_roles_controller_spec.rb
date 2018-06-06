@@ -4,6 +4,7 @@ module BenefitSponsors
   RSpec.describe Profiles::Employers::EmployerStaffRolesController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
