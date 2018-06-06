@@ -13,6 +13,8 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require "forgery"
 require 'factory_girl_rails'
+require 'test_prof'
+require 'test_prof/recipes/rspec/factory_default'
 require "pry"
 
 FactoryGirl.definition_file_paths = [

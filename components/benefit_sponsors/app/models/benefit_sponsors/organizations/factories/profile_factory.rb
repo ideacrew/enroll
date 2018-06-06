@@ -22,6 +22,7 @@ module BenefitSponsors
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
           organization.assign_attributes(attributes[:organization])
+          organization.update_benefit_sponsorship(organization.employer_profile) if (is_employer_profile? && address_changed?(organization.employer_profile))
           factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
             organization.save!
@@ -87,6 +88,11 @@ module BenefitSponsors
           self.first_name = person.first_name
           self.last_name = person.last_name
           self.dob = person.dob
+        end
+
+        def self.address_changed?(profile)
+          address = profile.primary_office_location.address
+          address.changed_attributes.include?("zip") || address.changed_attributes.include?("county") || address.changed_attributes.include?("state")
         end
 
         def save(attributes)

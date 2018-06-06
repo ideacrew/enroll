@@ -5,6 +5,10 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
+    let!(:benefit_markets_location_rating_area) { FactoryGirl.create_default(:benefit_markets_locations_rating_area) }
+    let!(:benefit_markets_location_service_area) { FactoryGirl.create_default(:benefit_markets_locations_service_area) }
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
+
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let!(:benefit_market) { site.benefit_markets.first }
     let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }

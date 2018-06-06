@@ -3,6 +3,8 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Forms::BenefitPackageForm, type: :model, dbclean: :after_each do
 
+    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
     let(:form_class)     { BenefitSponsors::Forms::BenefitPackageForm }
 
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
@@ -46,7 +48,7 @@ module BenefitSponsors
 
       let(:sponsor_contribution_attributes) {
         {
-        :contribution_levels_attributes => contribution_levels_attributes
+          :contribution_levels_attributes => contribution_levels_attributes
         }
       }
 
@@ -84,7 +86,7 @@ module BenefitSponsors
 
       let(:sponsor_contribution_attributes) {
         {
-        :contribution_levels_attributes => invalid_contribution_levels_attributes
+          :contribution_levels_attributes => invalid_contribution_levels_attributes
         }
       }
 
