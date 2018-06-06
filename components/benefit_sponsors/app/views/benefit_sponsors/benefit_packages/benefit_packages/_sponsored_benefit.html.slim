@@ -1,9 +1,6 @@
+- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false  
+
 .row.health
-  h1.heading-text
-    = @benefit_package_form.id.present? ? 'Health - Edit Benefit Package' : 'Health – Set Up Benefit Package'
-  h4 
-    | Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
-  
   = f.hidden_field :id, value: f.object.id if f.object.id.present?
   
   - unless @benefit_package_form.new_record?
@@ -15,4 +12,6 @@
     .reference_plan_info style='clear: both;'
       h4
       .content
+- unless show_benefit_application_tile == "true"
   = render "./ui-components/v1/cards/metal_level_select", f: f
+- if show_benefit_application_tile == "true"
