@@ -5,7 +5,6 @@ module BenefitSponsors
     include BenefitSponsors::Concerns::RecordTransition
     include AASM
 
-
     embedded_in :benefit_sponsorship,
       class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
@@ -77,6 +76,16 @@ module BenefitSponsors
       @predecessor_application = BenefitSponsorships::BenefitSponsorship.benefit_application_find_by(predecessor_application_id)
     end
 
+    def successor_applications=(applications)
+      self.successor_application_ids = applications.pluck(:_id)
+      @successor_applications = applications
+    end
+
+    def successor_applications
+      return if defined? @successor_applications
+      @successor_applications = benefit_sponsorship.benefit_applications.where(:id.in => successor_application_ids)
+    end
+
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
       raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
       self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
@@ -101,31 +110,12 @@ module BenefitSponsors
       @recorded_rating_area = BenefitMarkets::BenefitSponsorCatalog.find_by(recorded_rating_area_id)
     end
 
-
-
-    # Create a doubly-linked list of application chain:
-    #   predecessor_application is nil if it's the first in an application chain without
-    #   gaps in dates.  Otherwise, it references the preceding application that it replaces
-    #   successor_applications are nil if this is the last in an application chain without
-    #   gaps in dates.  Otherwise, it references the applications which immediately follow.
-    #   An application may have multiple successors, but only one may be active at once
-    belongs_to  :predecessor_application, inverse_of: :successor_applications,
-      class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
-
-    has_many    :successor_applications, inverse_of: :predecessor_application,
-      counter_cache: true,
-      class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
-
     belongs_to  :recorded_rating_area,
       class_name: "::BenefitMarkets::Locations::RatingArea"
 
     has_and_belongs_to_many  :recorded_service_areas,
       class_name: "::BenefitMarkets::Locations::ServiceArea",
       :inverse_of => nil
-
-    belongs_to  :benefit_sponsorship,
-      counter_cache: true,
-      class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
     embeds_one  :benefit_sponsor_catalog,
       class_name: "::BenefitMarkets::BenefitSponsorCatalog"
@@ -430,6 +420,15 @@ module BenefitSponsors
       self
     end
 
+    class << self
+      def find(id)
+        return nil if id.blank?
+        sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find_by(id).first
+        if sponsorship.present?
+          sponsorship.benefit_applications.find(id)
+        end
+      end
+    end
 
     aasm do
       state :draft, initial: true
