@@ -29,7 +29,7 @@ module BenefitMarkets
       field :cobra_epm, as: :cobra_enrollment_period_month, type: Integer, default: 6
       field :gf_new_enrollment_trans, as: :group_file_new_enrollment_transmit_on, type: Integer, default: 16
       field :gf_update_trans_dow, as: :group_file_update_transmit_day_of_week, type: String, default: "friday"
-      field :use_simple_er_cal_model, as: :use_simple_employer_calculation_model, type: Boolean, default: true
+      field :use_simple_er_cal_model, as: :use_simple_employer_calculation_model, type: Boolean, default: false
       field :offerings_constrained_to_service_areas, type: Boolean, default: false
       field :trans_er_immed, as: :transmit_employers_immediately, type: Boolean, default: false
       field :trans_scheduled_er, as: :transmit_scheduled_employers, type: Boolean, default: true
