@@ -73,10 +73,8 @@ module EventsHelper
   def employer_plan_years(employer)
     employer.benefit_applications.select(&:eligible_for_export?)
   end
-
-
+  
   def plan_years_for_manual_export(employer)
-    benefit_application_states = BenefitSponsors::BenefitApplications::BenefitApplication::INELIGIBLE_FOR_EXPORT_STATES.delete_if{|py_state| [:enrollment_open].include?(py_state)}
-    employer.benefit_applications.select {|benefit_application| !benefit_application_states.include?(benefit_application.aasm_state)}
+    employer.benefit_applications.select {|benefit_application|  benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?}
   end
 end

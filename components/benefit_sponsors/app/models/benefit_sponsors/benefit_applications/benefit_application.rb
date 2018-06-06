@@ -21,7 +21,6 @@ module BenefitSponsors
       PUBLISHED_STATES = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
 
       APPROVED_STATES           = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
-      INELIGIBLE_FOR_EXPORT_STATES = APPLICATION_DRAFT_STATES + ENROLLMENT_INELIGIBLE_STATES + APPLICATION_APPROVED_STATES+ [:enrollment_open, :denied, :suspended, :canceled, :imported]
 
 
       # The date range when this application is active
@@ -710,27 +709,12 @@ module BenefitSponsors
         benefit_sponsorship.profile
       end
 
-      def past_transmission_threshold?
-        return false if effective_period.blank?
-        return true if transmit_employers_immediately?
-        t_threshold_date = (effective_period.begin - 1.month).beginning_of_month + 14.days
-        (TimeKeeper.date_of_record > t_threshold_date)
-      end
-
       def eligible_for_export?
         return false if self.aasm_state.blank?
         return false if self.imported?
         return false if self.effective_period.blank?
-        return false if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state)
-        if (TimeKeeper.date_of_record < self.effective_period.begin)
-          if enrollment_eligible?
-            if TimeKeeper.date_of_record > open_enrollment_period.end && (is_renewing? || benefit_sponsorship.initial_enrollment_eligible?) && past_transmission_threshold?
-              return true
-            end
-          end
-          return false
-        end
-        true
+        return true if self.enrollment_eligible? || self.active?
+        self.terminated? || self.expired?
       end
 
       private
