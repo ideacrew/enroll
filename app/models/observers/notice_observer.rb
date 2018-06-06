@@ -256,8 +256,8 @@ module Observers
       end
     end
 
-    def deliver(recipient:, event_object:, notice_event:)
-      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
+    def deliver(recipient:, event_object:, notice_event:, notice_params: {})
+      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
     end
 
     def trigger_zero_employees_on_roster_notice(plan_year)

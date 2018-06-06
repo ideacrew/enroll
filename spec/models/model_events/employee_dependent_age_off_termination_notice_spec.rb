@@ -43,14 +43,14 @@ let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.next_month.prev_ye
 
   describe "NoticeTrigger" do
     context "First of the month when dependebt child turns 26" do
-      subject { Observers::Observer.new }
+      subject { Observers::NoticeObserver.new }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_notice_dependent_age_off_termination_non_congressional"
           expect(payload[:event_object_kind]).to eq 'CensusEmployee'
           expect(payload[:event_object_id]).to eq census_employee.id.to_s
         end
-        subject.trigger_notice(recipient: employee_role, event_object: census_employee, notice_event: "employee_notice_dependent_age_off_termination_non_congressional")
+        subject.deliver(recipient: employee_role, event_object: census_employee, notice_event: "employee_notice_dependent_age_off_termination_non_congressional")
       end
     end
   end
