@@ -21,8 +21,8 @@ describe 'ModelEvents::InitialEmployerNoBinderPaymentReceived', :dbclean => :aft
   describe "ModelEvent" do
     context "when initial employer missed binder payment deadline" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer_profile, event_object: model_instance, notice_event: notice_event1).and_return(true)
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employee_role, event_object: model_instance, notice_event: notice_event2).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer_profile, event_object: model_instance, notice_event: notice_event1).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employee_role, event_object: model_instance, notice_event: notice_event2).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end
@@ -35,14 +35,14 @@ describe 'ModelEvents::InitialEmployerNoBinderPaymentReceived', :dbclean => :aft
       let(:model_event) { ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, PlanYear, {}) }
 
       it "should trigger notice event for initial employer and employees" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_employer_no_binder_payment_received"
           expect(payload[:employer_id]).to eq employer_profile.send(:hbx_id).to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.notice_to_ee_that_er_plan_year_will_not_be_written"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

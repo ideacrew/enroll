@@ -4,9 +4,8 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
 
 
   let(:model_event) { "low_enrollment_notice_for_employer" }
-  let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
-  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_enrolling') }
+  let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer,  start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, aasm_state: 'renewing_enrolling') }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: 18)}
 
@@ -21,7 +20,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
     end
     context "organizations for low enrollment" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end
@@ -37,7 +36,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer' do
       let(:model_event) { ModelEvents::ModelEvent.new(:low_enrollment_notice_for_employer, PlanYear, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
           expect(payload[:employer_id]).to eq employer.send(:hbx_id).to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
