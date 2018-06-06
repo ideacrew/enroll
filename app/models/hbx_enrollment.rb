@@ -782,6 +782,15 @@ class HbxEnrollment
     broker_agency_profile_id.present?
   end
 
+  def can_waive_enrollment?(on_date = ::TimeKeeper.date_of_record)
+    return false unless is_shop?
+    return false unless may_waive_coverage?
+    return true if self.sponsored_benefit_package.open_enrollment_contains?(on_date)
+    # TODO: Get a method for is_under_special enrollment period that will
+    # check based on a given time.
+    family.is_under_special_enrollment_period?
+  end
+
   def can_complete_shopping?(options = {})
     household.family.is_eligible_to_enroll?(qle: options[:qle])
   end
