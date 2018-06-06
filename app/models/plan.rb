@@ -425,6 +425,18 @@ class Plan
     metal_level != 'catastrophic'
   end
 
+  def hsa_eligibility
+    qhp = Products::Qhp.where(standard_component_id: hios_base_id, active_year: active_year).last
+    case qhp.hsa_eligibility.downcase
+    when "" # dental always has empty data for hsa_eligibility in serff templates.
+      return false
+    when "yes"
+      return true
+    when "no"
+      return false
+    end
+  end
+
   def ehb
     percent = read_attribute(:ehb)
     (percent && percent > 0) ? percent : 1

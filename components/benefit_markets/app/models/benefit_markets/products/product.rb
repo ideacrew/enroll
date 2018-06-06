@@ -27,6 +27,9 @@ module BenefitMarkets
     field :provider_directory_url,      type: String
     field :is_reference_plan_eligible,  type: Boolean,  default: false
 
+    field :deductible, type: String
+    field :family_deductible, type: String
+
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"
 
