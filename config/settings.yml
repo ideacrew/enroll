@@ -2,7 +2,7 @@ site:
   key: :mhc
   subdomain: "mhc"
   domain_name: "hbxshop.org"
-  home_url: "https://enroll.mhc.hbxshop.org"
+  home_url: "https://business.mahealthconnector.org/"
   home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"

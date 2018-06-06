@@ -38,14 +38,14 @@ describe 'ModelEvents::GroupAdvanceTerminationConfirmation', dbclean: :around_ea
       subject { Observers::NoticeObserver.new }
       let(:model_event) { ModelEvents::ModelEvent.new(:group_advance_termination_confirmation, model_instance, {}) }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.group_advance_termination_confirmation"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_advance_termination"
           expect(payload[:employee_role_id]).to eq employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

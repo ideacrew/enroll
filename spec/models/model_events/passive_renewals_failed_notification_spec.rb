@@ -113,7 +113,7 @@ describe 'ModelEvents::PassiveRenewalsFailedNotification' do
         factory.employer = employer_profile
         factory.renewing_plan_year = renewing_plan_year
         allow(factory).to receive(:renewal_plan_offered_by_er?).and_return false
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.#{notice_event}"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
