@@ -198,13 +198,21 @@ module BenefitSponsors
             rating_area   = nil
             service_areas = nil
           end
-
           new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market, rating_area: rating_area, service_areas: service_areas)
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end
 
         new_sponsorship
+      end
+
+      def update_benefit_sponsorship(profile)
+        rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
+        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address)
+        rating_area_id = rating_area.id.to_s rescue nil
+        active_benefit_sponsorship.assign_attributes(rating_area_id: rating_area_id)
+        active_benefit_sponsorship.service_areas = service_areas
+        active_benefit_sponsorship
       end
 
       def entity_kinds
