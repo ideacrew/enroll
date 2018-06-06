@@ -5,8 +5,12 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
+    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:security_question)  { FactoryGirl.create_default :security_question }
+
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
-    let(:user) { FactoryGirl.create :user}
+    let!(:user) { FactoryGirl.create_default :user}
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
@@ -16,8 +20,6 @@ module BenefitSponsors
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
-    let(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
-    let(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
 
 
     let(:benefit_application_params) {
@@ -104,8 +106,8 @@ module BenefitSponsors
 
         before do
           benefit_application_params.merge!({
-              open_enrollment_end_on: nil
-            })
+            open_enrollment_end_on: nil
+          })
         end
 
         it "should redirect to new" do
@@ -178,8 +180,8 @@ module BenefitSponsors
 
         before do
           benefit_application_params.merge!({
-              open_enrollment_end_on: nil
-            })
+            open_enrollment_end_on: nil
+          })
         end
 
         it "should redirect to edit" do

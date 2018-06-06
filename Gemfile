@@ -131,6 +131,7 @@ group :development, :test do
 end
 
 group :test do
+  gem 'test-prof', '0.5.0'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'capybara-screenshot'

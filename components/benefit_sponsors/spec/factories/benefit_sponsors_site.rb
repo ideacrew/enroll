@@ -27,9 +27,9 @@ FactoryGirl.define do
         site.benefit_markets << create(:benefit_markets_benefit_market, kind: evaluator.kind)
       end
 
-      after :create do |site, evaluator|
-        site.benefit_markets << create(:benefit_markets_benefit_market, kind: evaluator.kind)
-      end
+#      after :create do |site, evaluator|
+#        site.benefit_markets << create(:benefit_markets_benefit_market, kind: evaluator.kind)
+#      end
     end
 
     trait :with_benefit_market_catalog do

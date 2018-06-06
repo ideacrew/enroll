@@ -102,7 +102,7 @@ module BenefitSponsors
       end
     end
 
-    def effectuate
+    def begin_benefit
       if @benefit_application.may_activate_enrollment?
         @benefit_application.activate_enrollment!
         if @benefit_application.active?
@@ -120,7 +120,7 @@ module BenefitSponsors
       end
     end
 
-    def expire
+    def end_benefit
       if @benefit_application.may_expire?
         @benefit_application.expire!
         if @benefit_application.expired?

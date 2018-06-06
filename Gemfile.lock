@@ -733,6 +733,7 @@ GEM
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
+    test-prof (0.5.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -897,6 +898,7 @@ DEPENDENCIES
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)
+  test-prof (= 0.5.0)
   therubyracer
   transport_gateway!
   transport_profiles!
