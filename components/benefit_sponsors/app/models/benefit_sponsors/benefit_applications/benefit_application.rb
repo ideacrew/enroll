@@ -64,62 +64,6 @@ module BenefitSponsors
 
     field :benefit_sponsor_catalog_id,  type: BSON::ObjectId
 
-    def predecessor_application=(new_benefit_application)
-      raise ArgumentError.new("expected BenefitApplication") unless new_benefit_application.is_a? BenefitSponsorships::BenefitApplications::BenefitApplication
-      self.predecessor_application_id = new_benefit_application._id
-      @predecessor_application = new_benefit_application
-    end
-
-    def predecessor_application
-      return nil if predecessor_application_id.blank?
-      return @predecessor_application if defined? @benefit_application
-      @predecessor_application = BenefitSponsorships::BenefitSponsorship.benefit_application_find_by(predecessor_application_id)
-    end
-
-    def successor_applications=(applications)
-      self.successor_application_ids = applications.pluck(:_id)
-      @successor_applications = applications
-    end
-
-    def successor_applications
-      return if defined? @successor_applications
-      @successor_applications = benefit_sponsorship.benefit_applications.where(:id.in => successor_application_ids)
-    end
-
-    def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
-      raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
-      self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
-      @benefit_sponsor_catalog = new_benefit_sponsor_catalog
-    end
-
-    def benefit_sponsor_catalog
-      return nil if benefit_sponsor_catalog_id.blank?
-      return @benefit_sponsor_catalog if defined? @benefit_sponsor_catalog
-      @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find_by(benefit_sponsor_catalog_id)
-    end
-
-    def recorded_rating_area=(new_recorded_rating_area)
-      raise ArgumentError.new("expected RatingArea") unless new_recorded_rating_area.is_a? BenefitMarkets::Locations::RatingArea
-      self.recorded_rating_area_id = new_recorded_rating_area._id
-      @recorded_rating_area = new_recorded_rating_area
-    end
-
-    def recorded_rating_area
-      return nil if recorded_rating_area_id.blank?
-      return @recorded_rating_area if defined? @recorded_rating_area
-      @recorded_rating_area = BenefitMarkets::BenefitSponsorCatalog.find_by(recorded_rating_area_id)
-    end
-
-    belongs_to  :recorded_rating_area,
-      class_name: "::BenefitMarkets::Locations::RatingArea"
-
-    has_and_belongs_to_many  :recorded_service_areas,
-      class_name: "::BenefitMarkets::Locations::ServiceArea",
-      :inverse_of => nil
-
-    embeds_one  :benefit_sponsor_catalog,
-      class_name: "::BenefitMarkets::BenefitSponsorCatalog"
-
     embeds_many :benefit_packages,
       class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
@@ -128,15 +72,6 @@ module BenefitSponsors
     index({ "aasm_state" => 1 })
     index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
     index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
-
-    # Load the
-    # after_initialize :set_values
-
-    def set_values
-      recorded_sic_code     = benefit_sponsorship.sic_code unless recorded_sic_code.present?
-      recorded_rating_area  = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-      recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
-    end
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
@@ -154,9 +89,9 @@ module BenefitSponsors
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
-    scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
-                                                      :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
-                                                }
+    # scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
+    #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
+    #                                             }
 
     scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"effective_period.min" => compare_date )
@@ -236,6 +171,88 @@ module BenefitSponsors
     #   end
     #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
     # end
+
+    after_initialize :set_values
+    after_create :renew_benefit_package_assignments
+
+    def set_values
+      if benefit_sponsorship
+        recorded_sic_code      = benefit_sponsorship.sic_code unless recorded_sic_code.present?
+        recorded_rating_area   = benefit_sponsorship.rating_area unless recorded_rating_area.present?
+        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
+      end
+    end
+
+    def predecessor_application=(new_benefit_application)
+      raise ArgumentError.new("expected BenefitApplication") unless new_benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
+      self.predecessor_application_id = new_benefit_application._id
+      @predecessor_application = new_benefit_application
+    end
+
+    def predecessor_application
+      return nil if predecessor_application_id.blank?
+      return @predecessor_application if defined? @benefit_application
+      @predecessor_application = benefit_sponsorship.benefit_applications_by(predecessor_application_id)
+    end
+
+    def successor_applications=(applications)
+      raise ArgumentError.new("expected BenefitApplication") if applications.any?{|application| !application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication}
+      self.successor_application_ids = applications.map(&:_id)
+      @successor_applications = applications
+    end
+
+    def successor_applications
+      return nil if successor_application_ids.blank?
+      return if defined? @successor_applications
+      @successor_applications = benefit_sponsorship.benefit_applications_by(successor_application_ids)
+    end
+
+    def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
+      raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
+      self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
+      @benefit_sponsor_catalog = new_benefit_sponsor_catalog
+    end
+
+    def benefit_sponsor_catalog
+      return nil if benefit_sponsor_catalog_id.blank?
+      return @benefit_sponsor_catalog if defined? @benefit_sponsor_catalog
+      @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find_by(benefit_sponsor_catalog_id)
+    end
+
+    def recorded_rating_area=(new_recorded_rating_area)
+      raise ArgumentError.new("expected RatingArea") unless new_recorded_rating_area.is_a? BenefitMarkets::Locations::RatingArea
+      self.recorded_rating_area_id = new_recorded_rating_area._id
+      @recorded_rating_area = new_recorded_rating_area
+    end
+
+    def recorded_rating_area
+      return nil if recorded_rating_area_id.blank?
+      return @recorded_rating_area if defined? @recorded_rating_area
+      @recorded_rating_area = BenefitMarkets::Locations::RatingArea.find(recorded_rating_area_id)
+    end
+
+    def recorded_service_areas=(new_recorded_service_areas)
+      raise ArgumentError.new("expected ServiceArea") if new_recorded_service_areas.any?{|service_area| !service_area.is_a? BenefitMarkets::Locations::ServiceArea}
+      self.recorded_service_area_ids = new_recorded_service_areas.map(&:_id)
+      @recorded_service_areas = new_recorded_service_areas
+    end
+
+    def recorded_service_areas
+      return @recorded_service_areas if defined? @recorded_service_areas
+      @recorded_rating_area = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
+    end
+
+    def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
+      raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
+      self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
+      @benefit_sponsor_catalog = new_benefit_sponsor_catalog
+    end
+
+    def benefit_sponsor_catalog
+      return nil if benefit_sponsor_catalog_id.blank?
+      return @benefit_sponsor_catalog if defined? @benefit_sponsor_catalog
+      @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find(benefit_sponsor_catalog_id)
+    end
 
     def effective_period=(new_effective_period)
       effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
@@ -350,19 +367,25 @@ module BenefitSponsors
     end
 
     def renew_benefit_package_assignments
-      benefit_packages.each do |benefit_package|
-        benefit_package.renew_employee_assignments
-      end
+      if is_renewing?
+        benefit_packages.each do |benefit_package|
+          benefit_package.renew_employee_assignments
+        end
 
-      default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
-      benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self.benefit_application).each do |census_employee|
-        census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
+        default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
+        if benefit_sponsorship.census_employees.present?
+          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self.benefit_application).each do |census_employee|
+            census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
+          end
+        end
       end
     end
 
     def renew_benefit_package_members
-      benefit_packages.each do |benefit_package|
-        benefit_package.renew_member_benefits
+      if is_renewing?
+        benefit_packages.each do |benefit_package|
+          benefit_package.renew_member_benefits
+        end
       end
     end
 
@@ -392,7 +415,6 @@ module BenefitSponsors
       end
     end
 
-
     def cancel_benefit_package_members
       benefit_packages.each do |benefit_package|
         disable_benefit_package(benefit_package)
@@ -405,7 +427,6 @@ module BenefitSponsors
         benefit_package.cancel_family_coverages(family)
       end
     end
-
 
     def refresh(new_benefit_sponsor_catalog)
       if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
@@ -421,25 +442,22 @@ module BenefitSponsors
     end
 
     class << self
+
       def find(id)
         return nil if id.blank?
-        sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find_by(id).first
+        sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find(id).first
         if sponsorship.present?
-          sponsorship.benefit_applications.find(id)
+          sponsorship.benefit_applications_by(id)
         end
       end
     end
 
     aasm do
       state :draft, initial: true
-      # state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
-
       state :imported             # Static state for seed application instances used to transfer Benefit Sponsors and members into the system
 
       state :approved             # Accepted - Application meets criteria necessary for sponsored members to shop for benefits.  Members may view benefits, but not enroll
       state :denied               # Rejected
-
-      # state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
       # TODO: Compare optional states with CCA values for Employer Attestation approval flow
       ## Begin optional states for exception processing
@@ -451,61 +469,21 @@ module BenefitSponsors
       state :appealing            # request reversal of negative determination
       ## End optional states for exception processing
 
-      state :enrollment_open      # Approved application has entered open enrollment period
-      # :after_enter => :send_employee_invites
-      # state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-
+      state :enrollment_open#, after_enter: :renew_benefit_package_members     # Approved application has entered open enrollment period
       state :enrollment_closed
       state :enrollment_eligible  # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
-      # :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed]
-      # Published plan open enrollment has ended and is eligible for coverage,
-      #   but effective date is in future
-      # state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
-
-      state :enrollment_ineligible, :after_enter => :deny_enrollment   # open enrollment did not meet eligibility criteria
-      # state :application_ineligible,          :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
-      # state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
-
-      state :active               # Application benefit coverage is in-force
-      state :suspended            # Coverage is no longer in effect. members may not enroll or change enrollments
-      state :terminated           # Coverage under this application is terminated
-      state :expired              # Non-published plans are expired following their end on date
-      state :canceled             # Application closed prior to coverage taking effect
+      state :enrollment_ineligible   # open enrollment did not meet eligibility criteria
+      
+      state :active,     :after_enter => :effectuate_benefit_package_members    # Application benefit coverage is in-force
+      state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
+      state :terminated, :after_enter => :terminate_benefit_package_members # Coverage under this application is terminated
+      state :expired,    :after_enter => :expire_benefit_package_members    # Non-published plans are expired following their end on date
+      state :canceled,   :after_enter => :cancel_benefit_package_members    # Application closed prior to coverage taking effect
 
       after_all_transitions :publish_state_transition
 
       event :import do
         transitions from: :draft, to: :imported
-      end
-
-      # Time-based transitions: Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
-      # event :advance_date do
-      #   transitions from: :enrollment_eligible,                   to: :active,                 guard:   :is_event_date_valid?
-      #   transitions from: :approved,                              to: :enrollment_open,        guard:   :is_event_date_valid?
-      #   transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_eligible,    guards:  [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      #   transitions from: [:enrollment_open, :enrollment_closed], to: :enrollment_ineligible,  guard:   :is_open_enrollment_closed? #, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
-      #   transitions from: :enrollment_open,                       to: :enrollment_closed,      guard:   :is_event_date_valid?
-
-      #   transitions from: :active,                                to: :terminated,             guard:   :is_event_date_valid?
-      #   transitions from: [:pending],                             to: :expired,                guard:   :is_plan_year_end?
-      #   transitions from: :enrollment_ineligible,                 to: :canceled,               guard:   :is_plan_year_end?
-
-      #   ## TODO update this renewal transition
-      #   # transitions from: :enrollment_open,                           to: :enrollment_ineligible,  guard:  :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
-
-      #   transitions from: :enrollment_open,                       to: :enrollment_open  # avoids error when application is in enrollment_open state
-      # end
-
-      ## Application eligibility determination process
-
-      # Submit plan year application
-      event :submit_application do
-        transitions from: :draft, to: :enrollment_open, guard:  [:is_event_date_valid?]#, :after => [:accept_application, :initial_employer_approval_notice, :zero_employees_on_roster]
-        transitions from: :draft, to: :approved #, :after => [:initial_employer_approval_notice, :zero_employees_on_roster]
-
-        ## TODO update these renewal transitions
-        # transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
-        # transitions from: :draft, to: :approved,        guard:  :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster]
       end
 
       event :review_application do
@@ -517,21 +495,9 @@ module BenefitSponsors
         transitions from: :pending, to: :draft
       end
 
-      # Plan as submitted failed eligibility check
-      event :auto_approve_application do
-        transitions from: :draft, to: :draft,           guard:  :is_application_invalid?
-        transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?]#, :after => [:accept_application, :zero_employees_on_roster]
-        transitions from: :draft, to: :approved,        guard:  :is_application_eligible?#, :after => :zero_employees_on_roster
-
-        ## TODO update these renewal transitions
-        # transitions from: :draft, to: :enrollment_open, guard:  [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
-        # transitions from: :draft, to: :approved,        guard:  :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster]
-        # transitions from: :draft, to: :pending,         :after => [:employer_renewal_eligibility_denial_notice, :notify_employee_of_renewing_employer_ineligibility]
-      end
-
       # Employer requests review of invalid application determination
       event :request_eligibility_review do
-        transitions from: :submitted, to: :pending,  guard:  :is_within_review_period?
+        transitions from: :submitted, to: :pending #,  guard:  :is_within_review_period?
       end
 
       # Upon review, application ineligible status overturned and deemed eligible
@@ -547,7 +513,7 @@ module BenefitSponsors
       event :deny_application do
         transitions from: APPLICATION_EXCEPTION_STATES, to: :denied
       end
-
+      
       event :begin_open_enrollment do
         transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
           to:     :enrollment_open
@@ -573,23 +539,19 @@ module BenefitSponsors
           to:     :enrollment_closed
       end
 
-      event :revert_application do #, :after => :revert_employer_profile_application do
-        transitions from:   [:approved, :denied] + APPLICATION_EXCEPTION_STATES,
-          to:     :draft
-      end
-
-      event :revert_enrollment do #, :after => :revert_employer_profile_application do
+      event :revert_application do
         transitions from:   [
+          :approved, :denied,
           :enrollment_open, :enrollment_closed,
           :enrollment_eligible, :enrollment_ineligible,
-          :active,
-        ],
-          to:     :draft,
-          after:  :cancel_enrollments
+          :active
+        ] + APPLICATION_EXCEPTION_STATES, 
+          to:     :draft, 
+          after:  :cancel_benefit_package_members
       end
 
       event :activate_enrollment do
-        transitions from:   [:enrollment_open, :enrollment_closed, :enrollment_eligible],
+        transitions from:   :enrollment_eligible,
           to:     :active
       end
 
@@ -616,7 +578,7 @@ module BenefitSponsors
 
       # Coverage reinstated
       event :reinstate_enrollment do
-        transitions from: [:suspended, :terminated], to: :active, after: :reset_termination_and_end_date
+        transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
       end
     end
 

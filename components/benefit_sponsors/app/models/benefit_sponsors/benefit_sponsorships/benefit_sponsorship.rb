@@ -102,50 +102,57 @@ module BenefitSponsors
       class_name: "BenefitSponsors::Documents::Document"
 
 
-
     validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
     validates :source_kind,
       inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
       allow_blank: false
 
-
-    scope :effective_begin_on,    ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                 :"effective_begin_on".lte => compare_date )
-                                                                                 }
-
     scope :may_begin_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      matched = BenefitSponsors::BenefitApplications::BenefitApplication.open_enrollment_begin_on(compare_date).approved
-      unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      where(
+        :"benefit_applications.open_enrollment_period.min" => compare_date,
+        :"benefit_applications.aasm_state" => :approved
+      )
     }
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      matched = BenefitSponsors::BenefitApplications::BenefitApplication.open_enrollment_end_on(compare_date).enrolling
-      unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      where(
+        :"benefit_applications.open_enrollment_period.max" => compare_date,
+        :"benefit_applications.aasm_state" => :enrollment_open
+      )
     }
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_begin_on(compare_date).enrollment_eligible
-      unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      where(
+        :"benefit_applications.effective_period.min" => compare_date,
+        :"benefit_applications.aasm_state" => :enrollment_eligible
+      )
     }
 
     scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_end_on(compare_date).coverage_effective
-      unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      where(
+        :"benefit_applications.effective_period.max" => compare_date,
+        :"benefit_applications.aasm_state" => :active
+      )
     }
 
     scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
-      matched = BenefitSponsors::BenefitApplications::BenefitApplication.effective_date_end_on(compare_date).coverage_effective
-      unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      where(
+        :"benefit_applications.effective_period.min" => compare_date,
+        :"benefit_applications.aasm_state" => :active
+      )
     }
 
     scope :may_terminate_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      matched = BenefitSponsors::BenefitApplications::BenefitApplication.benefit_terminate_on(compare_date)
-      unscoped.where(:id.in => matched.pluck(:benefit_sponsorship_id))
+      where(
+        :"benefit_applications.terminated_on" => compare_date,
+        :"benefit_applications.aasm_state".in => [:active, :suspended]
+      )
     }
 
-
-    scope :benefit_application_find_by,   ->(id) { where(:"benefit_applications._id" => id) }
+    scope :benefit_application_find,     ->(ids) { 
+      where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
+    }
 
     before_create :generate_hbx_id
 
@@ -205,6 +212,10 @@ module BenefitSponsors
       else
         nil
       end
+    end
+
+    def benefit_applications_by(ids)
+      benefit_applications.find(ids)
     end
 
     def is_attestation_eligible?

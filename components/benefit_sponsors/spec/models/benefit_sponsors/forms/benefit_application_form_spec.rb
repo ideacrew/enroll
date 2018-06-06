@@ -85,7 +85,7 @@ module BenefitSponsors
 
     describe ".submit_application" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to submit application and" do
@@ -105,7 +105,7 @@ module BenefitSponsors
 
     describe ".force_submit_application" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to force submit application and" do
@@ -119,7 +119,7 @@ module BenefitSponsors
 
     describe ".revert" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to revert back and" do
@@ -140,7 +140,7 @@ module BenefitSponsors
 
     describe ".persist" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship.id) }
+      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
       let!(:service_object) { double("BenefitApplicationService")}
       context "save request received" do
