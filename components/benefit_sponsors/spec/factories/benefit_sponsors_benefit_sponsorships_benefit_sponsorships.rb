@@ -3,6 +3,7 @@ FactoryGirl.define do
 
     source_kind     { :self_serve }
     benefit_market  { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "MA Health SHOP", site_urn: :cca) }
+    employer_attestation { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     organization    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
 
     rating_area     { create(:benefit_markets_locations_rating_area) }

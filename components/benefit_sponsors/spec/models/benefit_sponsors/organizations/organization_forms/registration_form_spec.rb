@@ -5,6 +5,13 @@ module BenefitSponsors
   RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :after_each do
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :cca) }
     subject { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
+    let!(:county_zip) { FactoryGirl.create(:benefit_markets_locations_county_zip, :county_name => "Hampden", :zip => "01001", :state => "MA") }
+    let!(:service_area) { FactoryGirl.create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip.id], covered_states: [county_zip.state]) }
+    let!(:rating_area) { FactoryGirl.create(:benefit_markets_locations_rating_area, county_zip_ids: [county_zip.id], covered_states: [county_zip.state]) }
+
+    before :each do
+      site.benefit_markets.first.save!
+    end
 
     describe '#for_new' do
 
@@ -15,7 +22,7 @@ module BenefitSponsors
           expect(form.profile_type).to eq 'benefit_sponsor'
           expect(form.profile_id).to eq nil
           expect(form.organization).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::OrganizationForm)
-          expect( form.organization.profile.parent).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::OrganizationForm)
+          expect(form.organization.profile.parent).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::OrganizationForm)
           expect(form.organization.profile).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::ProfileForm)
           expect(form.organization.profile.inbox).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::InboxForm)
           expect(form.organization.profile.office_locations.first).to be_an_instance_of(BenefitSponsors::Organizations::OrganizationForms::OfficeLocationForm)
@@ -69,7 +76,7 @@ module BenefitSponsors
                    "accept_new_clients"=>"1",
                    "office_locations_attributes"=>
                        {"0"=>
-                            {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA", "zip"=>"01001", "county"=>"Hampden"},
+                            {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>county_zip.state, "zip"=>county_zip.zip, "county"=>county_zip.county_name},
                              "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"222", "number"=>"2221111", "extension"=>""}}},
                   "contact_method"=>"paper_and_electronic"}},
          "profile_id"=>nil,
@@ -195,7 +202,7 @@ module BenefitSponsors
                      "office_locations_attributes"=>
                          {"0"=>
                               {"address_attributes"=>
-                                   {"kind"=>"primary", "address_1"=>"new_address", "address_2"=>"", "city"=>"ma_city", "state"=>"MA", "zip"=>"01001"},
+                                   {"kind"=>"primary", "address_1"=>"new_address", "address_2"=>"", "city"=>"ma_city", "state"=>county_zip.state, "zip"=>county_zip.zip, "county"=>county_zip.county_name},
                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"333", "number"=>"111-2222", "extension"=>"111"}}},
                      "contact_method"=>"paper_and_electronic"}},
            "profile_id"=>employer_profile.id.to_s,
@@ -241,7 +248,7 @@ module BenefitSponsors
                      "accept_new_clients"=>"1",
                      "office_locations_attributes"=>
                          {"0"=>
-                              {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA", "zip"=>"01001", "county"=>"Hampden"},
+                              {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city","state"=>county_zip.state, "zip"=>county_zip.zip},
                                "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"222", "number"=>"2221111", "extension"=>""}}},
                      "contact_method"=>"paper_and_electronic"}},
            "profile_id"=>broker_agency_profile.id.to_s,
