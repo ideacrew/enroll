@@ -175,8 +175,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
-    ip_lookup_table = {}
     @issuer_profiles = []
+    @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
+    ip_lookup_table = {}
     ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |ipo|
       if @issuer_profile_ids.include?(ipo.issuer_profile.id)
         @issuer_profiles << ipo.issuer_profile
