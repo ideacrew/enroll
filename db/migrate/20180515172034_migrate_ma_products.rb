@@ -70,6 +70,8 @@ class MigrateMaProducts < Mongoid::Migration
               service_area_id: mapped_service_area_id,
               provider_directory_url: plan.provider_directory_url,
               sbc_document: plan.sbc_document,
+              deductible: plan.deductible,
+              family_deductible: plan.family_deductible,
               is_reference_plan_eligible: true,
               premium_ages: (plan.minimum_age..plan.maximum_age),
               premium_tables: premium_tables
@@ -92,6 +94,7 @@ class MigrateMaProducts < Mongoid::Migration
                 ehb: plan.ehb,
                 is_standard_plan: plan.is_standard_plan,
                 rx_formulary_url: plan.rx_formulary_url,
+                hsa_eligibility: plan.hsa_eligibility,
               }.merge(shared_attributes))
             else
               BenefitMarkets::Products::DentalProducts::DentalProduct.create!({
