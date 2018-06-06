@@ -121,6 +121,16 @@ module BenefitMarkets
       end
     end
 
+    def deductible_value
+      return nil if deductible.blank?
+      deductible.split(".").first.gsub(/[^0-9]/, "").to_i
+    end
+
+    def family_deductible_value
+      return nil if family_deductible.blank?
+      deductible.split("|").last.split(".").first.gsub(/[^0-9]/, "").to_i
+    end
+
     def product_kind
       kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
       kind_string.present? ? kind_string.to_sym : :product_base_class
