@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 describe Forms::GeneralAgencyProfile, "given nothing" do
   subject { Forms::GeneralAgencyProfile.new }
 
@@ -300,4 +301,5 @@ describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
   it "should have correct npn" do
     expect(@form.npn).to eq general_agency_profile.primary_staff.npn
   end
+end
 end

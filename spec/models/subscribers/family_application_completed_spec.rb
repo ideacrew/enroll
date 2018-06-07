@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe Subscribers::FamilyApplicationCompleted do
   let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
   let(:max_aptc) { parser.households.select do |h|
@@ -618,4 +619,5 @@ describe '.search_person' do
       expect(subject.search_person(verified_family_member)).to eq nil
     end
   end
+end
 end

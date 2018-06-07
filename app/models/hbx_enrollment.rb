@@ -92,6 +92,7 @@ class HbxEnrollment
   field :consumer_role_id, type: BSON::ObjectId
   field :resident_role_id, type: BSON::ObjectId
   # We will need to re-visit these names possibly, as we implement sponsored benefits.
+  field :plan_id, type: BSON::ObjectId
   field :benefit_package_id, type: BSON::ObjectId
   field :benefit_coverage_period_id, type: BSON::ObjectId
 
