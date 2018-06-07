@@ -496,8 +496,9 @@ $(':input[required]').on('keyup change', function(){
 function validateForm(form) {
   var isValid = true;
   form.find(':input[required]').each(function() {
-    if ( $(this).val() == '' ||  $(this).val()=='0')
+    if ( $(this).val() == '' ||  $(this).val()=='0.00' || $(this).val()=='Choose' ) {
       isValid = false;
+    }
   });
   return isValid;
 }
