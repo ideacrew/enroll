@@ -40,7 +40,7 @@ class HbxProfile
   end
 
   def under_open_enrollment?
-    (benefit_sponsorship.present? && benefit_sponsorship.is_under_open_enrollment?) ?  true : false
+    (benefit_sponsorship.present? && benefit_sponsorship.is_coverage_period_under_open_enrollment?) ?  true : false
   end
 
   def active_employers
