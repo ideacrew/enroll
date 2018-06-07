@@ -181,6 +181,10 @@ module BenefitSponsors
       BenefitApplicationEnrollmentsMonthlyQuery.new(self).call(date)
     end
 
+    def application_eligibility_warnings
+      {}
+    end
+
     private
 
     def log_message(errors)
@@ -197,10 +201,6 @@ module BenefitSponsors
     end
 
     def application_errors
-      {}
-    end
-
-    def application_eligibility_warnings
       {}
     end
 
