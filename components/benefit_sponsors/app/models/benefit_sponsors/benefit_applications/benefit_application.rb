@@ -209,6 +209,7 @@ module BenefitSponsors
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
       raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
       self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
+      new_benefit_sponsor_catalog.benefit_application = self
       @benefit_sponsor_catalog = new_benefit_sponsor_catalog
     end
 
@@ -445,6 +446,7 @@ module BenefitSponsors
       def find(id)
         return nil if id.blank?
         sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find(id).first
+        
         if sponsorship.present?
           sponsorship.benefit_applications_by(id)
         end

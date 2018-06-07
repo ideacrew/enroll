@@ -31,8 +31,9 @@ module BenefitMarkets
 
 
     def benefit_application=(benefit_application)
-      raise "Expected Benefit Application" unless is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+      raise "Expected Benefit Application" unless benefit_application.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
       self.benefit_application_id = benefit_application._id
+      @benefit_application = benefit_application
     end
 
     def benefit_application

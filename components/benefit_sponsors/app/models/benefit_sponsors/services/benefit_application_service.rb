@@ -137,9 +137,7 @@ module BenefitSponsors
         end
 
         if save_successful = benefit_application.save
-          catalog = benefit_application.benefit_sponsor_catalog
-          catalog.benefit_application = benefit_application
-          catalog.save
+          benefit_application.benefit_sponsor_catalog.save
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
