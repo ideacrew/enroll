@@ -346,6 +346,10 @@ module BenefitSponsors
           self.organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
         end
 
+        def get_profile
+          self.profile = BenefitSponsors::Organizations::Profile.find(profile_id)
+        end
+
         protected
 
         def site

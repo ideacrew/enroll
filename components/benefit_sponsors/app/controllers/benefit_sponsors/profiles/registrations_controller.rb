@@ -117,6 +117,7 @@ module BenefitSponsors
           session[:portal] = url_for(params)
           redirect_to self.send(:sign_up_url)
         else
+          session[:custom_url] = main_app.new_user_registration_path unless current_user
           super
         end
       end
