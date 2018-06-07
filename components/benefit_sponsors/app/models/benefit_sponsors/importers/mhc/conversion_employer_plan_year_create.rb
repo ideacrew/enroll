@@ -54,7 +54,12 @@ module Importers::Mhc
     end
 
     def tier_contribution_values
-      contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
+      contribution_level_names = [
+        "employee_only",
+        "employee_and_spouse",
+        "employee_and_one_or_more_dependents",
+        "family"
+      ]
       contribution_level_names.inject([]) do |contributions, sponsor_level_name|
         contributions << {
           relationship: sponsor_level_name,
