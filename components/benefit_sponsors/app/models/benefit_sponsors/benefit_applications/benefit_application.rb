@@ -381,7 +381,7 @@ module BenefitSponsors
 
         default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
         if benefit_sponsorship.census_employees.present?
-          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self.benefit_application).each do |census_employee|
+          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |census_employee|
             census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
           end
         end
