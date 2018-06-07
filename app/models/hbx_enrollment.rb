@@ -435,6 +435,7 @@ class HbxEnrollment
   end
 
   def active_during?(date)
+    return false if ["coverage_canceled", "void"].include?(aasm_state.to_s)
     false
   end
 
