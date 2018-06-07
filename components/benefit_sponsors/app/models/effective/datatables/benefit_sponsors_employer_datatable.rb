@@ -22,7 +22,12 @@ module Effective
         table_column :general_agency, :proc => Proc.new { |row|
           @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
         }, :filter => false
-        table_column :conversion, :proc => Proc.new { |row| boolean_to_glyph(@employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
+
+        table_column :conversion, :proc => Proc.new { |row|
+          boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
+
+        table_column :mid_plan_year_conversion, :proc => Proc.new { |row|
+          boolean_to_glyph(row.is_mid_plan_year_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
         table_column :benefit_application_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
