@@ -2,7 +2,7 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitSponsorCatalogDecorator < SimpleDelegator
 
-      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind)
+      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind, :health_plan_kind)
       ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered)
 
       def sponsor_contributions(benefit_package_id = nil)
@@ -75,7 +75,7 @@ module BenefitSponsors
 
         product_packages.each do |product_package|
           package_products = product_package.products.collect do |product|
-            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental")
+            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental", product.health_plan_kind)
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :single_issuer

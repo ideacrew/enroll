@@ -146,7 +146,7 @@ javascript:
             </div>\
             <div class="col-xs-9 p0 rp-info mb-1">\
               <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
-              <span class="plan-label">Type:</span><br>\
+              <span class="plan-label">Type:</span>' +plan.health_plan_kind+'<br>\
               <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
               <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
             </div>\
@@ -198,6 +198,7 @@ javascript:
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
     
     document.getElementById('referencePlanTitle').append(plan.title);
+    document.getElementById('rpType').append(plan.health_plan_kind);
     document.getElementById('rpCarrier').append(plan.carrier_name);
     document.getElementById('rpMetalLevel').append(plan.metal_level_kind);
   }
