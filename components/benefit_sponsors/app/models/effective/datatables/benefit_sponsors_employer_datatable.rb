@@ -42,6 +42,19 @@ module Effective
         # if employer_attestation_is_enabled?
         #   # table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row| row.employer_profile.employer_attestation.aasm_state.titleize if row.employer_profile.employer_attestation }, :filter => false, :sortable => false
         # end
+
+        if employer_attestation_is_enabled?
+          table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
+            #TODO fix this after employer attestation is fixed, this is only temporary fix
+            #used below condition, as employer_attestation is embedded from both employer profile and benefit sponsorship
+            if row.employer_attestation.present?
+              row.employer_attestation.aasm_state.titleize
+            elsif @employer_profile.employer_attestation.present?
+              @employer_profile.employer_attestation.aasm_state.titleize
+            end
+          }, :filter => false, :sortable => false
+        end
+
         # table_column :actions, :width => '50px', :proc => Proc.new { |row|
         #   dropdown = [
         #    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
