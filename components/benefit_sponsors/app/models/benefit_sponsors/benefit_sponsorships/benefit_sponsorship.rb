@@ -17,6 +17,7 @@ module BenefitSponsors
     include Mongoid::Document
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
+    include BenefitSponsors::Concerns::EmployerDatatableConcern
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
@@ -150,11 +151,11 @@ module BenefitSponsors
       )
     }
 
-    scope :benefit_application_find,     ->(ids) { 
+    scope :benefit_application_find,     ->(ids) {
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
 
-    scope :benefit_package_find,         ->(id) { 
+    scope :benefit_package_find,         ->(id) {
       where(:"benefit_applications.benefit_packages._id" => BSON::ObjectId.from_string(id))
     }
 

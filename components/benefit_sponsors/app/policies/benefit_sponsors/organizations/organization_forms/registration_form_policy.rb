@@ -19,6 +19,7 @@ module BenefitSponsors
         end
 
         def create?
+          return false if benefit_sponsor_not_logged_in?
           return true unless role = user && user.person && user.person.hbx_staff_role
           role.permission.modify_employer
         end

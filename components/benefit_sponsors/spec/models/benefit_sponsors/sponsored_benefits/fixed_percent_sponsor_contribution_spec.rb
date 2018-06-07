@@ -23,6 +23,11 @@ module BenefitSponsors
       end
     end
 
+    # FIXME: This constraint should possibly be enforced in the domain logic
+    #        layer - and is currently causing loading issues for MPY
+    #        employers. As such I'm disabling it until we can either put
+    #        it back or move it to the domain layer.
+=begin
     describe "given a contribution level with no contribution < minimum" do
       let(:contribution_level) {
         {
@@ -45,5 +50,6 @@ module BenefitSponsors
         expect(subject.errors.keys.include?(:contribution_levels)).to be_truthy
       end
     end
+=end
   end
 end

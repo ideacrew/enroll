@@ -10,7 +10,7 @@ module BenefitSponsors
       delegate :pricing_model, to: :sponsored_benefit
 
       field :group_size, type: Integer, default: 1
-      field :participation_rate, type: Float, default: 0.00
+      field :participation_rate, type: Float, default: 0.01
 
       def participation_percent
         participation_rate * 100.00

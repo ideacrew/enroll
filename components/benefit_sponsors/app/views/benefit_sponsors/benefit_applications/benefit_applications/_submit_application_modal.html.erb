@@ -9,6 +9,7 @@
           <h4 class="modal-title">Confirm Publish Plan Year</h4>
         <%end%>
       </div>
+      <% warnings = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application).application_eligibility_warnings %>
       <% if employer_attestation_is_enabled? %>
         <div class="modal-body">
           <% if benefit_application.no_documents_uploaded? %>
@@ -37,7 +38,7 @@
           <% else %>
             <%= link_to 'Cancel', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
           <% end %>
-          <% error_page = benefit_application.application_eligibility_warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile.id) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
+          <% error_page = warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile.id) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
         </div>
       <%else%>
         <div class="modal-body">
@@ -48,7 +49,7 @@
         </div>
         <div class="modal-footer">
           <%= link_to 'Force Publish', benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
-          <% error_page = benefit_application.application_eligibility_warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
+          <% error_page = warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
           <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
         </div>
       <%end%>
