@@ -11,7 +11,7 @@
       // Collect the nav links, forms, and other content for toggling
       .collapse.navbar-collapse#bs-example-navbar-collapse-1
         ul.nav.navbar-nav
-          li 
+          li
             h4 = get_header_text(controller_name)
         ul.nav.navbar-nav.navbar-right
           li
@@ -23,16 +23,19 @@
               strong = Settings.contact_center.phone_number
           - if signed_in?
             li
-              span.my-portal-links 
+              span.my-portal-links
+                = render partial: "shared/my_portal_links"
                 span = link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'header-text'
-                span  | 
+                span  |&nbsp;
                 span = link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text"
                 br
                 strong.users-name = user_first_name_last_name_and_suffix
                 - unless current_user.try(:person).try(:hbx_id).nil?
                   | &nbsp;
-                  //span = l10n(".my_id") : = truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')
-
+                  | &nbsp;
+                  span
+                    = l10n(".my_id")
+                    | : #{truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')}
   - if user_signed_in?
   javascript:
     // check time until logout
@@ -48,10 +51,11 @@
       });
     }
     var logout_check_timer = setTimeout(check_time_until_logout, 87000);
-  
-    if (bowser.msie && bowser.version <= 8 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
-      $('body').before('<div id="modal-wrapper"></div>')
-      $('#modal-wrapper').html('<%= escape_javascript(render(:partial => "shared/update_browser_warning")) %>');
-      $('#modal-wrapper').fadeIn();
-    }
-        
+
+  javascript:
+        if (bowser.msie && bowser.version <= 8 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
+            $('body').before('<div id="modal-wrapper"></div>');
+            var $modalwrapper = $('#modal-wrapper');
+            $modalwrapper.html('#{escape_javascript(render(:partial => "shared/update_browser_warning"))}');
+            $modalwrapper.fadeIn();
+        }

@@ -15,7 +15,7 @@
   - if employer.staff_roles.any?
     %contacts
       = render :partial => "events/v2/employers/owner_contact", :collection => employer.staff_roles.uniq
-  %is_active= (employer.is_active.blank? ? true : employer.is_active)
+  %is_active= true
   - broker_agency_profile = employer.broker_agency_profile
   = render :partial => "events/v2/employers/broker_agency_profile", :object => employer.broker_agency_profile if broker_agency_profile && broker_agency_profile.active_broker_roles.present?
   %employer_profile

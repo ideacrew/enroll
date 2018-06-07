@@ -391,6 +391,10 @@ module BenefitSponsors
       source_kind == :conversion
     end
 
+    def is_mid_plan_year_conversion?
+      source_kind == :mid_plan_year_conversion
+    end
+
     def active_broker_agency_account
       broker_agency_accounts.detect { |baa| baa.is_active }
     end
