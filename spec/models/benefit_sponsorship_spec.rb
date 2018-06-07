@@ -61,7 +61,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
             end
 
             it 'is_under_open_enrollment should return true' do 
-              expect(benefit_sponsorship.is_under_open_enrollment?).to be_truthy
+              expect(benefit_sponsorship.is_coverage_period_under_open_enrollment?).to be_truthy
             end
           end
 
@@ -73,7 +73,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
             end
 
             it 'is_under_open_enrollment should return false' do 
-              expect(benefit_sponsorship.is_under_open_enrollment?).to be_falsey
+              expect(benefit_sponsorship.is_coverage_period_under_open_enrollment?).to be_falsey
             end
           end
         end
