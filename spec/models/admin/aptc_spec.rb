@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+
 RSpec.describe Admin::Aptc, :type => :model do
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
@@ -154,4 +156,6 @@ RSpec.describe Admin::Aptc, :type => :model do
       end
     end
   end
+end
+
 end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe SpecialEnrollmentPeriod, :type => :model do
+RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each do
 
   let(:family)        { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:shop_qle)      { QualifyingLifeEventKind.create(
