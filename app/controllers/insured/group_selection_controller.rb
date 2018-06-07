@@ -65,7 +65,7 @@ class Insured::GroupSelectionController < ApplicationController
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
 
-      hbx_enrollment.plan = @hbx_enrollment.plan
+      hbx_enrollment.product = @hbx_enrollment.product
     end
 
     hbx_enrollment.generate_hbx_signature
@@ -80,7 +80,6 @@ class Insured::GroupSelectionController < ApplicationController
 
     if hbx_enrollment.save
       if @adapter.keep_existing_plan?(params)
-        hbx_enrollment.update_coverage_kind_by_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
@@ -92,14 +91,12 @@ class Insured::GroupSelectionController < ApplicationController
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
-=begin
   rescue Exception => error
     flash[:error] = error.message
     logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
     return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
-=end
   end
 
   def terminate_selection
