@@ -4,7 +4,6 @@ module BenefitSponsors
     def show?
       return false unless user.present?
       return true if user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      # TODO
       true
     end
 
@@ -16,7 +15,6 @@ module BenefitSponsors
     def coverage_reports?
       return false unless user.present?
       return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      # TODO
       true
     end
 
@@ -29,13 +27,14 @@ module BenefitSponsors
     end
 
     def is_broker_for_employer?(profile)
-      # TODO
-      return true
+      broker_role = user.person.broker_role
+      return false unless broker_role
+      profile.broker_agency_accounts.any? {|acc| acc.writing_agent_id == broker_role.id}
     end
 
     def is_general_agency_staff_for_employer?(profile)
       # TODO
-      return true
+      return false
     end
 
     def updateable?

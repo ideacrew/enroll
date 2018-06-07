@@ -306,6 +306,12 @@ module BenefitSponsors
       self
     end
 
+    # TODO: Refer to benefit_sponsorship instead of employer profile.
+    def no_documents_uploaded?
+      # benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+      benefit_sponsorship.profile.employer_attestation.blank? || benefit_sponsorship.profile.employer_attestation.unsubmitted?
+    end
+
     def effective_date
       start_on
     end
@@ -445,6 +451,7 @@ module BenefitSponsors
       def find(id)
         return nil if id.blank?
         sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find(id).first
+        
         if sponsorship.present?
           sponsorship.benefit_applications_by(id)
         end

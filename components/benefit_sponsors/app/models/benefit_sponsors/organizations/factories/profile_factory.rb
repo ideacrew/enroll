@@ -328,7 +328,7 @@ module BenefitSponsors
             # return "sponsor_home_registration_url@#{profile_id}" if is_saved
             resource_id = profile_id
             resource_id = organization.employer_profile.id if resource_id.blank? && organization.present?
-            return "profiles_employers_employer_profile_path@#{resource_id}" if is_saved
+            return "sponsor_home_registration_url@#{resource_id}" if is_saved
 
             :sponsor_new_registration_url
           end
@@ -344,6 +344,10 @@ module BenefitSponsors
 
         def get_organization
           self.organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
+        end
+
+        def get_profile
+          self.profile = BenefitSponsors::Organizations::Profile.find(profile_id)
         end
 
         protected
