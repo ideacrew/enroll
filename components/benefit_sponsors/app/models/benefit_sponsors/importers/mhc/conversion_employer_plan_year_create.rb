@@ -109,7 +109,9 @@ module Importers::Mhc
 
       record = map_plan_year
       if save_result = record.save
-        record.benefit_sponsor_catalog.save!
+        catalog = record.benefit_sponsor_catalog
+        catalog.benefit_application = record
+        catalog.save
       end
       
       propagate_errors(record)
