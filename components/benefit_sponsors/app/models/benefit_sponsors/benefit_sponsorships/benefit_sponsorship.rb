@@ -17,6 +17,7 @@ module BenefitSponsors
     include Mongoid::Document
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
+    include BenefitSponsors::Concerns::EmployerDatatableConcern
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
