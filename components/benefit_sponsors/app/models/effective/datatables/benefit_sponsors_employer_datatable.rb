@@ -19,11 +19,11 @@ module Effective
         table_column :broker, :proc => Proc.new { |row|
             @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
-        # table_column :general_agency, :proc => Proc.new { |row|
-        #   @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
-        # }, :filter => false
-        # # table_column :conversion, :proc => Proc.new { |row| boolean_to_glyph(@employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
-        #
+        table_column :general_agency, :proc => Proc.new { |row|
+          @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
+        }, :filter => false
+        table_column :conversion, :proc => Proc.new { |row| boolean_to_glyph(@employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
+
         table_column :benefit_application_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
             row.latest_benefit_application.aasm_state
