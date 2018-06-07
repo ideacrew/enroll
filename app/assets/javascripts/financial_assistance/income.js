@@ -238,6 +238,7 @@ $(document).ready(function() {
         $(clonedForm).find('select').selectric();
         //$(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+        clonedForm.find('.interaction-click-control-save').addClass("disabled");
     });
 
     $('#has_job_income_true').click(function(e) {
