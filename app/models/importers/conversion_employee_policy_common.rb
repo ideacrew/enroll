@@ -98,7 +98,11 @@ module Importers
     end
 
     def start_date
-      [default_policy_start].detect { |item| !item.blank? }
+      if benefit_begin_date > default_policy_start
+        benefit_begin_date
+      else
+        default_policy_start
+      end
     end
 
     (1..8).to_a.each do |num|

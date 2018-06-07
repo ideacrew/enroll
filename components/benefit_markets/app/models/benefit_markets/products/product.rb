@@ -27,6 +27,9 @@ module BenefitMarkets
     field :provider_directory_url,      type: String
     field :is_reference_plan_eligible,  type: Boolean,  default: false
 
+    field :deductible, type: String
+    field :family_deductible, type: String
+
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"
 
@@ -116,6 +119,16 @@ module BenefitMarkets
           (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
         end
       end
+    end
+
+    def deductible_value
+      return nil if deductible.blank?
+      deductible.split(".").first.gsub(/[^0-9]/, "").to_i
+    end
+
+    def family_deductible_value
+      return nil if family_deductible.blank?
+      deductible.split("|").last.split(".").first.gsub(/[^0-9]/, "").to_i
     end
 
     def product_kind

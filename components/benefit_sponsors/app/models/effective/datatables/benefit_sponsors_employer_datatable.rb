@@ -30,12 +30,22 @@ module Effective
             @latest_plan_year.aasm_state.to_s.titleize if @latest_plan_year.present?
           end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
-          @latest_plan_year.try(:start_on)
+          @latest_plan_year.try(:start_on).strftime("%m/%d/%Y") if @latest_plan_year.present?
           }, :filter => false, :sortable => true
         # table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         if employer_attestation_is_enabled?
-          # table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row| row.employer_profile.employer_attestation.aasm_state.titleize if row.employer_profile.employer_attestation }, :filter => false, :sortable => false
+          table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
+            #TODO fix this after employer attestation is fixed, this is only temporary fix
+            #used below condition as employer_attestation is embedded from both employer profile and benefit sponsorship
+            benefit_sponsorship = row.active_benefit_sponsorship
+            src_kind = benefit_sponsorship.source_kind
+              if [:conversion, :mid_plan_year_conversion].include?(src_kind)
+                benefit_sponsorship.employer_attestation.aasm_state.titleize if benefit_sponsorship.employer_attestation.present?
+              elsif [:self_serve].include?(src_kind)
+                @employer_profile.employer_attestation.aasm_state.titleize if @employer_profile.employer_attestation.present?
+              end
+          }, :filter => false, :sortable => false
         end
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [

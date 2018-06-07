@@ -30,6 +30,7 @@ module BenefitMarkets
       field :is_standard_plan,            type: Boolean,  default: false
 
       field :rx_formulary_url,            type: String
+      field :hsa_eligibility,             type: Boolean,  default: false
 
 
       belongs_to  :renewal_product,

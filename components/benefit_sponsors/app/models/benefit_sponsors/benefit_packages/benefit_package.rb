@@ -33,8 +33,9 @@ module BenefitSponsors
       delegate :recorded_rating_area, to: :benefit_application
       delegate :benefit_sponsorship, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
+      delegate :benefit_market, to: :benefit_application
 
-      validates_presence_of :title, :probation_period_kind, :is_default, :is_active, :sponsored_benefits
+      validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
       # calculate effective on date based on probation period kind
       # Logic to deal with hired_on and created_at
@@ -55,6 +56,10 @@ module BenefitSponsors
         else
           ::TimeKeeper.date_of_record
         end
+      end
+
+      def open_enrollment_contains?(date)
+        open_enrollment_period.include?(date)
       end
 
       def package_for_open_enrollment(shopping_date)
@@ -86,6 +91,18 @@ module BenefitSponsors
         sponsored_benefits << new_sponsored_benefit
       end
 
+      def health_sponsored_benefit
+        sponsored_benefits.where(_type: /.*HealthSponsoredBenefit/).first
+      end
+
+      def dental_sponsored_benefit
+        sponsored_benefits.where(_type: /.*DentalSponsoredBenefit/).first
+      end
+
+      def rating_area
+        recorded_rating_area.blank? ? benefit_group.benefit_sponsorship.rating_area : recorded_rating_area
+      end
+      
       def drop_sponsored_benefit(sponsored_benefit)
         sponsored_benefits.delete(sponsored_benefit)
       end
@@ -225,12 +242,8 @@ module BenefitSponsors
 
       def self.find(id)
         ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
-
-          if benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
-            benefit_application.benefit_packages.find(id)
-          else
-            nil
-          end
+          benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_package_find(id).first
+          benefit_sponsorship.benefit_package_by(id)
         end
       end
 

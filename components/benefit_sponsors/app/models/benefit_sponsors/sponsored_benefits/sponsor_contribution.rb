@@ -24,6 +24,15 @@ module BenefitSponsors
       # Needs to return the most recent SIC CODE value recorded for this sponsorship
     end
 
+    # FIXME: This is wrong and only does the worlds dumbest pairing
+    #        by position. This DOES NOT WORK for the non-composite
+    #        cases.
+    def match_contribution_level_for(pricing_unit)
+      cl_list = contribution_levels.to_a.sort_by(&:order)
+      possible_cl = cl_list[pricing_unit.order]
+      possible_cl ? possible_cl : cl_list.last
+    end
+
     def self.sponsor_contribution_for(new_product_package)
       contribution_service = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
       contribution_service.build_sponsor_contribution(new_product_package)

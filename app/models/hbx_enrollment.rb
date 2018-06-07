@@ -434,6 +434,10 @@ class HbxEnrollment
     terminated_on >= TimeKeeper.date_of_record
   end
 
+  def active_during?(date)
+    false
+  end
+
   def is_active?
     self.is_active
   end
@@ -532,29 +536,19 @@ class HbxEnrollment
   end
 
   def update_existing_shop_coverage
-    id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
-    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
+    return if parent_enrollment.blank?
 
-    terminate_proc = lambda do |enrollment|
-      if enrollment.may_terminate_coverage?
-        if !enrollment.coverage_termination_pending?
-          enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-          enrollment.terminate_coverage!
-        end
-      end
-    end
-
-    shop_enrollments.each do |enrollment|
-      if enrollment.currently_active? && self.effective_on == enrollment.effective_on
-        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-      elsif enrollment.currently_active? && enrollment.may_terminate_coverage?
-        terminate_proc.call(enrollment)
-      elsif enrollment.future_active?
-        if enrollment.effective_on >= self.effective_on
-          enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-        else
-          terminate_proc.call(enrollment)
-        end
+    if parent_enrollment.currently_active? && self.effective_on == parent_enrollment.effective_on
+      parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
+    elsif parent_enrollment.currently_active? && parent_enrollment.may_terminate_coverage? && !parent_enrollment.coverage_termination_pending?
+      enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+      enrollment.terminate_coverage!
+    elsif parent_enrollment.future_active?
+      if parent_enrollment.effective_on >= self.effective_on
+        parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
+      elsif parent_enrollment.may_terminate_coverage? and !parent_enrollment.coverage_termination_pending?
+        parent_enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+        parent_enrollment.terminate_coverage!
       end
     end
 
@@ -786,6 +780,15 @@ class HbxEnrollment
 =end
   def has_broker_agency_profile?
     broker_agency_profile_id.present?
+  end
+
+  def can_waive_enrollment?(on_date = ::TimeKeeper.date_of_record)
+    return false unless is_shop?
+    return false unless may_waive_coverage?
+    return true if self.sponsored_benefit_package.open_enrollment_contains?(on_date)
+    # TODO: Get a method for is_under_special enrollment period that will
+    # check based on a given time.
+    family.is_under_special_enrollment_period?
   end
 
   def can_complete_shopping?(options = {})
@@ -1385,7 +1388,8 @@ class HbxEnrollment
         coverage_effective_date = open_enrollment_effective_date
       end
 
-      benefit_group_assignment_valid?(coverage_effective_date)
+      # TODO Have Trey confirm this isn't necessary anymore
+      #benefit_group_assignment_valid?(coverage_effective_date)
     else
       true
     end
@@ -1396,27 +1400,7 @@ class HbxEnrollment
   end
 
   def decorated_hbx_enrollment
-    # need to update this to match new model
-    return
-    return @cost_decorator if @cost_decorator
-    if product.present? && sponsored_benefit_package.present?
-      if sponsored_benefit_package.is_congress #is_a? BenefitGroupCongress
-        #need to map to new model
-        @cost_decorator = PlanCostDecoratorCongress.new(product, self, benefit_group)
-      elsif self.composite_rated? && (!plan.dental?)
-        @cost_decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
-      else
-        reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
-        @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
-      end
-    elsif plan.present? && consumer_role.present?
-      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
-    elsif plan.present? && resident_role.present?
-      @cost_decorator = UnassistedPlanCostDecorator.new(plan, self)
-    else
-      log("#3835 hbx_enrollment without benefit_group and consumer_role. hbx_enrollment_id: #{self.id}, plan: #{plan}", {:severity => "error"})
-      @cost_decorator = OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
-    end
+    @group_enrollment ||= HbxEnrollmentSponsoredCostCalculator.new(self).groups_for_products([product]).first.group_enrollment
   end
 
   def eligibility_event_kind

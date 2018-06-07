@@ -20,6 +20,14 @@ module BenefitSponsors
       true
     end
 
+    def export_census_employees?
+      show?
+    end
+
+    def inbox?
+      show?
+    end
+
     def is_broker_for_employer?(profile)
       # TODO
       return true

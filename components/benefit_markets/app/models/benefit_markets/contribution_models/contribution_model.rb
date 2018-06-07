@@ -18,7 +18,7 @@ module BenefitMarkets
       field :contribution_calculator_kind, type: String
 
       # Will an enrollment map to multiple possible contribution units?
-      field :many_simultaneous_contribution_units, default: false
+      field :many_simultaneous_contribution_units, type: Boolean, default: false
 
       # Indicates the set of product multiplicities that are compatible
       # with this contribution model.  Should be some subset of 

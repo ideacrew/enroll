@@ -571,8 +571,9 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    return plan.metal_level.titleize if plan.coverage_kind == "health"
-    (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:titleize) || ""
+    return plan.metal_level_kind.to_s.titleize if plan.kind == :health
+    # TODO Update this for dental plans
+    (plan.active_year == 2015 ? plan.metal_level_kind : plan.dental_level).try(:to_s).try(:titleize) || ""
   end
 
   def make_binder_checkbox_disabled(employer)

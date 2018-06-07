@@ -2,22 +2,22 @@
   %id
     %id= benefit_group.id
   %name= benefit_group.title
-  - if !benefit_group.use_simple_employer_calculation_model?
-    %group_size= benefit_group.group_size_count
-    %participation_rate= benefit_group.participation_rate
-  - if benefit_group.multiple_market_rating_areas?
-    - if !benefit_group.rating_area.blank?
-      %rating_area= benefit_group.rating_area
+  - unless benefit_group.benefit_market.configuration.use_simple_employer_calculation_model
+    %group_size= benefit_group.group_size_count  # todo
+    %participation_rate= benefit_group.participation_rate  #todo
+  - if benefit_group.rating_area.present?
+    %rating_area= benefit_group.rating_area.exchange_provided_code
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
   -#%federal_contributions= " " field not available in benefit group modal
-  - if benefit_group.sole_source?
+  - if sponsored_benefit.single_plan_type?
     %composite_rating_tiers
-      - benefit_group.composite_tier_contributions.each do |ctc|
-        %composite_rating_tier
-          %tier_name= "urn:openhbx:terms:v1:composite_rating_tier#" + ctc.composite_rating_tier
-          %premium= ctc.display_premium
-          %contribution_percent= ctc.employer_contribution_percent
+      - sponsored_benefit.pricing_determinations.each do |pricing_deter|
+        - pricing_deter.pricing_determination_tiers.each do |deter_tier|
+          %composite_rating_tier
+            %tier_name= "urn:openhbx:terms:v1:composite_rating_tier#" + deter_tier.pricing_unit.name
+            %premium= deter_tier.price
+            %contribution_percent= deter_tier.sponsor_contribution_factor
   - else
     %relationship_benefits
       = render :partial => "events/v2/employers/relationship_benefit", :collection => relationship_benefits

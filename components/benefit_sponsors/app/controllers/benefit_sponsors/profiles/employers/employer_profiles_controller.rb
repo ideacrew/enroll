@@ -3,12 +3,13 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :coverage_reports]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
         def show_pending
+          authorize @employer_profile
           respond_to do |format|
             format.html
             format.js
@@ -66,6 +67,7 @@ module BenefitSponsors
         end
 
         def export_census_employees
+          authorize @employer_profile
           respond_to do |format|
             format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
           end
@@ -88,6 +90,7 @@ module BenefitSponsors
         end
 
         def inbox
+          authorize @employer_profile
           @folder = params[:folder] || 'Inbox'
           @sent_box = false
         end
@@ -185,6 +188,11 @@ module BenefitSponsors
 
         def is_format_csv?
           request.format.csv?
+        end
+
+        def user_not_authorized(exception)
+          session[:custom_url] = main_app.new_user_registration_path unless current_user
+          super
         end
       end
     end

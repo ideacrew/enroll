@@ -20,8 +20,8 @@
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
-            <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
-            Benefit: <%= @enrollment.coverage_kind %><br>
+            <strong><%= @plan.issuer_profile.legal_name %> <%= @plan.title %></strong><br>
+            Benefit: <%= @enrollment.coverage_kind.titleize %><br>
             Market: <%= show_market_name_by_enrollment @enrollment %><br>
             Metal level : <%= display_dental_metal_level @plan %>
           </p>
@@ -52,19 +52,19 @@
             </div>
             <div class="modal-body">
 
-              <% if @plan.coverage_kind == 'health' %>
+              <% if @plan.kind == :health %>
 
 
-              <h4><strong><%= @plan.name %></strong></h4>
+              <h4><strong><%= @plan.title %></strong></h4>
               <br/>
               <ol>
                 <li>
-                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.carrier_profile.legal_name %> within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. <%= site_short_name %> doesn’t collect your premium payments.
+                  <strong>Make your first premium payment directly to <%= @plan.issuer_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.issuer_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.issuer_profile.legal_name %> within two weeks, please call <%= @plan.issuer_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.issuer_profile.legal_name %>. <%= site_short_name %> doesn’t collect your premium payments.
                   <br/>
                 </li>
                 <br>
                 <div class="carrier-numbers">
-                  <% if @plan.carrier_profile.legal_name == "CareFirst" %>
+                  <% if @plan.issuer_profile.legal_name == "CareFirst" %>
                   <div>
                     Call: <strong>1-855-444-3119</strong>
                     <!-- comment out congressional phone numbers
@@ -72,7 +72,7 @@
                     For Congressional Employees: <strong><a href="tel:+18557922587">1-855-792-2587</a></strong>
                     -->
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "Aetna" %>
+                  <% elsif @plan.issuer_profile.legal_name == "Aetna" %>
                   <div>
                     <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
                     Call: <strong>1-855-586-6959</strong><br/>
@@ -100,7 +100,7 @@
                     -->
                   </div>
 
-                  <% elsif @plan.carrier_profile.legal_name == "Kaiser" %>
+                  <% elsif @plan.issuer_profile.legal_name == "Kaiser" %>
                   <div>
                     Call: <strong>1-844-524-7370</strong>
                     <!-- comment out congressional phone numbers
@@ -108,7 +108,7 @@
                     For Congressional Employees: <strong><a href="tel:+18552513209">1-855-251-3209</a></strong>
                   -->
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "UnitedHealthcare" %>
+                  <% elsif @plan.issuer_profile.legal_name == "UnitedHealthcare" %>
                   <div>
                     Call: <strong>1-877-856-2430</strong><br/>
                   </div>
@@ -120,7 +120,7 @@
                 <br/>
 
                 <li>
-                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.issuer_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
                 </li>
               </ol>
               <% else %>
@@ -128,32 +128,32 @@
               <br/>
               <ol>
                 <li>
-                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   <%= site_short_name %> does not collect premiums.
+                  <strong>Make your first premium payment directly to <%= @plan.issuer_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.issuer_profile.legal_name %>. <%= @plan.issuer_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.issuer_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.issuer_profile.legal_name %>.   <%= site_short_name %> does not collect premiums.
                   <br/>
                 </li>
                 <div class="carrier-numbers">
-                  <% if @plan.carrier_profile.legal_name == "CareFirst" %>
+                  <% if @plan.issuer_profile.legal_name == "CareFirst" %>
                   <div><br/>
                     Call: <strong>1-855-444-3119</strong><br/>
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "Delta Dental" %>
+                  <% elsif @plan.issuer_profile.legal_name == "Delta Dental" %>
                   <div><br/>
                     Call: <strong>1-800-471-0236</strong> or <strong>1-800-471-0275</strong>
                     <br/>
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "MetLife" %>
+                  <% elsif @plan.issuer_profile.legal_name == "MetLife" %>
                   <div><br/>
                     Call: <strong>1-855-638-2221</strong><br/>
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "Dentegra" %>
+                  <% elsif @plan.issuer_profile.legal_name == "Dentegra" %>
                   <div><br/>
                     Call: <strong>1-800-471-0284</strong><br/>
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "Dominion" %>
+                  <% elsif @plan.issuer_profile.legal_name == "Dominion" %>
                   <div><br/>
                     Call: <strong>1-855-224-3016</strong><br/>
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "BestLife" %>
+                  <% elsif @plan.issuer_profile.legal_name == "BestLife" %>
                   <div><br/>
                     Call: <strong>1-800-433-0088</strong><br/>
                   </div>
@@ -165,7 +165,7 @@
                 <br/>
 
                 <li>
-                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you’ll need to start using your benefits (such as member number). They’ll also mail your insurance cards to you.<br/>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.issuer_profile.legal_name %> receives your first payment, they can provide the information you’ll need to start using your benefits (such as member number). They’ll also mail your insurance cards to you.<br/>
                 </li>
               </ol>
               <% end %>

@@ -1,6 +1,7 @@
 - selected_kind_carrier = f.object.product_option_choice == 'single_issuer'
 - selected_kind_metal_level = f.object.product_option_choice == 'metal_level'
 - selected_kind_plan = f.object.product_option_choice == 'single_product'
+- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 - if @benefit_package_form.new_record?
   h1.heading-text Select Your Plan Offering

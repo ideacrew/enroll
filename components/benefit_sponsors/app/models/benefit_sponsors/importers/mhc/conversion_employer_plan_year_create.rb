@@ -18,7 +18,15 @@ module Importers::Mhc
 
     def fetch_application_params
       service = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      formed_params = service.default_dates_for_coverage_starting_on(default_plan_year_start)
+
+      plan_year_begin = default_plan_year_start
+      if mid_year_conversion
+        if orginal_plan_year_begin_date > default_plan_year_start
+          plan_year_begin = orginal_plan_year_begin_date
+        end
+      end
+
+      formed_params = service.default_dates_for_coverage_starting_on(plan_year_begin)
       
       if mid_year_conversion
         effective_period = formed_params[:effective_period]
@@ -46,7 +54,12 @@ module Importers::Mhc
     end
 
     def tier_contribution_values
-      contribution_level_names = BenefitSponsors::SponsoredBenefits::ContributionLevel::NAMES
+      contribution_level_names = [
+        "employee_only",
+        "employee_and_spouse",
+        "employee_and_one_or_more_dependents",
+        "family"
+      ]
       contribution_level_names.inject([]) do |contributions, sponsor_level_name|
         contributions << {
           relationship: sponsor_level_name,
@@ -95,7 +108,10 @@ module Importers::Mhc
       return false if plan_year_exists?(sponsorship)
 
       record = map_plan_year
-      save_result = record.save
+      if save_result = record.save
+        record.benefit_sponsor_catalog.save!
+      end
+      
       propagate_errors(record)
 
       if save_result

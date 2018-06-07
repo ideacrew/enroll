@@ -98,7 +98,7 @@ module EnrollmentShopping
 
     def check_for_affected_enrollment(enrollment, sponsored_benefit)
       aef = AffectedEnrollmentFinder.new
-      affected_enrollments = aef.for_sponsored_benefit_and_date(sponsored_benefit, enrollment.effective_on)
+      affected_enrollments = aef.for_sponsored_benefit_and_date(enrollment.family, sponsored_benefit, enrollment.effective_on)
       if affected_enrollments.any?
         affected_enrollment = affected_enrollments.first
         enrollment.predecessor_enrollment_id = affected_enrollment.id

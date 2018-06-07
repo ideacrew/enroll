@@ -72,7 +72,7 @@
               <% end %>
           <% end %>
           <%#= pundit_span(EmployerProfile, :revert_application?) %>
-          <% if current_user.has_hbx_staff_role? && ( benefit_application.may_revert_enrollment? || benefit_application.may_revert_application? ) %>
+          <% if current_user.has_hbx_staff_role? && benefit_application.may_revert_application? %>
             <span class="btn btn-default pull-right" data-target="#revertBenefitApplication_<%= benefit_application.id %>" data-toggle="modal">Revert Application</span>
             <%#= link_to "Revert Application", benefit_sponsorship_benefit_application_revert_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right"%>
           <% end %>

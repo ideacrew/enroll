@@ -20,5 +20,8 @@ module BenefitSponsors
       })
     end
 
+    def employee_cost
+      product_price - sponsor_contribution
+    end
   end
 end

@@ -133,8 +133,9 @@ javascript:
   
   function filteredPlans(type) {
     filteredArray = [];
-    // Filters by Title
+    
     if (type == "plan-name") {
+      // Filters by Title
       availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
       filteredArray.sort(function(a,b) {
         var titleA = a.product.title.toLowerCase();
@@ -148,19 +149,33 @@ javascript:
     }
     
     if (type == "plan-metal-premium") {
-      filteredArray = [];
       // Filter by premium
       availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
       filteredArray.sort(function(a,b) {
         var priceA = parseFloat(a.product_cost_total - a.sponsor_contribution_total).toFixed(2);
         var priceB = parseFloat(b.product_cost_total - b.sponsor_contribution_total).toFixed(2);
-        if (priceA < priceB) //sort string ascending
+        if (Number(priceA) < Number(priceB)) //sort string ascending
           return -1
-        if (priceA > priceB)
+        if (Number(priceA) > Number(priceB))
           return 1
         return 0 //default return value (no sorting)
       })
     }
+    
+    if (type == "plan-metal-deductible") {
+      // Filter by deductible
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var priceA = parseFloat(a.product.deductible).toFixed(0);
+        var priceB = parseFloat(b.product.deductible).toFixed(0);
+        if (Number(priceA) < Number(priceB)) //sort string ascending
+          return -1
+        if (Number(priceA) > Number(priceB))
+          return 1
+        return 0 //default return value (no sorting)
+      })
+    }
+    
     showFilteredResults()
   }
   
@@ -194,10 +209,39 @@ javascript:
     
     availableEnrollments.filter(function(enrollment) {
       premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
-      if (premiumTotal >= premiumFrom && premiumTotal <= premiumTo) {
+      if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
         resultsArray.push(enrollment);
       }
     })
+    // Filters based on Deductible Amount
+    deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
+    deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
+    
+    availableEnrollments.filter(function(enrollment) {
+      deductible = parseFloat(enrollment.product.deductible.replace(',','').replace('$','')).toFixed(0);
+      if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
+        resultsArray.push(enrollment);
+      }
+    })
+    
+    if (selections.selectedHSA) {
+      var hsa = Boolean;
+      if (selections.selectedHSA == "Yes") {
+        hsa = true;
+      } else {
+        hsa = false;
+      }
+      
+      availableEnrollments.filter(function(enrollment) {
+        if (enrollment.product.hsa_eligibility == hsa) {
+          resultsArray.push(enrollment);
+        }
+      })
+      
+    }
+    
+    
+    
     // Removes duplicates from results array
     filteredArray = removeDuplicates(resultsArray)
     // Shows results in the view
@@ -209,6 +253,13 @@ javascript:
   function showFilteredResults() {
     var element = document.getElementById('filteredPlans');
     filteredArray.forEach(function(result) {
+      // Used to show deductible for plan
+      if (result.member_enrollments.length > 1) {
+        var deductible = result.product.family_deductible;
+      } else {
+        var deductible = result.product.deductible;
+      }
+      
       var div = document.createElement('div')
       div.setAttribute('class', 'myfilteredPlans')
       div.innerHTML = '<div class="module plan-row panel panel-default">\
@@ -248,7 +299,7 @@ javascript:
                     <td>'+result.product.kind.toUpperCase()+'</td>\
                     <td><span class="'+result.product.metal_level_kind+'-icon">'+result.product.metal_level_kind.toUpperCase()+'</td>\
                     <td>N/A</td>\
-                    <td>N/A</td>\
+                    <td>'+deductible+'</td>\
                   </tr>\
                 </tbody>\
               </table>\
@@ -274,13 +325,12 @@ javascript:
         </div>\
       </div>'
       element.append(div)
-      //console.log(result)
     });
   }
   
   function removeDuplicates(data) {
     return data.filter((item, index,arr)=>{
-      const c = arr.map(item=> item.product_cost_total);
+      var c = arr.map(item=> item.product_cost_total);
       return  index === c.indexOf(item.product_cost_total)
     })
   }

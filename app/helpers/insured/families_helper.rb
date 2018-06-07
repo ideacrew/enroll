@@ -14,13 +14,7 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.is_shop?
-      hbx_enrollment.total_employee_cost
-    elsif hbx_enrollment.kind == 'coverall'
-      hbx_enrollment.total_premium
-    else
-      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
-    end
+    hbx_enrollment.total_employee_cost
   end
 
   def hide_policy_selected_date?(hbx_enrollment)
@@ -127,20 +121,25 @@ module Insured::FamiliesHelper
   end
 
   def disable_make_changes_button?(hbx_enrollment)
-    return false
     # return false if IVL
+    puts '1'
     return false if hbx_enrollment.census_employee.blank?
+    puts '2'
     return false if !hbx_enrollment.is_shop?
+    puts '3'
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
       # 3) qle enrolmlent period check
-    return false if hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
-    return false if hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
-    return false if hbx_enrollment.is_special_enrollment? && hbx_enrollment.special_enrollment_period.present? && hbx_enrollment.special_enrollment_period.contains?(TimeKeeper.date_of_record)
+    return false if hbx_enrollment.sponsored_benefit_package.open_enrollment_contains?(TimeKeeper.date_of_record)
+    puts '4'
+    return false if hbx_enrollment.employee_role.can_enroll_as_new_hire?
+    puts '5'
+    return false if hbx_enrollment.family.is_under_special_enrollment_period? && hbx_enrollment.active_during?(hbx_enrollment.family.current_sep.effective_on)
+    puts '6'
 
     # Disable only  if non of the above conditions match
-    return true
+    true
   end
 
   def all_active_enrollment_with_aptc(family)

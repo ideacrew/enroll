@@ -4,13 +4,13 @@
 Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
 </p>
 <p>
-You're successfully enrolled in <%= @plan.name %>.
+You're successfully enrolled in <%= @plan.title %>.
 </p>
 
 <% if @market_kind != 'individual' %>
 <p>
-  Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @plan.total_employee_cost%>.</b><br>
-  Your employer contributes <b><%= ActionView::Base.new.number_to_currency @plan.total_employer_contribution %></b> towards your monthly premium.<br>
+  Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.employee_cost_total %>.</b><br>
+  Your employer contributes <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.sponsor_contribution_total %></b> towards your monthly premium.<br>
   Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
 </p>
 <p>

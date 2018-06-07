@@ -44,7 +44,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def receipt
     @enrollment = HbxEnrollment.find(params.require(:id))
-    plan = @enrollment.plan
+    @plan = @enrollment.product
 
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
@@ -54,7 +54,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @market_kind = "individual"
     end
 
-    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -65,10 +65,18 @@ class Insured::PlanShoppingsController < ApplicationController
     send_receipt_emails if @person.emails.first
   end
 
+  def fix_member_dates(enrollment, plan)
+    return if enrollment.parent_enrollment.present? && plan.id == enrollment.parent_enrollment.product_id
+
+    @enrollment.hbx_enrollment_members.each do |member|
+      member.coverage_start_on = enrollment.effective_on
+    end
+  end
+
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
-    @plan = Plan.find(params.require(:plan_id))
+    @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
 
@@ -78,8 +86,10 @@ class Insured::PlanShoppingsController < ApplicationController
       get_aptc_info_from_session(@enrollment)
     end
 
-    @enrollment.reset_dates_on_previously_covered_members(@plan)
-    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    # TODO Fix this stub
+    #@plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+
     @family = @person.primary_family
 
     #FIXME need to implement can_complete_shopping? for individual
@@ -87,7 +97,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
+    #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
@@ -156,11 +166,6 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
-    ip_lookup_table = {}
-    issuer_profile_cache = ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |ipo|
-      ip_lookup_table[ipo.issuer_profile.id] = ipo.issuer_profile
-    end
-    ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
@@ -170,38 +175,25 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
+    @issuer_profiles = []
+    @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
+    ip_lookup_table = {}
+    ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |ipo|
+      if @issuer_profile_ids.include?(ipo.issuer_profile.id)
+        @issuer_profiles << ipo.issuer_profile
+        ip_lookup_table[ipo.issuer_profile.id] = ipo.issuer_profile
+      end
+    end
+    ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     @member_groups = sponsored_cost_calculator.groups_for_products(products)
     @enrolled_hbx_enrollment_plan_ids = []
     @metal_levels = %w[platinum gold silver bronze catastrophic]
     @plan_types = %w[HMO PPO POS]
     @networks = %w[nationwide]
+    @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
+    @waivable = @hbx_enrollment.can_waive_enrollment?
     render "show_slug"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
-=begin
-    set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
-      session[:max_aptc] = @max_aptc
-      @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
-    else
-      session[:max_aptc] = 0
-      session[:elected_aptc] = 0
-    end
-
-    if params[:market_kind] == 'shop' && plan_match_dc
-      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
-    end
-    
-    @waivable = @hbx_enrollment.try(:can_complete_shopping?)
-    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
-    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
-    
-    
-    @networks = %w[nationwide DC-Metro]
-=end
   end
 
   def set_elected_aptc

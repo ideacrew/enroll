@@ -8,7 +8,10 @@ module BenefitMarkets
       field :hios_id,                     type: String
       field :hios_base_id,                type: String
       field :csr_variant_id,              type: String
-
+      field :hsa_eligibility,             type: Boolean,  default: false
+      field :dental_level, type: String
+      field :carrier_special_plan_identifier, type: String
+      field :metal_level_kind,            type: Symbol
     end
   end
 end

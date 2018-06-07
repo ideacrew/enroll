@@ -49,8 +49,12 @@
                 - plan_level = plan.metal_level_kind.to_s.humanize
                 span class="#{plan_level.downcase}-icon"
                   = plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize
-              td = false ? "Nationwide" : "DC-Metro"
-              td = "DEDUCTABLE WILL GO HERE"
+              td Nationwide
+              td 
+                - if @hbx_enrollment.hbx_enrollment_members.size > 1
+                  = plan.family_deductible
+                - else
+                  = plan.deductoble
     .row
       .col-xs-3
         .checkbox.no-buffer
@@ -60,7 +64,7 @@
       .col-xs-4
         = "SBC LINK WILL GO HERE"
       .col-md-5.col-sm-5.col-xs-5.text-right style="padding-left: 0"
-        = link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}})
+        = link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-default btn-right plan-select select')
         = link_to "See Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default ml-1", :remote => true}
             
           
