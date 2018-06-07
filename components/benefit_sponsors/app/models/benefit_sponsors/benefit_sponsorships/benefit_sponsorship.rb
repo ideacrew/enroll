@@ -154,6 +154,10 @@ module BenefitSponsors
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
 
+    scope :benefit_package_find,         ->(id) { 
+      where(:"benefit_applications.benefit_packages._id" => BSON::ObjectId.from_string(id))
+    }
+
     before_create :generate_hbx_id
 
     # after_initialize :set_service_and_rating_areas
@@ -216,6 +220,13 @@ module BenefitSponsors
 
     def benefit_applications_by(ids)
       benefit_applications.find(ids)
+    end
+
+    def benefit_package_by(id)
+      benefit_application = benefit_applications.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
+      if benefit_application
+        benefit_application.benefit_packages.find(id)
+      end
     end
 
     def is_attestation_eligible?
