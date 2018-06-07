@@ -39,6 +39,12 @@ module BenefitSponsors
         attestation.submit
         attestation.approve
         attestation.save
+
+        profile = benefit_sponsorship.profile
+        attestation = profile.build_employer_attestation
+        attestation.submit
+        attestation.approve
+        attestation.save
       end
 
       def map_site
