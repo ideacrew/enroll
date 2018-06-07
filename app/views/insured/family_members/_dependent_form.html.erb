@@ -19,7 +19,36 @@
         </div>
       <% end %>
 
-      <%= token_tag form_authenticity_token %>
+    <%if 
+      @dependent.first_name && 
+      @dependent.first_name && 
+      @dependent.dob &&
+      @dependent.gender &&
+      @dependent.relationship
+    %>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+          <div class="col-md-4 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.first_name} #{@dependent.middle_name} #{@dependent.last_name}" %></span>
+          </div>
+          <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="name">AGE</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.age_on(Date.today)}" %></span>
+          </div>
+          <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="name">GENDER</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.gender.humanize}" %></span>
+          </div>
+          <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.relationship.capitalize}" %></span>
+          </div>
+        </div>
+      </div>
+    <%end %>
+    
+    <%= token_tag form_authenticity_token %>
 
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>

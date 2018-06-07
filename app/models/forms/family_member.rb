@@ -325,5 +325,14 @@ module Forms
         end
       end
     end
+
+    def age_on(date)
+      age = date.year - dob.year
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
+      else
+        age
+      end
+    end  
   end
 end
