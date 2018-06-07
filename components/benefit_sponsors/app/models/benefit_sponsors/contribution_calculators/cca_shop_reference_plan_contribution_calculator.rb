@@ -84,7 +84,7 @@ module BenefitSponsors
       # @return [BenefitMarkets::SponsoredBenefits::ContributionRosterEntry] the
       #   contribution results paired with the roster
       def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
-        reference_product = sponsor_contribution.sponsored_benefit.reference_product
+        reference_product = sponsor_contribution.reference_product
         roster_coverage = priced_roster_entry.group_enrollment
         level_map = level_map_for(sponsor_contribution)
         group_size_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_group_size_factor(reference_product, 1)

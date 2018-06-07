@@ -11,6 +11,7 @@ module BenefitSponsors
                 class_name: "BenefitSponsors::SponsoredBenefits::ContributionLevel"
 
     delegate :contribution_model, to: :sponsored_benefit
+    delegate :reference_product, to: :sponsored_benefit, allow_nil: false
     
     accepts_nested_attributes_for :contribution_levels
     validates_presence_of :contribution_levels
