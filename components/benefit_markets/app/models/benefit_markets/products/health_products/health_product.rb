@@ -31,6 +31,7 @@ module BenefitMarkets
 
       field :rx_formulary_url,            type: String
       field :hsa_eligibility,             type: Boolean,  default: false
+      field :network_information,         type: String
 
 
       belongs_to  :renewal_product,
