@@ -14,7 +14,7 @@
         h5.col-md-12.current.bg-title
           i.fa.fa-star.fa-lg.enrolling = l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase
     .row
-      .col-md-2.col-sm-2 = "CARRIER LOGO WILL GO HERE"
+      .col-md-2.col-sm-2 = display_carrier_logo(Maybe.new(plan), {width: 80})
       .col-md-7
         h3.no-buffer
           = link_to summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, active_year: plan.try(:active_year), market_kind: @market_kind, coverage_kind: @coverage_kind}), {:remote => true} do 
