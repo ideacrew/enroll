@@ -171,6 +171,8 @@ module BenefitSponsors
     #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
     # end
 
+    delegate :benefit_market, to: :benefit_sponsorship
+
     after_initialize :set_values
     after_create :renew_benefit_package_assignments
 
@@ -209,7 +211,6 @@ module BenefitSponsors
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
       raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
       self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
-      new_benefit_sponsor_catalog.benefit_application = self
       @benefit_sponsor_catalog = new_benefit_sponsor_catalog
     end
 
@@ -305,6 +306,12 @@ module BenefitSponsors
         begin_open_enrollment!
       end
       self
+    end
+
+    # TODO: Refer to benefit_sponsorship instead of employer profile.
+    def no_documents_uploaded?
+      # benefit_sponsorship.employer_attestation.blank? || benefit_sponsorship.employer_attestation.unsubmitted?
+      benefit_sponsorship.profile.employer_attestation.blank? || benefit_sponsorship.profile.employer_attestation.unsubmitted?
     end
 
     def effective_date

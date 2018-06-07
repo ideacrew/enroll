@@ -435,6 +435,14 @@ class HbxEnrollment
   end
 
   def active_during?(date)
+    return false if ["shopping", "coverage_canceled", "void"].include?(aasm_state.to_s)
+    return false if effective_on.blank?
+    if terminated_on.present?
+      (effective_on..terminated_on).include?(date)
+    else
+      logical_end = self.sponsored_benefit_package.end_on
+      (effective_on..logical_end).include?(date)
+    end
     false
   end
 
