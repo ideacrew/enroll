@@ -31,19 +31,13 @@ module BenefitSponsors
               load_documents
             when 'employees'
               @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
-              # @current_plan_year = @employer_profile.show_plan_year
-              # paginate_employees
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'inbox'
 
             else
               @broker_agency_account = @employer_profile.active_broker_agency_account
-              # @current_plan_year = @employer_profile.show_plan_year
-              # collect_and_sort_invoices(params[:sort_order])
-              # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
-              # set_flash_by_announcement if @tab == 'home'
               respond_to do |format|
                 format.html
                 format.js
