@@ -30,6 +30,15 @@ module BenefitMarkets
     # the seed for both of these on benefit market catalog.
 
 
+    def benefit_application=(benefit_application)
+      raise "Expected Benefit Application" unless is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+      self.benefit_application_id = benefit_application._id
+    end
+
+    def benefit_application
+      return @benefit_application if defined? @benefit_application
+      @benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.find(benefit_application_id)
+    end
 
     def product_package_for(sponsored_benefit)
       product_packages.by_package_kind(sponsored_benefit.product_package_kind)
