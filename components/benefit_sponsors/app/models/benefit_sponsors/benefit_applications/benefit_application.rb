@@ -171,6 +171,8 @@ module BenefitSponsors
     #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
     # end
 
+    delegate :benefit_market, to: :benefit_sponsorship
+
     after_initialize :set_values
     after_create :renew_benefit_package_assignments
 

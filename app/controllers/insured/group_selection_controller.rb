@@ -79,7 +79,6 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     if hbx_enrollment.save
-      hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if @adapter.keep_existing_plan?(params)
         hbx_enrollment.update_coverage_kind_by_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, hbx_enrollment_id: hbx_enrollment.id)

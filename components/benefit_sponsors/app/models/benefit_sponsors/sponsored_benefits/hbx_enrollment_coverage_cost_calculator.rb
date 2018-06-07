@@ -24,7 +24,6 @@ module BenefitSponsors
 				def each
 					@hbx_enrollment_id_list.each_slice(200) do |heidl|
 						search_criteria(heidl).each do |agg_result|
-							puts agg_result["hbx_enrollment"]["product_id"].inspect
 							yield rosterize_hbx_enrollment(agg_result)
 						end
 					end
@@ -47,7 +46,7 @@ module BenefitSponsors
 									"effective_on" => "$households.hbx_enrollments.effective_on",
 									"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
 									"_id" => "$households.hbx_enrollments._id",
-									"product_id" => "$households.hbx_enrollments.plan_id"
+									"product_id" => "$households.hbx_enrollments.product_id"
 								},
 								"family_members" => 1,
 								"people_ids" => {

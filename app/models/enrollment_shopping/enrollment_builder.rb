@@ -98,7 +98,7 @@ module EnrollmentShopping
 
     def check_for_affected_enrollment(enrollment, sponsored_benefit)
       aef = AffectedEnrollmentFinder.new
-      affected_enrollments = aef.for_sponsored_benefit_and_date(enrollment.family, sponsored_benefit, enrollment.effective_on)
+      affected_enrollments = aef.for_sponsored_benefit_and_date(enrollment, sponsored_benefit, enrollment.effective_on)
       if affected_enrollments.any?
         affected_enrollment = affected_enrollments.first
         enrollment.predecessor_enrollment_id = affected_enrollment.id
@@ -106,7 +106,7 @@ module EnrollmentShopping
       end
     end
 
-    def copy_member_coverage_dates(old_hen, new_hem)
+    def copy_member_coverage_dates(old_hem, new_hem)
       old_hem.hbx_enrollment_members.each do |old_member|
         new_hem.hbx_enrollment_members.each do |new_member|
           if old_member.applicant_id == new_member.applicant_id
