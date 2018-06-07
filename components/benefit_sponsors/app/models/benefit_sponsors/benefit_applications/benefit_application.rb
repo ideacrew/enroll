@@ -267,7 +267,7 @@ module BenefitSponsors
 
     def rate_schedule_date
       if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor_application.blank?
-        end_on.prev_year.next_day
+        end_on.prev_year + 1.day
       else
         start_on
       end
