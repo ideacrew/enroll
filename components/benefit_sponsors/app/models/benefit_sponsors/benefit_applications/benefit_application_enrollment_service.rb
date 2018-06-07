@@ -10,7 +10,7 @@ module BenefitSponsors
 
     def renew
       effective_period_end = benefit_application.effective_period.end
-      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end.next_day)
+      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end + 1.day)
 
       if benefit_sponsor_catalog
         new_benefit_application = benefit_application.renew(benefit_sponsor_catalog)

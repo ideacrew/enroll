@@ -146,10 +146,10 @@ module BenefitSponsors
       end
 
       def renew_employee_assignments
-        assigned_census_employees = predecessor_benefit_package.census_employees_assigned_on(predecessor.effective_period.min)
+        assigned_census_employees = predecessor.census_employees_assigned_on(predecessor.start_on)
 
         assigned_census_employees.each do |census_employee|
-          new_benefit_package_assignment = census_employee.benefit_package_assignment_on(effective_period.min)
+          new_benefit_package_assignment = census_employee.benefit_package_assignment_on(start_on)
 
           if new_benefit_package_assignment.blank?
             census_employee.assign_to_benefit_package(self, effective_period.min)

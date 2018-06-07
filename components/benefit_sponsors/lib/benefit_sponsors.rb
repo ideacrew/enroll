@@ -57,7 +57,7 @@ module BenefitSponsors
 
     return range_period if (range_period.begin.class == Date) && (range_period.end.class == Date) && (range_is_increasing? range_period)
 
-    case range_period.begin.class
+    case range_period.begin
     when Date
       date_range  = range_period
     when String

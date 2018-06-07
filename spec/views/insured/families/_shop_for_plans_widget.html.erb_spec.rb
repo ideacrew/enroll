@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pry'
 
 RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
