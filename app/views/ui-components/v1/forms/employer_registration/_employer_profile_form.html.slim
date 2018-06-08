@@ -35,6 +35,9 @@ fieldset.mt-2
       .col-md-4.pl-0
         label for="inputEntityKind"  Kind *
         = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, {:required => true, :class => 'form-control mb-1'} )
+        .invalid-feedback
+          |
+            Please select a entity kind.
       - if display_sic_field_for_employer?
         .col-md-4.pl-0
           label for="inputSIC"  SIC Code *

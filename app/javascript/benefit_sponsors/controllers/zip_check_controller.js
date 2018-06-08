@@ -3,6 +3,10 @@ import axios from 'axios'
 
 export default class extends Controller {
   static targets = ['countySelect']
+  
+  initialize() {
+    document.getElementById('kindSelect').value = "primary";
+  }
 
   zipChange(event) {
     axios({
