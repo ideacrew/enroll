@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:general_agency_staff) { FactoryGirl.create(:general_agency_staff_role) }
@@ -360,4 +361,5 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
       expect(response).to render_template("new_agency_staff")
     end
   end
+end
 end

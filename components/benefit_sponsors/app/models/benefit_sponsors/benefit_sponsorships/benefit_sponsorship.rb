@@ -159,6 +159,10 @@ module BenefitSponsors
       where(:"benefit_applications.benefit_packages._id" => BSON::ObjectId.from_string(id))
     }
 
+    scope :by_profile,                   ->(profile) {
+      where(:profile_id => profile._id)
+    }
+
     before_create :generate_hbx_id
 
     # after_initialize :set_service_and_rating_areas
@@ -217,6 +221,15 @@ module BenefitSponsors
       else
         nil
       end
+    end
+
+    def published_benefit_application
+      benefit_applications.submitted.last
+    end
+
+    def submitted_benefit_application
+      # renewing_published_plan_year || active_plan_year || 
+      published_benefit_application
     end
 
     def benefit_applications_by(ids)
@@ -389,6 +402,10 @@ module BenefitSponsors
 
     def is_conversion?
       source_kind == :conversion
+    end
+
+    def is_mid_plan_year_conversion?
+      source_kind == :mid_plan_year_conversion
     end
 
     def active_broker_agency_account

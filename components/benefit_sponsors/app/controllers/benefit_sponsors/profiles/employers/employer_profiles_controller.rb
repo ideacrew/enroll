@@ -19,7 +19,7 @@ module BenefitSponsors
         def show # TODO - Each when clause should be a seperate action.
           authorize @employer_profile
           @tab = params['tab']
-          if params[:q] || params[:page] || params[:commit] || params[:status]
+          if (params[:q] || params[:page] || params[:commit] || params[:status]).present?
             # paginate_employees
           else
             case @tab
@@ -37,12 +37,24 @@ module BenefitSponsors
 
             else
               @broker_agency_account = @employer_profile.active_broker_agency_account
+              @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
+
+              if @benefit_sponsorship.present?
+                @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
+                @current_plan_year = @benefit_sponsorship.submitted_benefit_application
+              end
+
+
+                 # collect_and_sort_invoices(params[:sort_order])
+                 # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
               respond_to do |format|
                 format.html
                 format.js
               end
             end
+
+
           end
         end
 

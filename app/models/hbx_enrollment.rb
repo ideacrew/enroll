@@ -92,6 +92,8 @@ class HbxEnrollment
   field :consumer_role_id, type: BSON::ObjectId
   field :resident_role_id, type: BSON::ObjectId
   # We will need to re-visit these names possibly, as we implement sponsored benefits.
+  field :plan_id, type: BSON::ObjectId
+  field :carrier_profile_id, type: BSON::ObjectId
   field :benefit_package_id, type: BSON::ObjectId
   field :benefit_coverage_period_id, type: BSON::ObjectId
 
@@ -730,7 +732,13 @@ class HbxEnrollment
   end
 
   def product=(new_product)
-    raise ArgumentError.new("expected product") unless new_product.is_a?(BenefitMarkets::Products::Product)
+    if new_product.blank?
+      self.product_id = nil
+      self.issuer_profile_id = nil
+      @product = nil
+      return
+    end
+    raise ArgumentError.new("expected product") unless new_product.kind_of?(BenefitMarkets::Products::Product)
     self.product_id = new_product._id
     self.issuer_profile_id = new_product.issuer_profile_id
     @product = new_product

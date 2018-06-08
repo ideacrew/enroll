@@ -32,7 +32,7 @@ module BenefitSponsors
       delegate :benefit_sponsorship, to: :benefit_package
 
       validate :product_package_exists
-      validates_presence_of :sponsor_contribution
+#      validates_presence_of :sponsor_contribution
 
       def product_package_exists
         if product_package.blank?

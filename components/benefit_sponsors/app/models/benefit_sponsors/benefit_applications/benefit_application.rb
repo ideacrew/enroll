@@ -75,6 +75,8 @@ module BenefitSponsors
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
     scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
+
+    scope :submitted,           ->{ any_in(aasm_state: APPROVED_STATES) }
     scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
     scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
     scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
@@ -171,6 +173,8 @@ module BenefitSponsors
     #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
     # end
 
+    delegate :benefit_market, to: :benefit_sponsorship
+
     after_initialize :set_values
     after_create :renew_benefit_package_assignments
 
@@ -190,7 +194,7 @@ module BenefitSponsors
 
     def predecessor_application
       return nil if predecessor_application_id.blank?
-      return @predecessor_application if defined? @benefit_application
+      return @predecessor_application if @benefit_application
       @predecessor_application = benefit_sponsorship.benefit_applications_by(predecessor_application_id)
     end
 
@@ -265,7 +269,7 @@ module BenefitSponsors
 
     def rate_schedule_date
       if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor_application.blank?
-        end_on.prev_year.next_day
+        end_on.prev_year + 1.day
       else
         start_on
       end
@@ -321,7 +325,7 @@ module BenefitSponsors
     end
 
     def default_benefit_group
-      benefit_groups.detect(&:default)
+      benefit_packages.detect(&:is_default)
     end
 
     def is_renewing?
@@ -379,11 +383,76 @@ module BenefitSponsors
 
         default_benefit_package = benefit_packages.detect{|benefit_package| benefit_package.is_default }
         if benefit_sponsorship.census_employees.present?
-          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self.benefit_application).each do |census_employee|
+          benefit_sponsorship.census_employees.non_terminated.benefit_application_unassigned(self).each do |census_employee|
             census_employee.assign_to_benefit_package(default_benefit_package, effective_period.min)
           end
         end
       end
+    end
+
+    def waived
+      return @waived if defined? @waived
+      @waived ||= find_census_employees.waived
+    end
+
+    def waived_count
+      waived.count
+    end
+
+    def covered
+      return @covered if defined? @covered
+      @covered ||= find_census_employees.covered
+    end
+
+    def covered_count
+      covered.count
+    end
+
+    def eligible_to_enroll_count
+      eligible_to_enroll.size
+    end
+
+    def eligible_to_enroll
+      return @eligible if defined? @eligible
+      @eligible ||= active_census_employees
+    end
+
+    def find_census_employees
+      return @census_employees if defined? @census_employees
+      @census_employees ||= CensusEmployee.benefit_application_assigned(self)
+    end
+
+    def active_census_employees
+      find_census_employees.active
+    end
+
+    def total_enrolled_count
+      if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
+        families_enrolled_under_application.size
+      else
+        0
+      end
+    end
+
+    def non_business_owner_enrolled
+      total_enrolled   = families_enrolled_under_application
+      
+      owner_employees  = active_census_employees.select{|ce| ce.is_business_owner}
+      filter_enrolled_employees(owner_employees, total_enrolled)
+      
+      waived_employees = active_census_employees.select{|ce| ce.waived?}
+      filter_enrolled_employees(waived_employees, total_enrolled)
+
+      total_enrolled
+    end
+
+    def filter_enrolled_employees(employees_to_filter, total_enrolled)
+      families_to_filter = employees_to_filter.collect{|census_employee| census_employee.family }.compact
+      total_enrolled    -= families_to_filter
+    end
+
+    def families_enrolled_under_application
+      Family.enrolled_under_benefit_application(self)
     end
 
     def renew_benefit_package_members

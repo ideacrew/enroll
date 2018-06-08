@@ -31,6 +31,7 @@ module BenefitMarkets
 
       field :rx_formulary_url,            type: String
       field :hsa_eligibility,             type: Boolean,  default: false
+      field :network_information,         type: String
 
 
       belongs_to  :renewal_product,
@@ -76,6 +77,10 @@ module BenefitMarkets
 
       alias_method :is_standard_plan?, :is_standard_plan
       alias_method :is_reference_plan_eligible?, :is_reference_plan_eligible
+
+      def metal_level
+        metal_level_kind.to_s
+      end
 
       private
 

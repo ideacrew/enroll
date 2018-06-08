@@ -106,7 +106,7 @@ module EnrollmentShopping
       end
     end
 
-    def copy_member_coverage_dates(old_hen, new_hem)
+    def copy_member_coverage_dates(old_hem, new_hem)
       old_hem.hbx_enrollment_members.each do |old_member|
         new_hem.hbx_enrollment_members.each do |new_member|
           if old_member.applicant_id == new_member.applicant_id

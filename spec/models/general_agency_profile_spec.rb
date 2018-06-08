@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
 
   it { should validate_presence_of :market_kind }
@@ -253,4 +254,5 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       end
     end
   end
+end
 end

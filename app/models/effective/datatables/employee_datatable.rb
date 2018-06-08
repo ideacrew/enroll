@@ -110,6 +110,15 @@ module Effective
             top_scope: :employers
         }
       end
+
+      def global_search?
+        true
+      end
+
+      def global_search_method
+        :datatable_search
+      end
+
     end
   end
 end

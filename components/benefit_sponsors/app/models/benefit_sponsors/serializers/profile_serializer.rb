@@ -27,11 +27,11 @@ module BenefitSponsors
       end
 
       def is_cca_employer_profile?
-        object.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
+        object.kind_of?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
       end
 
       def is_dc_employer_profile?
-        object.is_a?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
+        object.kind_of?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
       end
 
       def is_employer_profile?
@@ -39,7 +39,7 @@ module BenefitSponsors
       end
 
       def is_broker_profile?
-        object.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+        object.kind_of?(BenefitSponsors::Organizations::BrokerAgencyProfile)
       end
 
       def market_kind_options

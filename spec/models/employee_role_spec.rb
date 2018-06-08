@@ -580,7 +580,6 @@ describe EmployeeRole, dbclean: :after_each do
 
 
   before do
-    # binding.pry
     # allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
     # allow(employee_role).to receive(:benefit_group).and_return(benefit_package)
     # census_employee.update_attributes({employee_role_id: employee_role.id})

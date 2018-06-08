@@ -121,6 +121,14 @@ module BenefitMarkets
       end
     end
 
+    def name
+      title
+    end
+
+    def carrier_profile
+      issuer_profile
+    end
+
     def deductible_value
       return nil if deductible.blank?
       deductible.split(".").first.gsub(/[^0-9]/, "").to_i

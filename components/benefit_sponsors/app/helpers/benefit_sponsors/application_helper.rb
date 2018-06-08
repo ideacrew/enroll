@@ -64,6 +64,10 @@ module BenefitSponsors
       inboxes_message_path(provider, message_id: message.id)
     end
 
+    def plan_shop_tool_tip_helper
+      "Employers offering coverage through #{site_short_name} for the first time must have an open enrollment period of no less than 14 days. Employers renewing their #{site_short_name} coverage must have an open enrollment period of at least 30 days."
+    end
+
     def find_and_sort_inbox_messages(provider, folder)
       provider.inbox.messages.select {|m| folder == (m.folder.try(:capitalize) || 'Inbox')}.sort_by(&:created_at).reverse
     end
