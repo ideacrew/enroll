@@ -145,8 +145,9 @@ class CensusEmployee < CensusMember
     }})
   }
 
-  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(&:_id)) }
-  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(&:_id)) }
+
+  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
