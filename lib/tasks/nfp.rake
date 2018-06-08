@@ -23,8 +23,8 @@ namespace :nfp do
   end
 
   def trigger_notice_for_employer(org)
-    observer = Observers::Observer.new
+    observer = Observers::NoticeObserver.new
     plan_year = org.employer_profile.active_plan_year
-    observer.trigger_notice(recipient: org.employer_profile, event_object: plan_year, notice_event: "employer_invoice_available") if plan_year.present?
+    observer.deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "employer_invoice_available") if plan_year.present?
   end
 end
