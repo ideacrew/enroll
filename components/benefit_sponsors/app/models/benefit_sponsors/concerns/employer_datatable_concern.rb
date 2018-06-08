@@ -6,6 +6,10 @@ module BenefitSponsors
       extend ActiveSupport::Concern
 
       included do
+
+
+        scope :datatable_search,        ->(query) { where(:"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true))}
+
         scope :created_in_the_past,    ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                    :"created_at".lte => compare_date )
                                                                                  }

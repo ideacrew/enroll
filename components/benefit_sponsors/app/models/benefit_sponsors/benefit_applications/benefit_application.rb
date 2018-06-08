@@ -194,7 +194,7 @@ module BenefitSponsors
 
     def predecessor_application
       return nil if predecessor_application_id.blank?
-      return @predecessor_application if defined? @benefit_application
+      return @predecessor_application if @benefit_application
       @predecessor_application = benefit_sponsorship.benefit_applications_by(predecessor_application_id)
     end
 
@@ -325,7 +325,7 @@ module BenefitSponsors
     end
 
     def default_benefit_group
-      benefit_groups.detect(&:default)
+      benefit_packages.detect(&:is_default)
     end
 
     def is_renewing?

@@ -30,7 +30,7 @@ RSpec.describe OfficeLocation, :type => :model do
     end
 
     describe "validate address county" do
-      let(:address) { build(:address, kind: office_kind, county: county_name) }
+      let(:address) { build_stubbed(:address, kind: office_kind, county: county_name) }
       let(:county_name) { "" }
       let(:office_kind) { "primary" }
 
