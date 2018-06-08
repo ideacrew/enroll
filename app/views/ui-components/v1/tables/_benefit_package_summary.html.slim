@@ -17,4 +17,4 @@ table.table.benefit-group-contribution-table
       tr
         td = raw(rb.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{rb.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{rb.display_name.try(:humanize)}")
         td#pct
-          /= number_to_percentage rb.premium_pct.ceil, precision: 0
+          = number_to_percentage rb.contribution_pct.ceil, precision: 0
