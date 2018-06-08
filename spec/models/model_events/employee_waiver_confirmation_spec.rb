@@ -44,7 +44,7 @@ describe 'ModelEvents::EmployeeWaiverConfirmation' do
         allow(model_instance).to receive(:is_shop?).and_return(true)
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_waiver_confirmation"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'

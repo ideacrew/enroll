@@ -13,7 +13,7 @@ module Effective
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                    if row.email.present?
-                                     ['Reset Password', user_password_path(user: { email: row.email }), 'post_ajax']
+                                     ['Reset Password', reset_password_user_path(row), 'ajax']
                                    else
                                      ['Reset Password', edit_user_path(row.id), 'ajax']
                                    end,
@@ -22,9 +22,6 @@ module Effective
                                ]
                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
                              }, :filter => false, :sortable => false
-      end
-
-      def reset_password_link(row)
       end
 
       def collection

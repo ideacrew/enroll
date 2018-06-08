@@ -147,7 +147,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user
       census_employee.census_dependents << child1
-      allow(employer_profile).to receive(:validate_and_send_denial_notice).and_return("")
       allow(controller).to receive(:authorize).and_return(true)
     end
 
@@ -362,6 +361,7 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET terminate" do
+
     before do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user

@@ -13,14 +13,14 @@ describe 'ModelEvents::EmployeeMidYearPlanChangeNoticeToEmployer', :dbclean => :
 
   describe "NoticeTrigger" do
     context "when employees made mid-year plan change in their account" do
-      subject { Observers::Observer.new }
+      subject { Observers::NoticeObserver.new }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_notice_to_employer"
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq hbx_enrollment.id.to_s
         end
-        subject.trigger_notice(recipient: employer_profile, event_object: hbx_enrollment, notice_event: "employee_mid_year_plan_change_notice_to_employer")
+        subject.deliver(recipient: employer_profile, event_object: hbx_enrollment, notice_event: "employee_mid_year_plan_change_notice_to_employer")
       end
     end
   end

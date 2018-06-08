@@ -175,6 +175,9 @@ class BenefitGroup
 
   def set_bounding_cost_plans
     return if reference_plan_id.nil?
+    if self.respond_to?(:benefit_application)
+      return unless self.benefit_application
+    end
     return "" if self.employer_profile.blank?
     if offerings_constrained_to_service_areas?
       profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(self.employer_profile, reference_plan.active_year)
@@ -389,7 +392,7 @@ class BenefitGroup
 
   def monthly_employee_cost(coverage_kind=nil)
     rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
-    return 0 if targeted_census_employees.count > 199
+    return [0] if targeted_census_employees.count > 199
     targeted_census_employees.active.collect do |ce|
       pcd = if self.sole_source? && (!rp.dental?)
         CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
@@ -405,19 +408,7 @@ class BenefitGroup
   end
 
   def monthly_max_employee_cost(coverage_kind = nil)
-    return 0 if targeted_census_employees.count > 100
-    targeted_census_employees_participation.collect do |ce|
-      if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-      else
-        if coverage_kind == 'dental'
-          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
-        else
-          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-        end
-      end
-      pcd.total_employee_cost
-    end.max
+    monthly_employee_cost(coverage_kind).max
   end
 
   def targeted_census_employees

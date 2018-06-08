@@ -25,7 +25,7 @@ describe 'ModelEvents::WelcomeNoticeToEmployer', dbclean: :around_each  do
       subject { Observers::NoticeObserver.new }
       let(:model_event) { ModelEvents::ModelEvent.new(:welcome_notice_to_employer, model_instance, {}) }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.welcome_notice_to_employer"
           expect(payload[:event_object_kind]).to eq 'EmployerProfile'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s

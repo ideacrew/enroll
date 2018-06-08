@@ -4,7 +4,11 @@ class SpecialEnrollmentPeriod
   include Mongoid::Timestamps
   include ScheduledEventService
   include TimeHelper
+  include Concerns::Observable
+  include ModelEvents::SpecialEnrollmentPeriod
 
+  after_save :notify_on_save
+  
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
 
@@ -270,11 +274,12 @@ private
 
 
   def is_eligible?
+    return true unless is_active?
     return true unless is_shop?
 
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
-      eligible_date = employee_role.census_employee.earliest_eligible_date
+      eligible_date = employee_role.census_employee.earliest_eligible_date 
       eligible_date <= TimeKeeper.date_of_record
     end
   end

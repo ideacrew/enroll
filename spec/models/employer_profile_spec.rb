@@ -956,18 +956,6 @@ describe EmployerProfile, "Renewal Queries" do
       expect(EmployerProfile.organizations_eligible_for_renewal(expected_renewal_start).to_a).to eq [organization2]
     end
   end
-
-  context '.organizations_for_low_enrollment_notice', dbclean: :after_each do
-    let(:date) { TimeKeeper.date_of_record }
-    let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
-    let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
-    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
-
-    it 'should return organizations elgible low enrollment notice' do
-      expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
-    end
-  end
 end
 
 describe EmployerProfile, "For General Agency", dbclean: :after_each do
@@ -1421,6 +1409,18 @@ describe EmployerProfile, "initial employers enrolled plan year state", dbclean:
   end
 end
 
+describe EmployerProfile, "update_status_to_binder_paid", dbclean: :after_each do
+  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
+  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year], :aasm_state => "eligible") }
+  let!(:organization){ employer_profile.organization }
+
+  it "should update employer profile aasm state to binder_paid" do
+    EmployerProfile.update_status_to_binder_paid([employer_profile.organization.id])
+    employer_profile.reload
+    expect(employer_profile.aasm_state).to eq 'binder_paid'
+  end
+
+end
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }

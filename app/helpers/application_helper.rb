@@ -170,6 +170,11 @@ module ApplicationHelper
     test ? content_tag(:span, "", class: "fa fa-check-square-o aria-hidden='true'") : content_tag(:span, "", class: "fa fa-square-o aria-hidden='true'")
   end
 
+  # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
+  def prepend_glyph_to_text(test)
+    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
+  end
+
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
   def number_to_ssn(number)
     return unless number
@@ -244,6 +249,7 @@ module ApplicationHelper
 
     if f.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
+      new_object.build_composite_tier_contributions
       new_object.build_dental_relationship_benefits
     end
 
@@ -385,18 +391,21 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(plan, options = {:width => 50})
+  def carrier_logo(plan)
     return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    carrier_name = plan.carrier_profile.legal_name.extract_value
+    issuer_hios_id = plan.hios_id[0..4].extract_value
+    Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
+  end
+
+  def display_carrier_logo(plan, options = {:width => 50})
+    carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
-    return "" if !plan.carrier_profile.legal_name.extract_value.present?
-    carrier_name = plan.carrier_profile.legal_name.extract_value
+    carrier_name = carrier_logo(plan)
     image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
-
 
   def dob_in_words(age, dob)
     return age if age > 0
@@ -448,7 +457,6 @@ module ApplicationHelper
     covered = plan_year.covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
-
     unless eligible.zero?
       condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
       condition = false if covered == 0 && waived > 0
@@ -466,7 +474,7 @@ module ApplicationHelper
           concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;")
         end
 
-        if eligible > 2
+        if eligible >= 2
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
           concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
         end
@@ -496,7 +504,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
+      return (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
     end
   end
 
@@ -548,8 +556,8 @@ module ApplicationHelper
   end
 
   def trigger_notice_observer(recipient, event_object, notice_event)
-    observer = Observers::Observer.new
-    observer.trigger_notice(recipient: recipient, event_object: event_object, notice_event: notice_event)
+    observer = Observers::NoticeObserver.new
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
   end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
