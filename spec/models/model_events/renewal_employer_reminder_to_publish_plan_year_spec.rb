@@ -21,7 +21,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', :d
     end
     context "when renewal employer 2 days prior to publish due date" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: organization.employer_profile, event_object: model_instance, notice_event: model_event).and_return(true)
+        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: organization.employer_profile, event_object: model_instance, notice_event: model_event).and_return(true)
         PlanYear.date_change_event(date_mock_object)
       end
     end
@@ -37,7 +37,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification', :d
       let(:model_event) { ModelEvents::ModelEvent.new(:renewal_plan_year_publish_dead_line, PlanYear, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.renewal_plan_year_publish_dead_line"
           expect(payload[:employer_id]).to eq employer.send(:hbx_id).to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

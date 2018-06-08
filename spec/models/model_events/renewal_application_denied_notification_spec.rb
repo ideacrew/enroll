@@ -63,7 +63,7 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
       let(:model_event) { ModelEvents::ModelEvent.new(:renewal_application_denied, model_instance, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.renewal_employer_ineligibility_notice"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
@@ -71,7 +71,7 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
         end
 
         employer.census_employees.non_terminated.each do |ce|
-          expect(subject).to receive(:notify) do |event_name, payload|
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employee.employee_renewal_employer_ineligibility_notice"
             expect(payload[:employee_role_id]).to eq ce.employee_role_id.to_s
             expect(payload[:event_object_kind]).to eq 'PlanYear'

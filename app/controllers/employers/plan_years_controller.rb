@@ -450,6 +450,7 @@ class Employers::PlanYearsController < ApplicationController
     @start_on = params[:start_on]
     @carrier_search_level = params[:selected_carrier_level]
     @object_id = @location_id.split('-').last
+    @panel_id = params[:panel_id] || @object_id
 
     ## TODO: different if we dont have service areas enabled
     ## TODO: awfully slow
