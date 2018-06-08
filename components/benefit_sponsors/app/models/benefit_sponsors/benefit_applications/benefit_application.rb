@@ -323,7 +323,7 @@ module BenefitSponsors
     end
 
     def default_benefit_group
-      benefit_groups.detect(&:default)
+      benefit_packages.detect(&:is_default)
     end
 
     def is_renewing?
