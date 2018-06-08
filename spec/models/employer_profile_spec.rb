@@ -505,7 +505,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
-    let(:observer) { Observers::Observer.new }
 
     def er3; organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
     def er4; organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end

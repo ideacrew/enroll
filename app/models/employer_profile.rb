@@ -170,10 +170,6 @@ class EmployerProfile
     trigger_notice_observer(active_broker_agency_account.broker_agency_profile.primary_broker_role, self, "broker_fired_confirmation_to_broker")
   end
 
-  def broker_agency_fired_confirmation
-    trigger_notices("broker_agency_fired_confirmation")
-  end
-
   def broker_fired_confirmation_to_broker
     trigger_notices('broker_fired_confirmation_to_broker')
   end
