@@ -87,13 +87,13 @@
       <div class="mt-3">
         <h1 class="heading-text"> Employer Information</h1>
         <div class="row no-buffer row-form-wrapper">
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
             <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
           </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
+          <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
             <%= f.text_field :dba, class: "floatlabel form-control", placeholder: 'DBA' %>
           </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
             <%= f.text_field :fein, class: "fien_field floatlabel form-control", required: true, placeholder: 'FEIN*', :readonly => true %>
           </div>
 
@@ -102,8 +102,11 @@
           <%= f_profile.hidden_field :id, value: f_profile.object.id %>
           <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
           <% if display_sic_field_for_employer? %>
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-20px">
               <%= f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} ) %>
+            </div>
+            <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-8px">
+              <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question" aria-hidden="true"></span></a>
             </div>
           <% end %>
           </div>
