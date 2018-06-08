@@ -144,7 +144,7 @@ module BenefitMarkets
       end_date_covered    = self.class.by_application_date(application_period.max).count > 0
 
       if begin_date_covered || end_date_covered
-        errors.add(:application_period, "application period already exists for dates: #{application_period}")
+        errors.add(:application_period, "already exists for dates: #{application_period}")
       end
     end
 

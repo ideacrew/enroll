@@ -116,7 +116,7 @@ module BenefitMarkets
         it "should be invalid" do
           conflicting_catalog.validate
           expect(conflicting_catalog).to_not be_valid
-          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/application period already exists for dates/)
+          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/already exists for dates/)
         end
       end
 
@@ -126,7 +126,7 @@ module BenefitMarkets
         it "should be invalid" do
           conflicting_catalog.validate
           expect(conflicting_catalog).to_not be_valid
-          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/application period already exists for dates/)
+          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/already exists for dates/)
         end
       end
 
