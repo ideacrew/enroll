@@ -114,7 +114,7 @@ module Effective
       end
 
       def global_search?
-        false
+        true
       end
 
       def global_search_method
