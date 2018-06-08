@@ -145,6 +145,7 @@ class CensusEmployee < CensusMember
     }})
   }
 
+  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(&:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(&:_id)) }
 
   scope :matchable, ->(ssn, dob) {
@@ -164,6 +165,13 @@ class CensusEmployee < CensusMember
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
+  end
+
+
+  def family
+    return nil if employee_role.blank?
+    person_rec = employee_role.person
+    person_rec.primary_family
   end
 
   def is_linked?

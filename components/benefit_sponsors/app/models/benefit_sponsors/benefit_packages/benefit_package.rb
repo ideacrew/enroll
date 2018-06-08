@@ -91,6 +91,59 @@ module BenefitSponsors
         sponsored_benefits << new_sponsored_benefit
       end
 
+      def effective_on_kind
+        effective_on_kind_mapping = {
+          date_of_hire: 'date_of_hire',
+          first_of_month: 'first_of_month',
+          first_of_month_after_30_days: 'first_of_month',
+          first_of_month_after_60_days: 'first_of_month'
+
+        }
+
+        effective_on_kind_mapping[probation_period_kind]
+      end
+
+      def effective_on_offset
+        offset_mapping = {
+          date_of_hire: 0,
+          first_of_month: 1,
+          first_of_month_after_30_days: 30,
+          first_of_month_after_60_days: 60
+        }
+
+        offset_mapping[probation_period_kind]
+      end
+
+      def sorted_composite_tier_contributions
+        health_sponsored_benefit.sponsor_contribution.contribution_levels
+      end
+
+      def sole_source?
+        if health_sponsored_benefit
+          health_sponsored_benefit.product_package_kind == :single_product
+        else
+          false
+        end
+      end
+
+      def plan_option_kind
+        if health_sponsored_benefit
+          health_sponsored_benefit.product_package_kind.to_s
+        end
+      end
+
+      def reference_plan
+        if health_sponsored_benefit
+          health_sponsored_benefit.reference_product
+        end
+      end
+
+      def dental_reference_plan
+        if dental_sponsored_benefit
+          dental_sponsored_benefit.reference_product
+        end
+      end
+
       def health_sponsored_benefit
         sponsored_benefits.where(_type: /.*HealthSponsoredBenefit/).first
       end

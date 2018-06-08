@@ -215,6 +215,10 @@ module BenefitSponsors
         active_benefit_sponsorship
       end
 
+      def latest_benefit_sponsorship_for(profile)
+        benefit_sponsorships.by_profile(profile).desc(:created_at).first
+      end
+
       def entity_kinds
         ENTITY_KINDS
       end

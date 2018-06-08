@@ -17,4 +17,4 @@
           |  - 
           = @current_plan_year.end_on.to_date.to_formatted_s :long_ordinal
         td.plan-year-status
-          = @current_plan_year.aasm_state.humanize
+          = @current_plan_year.aasm_state.to_s.humanize

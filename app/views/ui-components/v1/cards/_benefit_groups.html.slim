@@ -42,13 +42,16 @@
           td = selected_benefit_plan(bg.plan_option_kind)
           / Health plan collapsible: start
       .collapse#collapseHealth
-        = render :partial => 'ui-components/v1/tables/benefit_group_summary', locals: { bg: bg }
+        - if bg.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
+          = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { bg: bg }
+        - else
+          = render :partial => 'ui-components/v1/tables/benefit_group_summary', locals: { bg: bg }
         .panel.benefitgroup.col-xs-12.referenceplan.home.est
           .plan-details
             .col-xs-4
               .row
                 span Employer Estimated Maximum Monthly Cost
-                h2 = number_to_currency(bg.monthly_employer_contribution_amount)
+                / h2 = number_to_currency(bg.monthly_employer_contribution_amount)
             .col-xs-8
               .row
                 table
@@ -58,10 +61,10 @@
                     th Max
                   tr
                     td colspan="2" Total Estimated Monthly Cost for Plan Participants
-                    td = number_to_currency(bg.monthly_min_employee_cost)
-                    td = number_to_currency(bg.monthly_max_employee_cost)
+                    / td = number_to_currency(bg.monthly_min_employee_cost)
+                    / td = number_to_currency(bg.monthly_max_employee_cost)
     / Dental plan start
-  - if bg.dental_reference_plan_id.present?
+  - if bg.dental_reference_plan.present?
     .dental
       div style="float:right"
         button#showhidebuttonDental type="button" data-toggle="collapse" data-target="#collapseDental" aria-expanded="false" aria-controls="collapseDental"

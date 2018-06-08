@@ -248,9 +248,9 @@ module Employers::EmployerHelper
 
   def selected_benefit_plan(plan)
     case plan
-      when 'single_carrier' then fetch_plan_title_for_single_carrier
+      when 'single_carrier', 'single_issuer' then fetch_plan_title_for_single_carrier
       when 'metal_level' then fetch_plan_title_for_metal_level
-      when 'single_plan','sole_source' then 'A Single Plan'
+      when 'single_plan', 'sole_source', 'single_product' then 'A Single Plan'
     end
   end
 
