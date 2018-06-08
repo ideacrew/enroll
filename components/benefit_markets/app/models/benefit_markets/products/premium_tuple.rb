@@ -11,6 +11,8 @@ module BenefitMarkets
 
     validates_presence_of :age, :cost
 
+    default_scope   ->{ order(:"age".asc) }
+
 
     def comparable_attrs
       [:age, :cost]

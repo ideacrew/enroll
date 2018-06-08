@@ -50,61 +50,69 @@ namespace :reports do
         csv << field_names
 
         organizations.all.each do |org|
-          er = org.employer_profile
-          benefit_application = er.active_benefit_application || er.latest_benefit_application
-          next unless benefit_application
+          begin
+            er = org.employer_profile
+            benefit_application = er.active_benefit_application || er.latest_benefit_application
+            next unless benefit_application
 
-          fein                  = er.fein
-          legal_name            = er.legal_name
-          dba                   = er.dba
-          employer_aasm_state   = er.aasm_state
+            fein                  = er.fein
+            legal_name            = er.legal_name
+            dba                   = er.dba
+            employer_aasm_state   = er.aasm_state
 
-          staff_person = Person.staff_for_employer(er).first
-          if staff_person
-            staff_role = staff_person.employer_staff_roles.where(benefit_sponsor_employer_profile_id: er.id).first
-            staff_name    = staff_role.full_name
-            staff_phone   = staff_role.work_phone || staff_role.mobile_phone
-            staff_email   = staff_role.work_email_or_best
-          end
-
-          broker_account = er.active_benefit_sponsorship.broker_agency_accounts.first
-
-          if broker_account.present?
-            role = broker_account.broker_agency_profile.primary_broker_role
-            broker_name   = role.person.full_name
-            broker_phone  = role.phone
-            broker_email  = role.email.address if role.email
-          end
-
-          plan_year_start_on    = benefit_application.start_on
-          plan_year_aasm_state  = benefit_application.aasm_state
-
-          benefit_application.benefit_groups.each do |bg|
-            benefit_package_title = bg.title
-
-            plan_option_kind      = bg.sponsored_benefits.map(&:product_package_kind).join(',')
-
-            reference_products    = bg.sponsored_benefits.map(&:reference_product)
-            ref_plan_name     = reference_products.map(&:title).join(',')
-            ref_plan_year     = reference_products.map(&:active_year).join(',')
-            ref_plan_hios_id  = reference_products.map(&:hios_id).join(',')
-
-            contribution_levels = bg.sponsored_benefits.map(&:sponsor_contribution).map(&:contribution_levels)
-            health_contribution_levels = contribution_levels[0] # No dental for cca
-
-            employee_contribution_pct = health_contribution_levels.where(display_name: "Employee").first.contribution_pct
-            spouse_contribution_pct = health_contribution_levels.where(display_name: "Spouse").first.contribution_pct
-            domestic_partner_contribution_pct = health_contribution_levels.where(display_name: "Domestic Partner").first.contribution_pct
-            child_under_26_contribution_pct = health_contribution_levels.where(display_name: "Child Under 26").first.contribution_pct
-
-            csv << field_names.map do |field_name|
-              if field_name == "fein"
-                '="' + eval(field_name) + '"'
-              else
-                eval("#{field_name}")
-              end
+            staff_role = er.staff_roles.first
+            if staff_role
+              staff_name    = staff_role.full_name
+              staff_phone   = staff_role.work_phone || staff_role.mobile_phone
+              staff_email   = staff_role.work_email_or_best
             end
-            processed_count += 1
+
+            broker_account = er.broker_agency_accounts.first
+
+            if broker_account.present?
+              role = broker_account.broker_agency_profile.primary_broker_role
+              broker_name   = role.person.full_name
+              broker_phone  = role.phone
+              broker_email  = role.email.address if role.email
+            end
+
+            plan_year_start_on    = benefit_application.start_on
+            plan_year_aasm_state  = benefit_application.aasm_state
+
+            benefit_application.benefit_groups.each do |bg|
+              benefit_package_title = bg.title
+
+              plan_option_kind      = bg.sponsored_benefits.map(&:product_package_kind).join(',')
+
+              reference_products    = bg.sponsored_benefits.map(&:reference_product)
+              ref_plan_name     = reference_products.map(&:title).join(',')
+              ref_plan_year     = reference_products.map(&:active_year).join(',')
+              ref_plan_hios_id  = reference_products.map(&:hios_id).join(',')
+
+              contribution_levels = bg.sponsored_benefits.map(&:sponsor_contribution).map(&:contribution_levels)
+              health_contribution_levels = contribution_levels[0] # No dental for cca
+
+              if health_contribution_levels.size > 2
+                employee_contribution_pct = health_contribution_levels.where(display_name: /Employee/i).first.contribution_pct
+                spouse_contribution_pct = health_contribution_levels.where(display_name: /Spouse/i).first.contribution_pct
+                domestic_partner_contribution_pct = health_contribution_levels.where(display_name: /Domestic Partner/i).first.contribution_pct
+                child_under_26_contribution_pct = health_contribution_levels.where(display_name: /Child Under 26/i).first.contribution_pct
+              else
+                employee_contribution_pct = health_contribution_levels.where(display_name: /Employee Only/i).first.contribution_pct
+                spouse_contribution_pct = domestic_partner_contribution_pct = child_under_26_contribution_pct = health_contribution_levels.where(display_name: /Family/i).first.contribution_pct
+              end
+
+              csv << field_names.map do |field_name|
+                if field_name == "fein"
+                  '="' + eval(field_name) + '"'
+                else
+                  eval("#{field_name}")
+                end
+              end
+              processed_count += 1
+            end
+          rescue Exception => e
+            puts e.message
           end
         end
       end

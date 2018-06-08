@@ -74,6 +74,10 @@ module BenefitSponsors
         end
       end
 
+      def successor
+        nil
+      end
+
       def package_for_date(coverage_start_date)
         if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
           return self
@@ -89,6 +93,59 @@ module BenefitSponsors
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
         sponsored_benefits << new_sponsored_benefit
+      end
+
+      def effective_on_kind
+        effective_on_kind_mapping = {
+          date_of_hire: 'date_of_hire',
+          first_of_month: 'first_of_month',
+          first_of_month_after_30_days: 'first_of_month',
+          first_of_month_after_60_days: 'first_of_month'
+
+        }
+
+        effective_on_kind_mapping[probation_period_kind]
+      end
+
+      def effective_on_offset
+        offset_mapping = {
+          date_of_hire: 0,
+          first_of_month: 1,
+          first_of_month_after_30_days: 30,
+          first_of_month_after_60_days: 60
+        }
+
+        offset_mapping[probation_period_kind]
+      end
+
+      def sorted_composite_tier_contributions
+        health_sponsored_benefit.sponsor_contribution.contribution_levels
+      end
+
+      def sole_source?
+        if health_sponsored_benefit
+          health_sponsored_benefit.product_package_kind == :single_product
+        else
+          false
+        end
+      end
+
+      def plan_option_kind
+        if health_sponsored_benefit
+          health_sponsored_benefit.product_package_kind.to_s
+        end
+      end
+
+      def reference_plan
+        if health_sponsored_benefit
+          health_sponsored_benefit.reference_product
+        end
+      end
+
+      def dental_reference_plan
+        if dental_sponsored_benefit
+          dental_sponsored_benefit.reference_product
+        end
       end
 
       def health_sponsored_benefit
@@ -108,14 +165,15 @@ module BenefitSponsors
       end
 
       def predecessor
-        return @predecessor if defined? @predecessor
+        return @predecessor if @predecessor
+        return nil if predecessor_id.blank?
         @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
       end
 
       def predecessor=(old_benefit_package)
-        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
-        self.predecessor_id = old_benefit_package._id
+        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.kind_of? BenefitSponsors::BenefitPackages::BenefitPackage
         @predecessor = old_benefit_package
+        self.predecessor_id = old_benefit_package.id
       end
 
       def probation_period_display_name

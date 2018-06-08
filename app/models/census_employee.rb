@@ -145,7 +145,9 @@ class CensusEmployee < CensusMember
     }})
   }
 
-  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments._id".nin => benefit_application.benefit_packages.pluck(&:_id)) }
+
+  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
@@ -164,6 +166,13 @@ class CensusEmployee < CensusMember
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
+  end
+
+
+  def family
+    return nil if employee_role.blank?
+    person_rec = employee_role.person
+    person_rec.primary_family
   end
 
   def is_linked?
@@ -197,7 +206,7 @@ class CensusEmployee < CensusMember
 
     benefit_group_assignments.create(
       start_on: assignment_on,
-      end_on:   effective_period.max,
+      end_on:   benefit_package.effective_period.max,
       benefit_package: benefit_package
     )
   end

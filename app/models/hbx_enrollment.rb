@@ -93,6 +93,7 @@ class HbxEnrollment
   field :resident_role_id, type: BSON::ObjectId
   # We will need to re-visit these names possibly, as we implement sponsored benefits.
   field :plan_id, type: BSON::ObjectId
+  field :carrier_profile_id, type: BSON::ObjectId
   field :benefit_package_id, type: BSON::ObjectId
   field :benefit_coverage_period_id, type: BSON::ObjectId
 
@@ -395,7 +396,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).first
+    HbxEnrollment.find(predecessor_enrollment_id).try(:first)
   end
 
   def census_employee

@@ -11,7 +11,7 @@ module Effective
 
         table_column :legal_name, :proc => Proc.new { |row|
           @employer_profile = row.organization.employer_profile
-          (link_to row.organization.legal_name.titleize, benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
+          (link_to row.organization.legal_name.titleize, benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'home'))
 
           }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
@@ -19,9 +19,11 @@ module Effective
         table_column :broker, :proc => Proc.new { |row|
             @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
-        table_column :general_agency, :proc => Proc.new { |row|
-          @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
-        }, :filter => false
+
+        # TODO: Make this based on settings. MA does not use, but others might.
+        # table_column :general_agency, :proc => Proc.new { |row|
+        #   @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
+        # }, :filter => false
 
         table_column :conversion, :proc => Proc.new { |row|
           boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
@@ -29,19 +31,17 @@ module Effective
         table_column :mid_plan_year_conversion, :proc => Proc.new { |row|
           boolean_to_glyph(row.is_mid_plan_year_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
-        table_column :benefit_application_state, :proc => Proc.new { |row|
+        table_column :plan_year_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
             row.latest_benefit_application.aasm_state
           end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
-            row.latest_benefit_application.effective_period.min
+            row.latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
           end }, :filter => false, :sortable => true
+
         # # table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         # table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
-        # if employer_attestation_is_enabled?
-        #   # table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row| row.employer_profile.employer_attestation.aasm_state.titleize if row.employer_profile.employer_attestation }, :filter => false, :sortable => false
-        # end
 
         if employer_attestation_is_enabled?
           table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
@@ -110,7 +110,7 @@ module Effective
       end
 
       def global_search?
-        false
+        true
       end
 
       def global_search_method
@@ -118,21 +118,21 @@ module Effective
       end
 
       def search_column(collection, table_column, search_term, sql_column)
-        # if table_column[:name] == 'legal_name'
+        if table_column[:name] == 'legal_name'
         #   collection.datatable_search(search_term)
         # elsif table_column[:name] == 'fein'
         #   collection.datatable_search_fein(search_term)
-        # elsif table_column[:name] == 'conversion'
-        #   if search_term == "Yes"
-        #     collection.datatable_search_employer_profile_source("conversion")
-        #   elsif search_term == "No"
-        #     collection.datatable_search_employer_profile_source("self_serve")
-        #   else
-        #     super
-        #   end
-        # else
+        elsif table_column[:name] == 'conversion' || table_column[:name] == 'mid_plan_year_conversion'
+          if search_term == "Yes"
+            collection.datatable_search_for_source_kind([table_column[:name].to_sym])
+          elsif search_term == "No"
+            collection.datatable_search_for_source_kind([:self_serve])
+          else
+            super
+          end
+        else
           super
-        # end
+        end
       end
 
       def nested_filter_definition

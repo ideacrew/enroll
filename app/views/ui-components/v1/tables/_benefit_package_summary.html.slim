@@ -1,0 +1,20 @@
+table.table.benefit-group-contribution-table
+  - if bg.sole_source?
+    tr
+      th Member Type
+      th.text-center Employer Share
+      th.text-right Employee
+      th.text-right Employer
+      th.text-right Total
+    - bg.sorted_composite_tier_contributions.each_with_index do |ct, i|
+      tr class="<% if ct.is_offered %>offered<% else %>not-offered <% end %>"
+         td = raw(ct.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{ct.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{ct.display_name.try(:humanize)}")
+  - else
+    tr
+      th.benefit-group-heading Offered
+      th.benefit-group-heading Employer Contribution
+    - bg.health_sponsored_benefit.sponsor_contribution.contribution_levels.each_with_index do |rb, i|
+      tr
+        td = raw(rb.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{rb.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{rb.display_name.try(:humanize)}")
+        td#pct
+          = number_to_percentage rb.contribution_pct.ceil, precision: 0

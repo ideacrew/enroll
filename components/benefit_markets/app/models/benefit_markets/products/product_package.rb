@@ -46,6 +46,29 @@ module BenefitMarkets
         ]
     end
 
+    def lowest_cost_product
+      return @lowest_cost_product if defined? @lowest_cost_product
+      @lowest_cost_product = products_sorted_by_cost.min
+    end
+
+    def highest_cost_product
+      return @highest_cost_product if defined? @highest_cost_product
+      @highest_cost_product = products_sorted_by_cost.max
+    end
+
+    def products_sorted_by_cost
+      return @products_sorted_by_cost if defined? @products_sorted_by_cost
+
+      @products_sorted_by_cost = load_base_products.sort_by{|product| 
+        product.cost_for_application_period(application_period) 
+      }
+    end
+
+    def load_base_products
+      return [] if products.empty?
+      BenefitMarkets::Products::Product.find(products.pluck(:_id))
+    end
+
     # Define Comparable operator
     # If instance attributes are the same, compare Products
     def <=>(other)
@@ -92,8 +115,8 @@ module BenefitMarkets
     end
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
-    def load_embedded_products(service_area, effective_date)
-      benefit_market_products_available_for(service_area, effective_date)
+    def load_embedded_products(service_areas, effective_date)
+      benefit_market_products_available_for(service_areas, effective_date).collect { |prod| prod.create_copy_for_embedding }
     end
 
     # Query products from database applicable to this product package
@@ -104,8 +127,8 @@ module BenefitMarkets
     end
 
     # Intersection of BenefitMarket::Products that match both service area and effective date
-    def benefit_market_products_available_for(service_area, effective_date)
-      benefit_market_products_available_on(effective_date)# & benefit_market_products_available_where(service_area)
+    def benefit_market_products_available_for(service_areas, effective_date)
+      benefit_market_products_available_on(effective_date) & benefit_market_products_available_where(service_areas)
     end
 
     # BenefitMarket::Products available for purchase on effective date
@@ -114,8 +137,8 @@ module BenefitMarkets
     end
 
     # BenefitMarket::Products available for purchase within a specified service area
-    def benefit_market_products_available_where(service_area)
-      all_benefit_market_products.select { |product| product.service_area == service_area }
+    def benefit_market_products_available_where(service_areas)
+      all_benefit_market_products.select { |product| service_areas.include?(product.service_area) }
     end
 
     def products_for_plan_option_choice(product_option_choice)

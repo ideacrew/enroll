@@ -149,6 +149,22 @@ module Employers::EmployerHelper
     return benefit_packages, (renewing_benefit_packages || [])
   end
 
+  def current_option_for_initial_benefit_package
+    bga = @census_employee.active_benefit_group_assignment
+    return bga.benefit_package_id if bga && bga.benefit_package_id
+    application = @employer_profile.current_benefit_application
+    return nil if application.blank?
+    application.default_benefit_group || application.benefit_packages[0].id
+  end
+
+  def current_option_for_renewal_benefit_package
+    bga = @census_employee.renewal_benefit_group_assignment
+    return bga.benefit_package_id if bga && bga.benefit_package_id
+    application = @employer_profile.renewal_benefit_application
+    return nil if application.blank?
+    application.default_benefit_group || application.benefit_packages[0].id
+  end
+
   def cobra_effective_date(census_employee)
     disabled = current_user.has_hbx_staff_role? ? false : true
     content_tag(:div) do
@@ -248,9 +264,9 @@ module Employers::EmployerHelper
 
   def selected_benefit_plan(plan)
     case plan
-      when 'single_carrier' then fetch_plan_title_for_single_carrier
+      when 'single_carrier', 'single_issuer' then fetch_plan_title_for_single_carrier
       when 'metal_level' then fetch_plan_title_for_metal_level
-      when 'single_plan','sole_source' then 'A Single Plan'
+      when 'single_plan', 'sole_source', 'single_product' then 'A Single Plan'
     end
   end
 

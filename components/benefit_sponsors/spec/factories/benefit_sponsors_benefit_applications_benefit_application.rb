@@ -39,14 +39,15 @@ FactoryGirl.define do
     end
 
     trait :with_benefit_package do
+      association :benefit_sponsor_catalog, factory: :benefit_markets_benefit_sponsor_catalog
       after(:build) do |benefit_application, evaluator|
-        benefit_application.benefit_packages << create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application)
+        benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application)]
       end
     end
 
     trait :with_predecessor_application do
       after(:build) do |benefit_application, evaluator|
-        benefit_application.predecessor_application = FactoryGirl.create(:benefit_sponsors_benefit_application,
+        predecessor_application = FactoryGirl.create(:benefit_sponsors_benefit_application,
           :with_benefit_package,
           benefit_sponsorship: benefit_application.benefit_sponsorship,
           effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
@@ -54,6 +55,8 @@ FactoryGirl.define do
           successor_applications: [benefit_application],
           aasm_state: :active
         )
+        benefit_application.predecessor_application = predecessor_application
+       benefit_application.benefit_packages.first.predecessor = predecessor_application.benefit_packages.first
       end
     end
 

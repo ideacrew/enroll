@@ -3,7 +3,7 @@
     <% if @employer_profile.census_employees.empty? %>
     <div class="row">
       <div class="col-xs-12">
-       <h1>Employee Roster</h1>
+       <h1 class="heading-text">Employee Roster</h1>
 
        <div class="row <%= pundit_class(EmployerProfile, :updateable?) %>">
         <p class="twenty">You haven't added any employees to your roster. Select 'Add New Employee' to begin, or select 'Upload Employee Roster' if you’d like to download the roster template and/or upload it now or later.</p>
@@ -23,7 +23,7 @@
     <% else %>
     <div class="row">
       <div class="col-xs-12">
-       <h1>Employee Roster</h1>
+       <h1 class="heading-text">Employee Roster</h1>
         <p class="twenty">
             Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template. If you need to edit information for an employee, or if you're ready to add your employee to a benefit package you created, scroll over the employee's name and select the pencil icon to the right. When you're finished with your roster, select 'Benefits' in the blue menu bar to the left to continue.
         </p>
@@ -45,7 +45,7 @@
           <%= link_to "<i class='fa fa-cloud-download' aria-hidden='true'></i> Download Employee Roster".html_safe, main_app.employers_employer_profile_export_census_employees_path(@employer_profile, format: :csv), class: "btn btn-default" %>
       </div>
     </div>
-    <%= render "benefit_sponsors/profiles/employers/employer_profiles/my_account/employees_by_status", status: ( params[:status] || "active" ) %>
+       <%= render "benefit_sponsors/profiles/employers/employer_profiles/my_account/employees_by_status", status: ( params[:status] || "active" ) %>
     <% end %>
   </div>
 </div>

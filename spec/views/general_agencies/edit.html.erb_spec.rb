@@ -1,5 +1,6 @@
 require "rails_helper"
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/edit.html.erb" do
   let(:organization) {FactoryGirl.create(:organization)}
   let(:general_agency_profile) {FactoryGirl.create(:general_agency_profile, :with_staff, organization: organization)}
@@ -27,4 +28,5 @@ RSpec.describe "general_agencies/profiles/edit.html.erb" do
   it "should have a hidden field organization id" do
     expect(rendered).to have_selector("[name='organization[id]']", count: 1)
   end
+end
 end

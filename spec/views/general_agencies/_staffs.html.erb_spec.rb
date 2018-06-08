@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   let(:staff) { FactoryGirl.create(:general_agency_staff_role) }
   before :each do
@@ -16,4 +17,5 @@ RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   it 'should show staff info' do
     expect(rendered).to have_selector('a', text: "#{staff.person.first_name} #{staff.person.last_name}")
   end
+end
 end

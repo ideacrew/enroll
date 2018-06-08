@@ -14,8 +14,8 @@ module BenefitSponsors
     delegate :reference_product, to: :sponsored_benefit, allow_nil: false
     
     accepts_nested_attributes_for :contribution_levels
-    validates_presence_of :contribution_levels
-    # validate :validate_contribution_levels
+#    validates_presence_of :contribution_levels
+#    validate :validate_contribution_levels
 
     # def validate_contribution_levels
     #   true
