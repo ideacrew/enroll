@@ -396,7 +396,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).first
+    HbxEnrollment.find(predecessor_enrollment_id).try(:first)
   end
 
   def census_employee
