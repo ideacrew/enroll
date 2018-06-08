@@ -74,6 +74,10 @@ module BenefitSponsors
         end
       end
 
+      def successor
+        nil
+      end
+
       def package_for_date(coverage_start_date)
         if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
           return self
@@ -108,14 +112,15 @@ module BenefitSponsors
       end
 
       def predecessor
-        return @predecessor if defined? @predecessor
+        return @predecessor if @predecessor
+        return nil if predecessor_id.blank?
         @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
       end
 
       def predecessor=(old_benefit_package)
-        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
-        self.predecessor_id = old_benefit_package._id
+        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.kind_of? BenefitSponsors::BenefitPackages::BenefitPackage
         @predecessor = old_benefit_package
+        self.predecessor_id = old_benefit_package.id
       end
 
       def probation_period_display_name

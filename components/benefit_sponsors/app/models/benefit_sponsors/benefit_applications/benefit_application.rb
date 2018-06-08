@@ -192,7 +192,7 @@ module BenefitSponsors
 
     def predecessor_application
       return nil if predecessor_application_id.blank?
-      return @predecessor_application if defined? @benefit_application
+      return @predecessor_application if @benefit_application
       @predecessor_application = benefit_sponsorship.benefit_applications_by(predecessor_application_id)
     end
 
