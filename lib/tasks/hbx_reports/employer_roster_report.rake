@@ -27,18 +27,22 @@ def build_csv_report(file_name_DC, file_name_MA, organizations)
     @products_info = load_products
 
     organizations.each do |organization|
-      employer_profile = organization.employer_profile
-      next if employer_profile.census_employees.blank?
-      employer_data = [organization.legal_name, organization.dba, organization.fein]
+      begin
+        employer_profile = organization.employer_profile
+        next if employer_profile.census_employees.blank?
+        employer_data = [organization.legal_name, organization.dba, organization.fein]
 
-      employer_profile.census_employees.active.each do |active_employee|
-        data = build_employee_row(active_employee, employer_data)
-        csv << data
-      end
+        employer_profile.census_employees.active.each do |active_employee|
+          data = build_employee_row(active_employee, employer_data)
+          csv << data
+        end
 
-      employer_profile.census_employees.terminated.each do |active_employee|
-        data = build_employee_row(active_employee, employer_data)
-        csv << data
+        employer_profile.census_employees.terminated.each do |active_employee|
+          data = build_employee_row(active_employee, employer_data)
+          csv << data
+        end
+      rescue Exception => e
+        puts e.message
       end
     end
   end
