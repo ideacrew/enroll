@@ -16,7 +16,7 @@ RSpec.describe EmployerInvoice, dbclean: :after_each do
        subject { EmployerInvoice.new(initial_employer_organization, "Rspec_folder") }
 
        it "should trigger notice" do
-         expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(params_regular).and_return(true)
+         expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(params_regular).and_return(true)
          subject.send_first_invoice_available_notice
        end
      end
@@ -25,13 +25,13 @@ RSpec.describe EmployerInvoice, dbclean: :after_each do
         subject { EmployerInvoice.new(conversion_employer_organization, "Rspec-folder") }
 
         it "should trigger notice for employer with initial plan year only" do
-          expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(params_conversion).and_return(true)
+          expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(params_conversion).and_return(true)
           subject.send_first_invoice_available_notice
         end
 
         it "should not trigger notice for employer with renewal plan year" do
           conversion_employer_organization.employer_profile.published_plan_year.update_attributes!(:aasm_state => "renewing_draft")
-          expect_any_instance_of(Observers::Observer).not_to receive(:trigger_notice)
+          expect_any_instance_of(Observers::NoticeObserver).not_to receive(:deliver)
           subject.send_first_invoice_available_notice
         end
       end

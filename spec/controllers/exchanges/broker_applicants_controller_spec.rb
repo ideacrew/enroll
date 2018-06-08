@@ -19,7 +19,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
     context 'when hbx staff role missing' do
       let(:user) { instance_double("User", :has_hbx_staff_role? => false) }
 
-      it 'should redirect when hbx staff role missing' do 
+      it 'should redirect when hbx staff role missing' do
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to('/exchanges/hbx_profiles')
       end
@@ -46,7 +46,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
     let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
     let(:broker_role) {FactoryGirl.create(:broker_role)}
 
-    before :all do 
+    before :all do
       @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
 
@@ -102,6 +102,32 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           expect(broker_role.aasm_state).to eq 'active'
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+
+        it "should have training as true in broker role attributes" do
+          expect(broker_role.training).to eq true
+        end
+      end
+
+      context 'when application is updated' do
+        before :each do
+          broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
+          broker_role.approve!
+          put :update, id: broker_role.person.id, update: true, person: { broker_role_attributes: { training: true , carrier_appointments: {"Aetna Health Inc"=>"true", "United Health Care Insurance"=>"true"}} } , format: :js
+          broker_role.reload
+        end
+
+        it "should change applicant status to active" do
+          expect(assigns(:broker_applicant))
+          expect(broker_role.aasm_state).to eq 'active'
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to('/exchanges/hbx_profiles')
+          #only really testing that the params go through.
+          if aca_state_abbreviation == "DC"
+            expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc"=>"true", "Aetna Life Insurance Company"=>nil, "Carefirst Bluechoice Inc"=>nil, "Group Hospitalization and Medical Services Inc"=>nil, "Kaiser Foundation"=>nil, "Optimum Choice"=>nil, "United Health Care Insurance"=>"true", "United Health Care Mid Atlantic"=>nil})
+          else
+            expect(broker_role.carrier_appointments).to eq({"Aetna Health Inc"=>"true", "Altus" => nil, "Blue Cross Blue Shield MA" => nil, "Boston Medical Center Health Plan" => nil, "Delta" => nil, "FCHP" => nil, "Guardian" => nil, "Harvard Pilgrim Health Care" => nil, "Health New England" => nil, "Minuteman Health" => nil, "Neighborhood Health Plan" => nil, "Tufts Health Plan Direct" => nil, "Tufts Health Plan Premier" => nil, "United Health Care Insurance" => "true"})
+          end
         end
 
         it "should have training as true in broker role attributes" do

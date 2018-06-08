@@ -2,7 +2,7 @@ site:
   key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
-  home_url: "https://enroll.mhc.hbxshop.org"
+  home_url: "https://business.mahealthconnector.org/"
   home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
@@ -102,6 +102,12 @@ notices:
     state: "MA"
     zip:
 
+  shop:
+    attachments:
+      non_discrimination_attachment: "ma_shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "ma_envelope_without_address.pdf"
+
+
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
 
@@ -147,6 +153,9 @@ aca:
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
       end_on: <%= Date.new(2018,02,05) %>
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2018,11,1) %>
+      end_on: <%= Date.new(2019,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'

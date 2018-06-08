@@ -1,5 +1,7 @@
 module Notifier
   class Builders::EmployerProfile
+    include ActionView::Helpers::NumberHelper
+    include Notifier::ApplicationHelper
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
@@ -44,6 +46,10 @@ module Notifier
 
     def employer_name
       merge_model.employer_name = employer_profile.legal_name
+    end
+
+    def email
+      merge_model.email = employer_profile.staff_roles.first.work_email_or_best
     end
 
     def first_name

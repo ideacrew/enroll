@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
+RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :after_each do
   let(:organization) { FactoryGirl.create(:organization) }
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
   let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
@@ -14,6 +14,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
 
   describe 'with modify permissions for DC' do
     before :each do
+      Settings.aca.general_agency_enabled = true
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
     context "General Agency can be enabled or disabled via settings" do
@@ -36,13 +37,12 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
 
   describe 'with modify permissions for MA' do
     before :each do
+      Settings.aca.general_agency_enabled = false
       render template: "broker_agencies/profiles/_employers.html.erb"
     end
     context "General Agency can be enabled or disabled via settings" do
       # passes in MA and DC based on Settings
       context "when disbaled", :unless => Settings.aca.general_agency_enabled do
-        let(:general_agency_enabled) { false }
-
         it "should have general agency" do
           expect(rendered).to_not match(/General Agencies/)
         end
@@ -74,5 +74,4 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
       end
     end
   end
-
 end

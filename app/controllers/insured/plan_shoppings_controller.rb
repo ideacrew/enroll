@@ -129,6 +129,7 @@ class Insured::PlanShoppingsController < ApplicationController
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
 
     else
+      @employee_role = @person.active_employee_roles.first.census_employee
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
   rescue => e

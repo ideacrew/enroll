@@ -1,6 +1,7 @@
 module Notifier
   class Builders::EmployeeProfile
     include ActionView::Helpers::NumberHelper
+    include Notifier::ApplicationHelper
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
@@ -45,6 +46,18 @@ module Notifier
           zip: mailing_address.zip
           })
       end
+    end
+
+    def ivl_oe_start_date
+      merge_model.ivl_oe_start_date = Settings.aca.individual_market.upcoming_open_enrollment.start_on.strftime('%m/%d/%Y')
+    end
+
+    def ivl_oe_end_date
+      merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on.strftime('%m/%d/%Y')
+    end
+
+    def email
+      merge_model.email = employee_role.person.work_email_or_best if employee_role.present?
     end
 
     def employer_name
