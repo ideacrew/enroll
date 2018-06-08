@@ -17,14 +17,14 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
  
   describe "NoticeTrigger" do
     context "when ER successfully hires a broker" do
-      subject { Observers::Observer.new }
+      subject { Observers::NoticeObserver.new }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker.broker_hired_notice_to_broker"
           expect(payload[:event_object_kind]).to eq 'EmployerProfile'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.trigger_notice(recipient: broker_agency_profile.primary_broker_role, event_object: model_instance, notice_event: "broker_hired_notice_to_broker")
+        subject.deliver(recipient: broker_agency_profile.primary_broker_role, event_object: model_instance, notice_event: "broker_hired_notice_to_broker")
       end
     end
   end
@@ -81,7 +81,7 @@ describe 'ModelEvents::BrokerHiredNoticeToBroker', dbclean: :around_each  do
     end
 
     it "should return broker assignment date" do
-      expect(merge_model.assignment_date).to eq broker_agency_account.start_on
+      expect(merge_model.assignment_date).to eq broker_agency_account.start_on.strftime('%m/%d/%Y')
     end
 
     it "should return employer poc first name" do

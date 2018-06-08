@@ -34,14 +34,14 @@ describe 'ModelEvents::InitialEmployerApplicationApproval' do
       let(:model_event) { ModelEvents::ModelEvent.new(:initial_application_submitted, model_instance, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_application_submitted"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.zero_employees_on_roster_notice"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

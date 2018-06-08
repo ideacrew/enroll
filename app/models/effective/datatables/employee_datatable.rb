@@ -26,7 +26,7 @@ module Effective
 
         table_column :terminated_on, :proc => Proc.new { |row|
           row.employment_terminated_on || "Active"
-        }, :sortable => false, :filter => false, :visible => true 
+        }, :sortable => false, :filter => false, :visible => true
 
         table_column :status, :proc => Proc.new { |row|
           employee_state_format(row.aasm_state, row.employment_terminated_on)
