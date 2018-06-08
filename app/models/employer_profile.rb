@@ -1236,16 +1236,6 @@ class EmployerProfile
     )
   end
 
-  def self.notice_to_employee_for_missing_binder_payment(org)
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "ee_ers_plan_year_will_not_be_written_notice")
-      rescue Exception => e
-        (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
-      end
-    end
-  end
-
   # TODO - fix premium amount
   def initialize_account
     if employer_profile_account.blank?
