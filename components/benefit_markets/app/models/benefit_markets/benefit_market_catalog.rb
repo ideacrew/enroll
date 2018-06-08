@@ -145,6 +145,9 @@ module BenefitMarkets
 
       if begin_date_covered || end_date_covered
         errors.add(:application_period, "already exists for dates: #{application_period}")
+        false
+      else
+        true
       end
     end
 

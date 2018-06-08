@@ -56,8 +56,8 @@ module BenefitSponsors
     end
 
     before do
+      benefit_sponsorship.benefit_market.site_urn = site.site_key
       benefit_sponsorship.save
-      benefit_sponsorship.benefit_market.update_attributes!(:site_urn => site.site_key)
     end
 
     describe "GET new", dbclean: :after_each do
