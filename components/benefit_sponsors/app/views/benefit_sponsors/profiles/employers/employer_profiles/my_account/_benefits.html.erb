@@ -65,7 +65,7 @@
               <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
               <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right" %>
               <%# end %>
-              <% if benefit_application.benefit_packages.present? && benefit_application.benefit_packages.count > 1 %>
+              <% if benefit_application.benefit_packages.empty? %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz mr-1"%>
               <% else %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_benefit_package_path(benefit_application.benefit_sponsorship, benefit_application, benefit_application.benefit_packages.first, :show_benefit_application_tile => true), method: :get, class: "btn btn-default pull-right mrz mr-1"%>
