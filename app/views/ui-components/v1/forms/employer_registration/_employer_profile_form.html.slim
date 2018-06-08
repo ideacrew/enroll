@@ -11,18 +11,18 @@ fieldset.mt-2
     = render partial: './ui-components/v1/forms/employer_registration/staff_role_information', locals: {f: f}
 
 fieldset.mt-2
-  legend Employer Information:
+  legend Employer Information
   
   = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
     .row
       .col-md-4.mb-2
-        label for="inputLegalName"  Legal name *
+        label for="inputLegalName"  Legal Name *
         = f.text_field :legal_name, class: "form-control", required: true, placeholder: 'LEGAL NAME'
         .invalid-feedback
           |
             Please provide a legal name.
       .col-md-4.mb-2
-        label for="inputDBA"  DBA *
+        label for="inputDBA"  DBA
         = f.text_field :dba, class: "form-control", placeholder: 'DBA'
       .col-md-4.mb-2
         label for="inputFEIN"  FEIN *
