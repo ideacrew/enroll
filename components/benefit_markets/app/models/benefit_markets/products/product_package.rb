@@ -46,6 +46,29 @@ module BenefitMarkets
         ]
     end
 
+    def lowest_cost_product
+      return @lowest_cost_product if defined? @lowest_cost_product
+      @lowest_cost_product = products_sorted_by_cost.min
+    end
+
+    def highest_cost_product
+      return @highest_cost_product if defined? @highest_cost_product
+      @highest_cost_product = products_sorted_by_cost.max
+    end
+
+    def products_sorted_by_cost
+      return @products_sorted_by_cost if defined? @products_sorted_by_cost
+
+      @products_sorted_by_cost = load_base_products.sort_by{|product| 
+        product.cost_for_application_period(application_period) 
+      }
+    end
+
+    def load_base_products
+      return [] if products.empty?
+      BenefitMarkets::Products::Product.find(products.pluck(:_id))
+    end
+
     # Define Comparable operator
     # If instance attributes are the same, compare Products
     def <=>(other)

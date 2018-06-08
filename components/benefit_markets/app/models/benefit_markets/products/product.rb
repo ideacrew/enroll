@@ -129,6 +129,13 @@ module BenefitMarkets
       issuer_profile
     end
 
+    def cost_for_application_period(application_period)
+      premium_table = premium_tables.effective_period_cover(application_period.min).first
+      if premium_table
+        premium_table.premium_tuples.first.cost
+      end
+    end
+
     def deductible_value
       return nil if deductible.blank?
       deductible.split(".").first.gsub(/[^0-9]/, "").to_i

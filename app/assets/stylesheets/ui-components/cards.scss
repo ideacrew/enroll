@@ -342,4 +342,19 @@
     text-transform: uppercase;
   }
 }
+#employee-enrollments, #employer-plan-year, #employer-benefit-groups {
+  .panel-heading {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size:18px;
+    color:$mhc-orange;
+  }
+}
 
+.employer-broker-widget {
+  .panel-heading {
+    background-color:transparent;
+    font-size: 16px;
+    color:$mhc-dark-blue;
+  }
+}

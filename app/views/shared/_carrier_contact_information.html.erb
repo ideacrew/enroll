@@ -8,7 +8,7 @@
       </div>
       <div class="modal-body">
         <i class="fa fa-phone fa-3x"></i>
-        <% if plan.kind == 'health' %>
+        <% if plan.kind.to_s == "health" %>
           <div class="carrier-numbers">
             <% case plan.issuer_profile.legal_name %>
             <% when "BMC HealthNet Plan" %>

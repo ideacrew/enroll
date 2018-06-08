@@ -11,18 +11,18 @@ fieldset.mt-2
     = render partial: './ui-components/v1/forms/employer_registration/staff_role_information', locals: {f: f}
 
 fieldset.mt-2
-  legend Employer Information:
+  legend Employer Information
   
   = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
     .row
       .col-md-4.mb-2
-        label for="inputLegalName"  Legal name *
+        label for="inputLegalName"  Legal Name *
         = f.text_field :legal_name, class: "form-control", required: true, placeholder: 'LEGAL NAME'
         .invalid-feedback
           |
             Please provide a legal name.
       .col-md-4.mb-2
-        label for="inputDBA"  DBA *
+        label for="inputDBA"  DBA
         = f.text_field :dba, class: "form-control", placeholder: 'DBA'
       .col-md-4.mb-2
         label for="inputFEIN"  FEIN *
@@ -35,6 +35,9 @@ fieldset.mt-2
       .col-md-4.pl-0
         label for="inputEntityKind"  Kind *
         = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, {:required => true, :class => 'form-control mb-1'} )
+        .invalid-feedback
+          |
+            Please select a entity kind.
       - if display_sic_field_for_employer?
         .col-md-4.pl-0
           label for="inputSIC"  SIC Code *
