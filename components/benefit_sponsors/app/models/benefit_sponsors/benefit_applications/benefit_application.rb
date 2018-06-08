@@ -75,6 +75,8 @@ module BenefitSponsors
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
     scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
+
+    scope :submitted,           ->{ any_in(aasm_state: APPROVED_STATES) }
     scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
     scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
     scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
@@ -192,7 +194,7 @@ module BenefitSponsors
 
     def predecessor_application
       return nil if predecessor_application_id.blank?
-      return @predecessor_application if defined? @benefit_application
+      return @predecessor_application if @benefit_application
       @predecessor_application = benefit_sponsorship.benefit_applications_by(predecessor_application_id)
     end
 
@@ -386,6 +388,71 @@ module BenefitSponsors
           end
         end
       end
+    end
+
+    def waived
+      return @waived if defined? @waived
+      @waived ||= find_census_employees.waived
+    end
+
+    def waived_count
+      waived.count
+    end
+
+    def covered
+      return @covered if defined? @covered
+      @covered ||= find_census_employees.covered
+    end
+
+    def covered_count
+      covered.count
+    end
+
+    def eligible_to_enroll_count
+      eligible_to_enroll.size
+    end
+
+    def eligible_to_enroll
+      return @eligible if defined? @eligible
+      @eligible ||= active_census_employees
+    end
+
+    def find_census_employees
+      return @census_employees if defined? @census_employees
+      @census_employees ||= CensusEmployee.benefit_application_assigned(self)
+    end
+
+    def active_census_employees
+      find_census_employees.active
+    end
+
+    def total_enrolled_count
+      if active_census_employees.count <= Settings.aca.shop_market.small_market_active_employee_limit
+        families_enrolled_under_application.size
+      else
+        0
+      end
+    end
+
+    def non_business_owner_enrolled
+      total_enrolled   = families_enrolled_under_application
+      
+      owner_employees  = active_census_employees.select{|ce| ce.is_business_owner}
+      filter_enrolled_employees(owner_employees, total_enrolled)
+      
+      waived_employees = active_census_employees.select{|ce| ce.waived?}
+      filter_enrolled_employees(waived_employees, total_enrolled)
+
+      total_enrolled
+    end
+
+    def filter_enrolled_employees(employees_to_filter, total_enrolled)
+      families_to_filter = employees_to_filter.collect{|census_employee| census_employee.family }.compact
+      total_enrolled    -= families_to_filter
+    end
+
+    def families_enrolled_under_application
+      Family.enrolled_under_benefit_application(self)
     end
 
     def renew_benefit_package_members

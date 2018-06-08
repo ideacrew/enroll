@@ -76,6 +76,10 @@ module BenefitSponsors
         organization.benefit_sponsorships.select { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
       end
 
+      def latest_benefit_sponsorship
+        organization.latest_benefit_sponsorship_for(self)
+      end
+
       def contact_methods
         ::BenefitMarkets::CONTACT_METHODS_HASH
       end
