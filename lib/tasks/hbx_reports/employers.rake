@@ -92,10 +92,15 @@ namespace :reports do
               contribution_levels = bg.sponsored_benefits.map(&:sponsor_contribution).map(&:contribution_levels)
               health_contribution_levels = contribution_levels[0] # No dental for cca
 
-              employee_contribution_pct = health_contribution_levels.where(display_name: "Employee").first.contribution_pct
-              spouse_contribution_pct = health_contribution_levels.where(display_name: "Spouse").first.contribution_pct
-              domestic_partner_contribution_pct = health_contribution_levels.where(display_name: "Domestic Partner").first.contribution_pct
-              child_under_26_contribution_pct = health_contribution_levels.where(display_name: "Child Under 26").first.contribution_pct
+              if health_contribution_levels.size > 2
+                employee_contribution_pct = health_contribution_levels.where(display_name: /Employee/i).first.contribution_pct
+                spouse_contribution_pct = health_contribution_levels.where(display_name: /Spouse/i).first.contribution_pct
+                domestic_partner_contribution_pct = health_contribution_levels.where(display_name: /Domestic Partner/i).first.contribution_pct
+                child_under_26_contribution_pct = health_contribution_levels.where(display_name: /Child Under 26/i).first.contribution_pct
+              else
+                employee_contribution_pct = health_contribution_levels.where(display_name: /Employee Only/i).first.contribution_pct
+                spouse_contribution_pct = domestic_partner_contribution_pct = child_under_26_contribution_pct = health_contribution_levels.where(display_name: /Family/i).first.contribution_pct
+              end
 
               csv << field_names.map do |field_name|
                 if field_name == "fein"

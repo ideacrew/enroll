@@ -1,6 +1,6 @@
 .row.pl-1
   h4 Office Location
-.row
+.row[data-controller='zip-check']
   .col-md-9.col-sm-6.col-xs-12
     label for="inputAddress1" Address
     = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true'
@@ -11,7 +11,7 @@
     - kinds = f.object.office_kind_options; kinds = kinds.rotate if params[:child_index]
     = f.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, selected: f.object.try(:kind)),{}, class: "form-control", required: true, id:'kindSelect',placeholder: 'KIND'
     .invalid-feedback
-      | Please select a Address kind.
+      | Please select an address kind.
 
 .row
   .col-md-12.col-sm-12.col.xs-12

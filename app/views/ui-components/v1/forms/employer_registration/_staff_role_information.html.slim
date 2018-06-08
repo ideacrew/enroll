@@ -1,29 +1,37 @@
 - if current_user.blank? || current_user.person_id.blank?
 
-  legend Personal Information:
+  legend Personal Information
   .row
     .col-md-4
       = f.hidden_field :person_id, value: f.object.person_id
-      label for="inputFirstName"  First name *
-      = f.text_field :first_name, class: "form-control", required: true, placeholder: 'FIRST NAME *'
-
+      label for="inputFirstName"  First Name *
+      = f.text_field :first_name, class: "form-control", required: true, placeholder: 'John'
+      .invalid-feedback
+        |
+          Please provide a first name.
     .col-md-4
-      label for="inputLastName"  Last name *
-      = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'LAST NAME *'
-
+      label for="inputLastName"  Last Name *
+      = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'Doe'
+      .invalid-feedback
+        |
+          Please provide a last name.
     .col-md-4
       label for="inputDob"  Date of Birth *
-      = f.text_field :dob, {:class => "form-control", :placeholder => "DATE OF BIRTH *", id:'inputDOB' , required: true, readonly: defined?(readonly)}
-  <br>
-
-  .row
+      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB' , required: true, readonly: defined?(readonly)}
+      .invalid-feedback
+        |
+          Please provide a date of birth.
+  .row.mt-1
     .col-md-3
       label for="inputEmail"  Email *
-      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'EMAIL'
+      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'john@example.com'
+      .invalid-feedback
+        |
+          Please provide a email address.
 
     .col-md-3
       label for="inputAreaCode"  Area code *
-      = f.text_field :area_code, class: "form-control", minlength: '3', maxlength:'3', onkeypress:'return isNumberKey(event)', placeholder: 'AREA CODE', required: true
+      = f.text_field :area_code, class: "form-control", minlength: '3', maxlength:'3', onkeypress:'return isNumberKey(event)', placeholder: '508', required: true
       .invalid-feedback
         |
               Please provide a valid area code.
@@ -34,7 +42,7 @@
         |
               Please provide a valid number.
     .col-md-3
-      label for="inputExtension"  Extension *
+      label for="inputExtension"  Extension
       = f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10'
 - else
   = f.hidden_field :person_id, value: current_user.person_id
