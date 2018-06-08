@@ -16,7 +16,7 @@ module Queries
 
     def build_scope()
       return [] if @employer_profile.nil?
-      case @custom_attributes[:employers]
+      collection =  case @custom_attributes[:employers]
         when "active"
           @employer_profile.census_employees.active
         when "active_alone"
@@ -30,6 +30,12 @@ module Queries
         else
           @employer_profile.census_employees.active_alone
       end
+
+      if @search_string.present?
+        return collection.any_of(CensusEmployee.search_hash(@search_string))
+      end
+
+      return collection
     end
 
     def skip(num)
