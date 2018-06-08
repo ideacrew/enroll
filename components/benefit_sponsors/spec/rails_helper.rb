@@ -16,6 +16,8 @@ require 'factory_girl_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 require "pry"
+require 'pundit/rspec'
+
 
 FactoryGirl.definition_file_paths = [
   File.expand_path(File.join(File.dirname(__FILE__),'../../benefit_markets/spec/factories')),
