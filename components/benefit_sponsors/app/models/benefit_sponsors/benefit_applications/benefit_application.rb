@@ -434,6 +434,22 @@ module BenefitSponsors
       end
     end
 
+    def employee_participation_ratio_minimum
+      Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
+    end
+
+    def minimum_enrolled_count
+      (employee_participation_ratio_minimum * eligible_to_enroll_count).ceil
+    end
+
+    def additional_required_participants_count
+      if total_enrolled_count < minimum_enrolled_count
+        minimum_enrolled_count - total_enrolled_count
+      else
+        0.0
+      end
+    end
+
     def non_business_owner_enrolled
       total_enrolled   = families_enrolled_under_application
       
