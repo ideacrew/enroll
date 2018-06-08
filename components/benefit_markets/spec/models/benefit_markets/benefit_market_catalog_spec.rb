@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe BenefitMarketCatalog, type: :model do
+  RSpec.describe BenefitMarketCatalog, type: :model, dbclean: :after_each do
 
     let(:benefit_market_kind)       { :aca_shop }
     let(:today)                     { Date.today }
@@ -15,17 +15,18 @@ module BenefitMarkets
     let(:probation_period_kinds)    { [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days] }
 
 
+    let(:params) do
+      {
+        benefit_market: benefit_market,
+        application_interval_kind: application_interval_kind,
+        application_period: application_period,
+        probation_period_kinds: probation_period_kinds,
+        title: title,
+        description: description,
+      }
+    end
+
     context "A new model instance" do
-      let(:params) do 
-        {
-          benefit_market: benefit_market,
-          application_interval_kind: application_interval_kind,
-          application_period: application_period,
-          probation_period_kinds: probation_period_kinds,
-          title: title,
-          description: description,
-        }
-      end
 
       context "with no benefit_market" do
         subject { described_class.new(params.except(:benefit_market)) }
@@ -63,10 +64,24 @@ module BenefitMarkets
         end
       end
 
+      context "with an invalid probation_period_kinds" do
+        subject { described_class.new(params) }
+        let(:invalid_kind)                    { :after_termination }
+        let(:invalid_probation_period_kinds)  { probation_period_kinds << invalid_kind }
+
+        before { subject.probation_period_kinds = invalid_probation_period_kinds }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors.messages[:probation_period_kinds].first).to match(/#{invalid_kind} is not a valid probation period kind/)
+        end
+      end
+
       context "with all required arguments" do
         subject { described_class.new(params) }
 
-        context "and all arguments are valid", dbclean: :after_each do
+        context "and all arguments are valid" do
 
           it "should be valid" do
             subject.validate
@@ -77,9 +92,66 @@ module BenefitMarkets
             expect(subject.save!).to eq true
             expect(BenefitMarkets::BenefitMarketCatalog.find(subject.id)).to eq subject
           end
+
+
         end
       end
+
     end
+
+
+    context "A benefit catalog with application period overlapping an existing catalog" do
+      let(:period_with_same_start_date)         { application_period.min..(application_period.max + 1.day) }
+      let(:period_with_same_end_date)           { (application_period.min - 1.day)..application_period.max }
+      let(:period_with_overlapping_start_date)  { (application_period.min + 1.month)..(application_period.max + 1.month) }
+      let(:period_with_overlapping_end_date)    { (application_period.min - 1.month)..(application_period.max - 1.month) }
+
+      let!(:existing_catalog)                   { described_class.create(**params) }
+      let(:conflicting_catalog)                 { described_class.new(params.except(:application_period)) }
+
+
+      context "with same start date" do
+        before { conflicting_catalog.application_period = period_with_same_start_date }
+
+        it "should be invalid" do
+          conflicting_catalog.validate
+          expect(conflicting_catalog).to_not be_valid
+          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/application period already exists for dates/)
+        end
+      end
+
+      context "with same end date" do
+        before { conflicting_catalog.application_period = period_with_same_end_date }
+
+        it "should be invalid" do
+          conflicting_catalog.validate
+          expect(conflicting_catalog).to_not be_valid
+          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/application period already exists for dates/)
+        end
+      end
+
+      context "with overlapping start date" do
+        before { conflicting_catalog.application_period = period_with_overlapping_start_date }
+
+        it "should be invalid" do
+          conflicting_catalog.validate
+          expect(conflicting_catalog).to_not be_valid
+          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/application period already exists for dates/)
+        end
+      end
+
+      context "with overlapping end date" do
+        before { conflicting_catalog.application_period = period_with_overlapping_end_date }
+
+        it "should be invalid" do
+          conflicting_catalog.validate
+          expect(conflicting_catalog).to_not be_valid
+          expect(conflicting_catalog.errors.messages[:application_period].first).to match(/application period already exists for dates/)
+        end
+      end
+
+    end
+
 
   end
 end
