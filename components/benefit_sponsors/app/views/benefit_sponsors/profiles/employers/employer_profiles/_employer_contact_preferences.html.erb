@@ -4,8 +4,8 @@
   </div>
   <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
     <div class="row row-form-wrapper no-buffer">
-      <div class="col-md-6 col-sm-6 no-pd">
-        <%= f.select :contact_method, options_for_select(f.object.contact_method_options, selected: f.object.contact_method) %>
+      <div class="col-md-6 col-sm-6 no-pd form-group-lg">
+        <%= f.select :contact_method, options_for_select(f.object.contact_method_options, selected: f.object.contact_method), {}, class:'form-control' %>
       </div>
     </div>
   </div>
