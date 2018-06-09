@@ -15,6 +15,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 end
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => :controller do
   let(:user){ FactoryGirl.create(:user, :consumer) }
   let(:person){ FactoryGirl.build(:person) }
@@ -471,4 +472,5 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
   end
+end
 end
