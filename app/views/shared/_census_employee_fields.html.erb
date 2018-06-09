@@ -9,12 +9,8 @@
           Is Owner?
         </label>
         <label class="vertically-aligned-row">
-          <%= f.check_box :is_business_owner %>
-          <%= f.label :is_business_owner do %>
-          <i class="far fa-check-square fa-lg"></i>
-          <i class="far fa-square fa-lg"></i>
-          <% end %>
           <span>
+            <%= f.check_box :is_business_owner %>
             Owner?
           </span>
         </label>
@@ -57,3 +53,22 @@
     <% end %>
   </div>
 </div>
+
+<script>
+  var disableSelectric = false;
+</script>
+  
+<style>
+  .n-radio-group .n-radio-row:first-of-type {
+    border:none !important;
+  }
+  .n-radio-group .n-radio-row {
+    padding:0px !important;
+  }
+  .module.forms .owner.checkbox {
+      margin-left: -5px;
+  }
+  .module.forms .checkbox {
+      margin: auto;
+  }
+</style>
