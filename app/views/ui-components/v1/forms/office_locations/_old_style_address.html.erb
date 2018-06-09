@@ -59,7 +59,7 @@
                    <% @counties = RatingArea.find_counties_for(zip_code: f.object.try(:zip)) %>
                    <% @empty_message = f.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                    <% @counties = [@empty_message] if @counties.empty? %>
-                 <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{}, required: true, onchange: 'validateCounty(this)')%>
+                 <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', required: true, onchange: 'validateCounty(this)')%>
                 </div>
               <% end %>
           </div>
@@ -70,7 +70,7 @@
     <%= f.fields_for :phone, errors: {}, fieldset: false do |phone| %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
+        <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}), {selected:'phone main'}, class: "floatlabel form-control form-group-lg interaction-choice-control-office-location-phone-kind", required: true, disabled:true %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>

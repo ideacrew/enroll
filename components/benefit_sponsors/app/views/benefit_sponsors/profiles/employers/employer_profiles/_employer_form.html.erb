@@ -135,7 +135,9 @@
                 </div>
                 <% if office_fields.object.is_primary? %>
                     <div class="js-remove row">
-                      <label>Primary Address</label>
+                      <% unless params[:controller] == "benefit_sponsors/profiles/registrations" %>
+                        <label>Primary Address</label>
+                      <% end %>
                     </div>
                     <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
                         <%= address_fields.hidden_field :kind, value: 'primary' %>
