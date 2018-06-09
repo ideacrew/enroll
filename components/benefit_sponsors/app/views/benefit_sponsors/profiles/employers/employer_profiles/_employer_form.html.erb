@@ -102,7 +102,7 @@
           <%= f_profile.hidden_field :id, value: f_profile.object.id %>
           <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
           <% if display_sic_field_for_employer? %>
-            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd mr-1" style="margin-top:-20px">
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-20px">
               <%= f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} ) %>
             </div>
             <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-8px">
@@ -115,7 +115,7 @@
             <div data-target="site.officeLocations">
               <!-- This needs to be refactored but added so we can make stakeholder review by deadline -->
                 <%= f_profile.fields_for :office_locations, f_profile.object.office_locations.each do |office_fields| %>
-                  <%= office_fields.hidden_field :id, value: office_fields.object.try(:id) %>
+                  <%= office_fields.hidden_field :id, value: office_fields.object.id if office_fields.object.id.present? %>
                 <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
 
                 <% if office_fields.object.is_primary? %>
@@ -124,54 +124,33 @@
                 <% else %>
                     <div class="js-office-location">
                       <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] != "edit" %>
-                      <div class="row row-form-wrapper no-buffer js-non-primary">
+                        <div class="row row-form-wrapper no-buffer js-non-primary">
                       <% end %>
                 <% end %>
                 <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] != "edit" %>
-                <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group no-pd">
-                  <a class="btn btn-sm btn-outline-primary" data-action="click->site#removeLocation">Remove</a>
-                </div>
+                  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group no-pd">
+                    <a class="btn btn-sm btn-outline-primary" data-action="click->site#removeLocation">Remove</a>
+                  </div>
                 <% end %>
                 </div>
-                <% if office_fields.object.is_primary? %>
-                    <div class="js-remove row">
-                      <% unless params[:controller] == "benefit_sponsors/profiles/registrations" %>
-                        <label>Primary Address</label>
-                      <% end %>
-                    </div>
-                    <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
-                        <%= address_fields.hidden_field :kind, value: 'primary' %>
-                        <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" %>
-                          <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {f: address_fields}  %>
-                        <% else %>
-                        <%= render partial: './ui-components/v1/forms/office_locations/address', locals: {f: address_fields}  %>
-                        <% end %>
-                    <% end %>
-                <% end %>
-                
-                <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" && office_fields.object.is_primary? == false %>
-                  <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
-                      <%= address_fields.hidden_field :kind, value: 'primary' %>
-                      <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" %>
-                        <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {f: address_fields}  %>
-                      <% else %>
-                      <%= render partial: './ui-components/v1/forms/office_locations/address', locals: {f: address_fields}  %>
-                      <% end %>
-                  <% end %>
-                <% end %>
-                <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] != "edit" %>
                 <div class="js-remove row">
-                  <label>Main Phone </label>
+                  <label>Primary Address</label>
                 </div>
-                <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
-                    <%= phone_fields.hidden_field :kind, value: 'main' %>
-                    <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" %>
-                      
-                    <% else %>
+                <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" %>
+                  <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields}  %>
+                <% else %>
+                  <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
+                    <%= render partial: './ui-components/v1/forms/office_locations/address', locals: {f: address_fields}  %>
+                  <% end %>
+
+                  <div class="js-remove row">
+                    <label>Main Phone </label>
+                  </div>
+
+                  <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
+                    <%= phone_fields.hidden_field :kind, value: 'phone main' %>
                     <%= render partial: './ui-components/v1/forms/office_locations/phone', locals: { f: phone_fields } %>
-                    <% end %>
-                <% end %>
-                </div>
+                  <% end %>
                 <% end %>
               <% end %>
             </div>
