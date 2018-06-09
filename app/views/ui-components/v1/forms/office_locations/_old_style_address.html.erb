@@ -4,8 +4,8 @@
 
   <div id="address_info" class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-      <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
-
+      <%= office_fields.fields_for :address, office_fields.object.address, errors: {}, fieldset: false do |f| %>
+        <%= f.hidden_field :id, value: f.object.id if f.object.id.present? %>
         <%
           # address_kind = ''
           # if params.has_key?(:organization)
@@ -67,10 +67,11 @@
       </div>
       <div class="col-md-2 key col-sm-3 col-xs-12"></div>
     </div><br>
-    <%= f.fields_for :phone, errors: {}, fieldset: false do |phone| %>
+    <%= office_fields.fields_for :phone, office_fields.object.phone, errors: {}, fieldset: false do |phone| %>
+    <%= phone.hidden_field :id, value: phone.object.id if phone.object.id.present? %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <input type="text" value="Main" class="form-control form-group-lg" disabled>
+        <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>
