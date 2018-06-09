@@ -30,7 +30,7 @@ module BenefitMarkets
     validates_presence_of :product_kind, :benefit_kind, :package_kind, :application_period,
                           :pricing_model, :contribution_model
     validates_presence_of :title, :allow_blank => false
-    validates_presence_of :products, :allow_blank => false
+#    validates_presence_of :products, :allow_blank => false
 
     scope :by_benefit_kind,     ->(kind){ where(benefit_kind: kind) }
     scope :by_package_kind,     ->(package_kind) { where(package_kind: package_kind) }

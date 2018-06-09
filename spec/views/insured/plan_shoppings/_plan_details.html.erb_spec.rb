@@ -119,6 +119,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   end
 
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled? 
   context "with aptc" do
     before :each do
       allow(plan).to receive(:is_csr?).and_return true
@@ -154,6 +155,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     end
 
   end
+  end
 
   context "with dental coverage_kind" do
     before :each do
@@ -169,6 +171,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   end
 
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   context "with tax household and eligibility determination of csr_94" do
     before :each do
       allow(view).to receive(:params).and_return :market_kind => 'individual'
@@ -201,5 +204,5 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to_not have_css("#csrEligibleReminder-#{plan.id}")
     end
   end
-
+  end
 end
