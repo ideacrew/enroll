@@ -27,6 +27,6 @@ nav
        = link_to 'View Enrollment Reports', benefit_sponsors.profiles_employers_employer_profile_coverage_reports_path(profile.id)
      .panel-body
        = link_to benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'employees') do
-         | My Employees
+         = "My Employees: #{profile.census_employees.active.count}"
  
         
