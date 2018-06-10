@@ -24,15 +24,15 @@
       .card-body
         ul.nav.nav-tabs role="tablist"
           input#ppKind type="hidden" name="benefit_package[sponsored_benefits_attributes][0][product_package_kind]"
-          li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
+          li.col-md-4.col-sm-4 role="presentation" onclick="radioSelected(this)"
             a href="#carrier" aria-controls="carrier" role="tab" data-toggle="tab" data-name="single_issuer"
               i.far.fa-circle.mr-2
               | One Carrier
-          li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
+          li.col-md-4.col-sm-4 role="presentation" onclick="radioSelected(this)"
             a href="#level" aria-controls="level" role="tab" data-toggle="tab" data-name="metal_level"
               i.far.fa-circle.mr-2
               | One Level
-          li.col-md-4.col-sm-4.pl-0 role="presentation" onclick="radioSelected(this)"
+          li.col-md-4.col-sm-4 role="presentation" onclick="radioSelected(this)"
             a href="#plan" aria-controls="plan" role="tab" data-toggle="tab" data-name="single_product"
               i.far.fa-circle.mr-2
               | One Plan
@@ -192,19 +192,20 @@ javascript:
     }
   }
 
-  function calculateEmployerContributions()  {
+  function calculateEmployerContributions(productOptionKind,referencePlanID)  {
     $.ajax({
       type: "GET",
-      data:{},
+      data:{productOptionKind,referencePlanID},
       url: "/benefit_packages/calculate_employer_contributions",
       success: function (d) {
-              $('#loading').html("");
+              console.log(d)
       }
     });
   }
   
-  function displayReferencePlanDetails(element, plan) {
+  function displayReferencePlanDetails(element) {
     referencePlanID = element.id;
+    calculateEmployerContributions(productOptionKind, referencePlanID)
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
     
