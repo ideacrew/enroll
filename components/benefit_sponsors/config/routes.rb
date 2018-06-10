@@ -70,6 +70,7 @@ BenefitSponsors::Engine.routes.draw do
     end
   end
 
+
   resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
       post 'revert'
@@ -77,6 +78,7 @@ BenefitSponsors::Engine.routes.draw do
       post 'force_submit_application'
 
       resources :benefit_packages, controller: "benefit_packages/benefit_packages" do
+        get :calculate_employer_contributions, on: :collection
         resources :sponsored_benefits, only: :new
       end
     end

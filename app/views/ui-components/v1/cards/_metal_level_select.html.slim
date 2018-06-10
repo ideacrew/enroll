@@ -191,6 +191,17 @@ javascript:
       element.append(div)
     }
   }
+
+  function calculateEmployerContributions()  {
+    $.ajax({
+      type: "GET",
+      data:{},
+      url: "/benefit_packages/calculate_employer_contributions",
+      success: function (d) {
+              $('#loading').html("");
+      }
+    });
+  }
   
   function displayReferencePlanDetails(element, plan) {
     referencePlanID = element.id;

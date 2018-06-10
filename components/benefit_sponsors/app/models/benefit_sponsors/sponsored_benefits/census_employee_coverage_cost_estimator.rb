@@ -134,7 +134,7 @@ module BenefitSponsors
       def construct_sponsor_contribution_if_needed(sponsored_benefit, product_package)
         return sponsored_benefit.sponsor_contribution if sponsored_benefit.sponsor_contribution.present?
         cm_builder = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
-        sponsor_contribution = cm_builder.build_sponsor_contribution(p_package)
+        sponsor_contribution = cm_builder.build_sponsor_contribution(product_package)
         sponsor_contribution.sponsored_benefit = sponsored_benefit
         sponsor_contribution
       end
