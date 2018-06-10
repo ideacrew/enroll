@@ -45,7 +45,8 @@ FactoryGirl.define do
       after :build do |organization, evaluator|
         build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization)
         organization.benefit_sponsorships = [build(:benefit_sponsors_benefit_sponsorship,
-          :with_benefit_market, 
+          # :with_benefit_market,
+          benefit_market: organization.site.benefit_markets.first,
           profile: organization.employer_profile
         )]
       end

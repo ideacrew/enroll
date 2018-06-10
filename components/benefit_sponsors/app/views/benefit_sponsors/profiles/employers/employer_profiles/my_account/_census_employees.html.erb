@@ -16,7 +16,7 @@
         </ul>
         <p class="twenty">If you plan to make an optional contribution towards employee family coverage and need an accurate cost estimate, you’ll also need the date of birth for all family members because monthly premiums are based on age.</p>
         <%= link_to 'Add New Employee', main_app.new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-primary btn-lg"  %>
-        <%= link_to 'Upload Employee Roster', main_app.new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-primary btn-lg" %>
+        <%= link_to "Upload Employee Roster".html_safe, "", data: {toggle: "modal", target: "#upload_roster"}, class: "btn btn-primary btn-lg" %>
         </div>
       </div>
     </div>

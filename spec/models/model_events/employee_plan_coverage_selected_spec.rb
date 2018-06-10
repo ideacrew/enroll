@@ -44,7 +44,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(role)
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_plan_selection_confirmation_sep_new_hire"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'

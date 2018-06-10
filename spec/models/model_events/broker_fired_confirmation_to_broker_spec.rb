@@ -16,14 +16,14 @@ describe 'ModelEvents::BrokerFiredConfirmationToBroker', :dbclean => :after_each
 
   describe "NoticeTrigger" do
     context "when ER fires a broker" do
-      subject { Observers::Observer.new }
+      subject { Observers::NoticeObserver.new }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.broker.broker_fired_confirmation_to_broker"
           expect(payload[:event_object_kind]).to eq 'EmployerProfile'
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        subject.trigger_notice(recipient: broker_agency_account.broker_agency_profile.primary_broker_role, event_object: employer_profile, notice_event: "broker_fired_confirmation_to_broker")
+        subject.deliver(recipient: broker_agency_account.broker_agency_profile.primary_broker_role, event_object: employer_profile, notice_event: "broker_fired_confirmation_to_broker")
       end
     end
   end

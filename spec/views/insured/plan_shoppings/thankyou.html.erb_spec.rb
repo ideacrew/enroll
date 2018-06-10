@@ -47,6 +47,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     end
   end
 
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   context "ivl enrollment" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
@@ -95,5 +96,6 @@ RSpec.describe "insured/thankyou.html.erb" do
       expect(rendered).not_to have_selector('div#waive_confirm')
       expect(response).not_to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
     end
+  end
   end
 end

@@ -11,7 +11,7 @@ module BenefitSponsors
             #needs helper here
             organization.create_employer_profile(employer_profile_prams)
           else
-            new_organization = BenefitSponsors::Organizations::Organization.new(form_organizational_params)
+            new_organization = BenefitSponsors::Organizations::GeneralOrganization.new(form_organizational_params)
             employer_profile = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(employer_profile_prams.merge(:organization => new_organization))
             benefit_sponsorship = employer_profile.add_benefit_sponsorship
             benefit_sponsorship.update_attributes!(registered_on: registered_on, source_kind: :mid_plan_year_conversion)

@@ -1,5 +1,6 @@
 require "rails_helper"
 
+=begin
 describe PlanYear, "that is:
 - finished open enrollment
 - paid the binder
@@ -120,3 +121,4 @@ describe PlanYear, "that is:
     expect(subject.eligible_for_export?).to be_truthy
   end
 end
+=end

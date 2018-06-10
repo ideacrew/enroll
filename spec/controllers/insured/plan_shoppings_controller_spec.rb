@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
+=begin
   describe ".sort_by_standard_plans" do
       context "width standard plan present" do
         let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
@@ -55,6 +56,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
   end
+=end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
@@ -496,6 +498,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       end
     end
 
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
       let(:family) { FactoryGirl.build(:individual_market_family) }
@@ -590,6 +593,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           expect(session[:elected_aptc]).to eq 0
         end
       end
+    end
     end
   end
 

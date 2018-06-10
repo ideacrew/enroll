@@ -175,6 +175,9 @@ class BenefitGroup
 
   def set_bounding_cost_plans
     return if reference_plan_id.nil?
+    if self.respond_to?(:benefit_application)
+      return unless self.benefit_application
+    end
     return "" if self.employer_profile.blank?
     if offerings_constrained_to_service_areas?
       profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(self.employer_profile, reference_plan.active_year)

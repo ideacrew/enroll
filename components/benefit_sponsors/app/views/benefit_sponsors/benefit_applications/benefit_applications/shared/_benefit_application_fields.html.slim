@@ -89,19 +89,13 @@ javascript:
   
   function checkEmployeeCount(element) {
     var employeeCounts = {
-      fte: Number,
-      pte: Number,
-      msp: Number
+      fte: Number
     }
     
     if (element.id == "fteEmployee") {
       employeeCounts.fte = element.value
-    } else if (element.id == "pteEmployee") {
-      employeeCounts.pte = element.value
-    } else if (element.id == "medSecPayers") {
-      employeeCounts.msp = element.value
     }
-    if (employeeCounts.fte > 0 || employeeCounts.pte > 0 || employeeCounts.msp > 0 ) {
+    if (employeeCounts.fte >= 1) {
       document.getElementById('benefitContinueBtn').classList.remove('disabled')
     } else {
       document.getElementById('benefitContinueBtn').classList.add('disabled')

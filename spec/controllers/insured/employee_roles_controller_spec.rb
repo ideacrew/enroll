@@ -183,7 +183,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
 
     it "should trigger notice" do
-      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(notice_trigger_params).and_return(true)
+      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(notice_trigger_params).and_return(true)
       get :edit, id: employee_role.id
     end
   end

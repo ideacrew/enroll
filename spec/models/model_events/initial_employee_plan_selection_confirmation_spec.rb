@@ -51,7 +51,7 @@ describe 'ModelEvents::InitialEmployeePlanSelectionConfirmation', dbclean: :arou
          allow_any_instance_of(CensusEmployee).to receive(:employee_role).and_return(employee_role)
       end
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.initial_employee_plan_selection_confirmation"
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq hbx_enrollment.id.to_s

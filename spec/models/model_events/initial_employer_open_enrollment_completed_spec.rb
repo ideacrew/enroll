@@ -41,7 +41,7 @@ describe 'ModelEvents::InitialEmployerOpenEnrollmentCompleted', dbclean: :around
       let(:model_event) { ModelEvents::ModelEvent.new(:initial_employer_open_enrollment_completed, model_instance, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.initial_employer_open_enrollment_completed"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

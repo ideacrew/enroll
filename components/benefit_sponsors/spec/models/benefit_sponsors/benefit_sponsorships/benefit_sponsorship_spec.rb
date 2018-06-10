@@ -168,10 +168,6 @@ module BenefitSponsors
     end
 
     describe "Transitioning a BenefitSponsorship through workflow states" do
-      let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
-                                                :with_product_packages,
-                                                benefit_market: benefit_market) }
-
       let(:benefit_sponsorship)     { described_class.new(**params) }
       let(:benefit_application)     { build(:benefit_sponsors_benefit_application,
                                                 :with_benefit_sponsor_catalog,

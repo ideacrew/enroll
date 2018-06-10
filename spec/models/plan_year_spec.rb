@@ -1,6 +1,7 @@
 require 'rails_helper'
 include Config::BankHolidaysHelper
 
+=begin
 describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :start_on }
   it { should validate_presence_of :end_on }
@@ -2705,3 +2706,4 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
     end
   end
 end
+=end

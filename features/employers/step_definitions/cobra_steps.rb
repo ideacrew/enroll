@@ -439,7 +439,7 @@ end
 
 And(/clicks on the Add New Employee button/) do
   execute_script(<<-JSCODE)
-    $('.interaction-click-control-add-employee')[0].click()
+    $('.interaction-click-control-add-new-employee')[0].click()
   JSCODE
   wait_for_ajax(3,2)
 end
