@@ -136,13 +136,12 @@ javascript:
 
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
-
       var div = document.createElement('div')
       div.setAttribute('id', 'yourAvailablePlans')
       div.innerHTML = '<div class="col-xs-4 reference-plans">\
           <div class="col-xs-12 p0 mb-1">\
             <div class="col-xs-3 p0">\
-              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="'+plan.id+'" onclick="displayReferencePlanDetails(this, plan)" value="'+plan.id+'">\
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="'+plan.id+'" onclick="displayReferencePlanDetails(this)" value="'+plan.id+'" data-plan-title="'+plan.title+'" data-plan-carrier="'+plan.carrier_name+'" data-plan-id="'+plan.id+'" data-plan-metal-level="'+plan.metal_level_kind+'" data-plan-type="'+plan.health_plan_kind+'">\
             </div>\
             <div class="col-xs-9 p0 rp-info mb-1">\
               <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
@@ -195,7 +194,7 @@ javascript:
   function calculateEmployerContributions(productOptionKind,referencePlanID)  {
     $.ajax({
       type: "GET",
-      data:{productOptionKind,referencePlanID},
+      data:{product_package_kind: productOptionKind,reference_plan_id: referencePlanID},
       url: "calculate_employer_contributions",
       success: function (d) {
               console.log(d)
@@ -204,19 +203,37 @@ javascript:
   }
   
   function displayReferencePlanDetails(element) {
-    referencePlanID = element.id;
-    calculateEmployerContributions(productOptionKind, referencePlanID)
+    planTitle = element.dataset.planTitle;
+    metalLevel = element.dataset.planMetalLevel;
+    carrierName = element.dataset.planCarrier;
+    planType = element.dataset.planType;
+    //referencePlanID = element.id;
+    //calculateEmployerContributions(productOptionKind, referencePlanID)
+    showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
     
-    document.getElementById('referencePlanTitle').append(plan.title);
-    document.getElementById('rpType').append(plan.health_plan_kind);
-    document.getElementById('rpCarrier').append(plan.carrier_name);
-    document.getElementById('rpMetalLevel').append(plan.metal_level_kind);
+    document.getElementById('referencePlanTitle').append(planTitle);
+    document.getElementById('rpType').append(planType);
+    document.getElementById('rpCarrier').append(carrierName);
+    document.getElementById('rpMetalLevel').append(metalLevel);
+    document.getElementById('rpNetwork').append('N/A');
   }
   
   function setInputValue(element) {
     document.getElementById(element.dataset.id).value = element.value;
+  }
+  
+  function showFormButtons() {
+    document.getElementById('addBenefitPackage').classList.remove('hidden')
+    document.getElementById('submitBenefitPackage').classList.remove('hidden')
+    document.getElementById('cancelBenefitPackage').classList.remove('hidden')
+  }
+  
+  function hideFormButtons() {
+    document.getElementById('addBenefitPackage').classList.add('hidden')
+    document.getElementById('submitBenefitPackage').classList.add('hidden')
+    document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
   
   
