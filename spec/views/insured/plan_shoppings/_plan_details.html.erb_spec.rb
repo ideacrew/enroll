@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+=begin
 RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :after_each do
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
@@ -206,3 +207,4 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
   end
   end
 end
+=end

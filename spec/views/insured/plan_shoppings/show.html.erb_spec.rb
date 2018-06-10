@@ -1,5 +1,6 @@
 require "rails_helper"
 
+=begin
 RSpec.describe "insured/show" do
   let(:employee_role){FactoryGirl.create(:employee_role)}
   let(:plan){FactoryGirl.create(:plan)}
@@ -111,3 +112,4 @@ RSpec.describe "insured/show" do
     expect(rendered).to have_selector('#plans', text: 'Loading...')
   end
 end
+=end
