@@ -15,7 +15,7 @@ class MigrateMaProducts < Mongoid::Migration
 
         service_area_map = {}
         ::BenefitMarkets::Locations::ServiceArea.all.map do |sa|
-          service_area_map[[sa.issuer_profile_id,sa.active_year]] = sa.id
+          service_area_map[[sa.issuer_profile_id,sa.issuer_provided_code.strip,sa.active_year]] = sa.id
         end
 
         rating_area_id_cache = {}
@@ -57,7 +57,7 @@ class MigrateMaProducts < Mongoid::Migration
 
             product_kind = plan.coverage_kind
             issuer_profile_id = new_carrier_profile_map[old_carrier_profile_map[plan.carrier_profile_id]]
-            mapped_service_area_id = service_area_map[[issuer_profile_id,plan.active_year]]
+            mapped_service_area_id = service_area_map[[issuer_profile_id,plan.service_area_id.strip,plan.active_year]]
             shared_attributes = {
               benefit_market_kind: "aca_#{plan.market}",
               hbx_id: plan.hbx_id,
