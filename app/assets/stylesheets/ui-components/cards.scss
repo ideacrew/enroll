@@ -215,21 +215,31 @@
   .fa-dot-circle {
     color:$primary-green;
   }
+  #plan, #level, #carrier, #yourPlans, #sponsorContributions {
+    border:1px solid $mhc-light-gray;
+  }
   .nav-tabs {
     border-bottom:none;
   }
   .nav-tabs > li > a {
     background-color:$mhc-blue;
-    border-bottom: solid 3px $primary-botton-border-bottom;
     border-radius: 6px;
     font-weight: bold;
     font-size: 18px;
     padding: 10px;
     color:$primary-white;
     text-transform: uppercase;
+    border:1px solid $mhc-light-gray;
+  }
+  .nav-tabs > li > a  {
+    border:1px solid $mhc-light-gray;
   }
   .nav-tabs > li > a:hover {
     background-color:$mhc-dark-blue;
+    border-bottom: solid 3px $primary-botton-border-bottom;
+  }
+  .nav-tabs > li > a .active {
+    background-color:red
   }
   .tab-pane#carrier {
     background-color:$primary-white;

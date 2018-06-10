@@ -62,6 +62,7 @@ module BenefitSponsors
         [lowest_product_details, highest_product_details, reference_product_details]
       end
 
+      # Creating dummy sponsored benefit as estimator expects one.
       def create_dummy_sponsored_benefit(benefit_application)
         benefit_package = benefit_application.benefit_packages.build
         benefit_package.sponsored_benefits.build

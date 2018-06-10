@@ -42,18 +42,40 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     }
   end
 
-
   describe "given a employer" do
-    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
-    let(:benefit_group2)     { FactoryGirl.build(:benefit_group)}
-    let(:plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month+ 2.month - 1.year, benefit_groups: [benefit_group], aasm_state:'active',created_at:TimeKeeper.date_of_record)}
-    let(:future_plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month + 2.months, benefit_groups: [benefit_group2], aasm_state:'renewing_enrolled')}
-    let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+    let!(:benefit_market) { site.benefit_markets.first }
+    let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,:with_aca_shop_cca_employer_profile_initial_application, site:site)}
+    let(:broker_agency_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
+    let(:mailing_address){ FactoryGirl.build(:benefit_sponsors_locations_address, kind: "mailing")}
+    let(:mailing_office){ FactoryGirl.build(:benefit_sponsors_locations_office_location,address:mailing_address)}
+    let(:employer_profile) {
+      organization.employer_profile.office_locations <<  mailing_office
+      organization.employer_profile
+    }
+    let(:benefit_application) { employer_profile.latest_benefit_application }
+    let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: :single_issuer).first }
+    let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+    let!(:health_sponsored_benefit) {benefit_package.health_sponsored_benefit}
+    let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:update_products)  { product_package.products.update_all(issuer_profile:issuer_profile) }
+    let(:sponsor_contribution) {FactoryGirl.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: product_package,sponsored_benefit:health_sponsored_benefit)}
 
+    let!(:update_benefit) {
+      health_sponsored_benefit.product_option_choice = product_package.products.first.issuer_profile.id
+      health_sponsored_benefit.reference_product = product_package.products.first
+      health_sponsored_benefit.sponsor_contribution = sponsor_contribution
+      benefit_application.benefit_packages = [benefit_package]
+      benefit_application.save
+    }
+    let!(:update_sponsored_benefit_products)  { health_sponsored_benefit.product_package.products.update_all(issuer_profile:issuer_profile, service_area_id:health_sponsored_benefit.recorded_service_area_ids.first) }
+    let!(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
     let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
-    let(:broker_agency_profile) { BrokerAgencyProfile.create(market_kind: "both") }
     let(:person_broker) {FactoryGirl.build(:person,:with_work_email, :with_work_phone)}
     let(:broker) {FactoryGirl.build(:broker_role,aasm_state:'active',person:person_broker)}
+    let(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
+
     include AcapiVocabularySpecHelpers
 
     before(:all) do
@@ -62,11 +84,12 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     context "when manual gen of cv = false" do
       before :each do
-        allow(employer).to receive(:staff_roles).and_return([staff])
-        allow(employer).to receive(:broker_agency_profile).and_return(broker_agency_profile)
-        allow(broker_agency_profile).to receive(:brokers).and_return([broker])
+        allow(employer_profile).to receive(:staff_roles).and_return([staff])
+        allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
+        allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+        allow(broker_agency_profile).to receive(:active_broker_roles).and_return([broker])
         allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker)
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: false }
+        render :template => "events/v2/employers/updated", :locals => { :employer => employer_profile, manual_gen: false }
         @doc = Nokogiri::XML(rendered)
       end
 
@@ -86,8 +109,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         expect(@doc.xpath("//x:office_locations/x:office_location[2]/x:address/x:type","x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:address_type#mailing"
       end
 
-      it "should not have phone for mailing office location " do
-        expect(@doc.xpath("//x:office_location[2]/x:phone", "x"=>"http://openhbx.org/api/terms/1.0").to_a).to eq []
+      it "should have phone for mailing office location " do
+        expect(@doc.xpath("//x:office_location[2]/x:phone/x:type", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:phone_type#work"
       end
 
       it "should have one broker_agency_profile" do
