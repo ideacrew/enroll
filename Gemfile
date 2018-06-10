@@ -69,7 +69,7 @@ gem 'therubyracer', platforms: :ruby
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
 gem 'turbolinks','2.5.3'
-gem 'uglifier', '>= 1.3.0'
+gem 'uglifier', '>= 1.3.0', require: 'uglifier'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'

@@ -153,6 +153,7 @@ INSURED_TRANSLATIONS = {
   "en.hired_on" => "Hired On",
   "en.plan_end" => "Plan End",
   "en.enrollment_status" => "Enrollment Status",
+  "en.enrollment_id" => "ID",
   "en.coverage_waived" => "Coverage Waived",
   "en.waiver_reason" => "Waiver Reason",
   "en.insured.families.future_enrollment_termination_date" => "Future enrollment termination date",
