@@ -3,8 +3,7 @@
 
 = f.hidden_field :benefit_application_id
 
-h1.heading-text
-    = f.object.id.present? ? 'Health - Edit Benefit Package' : 'Health – Set Up Benefit Package'
+h1.heading-text Benefit Package - Set Up
 
 .benefit-properties
   .plan-title#uic-wrapper
@@ -17,10 +16,12 @@ h1.heading-text
       = f.select :probation_period_kind, options_for_select(@benefit_package_form.catalog.probation_period_kinds, selected: f.object.probation_period_kind), {}, :class => 'form-control'
     = f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|
       = render "sponsored_benefit", f: sb
-  button.btn.btn-primary type="submit" name="add_new_benefit_package" value="false" Submit Benefit Package
-  button.btn.btn-primary class="pull-right" type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
 
-  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default'
+  button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Submit Benefit Package
+  
+
+  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
       
 javascript:
   var disableSelectric = false;
