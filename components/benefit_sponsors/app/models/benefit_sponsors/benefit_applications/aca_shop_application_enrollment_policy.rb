@@ -19,16 +19,18 @@ module BenefitSponsors
     include BenefitMarkets::BusinessRulesEngine
     include Config::AcaModelConcern
 
-    def initialize(benefit_application)
-      @benefit_application = benefit_application
-      # @benefit_market = benefit_application.benefit_sponsorship.benefit_market
-      @errors = []
-    end
-
+    # def initialize(benefit_application)
+    #   @benefit_application = benefit_application
+    #   # @benefit_market = benefit_application.benefit_sponsorship.benefit_market
+    #   @errors = []
+    # end
 
     rule  :open_enrollment_period_minimum_rule,
             # params:     { number_of_days: (@benefit_application.open_enrollment_period.max - @benefit_application.open_enrollment_period.min) },
-            validate: ->(number_of_days){ number_of_days < @benefit_market.configuration.open_enrollment_days_min },
+            validate: ->(benefit_application){
+              number_of_days = (benefit_application.open_enrollment_period.max.to_date - benefit_application.open_enrollment_period.min.to_date)
+              number_of_days < @benefit_market.configuration.open_enrollment_days_min 
+              },
             fail:     ->(number_of_days){"open enrollment period length #{number_of_days} day(s) is less than #{@benefit_market.configuration.open_enrollment_days_min} day(s) minimum" }
 
     rule  :period_begin_before_end_rule,
@@ -53,6 +55,11 @@ module BenefitSponsors
       else
       end
 
+    end
+    
+    # retrieve business policy
+    def business_policies_for(model_instance, event_name)
+      
     end
 
     # Standard rules for verifying post-open enrollment initial BenefitApplication is compliant and
