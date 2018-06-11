@@ -206,7 +206,7 @@ module BenefitSponsors
       end
 
       def employees_enrolling_and_waiving
-        eligible_employee_criteria.where({expected_selection: {"$in" : ["enroll", "waive"]}})
+        eligible_employee_criteria.where({expected_selection: {"$in" => ["enroll", "waive"]}})
       end
 
       def calculate_group_size
