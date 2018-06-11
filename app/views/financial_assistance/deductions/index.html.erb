@@ -61,7 +61,7 @@
               <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
             </div>
 
-            <div class="col-md-9 no-pd">
+            <div class="col-md-9 no-pd <%= deduction_kind %>">
               <%= deduction_kind.gsub('_',' ').capitalize %>
             </div>
           </div>
@@ -121,7 +121,7 @@
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove everything you have entered <strong>for Alimony paid?
+          Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>?
           <br />
           This cannot be undone.
           </strong>
