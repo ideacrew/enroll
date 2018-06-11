@@ -168,6 +168,9 @@ class CensusEmployee < CensusMember
     write_attribute(:employee_relationship, "self")
   end
 
+  def benefit_group_assignment_for(benefit_package, effective_on = TimeKeeper.date_of_record)
+    benefit_group_assignments.by_benefit_package_and_assignment_on(benefit_package, effective_on).first
+  end
 
   def family
     return nil if employee_role.blank?

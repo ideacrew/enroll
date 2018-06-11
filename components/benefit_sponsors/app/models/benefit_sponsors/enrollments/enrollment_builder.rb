@@ -12,9 +12,9 @@ module BenefitSponsors
         @hbx_enrollment = HbxEnrollment.new
       end
 
-      def set_household(household)
-        @hbx_enrollment.household_id = household
-      end
+      # def set_household(household)
+      #   @hbx_enrollment.household_id = household
+      # end
 
       def set_effective_on(effective_on)
         @hbx_enrollment.effective_on = effective_on
@@ -25,7 +25,7 @@ module BenefitSponsors
       end
 
       def set_coverage_kind(coverage_kind)
-        @hbx_enrollment.set_coverage_kind = coverage_kind
+        @hbx_enrollment.coverage_kind = coverage_kind
       end
 
       def set_benefit_package(benefit_package)

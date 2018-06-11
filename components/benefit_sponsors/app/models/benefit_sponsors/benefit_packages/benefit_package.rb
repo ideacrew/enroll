@@ -199,7 +199,6 @@ module BenefitSponsors
         sponsored_benefits.each do |sponsored_benefit|
           new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
-
         new_benefit_package
       end
 
@@ -227,8 +226,8 @@ module BenefitSponsors
 
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
 
-        family.validate_member_eligibility_policy
-        if family.is_valid?
+        # family.validate_member_eligibility_policy
+        if true #family.is_valid?
 
           enrollments = family.enrollments.by_benefit_sponsorship(benefit_sponsorship)
           .by_effective_period(predecessor_benefit_package.effective_period)

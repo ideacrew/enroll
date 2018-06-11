@@ -81,8 +81,8 @@ module BenefitSponsors
               product_package_kind: product_package_kind,
               product_option_choice: product_option_choice,
               reference_product: reference_product.renewal_product,
-              sponsor_contribution: sponsor_contribution.renew(new_product_package),
-              pricing_determinations: renew_pricing_determinations(new_product_package)
+              sponsor_contribution: sponsor_contribution.renew(new_product_package)
+              # pricing_determinations: renew_pricing_determinations(new_product_package)
             )
           end
         end
