@@ -62,7 +62,7 @@ module BenefitSponsors
       end
     end
 
-    def begin_initial_open_enrollment
+    def begin_open_enrollment
       # benefit_application.validate_sponsor_market_policy
       # return false unless benefit_application.is_valid?
 
@@ -71,15 +71,6 @@ module BenefitSponsors
       else
         benefit_application.errors.add(:base => "State transition failed")
         return false
-      end
-    end
-
-    def begin_renewal_open_enrollment
-      # benefit_application.validate_sponsor_market_policy
-      # return false unless benefit_application.is_valid?
-
-      if benefit_application.may_begin_open_enrollment?
-        benefit_application.begin_open_enrollment!
       end
     end
 

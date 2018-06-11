@@ -13,28 +13,30 @@ module BenefitSponsors
         return if benefit_group_assignment.blank?
 
         census_employee = benefit_group_assignment.census_employee
-        new_benefit_package_assignment = census_employee.benefit_group_assignment_for(new_benefit_package, new_benefit_package.start_on)
-        return if new_benefit_package_assignment.blank?
+        new_benefit_group_assignment = census_employee.benefit_group_assignment_for(new_benefit_package, new_benefit_package.start_on)
+        return if new_benefit_group_assignment.blank?
 
         if @base_enrollment.product.renewal_product.blank?
           raise "Unable to map to renewal product"
         end
 
-        benefit_package    = new_benefit_package
-        @sponsored_benefit = new_benefit_package.sponsored_benefit_for(@base_enrollment.coverage_kind)
-        @new_effective_on   = benefit_package.start_on
-        @new_benefit_package_assignment = new_benefit_package_assignment
+        @sponsored_benefit  = new_benefit_package.sponsored_benefit_for(@base_enrollment.coverage_kind)
+        @new_effective_on   = new_benefit_package.start_on
 
         @renewal_enrollment = BenefitSponsors::Enrollments::EnrollmentBuilder.build do |builder|
-          # builder.set_household base_enrollment.household
-          builder.set_effective_on(new_benefit_package_assignment.start_on)
+
+          builder.init_enrollment(@base_enrollment.household)
+          builder.set_effective_on(new_benefit_group_assignment.start_on)
           builder.set_kind(base_enrollment.kind)
           builder.set_coverage_kind(base_enrollment.coverage_kind)
-          builder.set_benefit_package(new_benefit_package_assignment.benefit_package)
-          builder.set_benefit_package_assignment(new_benefit_package_assignment)
           builder.set_employee_role(base_enrollment.employee_role)
           builder.set_product(base_enrollment.product.renewal_product)
-          # builder.set_hbx_enrollment_members(renewal_hbx_enrollment_members)
+
+          builder.set_sponsored_benefit_package(new_benefit_group_assignment.benefit_package)
+          builder.set_benefit_group_assignment(new_benefit_group_assignment)
+          builder.set_benefit_sponsorship(new_benefit_package.benefit_sponsorship)
+          builder.set_sponsored_benefit(@sponsored_benefit)
+          builder.set_rating_area(new_benefit_package.recorded_rating_area)
 
           if base_enrollment.is_coverage_waived?
             builder.set_waiver_reason
@@ -43,11 +45,12 @@ module BenefitSponsors
             builder.set_as_renew_enrollment
           end
         end
-
-        build_hbx_enrollment_members
+        
+        @renewal_enrollment.hbx_enrollment_members = cloned_enrollment_members
+        finalize_hbx_enrollment_members
       end
 
-      def build_hbx_enrollment_members
+      def finalize_hbx_enrollment_members
         member_group = @renewal_enrollment.as_shop_member_group
         member_group = member_group.clone_for_coverage(@renewal_enrollment.product)
 
@@ -58,7 +61,18 @@ module BenefitSponsors
         @renewal_enrollment.hbx_enrollment_members = @renewal_enrollment.hbx_enrollment_members.select do |member|
           eligible_member_ids.include?(member.id)
         end
-      end     
+      end 
+
+      def cloned_enrollment_members
+        @base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
+          members << HbxEnrollmentMember.new({
+            applicant_id: hbx_enrollment_member.applicant_id,
+            eligibility_date: @new_effective_on,
+            coverage_start_on: @new_effective_on,
+            is_subscriber: hbx_enrollment_member.is_subscriber
+            })
+        end
+      end   
   
       def renewal_enrollment
         @renewal_enrollment

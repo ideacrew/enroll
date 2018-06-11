@@ -273,8 +273,7 @@ class HbxEnrollment
   def renew_benefit(new_benefit_package)
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
-      household.hbx_enrollments << enrollment
-      household.save
+      enrollment.save
     rescue Exception => e
     end
   end

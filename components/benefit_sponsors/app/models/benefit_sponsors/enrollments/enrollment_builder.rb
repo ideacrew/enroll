@@ -5,16 +5,23 @@ module BenefitSponsors
       def self.build
         builder = new
         yield(builder)
-        builder.user
+        builder.hbx_enrollment
       end
 
       def initialize
-        @hbx_enrollment = HbxEnrollment.new
       end
 
       # def set_household(household)
       #   @hbx_enrollment.household_id = household
       # end
+
+      def init_enrollment(household)
+        @hbx_enrollment = household.hbx_enrollments.new
+      end
+
+      def set_product(product)
+        @hbx_enrollment.product = product
+      end
 
       def set_effective_on(effective_on)
         @hbx_enrollment.effective_on = effective_on
@@ -28,12 +35,24 @@ module BenefitSponsors
         @hbx_enrollment.coverage_kind = coverage_kind
       end
 
-      def set_benefit_package(benefit_package)
-        @hbx_enrollment.benefit_group_id = benefit_package.id
+      def set_sponsored_benefit_package(benefit_package)
+        @hbx_enrollment.sponsored_benefit_package_id = benefit_package.id
       end
 
-      def set_benefit_package_assignment(new_benefit_package_assignment)
+      def set_benefit_group_assignment(new_benefit_package_assignment)
         @hbx_enrollment.benefit_group_assignment_id = new_benefit_package_assignment.id
+      end
+
+      def set_rating_area(rating_area)
+        @hbx_enrollment.rating_area_id = rating_area.id
+      end
+
+      def set_sponsored_benefit(sponsored_benefit)
+        @hbx_enrollment.sponsored_benefit_id = sponsored_benefit.id
+      end
+
+      def set_benefit_sponsorship(benefit_sponsorship)
+        @hbx_enrollment.benefit_sponsorship_id = benefit_sponsorship.id
       end
 
       def set_employee_role(employee_role)
