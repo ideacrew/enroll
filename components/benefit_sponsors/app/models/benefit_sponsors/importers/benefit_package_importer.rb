@@ -84,7 +84,7 @@ module BenefitSponsors
             )
         end
         
-        sponsored_benefit.price_determinations.build(pricing_determination_tiers: price_determination_tiers)
+        sponsored_benefit.pricing_determinations.build(pricing_determination_tiers: price_determination_tiers)
   
         pricing_determination = sponsored_benefit.pricing_determinations.first
         copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
