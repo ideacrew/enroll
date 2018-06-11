@@ -37,7 +37,7 @@ module Notifier
 
     def render_envelope(params)
        Notifier::NoticeKindsController.new.render_to_string({
-        :template => 'notifier/notice_kinds/template.html.erb', 
+        :template => Settings.notices.shop.partials.template, 
         :layout => false,
         :locals => params.merge(notice_number: self.notice_number)
       })
@@ -96,7 +96,7 @@ module Notifier
       if dc_exchange?
         options.merge!({footer: {
           content: ApplicationController.new.render_to_string({
-            template: "notifier/notice_kinds/footer.html.erb",
+            partial: "layouts/notifier/footer.html.erb",
             layout: false,
             locals: {notice: self}
           })
