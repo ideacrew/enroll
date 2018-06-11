@@ -12,7 +12,7 @@
           %id= rel.relative.hbx_id
 = render :partial => "events/individuals/person_demographics", :object => individual
 - if individual.broker_role.present?
-  - if !individual.broker_role.broker_agency_profile_id.blank?
+  - if !individual.broker_role.benefit_sponsors_broker_agency_profile_id.blank?
     - broker_role = individual.broker_role
     - broker_agency_profile = broker_role.broker_agency_profile
     %broker_roles
@@ -26,8 +26,8 @@
           %name= broker_agency_profile.legal_name
           - if !broker_agency_profile.corporate_npn.blank?
             %npn= broker_agency_profile.corporate_npn
-          - if broker_agency_profile.organization.primary_office_location.present?
-            - office_location = broker_agency_profile.organization.primary_office_location
+          - if broker_agency_profile.primary_office_location.present?
+            - office_location = broker_agency_profile.primary_office_location
             %office_locations
               = render :partial => "events/organizations/office_location", :object => office_location
         - if  broker_agency_profile.ach_routing_number && broker_agency_profile.ach_account_number

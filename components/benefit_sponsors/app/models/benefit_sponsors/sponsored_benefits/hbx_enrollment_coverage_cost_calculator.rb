@@ -149,7 +149,7 @@ module BenefitSponsors
 				@as_of_date = as_date
 			end
 
-			def calculate(sponsored_benefit)
+			def calculate(sponsored_benefit, hbx_enrollment_id_list, waiver_count)
 				p_package = sponsored_benefit.product_package
 				pricing_model = p_package.pricing_model
 				contribution_model = p_package.contribution_model
@@ -171,7 +171,9 @@ module BenefitSponsors
 						sponsor_contribution,
 						p_calculator,
 						c_calculator,
-						p_determination_builder
+						p_determination_builder,
+            hbx_enrollment_id_list,
+            waiver_count
 					)
 				end
 				sponsor_contribution
@@ -197,11 +199,12 @@ module BenefitSponsors
 				c_calculator,
 				roster_eligibility_optimizer,
 				p_determination_builder_klass,
-				hbx_enrollment_id_list
+				hbx_enrollment_id_list,
+        waiver_count
 			)
 				p_determination_builder = p_determination_builder_klass.new
 				group_size = calculate_group_size(hbx_enrollment_id_list)
-				participation = calculate_participation_percent(hbx_enrollment_id_list)
+				participation = calculate_participation_percent(hbx_enrollment_id_list, waiver_count)
 				sic_code = sponsor_contribution.sic_code
 				group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
 				p_determination_builder.create_pricing_determinations(sponsored_benefit, reference_product, pricing_model, mapped_eligible_roster, group_size, participation, sic_code)
@@ -226,8 +229,8 @@ module BenefitSponsors
 				hbx_enrollment_ids.count
 			end
 
-			def calculate_participation_percent(hbx_enrollment_ids)
-				enrolling_count = calculate_group_size(hbx_enrollment_ids)
+			def calculate_participation_percent(hbx_enrollment_ids, waiver_count)
+				enrolling_count = calculate_group_size(hbx_enrollment_ids) + waiver_count
 				return 0.0 if enrolling_count < 1
 				(enrolling_count.to_f / eligible_employee_count) * 100.0
 			end
