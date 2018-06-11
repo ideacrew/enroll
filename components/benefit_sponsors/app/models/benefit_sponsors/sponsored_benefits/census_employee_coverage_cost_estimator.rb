@@ -205,12 +205,16 @@ module BenefitSponsors
         eligible_employee_criteria.where({expected_selection: "enroll"})
       end
 
+      def employees_enrolling_and_waiving
+        eligible_employee_criteria.where({expected_selection: {"$in" : ["enroll", "waive"]}})
+      end
+
       def calculate_group_size
         employees_enrolling.count
       end
 
       def calculate_participation_percent
-        enrolling_count = calculate_group_size
+        enrolling_count = employees_enrolling_and_waiving.count
         return 0.0 if enrolling_count < 1
         (enrolling_count.to_f / eligible_employee_count) * 100.0
       end

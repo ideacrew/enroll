@@ -28,6 +28,7 @@ module BenefitSponsors
       delegate :rate_schedule_date, to: :benefit_package
       delegate :benefit_sponsor_catalog, to: :benefit_package
       delegate :benefit_sponsorship, to: :benefit_package
+      delegate :recorded_sic_code, to: :benefit_package
 
       validate :product_package_exists
 #      validates_presence_of :sponsor_contribution

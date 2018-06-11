@@ -27,6 +27,7 @@ module BenefitSponsors
       delegate :rate_schedule_date,      to: :benefit_application
       delegate :effective_period,        to: :benefit_application
       delegate :predecessor_application, to: :benefit_application
+      delegate :recorded_sic_code, to: :benefit_application
 
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
