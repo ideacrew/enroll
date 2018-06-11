@@ -30,8 +30,11 @@ describe "CcaEmployerProfilesMigration" do
       document2 = FactoryGirl.build(:document)
       employer_profile.organization.documents << document1
       employer_profile.documents << document2
+      employer_profile.documents.first.update_attributes(title: "MonthlyInvoiceAvailableNotice", creator: "hbx_staff", subject: "notice", description: nil, publisher: "dchl", type: "text", format: "application/pdf", identifier: "urn:openhbx:terms:v1:file_storage:s10:buckt:dchbx-enroll-notices-dev#92a6d67d", source: "enroll_system", language: "en", _type: "Document")
+
       # employer_profile.organization.home_page = nil
-      FactoryGirl.create(:inbox, :with_message, recipient: employer_profile)
+      inbox = FactoryGirl.create(:inbox, :with_message, recipient: employer_profile)
+      inbox.messages.first.update_attributes(body: "<br>Your invoice is now available in your employer profile under the Billing tab. For more information, please download your <a href=/document/authorized_download/EmployerProfile/#{employer_profile.id}/documents/#{document1.id}?content_type=application/pdf&filename=MonthlyInvoiceAvailableNotice.pdf&disposition=inline target='_blank'>MonthlyInvoiceAvailableNotice</a>")
       FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
       FactoryGirl.create(:employee_role, employer_profile: employer_profile)
       FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)
