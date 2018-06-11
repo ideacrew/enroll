@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "app/views/events/v2/employers/_benefit_group.xml.haml" do
+describe "app/views/events/v2/employers/_benefit_group.xml.haml" , dbclean: :after_each do
   let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
   let!(:benefit_market) { site.benefit_markets.first }
   let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
