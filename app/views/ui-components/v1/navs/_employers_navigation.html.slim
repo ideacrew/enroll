@@ -8,7 +8,7 @@ nav
       = link_to 'Benefits', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'benefits'), "aria-expanded" => "true"
     li
       = link_to 'Brokers', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'brokers'), "aria-expanded" => "true"
-    - if benefit_sponsor_display_families_tab(current_user, profile.id)
+    - if display_families_tab(current_user)
       li
         = link_to 'Families', profiles_employers_employer_profile_show_profile_path(profile.id, :tab=>'families'), "aria-expanded" => "true"
     li
