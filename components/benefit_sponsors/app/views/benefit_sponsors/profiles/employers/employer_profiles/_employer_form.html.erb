@@ -133,9 +133,6 @@
                   </div>
                 <% end %>
                 </div>
-                <div class="js-remove row">
-                  <label>Primary Address</label>
-                </div>
                 <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" %>
                   <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields}  %>
                 <% else %>
