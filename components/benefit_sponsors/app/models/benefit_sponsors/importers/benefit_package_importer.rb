@@ -73,9 +73,19 @@ module BenefitSponsors
       end
 
       def build_pricing_determinations(sponsored_benefit, sponsor_contribution_attrs)
-        estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
-        estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+        # estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
+        # estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
 
+        pricing_model = sponsored_benefit.product_package.pricing_model
+     
+        price_determination_tiers = pricing_model.pricing_units.inject([]) do |pd_tiers, pricing_unit|
+          pd_tiers << BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
+            pricing_unit_id: pricing_unit.id
+            )
+        end
+        
+        sponsored_benefit.price_determinations.build(pricing_determination_tiers: price_determination_tiers)
+  
         pricing_determination = sponsored_benefit.pricing_determinations.first
         copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
 
@@ -88,7 +98,7 @@ module BenefitSponsors
 
       def copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, attribute_to_copy)
         pricing_determination.pricing_determination_tiers.each do |tier|
-          matched_tier = sponsor_contribution_attrs.detect{|tier_contribution| tier_contribution[:relationship] == tier.pricing_unit.name }
+          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| tier_contribution[:relationship] == tier.pricing_unit.name }
           tier.price = matched_tier[attribute_to_copy].to_f
         end
       end
