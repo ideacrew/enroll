@@ -12,6 +12,7 @@ module BenefitMarkets
       field :dental_level, type: String
       field :carrier_special_plan_identifier, type: String
       field :metal_level_kind,            type: Symbol
+      field :ehb,                         type: Symbol
     end
   end
 end
