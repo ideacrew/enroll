@@ -74,17 +74,22 @@ module BenefitSponsors
             subject.validate
             expect(subject).to be_valid
           end
+
+          it "should be findable" do
+            subject.save!
+            expect(described_class.find(subject.id)).to eq subject
+          end
         end
       end
     end
 
     describe "Working around validating model factory" do
       context "when benefit sponsor has profile and organization" do
-        let(:benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
+        let(:benefit_sponsorships) { FactoryGirl.build_stubbed(:benefit_sponsors_benefit_sponsorship)}
         let(:valid_build_benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
         let(:valid_create_benefit_sponsorships) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
 
-        it "should be valid" do
+        it "should be valid", :aggregate_failures do
           expect(benefit_sponsorships.valid?).to be_falsy
           expect(valid_build_benefit_sponsorships.valid?).to be_truthy
           expect(valid_create_benefit_sponsorships.valid?).to be_truthy
@@ -99,6 +104,43 @@ module BenefitSponsors
         end
 
       end
+    end
+
+
+    describe "Finding a BenefitSponsorCatalog" do
+      let(:next_year)                           { Date.today.year + 1 }
+      let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
+      let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
+      let!(:benefit_market_catalog_next_year)   { FactoryGirl.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period_next_year) }
+      # let(:benefit_market_catalog_future_year)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period) }
+
+      before { benefit_market.add_benefit_market_catalog(benefit_market_catalog_next_year) }
+
+      it "should belong to the same site and benefit_market and include benefit_market_catalog_next_year", :aggregate_failures do
+        expect(benefit_sponsorship.profile.organization.site).to eq benefit_market.site
+        expect(benefit_sponsorship.benefit_market).to eq benefit_market
+        expect(benefit_market.benefit_market_catalogs.size).to eq 1
+        expect(benefit_market.benefit_market_catalogs.first).to eq benefit_market_catalog_next_year
+      end
+
+      context "given an effective_date during next year's application period" do
+        let(:effective_date)  { benefit_market.benefit_market_catalogs.first.application_period.min }
+
+        # before { benefit_market.benefit_market_catalogs = benefit_market_catalogs }
+        it "should find a benefit_market_catalog" do
+          # binding.pry
+          expect(benefit_sponsorship.benefit_sponsor_catalog_for(effective_date)).to be_an_instance_of(BenefitMarkets::BenefitSponsorCatalog)
+        end
+      end
+
+      context "given an effective_date in future, undefined application period" do
+        let(:future_effective_date)  { Date.new((next_year + 2),1,1) }
+
+        it "should not find a benefit_market_catalog" do
+          expect{benefit_sponsorship.benefit_sponsor_catalog_for(future_effective_date)}.to raise_error(/benefit_market_catalog not found for effective date: #{future_effective_date}/)
+        end
+      end
+
     end
 
     context "Working with subclassed parent Profiles" do
@@ -169,8 +211,10 @@ module BenefitSponsors
 
     describe "Transitioning a BenefitSponsorship through workflow states" do
       let(:benefit_sponsorship)     { described_class.new(**params) }
+      let(:effective_date)          { Date.today.beginning_of_month }
       let(:benefit_application)     { build(:benefit_sponsors_benefit_application,
                                                 :with_benefit_sponsor_catalog,
+                                                effective_period: effective_date..(effective_date + 1.year - 1.day),
                                                 benefit_sponsorship: benefit_sponsorship,
                                                 recorded_service_areas: benefit_sponsorship.service_areas) }
 
@@ -181,6 +225,7 @@ module BenefitSponsors
                   }
 
         it "should initialize in state: :applicant" do
+          binding.pry
           expect(benefit_sponsorship.aasm_state).to eq :applicant
         end
 
