@@ -1,46 +1,7 @@
 require 'rails_helper'
 require File.join(Rails.root, "spec", "support", "acapi_vocabulary_spec_helpers")
 
-RSpec.describe "events/v2/employer/updated.haml.erb" do
-  let(:entity_kind)     { "partnership" }
-  let(:bad_entity_kind) { "fraternity" }
-  let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
-
-  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "CountyName") }
-  let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
-  let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
-  let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
-  let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
-
-  let(:office_location) { OfficeLocation.new(
-      is_primary: true,
-      address: address,
-      phone: phone
-  )
-  }
-
-  let(:office_location2) { OfficeLocation.new(
-      is_primary: false,
-      address: mailing_address
-  )
-  }
-
-  let(:organization) { Organization.create(
-      legal_name: "Sail Adventures, Inc",
-      dba: "Sail Away",
-      fein: "001223333",
-      office_locations: [office_location,office_location2]
-  )
-  }
-
-  let(:valid_params) do
-    {
-        organization: organization,
-        entity_kind: entity_kind,
-        profile_source: 'self_serve',
-        created_at: Date.today
-    }
-  end
+RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
   describe "given a employer" do
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
