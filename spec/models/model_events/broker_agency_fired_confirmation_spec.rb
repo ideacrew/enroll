@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
-  let(:model_event)  { "broker_agency_hired_confirmation" }
-  let(:notice_event) { "broker_agency_hired_confirmation" }
+describe 'ModelEvents::BrokerAgencyFiredConfirmation', dbclean: :around_each  do
+  let(:model_event)  { "broker_agency_fired_confirmation" }
+  let(:notice_event) { "broker_agency_fired_confirmation" }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
   let!(:broker_agency_profile) { create :broker_agency_profile}
   let!(:broker_agency_account) { create :broker_agency_account, is_active: true, broker_agency_profile: broker_agency_profile }
@@ -15,11 +15,11 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
       subject { Observers::NoticeObserver.new }
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.broker_agency.broker_agency_hired_confirmation"
+          expect(event_name).to eq "acapi.info.events.broker_agency.broker_agency_fired_confirmation"
           expect(payload[:event_object_kind]).to eq 'EmployerProfile'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.deliver(recipient: broker_agency_profile, event_object: model_instance, notice_event: "broker_agency_hired_confirmation")
+        subject.deliver(recipient: broker_agency_profile, event_object: model_instance, notice_event: "broker_agency_fired_confirmation")
       end
     end
   end
@@ -33,11 +33,10 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
           "broker_agency_profile.first_name",
           "broker_agency_profile.last_name",
           "broker_agency_profile.assignment_date",
+          "broker_agency_profile.termination_date",
           "broker_agency_profile.broker_agency_name",
           "broker_agency_profile.employer_poc_firstname",
-          "broker_agency_profile.employer_poc_lastname",
-          "broker_agency_profile.employer_poc_phone",
-          "broker_agency_profile.employer_poc_email"
+          "broker_agency_profile.employer_poc_lastname"
       ]
     }
 
@@ -61,7 +60,7 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
     end
 
     it "should return notice date" do
-      expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     end
 
     it "should return employer name" do
@@ -77,17 +76,13 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
       expect(merge_model.assignment_date).to eq broker_agency_account.start_on.strftime('%m/%d/%Y')
     end
 
+    it "should return broker termination date" do
+      expect(merge_model.termination_date).to eq broker_agency_account.end_on
+    end
+
     it "should return employer poc name" do
       expect(merge_model.employer_poc_firstname).to eq model_instance.staff_roles.first.first_name
       expect(merge_model.employer_poc_lastname).to eq model_instance.staff_roles.first.last_name
-    end
-
-    it "should return employer poc phone" do
-      expect(merge_model.employer_poc_phone).to eq model_instance.staff_roles.first.work_phone_or_best
-    end
-
-    it "should return employer poc email" do
-      expect(merge_model.employer_poc_email).to eq model_instance.staff_roles.first.work_email_or_best
     end
 
     it "should return broker agency name " do

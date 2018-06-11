@@ -1,5 +1,5 @@
 module Notifier
-  class MergeDataModels::BrokerProfile
+  class MergeDataModels::GeneralAgency
 
     include Virtus.model
     include ActiveModel::Model
@@ -11,32 +11,33 @@ module Notifier
     attribute :mailing_address, MergeDataModels::Address
 
     attribute :email, String
-    attribute :broker_agency_name, String
-    attribute :assignment_date, String
-    attribute :termination_date, Date
+    attribute :broker, MergeDataModels::Broker
+    attribute :legal_name, String
+    attribute :assignment_date, Date
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
     attribute :employer_poc_lastname, String
 
+
     def self.stubbed_object
-      notice = Notifier::MergeDataModels::BrokerProfile.new({
+      notice = Notifier::MergeDataModels::GeneralAgency.new({
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        first_name: 'John',
-        last_name: 'Whitmore',
-        broker_agency_name: 'Best Brokers LLC',
-        email: 'john.whitmore@yopmail.com',
+        first_name: 'Johnny',
+        last_name: 'Pepper',
+        email: 'johnnypepper@ypomail.com',
+        legal_name: 'Best General Agency LLC',
         assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
-        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         employer_name: 'North America Football Federation',
         employer_poc_firstname: 'David',
         employer_poc_lastname: 'Samules'
         })
-      notice.mailing_address = Notifier::MergeDataModels::Address.new
+      notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
+      notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
       notice
     end
 
     def collections
-      []
+      %w{addresses}
     end
 
     def conditions

@@ -539,6 +539,17 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 0
     end
 
+    it 'should trigger broker fired notice to broker and employer' do
+      employer = organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111');
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
+      employer = Organization.find(employer.organization.id).employer_profile
+      expect_any_instance_of(EmployerProfile).to receive(:trigger_notice_observer).exactly(3).times
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
+    end
+
     it 'shows an employer selected a broker for the first time' do
       employer = er5
       employer.hire_broker_agency(broker_agency_profile7)
