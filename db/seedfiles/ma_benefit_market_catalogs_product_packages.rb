@@ -21,7 +21,8 @@ Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
     list_bill_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "MA List Bill Shop Pricing Model").first.create_copy_for_embedding
 
 
-    def products_for(product_package)
+    def products_for(product_package, calender_year)
+      puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}"
       BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
     end
 
@@ -34,7 +35,7 @@ Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
       pricing_model: list_bill_pricing_model
     })
 
-    product_package.products = products_for(product_package)
+    product_package.products = products_for(product_package, calender_year)
     product_package.save! if product_package.valid?
 
     product_package = benefit_market_catalog.product_packages.new({
@@ -45,7 +46,7 @@ Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
       pricing_model: list_bill_pricing_model
     })
 
-    product_package.products = products_for(product_package)
+    product_package.products = products_for(product_package, calender_year)
     product_package.save! if product_package.valid?
 
     product_package = benefit_market_catalog.product_packages.new({
@@ -56,8 +57,7 @@ Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
       pricing_model: composite_pricing_model
     })
 
-    product_package.products = products_for(product_package)
+    product_package.products = products_for(product_package, calender_year)
     product_package.save! if product_package.valid?
   end
-
 end

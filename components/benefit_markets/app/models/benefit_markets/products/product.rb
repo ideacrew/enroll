@@ -69,7 +69,7 @@ module BenefitMarkets
     scope :by_product_package,    ->(product_package) { by_application_period(product_package.application_period).where(
                 :"benefit_market_kind"          => product_package.benefit_kind,
                 :"kind"                         => product_package.product_kind,
-                :"product_package_kinds"        => product_package.package_kind
+                :"product_package_kinds".in     => [product_package.package_kind]
               )
             }
 
