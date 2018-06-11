@@ -21,6 +21,7 @@ module BenefitMarkets
         cv.contribution_unit_id = self.id
         cv.display_name = display_name
         cv.order = order
+        cv.is_offered = true
       end
 
       def at_least_one_matches?(rel_hash)

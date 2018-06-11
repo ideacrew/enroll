@@ -191,6 +191,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @metal_levels = %w[platinum gold silver bronze catastrophic]
     @plan_types = %w[HMO PPO POS]
     @networks = %w[nationwide]
+    @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     @waivable = @hbx_enrollment.can_waive_enrollment?
     render "show_slug"

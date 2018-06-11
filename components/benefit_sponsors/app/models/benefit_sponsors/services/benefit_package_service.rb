@@ -49,17 +49,24 @@ module BenefitSponsors
 
       # No dental in MA. So, calculating premiums only for health sponsored benefits.
       def calculate_premiums(form)
-        selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind)
+        selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
         lowest_cost_product = selected_package.lowest_cost_product
         highest_cost_product = selected_package.highest_cost_product
-        reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefit[0].reference_plan_id)
-        cost_estimator = initialize_cost_estimator
+        reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
 
-        create_dummy_sponsored_benefit(benefit_application)
-        lowest_product_details = cost_estimator.calculate(dummy_sponsored_benefit, lowest_cost_product, product_package)
-        highest_product_details = cost_estimator.calculate(dummy_sponsored_benefit, highest_cost_product, product_package)
-        reference_product_details = cost_estimator.calculate(dummy_sponsored_benefit, reference_product, product_package)
-        [lowest_product_details, highest_product_details, reference_product_details]
+        sponsored_benefit_with_lowest_cost_product  = decorated_sponsored_benefit(lowest_cost_product, selected_package)
+        sponsored_benefit_with_highest_cost_product = decorated_sponsored_benefit(highest_cost_product, selected_package)
+        sponsored_benefit_with_reference_product    = decorated_sponsored_benefit(reference_product, selected_package)
+
+        [sponsored_benefit_with_lowest_cost_product, sponsored_benefit_with_reference_product, sponsored_benefit_with_highest_cost_product]
+      end
+
+      def decorated_sponsored_benefit(product, package)
+        dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
+        dummy_sponsored_benefit.reference_product = product
+
+        cost_estimator = initialize_cost_estimator
+        cost_estimator.calculate(dummy_sponsored_benefit, product, package)
       end
 
       # Creating dummy sponsored benefit as estimator expects one.

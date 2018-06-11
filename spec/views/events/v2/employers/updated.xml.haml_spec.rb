@@ -3,7 +3,7 @@ require File.join(Rails.root, "spec", "support", "acapi_vocabulary_spec_helpers"
 
 RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
-  describe "given a employer" do
+  describe "given a employer" , dbclean: :after_each do
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let!(:benefit_market) { site.benefit_markets.first }
     let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
@@ -24,6 +24,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     let(:sponsor_contribution) {FactoryGirl.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: product_package,sponsored_benefit:health_sponsored_benefit)}
 
     let!(:update_benefit) {
+      benefit_application.aasm_state = :active
       health_sponsored_benefit.product_option_choice = product_package.products.first.issuer_profile.id
       health_sponsored_benefit.reference_product = product_package.products.first
       health_sponsored_benefit.sponsor_contribution = sponsor_contribution
@@ -36,6 +37,9 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     let(:person_broker) {FactoryGirl.build(:person,:with_work_email, :with_work_phone)}
     let(:broker) {FactoryGirl.build(:broker_role,aasm_state:'active',person:person_broker)}
     let(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
+    let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+    let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
 
     include AcapiVocabularySpecHelpers
 
@@ -97,32 +101,32 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
     context "with dental plans" do
 
-      context "is_offering_dental? is true" do
+      # TODO No dental for MA fix for DC.
 
-        before do
-          dental_plan = FactoryGirl.create(:plan, name: "new dental plan", coverage_kind: 'dental',
-                                           dental_level: 'high')
-          benefit_group.elected_dental_plans = [dental_plan]
-          benefit_group.dental_reference_plan_id = dental_plan.id
-          plan_year.save!
-        end
-
-        it "shows the dental plan in output" do
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
-          expect(rendered).to include "new dental plan"
-        end
-      end
+      # context "is_offering_dental? is true" do
+      #
+      #   before do
+      #     dental_plan = FactoryGirl.create(:plan, name: "new dental plan", coverage_kind: 'dental',
+      #                                      dental_level: 'high')
+      #     benefit_group.elected_dental_plans = [dental_plan]
+      #     benefit_group.dental_reference_plan_id = dental_plan.id
+      #     plan_year.save!
+      #   end
+      #
+      #   it "shows the dental plan in output" do
+      #     render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+      #     expect(rendered).to include "new dental plan"
+      #   end
+      # end
 
 
       context "is_offering_dental? is false" do
         before do
-          benefit_group.dental_reference_plan_id = nil
-          benefit_group.save!
+          allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
         end
-
         it "does not show the dental plan in output" do
 
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: false}
           expect(rendered).not_to include "new dental plan"
         end
       end
@@ -131,10 +135,11 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     context "person of contact" do
 
       before do
-        allow(employer).to receive(:staff_roles).and_return([staff])
+        allow(employer_profile).to receive(:staff_roles).and_return([staff])
+        allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
       end
       it "should be included in xml" do
-        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: false}
         expect(rendered).to have_selector('contact', count: 1)
       end
     end
@@ -142,9 +147,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     context "POC address" do
 
       before do
-        allow(employer).to receive(:staff_roles).and_return([staff])
+        allow(employer_profile).to receive(:staff_roles).and_return([staff])
+        allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
         allow(staff).to receive(:addresses).and_return([mailing_address,home_address])
-        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: false}
         @doc = Nokogiri::XML(rendered)
       end
 
@@ -157,10 +163,23 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     context "when manual gen of cv = true" do
 
       context "non termination case" do
+
+        let!(:renewal_benefit_application){ FactoryGirl.create(:benefit_sponsors_benefit_application,:with_benefit_package, aasm_state: :enrollment_eligible)}
+        let(:renewal_benefit_package){ renewal_benefit_application.benefit_packages.first}
+        let!(:update_renewal){
+          renewal_benefit_application.predecessor_application_id = benefit_application.id
+          renewal_benefit_application.benefit_sponsor_catalog.product_packages.first.products.update_all(issuer_profile:issuer_profile, service_area_id: renewal_benefit_application.recorded_service_area_ids.first)
+          active_benefit_sponsorship = employer_profile.active_benefit_sponsorship
+          active_benefit_sponsorship.benefit_applications << renewal_benefit_application
+          renewal_benefit_package.health_sponsored_benefit.product_option_choice = product_package.products.first.issuer_profile.id
+          renewal_benefit_package.health_sponsored_benefit.reference_product = product_package.products.first
+          renewal_benefit_package.health_sponsored_benefit.sponsor_contribution = sponsor_contribution
+          active_benefit_sponsorship.save
+        }
+
         before :each do
-          employer.plan_years = [plan_year, future_plan_year]
-          employer.save
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: true}
           @doc = Nokogiri::XML(rendered)
         end
 
@@ -171,11 +190,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
       context "terminated plan year with future termination date" do
         before :each do
-          plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
-                                       :aasm_state => "terminated"})
-          employer.plan_years = [plan_year]
-          employer.save
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          benefit_application.aasm_state = :terminated
+          benefit_application.save
+          allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: true}
           @doc = Nokogiri::XML(rendered)
         end
 
