@@ -1,36 +1,13 @@
 require 'rails_helper'
 
 describe "app/views/events/v2/employers/_elected_plan.xml.haml" do
-  let(:carrier_profile) do 
-    instance_double(
-      CarrierProfile,
-      {
-        hbx_carrier_id: "12345",
-        legal_name: "CARRIER LEGAL NAME",
-        is_active: true
-      }
-    )
-  end
-  let(:elected_plan) do
-    instance_double(
-      Plan,
-      {
-        carrier_special_plan_identifier: carrier_special_plan_id,
-        hios_id: "HIOS ID",
-        name: "PLAN NAME",
-        is_dental_only?: false,
-        active_year: 2015,
-        metal_level: "gold",
-        coverage_kind: "health",
-        ehb: 0.93,
-        carrier_profile: carrier_profile
-      }
-    )
-  end
-
-  let(:carrier_special_plan_id) { nil }
+  let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
+  let!(:carrier_special_plan_id)  { "abcde" }
+  let!(:application_period)  { TimeKeeper.date_of_record.beginning_of_month..TimeKeeper.date_of_record.beginning_of_month + 1.year }
+  let!(:elected_plan)  { BenefitMarkets::Products::DentalProducts::DentalProduct.create(application_period: application_period, carrier_special_plan_identifier:carrier_special_plan_id,issuer_profile: issuer_profile) }
 
   before :each do
+    allow(elected_plan).to receive(:ehb).and_return(0.0)
     render :template => "events/v2/employers/_elected_plan.xml.haml", locals: { elected_plan: elected_plan }
   end
 
@@ -42,7 +19,5 @@ describe "app/views/events/v2/employers/_elected_plan.xml.haml" do
     it "includes the alias  id" do
       expect(rendered).to have_selector("elected_plan id alias_ids alias_id id", :text => expected_plan_alias_id) 
     end
-
   end
-
 end

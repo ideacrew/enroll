@@ -3,7 +3,7 @@ require File.join(Rails.root, "spec", "support", "acapi_vocabulary_spec_helpers"
 
 RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
-  describe "given a employer" do
+  describe "given a employer" , dbclean: :after_each do
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let!(:benefit_market) { site.benefit_markets.first }
     let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
