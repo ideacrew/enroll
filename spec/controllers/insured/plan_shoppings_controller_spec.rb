@@ -508,28 +508,37 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
       end
 
-      context "with tax_household" do
-        before :each do
-          allow(family).to receive(:latest_household).and_return(household)
-          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
-          allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
-          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
-          allow(person).to receive(:active_employee_roles).and_return []
-          allow(person).to receive(:employee_roles).and_return []
-          allow(hbx_enrollment).to receive(:kind).and_return 'individual'
-          #allow(hbx_enrollment).to receive_message_chain(:employee_rol,:census_employe).and_return 'individual'
-          get :show, id: "hbx_id"
-        end
-
-        it "should get max_aptc" do
-          expect(assigns(:max_aptc)).to eq 111
-        end
-
-        it "should get default selected_aptc_pct" do
-          expect(assigns(:elected_aptc)).to eq 111*0.85
-        end
+    context "with tax_household" do
+      let(:sample_max_aptc) { 111 }
+      let(:eligibility_determination_1) do
+        EligibilityDetermination.new(
+          determined_at: TimeKeeper.date_of_record.beginning_of_year,
+          max_aptc: sample_max_aptc,
+          csr_percent_as_integer: 100)
       end
 
+      before :each do
+        allow(family).to receive(:latest_household).and_return(household)
+        allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+        allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+        allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+        allow(person).to receive(:active_employee_roles).and_return []
+        allow(person).to receive(:employee_roles).and_return []
+        allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+        #allow(hbx_enrollment).to receive_message_chain(:employee_rol,:census_employe).and_return 'individual'
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        get :show, id: "hbx_id"
+      end
+
+      it "should get max_aptc" do
+        expect(assigns(:max_aptc)).to eq sample_max_aptc
+      end
+
+      it "should get default selected_aptc_pct" do
+        expect(assigns(:elected_aptc)).to eq sample_max_aptc*0.85
+      end
+    end
+      
       context "without tax_household" do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
