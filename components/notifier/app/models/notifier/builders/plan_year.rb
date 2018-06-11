@@ -16,7 +16,7 @@ module Notifier
 
     def plan_year_renewal_py_start_date
       if renewal_plan_year.present?
-        merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on) 
+        merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on)
       end
     end
 

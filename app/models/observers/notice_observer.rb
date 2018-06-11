@@ -178,17 +178,6 @@ module Observers
       current_date = TimeKeeper.date_of_record
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
 
-        if [ :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
-             :renewal_plan_year_first_reminder_before_soft_dead_line,
-             :renewal_plan_year_publish_dead_line
-        ].include?(model_event.event_key)
-          current_date = TimeKeeper.date_of_record
-          EmployerProfile.organizations_for_force_publish(current_date).each do |organization|
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
-          end
-        end
-
         if model_event.event_key == :low_enrollment_notice_for_employer
           organizations_for_low_enrollment_notice(current_date).each do |organization|
            begin
@@ -202,12 +191,14 @@ module Observers
           end
         end
 
-        if model_event.event_key == :initial_employer_no_binder_payment_received
-          EmployerProfile.initial_employers_enrolled_plan_year_state.each do |org|
-            if !org.employer_profile.binder_paid?
-              py = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
-              deliver(recipient: org.employer_profile, event_object: py, notice_event: "initial_employer_no_binder_payment_received")
-            end
+        if [ :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
+             :renewal_plan_year_first_reminder_before_soft_dead_line,
+             :renewal_plan_year_publish_dead_line
+        ].include?(model_event.event_key)
+          current_date = TimeKeeper.date_of_record
+          EmployerProfile.organizations_for_force_publish(current_date).each do |organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
           end
         end
 
@@ -220,6 +211,21 @@ module Observers
           organizations.each do|organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
             deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+          end
+        end
+
+        if model_event.event_key == :initial_employer_no_binder_payment_received
+          EmployerProfile.initial_employers_enrolled_plan_year_state.each do |org|
+            if !org.employer_profile.binder_paid?
+              py = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
+              deliver(recipient: org.employer_profile, event_object: py, notice_event: "initial_employer_no_binder_payment_received")
+              #Notice to employee that there employer misses binder payment
+              org.employer_profile.census_employees.active.each do |ce|
+                begin
+                  deliver(recipient: ce.employee_role, event_object: py, notice_event: "notice_to_ee_that_er_plan_year_will_not_be_written")
+                end
+              end
+            end
           end
         end
       end
@@ -256,8 +262,8 @@ module Observers
       end
     end
 
-    def deliver(recipient:, event_object:, notice_event:)
-      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
+    def deliver(recipient:, event_object:, notice_event:, notice_params: {})
+      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
     end
 
     def trigger_zero_employees_on_roster_notice(plan_year)

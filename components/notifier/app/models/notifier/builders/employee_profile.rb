@@ -1,5 +1,6 @@
 module Notifier
   class Builders::EmployeeProfile
+
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
     include Notifier::Builders::PlanYear
@@ -169,6 +170,18 @@ module Notifier
       employee_role.employer_profile
     end
 
+    def dependents_name
+      names = []
+      payload["notice_params"]["dep_hbx_ids"].each do |dep_id|
+        names << Person.where(hbx_id: dep_id).first.full_name
+      end
+      merge_model.dependents_name = names.join(", ")
+    end
+
+    def dependent_termination_date
+      merge_model.dependent_termination_date = format_date(TimeKeeper.date_of_record.end_of_month)
+    end
+    
     def special_enrollment_period
       return @special_enrollment_period if defined? @special_enrollment_period
       if payload['event_object_kind'].constantize == SpecialEnrollmentPeriod

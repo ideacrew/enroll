@@ -1,5 +1,6 @@
 module Notifier
   class Builders::BrokerAgencyProfile
+
     include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
@@ -44,6 +45,10 @@ module Notifier
       merge_model.last_name = broker_agency_profile.primary_broker_role.person.last_name
     end
 
+    def last_broker_agency_account
+      employer.broker_agency_accounts.unscoped.reject{ |account| account.is_active? }.last
+    end
+
     def employer
       if payload['event_object_kind'].constantize == EmployerProfile
         employer = EmployerProfile.find payload['event_object_id']
@@ -62,16 +67,24 @@ module Notifier
       merge_model.employer_poc_lastname = employer.staff_roles.first.last_name
     end
 
+    def assignment_date
+      merge_model.assignment_date = employer.active_broker_agency_account.start_on.strftime('%m/%d/%Y') if employer.active_broker_agency_account
+    end
+
+    def termination_date
+      merge_model.termination_date = last_broker_agency_account.end_on.strftime('%m/%d/%Y') if last_broker_agency_account
+    end
+
+    def broker_agency_name
+      merge_model.broker_agency_name = broker_agency_profile.legal_name
+    end
+
     def employer_poc_phone
       merge_model.employer_poc_phone = employer.staff_roles.first.work_phone_or_best
     end
 
     def employer_poc_email
       merge_model.employer_poc_email = employer.staff_roles.first.work_email_or_best
-    end
-
-    def assignment_date
-      merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
     end
   end
 end
