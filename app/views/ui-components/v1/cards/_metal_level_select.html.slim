@@ -207,8 +207,8 @@ javascript:
     metalLevel = element.dataset.planMetalLevel;
     carrierName = element.dataset.planCarrier;
     planType = element.dataset.planType;
-    //referencePlanID = element.id;
-    //calculateEmployerContributions(productOptionKind, referencePlanID)
+    referencePlanID = element.id;
+    calculateEmployerContributions(productOptionKind, referencePlanID)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
@@ -218,6 +218,9 @@ javascript:
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
     document.getElementById('rpNetwork').append('N/A');
+    document.getElementById('rpEstimatedMonthlyCost').append('N/A');
+    document.getElementById('rpMin').append('N/A');
+    document.getElementById('rpMax').append('N/A');
   }
   
   function setInputValue(element) {
