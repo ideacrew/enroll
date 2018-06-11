@@ -13,12 +13,12 @@ RSpec.describe 'upload the invoice to s3 and trigger the notice', :type => :task
   context "Upload the notice to s3 and trigger the notice " do
     it "file invoice file exists it should upload and trigger notice" do
       allow(Organization).to receive(:upload_invoice).with(file_path, "211045_12062017_INVOICE_R.pdf").and_return nil
-      expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(params).and_return(true)
+      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(params).and_return(true)
       Rake::Task['nfp:invoice_upload'].invoke('spec/test_data/invoices/')
     end
 
     it "should not upload or trigger when no file is exists in direcotry" do
-      expect_any_instance_of(Observers::Observer).to_not receive(:trigger_notice).with(params).and_return(true)
+      expect_any_instance_of(Observers::NoticeObserver).to_not receive(:deliver).with(params).and_return(true)
       Rake::Task['nfp:invoice_upload'].invoke('spec/test_data/user_name/')
     end
 

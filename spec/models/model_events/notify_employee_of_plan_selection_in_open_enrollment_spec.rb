@@ -13,14 +13,14 @@ describe 'ModelEvents::NotifyEmployeeOfPlanSelectionInOpenEnrollment', dbclean: 
   
   describe "NoticeTrigger" do
     context "when employee terminates coverage" do
-      subject { Observers::Observer.new }
+      subject { Observers::NoticeObserver.new }
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_plan_selection_in_open_enrollment"
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.trigger_notice(recipient: employee_role, event_object: model_instance, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
+        subject.deliver(recipient: employee_role, event_object: model_instance, notice_event: "notify_employee_of_plan_selection_in_open_enrollment")
       end
     end
   end

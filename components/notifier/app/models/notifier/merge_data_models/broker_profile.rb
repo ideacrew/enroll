@@ -10,8 +10,9 @@ module Notifier
     attribute :last_name, String
     attribute :mailing_address, MergeDataModels::Address
 
+    attribute :email, String
     attribute :broker_agency_name, String
-    attribute :assignment_date, Date
+    attribute :assignment_date, String
     attribute :termination_date, Date
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
@@ -23,6 +24,7 @@ module Notifier
         first_name: 'John',
         last_name: 'Whitmore',
         broker_agency_name: 'Best Brokers LLC',
+        email: 'john.whitmore@yopmail.com',
         assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         employer_name: 'North America Football Federation',
@@ -39,6 +41,14 @@ module Notifier
 
     def conditions
       []
+    end
+
+    def shop?
+      true
+    end
+
+    def employee_notice?
+      false
     end
   end
 end

@@ -16,7 +16,7 @@ module Notifier
 
     def plan_year_renewal_py_start_date
       if renewal_plan_year.present?
-        merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on) 
+        merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on)
       end
     end
 
@@ -44,6 +44,12 @@ module Notifier
       if current_plan_year.present?
         payment = current_plan_year.benefit_groups.map(&:monthly_employer_contribution_amount)
         merge_model.plan_year.monthly_employer_contribution_amount = number_to_currency(payment.inject(0){ |sum,a| sum+a })
+      end
+    end
+
+    def plan_year_current_py_plus_60_days
+      if current_plan_year.present?
+        merge_model.plan_year.current_py_plus_60_days = format_date(current_plan_year.end_on + 60.days)
       end
     end
 

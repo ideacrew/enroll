@@ -33,7 +33,7 @@ describe 'ModelEvents::NotifyEmployeeOfInitialEmployerIneligibility', :dbclean =
       it "should trigger notice event" do
         allow(model_instance).to receive(:enrollment_errors).and_return(errors)
         allow_any_instance_of(CensusEmployee).to receive(:employee_role).and_return(employee_role)
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.group_ineligibility_notice_to_employee"
           expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
