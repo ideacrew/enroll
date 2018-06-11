@@ -15,7 +15,6 @@ export default class extends Controller {
   addLocation() {
     //clone new location node, unhide remove button, modify name attribute
     var newLocation = document.importNode(this.officeLocationTarget, true)
-    newLocation.querySelector('.js-non-primary').classList.remove('hidden')
     newLocation.querySelectorAll('.js-remove').forEach(function(element) {
       element.remove()
     })
