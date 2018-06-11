@@ -216,11 +216,7 @@ module BenefitSponsors
 
     def benefit_sponsor_catalog_for(effective_date)
       benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
-      if benefit_market_catalog.present?
-        benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
-      else
-        nil
-      end
+      benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
     end
 
     def published_benefit_application
