@@ -38,6 +38,10 @@ module BenefitSponsors
         end
       end
 
+      def calculate_employer_contributions
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employer_contributions(employer_contribution_params)
+      end
+
       def destroy
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.fetch(params.permit(:id, :benefit_application_id))
         if @benefit_package_form.destroy
@@ -64,6 +68,10 @@ module BenefitSponsors
             ]
           ]
         )
+      end
+
+      def employer_contribution_params
+        params
       end
     end
   end

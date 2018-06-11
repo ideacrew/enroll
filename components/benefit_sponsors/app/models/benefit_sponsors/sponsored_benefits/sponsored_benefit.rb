@@ -19,8 +19,6 @@ module BenefitSponsors
       embeds_many :pricing_determinations, 
                   class_name: "::BenefitSponsors::SponsoredBenefits::PricingDetermination"
 
-      delegate :rate_schedule_date, to: :benefit_package
-
       delegate :contribution_model, to: :product_package, allow_nil: true
       delegate :pricing_model, to: :product_package, allow_nil: true
       delegate :pricing_calculator, to: :product_package, allow_nil: true

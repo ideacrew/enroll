@@ -116,8 +116,19 @@ module BenefitSponsors
 
       context "when create fails" do
 
+        let(:sponsored_benefits_params) {
+          {
+            "0" => {
+              :sponsor_contribution_attributes => sponsor_contribution_attributes,
+              :product_package_kind => product_package_kind,
+              :kind => "health",
+              :product_option_choice => issuer_profile.legal_name,
+              :reference_plan_id => nil
+            }
+          }
+        }
+
         before do
-          product.service_area.delete
           sign_in_and_do_create
         end
 
@@ -128,7 +139,7 @@ module BenefitSponsors
 
         it "should return error messages" do
           sign_in_and_do_create
-          expect(flash[:error]).to match("<li>Sponsored benefits is invalid</li>")
+          expect(flash[:error]).to match(/Reference plan can't be blank/)
         end
       end
 
@@ -209,9 +220,17 @@ module BenefitSponsors
 
       context "when update fails" do
 
-        before do
-          product.service_area.delete
-        end
+        let(:sponsored_benefits_params) {
+          {
+            "0" => {
+              :sponsor_contribution_attributes => sponsor_contribution_attributes,
+              :product_package_kind => product_package_kind,
+              :kind => "health",
+              :product_option_choice => issuer_profile.legal_name,
+              :reference_plan_id => nil
+            }
+          }
+        }
 
         it "should redirect to edit" do
           sign_in_and_do_update
@@ -220,7 +239,7 @@ module BenefitSponsors
 
         it "should return error messages" do
           sign_in_and_do_update
-          expect(flash[:error]).to match(/Sponsored benefits is invalid/)
+          expect(flash[:error]).to match(/Reference plan can't be blank/)
         end
       end
     end

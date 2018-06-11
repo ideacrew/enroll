@@ -292,8 +292,8 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     end
   end
 
-  context "search_broker_agency" do
-    before :all do
+  context "search_broker_agency", :dbclean => :after_each do
+    before :each do
       @organization = FactoryGirl.create(:broker_agency)
       @broker_agency_profile = @organization.broker_agency_profile
     end

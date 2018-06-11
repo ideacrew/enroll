@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
+RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean: :after_each do
   let(:hbx_profile) { double(id: double("hbx_profile_id"))}
   let(:user) { double("user") }
   let(:person) { FactoryGirl.create(:person, :with_employer_staff_role) }

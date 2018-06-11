@@ -47,6 +47,31 @@ module BenefitSponsors
         store(form, benefit_package)
       end
 
+      # No dental in MA. So, calculating premiums only for health sponsored benefits.
+      def calculate_premiums(form)
+        selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind)
+        lowest_cost_product = selected_package.lowest_cost_product
+        highest_cost_product = selected_package.highest_cost_product
+        reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefit[0].reference_plan_id)
+        cost_estimator = initialize_cost_estimator
+
+        create_dummy_sponsored_benefit(benefit_application)
+        lowest_product_details = cost_estimator.calculate(dummy_sponsored_benefit, lowest_cost_product, product_package)
+        highest_product_details = cost_estimator.calculate(dummy_sponsored_benefit, highest_cost_product, product_package)
+        reference_product_details = cost_estimator.calculate(dummy_sponsored_benefit, reference_product, product_package)
+        [lowest_product_details, highest_product_details, reference_product_details]
+      end
+
+      # Creating dummy sponsored benefit as estimator expects one.
+      def create_dummy_sponsored_benefit(benefit_application)
+        benefit_package = benefit_application.benefit_packages.build
+        benefit_package.sponsored_benefits.build
+      end
+
+      def initialize_cost_estimator
+        BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+      end
+
       def update(form)
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)

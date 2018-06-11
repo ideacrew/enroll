@@ -1074,14 +1074,14 @@ class CensusEmployee < CensusMember
   def enrollments_for_display
     enrollments = []
 
-    coverages_selected = lambda do |benefit_group_assignment|
-      return [] if benefit_group_assignment.blank?
-      coverages = benefit_group_assignment.active_and_waived_enrollments.reject{|e| e.external_enrollment }
+    coverages_selected = lambda do |enrollments|
+      return [] if enrollments.blank?
+      coverages = enrollments.non_expired_and_non_terminated.non_external
       [coverages.detect{|c| c.coverage_kind == 'health'}, coverages.detect{|c| c.coverage_kind == 'dental'}]
     end
 
-    enrollments += coverages_selected.call(active_benefit_group_assignment)
-    enrollments += coverages_selected.call(renewal_benefit_group_assignment)
+    enrollments += coverages_selected.call(active_benefit_group_enrollments)
+    enrollments += coverages_selected.call(renewal_benefit_group_enrollments)
     enrollments.compact.uniq
   end
 
@@ -1129,6 +1129,8 @@ class CensusEmployee < CensusMember
       }
     }).first
 
+    return [] if family.blank?
+
     family.active_household.hbx_enrollments.where(
       :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
       :"employee_role_id" => self.employee_role_id
@@ -1143,6 +1145,8 @@ class CensusEmployee < CensusMember
         :"employee_role_id" => self.employee_role_id }
       }
     }).first
+
+    return [] if family.blank?
 
     family.active_household.hbx_enrollments.where(
       :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
