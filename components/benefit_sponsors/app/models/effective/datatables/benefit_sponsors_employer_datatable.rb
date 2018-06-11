@@ -2,6 +2,9 @@ module Effective
   module Datatables
     class BenefitSponsorsEmployerDatatable < Effective::MongoidDatatable
       include Config::AcaModelConcern
+
+      SOURCE_KINDS = BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS.unshift(:all).freeze
+
       datatable do
 
         # bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
@@ -25,11 +28,12 @@ module Effective
         #   @employer_profile.try(:active_general_agency_legal_name).try(:titleize) #if row.employer_profile.active_general_agency_legal_name.present?
         # }, :filter => false
 
-        table_column :conversion, :proc => Proc.new { |row|
-          boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
+        # table_column :conversion, :proc => Proc.new { |row|
+        #   boolean_to_glyph(row.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
-        table_column :mid_plan_year_conversion, :proc => Proc.new { |row|
-          boolean_to_glyph(row.is_mid_plan_year_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
+        table_column :source_kind, :proc => Proc.new { |row|
+          row.source_kind.to_s.humanize},
+          :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
 
         table_column :plan_year_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
@@ -88,7 +92,7 @@ module Effective
         return @employer_collection if defined? @employer_collection
         employers = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
-          employers = employers.send(attributes[:employers]) if ['employer_profiles_applicants','employer_profiles_enrolling','employer_profiles_enrolled', 'employer_attestations'].include?(attributes[:employers])
+          employers = employers.send(attributes[:employers]) if ['benefit_sponsorship_applicant','benefit_application_enrolling','benefit_application_enrolled', 'employer_attestations'].include?(attributes[:employers])
           employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
           # employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
           # employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
@@ -118,15 +122,10 @@ module Effective
       end
 
       def search_column(collection, table_column, search_term, sql_column)
-        if table_column[:name] == 'legal_name'
-        #   collection.datatable_search(search_term)
-        # elsif table_column[:name] == 'fein'
-        #   collection.datatable_search_fein(search_term)
-        elsif table_column[:name] == 'conversion' || table_column[:name] == 'mid_plan_year_conversion'
-          if search_term == "Yes"
-            collection.datatable_search_for_source_kind([table_column[:name].to_sym])
-          elsif search_term == "No"
-            collection.datatable_search_for_source_kind([:self_serve])
+        if table_column[:name] == 'source_kind' || table_column[:name] == 'mid_plan_year_conversion'
+          if search_term != "all"
+            #binding.pry
+            collection.datatable_search_for_source_kind(search_term.to_sym)
           else
             super
           end
