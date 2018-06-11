@@ -13,9 +13,12 @@ describe "CcaEmployerProfilesMigration" do
 
   describe ".up" do
 
-    before :all do
-      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization,:with_benefit_market, site_key: :cca)
+    let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)}
+    let!(:benefit_market) {FactoryGirl.create(:benefit_markets_benefit_market)}
+    let!(:site_assign) {site.benefit_markets << benefit_market}
+    let!(:saved) {site.save!}
 
+    before :all do
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       FactoryGirl.create(:broker_agency_profile, organization: organization)
 
@@ -99,10 +102,8 @@ describe "CcaEmployerProfilesMigration" do
     it "should match all migrated attributes for employer profile" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
-      expect(migrated_profile).to have_attributes(entity_kind: old_profile.entity_kind.to_sym, created_at: old_profile.created_at,
-                                                  updated_at: old_profile.updated_at,
-                                                  aasm_state: old_profile.aasm_state, profile_source: old_profile.profile_source,
-                                                  registered_on: old_profile.registered_on)
+      expect(migrated_profile).to have_attributes( created_at: old_profile.created_at,
+                                                  updated_at: old_profile.updated_at, aasm_state: old_profile.aasm_state)
     end
 
     it "should match all migrated attributes for employer profile" do

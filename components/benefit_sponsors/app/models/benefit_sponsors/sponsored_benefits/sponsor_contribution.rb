@@ -12,6 +12,7 @@ module BenefitSponsors
 
     delegate :contribution_model, to: :sponsored_benefit
     delegate :reference_product, to: :sponsored_benefit, allow_nil: false
+    delegate :recorded_sic_code, to: :sponsored_benefit
     
     accepts_nested_attributes_for :contribution_levels
 #    validates_presence_of :contribution_levels
@@ -22,7 +23,7 @@ module BenefitSponsors
     # end
 
     def sic_code
-      # Needs to return the most recent SIC CODE value recorded for this sponsorship
+      recorded_sic_code
     end
 
     # FIXME: This is wrong and only does the worlds dumbest pairing

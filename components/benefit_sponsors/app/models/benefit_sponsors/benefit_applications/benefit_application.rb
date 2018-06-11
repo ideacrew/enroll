@@ -560,7 +560,7 @@ module BenefitSponsors
       state :appealing            # request reversal of negative determination
       ## End optional states for exception processing
 
-      state :enrollment_open#, after_enter: :renew_benefit_package_members     # Approved application has entered open enrollment period
+      state :enrollment_open, after_enter: :renew_benefit_package_members     # Approved application has entered open enrollment period
       state :enrollment_closed
       state :enrollment_eligible  # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible   # open enrollment did not meet eligibility criteria

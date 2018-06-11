@@ -198,6 +198,12 @@ class HbxEnrollment
   scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
 
+  scope :by_effective_period,      ->(effective_period) { where(
+                                                          :"effective_on".gte => effective_period.min,
+                                                          :"effective_on".lte => effective_period.max
+                                                        )}
+
+
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to  :benefit_sponsorship,
@@ -266,7 +272,7 @@ class HbxEnrollment
 
   def renew_benefit(new_benefit_package)
     begin
-      enrollment = BenefitSponsors::Enrollments::EnrollmentRenewalFactory.call(self, new_benefit_package)
+      enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       enrollment.save
     rescue Exception => e
     end

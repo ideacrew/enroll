@@ -108,6 +108,6 @@ module BenefitMarkets
 
     class DuplicatePremiumTableError                < StandardError; end
     class InvalidEffectivePeriodError               < StandardError; end
-
+    class InvalidEffectiveDateError                 < StandardError; end
 
 end

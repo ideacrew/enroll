@@ -64,7 +64,9 @@ module BenefitSponsors
         rate_hash.each_pair do |k, v|
           price_determination_tiers << ::BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
             pricing_unit_id: k,
-            price: v
+            price: v,
+            group_size: group_size,
+            participation_rate: (participation_percent * 0.01)
           )
         end 
         price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(pricing_determination_tiers: price_determination_tiers)
