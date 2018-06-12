@@ -177,13 +177,10 @@ RSpec.describe TaxHousehold, type: :model do
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(decorated_plan)
       allow(decorated_plan).to receive(:premium_for).and_return(100)
       allow(household).to receive(:hbx_enrollments_with_aptc_by_date).and_return([hbx_enrollment])
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).with(:nil).and_return 20
-      allow(@tax_household).to receive(:hbx_applicant_ids).with(hbx_enrollment).and_return []
     end
 
     it "can return result when plan is individual" do
       allow(plan).to receive(:coverage_kind).and_return 'individual'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>30, 'member2'=>20}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -192,7 +189,6 @@ RSpec.describe TaxHousehold, type: :model do
     it "when ehb_premium > aptc_amount" do
       allow(decorated_plan).to receive(:premium_for).and_return(10)
       allow(plan).to receive(:coverage_kind).and_return 'individual'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>9, 'member2'=>9}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -200,7 +196,6 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "can return result when plan is dental" do
       allow(plan).to receive(:coverage_kind).and_return 'dental'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -210,7 +205,6 @@ RSpec.describe TaxHousehold, type: :model do
       allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 0
       allow(decorated_plan).to receive(:premium_for).and_return(10)
       allow(plan).to receive(:coverage_kind).and_return 'individual'
-      allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
@@ -243,23 +237,47 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
-  context 'deduct_aptc_available_amount_for_unenrolled' do
-    let(:aptc_ratio_by_member) { {'member1'=>0.6, 'member2'=>0.4} }
-    let(:hbx_member1) { double(applicant_id: 'member1', applied_aptc_amount: 20) }
-    let(:hbx_member2) { double(applicant_id: 'member2', applied_aptc_amount: 10) }
-    let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-    let(:household) { double }
+  context 'total_aptc_available_amount_for_enrollment' do
+    let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
+    let(:household) { create(:household, family: family) }
+    let!(:tax_household) { create(:tax_household, household: household) }
+    let(:hbx_enrollment) { create(:hbx_enrollment, :with_enrollment_members,household: household) }
+    let(:member_ids) { family.active_family_members.collect(&:id) }
+    let(:aptc_available_amount_by_member) do
+      { member_ids.first.to_s => 60,
+        member_ids.second.to_s => 40,
+        member_ids.last.to_s => 110
+      }
+    end
+    let(:total_aptc_available_amount) { 210 }
     
-    it 'can return benchmark total for unenrolled members' do
-      tax_household = TaxHousehold.new()
-      allow(tax_household).to receive(:household).and_return household
-      allow(tax_household).to receive(:aptc_ratio_by_member).and_return aptc_ratio_by_member
-      allow(tax_household).to receive(:current_max_aptc).and_return 100
-      allow(tax_household).to receive(:effective_starting_on).and_return TimeKeeper.date_of_record
-      allow(household).to receive(:hbx_enrollments_with_aptc_by_year).and_return([hbx_enrollment])
-      benchmark_cost = 20
-      allow(tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return benchmark_cost
-      expect(tax_household.deduct_aptc_available_amount_for_unenrolled(hbx_enrollment)).to eq benchmark_cost
+    before :each do
+      allow(tax_household).to receive(:aptc_available_amount_by_member).and_return aptc_available_amount_by_member
+    end
+
+    context 'when all family members checked' do
+      before do
+        allow(tax_household).to receive(:unwanted_family_members).and_return []
+      end
+
+      it 'should return all members amount' do
+        result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
+        expect(result).to eq(total_aptc_available_amount)
+      end
+    end
+
+    context 'when family members unchecked' do
+      let(:total_benchmark_amount) { 60 }
+      before do
+        allow(tax_household).to receive(:unwanted_family_members).and_return [member_ids.first.to_s]
+        allow(tax_household).to receive(:total_benchmark_amount).and_return total_benchmark_amount
+      end
+
+      it 'should deduct benchmark cost' do
+        result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
+        expect(result).not_to eq(total_aptc_available_amount)
+        expect(result).to eq(total_aptc_available_amount - total_benchmark_amount)
+      end
     end
   end
 end
