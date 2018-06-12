@@ -197,9 +197,9 @@ javascript:
       data:{product_package_kind: productOptionKind,reference_plan_id: referencePlanID},
       url: "calculate_employer_contributions",
       success: function (d) {
-        var eeMin = d[0][2];
-        var eeCost = d[1][2];
-        var eeMax = d[2][2];
+        var eeMin = parseFloat(d[0][2]).toFixed(2);
+        var eeCost = parseFloat(d[1][2]).toFixed(2);
+        var eeMax = parseFloat(d[2][2]).toFixed(2);
         showCostDetails(eeCost,eeMin,eeMax)
       }
     });
