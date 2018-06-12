@@ -41,7 +41,7 @@ module Aws
         object = get_object(env_bucket_name, key)
         read_object(object)
       rescue Exception => e
-       puts "Error caused due to %s" %[$!.class]
+       puts "Error caused due to %s" %[$!.class] unless Rails.env.test?
        raise
       end
     end
