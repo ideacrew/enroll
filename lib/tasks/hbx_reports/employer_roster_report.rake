@@ -86,8 +86,8 @@ def build_employee_row(employee, employer_data)
     enrollments = employee.active_benefit_group_enrollments
     health_enrollment = enrollments.enrolled_and_waived.by_coverage_kind('health').first
     dental_enrollment = enrollments.enrolled_and_waived.by_coverage_kind('dental').first
-    data += (health_enrollment.present? ? [health_enrollment.aasm_state, @products_info[health_enrollment.product_id]] : add_data(2,''))
-    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, @products_info[dental_enrollment.product_id]] : add_data(2,''))
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, @products_info[health_enrollment.product_id.to_s]] : add_data(2,''))
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, @products_info[dental_enrollment.product_id.to_s]] : add_data(2,''))
   else
     data += add_data(4,'')
   end
@@ -96,8 +96,8 @@ def build_employee_row(employee, employer_data)
     enrollments = employee.renewal_benefit_group_enrollments
     health_enrollment = enrollments.enrolled_and_waived.by_coverage_kind('health').first
     dental_enrollment = enrollments.enrolled_and_waived.by_coverage_kind('dental').first
-    data += (health_enrollment.present? ? [health_enrollment.aasm_state, @products_info[health_enrollment.product_id]] : add_data(2,''))
-    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, @products_info[dental_enrollment.product_id]] : add_data(2,''))
+    data += (health_enrollment.present? ? [health_enrollment.aasm_state, @products_info[health_enrollment.product_id.to_s]] : add_data(2,''))
+    data += (dental_enrollment.present? ? [dental_enrollment.aasm_state, @products_info[dental_enrollment.product_id.to_s]] : add_data(2,''))
   else
     data += add_data(4,'')
   end
