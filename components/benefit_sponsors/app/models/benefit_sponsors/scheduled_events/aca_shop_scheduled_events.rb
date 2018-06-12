@@ -16,7 +16,7 @@ module BenefitSponsors
         end_enrollment_quiet_period
       end
 
-      def is_event_date_valid?(:event)
+      def is_event_date_valid?(new_date)
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           return true
         end
