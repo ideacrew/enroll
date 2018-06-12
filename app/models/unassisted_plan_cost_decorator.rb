@@ -50,9 +50,13 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def aptc_amount(member)
     if @tax_household.present?
       aptc_ratio = ((member.family_member.aptc_benchmark_amount)/@tax_household.total_benchmark_amount(members.map(&:family_member)))
-      ehb_premium = premium_for(member) * __getobj__.ehb
-      available_aptc = [@elected_aptc, ehb_premium].min
-      available_aptc * aptc_ratio
+      available_aptc = @elected_aptc * aptc_ratio
+      member_premium = premium_for(member)
+      if available_aptc > member_premium
+        ehb_premium = member_premium * __getobj__.ehb
+        available_aptc = [@elected_aptc, ehb_premium].min
+      end
+      available_aptc
     else
       0.00
     end
@@ -69,7 +73,6 @@ class UnassistedPlanCostDecorator < SimpleDelegator
       (sum + premium_for(member)).round(2)
     end
   end
-
   def total_employer_contribution
     0.00
   end
