@@ -37,7 +37,7 @@ attributes: !ruby/hash:BSON::Document
   family_deductible: "$500 per person | $1000 per group"
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-06-10 20:37:31.409000000 Z
+  updated_at: 2018-06-12 17:26:58.169000000 Z
   created_at: 2018-06-10 20:37:00.568000000 Z
   sbc_document: !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -51,11 +51,11 @@ attributes: !ruby/hash:BSON::Document
     source: enroll_system
     language: en
     tags: []
+    _type: Document
     subject: SBC
     identifier: urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-prod#0a32e1a3-5045-4c55-8955-94818133c190
     updated_at: 2017-08-15 06:46:32.960000000 Z
     created_at: 2017-08-15 06:46:32.960000000 Z
-    _type: Document
   premium_tables:
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId

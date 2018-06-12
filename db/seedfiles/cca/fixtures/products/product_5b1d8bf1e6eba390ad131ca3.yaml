@@ -38,7 +38,7 @@ attributes: !ruby/hash:BSON::Document
   family_deductible: per person not applicable | per group not applicable
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-06-10 20:37:05.800000000 Z
+  updated_at: 2018-06-12 17:28:57.050000000 Z
   created_at: 2018-06-10 20:37:05.800000000 Z
   sbc_document: !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -52,11 +52,11 @@ attributes: !ruby/hash:BSON::Document
     source: enroll_system
     language: en
     tags: []
+    _type: Document
     subject: SBC
     identifier: urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-prod#a12c4289-29d6-4458-a9fa-7a1003f60c43
     updated_at: 2017-11-06 00:41:20.649000000 Z
     created_at: 2017-11-06 00:41:20.649000000 Z
-    _type: Document
   premium_tables:
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -6715,3 +6715,4 @@ attributes: !ruby/hash:BSON::Document
           Wx2L8ebro5CtEyDn
       age: 64
       cost: 1180.01
+  issuer_assigned_id: NHPHMOMM141-142DV
