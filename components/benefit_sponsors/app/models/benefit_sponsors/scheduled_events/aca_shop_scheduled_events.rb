@@ -16,14 +16,16 @@ module BenefitSponsors
         end_enrollment_quiet_period
       end
 
-      def is_event_date_valid?(new_date)
+      # def is_event_date_valid?(new_date) commented out as jenkins build was failing
+      def is_event_date_valid?
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           return true
         end
       end
 
       def trigger_force_submit_applications
-        if is_event_date_valid?(:force_submit)
+        # if is_event_date_valid?(:force_submit) commented this line as jenkins build was failing
+        if is_event_date_valid?
 
           benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_open_enrollment?(new_date)
         end
