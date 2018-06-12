@@ -15,13 +15,26 @@ export default class extends Controller {
   addLocation() {
     //clone new location node, unhide remove button, modify name attribute
     var newLocation = document.importNode(this.officeLocationTarget, true)
+    var totalLocations = document.importNode(this.officeLocationsTarget, true)
+    // totalLocationsCount includes currently loaded OL form too
+    var totalLocationsCount = totalLocations.querySelectorAll('.ol_title').length
     newLocation.querySelectorAll('.js-remove').forEach(function(element) {
       element.remove()
     })
-    newLocation.querySelectorAll('input[name]').forEach(function(input) {
-      var name = input.getAttribute('name').replace('[0]', `[${Date.now()}]`)
+
+    newLocation.querySelectorAll('.ol_title').forEach(function(element) {
+      element.innerHTML = "Office Location"
+    })
+
+    newLocation.querySelectorAll('input').forEach(function(input) {
+      var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`)
       input.setAttribute('name', name)
       input.value = ''
+    })
+
+    newLocation.querySelectorAll('select').forEach(function(input) {
+      var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`)
+      input.setAttribute('name', name)
     })
 
     this.officeLocationsTarget.appendChild(newLocation)
