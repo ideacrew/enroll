@@ -29,6 +29,7 @@ module BenefitMarkets
 
     field :deductible, type: String
     field :family_deductible, type: String
+    field :issuer_assigned_id, type: String
 
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"

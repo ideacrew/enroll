@@ -403,7 +403,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).try(:first)
+    HbxEnrollment.find(predecessor_enrollment_id)
   end
 
   def census_employee
@@ -452,7 +452,6 @@ class HbxEnrollment
       logical_end = self.sponsored_benefit_package.end_on
       (effective_on..logical_end).include?(date)
     end
-    false
   end
 
   def is_active?
@@ -561,8 +560,8 @@ class HbxEnrollment
     if parent_enrollment.currently_active? && self.effective_on == parent_enrollment.effective_on
       parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
     elsif parent_enrollment.currently_active? && parent_enrollment.may_terminate_coverage? && !parent_enrollment.coverage_termination_pending?
-      enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-      enrollment.terminate_coverage!
+      parent_enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+      parent_enrollment.terminate_coverage!
     elsif parent_enrollment.future_active?
       if parent_enrollment.effective_on >= self.effective_on
         parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?

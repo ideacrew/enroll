@@ -11,6 +11,7 @@ module BenefitSponsors
 
       delegate :pricing_model, to: :pricing_determination
       delegate :sponsor_contribution, to: :pricing_determination
+      delegate :display_name, to: :pricing_unit, allow_nil: true
 
       def pricing_unit
         return @pricing_unit if defined? @pricing_unit
@@ -21,7 +22,11 @@ module BenefitSponsors
       #        It tries to map contribution levels to pricing units,
       #        which is kind of inherently absurd.
       def sponsor_contribution_factor
-        sponsor_contribution.match_contribution_level_for(pricing_unit).contribution_factor
+        contribution_level.contribution_factor
+      end
+
+      def contribution_level
+        sponsor_contribution.match_contribution_level_for(pricing_unit)
       end
     end
   end
