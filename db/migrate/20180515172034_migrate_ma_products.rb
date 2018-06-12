@@ -74,7 +74,8 @@ class MigrateMaProducts < Mongoid::Migration
               family_deductible: plan.family_deductible,
               is_reference_plan_eligible: true,
               premium_ages: (plan.minimum_age..plan.maximum_age),
-              premium_tables: premium_tables
+              premium_tables: premium_tables,
+              issuer_assigned_id: plan.carrier_special_plan_identifier
             }
             if product_kind.to_s.downcase == "health"
               product_package_kinds = []
