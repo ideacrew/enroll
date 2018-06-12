@@ -118,22 +118,7 @@
                 <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
 
                 <div data-target="<%= 'site.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
-                  <% if params[:controller] == "benefit_sponsors/profiles/registrations" && params[:action] == "edit" %>
-                    <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields}  %>
-                  <% else %>
-                    <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
-                      <%= render partial: './ui-components/v1/forms/office_locations/address', locals: {f: address_fields}  %>
-                    <% end %>
-
-                    <div class="js-remove row">
-                      <label>Main Phone </label>
-                    </div>
-
-                    <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
-                      <%= phone_fields.hidden_field :kind, value: 'phone main' %>
-                      <%= render partial: './ui-components/v1/forms/office_locations/phone', locals: { f: phone_fields } %>
-                    <% end %>
-                  <% end %>
+                  <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields}  %>
                 </div>
               <% end %> 
             </div>
