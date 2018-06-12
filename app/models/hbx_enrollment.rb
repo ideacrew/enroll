@@ -560,8 +560,8 @@ class HbxEnrollment
     if parent_enrollment.currently_active? && self.effective_on == parent_enrollment.effective_on
       parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
     elsif parent_enrollment.currently_active? && parent_enrollment.may_terminate_coverage? && !parent_enrollment.coverage_termination_pending?
-      enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-      enrollment.terminate_coverage!
+      parent_enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+      parent_enrollment.terminate_coverage!
     elsif parent_enrollment.future_active?
       if parent_enrollment.effective_on >= self.effective_on
         parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
