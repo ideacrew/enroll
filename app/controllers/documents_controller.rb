@@ -22,6 +22,12 @@ class DocumentsController < ApplicationController
       model_id = params[:model_id]
       relation = params[:relation]
       relation_id = params[:relation_id]
+
+      #Fix for new model inbox-messages notice download
+      if model == "AcaShopCcaEmployerProfile"
+        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
+      end
+
       model_object = Object.const_get(model).find(model_id)
       documents = model_object.send(relation.to_sym)
       if authorized_to_download?(model_object, documents, relation_id)
