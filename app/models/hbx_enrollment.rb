@@ -403,7 +403,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).try(:first)
+    HbxEnrollment.find(predecessor_enrollment_id)
   end
 
   def census_employee
@@ -452,7 +452,6 @@ class HbxEnrollment
       logical_end = self.sponsored_benefit_package.end_on
       (effective_on..logical_end).include?(date)
     end
-    false
   end
 
   def is_active?
