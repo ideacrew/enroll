@@ -138,13 +138,12 @@ class CensusEmployee < CensusMember
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
   scope :by_employer_profile_id,          ->(employer_profile_id) { scoped_profile(employer_profile_id) }
 
-  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
+  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on, is_active) {
     where(:"benefit_group_assignments" => { :$elemMatch => {
-      :start_on.lte => effective_on, :end_on.gte => effective_on,
-      :benefit_package_id => benefit_package.id, :is_active => true
+      :start_on => effective_on,
+      :benefit_package_id => benefit_package.id, :is_active => is_active
     }})
   }
-
 
   scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
   scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }

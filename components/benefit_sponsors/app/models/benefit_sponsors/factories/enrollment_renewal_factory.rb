@@ -13,7 +13,8 @@ module BenefitSponsors
         return if benefit_group_assignment.blank?
 
         census_employee = benefit_group_assignment.census_employee
-        new_benefit_group_assignment = census_employee.benefit_group_assignment_for(new_benefit_package, new_benefit_package.start_on)
+        new_benefit_group_assignment = census_employee.benefit_package_assignment_for(new_benefit_package)
+        
         return if new_benefit_group_assignment.blank?
 
         if @base_enrollment.product.renewal_product.blank?
@@ -45,7 +46,7 @@ module BenefitSponsors
             builder.set_as_renew_enrollment
           end
         end
-        
+
         @renewal_enrollment.hbx_enrollment_members = cloned_enrollment_members
         finalize_hbx_enrollment_members
       end
