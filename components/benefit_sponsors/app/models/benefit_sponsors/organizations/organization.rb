@@ -185,11 +185,13 @@ module BenefitSponsors
       def sponsor_benefits_for(profile)
         if profile.is_benefit_sponsorship_eligible?
 
-          if profile._type == "BenefitSponsors::Organizations::HbxProfile"
-            benefit_market = site.benefit_market_for(:aca_individual)
-          else
-            benefit_market = site.benefit_market_for(:aca_shop)
-          end
+          # if profile._type == "BenefitSponsors::Organizations::HbxProfile"
+          #   benefit_market = site.benefit_market_for(:aca_individual)
+          # else
+          #   benefit_market = site.benefit_market_for(:aca_shop)
+          # end
+
+          benefit_market = site.benefit_market_for(:aca_shop)
 
           if profile.primary_office_location.address.present?
             rating_area   = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
