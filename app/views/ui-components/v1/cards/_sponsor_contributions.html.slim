@@ -1,5 +1,5 @@
 #sponsorContributions.mt-1
-  .col-xs-12
+  .col-xs-12.mb-1
     .col-xs-6.offered-heading
       .text-uppercase.text-center 
         | Offered 
@@ -8,6 +8,22 @@
       .text-uppercase.text-center 
         | Employer Contribution 
         i.fas.fa-question-circle
-  .col-xs-12#benefitFields
+  .col-xs-12
+    - f.object.sponsor_contribution.contribution_levels.each do |level|
+      .row.mb-1
+        .col-xs-4.ml-4.mt-1
+          i.far.fa-check-square.fa-2x.fl style="width:60px"
+          = level.display_name
+        .col-xs-6
+          .col-xs-3
+            input type="number" id="#{level.id}" value="#{(level.contribution_factor * 100).to_i}"
+          .col-xs-9
+            input type="range" min="0" max="100" value="#{(level.contribution_factor * 100).to_i}" step="5" class="slider" id="#{level.id}" onchange="setInputValue(this)" data-id="#{level.id}"
+
+javascript:
+  function setInputValue(element) {
+    document.getElementById(element.dataset.id).value = element.value;
+  }
+
 
 

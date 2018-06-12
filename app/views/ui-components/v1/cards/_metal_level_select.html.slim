@@ -121,7 +121,7 @@ javascript:
   function populateReferencePlans(plans) {
     sponsorContribution = sponsorContributions[productOptionKind]['contribution_levels'];
     
-    document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions")}'
+    document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions_shell")}'
     
     // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
@@ -197,7 +197,7 @@ javascript:
       data:{product_package_kind: productOptionKind,reference_plan_id: referencePlanID},
       url: "calculate_employer_contributions",
       success: function (d) {
-              console.log(d)
+        console.log(d)
       }
     });
   }
