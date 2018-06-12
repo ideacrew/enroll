@@ -1,3 +1,4 @@
+@disable_coverall_feature
 Feature: can Transition family members
     
   Background: Hbx Admin can Transition family members
