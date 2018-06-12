@@ -30,9 +30,8 @@ class HbxEnrollmentListSponsorCostCalculator
 		def search_criteria(enrollment_ids)
 			Family.collection.aggregate([
 				{"$match" => {
-					"households.hbx_enrollments" => { "$elemMatch" => {
-						"_id" => {"$in" => enrollment_ids}
-					}}}},
+					"households.hbx_enrollments._id" => {"$in" => enrollment_ids}
+        }},
 					{"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
 					{"$unwind" => "$households"},
 					{"$unwind" => "$households.hbx_enrollments"},
@@ -154,9 +153,9 @@ class HbxEnrollmentListSponsorCostCalculator
 		c_calculator = contribution_model.contribution_calculator
 		price = 0.00
 		contribution = 0.00
-		if hbx_enrollment_ids.count < 1
-			return [sponsor_contribution, price, contribution]
-		end
+#		if hbx_enrollment_ids.count < 1
+#			return [sponsor_contribution, price, contribution]
+#		end
 		price, contribution = calculate_normal_costs(
 			pricing_model,
 			contribution_model,

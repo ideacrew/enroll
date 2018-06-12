@@ -49,7 +49,10 @@
               .col-xs-4
                 .row
                   span Employer Estimated Maximum Monthly Cost
-                  / h2 = number_to_currency(bg.monthly_employer_contribution_amount)
+                  - query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(sb.benefit_package.benefit_application, sb).call(::Family, TimeKeeper.date_of_record).lazy.map { |rec| rec["hbx_enrollment_id"] }
+                  - calculator = HbxEnrollmentListSponsorCostCalculator.new(sb.benefit_sponsorship)
+                  - _s_contribution, total_price, contribution = calculator.calculate(sb, query) 
+                  h2 = number_to_currency(total_price)
               .col-xs-8
                 .row
                   table
