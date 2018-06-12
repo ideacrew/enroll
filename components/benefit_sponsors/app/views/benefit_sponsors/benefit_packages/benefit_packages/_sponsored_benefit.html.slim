@@ -23,17 +23,17 @@
   | Your final monthly cost is based on final enrollment.
   br
   br
+
+  javascript:
+    window.onload = function() {
+      showFormButtons()
+    }
   
-javascript:
-  window.onload = function() {
-    showFormButtons()
-  }
-  
-  function showFormButtons() {
-    document.getElementById('addBenefitPackage').classList.remove('hidden')
-    document.getElementById('submitBenefitPackage').classList.remove('hidden')
-    document.getElementById('cancelBenefitPackage').classList.remove('hidden')
-  }
+    function showFormButtons() {
+      document.getElementById('addBenefitPackage').classList.remove('hidden')
+      document.getElementById('submitBenefitPackage').classList.remove('hidden')
+      document.getElementById('cancelBenefitPackage').classList.remove('hidden')
+    }
   
 
 
