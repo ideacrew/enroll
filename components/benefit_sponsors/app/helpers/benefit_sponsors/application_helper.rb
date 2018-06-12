@@ -93,6 +93,14 @@ module BenefitSponsors
       end
     end
 
+    def total_active_census_employees(profile)
+      profile_id = profile.id
+      org = BenefitSponsors::Organizations::Organization.by_employer_profile(profile_id)
+      emp_profile = org.first.employer_profile
+      census_employees = emp_profile.census_employees
+      census_employees.active.count
+    end
+
     def format_name(first_name: nil, last_name: nil, middle_name: nil, name_sfx: nil)
       given_name = [first_name, middle_name].reject(&:nil? || empty?).join(' ')
       sir_name  = content_tag(:strong, mixed_case(last_name))
