@@ -29,7 +29,7 @@ class PlanSelection
 
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
-    hbx_enrollment.update_current(product_id: plan.id)
+    hbx_enrollment.update_current(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
 
     qle = hbx_enrollment.is_special_enrollment?
     if qle
