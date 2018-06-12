@@ -177,6 +177,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   def self.build_inbox_messages(new_profile)
     @old_profile.inbox.messages.each do |message|
       msg = new_profile.inbox.messages.new(message.attributes.except("_id"))
+      msg.body.gsub!("EmployerProfile", "AcaShopCcaEmployerProfile")
       msg.body.gsub!(@old_profile.id.to_s, new_profile.id.to_s)
 
       new_profile.documents.where(subject: "notice").each do |doc|
