@@ -97,6 +97,7 @@ module Observers
 
         if new_model_event.event_key == :application_denied
           errors = plan_year.enrollment_errors
+          
           if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
               if ce.employee_role.present?
@@ -104,6 +105,9 @@ module Observers
               end
             end
           end
+
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
+
         end
 
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
@@ -262,8 +266,8 @@ module Observers
       end
     end
 
-    def deliver(recipient:, event_object:, notice_event:)
-      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
+    def deliver(recipient:, event_object:, notice_event:, notice_params: {})
+      notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
     end
 
     def trigger_zero_employees_on_roster_notice(plan_year)
