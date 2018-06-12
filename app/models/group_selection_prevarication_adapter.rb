@@ -158,13 +158,26 @@ class GroupSelectionPrevaricationAdapter
 		end
 	end
 
-	def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment)
-		if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && enrollment.blank?
-			prev_enrollment = selected_enrollment(@family, possible_employee_role)
-			waivable_value = prev_enrollment.can_complete_shopping?
-			yield prev_enrollment,waivable_value
+	def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment, new_effective_date)
+		if (select_market(params) == 'shop') && (@change_plan == 'change_by_qle') && enrollment.blank?
+      
+			prev_enrollment = find_previous_enrollment_for(params, new_effective_date)
+      if prev_enrollment
+			  waivable_value = prev_enrollment.can_complete_shopping?
+			  yield prev_enrollment,waivable_value
+      else
+        yield nil, nil
+      end
 		end
 	end
+
+  def find_previous_enrollment_for(params, new_effective_date)
+    @family.households.flat_map(&:hbx_enrollments).detect do |other_enrollment|
+      (other_enrollment.employee_role_id == possible_employee_role.id) &&
+        other_enrollment.active_during?(new_effective_date) &&
+        (other_enrollment.coverage_kind == @coverage_kind)
+    end
+  end
 
 	def is_qle?
 		(@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')

@@ -31,11 +31,6 @@ class Insured::GroupSelectionController < ApplicationController
     end
     @qle = @adapter.is_qle?
 
-    @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment) do |enrollment, can_waive|
-      @hbx_enrollment = enrollment
-      @waivable = can_waive
-    end
-
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
     @new_effective_on = @adapter.calculate_new_effective_on(params)
@@ -46,6 +41,10 @@ class Insured::GroupSelectionController < ApplicationController
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
     @adapter.if_qle_with_date_option_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
+    end
+    @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment, @new_effective_on) do |enrollment, can_waive|
+      @hbx_enrollment = enrollment
+      @waivable = can_waive
     end
   end
 
