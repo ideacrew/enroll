@@ -1,21 +1,21 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
-  attr_reader :member_provider
+  attr_reader :hbx_enrollment
   attr_reader :elected_aptc
   attr_reader :tax_household
 
   def initialize(plan, hbx_enrollment, elected_aptc=0, tax_household=nil)
     super(plan)
-    @member_provider = hbx_enrollment
+    @hbx_enrollment = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
     @tax_household = tax_household
   end
 
   def members
-    member_provider.hbx_enrollment_members
+    hbx_enrollment.hbx_enrollment_members
   end
 
   def schedule_date
-    @member_provider.effective_on
+    @hbx_enrollment.effective_on
   end
 
   def age_of(member)
@@ -49,8 +49,10 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def aptc_amount(member)
     if @tax_household.present?
-      aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_aptc)
-      ((aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0) * large_family_factor(member)).round(2)
+      aptc_ratio = ((member.family_member.aptc_benchmark_amount)/@tax_household.total_benchmark_amount(members.map(&:family_member)))
+      ehb_premium = premium_for(member) * __getobj__.ehb
+      available_aptc = [@elected_aptc, ehb_premium].min
+      available_aptc * aptc_ratio
     else
       0.00
     end

@@ -86,6 +86,13 @@ class FamilyMember
     # TODO parent.households.coverage_households.where()
   end
 
+  def aptc_benchmark_amount
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+    slcsp.premium_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
+  end
+
   def broker=(new_broker)
     return unless new_broker.is_a? BrokerRole
     self.broker_role_id = new_broker._id

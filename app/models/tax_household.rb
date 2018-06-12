@@ -100,12 +100,32 @@ class TaxHousehold
     {}
   end
 
+  def aptc_family_members
+    household.hbx_enrollments.enrolled.select{ |enr| enr.applied_aptc_amount > 0.00 }.flat_map(&:hbx_enrollment_members).flat_map(&:family_member).uniq
+  end
+
+  def unwanted_family_members(hbx_enrollment)
+    ((family.active_family_members - hbx_enrollment.hbx_enrollment_members.map(&:family_member)) - aptc_family_members)
+  end
+
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
-    hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
+    total = family.active_family_members.reduce(0) do |sum, member|
+      sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
     end
+    unchecked_family_members = unwanted_family_members(hbx_enrollment)
+    deduction_amount = total_benchmark_amount(unchecked_family_members)
+    total = total - deduction_amount
+    (total < 0.00) ? 0.00 : total
+  end
+
+  def total_benchmark_amount(unchecked_family_members)
+    total_sum = 0
+    unchecked_family_members.each do |family_member|
+      total_sum += family_member.aptc_benchmark_amount
+    end
+    total_sum
   end
 
   def aptc_available_amount_by_member
@@ -115,7 +135,6 @@ class TaxHousehold
     aptc_ratio_by_member.each do |member_id, ratio|
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
-
     # FIXME should get hbx_enrollments by effective_starting_on
     household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
@@ -124,7 +143,6 @@ class TaxHousehold
         aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end
-
     aptc_available_amount_hash
   end
 
