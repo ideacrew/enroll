@@ -40,6 +40,7 @@ module BenefitSponsors
 
       def calculate_employer_contributions
         @employer_contributions = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employer_contributions(employer_contribution_params)
+        render json: @employer_contributions
       end
 
       def destroy
