@@ -7,7 +7,7 @@ module BenefitSponsors
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
     let!(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let!(:new_benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let!(:employer_profile) {benefit_sponsor.employer_profile}

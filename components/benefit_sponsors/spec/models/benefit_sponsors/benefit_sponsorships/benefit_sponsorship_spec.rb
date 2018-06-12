@@ -85,12 +85,12 @@ module BenefitSponsors
 
     describe "Working around validating model factory" do
       context "when benefit sponsor has profile and organization" do
-        let(:benefit_sponsorships) { FactoryGirl.build_stubbed(:benefit_sponsors_benefit_sponsorship)}
-        let(:valid_build_benefit_sponsorships) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
+        let(:benefit_sponsorships)              { FactoryGirl.build_stubbed(:benefit_sponsors_benefit_sponsorship)}
+        let(:valid_build_benefit_sponsorships)  { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
         let(:valid_create_benefit_sponsorships) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
 
         it "should be valid", :aggregate_failures do
-          expect(benefit_sponsorships.valid?).to be_falsy
+          expect(benefit_sponsorships.valid?).to eq true
           expect(valid_build_benefit_sponsorships.valid?).to be_truthy
           expect(valid_create_benefit_sponsorships.valid?).to be_truthy
         end
@@ -108,9 +108,9 @@ module BenefitSponsors
 
 
     describe "Finding a BenefitSponsorCatalog" do
+      let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
       let(:next_year)                           { Date.today.year + 1 }
       let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
-      let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
       let!(:benefit_market_catalog_next_year)   { FactoryGirl.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period_next_year) }
       # let(:benefit_market_catalog_future_year)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period) }
 
@@ -210,22 +210,16 @@ module BenefitSponsors
     end
 
     describe "Transitioning a BenefitSponsorship through workflow states" do
-      let(:benefit_sponsorship)     { described_class.new(**params) }
-      let(:effective_date)          { Date.today.beginning_of_month }
-      let(:benefit_application)     { build(:benefit_sponsors_benefit_application,
-                                                :with_benefit_sponsor_catalog,
-                                                effective_period: effective_date..(effective_date + 1.year - 1.day),
-                                                benefit_sponsorship: benefit_sponsorship,
-                                                recorded_service_areas: benefit_sponsorship.service_areas) }
+      let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
+      let(:this_year)                           { Date.today.year }
+      let(:benefit_application)                 { build(:benefit_sponsors_benefit_application,
+                                                          benefit_sponsorship: benefit_sponsorship,
+                                                          recorded_service_areas: benefit_sponsorship.service_areas) }
 
       context "Initial application happy path workflow" do
-        before {
-                    organization.benefit_sponsorships << benefit_sponsorship
-                    TimeKeeper.set_date_of_record_unprotected!(Date.today)
-                  }
+        before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
         it "should initialize in state: :applicant" do
-          binding.pry
           expect(benefit_sponsorship.aasm_state).to eq :applicant
         end
 

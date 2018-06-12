@@ -5,12 +5,15 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile)}
-    let(:employer_profile) { organization.employer_profile }
-    let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+    let(:employer_profile)        { organization.employer_profile }
+    let!(:benefit_sponsorship)    { employer_profile.benefit_sponsorships.first }
+
+    let!(:broker_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site)}
+    let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: employer_profile.organization, profile_id: employer_profile.id) }
     let(:broker_management_form_create) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(
                                           employer_profile_id: employer_profile.id,
                                           broker_agency_profile_id: broker_agency_profile1.id,

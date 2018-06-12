@@ -5,7 +5,8 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile)}
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let(:employer_profile) { organization.employer_profile }
     let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1') }
     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
@@ -64,7 +65,7 @@ module BenefitSponsors
          :employer_profile_id=> employer_profile.id.to_s}
       }
 
-      let!(:termiante_form) { subject.for_terminate terminate_params }
+      let!(:terminate_form) { subject.for_terminate terminate_params }
 
 
       before do
@@ -73,21 +74,21 @@ module BenefitSponsors
       end
 
       it "should assign the termiante params to broker management forms" do
-        expect(termiante_form.employer_profile_id).to eq termiante_form[:employer_profile_id]
-        expect(termiante_form.broker_agency_profile_id).to eq termiante_form[:broker_agency_profile_id]
-        expect(termiante_form.broker_role_id).to eq termiante_form[:broker_role_id]
-        expect(termiante_form.direct_terminate).to eq true
-        expect(termiante_form.termination_date).to eq TimeKeeper.date_of_record
+        expect(terminate_form.employer_profile_id).to eq terminate_form[:employer_profile_id]
+        expect(terminate_form.broker_agency_profile_id).to eq terminate_form[:broker_agency_profile_id]
+        expect(terminate_form.broker_role_id).to eq terminate_form[:broker_role_id]
+        expect(terminate_form.direct_terminate).to eq true
+        expect(terminate_form.termination_date).to eq TimeKeeper.date_of_record
       end
 
       it "create_form should be valid" do
-        termiante_form.validate
-        expect(termiante_form).to be_valid
+        terminate_form.validate
+        expect(terminate_form).to be_valid
       end
 
       it 'should terminate broker_agency_account in benefit_sponsorship when terminated' do
         expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts.count).to eq 1
-        termiante_form.terminate
+        terminate_form.terminate
         employer_profile.active_benefit_sponsorship.reload
         expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts.count).to eq 0
       end

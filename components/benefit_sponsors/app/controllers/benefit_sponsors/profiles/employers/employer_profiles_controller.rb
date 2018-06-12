@@ -3,7 +3,7 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :show_pending]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         layout "two_column", except: [:new]
 
@@ -106,8 +106,7 @@ module BenefitSponsors
         def find_employer
           id_params = params.permit(:id, :employer_profile_id)
           id = id_params[:id] || id_params[:employer_profile_id]
-          @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
-          @employer_profile = @organization.employer_profile
+          @employer_profile = BenefitSponsors::Organizations::Profile.find(id)
           render file: 'public/404.html', status: 404 if @employer_profile.blank?
         end
 
@@ -164,7 +163,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [  
+                csv << [
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,

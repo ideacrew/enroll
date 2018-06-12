@@ -1,9 +1,10 @@
 FactoryGirl.define do
   factory :benefit_sponsors_benefit_sponsorship, class: 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship' do
 
+    organization    { build(:benefit_sponsors_organizations_general_organization) }
+    profile         { create(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization) }
     source_kind     { :self_serve }
-    benefit_market  { ::BenefitMarkets::BenefitMarket.new(kind: :aca_shop, title: "MA Health SHOP", site_urn: :cca) }
-    organization    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
+    benefit_market  { build(:benefit_markets_benefit_market, kind: :aca_shop, title: "MA Health SHOP", site_urn: :cca) }
 
     rating_area     { create(:benefit_markets_locations_rating_area) }
     service_areas    { [create(:benefit_markets_locations_service_area)] }

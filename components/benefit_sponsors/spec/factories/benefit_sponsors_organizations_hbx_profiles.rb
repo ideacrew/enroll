@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :benefit_sponsors_organizations_hbx_profile, class: 'BenefitSponsors::Organizations::HbxProfile' do
 
-    # organization  { :benefit_sponsors_organizations_exempt_organization }
+    # organization  { build(:benefit_sponsors_organizations_exempt_organization) }
     is_benefit_sponsorship_eligible true
 
     transient do

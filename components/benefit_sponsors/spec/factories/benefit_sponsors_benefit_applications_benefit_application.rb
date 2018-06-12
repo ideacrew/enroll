@@ -14,6 +14,7 @@ FactoryGirl.define do
 
     # design using defining module spec helpers
     effective_period do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
       start_on  = TimeKeeper.date_of_record.end_of_month + 1.day + 1.month
       end_on    = start_on + 1.year - 1.day
       start_on..end_on
