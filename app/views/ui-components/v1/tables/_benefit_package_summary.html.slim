@@ -15,9 +15,9 @@ table.table.benefit-group-contribution-table
       tr class="#{pdt.contribution_level.is_offered ? "offered" : "not-offered"}"
         td = raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.try(:humanize)}")
         td= number_to_percentage((pdt.sponsor_contribution_factor * 100.0), precision: 0)
-        td= pdt_employee
-        td= pdt_employer
-        td= pdt.price  
+        td= number_to_currency(pdt_employee)
+        td= number_to_currency(pdt_employer)
+        td= number_to_currency(pdt.price)
   - else
     tr
       th.benefit-group-heading Offered

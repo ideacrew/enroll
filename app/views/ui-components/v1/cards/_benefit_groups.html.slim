@@ -34,13 +34,13 @@
           tr
             td = sb.reference_product.name.try(:upcase)
             td = sb.reference_product.issuer_profile.legal_name
-            td = sb.try(:reference_product).try(:product_type).try(:upcase)
+            td = sb.try(:reference_product).try(:health_plan_kind).try(:upcase)
           tr
             td.benefit-group-heading Metal Level
             td.benefit-group-heading Plans By
           tr
             td = sb.reference_product.metal_level.titleize
-            td = selected_benefit_plan(sb.product_package_kind)
+            td = sb.product_package_kind.to_s.humanize.capitalize
             / Health plan collapsible: start
         .collapse id="collapse#{sb.product_kind.downcase}"
           = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }
@@ -62,6 +62,15 @@
                       th Max
                     tr
                       td colspan="2" Total Estimated Monthly Cost for Plan Participants
+                      - pd = sb.latest_pricing_determination
+                      - if pd.present?
+                        - costs = pd.pricing_determination_tiers.map do |pdt|
+                          - pdt_total = pdt.price
+                          - pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+                          - BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+                        td= number_to_currency(costs.min)
+                        td= number_to_currency(costs.max)
+                      - else
                       / td = number_to_currency(bg.monthly_min_employee_cost)
                       / td = number_to_currency(bg.monthly_max_employee_cost)
 
