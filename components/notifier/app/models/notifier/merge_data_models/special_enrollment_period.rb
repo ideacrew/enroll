@@ -7,8 +7,8 @@ module Notifier
      attribute :start_on, String
      attribute :end_on, String
      attribute :submitted_at, String
-     attribute :reporting_deadline, Date
-     attribute :event_on, Date
+     attribute :reporting_deadline, String
+     attribute :event_on, String
 
      def self.stubbed_object
        Notifier::MergeDataModels::SpecialEnrollmentPeriod.new({

@@ -170,7 +170,7 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      merge_model.special_enrollment_period.event_on = (special_enrollment_period.present? && special_enrollment_period.event_on.present?) ? special_enrollment_period.event_on : Date.strptime(payload['notice_params'][:qle_event_on], '%m/%d/%Y')
+      merge_model.special_enrollment_period.event_on =  format_date(special_enrollment_period.effective_on ||= payload['notice_params'][:qle_event_on])
     end
 
     def special_enrollment_period_title
@@ -196,7 +196,8 @@ module Notifier
     end
 
     def special_enrollment_period_reporting_deadline
-      merge_model.special_enrollment_period.reporting_deadline = Date.strptime(payload['notice_params'][:qle_reporting_deadline], '%m/%d/%Y') if payload['notice_params'][:qle_reporting_deadline].present?
+      deadline = if payload['notice_params'][:qle_reporting_deadline] ||= TimeKeeper.date_of_record + 15.days
+      merge_model.special_enrollment_period.reporting_deadline = format_date(deadline) 
     end
 
     def format_date(date)
