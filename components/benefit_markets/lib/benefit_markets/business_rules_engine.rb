@@ -30,10 +30,8 @@ module BenefitMarkets
       self.business_policies = {}
       self.rules = []
 
-      # TONY: Make this an instance method
-      def assert_business_policies(name)
-        if name
-          # TONY:  iterate through hash and not array
+      def assert_business_policies(name = nil)
+        unless name
           business_policies.each do |business_policy, value|
             business_policies[business_policy].send(:process_rules)
           end
