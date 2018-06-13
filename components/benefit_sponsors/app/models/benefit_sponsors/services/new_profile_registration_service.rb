@@ -116,7 +116,7 @@ module BenefitSponsors
       end
 
       def sanitize_params attrs
-        profile_id.blank? ? attrs.except(:id) : attrs
+        (profile_id.blank? || attrs[:id].blank?) ? attrs.except(:id) : attrs
       end
 
       def organization_attributes(form)

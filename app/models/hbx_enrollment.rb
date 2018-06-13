@@ -192,10 +192,17 @@ class HbxEnrollment
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
+  scope :non_external, -> { where(:external_enrollment => false) }
   scope :non_expired_and_non_terminated,  -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
   scope :by_benefit_sponsorship,   -> (benefit_sponsorship) { where(:benefit_sponsorship_id => benefit_sponsorship.id) }
   scope :by_benefit_package,       -> (benefit_package) { where(:sponsored_benefit_package_id => benefit_package.id) }
   scope :by_enrollment_period,     -> (enrollment_period) { where(:effective_on.gte => enrollment_period.min, :effective_on.lte => enrollment_period.max) }
+
+  scope :by_effective_period,      ->(effective_period) { where(
+                                                          :"effective_on".gte => effective_period.min,
+                                                          :"effective_on".lte => effective_period.max
+                                                        )}
+
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -265,7 +272,7 @@ class HbxEnrollment
 
   def renew_benefit(new_benefit_package)
     begin
-      enrollment = BenefitSponsors::Enrollments::EnrollmentRenewalFactory.call(self, new_benefit_package)
+      enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       enrollment.save
     rescue Exception => e
     end
@@ -396,7 +403,7 @@ class HbxEnrollment
 
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
-    HbxEnrollment.find(predecessor_enrollment_id).try(:first)
+    HbxEnrollment.find(predecessor_enrollment_id)
   end
 
   def census_employee
@@ -445,7 +452,6 @@ class HbxEnrollment
       logical_end = self.sponsored_benefit_package.end_on
       (effective_on..logical_end).include?(date)
     end
-    false
   end
 
   def is_active?
@@ -554,8 +560,8 @@ class HbxEnrollment
     if parent_enrollment.currently_active? && self.effective_on == parent_enrollment.effective_on
       parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
     elsif parent_enrollment.currently_active? && parent_enrollment.may_terminate_coverage? && !parent_enrollment.coverage_termination_pending?
-      enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-      enrollment.terminate_coverage!
+      parent_enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+      parent_enrollment.terminate_coverage!
     elsif parent_enrollment.future_active?
       if parent_enrollment.effective_on >= self.effective_on
         parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?

@@ -39,7 +39,8 @@ module BenefitSponsors
       end
 
       def calculate_employer_contributions
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employer_contributions(employer_contribution_params)
+        @employer_contributions = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employer_contributions(employer_contribution_params)
+        render json: @employer_contributions
       end
 
       def destroy
@@ -70,8 +71,12 @@ module BenefitSponsors
         )
       end
 
+      def sponsored_benefit_params
+        {:sponsored_benefits_attributes => {"0" => {:product_package_kind => params[:product_package_kind], :reference_plan_id => params[:reference_plan_id]}}}
+      end
+
       def employer_contribution_params
-        params
+        params.permit(:benefit_application_id).merge(sponsored_benefit_params)
       end
     end
   end

@@ -53,7 +53,8 @@ class EmployerAttestation
   end
 
   def terminate_employer
-    employer_profile.terminate(TimeKeeper.date_of_record.end_of_month)
+    #TODO refactor while working on employer attestation
+    # employer_profile.terminate(TimeKeeper.date_of_record.end_of_month)
   end
 
   def editable?

@@ -99,20 +99,20 @@ class BrokerRole
 
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency)
-    if new_broker_agency.is_a? BrokerAgencyProfile
-      if new_broker_agency.nil?
-        self.broker_agency_profile_id = nil
-      else
-        raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
-        self.broker_agency_profile_id = new_broker_agency._id
-        @broker_agency_profile = new_broker_agency
-      end
-    else
+    if new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
       if new_broker_agency.nil?
         self.benefit_sponsors_broker_agency_profile_id = nil
       else
         raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
         self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
+        @broker_agency_profile = new_broker_agency
+      end
+    else
+      if new_broker_agency.nil?
+        self.broker_agency_profile_id = nil
+      else
+        raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
+        self.broker_agency_profile_id = new_broker_agency._id
         @broker_agency_profile = new_broker_agency
       end
     end

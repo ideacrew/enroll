@@ -27,10 +27,9 @@ class PlanSelection
     end
   end
 
+  # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
-    hbx_enrollment.update_current(product_id: plan.id)
-    # hbx_enrollment.inactive_related_hbxs
-    # hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
+    hbx_enrollment.update_current(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
 
     qle = hbx_enrollment.is_special_enrollment?
     if qle
@@ -40,11 +39,12 @@ class PlanSelection
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
     hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
-    if enrollment_members_verification_status(market_kind)
-      hbx_enrollment.move_to_contingent!
-    else
-      hbx_enrollment.select_coverage!(qle: qle)
-    end
+#    if enrollment_members_verification_status(market_kind)
+#      hbx_enrollment.move_to_contingent!
+#    else
+    hbx_enrollment.select_coverage!(qle: qle)
+#    end
+    hbx_enrollment.update_existing_shop_coverage
   end
 
   def enrollment_members_verification_status(market_kind)
@@ -67,12 +67,12 @@ class PlanSelection
   end
 
   def verify_and_set_member_coverage_start_dates
-    if existing_coverage.present? && (existing_coverage.product.hios_id == plan.hios_id)
-      hbx_enrollment = set_enrollment_member_coverage_start_dates
-      hbx_enrollment.parent_enrollment.id = existing_coverage._id
+    if existing_coverage.present? && (existing_coverage.product_id == plan.id)
+      set_enrollment_member_coverage_start_dates(hbx_enrollment)
     end
   end
 
+=begin
   def same_plan_enrollment
     return @same_plan_enrollment if defined? @same_plan_enrollment
 
@@ -82,6 +82,7 @@ class PlanSelection
 
     @same_plan_enrollment
   end
+=end
 
   def build_hbx_enrollment_members
     hbx_enrollment.hbx_enrollment_members.collect do |hbx_enrollment_member|
@@ -95,7 +96,7 @@ class PlanSelection
   end
 
   def existing_coverage
-    existing_enrollment_for_covered_individuals
+    @hbx_enrollment.parent_enrollment
   end
 
   def set_enrollment_member_coverage_start_dates(enrollment_obj = hbx_enrollment)
@@ -115,6 +116,7 @@ class PlanSelection
     enrollment_obj
   end
 
+=begin
   def existing_enrollment_for_covered_individuals
     previous_active_coverages.detect{|en|
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? && en.id != hbx_enrollment.id
@@ -134,8 +136,8 @@ class PlanSelection
         {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
       ).order("effective_on DESC")
   end
-
+=end
   def family
-    hbx_enrollment.family
+    @hbx_enrollment.family
   end
 end

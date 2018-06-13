@@ -28,6 +28,7 @@ module BenefitSponsors
       delegate :rate_schedule_date, to: :benefit_package
       delegate :benefit_sponsor_catalog, to: :benefit_package
       delegate :benefit_sponsorship, to: :benefit_package
+      delegate :recorded_sic_code, to: :benefit_package
 
       validate :product_package_exists
 #      validates_presence_of :sponsor_contribution
@@ -79,8 +80,8 @@ module BenefitSponsors
               product_package_kind: product_package_kind,
               product_option_choice: product_option_choice,
               reference_product: reference_product.renewal_product,
-              sponsor_contribution: sponsor_contribution.renew(new_product_package),
-              pricing_determinations: renew_pricing_determinations(new_product_package)
+              sponsor_contribution: sponsor_contribution.renew(new_product_package)
+              # pricing_determinations: renew_pricing_determinations(new_product_package)
             )
           end
         end

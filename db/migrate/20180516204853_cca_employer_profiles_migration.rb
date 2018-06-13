@@ -126,15 +126,36 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
       new_profile.contact_method = :paper_only
     end
 
-    build_inbox_messages(new_profile)
+    build_employer_attestation(new_profile) if @old_profile.employer_attestation.present?
     build_documents(old_org, new_profile)
+    build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
   end
 
-  def self.build_inbox_messages(new_profile)
-    @old_profile.inbox.messages.each do |message|
-      new_profile.inbox.messages.new(message.attributes.except("_id"))
+
+  def self.build_employer_attestation(obj)
+
+    old_attestation_params = @old_profile.employer_attestation.attributes.except("_id", "employer_profile", "employer_attestation_documents", "workflow_state_transitions")
+
+    new_employer_attestation  = obj.build_employer_attestation(old_attestation_params)
+
+    old_workflow_state_trans = @old_profile.employer_attestation.workflow_state_transitions
+    build_workflow_state_transition(old_workflow_state_trans ,new_employer_attestation)
+
+    @old_profile.employer_attestation.employer_attestation_documents.each do |employer_attestation_document|
+      old_attestation_doc_params = employer_attestation_document.attributes.except("_id", "workflow_state_transitions")
+      new_emp_attest_doc = new_employer_attestation.employer_attestation_documents.new(old_attestation_doc_params)
+
+      old_workflow_state_trans = employer_attestation_document.workflow_state_transitions
+      build_workflow_state_transition(old_workflow_state_trans, new_emp_attest_doc)
+    end
+  end
+
+  def self.build_workflow_state_transition(old_workflow_state_trans, new_obj)
+    old_workflow_state_trans.each do |old_workflow_state_tran|
+      old_attestation_doc_params = old_workflow_state_tran.attributes.except("_id", "transitional")
+      new_obj.workflow_state_transitions.new(old_attestation_doc_params)
     end
   end
 
@@ -150,6 +171,26 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
       doc.save!
+    end
+  end
+
+  def self.build_inbox_messages(new_profile)
+    @old_profile.inbox.messages.each do |message|
+      msg = new_profile.inbox.messages.new(message.attributes.except("_id"))
+      msg.body.gsub!("EmployerProfile", "AcaShopCcaEmployerProfile")
+      msg.body.gsub!(@old_profile.id.to_s, new_profile.id.to_s)
+
+      new_profile.documents.where(subject: "notice").each do |doc|
+        old_emp_docs = @old_profile.documents.where(identifier: doc.identifier)
+        old_org_docs = @old_profile.organization.documents.where(identifier: doc.identifier)
+        old_document_id = if old_emp_docs.present?
+          old_emp_docs.first.id.to_s
+        elsif old_org_docs.present?
+          old_org_docs.first.id.to_s
+        end
+        msg.body.gsub!(old_document_id, doc.id.to_s) if (doc.id.to_s.present? && old_document_id.present?)
+      end
+
     end
   end
 

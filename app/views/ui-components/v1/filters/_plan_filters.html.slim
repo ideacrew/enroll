@@ -55,8 +55,8 @@
             i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
       ul.list-unstyled
           li
-            //.filter-input-block
-              = select_tag :carrier, options_for_select(@carriers), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
+            .filter-input-block
+              = select_tag :carrier, options_for_select(@carrier_names), class: "plan-carrier-selection-filter", include_blank: "All", onchange:"filterPlanCarriers(this)"
     .checkbox-filter-wrapper-uc
       h5
         strong = l10n("hsa_eligible")

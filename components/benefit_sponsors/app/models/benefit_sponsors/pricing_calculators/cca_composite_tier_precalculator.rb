@@ -67,7 +67,11 @@ module BenefitSponsors
             price: v
           )
         end 
-        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(pricing_determination_tiers: price_determination_tiers)
+        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(
+          pricing_determination_tiers: price_determination_tiers,
+          group_size: group_size,
+          participation_rate: (participation_percent * 0.01)
+        )
         sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations + [price_determination]
       end
 

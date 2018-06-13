@@ -14,7 +14,7 @@ FactoryGirl.define do
       address { FactoryGirl.build(:benefit_sponsors_locations_address,
                     kind: "primary",
                     city: 'boston',
-                    state: 'ma',
+                    state: 'MA',
                     zip: '10010',
                     county: 'Hampstead',
                   )

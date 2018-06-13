@@ -17,121 +17,62 @@
             | First of the month following date of hire
           - else
             = "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days"
-    .health
-      div style="float:right"
-        button#showhidebutton type="button" data-toggle="collapse" data-target="#collapseHealth" aria-expanded="false" aria-controls="collapseHealth"
-          | View Details
-          a
-            i.fa.fa-chevron-down.fa-lg
-      div
-        h5.title.pl-1 Health
-      table.table.benefit-group.borderless
-        tr
-          th.benefit-group-heading Reference Plan
-          th.benefit-group-heading Carrier
-          th.benefit-group-heading Type
-        tr
-          td = bg.reference_plan.name.try(:upcase)
-          td = bg.reference_plan.carrier_profile.legal_name
-          td = bg.try(:reference_plan).try(:plan_type).try(:upcase)
-        tr
-          td.benefit-group-heading Metal Level
-          td.benefit-group-heading Plans By
-        tr
-          td = bg.reference_plan.metal_level.titleize
-          td = selected_benefit_plan(bg.plan_option_kind)
-          / Health plan collapsible: start
-      .collapse#collapseHealth
-        - if bg.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
-          = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { bg: bg }
-        - else
-          = render :partial => 'ui-components/v1/tables/benefit_group_summary', locals: { bg: bg }
-        .panel.benefitgroup.col-xs-12.referenceplan.home.est
-          .plan-details
-            .col-xs-4
-              .row
-                span Employer Estimated Maximum Monthly Cost
-                / h2 = number_to_currency(bg.monthly_employer_contribution_amount)
-            .col-xs-8
-              .row
-                table
-                  tr
-                    th colspan="2"
-                    th Min
-                    th Max
-                  tr
-                    td colspan="2" Total Estimated Monthly Cost for Plan Participants
-                    / td = number_to_currency(bg.monthly_min_employee_cost)
-                    / td = number_to_currency(bg.monthly_max_employee_cost)
-    / Dental plan start
-  - if bg.dental_reference_plan.present?
-    .dental
-      div style="float:right"
-        button#showhidebuttonDental type="button" data-toggle="collapse" data-target="#collapseDental" aria-expanded="false" aria-controls="collapseDental"
-          | View Details
-          a
-            i.fa.fa-chevron-down.fa-lg
-      div
-        h5.title.pl-1 Dental
-      table.table.benefit-group.borderless
-        tr
-          th.benefit-group-heading Reference Plan
-          th.benefit-group-heading Carrier
-          th.benefit-group-heading Type
-        tr
-          td = bg.dental_reference_plan.name
-          td = bg.dental_reference_plan.carrier_profile.legal_name
-          td = bg.dental_reference_plan.plan_type.to_s.upcase
-        tr
-          td.benefit-group-heading Metal Level
-          td.benefit-group-heading Plans By
-        tr
-          td = display_dental_metal_level bg.dental_reference_plan
-          td
-            - if bg.dental_plan_option_kind == "single_carrier"
-              | All Plans From A 
-              = fetch_plan_title_for_single_carrier
-            - elsif bg.dental_plan_option_kind == "single_plan"
-              - if bg.elected_dental_plan_ids.count < 13
-                | Custom 
-                = bg.elected_dental_plans.count 
-                | Plans
-                br
-                = link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"}
-              - else
-                | All Plans
-      / Dental Plan collapsible: start
-      .collapse#collapseDental
-        .col-xs-12.package-offering
-          table
-            tr
-              th Offered
-              th Employer Dental Contribution
-          - bg.relationship_benefits.each_with_index do |rb, i|
-            tr
-              td = raw(bg.dental_relationship_benefits[i].offered ? "<i class='far fa-check-square fa-lg'></i>" : "<i class='far fa-square fa-lg'></i>"  " #{bg.dental_relationship_benefits[i].relationship.try(:humanize)}")
-              td
-                strong = number_to_percentage bg.dental_relationship_benefits[i].premium_pct.try(:ceil), precision: 0
-        .panel.benefitgroup.col-xs-12.referenceplan.home.est
-          .plan-details
-            .col-xs-4
-              .row
-                span Employer Estimated Maximum Monthly Cost
-                h2 = number_to_currency(bg.monthly_employer_contribution_amount(bg.dental_reference_plan))
-            .col-xs-8
-              .row
-                table
-                  tr
-                    th colspan="2"
-                    th Min
-                    th Max
-                  tr
-                    td colspan="2" Total Estimated Monthly Cost for Plan Participants
-                    td = number_to_currency(bg.monthly_min_employee_cost('dental'))
-                    td = number_to_currency(bg.monthly_max_employee_cost('dental'))
-      - if bg.elected_dental_plan_ids.count < 13 && bg.elected_dental_plan_ids.count > 1
-        = render partial: 'ui-components/v1/modals/custom_dental_offered_plans_modal', locals: { bg: bg }
-        
+    - bg.sponsored_benefits.each do |sb|
+      div class="#{sb.product_kind.downcase}"
+        div style="float:right"
+          button#showhidebutton type="button" data-toggle="collapse" data-target="#collapse#{sb.product_kind.downcase}" aria-expanded="false" aria-controls="collapse#{sb.product_kind.downcase}"
+            | View Details
+            a
+              i.fa.fa-chevron-down.fa-lg
+        div
+          h5.title.pl-1 Health
+        table.table.benefit-group.borderless
+          tr
+            th.benefit-group-heading Reference Plan
+            th.benefit-group-heading Carrier
+            th.benefit-group-heading Type
+          tr
+            td = sb.reference_product.name.try(:upcase)
+            td = sb.reference_product.issuer_profile.legal_name
+            td = sb.try(:reference_product).try(:health_plan_kind).try(:upcase)
+          tr
+            td.benefit-group-heading Metal Level
+            td.benefit-group-heading Plans By
+          tr
+            td = sb.reference_product.metal_level.titleize
+            td = sb.product_package_kind.to_s.humanize.capitalize
+            / Health plan collapsible: start
+        .collapse id="collapse#{sb.product_kind.downcase}"
+          = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }
+          .panel.benefitgroup.col-xs-12.referenceplan.home.est
+            .plan-details
+              .col-xs-4
+                .row
+                  span Employer Estimated Maximum Monthly Cost
+                  - query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(sb.benefit_package.benefit_application, sb).call(::Family, TimeKeeper.date_of_record).lazy.map { |rec| rec["hbx_enrollment_id"] }
+                  - calculator = HbxEnrollmentListSponsorCostCalculator.new(sb.benefit_sponsorship)
+                  - _s_contribution, total_price, contribution = calculator.calculate(sb, query) 
+                  h2 = number_to_currency(total_price)
+              .col-xs-8
+                .row
+                  table
+                    tr
+                      th colspan="2"
+                      th Min
+                      th Max
+                    tr
+                      td colspan="2" Total Estimated Monthly Cost for Plan Participants
+                      - pd = sb.latest_pricing_determination
+                      - if pd.present?
+                        - costs = pd.pricing_determination_tiers.map do |pdt|
+                          - pdt_total = pdt.price
+                          - pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+                          - BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+                        td= number_to_currency(costs.min)
+                        td= number_to_currency(costs.max)
+                      - else
+                      / td = number_to_currency(bg.monthly_min_employee_cost)
+                      / td = number_to_currency(bg.monthly_max_employee_cost)
 
 javascript:
   $('#collapseHealth').on('hide.bs.collapse', function () {

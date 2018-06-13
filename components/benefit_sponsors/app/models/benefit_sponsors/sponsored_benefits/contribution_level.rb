@@ -24,7 +24,7 @@ module BenefitSponsors
       validates_presence_of :contribution_factor, :allow_blank => false
 
       def contribution_pct
-        (contribution_factor * 100)
+        (contribution_factor * 100).round(2)
       end
 
       def offered?

@@ -12,7 +12,7 @@ module BenefitSponsors
           self.where(:"organization".in => orgs.collect{|org| org.id.to_s})
         }
 
-        scope :datatable_search_for_source_kind, ->(source_kinds) {self.where({"$or" => ([{:"source_kind".in => source_kinds}])}) }
+        scope :datatable_search_for_source_kind, ->(source_kinds) {where(:"source_kind" => source_kinds) }
 
         scope :created_in_the_past,    ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                    :"created_at".lte => compare_date )

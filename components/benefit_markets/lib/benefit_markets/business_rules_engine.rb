@@ -80,7 +80,7 @@ module BenefitMarkets
       # end
 
       def rule(name, options={})
-        rule_instance = BusinessRulesEngine::Rule.new(name, options={})
+        rule_instance = BusinessRulesEngine::Rule.new(name, options)
         self.rules << rule_instance
         rule_instance
       end
@@ -105,16 +105,28 @@ module BenefitMarkets
     class BusinessPolicy
 
       attr_accessor :name
+      attr_accessor :fail_results, :success_results
 
       def initialize(name, options={})
         @name = name
         @rules = options[:rules] || []
-        @errors = []
+        @fail_results = []
+        @success_results = []
       end
 
-      def process_rules
+      def is_satisfied?(model_instance)
+        process_rules(model_instance)
+        @fail_results.empty?
+      end
+
+      def process_rules(model_instance)
         rules.sort_by(&:priority).each do |rule|
-          errors << rule.run
+          success, result = rule.run(model_instance)
+          if success
+            @success_results << { "#{rule.name}" => result }
+          else
+            @fail_results    << { "#{rule.name}" => result }
+          end
         end
       end
 
@@ -183,7 +195,6 @@ module BenefitMarkets
 
       NO_OP = lambda {|o| true }
 
-
       def initialize(name = nil, options={})
         self.name(name) if name.present?
         self.params   = options[:params]    || {}
@@ -197,13 +208,12 @@ module BenefitMarkets
         @name = name if (name && ! @name)
         @name if defined?(@name)
       end
-
-
-      def run(data)
+      
+      def run(data)        
         if validate.call(data)
-          success.call(data)
+          [true, success.call(data)]
         else
-          fail.call(data)
+          [false, fail.call(data)]
         end
       end
 

@@ -6,6 +6,8 @@ module BenefitSponsors
     attr_accessor :group_id, :group_enrollment
     attr_reader :members, :primary_member
 
+    # group_enrollment (BenefitSponsors::Enrollments::GroupEnrollment)
+
     def initialize(collection = [], group_id: nil, group_enrollment: nil)
       self.members = collection
       @group_id         = group_id
