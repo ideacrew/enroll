@@ -306,6 +306,13 @@ class CensusEmployee < CensusMember
     @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
   end
 
+  def benefit_sponsorship=(benefit_sponsorship)
+    return "expected Benefit Sponsorship" unless defined?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
+    self.benefit_sponsorship_id = benefit_sponsorship.id
+    self.benefit_sponsors_employer_profile_id = benefit_sponsorship.profile.id
+    @benefit_sponsorship = benefit_sponsorship
+  end
+
   def qle_30_day_eligible?
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
