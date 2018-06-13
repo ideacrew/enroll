@@ -2,7 +2,8 @@ module ModelEvents
   module EmployerProfile
 
     REGISTERED_EVENTS = [
-      :initial_employee_plan_selection_confirmation
+      :initial_employee_plan_selection_confirmation,
+      :initial_employer_invoice_available
     ]
 
     #TODO: The trigger for this notice is in the controller and it has to be eventually moved to observer pattern.
@@ -19,7 +20,11 @@ module ModelEvents
       end
     end
 
-    def notify_on_save
+    def notify_on_save  
+      if organization.initial_invoices.present? && organization.initial_invoices.first.identifier.present?
+        is_initial_employer_invoice_available = true
+      end
+
       if aasm_state_changed?
 
         if is_transition_matching?(to: :binder_paid, from: :eligible, event: :binder_credited)

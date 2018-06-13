@@ -8,6 +8,16 @@ describe 'ModelEvents::GenerateInitialEmployerInvoice', dbclean: :after_each do
   let!(:model_instance){ create :employer_profile}
   let!(:plan_year) { build(:plan_year, employer_profile: model_instance, start_on: start_on, aasm_state: 'enrolled') }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+  let!(:initial_invoice) {Document.new({ title: "file_name_1", 
+    date: TimeKeeper.date_of_record, 
+    creator: "hbx_staff", 
+    subject: "initial_invoice", 
+    identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
+    format: "file_content_type" })}
+
+  before do
+    model_instance.documents << initial_invoice
+  end
 
   describe "ModelEvent" do
     context "when initial invoice is generated" do
@@ -30,7 +40,7 @@ describe 'ModelEvents::GenerateInitialEmployerInvoice', dbclean: :after_each do
       let(:model_event) { ModelEvents::ModelEvent.new(:generate_initial_employer_invoice, model_instance, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.generate_initial_employer_invoice"
           expect(payload[:employer_id]).to eq model_instance.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

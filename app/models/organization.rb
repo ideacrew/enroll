@@ -196,6 +196,10 @@ class Organization
     employer_profile.documents.select{ |document| ["invoice", "initial_invoice"].include? document.subject }
   end
 
+  def initial_invoices
+    employer_profile.documents.select{ |document| ["initial_invoice"].include? document.subject }
+  end
+
   def current_month_invoice
     invoices.select{ |document| document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
   end

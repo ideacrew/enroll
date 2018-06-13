@@ -115,6 +115,7 @@ module Observers
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
       employer_profile = new_model_event.klass_instance
       if EmployerProfile::REGISTERED_EVENTS.include?(new_model_event.event_key)
+
         if new_model_event.event_key == :initial_employee_plan_selection_confirmation
           if employer_profile.is_new_employer?
             census_employees = employer_profile.census_employees.non_terminated
@@ -125,10 +126,14 @@ module Observers
             end
           end
         end
+
+        if new_model_event.event_key == :initial_employer_invoice_available
+          deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
+        end
       end
 
       if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
-       if new_model_event.event_key == :generate_initial_employer_invoice
+        if new_model_event.event_key == :generate_initial_employer_invoice
           if employer_profile.is_new_employer?
             deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "generate_initial_employer_invoice")
           end
@@ -184,15 +189,15 @@ module Observers
     end
 
     def document_update(new_model_event)
-      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      # raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-      if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        document = new_model_event.klass_instance
-        if new_model_event.event_key == :initial_employer_invoice_available
-          employer_profile = document.documentable
-          deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
-        end
-      end
+      # if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
+      #   document = new_model_event.klass_instance
+      #   if new_model_event.event_key == :initial_employer_invoice_available
+      #     employer_profile = document.documentable
+      #     deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
+      #   end
+      # end
     end
 
     def vlp_document_update; end
