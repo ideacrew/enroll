@@ -8,6 +8,7 @@ module BenefitMarkets
     attr_accessor :contribution_cap
     attr_accessor :display_name
     attr_accessor :order
+    attr_accessor :is_offered
 
     def initialize(opts = {})
       opts.each_key do |k|

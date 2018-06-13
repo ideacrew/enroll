@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe Products::Product, type: :model do
+  RSpec.describe Products::Product, type: :model, dbclean: :after_each do
 
     let(:this_year)           { TimeKeeper.date_of_record.year }
     let(:benefit_market_kind) { :aca_shop }

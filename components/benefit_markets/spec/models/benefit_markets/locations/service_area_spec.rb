@@ -44,7 +44,7 @@ module BenefitMarkets
       end
     end
 
-    describe "created for a given zip code and county in a state" do
+    describe "created for a given zip code and county in a state", :dbclean => :after_each do
       let(:county_zip) { ::BenefitMarkets::Locations::CountyZip.create!(county_name: "Hampshire", zip: "01001", state: "MA") }
       let(:service_area) { ::BenefitMarkets::Locations::ServiceArea.create!(active_year: TimeKeeper.date_of_record.year, county_zip_ids: [county_zip.id], issuer_provided_code: "Some issuer code", issuer_profile_id: BSON::ObjectId.new) }
 
@@ -107,7 +107,7 @@ module BenefitMarkets
       end
     end
 
-    describe "created for a given state" do
+    describe "created for a given state", :dbclean => :after_each do
       let(:service_area) { ::BenefitMarkets::Locations::ServiceArea.create!(active_year: TimeKeeper.date_of_record.year, covered_states: ["MA"], issuer_provided_code: "Some issuer code", issuer_profile_id: BSON::ObjectId.new) }
 
       let(:address_outside_state) {

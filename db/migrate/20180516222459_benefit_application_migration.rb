@@ -49,6 +49,10 @@ class BenefitApplicationMigration < Mongoid::Migration
     end
 
     def benefit_sponsorship_for(new_organization, plan_year_start)
+      if new_organization.benefit_sponsorships.size == 1
+        return new_organization.benefit_sponsorships[0] if new_organization.benefit_sponsorships[0].effective_begin_on.blank?
+      end
+
       benefit_sponsorship = new_organization.benefit_sponsorships.desc(:effective_begin_on).effective_begin_on(plan_year_start).first
 
       if benefit_sponsorship && benefit_sponsorship.effective_end_on.present?
