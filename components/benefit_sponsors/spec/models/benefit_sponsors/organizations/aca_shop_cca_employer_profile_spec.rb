@@ -1,7 +1,9 @@
 require 'rails_helper'
+require_relative '../../../concerns/observable_spec.rb'
 
 module BenefitSponsors
   RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model do
+    it_behaves_like 'observable'
 
     let(:hbx_id)            { "56789" }
     let(:legal_name)        { "Tyrell Corporation" }
