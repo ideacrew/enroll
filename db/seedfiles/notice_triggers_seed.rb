@@ -1809,7 +1809,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Group Ineligible to Obtain Coverage',
       description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
       resource_name: 'employer',
-      event_name: 'initial_employer_ineligibility_notice',
+      event_name: 'initial_employer_application_denied',
       notice_triggers: [
         {
           name: 'Initial Employer ineligible to obtain coverage.',
