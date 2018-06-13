@@ -128,7 +128,6 @@ module BenefitSponsors
 
         # before { benefit_market.benefit_market_catalogs = benefit_market_catalogs }
         it "should find a benefit_market_catalog" do
-          # binding.pry
           expect(benefit_sponsorship.benefit_sponsor_catalog_for(effective_date)).to be_an_instance_of(BenefitMarkets::BenefitSponsorCatalog)
         end
       end
